@@ -21,6 +21,13 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 
 import org.dspace.AbstractUnitTest;
@@ -44,6 +51,7 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.MultiFormatDateParser;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -162,12 +170,13 @@ public class RequestItemTest extends AbstractUnitTest {
 
     @Test
     public void testAuthorizeWithValidPeriod() throws Exception {
+        Instant decisionDate = getYesterdayAsInstant();
         RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .withAcceptRequest(true)
                 .withAccessToken("test-token")
-                .withDecisionDate(new Date(System.currentTimeMillis() + 86400000)) // Yesterday
-                .withAccessPeriod(10 * 86400) // 10 day period
+                .withDecisionDate(decisionDate) // Yesterday
+                .withAccessExpiry(getExpiryAsInstant("+10DAYS", decisionDate)) // 10 day period
                 .build();
 
         // The access token should be valid so we expect no exceptions
@@ -181,12 +190,13 @@ public class RequestItemTest extends AbstractUnitTest {
 
     @Test(expected = AuthorizeException.class)
     public void testAuthorizeWithExpiredPeriod() throws Exception {
+        Instant decisionDate = getYesterdayAsInstant();
         RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .withAcceptRequest(true)
                 .withAccessToken("test-token")
-                .withDecisionDate(new Date(System.currentTimeMillis() - 86400000)) // Yesterday
-                .withAccessPeriod(86400) // 1 day period
+                .withDecisionDate(decisionDate) // Yesterday
+                .withAccessExpiry(getExpiryAsInstant("+1DAY", decisionDate)) // 1 day period
                 .build();
 
         // The access token should not be valid so we expect to catch an AuthorizeException
@@ -207,12 +217,13 @@ public class RequestItemTest extends AbstractUnitTest {
 
     @Test(expected = AuthorizeException.class)
     public void testAuthorizeWithMismatchedToken() throws Exception {
+        Instant decisionDate = getYesterdayAsInstant();
         RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .withAcceptRequest(true)
                 .withAccessToken("test-token")
-                .withDecisionDate(new Date(System.currentTimeMillis() - 86400000)) // Yesterday
-                .withAccessPeriod(0) // forever
+                .withDecisionDate(decisionDate) // Yesterday
+                .withAccessExpiry(getExpiryAsInstant("FOREVER", decisionDate)) // forever
                 .build();
 
         // The access token should NOT valid so we expect to catch an AuthorizeException
@@ -262,29 +273,32 @@ public class RequestItemTest extends AbstractUnitTest {
 
     @Test
     public void testGrantRequestWithAccessPeriod() throws Exception {
+        Instant decisionDate = Instant.now();
+        Instant expectedExpiryDate = decisionDate.plus(7, ChronoUnit.DAYS);
         RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .build();
 
         request.setAccept_request(true);
-        request.setDecision_date(new Date(System.currentTimeMillis()));
-        request.setAccess_period(7); // 7 day access
+        request.setDecision_date(decisionDate);
+        request.setAccess_expiry(getExpiryAsInstant("+7DAYS", decisionDate)); // 7 day access
         requestItemService.update(context, request);
 
         RequestItem found = requestItemService.findByToken(context, request.getToken());
         assertTrue(found.isAccept_request());
-        assertNotNull(found.getDecision_date());
-        assertEquals(7, found.getAccess_period());
+        assertEquals(decisionDate, found.getDecision_date());
+        assertEquals(expectedExpiryDate, found.getAccess_expiry());
     }
 
     @Test
     public void testDenyRequest() throws Exception {
+        Instant decisionDate = Instant.now();
         RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .build();
 
         request.setAccept_request(false);
-        request.setDecision_date(new Date(System.currentTimeMillis()));
+        request.setDecision_date(decisionDate);
         requestItemService.update(context, request);
 
         RequestItem found = requestItemService.findByToken(context, request.getToken());
@@ -314,19 +328,22 @@ public class RequestItemTest extends AbstractUnitTest {
 
     @Test
     public void testModifyGrantedRequest() throws Exception {
+        Instant decisionDate = Instant.now();
+        Instant expectedExpiryDate = decisionDate.plus(10, ChronoUnit.DAYS);
         RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .withAcceptRequest(true)
-                .withDecisionDate(new Date(System.currentTimeMillis()))
-                .withAccessPeriod(30)
+                .withDecisionDate(decisionDate)
+                .withAccessExpiry(getExpiryAsInstant("+1DAY", decisionDate))
                 .build();
 
-        request.setAccess_period(60);
+        // Manually set new expiry date
+        request.setAccess_expiry(getExpiryAsInstant("+10DAYS", decisionDate));
         request.setAllfiles(true);
         requestItemService.update(context, request);
 
         RequestItem found = requestItemService.findByToken(context, request.getToken());
-        assertEquals(60, found.getAccess_period());
+        assertEquals(expectedExpiryDate, found.getAccess_expiry());
         assertTrue(found.isAccept_request());
         assertTrue(found.isAllfiles());
     }
@@ -359,6 +376,17 @@ public class RequestItemTest extends AbstractUnitTest {
         configurationService.reloadConfig();
     }
 
+    private Instant getYesterdayAsInstant() {
+        return Instant.now().minus(Duration.ofDays(1));
+    }
+
+    private Instant getExpiryAsInstant(String dateOrDelta, Instant decision) {
+        try {
+            return RequestItemServiceImpl.parseDateOrDelta(dateOrDelta, decision);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
 }

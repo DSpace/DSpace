@@ -46,7 +46,7 @@ public class RequestItemConverter
         requestItemRest.setRequestDate(requestItem.getRequest_date());
         requestItemRest.setToken(requestItem.getToken());
         requestItemRest.setAccessToken(requestItem.getAccess_token());
-        requestItemRest.setAccessPeriod(requestItem.getAccess_period());
+        requestItemRest.setAccessExpiry(requestItem.getAccess_expiry());
         return requestItemRest;
     }
 

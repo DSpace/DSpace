@@ -11,9 +11,16 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.time.DateTimeException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -32,8 +39,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
-import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.DateMathParser;
+import org.dspace.util.MultiFormatDateParser;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -60,6 +68,11 @@ public class RequestItemServiceImpl implements RequestItemService {
 
     @Autowired
     protected ConfigurationService configurationService;
+
+    /**
+     * Always set UTC for dateMathParser for consistent database date handling
+     */
+    static DateMathParser dateMathParser = new DateMathParser(TimeZone.getTimeZone("UTC"));
 
     private static final int DEFAULT_MINIMUM_FILE_SIZE = 20;
 
@@ -145,8 +158,8 @@ public class RequestItemServiceImpl implements RequestItemService {
         // Save the request item
         requestItemDAO.save(context, requestItem);
 
-        log.debug("Created RequestItem with ID {}, approval token {}, access token {}, access period {}",
-                requestItem::getID, requestItem::getToken, requestItem::getAccess_token, requestItem::getAccess_period);
+        log.debug("Created RequestItem with ID {}, approval token {}, access token {}, access expiry {}",
+                requestItem::getID, requestItem::getToken, requestItem::getAccess_token, requestItem::getAccess_expiry);
 
         // Return the approver token
         return requestItem.getToken();
@@ -226,6 +239,35 @@ public class RequestItemServiceImpl implements RequestItemService {
     }
 
     /**
+     * Set the access expiry date for the request item.
+     * @param requestItem the request item to update
+     * @param accessExpiry the expiry date to set
+     */
+    @Override
+    public void setAccessExpiry(RequestItem requestItem, Instant accessExpiry) {
+        requestItem.setAccess_expiry(accessExpiry);
+    }
+
+    /**
+     * Take a string either as a formatted date, or in the "math" format expected by
+     * the DateMathParser, e.g. +7DAYS or +10MONTHS, and set the access expiry date accordingly.
+     * There are no special checks here to check that the date is in the future, or after the
+     * 'decision date', as there may be legitimate reasons to set past dates.
+     * If past dates are not allowed by some interface, then the caller should check this.
+     *
+     * @param requestItem the request item to update
+     * @param dateOrDelta the delta as a string in format expected by the DateMathParser
+     */
+    @Override
+    public void setAccessExpiry(RequestItem requestItem, String dateOrDelta) {
+        try {
+            setAccessExpiry(requestItem, parseDateOrDelta(dateOrDelta, requestItem.getDecision_date()));
+        } catch (ParseException e) {
+            log.error("Error parsing access expiry or duration: {}", e.getMessage());
+        }
+    }
+
+    /**
      * Taking into account 'accepted' flag, bitstream id or allfiles flag, decision date and access period,
      * either return cleanly or throw an AuthorizeException
      *
@@ -247,9 +289,8 @@ public class RequestItemServiceImpl implements RequestItemService {
                 && (requestItem.getAccess_token() != null && requestItem.getAccess_token().equals(accessToken))
                 // 3. Request is 'allfiles' or for this bitstream ID
                 && (requestItem.isAllfiles() || bitstream.equals(requestItem.getBitstream()))
-                // 4. access period is 0 (forever), or the elapsed seconds since decision date is less than the
-                // access period granted
-                && requestItem.accessPeriodCurrent()
+                // 4. access expiry timestamp is null (forever), or is *after* the current time
+                && (requestItem.getAccess_expiry() == null || requestItem.getAccess_expiry().isAfter(Instant.now()))
         ) {
             log.info("Authorizing access to bitstream {} by access token", bitstream.getID());
             return;
@@ -306,8 +347,7 @@ public class RequestItemServiceImpl implements RequestItemService {
     }
 
     /**
-     * Sanitize a RequestItem depending on the current session user. If the current user is not
-     * the approver, an administrator or other privileged group, the following values in the return object
+     * Sanitize a RequestItem. The following values in the referenced RequestItem
      * are nullified:
      * - approver token (aka token)
      * - requester name
@@ -325,28 +365,39 @@ public class RequestItemServiceImpl implements RequestItemService {
             log.error("Null request item passed for sanitization, skipping");
             return;
         }
-        if (null != context) {
-            // Get current user, if any
-            EPerson currentUser = context.getCurrentUser();
-            // Get item
-            Item item = requestItem.getItem();
-            if (null != currentUser) {
-                try {
-                    if (currentUser == requestItem.getItem().getSubmitter()
-                            && authorizeService.isAdmin(context, requestItem.getItem())) {
-                        // Return original object, this person technically had full access to the request item data via
-                        // the original approval link
-                        log.debug("User is authorized to receive all request item data: {}", currentUser.getEmail());
-                    }
-                } catch (SQLException e) {
-                    log.error("Could not determine isAdmin for item {}: {}",item.getID(), e.getMessage());
-                }
-            }
-        }
 
-        // By default, sanitize (strips requester name, email, message, and the approver token)
-        // This is the case if we have a non-admin, non-submitter or a null user/session
+        // Sanitized referenced data (strips requester name, email, message, and the approver token)
         requestItem.sanitizePersonalData();
+    }
 
+    /**
+     * Parse a date or delta string into an Instant. Kept here as a static method for use in unit tests
+     * and other areas that might not have access to the full spring service
+     *
+     * @param dateOrDelta
+     * @param decisionDate
+     * @return parsed date as instant
+     * @throws ParseException
+     */
+    public static Instant parseDateOrDelta(String dateOrDelta, Instant decisionDate) throws ParseException, DateTimeException {
+        // First, if dateOrDelta is a null string or "FOREVER", we will set the expiry
+        // date to a very distant date in the future.
+        if (dateOrDelta == null || dateOrDelta.equals("FOREVER")) {
+            return Instant.MAX;
+        }
+        // Next, try parsing as a straight date using the multiple format parser
+        ZonedDateTime parsedExpiryDate = MultiFormatDateParser.parse(dateOrDelta);
+
+        if (parsedExpiryDate == null) {
+            // That did not work, so try parsing as a delta
+            // Set the 'now' date to the decision date of the request item
+            dateMathParser.setNow(LocalDateTime.ofInstant(decisionDate, ZoneOffset.UTC));
+            // Parse the delta (e.g. +7DAYS) and set the new access expiry date
+            return dateMathParser.parseMath(dateOrDelta).toInstant(ZoneOffset.UTC);
+        }
+        else {
+            // The expiry date was a valid formatted date string, so set the access expiry date
+            return parsedExpiryDate.toInstant();
+        }
     }
 }

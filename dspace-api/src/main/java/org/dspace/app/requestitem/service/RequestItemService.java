@@ -10,6 +10,7 @@ package org.dspace.app.requestitem.service;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 
@@ -111,6 +112,10 @@ public interface RequestItemService {
      */
     public boolean isRestricted(Context context, DSpaceObject o)
             throws SQLException;
+
+    void setAccessExpiry(RequestItem requestItem, Instant accessExpiry);
+
+    void setAccessExpiry(RequestItem requestItem, String delta);
 
     /**
      * Taking into account 'accepted' flag, bitstream id or allfiles flag, decision date and access period,

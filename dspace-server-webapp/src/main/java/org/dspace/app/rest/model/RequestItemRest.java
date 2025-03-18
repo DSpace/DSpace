@@ -56,9 +56,7 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     protected String accessToken;
 
-    protected int accessPeriod;
-
-    protected String decisionNote;
+    protected Instant accessExpiry;
 
     /**
      * @return the bitstream requested.
@@ -229,17 +227,17 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
     }
 
     /**
-     * @return access period (in seconds) which indicates how long this access is valid from the decision date
+     * @return the date the access token expires.
      */
-    public int getAccessPeriod() {
-        return accessPeriod;
+    public Instant getAccessExpiry() {
+        return this.accessExpiry;
     }
 
     /**
-     * @param accessPeriod access period, in seconds, indicating how long this access is valid from the decision date
+     * @param accessExpiry the date the access token expires.
      */
-    public void setAccessPeriod(int accessPeriod) {
-        this.accessPeriod = accessPeriod;
+    public void setAccessExpiry(Instant accessExpiry) {
+        this.accessExpiry = accessExpiry;
     }
 
     /*
