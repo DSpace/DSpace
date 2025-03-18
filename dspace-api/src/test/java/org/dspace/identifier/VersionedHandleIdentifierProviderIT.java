@@ -36,21 +36,28 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIdentifierProvi
     public void setUp() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();
+
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
         collection = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Collection")
                 .build();
+
+        context.restoreAuthSystemState();
     }
 
     private void createVersions() throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+
         itemV1 = ItemBuilder.createItem(context, collection)
                 .withTitle("First version")
                 .build();
         firstHandle = itemV1.getHandle();
         itemV2 = VersionBuilder.createVersion(context, itemV1, "Second version").build().getItem();
         itemV3 = VersionBuilder.createVersion(context, itemV1, "Third version").build().getItem();
+
+        context.restoreAuthSystemState();
     }
 
     @Test
