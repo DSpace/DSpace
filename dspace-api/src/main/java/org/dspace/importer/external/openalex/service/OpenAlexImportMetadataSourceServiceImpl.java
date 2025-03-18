@@ -212,7 +212,11 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
     private List<ImportRecord> searchById(String id) {
         List<ImportRecord> results = new ArrayList<>();
         try {
-            String resp = liveImportClient.executeHttpGetRequest(timeout, this.url + "/" + id, new HashMap<>());
+            String queryUrl = url;
+            if (queryUrl.contains("?filter=authorships.author.id:")) {
+                queryUrl = queryUrl.replace("?filter=authorships.author.id:", "");
+            }
+            String resp = liveImportClient.executeHttpGetRequest(timeout, queryUrl + "/" + id, new HashMap<>());
             if (StringUtils.isEmpty(resp)) {
                 return results;
             }
