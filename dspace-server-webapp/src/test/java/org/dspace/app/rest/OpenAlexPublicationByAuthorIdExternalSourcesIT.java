@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -17,17 +18,24 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.matcher.ExternalSourceEntryMatcher;
 import org.dspace.app.rest.matcher.ExternalSourceMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl;
 import org.hamcrest.Matchers;
@@ -36,6 +44,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -54,7 +63,8 @@ public class OpenAlexPublicationByAuthorIdExternalSourcesIT extends AbstractCont
 
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
+        super.setUp();
         ReflectionTestUtils.setField(openAlexImportMetadataSourceService, "liveImportClient", liveImportClient);
     }
 
@@ -276,4 +286,148 @@ public class OpenAlexPublicationByAuthorIdExternalSourcesIT extends AbstractCont
         }
     }
 
+    @Test
+    public void createWorkspaceItemFromOpenAlexPubIdTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef1 = new AtomicReference<>();
+        try (InputStream file = getClass().getResourceAsStream("openalex-publication-by-author-id.json")) {
+            String jsonResponse = IOUtils.toString(file, Charset.defaultCharset());
+
+            when(liveImportClient.executeHttpGetRequest(anyInt(), anyString(), anyMap()))
+                .thenReturn(jsonResponse);
+
+            String authToken = getAuthToken(eperson.getEmail(), password);
+
+            // create a workspaceitem explicitly in the col1
+            getClient(authToken).perform(post("/api/submission/workspaceitems")
+                                             .param("owningCollection", col1.getID().toString())
+                                             .param("embed", "item,sections,collection")
+                                             .contentType(MediaType.parseMediaType("text/uri-list"))
+                                             .content(
+                                                 "http://localhost:8080/server/api/integration/externalsources" +
+                                                     "/openalexPublicationByAuthorId/entryValues/W1775749144"))
+                                .andExpect(status().isCreated())
+                                .andDo(result -> idRef1.set(read(result.getResponse().getContentAsString(), "$.id")))
+                                .andExpect(jsonPath("$._embedded.item.name")
+                                               .value("PROTEIN MEASUREMENT WITH THE FOLIN PHENOL REAGENT"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.contributor.author']",
+                                                    Matchers.hasSize(4)))
+                                .andExpect(
+                                    jsonPath("$._embedded.item.metadata['dc.contributor.author'][0].value")
+                                        .value("OliverH. Lowry"))
+                                .andExpect(
+                                    jsonPath("$._embedded.item.metadata['dc.contributor.author'][1].value")
+                                        .value("NiraJ. Rosebrough"))
+                                .andExpect(
+                                    jsonPath("$._embedded.item.metadata['dc.contributor.author'][2].value")
+                                        .value("A. Farr"))
+                                .andExpect(
+                                    jsonPath("$._embedded.item.metadata['dc.contributor.author'][3].value")
+                                        .value("RoseJ. Randall"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.other']",
+                                                    Matchers.hasSize(1)))
+                                .andExpect(
+                                    jsonPath("$._embedded.item.metadata['dc.identifier.other'][0].value")
+                                        .value("https://pubmed.ncbi.nlm.nih.gov/14907713"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri']",
+                                                    Matchers.hasSize(7)))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri'][0]" +
+                                                        ".value")
+                                               .value("/best_oa_location/landing_page_url"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri'][1]" +
+                                                        ".value")
+                                               .value("/best_oa_location/pdf_url"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri'][2]" +
+                                                        ".value")
+                                               .value("/locations/landing_page_url"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri'][3]" +
+                                                        ".value")
+                                               .value("/locations/pdf_url"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri'][4]" +
+                                                        ".value")
+                                               .value("/primary_location/landing_page_url"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri'][5]" +
+                                                        ".value")
+                                               .value("/primary_location/pdf_url"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri'][6]" +
+                                                        ".value")
+                                               .value("/open_access/oa_url"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.date.issued'][0].value")
+                                               .value("1951-11-01"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier" +
+                                                        ".openalex'][0].value").value("W1775749144"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['oaire.citation.volume'][0]" +
+                                                        ".value")
+                                               .value("193"))
+                                .andExpect(
+                                    jsonPath("$._embedded.item.metadata['oaire.citation.issue'][0].value")
+                                        .value("1"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['oaire.citation" +
+                                                        ".startPage'][0].value")
+                                               .value("265"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['oaire.citation" +
+                                                        ".endPage'][0].value")
+                                               .value("275"))
+                                .andExpect(
+                                    jsonPath("$._embedded.item.metadata['oaire.version'][0].value")
+                                        .value("http://purl.org/coar/version/c_970fb48d4fbd8a85"))
+                                .andExpect(
+                                    jsonPath("$._embedded.item.metadata['oaire.citation.title'][0].value")
+                                        .value("Journal of Biological Chemistry"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.issn']",
+                                                    Matchers.hasSize(3)))
+                                .andExpect(
+                                    jsonPath("$._embedded.item.metadata['dc.identifier.doi'][0].value")
+                                        .value("10.1016/s0021-9258(19)52451-6"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.language.iso'][0].value")
+                                               .value("en"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.title'][0].value")
+                                               .value("PROTEIN MEASUREMENT WITH THE FOLIN PHENOL REAGENT"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.subject']",
+                                                    Matchers.hasSize(13)))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.subject'][9].value")
+                                               .value("Peer Review, Research standards"))
+                                .andExpect(jsonPath("$._embedded.item.metadata['dc.subject'][12].value")
+                                               .value(
+                                                   "Life Sciences Biochemistry, Genetics and Molecular Biology " +
+                                                       "Molecular " +
+                                                       "Biology Cancer and biochemical research"))
+                                .andExpect(
+                                    jsonPath("$._embedded.item.metadata['dc.rights.license'][0].value")
+                                        .value("cc-by"))
+                                .andExpect(
+                                    jsonPath("$._embedded.item.metadata['dc.type'][0].value")
+                                        .value("Article"))
+                                .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())));
+
+            // Capture arguments
+            ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<Map<String, Map<String, String>>> paramsCaptor = ArgumentCaptor.forClass(Map.class);
+
+            verify(liveImportClient, times(1)).executeHttpGetRequest(anyInt(), urlCaptor.capture(),
+                                                                     paramsCaptor.capture());
+
+            // Assert the URL is correct
+            assertEquals(1, urlCaptor.getAllValues().size());
+            assertEquals("https://api.openalex.org/works/W1775749144", urlCaptor.getValue());
+            assertTrue(paramsCaptor.getValue().isEmpty());
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef1.get());
+        }
+    }
 }
