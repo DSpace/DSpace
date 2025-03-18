@@ -52,7 +52,7 @@ public class ConditionEqualJsonPathMetadataContributor extends SimpleJsonPathMet
     public Collection<MetadatumDTO> contributeMetadata(String json) {
         Collection<String> leftOperands = leftOperandProcessor.processMetadata(json);
         if (leftOperands == null || leftOperands.size() != 1) {
-            log.warn("No left operands found in json path: " + json);
+            log.debug("No left operands found in json path: {}", json);
             return Collections.emptyList();
         }
 
@@ -60,6 +60,7 @@ public class ConditionEqualJsonPathMetadataContributor extends SimpleJsonPathMet
             return metadatumContributor.contributeMetadata(json);
         }
 
+        log.debug("No matching condition found in json path: {}", json);
         return Collections.emptyList();
     }
 
