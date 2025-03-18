@@ -588,7 +588,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void testOrcidQueueRecordCreationToUpdateProject() throws Exception {
+    public void testOrcidQueueRecordCreationForProduct() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -596,34 +596,223 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withTitle("Test User")
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
-            .withOrcidSynchronizationFundingsPreference(ALL)
+            .withOrcidSynchronizationProductsPreference(ALL)
             .build();
 
-        Collection projectCollection = createCollection("Projects", "Project");
+        Collection productCollection = createCollection("Products", "Product");
 
-        Item project = ItemBuilder.createItem(context, projectCollection)
-            .withTitle("Test project")
+        Item product = ItemBuilder.createItem(context, productCollection)
+            .withTitle("Test product")
+            .withAuthor("Test User")
             .build();
 
-        createOrcidHistory(context, profile, project)
-            .withPutCode("123456")
-            .build();
-
-        EntityType projectType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        EntityType productType = EntityTypeBuilder.createEntityTypeBuilder(context, "Product").build();
         EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
 
-        RelationshipType isProjectOfPerson = createRelationshipTypeBuilder(context, projectType, personType,
-            "isProjectOfPerson", "isPersonOfProject", 0, null, 0, null).build();
+        RelationshipType isCreatorOfProduct = createRelationshipTypeBuilder(context, productType, personType,
+                "isCreatorOfProduct", "isProductOfCreator", 0, null, 0, null).build();
 
-        RelationshipBuilder.createRelationshipBuilder(context, project, profile, isProjectOfPerson).build();
+        RelationshipBuilder.createRelationshipBuilder(context, product, profile, isCreatorOfProduct).build();
 
         context.restoreAuthSystemState();
         context.commit();
 
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(1));
-        assertThat(orcidQueueRecords.get(0), matches(profile, project, "Project", "123456", UPDATE));
+        assertThat(orcidQueueRecords.get(0), matches(profile, product, "Product", null, INSERT));
+
+        addMetadata(product, "dc", "type", null, "http://purl.org/coar/resource_type/scheme/c_12cc", null);
+        context.commit();
+
+        List<OrcidQueue> newOrcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(newOrcidQueueRecords, hasSize(1));
+
+        assertThat(orcidQueueRecords.get(0), equalTo(newOrcidQueueRecords.get(0)));
     }
+
+    @Test
+    public void testOrcidQueueRecordCreationForPatent() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
+            .withOrcidSynchronizationPatentsPreference(ALL)
+            .build();
+
+        Collection patentCollection = createCollection("Patents", "Patent");
+
+        Item patent = ItemBuilder.createItem(context, patentCollection)
+            .withTitle("Test patent")
+            .withAuthor("Test User")
+            .build();
+
+        EntityType patentType = EntityTypeBuilder.createEntityTypeBuilder(context, "Patent").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isInventorOfPatent = createRelationshipTypeBuilder(context, patentType, personType,
+                "isInventorOfPatent", "isPatentOfInventor", 0, null, 0, null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, patent, profile, isInventorOfPatent).build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecords, hasSize(1));
+        assertThat(orcidQueueRecords.get(0), matches(profile, patent, "Patent", null, INSERT));
+
+        addMetadata(patent, "dc", "type", null, "http://purl.org/coar/resource_type/scheme/Z907-YMBB", null);
+        context.commit();
+
+        List<OrcidQueue> newOrcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(newOrcidQueueRecords, hasSize(1));
+
+        assertThat(orcidQueueRecords.get(0), equalTo(newOrcidQueueRecords.get(0)));
+    }
+
+    @Test
+    public void testOrcidQueueRecordCreationToUpdateProduct() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
+            .withOrcidSynchronizationProductsPreference(ALL)
+            .build();
+
+        Collection productCollection = createCollection("Products", "Product");
+
+        Item product = ItemBuilder.createItem(context, productCollection)
+            .withTitle("Test product")
+            .build();
+
+        createOrcidHistory(context, profile, product)
+            .withPutCode("123456")
+            .build();
+
+        EntityType productType = EntityTypeBuilder.createEntityTypeBuilder(context, "Product").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isCreatorOfProduct = createRelationshipTypeBuilder(context, productType, personType,
+                "isCreatorOfProduct", "isProductOfCreator", 0, null, 0, null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, product, profile, isCreatorOfProduct).build();
+
+        addMetadata(product, "dc", "contributor", "author", "Test User", profile.getID().toString());
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecords, hasSize(1));
+        assertThat(orcidQueueRecords.get(0), matches(profile, product, "Product", "123456", UPDATE));
+    }
+
+    @Test
+    public void testOrcidQueueRecordCreationToUpdatePatent() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
+            .withOrcidSynchronizationPatentsPreference(ALL)
+            .build();
+
+        Collection patentCollection = createCollection("Patents", "Patent");
+
+        Item patent = ItemBuilder.createItem(context, patentCollection)
+            .withTitle("Test patent")
+            .build();
+
+        createOrcidHistory(context, profile, patent)
+            .withPutCode("123456")
+            .build();
+
+        EntityType patentType = EntityTypeBuilder.createEntityTypeBuilder(context, "Patent").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isInventorOfPatent = createRelationshipTypeBuilder(context, patentType, personType,
+                "isInventorOfPatent", "isPatentOfInventor", 0, null, 0, null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, patent, profile, isInventorOfPatent).build();
+
+        addMetadata(patent, "dc", "contributor", "author", "Test User", profile.getID().toString());
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecords, hasSize(1));
+        assertThat(orcidQueueRecords.get(0), matches(profile, patent, "Patent", "123456", UPDATE));
+    }
+
+    @Test
+    public void testNoOrcidQueueRecordCreationOccursIfProductSynchronizationIsDisabled() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
+            .build();
+
+        Collection productCollection = createCollection("Products", "Product");
+
+        Item product = ItemBuilder.createItem(context, productCollection)
+            .withTitle("Test product")
+            .withAuthor("Test User")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        assertThat(orcidQueueService.findAll(context), empty());
+
+        addMetadata(profile, "dspace", "orcid", "sync-products", DISABLED.name(), null);
+        addMetadata(product, "dc", "description", "abstract", "Product Poduct Pduct Puct Pct Pt P", null);
+        context.commit();
+
+        assertThat(orcidQueueService.findAll(context), empty());
+    }
+
+    @Test
+    public void testNoOrcidQueueRecordCreationOccursIfPatentSynchronizationIsDisabled() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
+            .build();
+
+        Collection patentCollection = createCollection("Patents", "Patent");
+
+        Item patent = ItemBuilder.createItem(context, patentCollection)
+            .withTitle("Test patent")
+            .withAuthor("Test User")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        assertThat(orcidQueueService.findAll(context), empty());
+
+        addMetadata(profile, "dspace", "orcid", "sync-patents", DISABLED.name(), null);
+        addMetadata(patent, "dc", "description", "abstract", "Patent Ptent Pent Pnt Pt P", null);
+        context.commit();
+
+        assertThat(orcidQueueService.findAll(context), empty());
+    }
+
 
     @Test
     public void testNoOrcidQueueRecordCreationOccursForNotConfiguredEntities() throws Exception {
