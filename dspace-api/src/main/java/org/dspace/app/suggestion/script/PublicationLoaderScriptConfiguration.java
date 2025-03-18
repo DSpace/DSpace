@@ -90,7 +90,7 @@ public class PublicationLoaderScriptConfiguration<T extends PublicationLoaderRun
             options.getOption("l").setType(String.class);
             options.getOption("l").setRequired(true);
 
-            options.addOption("f", "solrfilter", true, "The additional SORL filter to better refine results");
+            options.addOption("f", "solrfilter", true, "The additional SOLR filter to better refine results");
             options.getOption("f").setType(String.class);
 
             options.addOption("m", "max", true,
