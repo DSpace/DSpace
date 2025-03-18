@@ -65,6 +65,7 @@ public class RequestCopyFeature implements AuthorizationFeature {
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         String requestType = configurationService.getProperty("request.item.type");
+        log.warn("isAuthorized for REQ A COPY IS requestType=" + requestType);
         if (StringUtils.isBlank(requestType)) {
             return false;
         } else if (StringUtils.equalsIgnoreCase(requestType, "logged")) {
