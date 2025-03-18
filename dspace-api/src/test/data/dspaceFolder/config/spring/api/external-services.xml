@@ -141,6 +141,19 @@
         </property>
     </bean>
 
+    <bean id="openalexPublicationByDOILiveImportDataProvider"
+          class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openalexImportPublicationByDOIService"/>
+        <property name="sourceIdentifier" value="openalexPublicationByDOI"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
     <bean id="openalexPersonLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="openalexImportPersonService"/>
         <property name="sourceIdentifier" value="openalexPerson"/>
