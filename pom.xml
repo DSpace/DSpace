@@ -19,9 +19,9 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>17</java.version>
-        <spring.version>6.2.3</spring.version>
-        <spring-boot.version>3.4.2</spring-boot.version>
-        <spring-security.version>6.4.2</spring-security.version> <!-- sync with version used by spring-boot-->
+        <spring.version>6.2.4</spring.version>
+        <spring-boot.version>3.4.3</spring-boot.version>
+        <spring-security.version>6.4.4</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>6.4.8.Final</hibernate.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <postgresql.driver.version>42.7.5</postgresql.driver.version>
@@ -1285,6 +1285,16 @@
                         <artifactId>mockito-core</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-core</artifactId>
+                <version>${spring-security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-web</artifactId>
+                <version>${spring-security.version}</version>
             </dependency>
 
             <dependency>
