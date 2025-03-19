@@ -8,9 +8,8 @@
 package org.dspace.access.status.service;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.dspace.content.AccessStatus;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -43,10 +42,10 @@ public interface AccessStatusService {
      *
      * @param context the DSpace context
      * @param item the item
-     * @return a pair with an access status value and the availability date
+     * @return the access status
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public Pair<String, LocalDate> getAccessStatus(Context context, Item item) throws SQLException;
+    public AccessStatus getAccessStatus(Context context, Item item) throws SQLException;
 
     /**
      * Retrieve embargo information for the item
@@ -63,8 +62,8 @@ public interface AccessStatusService {
      *
      * @param context the DSpace context
      * @param bitstream the bitstream
-     * @return a pair with an access status value and the availability date
+     * @return the access status
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public Pair<String, LocalDate> getAccessStatus(Context context, Bitstream bitstream) throws SQLException;
+    public AccessStatus getAccessStatus(Context context, Bitstream bitstream) throws SQLException;
 }

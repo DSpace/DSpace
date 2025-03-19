@@ -8,13 +8,12 @@
 package org.dspace.discovery;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.access.status.DefaultAccessStatusHelper;
 import org.dspace.access.status.factory.AccessStatusServiceFactory;
 import org.dspace.access.status.service.AccessStatusService;
+import org.dspace.content.AccessStatus;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableItem;
@@ -63,7 +62,7 @@ public class SolrServiceIndexAccessStatusPlugin implements SolrServiceIndexPlugi
         UNKNOWN = "unknown"
      */
     private String retrieveItemAccessStatus(Context context, Item item) throws SQLException {
-        Pair<String, LocalDate> accessStatus = accessStatusService.getAccessStatus(context, item);
-        return accessStatus.getLeft();
+        AccessStatus accessStatus = accessStatusService.getAccessStatus(context, item);
+        return accessStatus.getStatus();
     }
 }

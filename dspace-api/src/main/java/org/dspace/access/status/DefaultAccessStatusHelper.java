@@ -15,11 +15,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.content.AccessStatus;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
@@ -79,17 +79,17 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * @param item        the item to check for embargoes
      * @param threshold   the embargo threshold date
      * @param type        the type of calculation
-     * @return a pair with an access status value and the availability date
+     * @return the access status
      */
     @Override
-    public Pair<String, LocalDate> getAccessStatusFromItem(Context context, Item item, LocalDate threshold, String type)
+    public AccessStatus getAccessStatusFromItem(Context context, Item item, LocalDate threshold, String type)
             throws SQLException {
         if (item == null) {
-            return Pair.of(UNKNOWN, null);
+            return new AccessStatus(UNKNOWN, null);
         }
         Bitstream bitstream = getPrimaryOrFirstBitstreamInOriginalBundle(item);
         if (bitstream == null) {
-            return Pair.of(METADATA_ONLY, null);
+            return new AccessStatus(METADATA_ONLY, null);
         }
         return getAccessStatusFromBitstream(context, bitstream, threshold, type);
     }
@@ -104,19 +104,19 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * @param bitstream   the bitstream to check for embargoes
      * @param threshold   the embargo threshold date
      * @param type        the type of calculation
-     * @return a pair with an access status value and the availability date
+     * @return the access status
      */
     @Override
-    public Pair<String, LocalDate> getAccessStatusFromBitstream(Context context,
+    public AccessStatus getAccessStatusFromBitstream(Context context,
         Bitstream bitstream, LocalDate threshold, String type) throws SQLException {
         if (bitstream == null) {
-            return Pair.of(UNKNOWN, null);
+            return new AccessStatus(UNKNOWN, null);
         }
         List<ResourcePolicy> policies = getReadPolicies(context, bitstream, type);
         LocalDate availabilityDate = findAvailabilityDate(policies, threshold);
         // Get the access status based on the availability date
         String accessStatus = getAccessStatusFromAvailabilityDate(availabilityDate, threshold);
-        return Pair.of(accessStatus, availabilityDate);
+        return new AccessStatus(accessStatus, availabilityDate);
     }
 
     /**

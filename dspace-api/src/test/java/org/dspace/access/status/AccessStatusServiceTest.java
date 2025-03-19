@@ -15,14 +15,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.time.LocalDate;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.access.status.factory.AccessStatusServiceFactory;
 import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.AccessStatus;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -156,8 +155,8 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
 
     @Test
     public void testGetAccessStatusItem() throws Exception {
-        Pair<String, LocalDate> accessStatus = accessStatusService.getAccessStatus(context, item);
-        String status = accessStatus.getLeft();
+        AccessStatus accessStatus = accessStatusService.getAccessStatus(context, item);
+        String status = accessStatus.getStatus();
         assertNotEquals("testGetAccessStatusItem 0", status, DefaultAccessStatusHelper.UNKNOWN);
     }
 
@@ -169,8 +168,8 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
 
     @Test
     public void testGetAccessStatusBitstream() throws Exception {
-        Pair<String, LocalDate> accessStatus = accessStatusService.getAccessStatus(context, bitstream);
-        String status = accessStatus.getLeft();
+        AccessStatus accessStatus = accessStatusService.getAccessStatus(context, bitstream);
+        String status = accessStatus.getStatus();
         assertNotEquals("testGetAccessStatusBitstream 0", status, DefaultAccessStatusHelper.UNKNOWN);
     }
 }

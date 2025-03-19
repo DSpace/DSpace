@@ -10,7 +10,7 @@ package org.dspace.access.status;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.dspace.content.AccessStatus;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -26,10 +26,10 @@ public interface AccessStatusHelper {
      * @param item the item
      * @param threshold the embargo threshold date
      * @param type the type of calculation
-     * @return a pair with an access status value and the availability date
+     * @return the access status
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public Pair<String, LocalDate> getAccessStatusFromItem(Context context,
+    public AccessStatus getAccessStatusFromItem(Context context,
         Item item, LocalDate threshold, String type) throws SQLException;
 
     /**
@@ -50,9 +50,9 @@ public interface AccessStatusHelper {
      * @param bitstream the bitstream
      * @param threshold the embargo threshold date
      * @param type the type of calculation
-     * @return a pair with an access status value and the availability date
+     * @return the access status
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public Pair<String, LocalDate> getAccessStatusFromBitstream(Context context,
+    public AccessStatus getAccessStatusFromBitstream(Context context,
         Bitstream bitstream, LocalDate threshold, String type) throws SQLException;
 }

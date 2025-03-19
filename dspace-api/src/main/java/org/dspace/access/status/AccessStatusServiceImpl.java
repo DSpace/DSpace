@@ -12,10 +12,10 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.access.status.service.AccessStatusService;
+import org.dspace.content.AccessStatus;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -76,7 +76,7 @@ public class AccessStatusServiceImpl implements AccessStatusService {
     }
 
     @Override
-    public Pair<String, LocalDate> getAccessStatus(Context context, Item item) throws SQLException {
+    public AccessStatus getAccessStatus(Context context, Item item) throws SQLException {
         return helper.getAccessStatusFromItem(context, item, forever_date, itemCalculationType);
     }
 
@@ -86,7 +86,7 @@ public class AccessStatusServiceImpl implements AccessStatusService {
     }
 
     @Override
-    public Pair<String, LocalDate> getAccessStatus(Context context, Bitstream bitstream) throws SQLException {
+    public AccessStatus getAccessStatus(Context context, Bitstream bitstream) throws SQLException {
         return helper.getAccessStatusFromBitstream(context, bitstream, forever_date, bitstreamCalculationType);
     }
 
