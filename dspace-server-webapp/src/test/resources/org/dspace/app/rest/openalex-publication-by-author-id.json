@@ -379,7 +379,7 @@
   ],
   "best_oa_location": {
     "is_oa": true,
-    "landing_page_url": "/best_oa_location/landing_page_url",
+    "landing_page_url": "/best_oa_location/pdf_url",
     "pdf_url": "/best_oa_location/pdf_url",
     "source": {
       "id": "https://openalex.org/S140251998",

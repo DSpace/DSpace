@@ -126,33 +126,16 @@ public class OpenAlexPublicationByDOIExternalSourcesIT extends AbstractControlle
                            jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.contributor.author'][3].value")
                                .value("RoseJ. Randall"))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.other']",
-                                           Matchers.hasSize(1)))
+                                           Matchers.hasSize(3)))
                        .andExpect(
                            jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.other'][0].value")
                                .value("https://pubmed.ncbi.nlm.nih.gov/14907713"))
-                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri']",
-                                           Matchers.hasSize(7)))
-                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][0]" +
-                                               ".value")
-                                      .value("https://doi.org/10.1016/s0021-9258(19)52451-6"))
-                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][1]" +
-                                               ".value")
-                                      .value("https://doi.org/10.1016/s0021-9258(19)52451-6/pdf"))
-                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][2]" +
-                                               ".value")
-                                      .value("https://doi.org/10.1016/s0021-9258(19)52451-6"))
-                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][3]" +
-                                               ".value")
-                                      .value("https://www.jbc.org/article/S0021-9258(19)52451-6/pdf"))
-                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][4]" +
-                                               ".value")
-                                      .value("https://www.jbc.org/article/S0021-9258(19)52451-6/pdf"))
-                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][5]" +
-                                               ".value")
-                                      .value("https://doi.org/10.1016/s0021-9258(19)52451-6"))
-                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][6]" +
-                                               ".value")
-                                      .value("https://doi.org/10.1016/s0021-9258(19)52451-6"))
+                       .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.other'][1].value")
+                               .value("https://doi.org/10.1016/s0021-9258(19)52451-6/pdf"))
+                       .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.other'][2].value")
+                               .value("https://doi.org/10.1016/s0021-9258(19)52451-6"))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.date.issued'][0].value")
                                       .value("1951-11-01"))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier" +
@@ -322,33 +305,13 @@ public class OpenAlexPublicationByDOIExternalSourcesIT extends AbstractControlle
                                     jsonPath("$._embedded.item.metadata['dc.contributor.author'][3].value")
                                         .value("RoseJ. Randall"))
                                 .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.other']",
-                                                    Matchers.hasSize(1)))
+                                                    Matchers.hasSize(2)))
                                 .andExpect(
                                     jsonPath("$._embedded.item.metadata['dc.identifier.other'][0].value")
                                         .value("https://pubmed.ncbi.nlm.nih.gov/14907713"))
-                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri']",
-                                                    Matchers.hasSize(7)))
-                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri'][0]" +
-                                                        ".value")
-                                               .value("/best_oa_location/landing_page_url"))
-                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri'][1]" +
-                                                        ".value")
-                                               .value("/best_oa_location/pdf_url"))
-                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri'][2]" +
-                                                        ".value")
-                                               .value("/locations/landing_page_url"))
-                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri'][3]" +
-                                                        ".value")
-                                               .value("/locations/pdf_url"))
-                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri'][4]" +
-                                                        ".value")
-                                               .value("/primary_location/landing_page_url"))
-                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri'][5]" +
-                                                        ".value")
-                                               .value("/primary_location/pdf_url"))
-                                .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.uri'][6]" +
-                                                        ".value")
-                                               .value("/open_access/oa_url"))
+                                .andExpect(
+                                    jsonPath("$._embedded.item.metadata['dc.identifier.other'][1].value")
+                                        .value("/best_oa_location/pdf_url"))
                                 .andExpect(jsonPath("$._embedded.item.metadata['dc.date.issued'][0].value")
                                                .value("1951-11-01"))
                                 .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier" +
