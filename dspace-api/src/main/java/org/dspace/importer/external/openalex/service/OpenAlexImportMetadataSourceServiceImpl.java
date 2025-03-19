@@ -29,6 +29,7 @@ import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
+import org.dspace.importer.external.service.DoiCheck;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -45,6 +46,10 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
     implements OpenAlexImportMetadataSourceService {
 
     private final static Logger log = LogManager.getLogger();
+    private static final String URL_FILTER_AUTHORSHIPS_AUTHOR_ID = "?filter=authorships.author.id:";
+    private static final String PARAM_FILTER_AUTHORSHIPS_AUTHOR_ID = "authorships.author.id:";
+    private static final String URL_FILTER_DOI = "?filter=doi:";
+    private static final String PARAM_FILTER_DOI = "doi:";
     private final int timeout = 1000;
     private String url;
 
@@ -179,9 +184,14 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         params.put(LiveImportClientImpl.URI_PARAMETERS, uriParams);
         String queryUrl = url;
         try {
-            if (queryUrl.contains("?filter=authorships.author.id:")) {
-                queryUrl = queryUrl.replace("?filter=authorships.author.id:", "");
-                uriParams.put("filter", "authorships.author.id:" + query);
+            if (queryUrl.contains(URL_FILTER_AUTHORSHIPS_AUTHOR_ID)) {
+                queryUrl = queryUrl.replace(URL_FILTER_AUTHORSHIPS_AUTHOR_ID, "");
+                uriParams.put("filter", PARAM_FILTER_AUTHORSHIPS_AUTHOR_ID + query);
+            } else if (queryUrl.contains(URL_FILTER_DOI)) {
+                queryUrl = queryUrl.replace(URL_FILTER_DOI, "");
+                if (DoiCheck.isDoi(query)) {
+                    uriParams.put("filter", PARAM_FILTER_DOI + DoiCheck.purgeDoiValue(query));
+                }
             } else if (queryUrl.contains("sources")) {
                 uriParams.put("filter", "type:journal,default.search:" + query);
             } else {
@@ -213,8 +223,10 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         List<ImportRecord> results = new ArrayList<>();
         try {
             String queryUrl = url;
-            if (queryUrl.contains("?filter=authorships.author.id:")) {
-                queryUrl = queryUrl.replace("?filter=authorships.author.id:", "");
+            if (queryUrl.contains(URL_FILTER_AUTHORSHIPS_AUTHOR_ID)) {
+                queryUrl = queryUrl.replace(URL_FILTER_AUTHORSHIPS_AUTHOR_ID, "");
+            } else if (queryUrl.contains(URL_FILTER_DOI)) {
+                queryUrl = queryUrl.replace(URL_FILTER_DOI, "");
             }
             String resp = liveImportClient.executeHttpGetRequest(timeout, queryUrl + "/" + id, new HashMap<>());
             if (StringUtils.isEmpty(resp)) {
@@ -240,9 +252,14 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         params.put(LiveImportClientImpl.URI_PARAMETERS, uriParams);
         String queryUrl = url;
         try {
-            if (queryUrl.contains("?filter=authorships.author.id:")) {
-                queryUrl = queryUrl.replace("?filter=authorships.author.id:", "");
-                uriParams.put("filter", "authorships.author.id:" + query);
+            if (queryUrl.contains(URL_FILTER_AUTHORSHIPS_AUTHOR_ID)) {
+                queryUrl = queryUrl.replace(URL_FILTER_AUTHORSHIPS_AUTHOR_ID, "");
+                uriParams.put("filter", PARAM_FILTER_AUTHORSHIPS_AUTHOR_ID + query);
+            } else if (queryUrl.contains(URL_FILTER_DOI)) {
+                queryUrl = queryUrl.replace(URL_FILTER_DOI, "");
+                if (DoiCheck.isDoi(query)) {
+                    uriParams.put("filter", PARAM_FILTER_DOI + DoiCheck.purgeDoiValue(query));
+                }
             } else if (queryUrl.contains("sources")) {
                 uriParams.put("filter", "type:journal,default.search:" + query);
             } else {
