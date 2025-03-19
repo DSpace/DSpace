@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion.openaire;
+package org.dspace.app.suggestion.scorer;
 
 import static org.dspace.app.suggestion.SuggestionUtils.getAllEntriesByMetadatum;
 
@@ -137,6 +137,8 @@ public class AuthorNamesScorer implements EvidenceScorer {
      * */
     private String normalize(String value) {
         String norm = Normalizer.normalize(value, Normalizer.NFD);
+        // Removes diacritical marks
+        norm = norm.replaceAll("\\p{M}", "");
         CharsetDetector cd = new CharsetDetector();
         cd.setText(value.getBytes());
         CharsetMatch detect = cd.detect();
