@@ -58,6 +58,8 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource(
                                     "openalexPublicationByAuthorId", "openalexPublicationByAuthorId", false),
                                 ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPublicationByDOI", "openalexPublicationByDOI", false),
+                                ExternalSourceMatcher.matchExternalSource(
                                     "openalexPerson", "openalexPerson", false),
                                 ExternalSourceMatcher.matchExternalSource(
                                     "openalexInstitution", "openalexInstitution", false),
@@ -68,7 +70,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource(
                                     "openalexJournal", "openalexJournal", false)
                             )))
-                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(19)));
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(20)));
     }
 
     @Test
