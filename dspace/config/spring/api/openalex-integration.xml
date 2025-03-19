@@ -33,7 +33,6 @@
         <entry key-ref="openalex.doi" value-ref="openalexDoiContrib"/>
         <entry key-ref="dc.identifier.other" value-ref="openalexPublicationIdentifierOtherContrib"/>
         <entry key-ref="dc.identifier.openalex" value-ref="openalexIdContrib"/>
-        <entry key-ref="openalex.uri" value-ref="openalexUriIdentifierscContrib"/>
         <entry key-ref="openalex.author" value-ref="openalexAuthorContrib"/>
         <entry key-ref="openalex.language" value-ref="openalexLanguageContrib"/>
         <entry key-ref="openalex.publication.version" value-ref="openalexPublicationVersionContrib"/>
@@ -139,85 +138,89 @@
                value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor"
                list-class="java.util.ArrayList">
         <ref bean="openalexPmidContrib"/>
+        <ref bean="openalexUriPdfContrib"/>
+        <ref bean="openalexUriLandingContrib"/>
     </util:list>
 
     <bean id="openalexPublicationIdentifierOtherContrib"
           class="org.dspace.importer.external.metadatamapping.contributor.MultipleMetadataContributor">
         <property name="metadatumContributors" ref="publicationIdentifierOtherContribList"/>
         <property name="field" ref="dc.identifier.other"/>
+        <property name="ensureUniqueValues" value="true"/>
     </bean>
 
-    <util:list id="contribList"
-               value-type="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor"
-               list-class="java.util.ArrayList">
-        <ref bean="openalexUriLandingContrib"/>
-        <ref bean="openalexUriPdfContrib"/>
-        <ref bean="openalexLandingPageUrlContrib"/>
-        <ref bean="openalexLocationPdfUrlContrib"/>
-        <ref bean="openalexPrimaryLocationPdfUrlContrib"/>
-        <ref bean="openalexPrimaryLocationLandingPageUrlContrib"/>
-        <ref bean="openalexOpenAccessUrlContrib"/>
-    </util:list>
+    <!--    Commented out, as using dc.identifier.uri is not appropriate, as it should represent the URI of the item -->
+    <!--    within DSpace. If needed, map to an appropriate field-->
+    <!--    <util:list id="contribList"-->
+    <!--               value-type="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor"-->
+    <!--               list-class="java.util.ArrayList">-->
+    <!--        <ref bean="openalexUriLandingContrib"/>-->
+    <!--        <ref bean="openalexUriPdfContrib"/>-->
+    <!--        <ref bean="openalexLandingPageUrlContrib"/>-->
+    <!--        <ref bean="openalexLocationPdfUrlContrib"/>-->
+    <!--        <ref bean="openalexPrimaryLocationPdfUrlContrib"/>-->
+    <!--        <ref bean="openalexPrimaryLocationLandingPageUrlContrib"/>-->
+    <!--        <ref bean="openalexOpenAccessUrlContrib"/>-->
+    <!--    </util:list>-->
 
-    <bean id="openalexUriIdentifierscContrib"
-          class="org.dspace.importer.external.metadatamapping.contributor.MultipleMetadataContributor">
-        <property name="metadatumContributors" ref="contribList"/>
-        <property name="field" ref="openalex.uri"/>
-    </bean>
-    <bean id="openalex.uri" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.uri"/>
-    </bean>
+    <!--    <bean id="openalexUriIdentifierscContrib"-->
+    <!--          class="org.dspace.importer.external.metadatamapping.contributor.MultipleMetadataContributor">-->
+    <!--        <property name="metadatumContributors" ref="contribList"/>-->
+    <!--        <property name="field" ref="openalex.uri"/>-->
+    <!--    </bean>-->
+    <!--    <bean id="openalex.uri" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">-->
+    <!--        <constructor-arg value="dc.identifier.uri"/>-->
+    <!--    </bean>-->
+    <!--    <bean id="openalexLandingPageUrlContrib"-->
+    <!--          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">-->
+    <!--        <property name="field" ref="openalex.uri"/>-->
+    <!--        <property name="metadataProcessor" ref="openalexLandingPageUrlProcessor"/>-->
+    <!--    </bean>-->
+    <!--    <bean name="openalexLandingPageUrlProcessor"-->
+    <!--          class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">-->
+    <!--        <property name="pathToArray" value="/locations"/>-->
+    <!--        <property name="elementAttribute" value="/landing_page_url"/>-->
+    <!--    </bean>-->
+
+    <!--    <bean id="openalexLocationPdfUrlContrib"-->
+    <!--          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">-->
+    <!--        <property name="field" ref="openalex.uri"/>-->
+    <!--        <property name="metadataProcessor" ref="openalexLocationPdfUrlProcessor"/>-->
+    <!--    </bean>-->
+    <!--    <bean name="openalexLocationPdfUrlProcessor"-->
+    <!--          class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">-->
+    <!--        <property name="pathToArray" value="/locations"/>-->
+    <!--        <property name="elementAttribute" value="/pdf_url"/>-->
+    <!--    </bean>-->
+
+    <!--    <bean id="openalexPrimaryLocationPdfUrlContrib"-->
+    <!--          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">-->
+    <!--        <property name="field" ref="openalex.uri"/>-->
+    <!--        <property name="query" value="/primary_location/landing_page_url"/>-->
+    <!--    </bean>-->
+
+    <!--    <bean id="openalexPrimaryLocationLandingPageUrlContrib"-->
+    <!--          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">-->
+    <!--        <property name="field" ref="openalex.uri"/>-->
+    <!--        <property name="query" value="/primary_location/pdf_url"/>-->
+    <!--    </bean>-->
+
+    <!--    <bean id="openalexOpenAccessUrlContrib"-->
+    <!--          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">-->
+    <!--        <property name="field" ref="openalex.uri"/>-->
+    <!--        <property name="query" value="/open_access/oa_url"/>-->
+    <!--    </bean>-->
 
     <bean id="openalexUriLandingContrib"
           class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="openalex.uri"/>
+        <property name="field" ref="dc.identifier.other"/>
         <property name="query" value="/best_oa_location/landing_page_url"/>
     </bean>
 
     <bean id="openalexUriPdfContrib"
           class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="openalex.uri"/>
+        <property name="field" ref="dc.identifier.other"/>
         <property name="query" value="/best_oa_location/pdf_url"/>
-    </bean>
-
-    <bean id="openalexLandingPageUrlContrib"
-          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="openalex.uri"/>
-        <property name="metadataProcessor" ref="openalexLandingPageUrlProcessor"/>
-    </bean>
-    <bean name="openalexLandingPageUrlProcessor"
-          class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
-        <property name="pathToArray" value="/locations"/>
-        <property name="elementAttribute" value="/landing_page_url"/>
-    </bean>
-
-    <bean id="openalexLocationPdfUrlContrib"
-          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="openalex.uri"/>
-        <property name="metadataProcessor" ref="openalexLocationPdfUrlProcessor"/>
-    </bean>
-    <bean name="openalexLocationPdfUrlProcessor"
-          class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
-        <property name="pathToArray" value="/locations"/>
-        <property name="elementAttribute" value="/pdf_url"/>
-    </bean>
-
-    <bean id="openalexPrimaryLocationPdfUrlContrib"
-          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="openalex.uri"/>
-        <property name="query" value="/primary_location/landing_page_url"/>
-    </bean>
-
-    <bean id="openalexPrimaryLocationLandingPageUrlContrib"
-          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="openalex.uri"/>
-        <property name="query" value="/primary_location/pdf_url"/>
-    </bean>
-
-    <bean id="openalexOpenAccessUrlContrib"
-          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="openalex.uri"/>
-        <property name="query" value="/open_access/oa_url"/>
     </bean>
 
     <bean name="openalexPublishedVersionMetadataProcessor"
