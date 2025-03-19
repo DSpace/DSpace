@@ -141,7 +141,7 @@ public class TikaTextExtractionFilter
                 @Override
                 public void characters(char[] ch, int start, int length) throws SAXException {
                     try {
-                        writer.append(new String(ch), start, length);
+                        writer.append(new String(ch, start, length));
                     } catch (IOException e) {
                         String errorMsg = String.format("Could not append to temporary file at %s " +
                                                             "when performing text extraction",
@@ -159,7 +159,7 @@ public class TikaTextExtractionFilter
                 @Override
                 public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
                     try {
-                        writer.append(new String(ch), start, length);
+                        writer.append(new String(ch, start, length));
                     } catch (IOException e) {
                         String errorMsg = String.format("Could not append to temporary file at %s " +
                                                             "when performing text extraction",
