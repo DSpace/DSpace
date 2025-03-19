@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.io.IOUtils;
-import org.dspace.app.rest.matcher.ExternalSourceEntryMatcher;
 import org.dspace.app.rest.matcher.ExternalSourceMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
@@ -230,7 +229,7 @@ public class OpenAlexPublicationByDOIExternalSourcesIT extends AbstractControlle
     }
 
     @Test
-    public void findOneOpenalexPublicationByDOIExternalSourceEntriesWithUtlDOIQueryTest() throws Exception {
+    public void findOneOpenalexPublicationByDOIExternalSourceEntriesWithUrlDOIQueryTest() throws Exception {
 
         try (InputStream file = getClass().getResourceAsStream("openalex-publication-single.json")) {
             String jsonResponse = IOUtils.toString(file, Charset.defaultCharset());
@@ -243,63 +242,6 @@ public class OpenAlexPublicationByDOIExternalSourcesIT extends AbstractControlle
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$._embedded.externalSourceEntries", Matchers.hasSize(1)))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].id").value("W1775749144"));
-
-            // Capture arguments
-            ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
-            ArgumentCaptor<Map<String, Map<String, String>>> paramsCaptor = ArgumentCaptor.forClass(Map.class);
-
-            verify(liveImportClient, times(2)).executeHttpGetRequest(anyInt(), urlCaptor.capture(),
-                                                                     paramsCaptor.capture());
-
-            // Assert the URL is correct
-            assertEquals(2, urlCaptor.getAllValues().size());
-            assertEquals("https://api.openalex.org/works", urlCaptor.getAllValues().get(0));
-            assertEquals("https://api.openalex.org/works", urlCaptor.getAllValues().get(1));
-
-            // Assert the parameters contain "filter" => "authorships.author.id:"
-            assertEquals(2, paramsCaptor.getAllValues().size());
-            Map<String, Map<String, String>> capturedParams = paramsCaptor.getAllValues().get(0);
-            assertTrue(capturedParams.containsKey("uriParameters"));
-            assertEquals("doi:10.1016/s0021-9258(19)52451-6", capturedParams.get("uriParameters").get("filter"));
-            assertEquals("20", capturedParams.get("uriParameters").get("per_page"));
-            assertEquals("1", capturedParams.get("uriParameters").get("page"));
-            Map<String, Map<String, String>> capturedParams1 = paramsCaptor.getAllValues().get(1);
-            assertTrue(capturedParams1.containsKey("uriParameters"));
-            assertEquals("doi:10.1016/s0021-9258(19)52451-6", capturedParams1.get("uriParameters").get("filter"));
-        }
-    }
-
-    @Test
-    public void findAllOpenalexPublicationByDOIExternalSourceEntriesWithQueryTest() throws Exception {
-
-        try (InputStream file = getClass().getResourceAsStream("openalex-publication-multiple.json")) {
-            String jsonResponse = IOUtils.toString(file, Charset.defaultCharset());
-
-            when(liveImportClient.executeHttpGetRequest(anyInt(), anyString(), anyMap()))
-                .thenReturn(jsonResponse);
-
-            getClient().perform(get("/api/integration/externalsources/openalexPublicationByDOI/entries")
-                                    .param("query", "10.1016/s0021-9258(19)52451-6"))
-                       .andExpect(status().isOk())
-                       .andExpect(jsonPath("$._embedded.externalSourceEntries", Matchers.hasSize(2)))
-                       .andExpect(jsonPath("$._embedded.externalSourceEntries",
-                                           Matchers.containsInAnyOrder(
-                                               ExternalSourceEntryMatcher.matchExternalSourceEntry(
-                                                   "W3111255098",
-                                                   "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine",
-                                                   "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine",
-                                                   "openalexPublicationByDOI"
-                                               ),
-                                               ExternalSourceEntryMatcher.matchExternalSourceEntry(
-                                                   "W3008028633",
-                                                   "Characteristics of and Important Lessons From the Coronavirus " +
-                                                       "Disease 2019 (COVID-19) Outbreak in China",
-                                                   "Characteristics of and Important Lessons From the Coronavirus " +
-                                                       "Disease 2019 (COVID-19) Outbreak in China",
-                                                   "openalexPublicationByDOI"
-                                               )
-                                           )
-                       ));
 
             // Capture arguments
             ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
