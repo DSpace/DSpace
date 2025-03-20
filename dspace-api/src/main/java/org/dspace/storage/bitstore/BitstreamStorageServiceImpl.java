@@ -442,7 +442,13 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             //modulo
             if ((processedCounter % batchCommitSize) == 0) {
                 log.info("Migration Commit Checkpoint: " + processedCounter);
-                context.dispatchEvents();
+                // UMD Customization
+                // This change was provided to DSpace in Pull Request 10940
+                // This customization markers can be removed once the
+                // application has been upgraded to a DSpace version containing
+                // the pull request.
+                context.commit();
+                // End UMD Customizaton
             }
         }
 
