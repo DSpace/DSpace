@@ -422,7 +422,8 @@ public class DCDateTest {
      */
     @Test
     public void testGetCurrent() {
-        LocalDate today = LocalDate.now();
+        ZonedDateTime todayDateTimeUTC = ZonedDateTime.now(ZoneId.of("UTC"));
+        LocalDate today = todayDateTimeUTC.toLocalDate();
         assertEquals("testGetCurrent 0", DCDate.getCurrent().toDate().toLocalDate(), today);
     }
 
