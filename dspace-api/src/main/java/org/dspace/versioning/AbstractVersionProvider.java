@@ -22,6 +22,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.RelationshipMetadataValue;
+import org.dspace.content.service.BitstreamLinkingService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
@@ -48,6 +49,8 @@ public abstract class AbstractVersionProvider {
     protected BundleService bundleService;
     @Autowired(required = true)
     protected ItemService itemService;
+    @Autowired(required = true)
+    protected BitstreamLinkingService bitstreamLinkingService;
 
     protected void copyMetadata(Context context, Item itemNew, Item nativeItem) throws SQLException {
         List<MetadataValue> md = itemService.getMetadata(nativeItem, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
@@ -98,6 +101,9 @@ public abstract class AbstractVersionProvider {
                 Bitstream bitstreamNew =  bitstreamStorageService.clone(c, nativeBitstream);
 
                 bundleService.addBitstream(c, bundleNew, bitstreamNew);
+
+                // Update Bitstreams
+                bitstreamLinkingService.registerBitstreams(c, nativeBitstream, bitstreamNew);
 
                 // NOTE: bundle.addBitstream() causes Bundle policies to be inherited by default.
                 // So, we need to REMOVE any inherited TYPE_CUSTOM policies before copying over the correct ones.
