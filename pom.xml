@@ -77,6 +77,18 @@
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
                      as it is used to reference the LICENSE.header and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
+
+        <!-- UMD Customization -->
+        <!--
+          Fix CVE-2025-24813 (from the "patch.diff" file provided on the
+          "dspace-tech" mailing list in a March 18, 2025 email from
+          mrwerdo331@gmail.com.
+
+          This customization can be removed when upgrading DRUM to a
+          version that uses a Tomcat no longer affected by the CVE.
+         -->
+        <tomcat.version>10.1.39</tomcat.version>
+        <!-- End UMD Customization -->
     </properties>
 
     <build>
@@ -1911,6 +1923,31 @@
                 <artifactId>byte-buddy</artifactId>
                 <version>1.11.13</version>
             </dependency>
+            <!-- UMD Customization -->
+            <!--
+              Fix CVE-2025-24813 (from the "patch.diff" file provided on the
+              "dspace-tech" mailing list in a March 18, 2025 email from
+              mrwerdo331@gmail.com.
+
+              This customization can be removed when upgrading DRUM to a
+              version that uses a Tomcat no longer affected by the CVE.
+            -->
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>10.1.39</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+                <version>10.1.39</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-websocket</artifactId>
+                <version>10.1.39</version>
+            </dependency>
+            <!-- End UMD Customization-->
         </dependencies>
     </dependencyManagement>
 
