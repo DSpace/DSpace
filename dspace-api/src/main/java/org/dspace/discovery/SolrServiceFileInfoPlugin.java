@@ -54,8 +54,8 @@ public class SolrServiceFileInfoPlugin implements SolrServiceIndexPlugin {
                             for (Bitstream bitstream : bitstreams) {
                                 if (bitstream != null) {
                                     document.addField(SOLR_FIELD_NAME_FOR_FILENAMES, bitstream.getName());
-                                    // Add _keyword and _filter fields which are necessary to support filtering and faceting
-                                    // for the file names
+                                    // Add _keyword and _filter fields which are necessary to
+                                    // support filtering and faceting for the file names
                                     document.addField(SOLR_FIELD_NAME_FOR_FILENAMES + "_keyword", bitstream.getName());
                                     document.addField(SOLR_FIELD_NAME_FOR_FILENAMES + "_filter", bitstream.getName());
 
