@@ -14,12 +14,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.List;
 
+import org.apache.commons.codec.CharEncoding;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamLinkingService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.InstallItemService;
@@ -27,6 +35,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
@@ -50,6 +59,7 @@ public class VersioningTest extends AbstractUnitTest {
 
     private Item originalItem;
     private Item versionedItem;
+    private Bitstream originalBitstream;
     private String summary = "Unit test version";
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
@@ -60,6 +70,12 @@ public class VersioningTest extends AbstractUnitTest {
     protected VersioningService versionService = VersionServiceFactory.getInstance().getVersionService();
     protected VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance()
                                                                                  .getVersionHistoryService();
+    protected BitstreamLinkingService bitstreamLinkingService = DSpaceServicesFactory.getInstance()
+            .getServiceManager()
+            .getServiceByName(BitstreamLinkingServiceImpl.class.getName(),
+                    BitstreamLinkingServiceImpl.class);
+    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     //A regex that can be used to see if a handle contains the format of handle created by the org.dspace.identifier
     // .VersionedHandleIdentifierProvider*
@@ -84,6 +100,16 @@ public class VersioningTest extends AbstractUnitTest {
             WorkspaceItem is = workspaceItemService.create(context, col, false);
 
             originalItem = installItemService.installItem(context, is);
+
+
+            Bundle oldBundle = bundleService.create(context, originalItem, "ORIGINAL");
+
+            String bitstreamOneContent = "Dummy content one";
+            try (InputStream inputStream = IOUtils.toInputStream(bitstreamOneContent, CharEncoding.UTF_8)) {
+                originalBitstream = bitstreamService.create(context, oldBundle, inputStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             Version version = versionService.createNewVersion(context, originalItem, summary);
             WorkspaceItem wsi = workspaceItemService.findByItem(context, version.getItem());
@@ -168,6 +194,19 @@ public class VersioningTest extends AbstractUnitTest {
         versionService.removeVersion(context, versionedItem);
         assertThat("Test_version_delete", itemService.find(context, versionedItem.getID()), nullValue());
         assertThat("Test_version_handle_delete", handleService.resolveToObject(context, handle), nullValue());
+        context.restoreAuthSystemState();
+    }
+
+    @Test
+    public void testBitstreamLinking() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<Bitstream> copies = bitstreamLinkingService.getCopies(context, originalBitstream);
+        assertThat("Copies count match", copies.size(), equalTo(1));
+
+        List<Bitstream> originals = bitstreamLinkingService.getOriginals(context, copies.get(0));
+        assertThat("Original count match", originals.size(), equalTo(1));
+        assertThat("Original bitstream match", originals.get(0), equalTo(originalBitstream));
+
         context.restoreAuthSystemState();
     }
 }

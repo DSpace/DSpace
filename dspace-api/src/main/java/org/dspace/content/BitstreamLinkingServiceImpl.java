@@ -29,6 +29,12 @@ public class BitstreamLinkingServiceImpl implements BitstreamLinkingService {
     @Autowired
     BitstreamService bitstreamService;
 
+    public static final String HAS_COPIES = "dspace.bitstream.hasCopies";
+    public static final String IS_COPY_OF = "dspace.bitstream.isCopyOf";
+    public static final String IS_REPLACED_BY = "dspace.bitstream.isReplacedBy";
+    public static final String IS_REPLACEMENT_OF = "dspace.bitstream.isReplacementOf";
+
+
     @Override
     public void registerBitstreams(Context context, Bitstream oldCopy,
                                    Bitstream newCopy) throws SQLException, AuthorizeException {
@@ -51,45 +57,44 @@ public class BitstreamLinkingServiceImpl implements BitstreamLinkingService {
 
     @Override
     public List<Bitstream> getCopies(Context context, Bitstream bitstream) throws SQLException {
-        List<Bitstream> bitstreamCopies = new ArrayList<>();
-        List<MetadataValue> uuids = bitstreamService.getMetadata(bitstream, "dspace", "bitstream",
-                "hasCopies", null);
-        for (MetadataValue uuid : uuids) {
-            bitstreamCopies.add(bitstreamService.find(context, UUID.fromString(uuid.getValue())));
-        }
-        return bitstreamCopies;
+        return getRelatedBitstreams(context, bitstream, HAS_COPIES);
     }
 
     @Override
     public List<Bitstream> getOriginals(Context context, Bitstream bitstream) throws SQLException {
-        List<Bitstream> bitstreamOriginals = new ArrayList<>();
-        List<MetadataValue> uuids = bitstreamService.getMetadata(bitstream, "dspace", "bitstream",
-                "isCopyOf", null);
-        for (MetadataValue uuid : uuids) {
-            bitstreamOriginals.add(bitstreamService.find(context, UUID.fromString(uuid.getValue())));
-        }
-        return bitstreamOriginals;
+        return getRelatedBitstreams(context, bitstream, IS_COPY_OF);
     }
 
     @Override
     public List<Bitstream> getReplacements(Context context, Bitstream bitstream) throws SQLException {
-        List<Bitstream> bitstreamReplacements = new ArrayList<>();
-        List<MetadataValue> uuids = bitstreamService.getMetadata(bitstream, "dspace", "bitstream",
-                "isReplacedBy", null);
-        for (MetadataValue uuid : uuids) {
-            bitstreamReplacements.add(bitstreamService.find(context, UUID.fromString(uuid.getValue())));
-        }
-        return bitstreamReplacements;
+        return getRelatedBitstreams(context, bitstream, IS_REPLACED_BY);
     }
 
     @Override
     public List<Bitstream> getOriginalReplacement(Context context, Bitstream bitstream) throws SQLException {
-        List<Bitstream> bitstreamOriginalReplacement = new ArrayList<>();
-        List<MetadataValue> uuids = bitstreamService.getMetadata(bitstream, "dspace", "bitstream",
-                "isReplacementOf", null);
+        return getRelatedBitstreams(context, bitstream, IS_REPLACEMENT_OF);
+    }
+
+    /**
+     * Inner class that is used to get all related bitstreams according to a specific metadataField
+     *
+     * @param context Context
+     * @param bitstream The bitstream to search from
+     * @param metadataField The metadatafield 'schema.element.qualifier' that is then split to the bitstreamService to
+     *                      find what we assume are UUIDS.
+     * @return List<Bitstream> of bitstreams that were found using the uuids found in the given metadatafield.
+     * @throws SQLException If bitstreamService.find() fails to access the database
+     */
+    protected List<Bitstream> getRelatedBitstreams(Context context, Bitstream bitstream, String metadataField)
+            throws SQLException {
+        String[] metadataFields = metadataField.split("\\.");
+        List<Bitstream> bitstreams = new ArrayList<>();
+        List<MetadataValue> uuids = bitstreamService.getMetadata(bitstream, metadataFields[0], metadataFields[1],
+                metadataFields[2], null);
         for (MetadataValue uuid : uuids) {
-            bitstreamOriginalReplacement.add(bitstreamService.find(context, UUID.fromString(uuid.getValue())));
+            bitstreams.add(bitstreamService.find(context, UUID.fromString(uuid.getValue())));
         }
-        return bitstreamOriginalReplacement;
+        return bitstreams;
+
     }
 }
