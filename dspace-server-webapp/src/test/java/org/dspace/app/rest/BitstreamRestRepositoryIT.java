@@ -16,6 +16,8 @@ import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -2931,6 +2933,82 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                      .content(patchBody)
                                      .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void findAccessStatusForBitstreamBadRequestTest() throws Exception {
+        getClient().perform(get("/api/core/bitstreams/{uuid}/accessStatus", "1"))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findAccessStatusForItemNotFoundTest() throws Exception {
+        UUID fakeUUID = UUID.randomUUID();
+        getClient().perform(get("/api/core/items/{uuid}/accessStatus", fakeUUID))
+                   .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void findAccessStatusForBitstreamTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                           .withTitle("Test item 1")
+                                           .build();
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                        .withName("Bitstream")
+                                        .withDescription("Description")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Bitstream access status should still be accessible by anonymous request
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/accessStatus"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+            .andExpect(jsonPath("$.status", notNullValue()))
+            .andExpect(jsonPath("$.embargoDate", nullValue()));
+    }
+
+    @Test
+    public void findAccessStatusWithEmbargoDateForBitstreamTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                           .withTitle("Test item 1")
+                                           .build();
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                        .withName("Bitstream")
+                                        .withDescription("Description")
+                                        .withMimeType("text/plain")
+                                        .withEmbargoPeriod(Period.ofMonths(6))
+                                        .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Bitstream access status should still be accessible by anonymous request
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/accessStatus"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+            .andExpect(jsonPath("$.status", notNullValue()))
+            .andExpect(jsonPath("$.embargoDate", notNullValue()));
     }
 
     public boolean bitstreamExists(String token, Bitstream ...bitstreams) throws Exception {

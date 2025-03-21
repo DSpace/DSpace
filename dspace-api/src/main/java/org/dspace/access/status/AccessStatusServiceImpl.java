@@ -11,7 +11,12 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.access.status.service.AccessStatusService;
+import org.dspace.content.AccessStatus;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.service.PluginService;
@@ -22,10 +27,15 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Implementation for the access status calculation service.
  */
 public class AccessStatusServiceImpl implements AccessStatusService {
+    private static final Logger log = LogManager.getLogger(AccessStatusServiceImpl.class);
+
     // Plugin implementation, set from the DSpace configuration by init().
     protected AccessStatusHelper helper = null;
 
     protected LocalDate forever_date = null;
+
+    protected String itemCalculationType = null;
+    protected String bitstreamCalculationType = null;
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
@@ -59,16 +69,35 @@ public class AccessStatusServiceImpl implements AccessStatusService {
                     .atStartOfDay()
                     .atZone(ZoneId.systemDefault())
                     .toLocalDate();
+
+            itemCalculationType = getAccessStatusCalculationType("access.status.for-user.item");
+            bitstreamCalculationType = getAccessStatusCalculationType("access.status.for-user.bitstream");
         }
     }
 
     @Override
-    public String getAccessStatus(Context context, Item item) throws SQLException {
-        return helper.getAccessStatusFromItem(context, item, forever_date);
+    public AccessStatus getAccessStatus(Context context, Item item) throws SQLException {
+        return helper.getAccessStatusFromItem(context, item, forever_date, itemCalculationType);
     }
 
     @Override
-    public String getEmbargoFromItem(Context context, Item item) throws SQLException {
-        return helper.getEmbargoFromItem(context, item, forever_date);
+    public AccessStatus getAnonymousAccessStatus(Context context, Item item) throws SQLException {
+        return helper.getAnonymousAccessStatusFromItem(context, item, forever_date);
+    }
+
+    @Override
+    public AccessStatus getAccessStatus(Context context, Bitstream bitstream) throws SQLException {
+        return helper.getAccessStatusFromBitstream(context, bitstream, forever_date, bitstreamCalculationType);
+    }
+
+    private String getAccessStatusCalculationType(String key) {
+        String value = configurationService.getProperty(key, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS);
+        if (!StringUtils.equalsIgnoreCase(value, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS) &&
+            !StringUtils.equalsIgnoreCase(value, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER)) {
+            log.warn("The configuration parameter \"" + key
+                + "\" contains an invalid value. Valid values include: 'anonymous' and 'current'.");
+            value = DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS;
+        }
+        return value;
     }
 }
