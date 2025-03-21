@@ -17,9 +17,9 @@ import java.util.UUID;
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.bulkedit.service.BulkEditImportService;
-import org.dspace.app.bulkedit.service.CSVBulkEditCacheService;
 import org.dspace.app.bulkedit.service.BulkEditRegisterService;
 import org.dspace.app.bulkedit.service.BulkEditServiceFactory;
+import org.dspace.app.bulkedit.util.BulkEditUtil;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.Collection;
@@ -87,10 +87,9 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
     protected BulkEditRegisterService<DSpaceCSV> bulkEditRegisterService =
         BulkEditServiceFactory.getInstance().getCSVBulkEditRegisterService();
-    protected CSVBulkEditCacheService bulkEditCacheService =
-        BulkEditServiceFactory.getInstance().getCSVBulkEditCacheService();
     protected BulkEditImportService bulkEditImportService =
         BulkEditServiceFactory.getInstance().getBulkEditImportService();
+    protected BulkEditUtil bulkEditUtil = BulkEditUtil.getInstance();
 
     @Override
     public void internalRun() throws Exception {
@@ -372,7 +371,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                     handler.logInfo(" + Added   (" + md + "): ");
                 }
                 handler.logInfo(metadataValue.getValue());
-                if (bulkEditCacheService.isAuthorityControlledField(md)) {
+                if (bulkEditUtil.isAuthorityControlledField(md)) {
                     handler.logInfo(", authority = " + metadataValue.getAuthority());
                     handler.logInfo(", confidence = " + metadataValue.getConfidence());
                 }
@@ -393,7 +392,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                     handler.logInfo(" - Removed (" + md + "): ");
                 }
                 handler.logInfo(metadataValue.getValue());
-                if (bulkEditCacheService.isAuthorityControlledField(md)) {
+                if (bulkEditUtil.isAuthorityControlledField(md)) {
                     handler.logInfo(", authority = " + metadataValue.getAuthority());
                     handler.logInfo(", confidence = " + metadataValue.getConfidence());
                 }

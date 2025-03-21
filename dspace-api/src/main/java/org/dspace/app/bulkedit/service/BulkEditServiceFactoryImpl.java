@@ -8,19 +8,11 @@ public class BulkEditServiceFactoryImpl extends BulkEditServiceFactory {
     private BulkEditRegisterService<DSpaceCSV> csvBulkEditRegisterService;
 
     @Autowired
-    private CSVBulkEditCacheService csvBulkEditCacheService;
-
-    @Autowired
     private BulkEditImportService bulkEditImportService;
 
     @Override
     public BulkEditRegisterService<DSpaceCSV> getCSVBulkEditRegisterService() {
         return csvBulkEditRegisterService;
-    }
-
-    @Override
-    public CSVBulkEditCacheService getCSVBulkEditCacheService() {
-        return csvBulkEditCacheService;
     }
 
     @Override

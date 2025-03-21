@@ -17,6 +17,9 @@ import org.dspace.app.bulkedit.BulkEditMetadataValue;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.bulkedit.DSpaceCSVLine;
 import org.dspace.app.bulkedit.MetadataImportException;
+import org.dspace.app.bulkedit.cache.CSVBulkEditCache;
+import org.dspace.app.bulkedit.cache.CSVBulkEditCacheImpl;
+import org.dspace.app.bulkedit.util.BulkEditUtil;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authorize.AuthorizeException;
@@ -47,21 +50,25 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
     protected ConfigurationService configurationService;
 
     @Autowired
-    protected CSVBulkEditCacheService bulkEditCacheService;
+    protected BulkEditUtil csvBulkEditUtil;
 
     @Autowired
     protected AuthorityValueService authorityValueService;
 
+    private CSVBulkEditCache bulkEditCache;
+
     public List<BulkEditChange> registerBulkEditChange(Context c, DSpaceCSV csv)
         throws MetadataImportException, SQLException, AuthorizeException, IOException {
+        bulkEditCache = new CSVBulkEditCacheImpl();
+
         Context.Mode lastMode = c.getCurrentMode();
         // Force a READ ONLY mode to make it clear no actual changes are meant to be made during a register
         c.setMode(Context.Mode.READ_ONLY);
-        bulkEditCacheService.resetCache();
+        bulkEditCache.resetCache();
 
         List<BulkEditChange> changes = new ArrayList<>();
 
-        bulkEditCacheService.resetRowCount();
+        bulkEditCache.resetRowCount();
         for (DSpaceCSVLine line : csv.getCSVLines()) {
             // Resolve target references to other items
             line = resolveEntityRefs(c, line);
@@ -148,7 +155,7 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
                 }
 
                 // Iterate through each metadata element in the csv line
-                whatHasChanged = new BulkEditChange(new UUID(0, bulkEditCacheService.getRowCount()));
+                whatHasChanged = new BulkEditChange(new UUID(0, bulkEditCache.getRowCount()));
                 for (String md : metadataValues.keySet()) {
                     // Add all the values from the CSV line
                     add(c, csv, metadataValues.get(md), md, whatHasChanged);
@@ -207,11 +214,11 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
                 changes.add(whatHasChanged);
             }
 
-            bulkEditCacheService.populateReferenceMaps(line, bulkEditCacheService.getRowCount(), whatHasChanged.getUuid());
-            bulkEditCacheService.increaseRowCount();
+            bulkEditCache.populateReferenceMaps(line, bulkEditCache.getRowCount(), whatHasChanged.getUuid());
+            bulkEditCache.increaseRowCount();
         }
 
-        bulkEditCacheService.validateExpressedRelations(c, csv);
+        bulkEditCache.validateExpressedRelations(c, csv);
 
         // Restore the Context Mode
         c.setMode(lastMode);
@@ -318,7 +325,7 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
     private boolean isAuthorityControlledField(String md) {
         String mdf = StringUtils.substringAfter(md, ":");
         mdf = StringUtils.substringBefore(mdf, "[");
-        return bulkEditCacheService.getAuthorityControlledFields().contains(mdf);
+        return csvBulkEditUtil.getAuthorityControlledFields().contains(mdf);
     }
 
     /**
@@ -331,7 +338,7 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
      */
     public DSpaceCSVLine resolveEntityRefs(Context c, DSpaceCSVLine line) throws MetadataImportException {
         DSpaceCSVLine newLine = new DSpaceCSVLine(line.getID());
-        UUID originId = bulkEditCacheService.evaluateOriginId(line.getID());
+        UUID originId = bulkEditCache.evaluateOriginId(line.getID());
         for (String key : line.keys()) {
             // If a key represents a relation field attempt to resolve the target reference from the csvRefMap
             if (key.split("\\.")[0].equalsIgnoreCase("relation")) {
@@ -339,11 +346,11 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
                     for (String val : line.get(key)) {
                         // Attempt to resolve the relation target reference
                         // These can be a UUID, metadata target reference or rowName target reference
-                        String uuid = bulkEditCacheService.resolveEntityRef(c, val).toString();
+                        String uuid = bulkEditCache.resolveEntityRef(c, val).toString();
                         newLine.add(key, uuid);
                         //Entity refs have been resolved / placeholdered
                         //Populate the EntityRelationMap
-                        bulkEditCacheService.populateEntityRelationMap(uuid, key, originId.toString());
+                        bulkEditCache.populateEntityRelationMap(uuid, key, originId.toString());
                     }
                 } else {
                     newLine.add(key, null);

@@ -1,4 +1,4 @@
-package org.dspace.app.bulkedit.service;
+package org.dspace.app.bulkedit.cache;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -9,56 +9,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.bulkedit.MetadataImportException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.EntityTypeService;
-import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
-import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
-import org.dspace.services.ConfigurationService;
-import org.springframework.beans.factory.annotation.Autowired;
 
-public class BulkEditCacheServiceImpl implements BulkEditCacheService {
-    @Autowired
-    protected ConfigurationService configurationService;
-
-    @Autowired
-    protected EntityTypeService entityTypeService;
-
-    @Autowired
-    protected ItemService itemService;
-
-    @Autowired
-    protected RelationshipTypeService relationshipTypeService;
-
+public class BulkEditCacheImpl implements BulkEditCache {
     /**
      * Map of field:value to item UUID, used to resolve indirect entity target references.
      */
-    protected Map<String, Set<UUID>> metadataReferenceToUUIDMap = new ConcurrentHashMap<>();
+    protected Map<String, Set<UUID>> metadataReferenceToUUIDMap = new HashMap<>();
 
     /**
      * Map of UUIDs to their entity types.
      */
-    protected Map<UUID, String> entityTypeMap = new ConcurrentHashMap<>();
+    protected Map<UUID, String> entityTypeMap = new HashMap<>();
 
     /**
      * Map of UUIDs to their relations that are referenced within any import with their referrers.
      */
-    protected Map<String, HashMap<String, ArrayList<String>>> entityRelationMap = new ConcurrentHashMap<>();
+    protected Map<String, HashMap<String, ArrayList<String>>> entityRelationMap = new HashMap<>();
 
     @Override
     public void resetCache() {
-        metadataReferenceToUUIDMap = new ConcurrentHashMap<>();
-        entityTypeMap = new ConcurrentHashMap<>();
-        entityRelationMap = new ConcurrentHashMap<>();
+        metadataReferenceToUUIDMap = new HashMap<>();
+        entityTypeMap = new HashMap<>();
+        entityRelationMap = new HashMap<>();
     }
 
     /**

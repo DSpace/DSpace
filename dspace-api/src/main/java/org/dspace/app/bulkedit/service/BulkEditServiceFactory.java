@@ -5,7 +5,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 public abstract class BulkEditServiceFactory {
     public abstract BulkEditRegisterService<DSpaceCSV> getCSVBulkEditRegisterService();
-    public abstract CSVBulkEditCacheService getCSVBulkEditCacheService();
     public abstract BulkEditImportService getBulkEditImportService();
 
     public static BulkEditServiceFactory getInstance() {

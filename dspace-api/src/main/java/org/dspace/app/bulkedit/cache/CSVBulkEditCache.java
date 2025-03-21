@@ -1,6 +1,5 @@
-package org.dspace.app.bulkedit.service;
+package org.dspace.app.bulkedit.cache;
 
-import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
@@ -9,10 +8,8 @@ import org.dspace.app.bulkedit.DSpaceCSVLine;
 import org.dspace.app.bulkedit.MetadataImportException;
 import org.dspace.core.Context;
 
-public interface CSVBulkEditCacheService extends BulkEditCacheService {
+public interface CSVBulkEditCache extends BulkEditCache {
     void populateReferenceMaps(DSpaceCSVLine line, Integer rowNumber, UUID uuid);
-    Set<String> getAuthorityControlledFields();
-    boolean isAuthorityControlledField(String field);
     Integer getRowCount();
     void setRowCount(Integer rowCount);
     void increaseRowCount();

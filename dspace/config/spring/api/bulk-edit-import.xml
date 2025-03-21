@@ -6,7 +6,8 @@
 
     <bean class="org.dspace.app.bulkedit.service.BulkEditImportServiceImpl"/>
 
-    <!-- CSV import services -->
+    <bean name="bulkEditUtil" class="org.dspace.app.bulkedit.util.BulkEditUtil"/>
+
+    <!-- CSV import -->
     <bean class="org.dspace.app.bulkedit.service.CSVBulkEditRegisterServiceImpl"/>
-    <bean class="org.dspace.app.bulkedit.service.CSVBulkEditCacheServiceImpl"/>
 </beans>

@@ -1,15 +1,11 @@
-package org.dspace.app.bulkedit.service;
+package org.dspace.app.bulkedit.cache;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,23 +16,24 @@ import org.dspace.app.util.RelationshipUtils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.RelationshipType;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
 
-public class CSVBulkEditCacheServiceImpl extends BulkEditCacheServiceImpl implements CSVBulkEditCacheService {
-    /**
-     * The prefix of the authority controlled field
-     */
-    protected static final String AC_PREFIX = "authority.controlled.";
+public class CSVBulkEditCacheImpl extends BulkEditCacheImpl implements CSVBulkEditCache {
+    protected ItemService itemService =
+        ContentServiceFactory.getInstance().getItemService();
+    protected EntityTypeService entityTypeService =
+        ContentServiceFactory.getInstance().getEntityTypeService();
+    protected RelationshipTypeService relationshipTypeService =
+        ContentServiceFactory.getInstance().getRelationshipTypeService();
 
     /**
      * Map with item UUIDs for each CSV row
      */
-    protected Map<Integer, UUID> csvRowMap = new ConcurrentHashMap<>();
-
-    /**
-     * The authority controlled fields
-     */
-    private Set<String> authorityControlledFields;
+    protected Map<Integer, UUID> csvRowMap = new HashMap<>();
 
     /**
      * Counter of rows processed in a CSV.
@@ -51,24 +48,9 @@ public class CSVBulkEditCacheServiceImpl extends BulkEditCacheServiceImpl implem
     @Override
     public void resetCache() {
         super.resetCache();
-        csvRowMap = new ConcurrentHashMap<>();
+        csvRowMap = new HashMap<>();
         relationValidationErrors = new ArrayList<>();
         rowCount = 1;
-    }
-
-    /**
-     * Set authority controlled fields
-     */
-    protected void initialiseAuthorityControlledFields() {
-        authorityControlledFields = new HashSet<>();
-        Enumeration propertyNames = configurationService.getProperties().propertyNames();
-        while (propertyNames.hasMoreElements()) {
-            String key = ((String) propertyNames.nextElement()).trim();
-            if (key.startsWith(AC_PREFIX)
-                && configurationService.getBooleanProperty(key, false)) {
-                authorityControlledFields.add(key.substring(AC_PREFIX.length()));
-            }
-        }
     }
 
     @Override
@@ -79,18 +61,6 @@ public class CSVBulkEditCacheServiceImpl extends BulkEditCacheServiceImpl implem
         }
         populateMetadataReferenceMap(valueMap, uuid);
         csvRowMap.put(rowNumber, uuid);
-    }
-
-    public Set<String> getAuthorityControlledFields() {
-        if (authorityControlledFields == null) {
-            initialiseAuthorityControlledFields();
-        }
-        return authorityControlledFields;
-    }
-
-    @Override
-    public boolean isAuthorityControlledField(String field) {
-        return getAuthorityControlledFields().contains(field);
     }
 
     public Integer getRowCount() {
