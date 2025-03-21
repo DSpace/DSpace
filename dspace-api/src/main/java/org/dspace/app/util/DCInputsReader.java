@@ -379,7 +379,7 @@ public class DCInputsReader {
         }
         // sanity check number of fields
         if (fields.size() < 1) {
-            throw new DCInputsReaderException("Form " + formName + "row " + rowIdx + " has no fields");
+            throw new DCInputsReaderException("Form " + formName + ", row " + rowIdx + " has no fields");
         }
     }
 
