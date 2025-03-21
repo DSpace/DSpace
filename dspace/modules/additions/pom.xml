@@ -17,7 +17,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>8.0-drum-5-SNAPSHOT</version>
+      <version>8.0-drum-5</version>
       <relativePath>..</relativePath>
    </parent>
 
