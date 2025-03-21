@@ -35,16 +35,11 @@ import org.dspace.eperson.service.GroupService;
 
 /**
  * Default plugin implementation of the access status helper.
- * The getAccessStatusFromItem method provides a simple logic to
- * calculate the access status of an item based on the policies of
- * the primary or the first bitstream in the original bundle.
- * Users can override this method for enhanced functionality.
- *
- * The getEmbargoFromItem method provides a simple logic to retrieve
- * an embargo date based on information of bitstreams from an item
- * based on the policies of the primary or the first bitstream in the
- * original bundle. Users can override this method for enhanced
- * functionality.
+ * 
+ * The methods provides a simple logic to calculate the access status
+ * of an item based on the policies of the primary or the first bitstream
+ * in the original bundle. Users can override those methods for
+ * enhanced functionality.
  */
 public class DefaultAccessStatusHelper implements AccessStatusHelper {
     public static final String STATUS_FOR_CURRENT_USER  = "current";
@@ -123,32 +118,15 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * Look at the anonymous policies of the primary (or first)
      * bitstream of the item to retrieve its embargo.
      *
-     * If the item is null, simply returns an empty map with no embargo information.
-     *
      * @param context       the DSpace context
      * @param item          the item
      * @param threshold     the embargo threshold date
-     * @return an embargo date
+     * @return the access status
      */
     @Override
-    public String getEmbargoFromItem(Context context, Item item, LocalDate threshold)
+    public AccessStatus getAnonymousAccessStatusFromItem(Context context, Item item, LocalDate threshold)
             throws SQLException {
-        if (item == null) {
-            return null;
-        }
-        Bitstream bitstream = getPrimaryOrFirstBitstreamInOriginalBundle(item);
-        if (bitstream == null) {
-            return null;
-        }
-        // Only calculate the status for the anonymous group read policies
-        List<ResourcePolicy> policies = getReadPolicies(context, bitstream, STATUS_FOR_ANONYMOUS);
-        LocalDate availabilityDate = findAvailabilityDate(policies, threshold);
-        // If the date is null, it's an open access
-        // If the date is equal of after the threshold, it's a restriction
-        if (availabilityDate == null || !availabilityDate.isBefore(threshold)) {
-            return null;
-        }
-        return availabilityDate.toString();
+        return getAccessStatusFromItem(context, item, threshold, STATUS_FOR_ANONYMOUS);
     }
 
     /**

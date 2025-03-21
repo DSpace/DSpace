@@ -48,14 +48,14 @@ public interface AccessStatusService {
     public AccessStatus getAccessStatus(Context context, Item item) throws SQLException;
 
     /**
-     * Retrieve embargo information for the item
+     * Calculate the anonymous access status for an Item while considering the forever embargo date threshold.
      *
      * @param context the DSpace context
      * @param item the item to check for embargo information
-     * @return an embargo date
+     * @return the access status
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public String getEmbargoFromItem(Context context, Item item) throws SQLException;
+    public AccessStatus getAnonymousAccessStatus(Context context, Item item) throws SQLException;
 
     /**
      * Calculate the access status for a bitstream while considering the forever embargo date threshold.

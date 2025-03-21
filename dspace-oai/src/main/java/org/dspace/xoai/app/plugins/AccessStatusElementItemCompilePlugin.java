@@ -8,11 +8,13 @@
 package org.dspace.xoai.app.plugins;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.access.status.DefaultAccessStatusHelper;
 import org.dspace.access.status.factory.AccessStatusServiceFactory;
 import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.content.AccessStatus;
@@ -52,10 +54,13 @@ public class AccessStatusElementItemCompilePlugin implements XOAIExtensionItemCo
         AccessStatusService accessStatusService = AccessStatusServiceFactory.getInstance().getAccessStatusService();
 
         try {
-            AccessStatus accessStatusResult = accessStatusService.getAccessStatus(context, item);
+            AccessStatus accessStatusResult = accessStatusService.getAnonymousAccessStatus(context, item);
             String accessStatusType = accessStatusResult.getStatus();
-
-            String embargoFromItem = accessStatusService.getEmbargoFromItem(context, item);
+            LocalDate availabilityDate = accessStatusResult.getAvailabilityDate();
+            String embargoFromItem = null;
+            if (accessStatusType == DefaultAccessStatusHelper.EMBARGO && availabilityDate != null) {
+                embargoFromItem = availabilityDate.toString();
+            }
 
             Element accessStatus = ItemUtils.create("access-status");
             accessStatus.getField().add(ItemUtils.createValue("value", accessStatusType));

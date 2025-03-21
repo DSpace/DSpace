@@ -33,15 +33,16 @@ public interface AccessStatusHelper {
         Item item, LocalDate threshold, String type) throws SQLException;
 
     /**
-     * Retrieve embargo information for the item
+     * Calculate the anonymous access status for the item.
      *
      * @param context the DSpace context
      * @param item the item to check for embargo information
      * @param threshold the embargo threshold date
-     * @return an embargo date
+     * @return the access status
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public String getEmbargoFromItem(Context context, Item item, LocalDate threshold) throws SQLException;
+    public AccessStatus getAnonymousAccessStatusFromItem(Context context,
+        Item item, LocalDate threshold) throws SQLException;
 
     /**
      * Calculate the access status for the bitstream.

@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
@@ -157,19 +158,26 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
     public void testGetAccessStatusItem() throws Exception {
         AccessStatus accessStatus = accessStatusService.getAccessStatus(context, item);
         String status = accessStatus.getStatus();
+        LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertNotEquals("testGetAccessStatusItem 0", status, DefaultAccessStatusHelper.UNKNOWN);
+        assertNull("testGetAccessStatusItem 1", availabilityDate);
     }
 
     @Test
-    public void testGetEmbargoFromItem() throws Exception {
-        String embargo = accessStatusService.getEmbargoFromItem(context, item);
-        assertNull("testGetEmbargoFromItem 0", embargo);
+    public void testGetAnonymousAccessStatusItem() throws Exception {
+        AccessStatus accessStatus = accessStatusService.getAnonymousAccessStatus(context, item);
+        String status = accessStatus.getStatus();
+        LocalDate availabilityDate = accessStatus.getAvailabilityDate();
+        assertNotEquals("testGetAnonymousAccessStatusItem 0", status, DefaultAccessStatusHelper.UNKNOWN);
+        assertNull("testGetAnonymousAccessStatusItem 1", availabilityDate);
     }
 
     @Test
     public void testGetAccessStatusBitstream() throws Exception {
         AccessStatus accessStatus = accessStatusService.getAccessStatus(context, bitstream);
         String status = accessStatus.getStatus();
+        LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertNotEquals("testGetAccessStatusBitstream 0", status, DefaultAccessStatusHelper.UNKNOWN);
+        assertNull("testGetAccessStatusBitstream 1", availabilityDate);
     }
 }
