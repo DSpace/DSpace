@@ -9,9 +9,11 @@ package org.dspace.app.rest.submit.step;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ErrorRest;
@@ -50,7 +52,7 @@ public class UploadStep extends AbstractProcessingStep
 
     @Override
     public DataUpload getData(SubmissionService submissionService, InProgressSubmission obj,
-                              SubmissionStepConfig config) throws Exception {
+                              SubmissionStepConfig config) throws SQLException {
 
         DataUpload result = new DataUpload();
         List<Bundle> bundles = itemService.getBundles(obj.getItem(), Constants.CONTENT_BUNDLE_NAME);
@@ -98,8 +100,9 @@ public class UploadStep extends AbstractProcessingStep
     }
 
     @Override
-    public ErrorRest upload(Context context, SubmissionService submissionService, SubmissionStepConfig stepConfig,
-                            InProgressSubmission wsi, MultipartFile file) {
+    public Pair<Bitstream, ErrorRest> upload(Context context, SubmissionService submissionService,
+                                             SubmissionStepConfig stepConfig,
+                                             InProgressSubmission wsi, MultipartFile file) {
 
         Bitstream source = null;
         BitstreamFormat bf = null;
@@ -142,9 +145,8 @@ public class UploadStep extends AbstractProcessingStep
                 result.getPaths()
                     .add("/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + stepConfig.getId());
             }
-            return result;
+            return Pair.of(source, result);
         }
-
-        return null;
+        return Pair.of(source, null);
     }
 }
