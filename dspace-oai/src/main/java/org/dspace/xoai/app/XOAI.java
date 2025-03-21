@@ -110,7 +110,7 @@ public class XOAI {
         try {
             for (Bundle b : itemService.getBundles(item, "ORIGINAL")) {
                 for (Bitstream bs : b.getBitstreams()) {
-                    if (!formats.contains(bs.getFormat(context).getMIMEType())) {
+                    if (bs != null && !formats.contains(bs.getFormat(context).getMIMEType())) {
                         formats.add(bs.getFormat(context).getMIMEType());
                     }
                 }
