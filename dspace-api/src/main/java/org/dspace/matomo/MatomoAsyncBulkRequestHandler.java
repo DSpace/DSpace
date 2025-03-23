@@ -27,15 +27,15 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
-public class MatomoAsyncDequeHandler extends MatomoAbstractHandler {
+public class MatomoAsyncBulkRequestHandler extends MatomoAbstractHandler {
 
-    private static final Logger log = LogManager.getLogger(MatomoAsyncDequeHandler.class);
+    private static final Logger log = LogManager.getLogger(MatomoAsyncBulkRequestHandler.class);
 
     private final LinkedBlockingDeque<MatomoRequestDetails> deque;
     private final Lock lock = new ReentrantLock();
 
 
-    public MatomoAsyncDequeHandler(
+    public MatomoAsyncBulkRequestHandler(
         @Autowired MatomoRequestDetailsBuilder builder,
         @Autowired MatomoClient matomoClient,
         int capacity

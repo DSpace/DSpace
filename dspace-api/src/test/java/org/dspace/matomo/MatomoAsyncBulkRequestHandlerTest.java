@@ -19,19 +19,19 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-public class MatomoAsyncDequeHandlerTest extends AbstractUnitTest {
+public class MatomoAsyncBulkRequestHandlerTest extends AbstractUnitTest {
 
     @Mock
     MatomoRequestDetailsBuilder builder;
     @Mock
     MatomoClient matomoClient;
 
-    MatomoAsyncDequeHandler matomoAsyncDequeHandler;
+    MatomoAsyncBulkRequestHandler matomoAsyncDequeHandler;
 
     @Before
     public void setUp() throws Exception {
         matomoAsyncDequeHandler =
-            new MatomoAsyncDequeHandler(builder, matomoClient, 5);
+            new MatomoAsyncBulkRequestHandler(builder, matomoClient, 5);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class MatomoAsyncDequeHandlerTest extends AbstractUnitTest {
     @Test
     public void testSingleRequestCapacity() {
         matomoAsyncDequeHandler =
-            new MatomoAsyncDequeHandler(builder, matomoClient, 1);
+            new MatomoAsyncBulkRequestHandler(builder, matomoClient, 1);
 
         UsageEvent usageEvent = Mockito.mock(UsageEvent.class);
         MatomoRequestDetails matomoRequestDetails = new MatomoRequestDetails();
@@ -72,7 +72,7 @@ public class MatomoAsyncDequeHandlerTest extends AbstractUnitTest {
     @Test
     public void testTwoRequestsTwoCapacity() {
         matomoAsyncDequeHandler =
-            new MatomoAsyncDequeHandler(builder, matomoClient, 3);
+            new MatomoAsyncBulkRequestHandler(builder, matomoClient, 3);
 
         UsageEvent usageEvent = Mockito.mock(UsageEvent.class);
         MatomoRequestDetails matomoRequestDetails = new MatomoRequestDetails();

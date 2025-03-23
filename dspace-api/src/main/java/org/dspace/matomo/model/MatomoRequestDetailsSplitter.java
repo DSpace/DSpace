@@ -20,8 +20,18 @@ import java.util.stream.Collectors;
  **/
 public class MatomoRequestDetailsSplitter {
 
+    /**
+     * Private constructor to prevent instantiation of utility class.
+     */
     private MatomoRequestDetailsSplitter () { }
 
+    /**
+     * Splits a list of MatomoRequestDetails into a map grouped by their "_id" parameter.
+     *
+     * @param details The list of MatomoRequestDetails to split
+     * @return A Map where the key is the "_id" parameter value (or "default" if not set) and
+     *         the value is a List of MatomoRequestDetails with that "_id"
+     */
     public static Map<String, List<MatomoRequestDetails>> split(List<MatomoRequestDetails> details) {
         return details.stream().collect(
                 Collectors.groupingBy(

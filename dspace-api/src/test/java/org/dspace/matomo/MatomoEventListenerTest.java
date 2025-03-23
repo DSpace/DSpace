@@ -28,7 +28,7 @@ import org.mockito.Mockito;
 public class MatomoEventListenerTest extends AbstractUnitTest {
 
     @Mock
-    MatomoAsyncDequeHandler matomoHandler1;
+    MatomoAsyncBulkRequestHandler matomoHandler1;
     @Mock
     MatomoSyncEventHandler matomoHandler2;
     @Mock

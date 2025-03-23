@@ -23,6 +23,12 @@ public class MatomoCookieConverter {
     private MatomoCookieConverter() {
     }
 
+    /**
+     * Converts a single MatomoRequestDetails object's cookies into a Matomo-formatted string
+     *
+     * @param matomoRequestDetails The MatomoRequestDetails object containing cookies to convert
+     * @return A string containing the cookies in key=value format, separated by semicolons
+     */
     public static String convert(MatomoRequestDetails matomoRequestDetails) {
         return matomoRequestDetails.cookies
                     .entrySet()
@@ -33,6 +39,14 @@ public class MatomoCookieConverter {
                     .collect(Collectors.joining(";"));
     }
 
+    /**
+     * Converts a list of MatomoRequestDetails objects' cookies into a single Matomo-formatted string.
+     * If multiple cookies have the same key, the last value will be used.
+     *
+     * @param matomoRequestDetails List of MatomoRequestDetails objects containing cookies to convert
+     * @return A string containing the merged cookies in key=value format, separated by semicolons.
+     *         Returns empty string if input is null or empty.
+     */
     public static String convert(List<MatomoRequestDetails> matomoRequestDetails) {
         if (matomoRequestDetails == null || matomoRequestDetails.isEmpty()) {
             return "";

@@ -48,6 +48,12 @@ public abstract class MatomoAbstractClient<C, T, U> implements MatomoClient {
         this.httpClient = httpClient;
     }
 
+    /**
+     * Creates a request with the given request body and empty cookies.
+     *
+     * @param requestBody The body content of the request
+     * @return A request object of type T
+     */
     protected T createRequest(String requestBody) {
         return createRequest(requestBody, "");
     }
@@ -91,10 +97,23 @@ public abstract class MatomoAbstractClient<C, T, U> implements MatomoClient {
         }
     }
 
+    /**
+     * Generates a cookie string from a list of Matomo request details.
+     *
+     * @param details List of MatomoRequestDetails to extract cookie information from
+     * @return String containing the formatted cookie data
+     */
     protected String generateCookies(List<MatomoRequestDetails> details) {
         return MatomoCookieConverter.convert(details);
     }
 
+    /**
+     * Adds cookies to an HTTP connection by setting the Cookie request property.
+     * Takes a map of cookie names and values and formats them into a single cookie header string.
+     *
+     * @param connection The HttpURLConnection to add cookies to
+     * @param cookies Map containing cookie names as keys and cookie values as values
+     */
     protected static void addCookies(
         HttpURLConnection connection, Map<String, String> cookies
     ) {
@@ -108,11 +127,10 @@ public abstract class MatomoAbstractClient<C, T, U> implements MatomoClient {
                 }
             }
         }
-        if (!cookiesValue.isEmpty()) {
+        if (cookiesValue.length() > 0) {
             connection.setRequestProperty("Cookie", cookiesValue.toString());
         }
     }
-
     protected void logError(U response, String requestBody) {
         if (isNotSuccessful(response)) {
             String responseMessage = formatErrorMessage(response);

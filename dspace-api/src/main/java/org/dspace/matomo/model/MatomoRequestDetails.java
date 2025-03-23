@@ -20,15 +20,27 @@ public class MatomoRequestDetails {
     final Map<String, String> parameters = new HashMap<>();
     final Map<String, String> cookies = new HashMap<>();
 
+    /**
+     * Adds a parameter key-value pair to the request details
+     *
+     * @param key   The parameter key
+     * @param value The parameter value
+     * @return The current MatomoRequestDetails instance for method chaining
+     */
     public MatomoRequestDetails addParameter(String key, String value) {
         parameters.put(key, value);
         return this;
     }
 
+    /**
+     * Adds a cookie key-value pair to the request details
+     * @param key The cookie key
+     * @param value The cookie value
+     * @return The current MatomoRequestDetails instance for method chaining
+     */
     public MatomoRequestDetails addCookie(String key, String value) {
         cookies.put(key, value);
         return this;
     }
 
 }
-
