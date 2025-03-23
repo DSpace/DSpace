@@ -23,6 +23,12 @@ public class MatomoRequestDetailsBuilder {
     final String siteId;
     final List<MatomoRequestDetailsEnricher> enrichers;
 
+    /**
+     * Constructs a new MatomoRequestDetailsBuilder with the specified enrichers and site ID.
+     *
+     * @param enrichers List of MatomoRequestDetailsEnricher objects to enrich the request details
+     * @param siteId The Matomo site ID to be used for tracking
+     */
     MatomoRequestDetailsBuilder(
         List<MatomoRequestDetailsEnricher> enrichers,
         String siteId
@@ -31,6 +37,13 @@ public class MatomoRequestDetailsBuilder {
         this.siteId = siteId;
     }
 
+    /**
+     * Builds a MatomoRequestDetails object for the given usage event.
+     * This method initializes basic tracking parameters and applies all configured enrichers.
+     *
+     * @param usageEvent The usage event to build request details for
+     * @return MatomoRequestDetails object containing all tracking parameters
+     */
     public MatomoRequestDetails build(UsageEvent usageEvent) {
         MatomoRequestDetails requestDetails = new MatomoRequestDetails();
 

@@ -47,11 +47,22 @@ public class MatomoRequestDetailsListConverter<T extends Collection<MatomoReques
         return MessageFormat.format(requestTemplate, getRequestURL(request));
     }
 
+    /**
+     * Converts the request parameters into a URL query string format.
+     * The resulting format will be: param1=value1&param2=value2&param3=value3
+     * where each parameter-value pair is joined with '=' and multiple pairs are joined with '&'.
+     * Empty parameters or values are filtered out.
+     *
+     * @param request The MatomoRequestDetails containing the parameters to convert
+     * @return A URL query string containing the formatted parameters
+     */
     private String getRequestURL(MatomoRequestDetails request) {
         return request.parameters.entrySet()
                                  .stream()
                                  .filter(entry -> StringUtils.isNoneEmpty(entry.getValue(), entry.getKey()))
-                                 .map(entry -> MessageFormat.format(keyValueTemplate, entry.getKey(), entry.getValue()))
+                                 .map(entry ->
+                                          MessageFormat.format(keyValueTemplate, entry.getKey(), entry.getValue())
+                                 )
                                  .collect(Collectors.joining("&"));
     }
 }

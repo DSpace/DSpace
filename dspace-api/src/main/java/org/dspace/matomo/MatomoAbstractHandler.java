@@ -26,10 +26,15 @@ public abstract class MatomoAbstractHandler implements MatomoUsageEventHandler {
         this.builder = builder;
     }
 
+    /**
+     * Converts a DSpace usage event into a Matomo request details object.
+     *
+     * @param usageEvent The DSpace usage event to convert
+     * @return MatomoRequestDetails object containing the converted event details
+     */
     protected MatomoRequestDetails toDetails(UsageEvent usageEvent) {
         return this.builder.build(usageEvent);
     }
-
     @Override
     public abstract void handleEvent(UsageEvent usageEvent);
 
