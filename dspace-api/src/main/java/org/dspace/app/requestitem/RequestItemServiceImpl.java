@@ -382,7 +382,7 @@ public class RequestItemServiceImpl implements RequestItemService {
         // First, if dateOrDelta is a null string or "FOREVER", we will set the expiry
         // date to a very distant date in the future.
         if (dateOrDelta == null || dateOrDelta.equals("FOREVER")) {
-            return getMaxTimestamp();
+            return Utils.getMaxTimestamp();
         }
         // Next, try parsing as a straight date using the multiple format parser
         ZonedDateTime parsedExpiryDate = MultiFormatDateParser.parse(dateOrDelta);
@@ -398,14 +398,5 @@ public class RequestItemServiceImpl implements RequestItemService {
             // The expiry date was a valid formatted date string, so set the access expiry date
             return parsedExpiryDate.toInstant();
         }
-    }
-
-    /**
-     * Get the maximum timestamp that can be stored in a PostgreSQL database, for our "distant future" access expiry date.
-     * @return the maximum timestamp that can be stored in a PostgreSQL database
-     */
-    public static Instant getMaxTimestamp() {
-        return LocalDateTime.of(294276, 1, 1, 0, 0, 0)
-                .toInstant(ZoneOffset.UTC);
     }
 }

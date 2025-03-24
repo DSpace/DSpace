@@ -31,6 +31,7 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogHelper;
+import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
@@ -211,7 +212,7 @@ public class RequestItemEmailNotifier {
                             + "/items/" + ri.getItem().getID()
                             + "?accessToken=" + ri.getAccess_token());
                     // {7} access end date, but only add formatted date string if it is set and not "forever"
-                    if (ri.getAccess_expiry() != null && !ri.getAccess_expiry().equals(RequestItemServiceImpl.getMaxTimestamp())) {
+                    if (ri.getAccess_expiry() != null && !ri.getAccess_expiry().equals(Utils.getMaxTimestamp())) {
                         email.addArgument(dateTimeFormatter.format(ri.getAccess_expiry()));
                     } else {
                         email.addArgument(null);
