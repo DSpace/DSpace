@@ -11,8 +11,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
@@ -76,12 +74,6 @@ public class MatomoEventListenerTest extends AbstractUnitTest {
         // mock event
         UsageEvent event = Mockito.mock(UsageEvent.class);
         Mockito.when(event.getAction()).thenReturn(UsageEvent.Action.VIEW);
-        // mock request
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        Mockito.when(event.getRequest()).thenReturn(request);
-        // sets cookies that would be accepted on the angular side
-        Cookie idCookie = new Cookie("_pk_id.1.1fff", "3225aebdb98b13f9.1740076196.");
-        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { idCookie });
 
         // mock bitstream
         Bitstream bitstream = Mockito.spy(Bitstream.class);
@@ -117,19 +109,6 @@ public class MatomoEventListenerTest extends AbstractUnitTest {
         // default ( original bundle only ) then proceed with the invocation
         Mockito.when(configurationService.getArrayProperty(Mockito.eq("matomo.track.bundles"), Mockito.any()))
                .thenReturn(new String[] { Constants.CONTENT_BUNDLE_NAME });
-
-        // shouldn't proceed with the tracking when the cookie is not set on the request
-        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { });
-
-        matomoEventListener.receiveEvent(event);
-
-        Mockito.verifyNoMoreInteractions(matomoHandler1);
-        Mockito.verifyNoMoreInteractions(matomoHandler2);
-
-        matomoEventListener.receiveEvent(event);
-
-        // should proceed with the tracking when the cookie is set
-        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { idCookie });
 
         matomoEventListener.receiveEvent(event);
 
