@@ -8,11 +8,16 @@
 package org.dspace.matomo.model;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import jakarta.servlet.http.Cookie;
@@ -35,6 +40,7 @@ import org.dspace.matomo.factory.MatomoRequestCustomVariablesEnricher;
 import org.dspace.matomo.factory.MatomoRequestDetailsEnricher;
 import org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory;
 import org.dspace.matomo.factory.MatomoRequestIpAddressEnricher;
+import org.dspace.matomo.factory.MatomoRequestTrackerIdentifierParamEnricher;
 import org.dspace.service.ClientInfoService;
 import org.dspace.usage.UsageEvent;
 import org.hamcrest.CoreMatchers;
@@ -495,6 +501,145 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
             Matchers.hasEntry(
                 Matchers.is("_cvar"),
                 Matchers.is("{\"1\":[\"key1\",\"value1\"],\"2\":[\"key2\",\"value2\"]}")
+            )
+        );
+    }
+
+    /**
+     * Test the enrich method with an empty parameter map.
+     * This tests the edge case where the request's parameter map is empty, which is implicitly handled in the method.
+     */
+    @Test
+    public void testEnrichWithEmptyParameterMap() {
+        MatomoRequestTrackerIdentifierParamEnricher enricher = new MatomoRequestTrackerIdentifierParamEnricher();
+        MatomoRequestDetails matomoRequestDetails = new MatomoRequestDetails();
+        UsageEvent usageEvent = mock(UsageEvent.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(usageEvent.getRequest()).thenReturn(request);
+        when(usageEvent.getRequest().getParameterMap()).thenReturn(new HashMap<>());
+
+        MatomoRequestDetails result = enricher.enrich(usageEvent, matomoRequestDetails);
+
+        assertEquals(matomoRequestDetails, result);
+    }
+
+    /**
+     * Test the enrich method with an invalid tracker ID.
+     * This tests the edge case where the tracker ID is present but does not match the expected format.
+     */
+    @Test
+    public void testEnrichWithInvalidTrackerId() {
+        MatomoRequestTrackerIdentifierParamEnricher enricher = new MatomoRequestTrackerIdentifierParamEnricher();
+        MatomoRequestDetails matomoRequestDetails = new MatomoRequestDetails();
+        UsageEvent usageEvent = mock(UsageEvent.class);
+        when(usageEvent.getRequest()).thenReturn(mock(HttpServletRequest.class));
+
+        Map<String, String[]> parameterMap = new HashMap<>();
+        parameterMap.put("trackerId", new String[] {"invalidTrackerID"});
+        when(usageEvent.getRequest().getParameterMap()).thenReturn(parameterMap);
+
+        MatomoRequestDetails result = enricher.enrich(usageEvent, matomoRequestDetails);
+
+        assertEquals(matomoRequestDetails, result);
+    }
+
+    /**
+     * Test the enrich method with a UsageEvent that has a null request.
+     * This tests the edge case where the UsageEvent's request is null, which is explicitly handled in the method.
+     */
+    @Test
+    public void testEnrichWithNullRequest() {
+        MatomoRequestTrackerIdentifierParamEnricher enricher = new MatomoRequestTrackerIdentifierParamEnricher();
+        MatomoRequestDetails matomoRequestDetails = new MatomoRequestDetails();
+        UsageEvent usageEvent = mock(UsageEvent.class);
+        when(usageEvent.getRequest()).thenReturn(null);
+
+        MatomoRequestDetails result = enricher.enrich(usageEvent, matomoRequestDetails);
+
+        assertEquals(matomoRequestDetails, result);
+    }
+
+    /**
+     * Test the enrich method with a null UsageEvent.
+     * This tests the edge case where the UsageEvent is null, which is explicitly handled in the method.
+     */
+    @Test
+    public void testEnrichWithNullUsageEvent() {
+        MatomoRequestTrackerIdentifierParamEnricher enricher = new MatomoRequestTrackerIdentifierParamEnricher();
+        MatomoRequestDetails matomoRequestDetails = new MatomoRequestDetails();
+
+        MatomoRequestDetails result = enricher.enrich(null, matomoRequestDetails);
+
+        assertEquals(matomoRequestDetails, result);
+    }
+
+    /**
+     * Test case for the enrich method when the UsageEvent is null.
+     * This test verifies that the method returns the original MatomoRequestDetails
+     * object without modifications when the input UsageEvent is null.
+     */
+    @Test
+    public void test_enrich_whenUsageEventIsNull() {
+        MatomoRequestTrackerIdentifierParamEnricher enricher = new MatomoRequestTrackerIdentifierParamEnricher();
+        MatomoRequestDetails matomoRequestDetails = mock(MatomoRequestDetails.class);
+
+        MatomoRequestDetails result = enricher.enrich(null, matomoRequestDetails);
+
+        assertEquals(matomoRequestDetails, result);
+    }
+
+    /**
+     * Test case for enrich method when UsageEvent and HttpServletRequest are not null,
+     * but the parameter map does not contain a valid tracker identifier.
+     * Expected: The original MatomoRequestDetails should be returned unchanged.
+     */
+    @Test
+    public void test_enrich_withInvalidParameter() {
+        // Arrange
+        MatomoRequestTrackerIdentifierParamEnricher enricher = new MatomoRequestTrackerIdentifierParamEnricher();
+        UsageEvent usageEvent = mock(UsageEvent.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        MatomoRequestDetails matomoRequestDetails = new MatomoRequestDetails();
+
+        Map<String, String[]> parameterMap = new HashMap<>();
+        parameterMap.put("trackerId", new String[] {"invalidValue"});
+
+        when(usageEvent.getRequest()).thenReturn(request);
+        when(request.getParameterMap()).thenReturn(parameterMap);
+
+        // Act
+        MatomoRequestDetails result = enricher.enrich(usageEvent, matomoRequestDetails);
+
+        // Assert
+        assertEquals(matomoRequestDetails, result);
+    }
+
+    /**
+     * Tests the enrich method when a valid tracker identifier is present in the request parameters.
+     * This test verifies that the method adds the tracker identifier to the MatomoRequestDetails
+     * when the usage event contains a valid tracker ID in its request parameters.
+     */
+    @Test
+    public void test_enrich_with_valid_tracker_id() {
+        // Arrange
+        MatomoRequestTrackerIdentifierParamEnricher enricher = new MatomoRequestTrackerIdentifierParamEnricher();
+        UsageEvent usageEvent = mock(UsageEvent.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        MatomoRequestDetails matomoRequestDetails = new MatomoRequestDetails();
+
+        Map<String, String[]> parameterMap = new HashMap<>();
+        parameterMap.put("trackerId", new String[] {"1234567890abcdef"});
+
+        when(usageEvent.getRequest()).thenReturn(request);
+        when(request.getParameterMap()).thenReturn(parameterMap);
+
+        MatomoRequestDetails result = enricher.enrich(usageEvent, matomoRequestDetails);
+
+        assertThat(
+            result.parameters,
+            Matchers.hasEntry(
+                Matchers.is("_id"),
+                Matchers.is("1234567890abcdef")
             )
         );
     }
