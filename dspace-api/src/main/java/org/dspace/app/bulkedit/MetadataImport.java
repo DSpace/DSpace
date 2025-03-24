@@ -145,7 +145,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
         try {
             // If required, make the change
-            if (change && !validateOnly) {
+            if (change || (!testRun && !validateOnly)) {
                 c.setMode(Context.Mode.BATCH_EDIT);
                 int i = 1;
                 int batchSize = configurationService.getIntProperty("bulkedit.change.commit.count", 100);

@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.bulkedit.cache;
 
 import java.sql.SQLException;
@@ -10,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.bulkedit.MetadataImportException;
 import org.dspace.content.MetadataField;
@@ -161,20 +169,8 @@ public class BulkEditCacheImpl implements BulkEditCache {
         // Lookup UUIDs that may have already been processed
         // See populateRefAndRowMap() for how the Map is populated
         Set<UUID> referencedUUIDs = metadataReferenceToUUIDMap.get(reference);
-        if (referencedUUIDs.size() > 1) {
-            throw new MetadataImportException("Error resolving Entity reference:\n" +
-                "Ambiguous reference; multiple matches in import: " + reference);
-        } else if (referencedUUIDs.size() == 1) {
-            UUID batchEditUUID = referencedUUIDs.iterator().next();
-            if (batchEditUUID.equals(uuid)) {
-                return uuid; // one match from batch edit and db (same item)
-            } else if (uuid != null) {
-                throw new MetadataImportException("Error resolving Entity reference:\n" +
-                    "Ambiguous reference; multiple matches in db and import: " + reference);
-            } else {
-                return batchEditUUID; // one match from batch edit
-            }
-        } else { // size == 0; the reference does not exist throw an error
+        if (CollectionUtils.isEmpty(referencedUUIDs)) {
+            // size == 0; the reference does not exist throw an error
             if (uuid == null) {
                 throw new MetadataImportException("Error resolving Entity reference:\n" +
                     "No matches found for reference: " + reference
@@ -183,6 +179,19 @@ public class BulkEditCacheImpl implements BulkEditCache {
                     "this one within the batch edit.");
             } else {
                 return uuid; // one match from db
+            }
+        } else if (referencedUUIDs.size() > 1) {
+            throw new MetadataImportException("Error resolving Entity reference:\n" +
+                "Ambiguous reference; multiple matches in import: " + reference);
+        } else {
+            UUID batchEditUUID = referencedUUIDs.iterator().next();
+            if (batchEditUUID.equals(uuid)) {
+                return uuid; // one match from batch edit and db (same item)
+            } else if (uuid != null) {
+                throw new MetadataImportException("Error resolving Entity reference:\n" +
+                    "Ambiguous reference; multiple matches in db and import: " + reference);
+            } else {
+                return batchEditUUID; // one match from batch edit
             }
         }
     }

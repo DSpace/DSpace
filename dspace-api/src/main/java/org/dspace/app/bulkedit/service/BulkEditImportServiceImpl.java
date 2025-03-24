@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.bulkedit.service;
 
 import java.io.IOException;
@@ -202,9 +209,13 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
         // Update the item if it has changed
         if ((!bechange.getAdds().isEmpty()) || (!bechange.getRemoves().isEmpty())) {
             // Get the complete list of what values should now be in that element
-            Map<String, List<BulkEditMetadataValue>> metadataValues = getMetadataByField(bechange.getComplete());
-            for (String key : metadataValues.keySet()) {
-                List<BulkEditMetadataValue> list = metadataValues.get(key);
+            Map<String, List<BulkEditMetadataValue>> metadataValuesToAddOrKeep =
+                getMetadataByField(bechange.getComplete());
+            Map<String, List<BulkEditMetadataValue>> metadataValuesToRemove =
+                getMetadataByField(bechange.getRemoves());
+
+            for (String key : metadataValuesToAddOrKeep.keySet()) {
+                List<BulkEditMetadataValue> list = metadataValuesToAddOrKeep.get(key);
                 if (!list.isEmpty()) {
                     String schema = list.get(0).getSchema();
                     String element = list.get(0).getElement();
@@ -232,6 +243,19 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
                         itemService.clearMetadata(c, item, schema, element, qualifier, language);
                         itemService.addMetadata(c, item, schema, element, qualifier,
                             language, values, authorities, confidences);
+                    }
+                }
+            }
+            for (String key : metadataValuesToRemove.keySet()) {
+                if (!metadataValuesToAddOrKeep.containsKey(key)) {
+                    List<BulkEditMetadataValue> list = metadataValuesToRemove.get(key);
+                    if (!list.isEmpty()) {
+                        String schema = list.get(0).getSchema();
+                        String element = list.get(0).getElement();
+                        String qualifier = list.get(0).getQualifier();
+                        String language = list.get(0).getLanguage();
+
+                        itemService.clearMetadata(c, item, schema, element, qualifier, language);
                     }
                 }
             }
