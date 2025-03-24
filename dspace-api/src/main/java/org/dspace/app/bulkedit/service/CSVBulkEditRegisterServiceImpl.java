@@ -105,13 +105,13 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
                         throw new MetadataImportException("Missing collection from item " + item.getHandle());
                     }
                     List<Collection> actualCollections = item.getCollections();
-                    compare(c, item, collections, actualCollections, whatHasChanged);
+                    compareCollections(c, item, collections, actualCollections, whatHasChanged);
                 }
 
                 // Iterate through each metadata element in the csv line
                 for (String md : metadataValues.keySet()) {
                     // Compare
-                    compareAndUpdate(c, item, csv, metadataValues.get(md), md, whatHasChanged, line);
+                    compareMetadata(c, item, csv, metadataValues.get(md), md, whatHasChanged, line);
                 }
 
                 // Perform the action
@@ -239,10 +239,8 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
      * @throws IOException             Can be thrown when moving items in communities
      * @throws MetadataImportException If something goes wrong to be reported back to the user
      */
-    protected void compare(Context c, Item item,
-                           List<String> collections,
-                           List<Collection> actualCollections,
-                           BulkEditChange bechange)
+    protected void compareCollections(Context c, Item item, List<String> collections,
+                                      List<Collection> actualCollections, BulkEditChange bechange)
         throws SQLException, AuthorizeException, IOException, MetadataImportException {
         // First, check the owning collection (as opposed to mapped collections) is the same of changed
         String oldOwner = item.getOwningCollection().getHandle();
@@ -378,8 +376,8 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
      * @param changes The changes object to populate
      * @param line    line in CSV file
      */
-    protected void compareAndUpdate(Context c, Item item, DSpaceCSV csv, List<String> fromCSV,
-                                    String md, BulkEditChange changes, DSpaceCSVLine line) {
+    protected void compareMetadata(Context c, Item item, DSpaceCSV csv, List<String> fromCSV,
+                                   String md, BulkEditChange changes, DSpaceCSVLine line) {
         // Log what metadata element we're looking at
         String all = StringUtils.join(fromCSV, ',');
         log.debug(LogHelper.getHeader(c, "metadata_import",
@@ -397,7 +395,7 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
         List<String> dcvalues = new ArrayList<>();
         if (fromAuthority == null) {
             List<MetadataValue> current = itemService.getMetadata(item, metadataField.getSchema(),
-                metadataField.getElement(), metadataField.getQualifier(), metadataField.getLanguage());
+                metadataField.getElement(), metadataField.getQualifier(), metadataField.getLanguage(), false);
             for (MetadataValue dcv : current) {
                 if (dcv.getAuthority() == null || !isAuthorityControlledField(md)) {
                     dcvalues.add(dcv.getValue());
