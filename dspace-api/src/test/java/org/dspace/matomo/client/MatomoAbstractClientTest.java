@@ -80,7 +80,8 @@ public class MatomoAbstractClientTest extends AbstractUnitTest {
 
     /**
      * Test case for static void addCookies(HttpURLConnection connection, Map<String, String> cookies)
-     * This test verifies that when given a non-null but empty cookies map, no request property is set on the connection.
+     * This test verifies that when given a non-null but empty cookies map,
+     * no request property is set on the connection.
      */
     @Test
     public void test_addCookies_withEmptyCookiesMap() {
