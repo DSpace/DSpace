@@ -44,7 +44,6 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.EventService;
 import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.AbstractResource;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -178,15 +177,37 @@ public class BitstreamRestController {
             long filesize = bit.getSizeBytes();
             Boolean citationEnabledForBitstream = citationDocumentService.isCitationEnabledForBitstream(bit, context);
 
+
+
+            // Generate a special bitstream resource stream depending on whether we are accessing by token
+            // or eperson / group access
+            org.dspace.app.rest.utils.BitstreamResource bitstreamResource;
+            if (authorizedByAccessToken) {
+                // Get input stream using temporary privileged context
+                bitstreamResource = new org.dspace.app.rest.utils.BitstreamResourceAccessByToken(name, uuid,
+                                currentUser != null ? currentUser.getID() : null,
+                                context.getSpecialGroupUuids(), citationEnabledForBitstream, accessToken);
+            } else {
+                // Get input stream using default user/group authorization
+                bitstreamResource =
+                        new org.dspace.app.rest.utils.BitstreamResource(name, uuid,
+                                currentUser != null ? currentUser.getID() : null,
+                                context.getSpecialGroupUuids(), citationEnabledForBitstream);
+            }
+
+            // We have all the data we need, close the connection to the database so that it doesn't stay open during
+            // download/streaming
+            context.complete();
+
             // Set http headers
             HttpHeadersInitializer httpHeadersInitializer = new HttpHeadersInitializer()
-                .withBufferSize(BUFFER_SIZE)
-                .withFileName(name)
-                .withChecksum(bit.getChecksum())
-                .withLength(bit.getSizeBytes())
-                .withMimetype(mimetype)
-                .with(request)
-                .with(response);
+                    .withBufferSize(BUFFER_SIZE)
+                    .withFileName(name)
+                    .withChecksum(bitstreamResource.getChecksum())
+                    .withLength(bitstreamResource.contentLength())
+                    .withMimetype(mimetype)
+                    .with(request)
+                    .with(response);
 
             // Set last modified in headers
             if (lastModified != null) {
@@ -201,25 +222,6 @@ public class BitstreamRestController {
                     || checkFormatForContentDisposition(format)) {
                 httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_ATTACHMENT);
             }
-
-            // Generate a special bitstream resource stream depending on whether we are accessing by token
-            // or eperson / group access
-            AbstractResource bitstreamResource;
-            if (authorizedByAccessToken) {
-                // Get input stream using temporary privileged context
-                bitstreamResource = new org.dspace.app.rest.utils.BitstreamResourceAccessByToken(name, uuid,
-                                context.getSpecialGroupUuids(), citationEnabledForBitstream, accessToken);
-            } else {
-                // Get input stream using default user/group authorization
-                bitstreamResource =
-                        new org.dspace.app.rest.utils.BitstreamResource(name, uuid,
-                                currentUser != null ? currentUser.getID() : null,
-                                context.getSpecialGroupUuids(), citationEnabledForBitstream);
-            }
-
-            // We have all the data we need, close the connection to the database so that it doesn't stay open during
-            // download/streaming
-            context.complete();
 
             // Send the data
             if (httpHeadersInitializer.isValid()) {

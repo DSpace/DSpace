@@ -71,7 +71,7 @@ public class BitstreamResource extends AbstractResource {
      * @param bitstream the pdf for which we want to generate a coverpage
      * @return a byte array containing the cover page
      */
-    private byte[] getCoverpageByteArray(Context context, Bitstream bitstream)
+    byte[] getCoverpageByteArray(Context context, Bitstream bitstream)
             throws IOException, SQLException, AuthorizeException {
         try {
             var citedDocument = citationDocumentService.makeCitedDocument(context, bitstream);

@@ -45,7 +45,7 @@ import org.springframework.core.io.AbstractResource;
  *
  * @author Kim Shepherd
  */
-public class BitstreamResourceAccessByToken extends AbstractResource {
+public class BitstreamResourceAccessByToken extends BitstreamResource {
 
     private String name;
     private UUID uuid;
@@ -69,44 +69,14 @@ public class BitstreamResourceAccessByToken extends AbstractResource {
      */
     Logger log = LogManager.getLogger();
 
-    public BitstreamResourceAccessByToken(String name, UUID uuid, Set<UUID> currentSpecialGroups,
+    public BitstreamResourceAccessByToken(String name, UUID uuid, UUID currentUserUUID, Set<UUID> currentSpecialGroups,
                                           boolean shouldGenerateCoverPage, String accessToken) {
+        super(name, uuid, currentUserUUID, currentSpecialGroups, shouldGenerateCoverPage);
         this.name = name;
         this.uuid = uuid;
         this.currentSpecialGroups = currentSpecialGroups;
         this.shouldGenerateCoverPage = shouldGenerateCoverPage;
         this.accessToken = accessToken;
-    }
-
-    /**
-     * Get Potential cover page by array, this method should only be called when a coverpage should be generated
-     * In case of failure the original file will be returned
-     *
-     * @param context   the DSpace context
-     * @param bitstream the pdf for which we want to generate a coverpage
-     * @return a byte array containing the cover page
-     */
-    private byte[] getCoverpageByteArray(Context context, Bitstream bitstream)
-        throws IOException, SQLException, AuthorizeException {
-        if (file == null) {
-            try {
-                Pair<byte[], Long> citedDocument = citationDocumentService.makeCitedDocument(context, bitstream);
-                this.file = citedDocument.getLeft();
-            } catch (Exception e) {
-                // Return the original bitstream without the cover page
-                this.file = IOUtils.toByteArray(bitstreamService.retrieve(context, bitstream));
-            }
-        }
-        return file;
-    }
-
-    /**
-     * Get a download/attachment description for the bitstream
-     * @return description string
-     */
-    @Override
-    public String getDescription() {
-        return "bitstream [" + uuid + "]";
     }
 
     /**
@@ -163,34 +133,6 @@ public class BitstreamResourceAccessByToken extends AbstractResource {
     }
 
     /**
-     * Get the filename of the download disposition
-     * @return file name
-     */
-    @Override
-    public String getFilename() {
-        return name;
-    }
-
-    /**
-     * Get content length of the bitstream
-     * @return content length
-     * @throws IOException
-     */
-    @Override
-    public long contentLength() throws IOException {
-        try (Context context = initializeContext()) {
-            Bitstream bitstream = bitstreamService.find(context, uuid);
-            if (shouldGenerateCoverPage) {
-                return getCoverpageByteArray(context, bitstream).length;
-            } else {
-                return bitstream.getSizeBytes();
-            }
-        } catch (SQLException | AuthorizeException e) {
-            throw new IOException(e);
-        }
-    }
-
-    /**
      * Initialise a new temporary context just for the use of this download
      *
      * @return totally new context
@@ -200,4 +142,5 @@ public class BitstreamResourceAccessByToken extends AbstractResource {
     private Context initializeContext() throws SQLException, AuthorizeException {
         return new Context();
     }
+
 }
