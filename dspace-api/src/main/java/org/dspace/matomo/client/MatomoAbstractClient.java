@@ -114,7 +114,7 @@ public abstract class MatomoAbstractClient<C, T, U> implements MatomoClient {
      * @param connection The HttpURLConnection to add cookies to
      * @param cookies Map containing cookie names as keys and cookie values as values
      */
-    protected static void addCookies(
+    static void addCookies(
         HttpURLConnection connection, Map<String, String> cookies
     ) {
         StringBuilder cookiesValue = new StringBuilder();
@@ -126,11 +126,16 @@ public abstract class MatomoAbstractClient<C, T, U> implements MatomoClient {
                     cookiesValue.append("; ");
                 }
             }
+            String requestCookies = connection.getRequestProperty("Cookie");
+            if (!StringUtils.isEmpty(requestCookies)) {
+                cookiesValue.append("; ").append(requestCookies);
+            }
         }
-        if (cookiesValue.length() > 0) {
+        if (!cookiesValue.isEmpty()) {
             connection.setRequestProperty("Cookie", cookiesValue.toString());
         }
     }
+
     protected void logError(U response, String requestBody) {
         if (isNotSuccessful(response)) {
             String responseMessage = formatErrorMessage(response);
