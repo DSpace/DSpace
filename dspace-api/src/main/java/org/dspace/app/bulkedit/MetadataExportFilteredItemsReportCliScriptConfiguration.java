@@ -8,6 +8,8 @@
 
 package org.dspace.app.bulkedit;
 
+import java.util.Optional;
+
 import org.apache.commons.cli.Options;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,9 @@ public class MetadataExportFilteredItemsReportCliScriptConfiguration
     @Override
     public Options getOptions() {
         Options options = super.getOptions();
-        String filename = configurationService.getProperty("contentreport.metadataquery.csv.filename.default");
+        String filename = Optional.ofNullable(
+                configurationService.getProperty("contentreport.metadataquery.csv.filename.default"))
+                .orElse(MetadataExportFilteredItemsReport.DEFAULT_FILENAME);
         options.addOption("n", "filename", true, "the filename to export to (default: " + filename + ")");
         return options;
     }

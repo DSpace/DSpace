@@ -47,6 +47,7 @@ public class MetadataExportFilteredItemsReport extends DSpaceRunnable
         <MetadataExportFilteredItemsReportScriptConfiguration<MetadataExportFilteredItemsReport>> {
 
     private static final String EXPORT_CSV = "exportCSV";
+    public static final String DEFAULT_FILENAME = "metadataExportFilteredItems.csv";
     private boolean help = false;
     private String[] collectionUuids;
     private String[] queryPredicates;
@@ -153,7 +154,9 @@ public class MetadataExportFilteredItemsReport extends DSpaceRunnable
     }
 
     protected String getFileNameOrExportFile() {
-        return configurationService.getProperty("contentreport.metadataquery.csv.filename.default");
+        return Optional.ofNullable(
+                configurationService.getProperty("contentreport.metadataquery.csv.filename.default"))
+                .orElse(DEFAULT_FILENAME);
     }
 
     private static Stream<String> arrayToStream(String... array) {
