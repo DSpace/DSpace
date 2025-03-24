@@ -45,9 +45,20 @@ public class MatomoAbstractClientTest extends AbstractUnitTest {
         }
 
         // Stub implementations for abstract methods
-        @Override public void disconnect() {}
-        @Override public boolean usingProxy() { return false; }
-        @Override public void connect() {}
+        @Override
+        public void disconnect() {
+
+        }
+
+        @Override
+        public boolean usingProxy() {
+            return false;
+        }
+
+        @Override
+        public void connect() {
+
+        }
     }
 
     /**
