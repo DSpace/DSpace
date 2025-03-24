@@ -287,4 +287,52 @@
         <scope_note>Contains all uuids of PROJECTS which link to the current FUNDING AGENCY via a "latest" relationship. In other words, this stores all relationships pointing to the current FUNDING AGENCY from any PROJECT, implying that the FUNDING AGENCY is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>relation</schema>
+        <element>isInventorOfPatent</element>
+        <scope_note>Contains all uuids of the "latest" AUTHORS that the current PATENT links to via a relationship. In other words, this stores all relationships pointing from the current PUBLICATION to any AUTHOR where the AUTHOR is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isInventorOfPatent</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of AUTHORS which link to the current PATENT via a "latest" relationship. In other words, this stores all relationships pointing to the current PUBLICATION from an AUTHOR, implying that the PUBLICATION is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPatentOfInventor</element>
+        <scope_note>Contains all uuids of the "latest" PATENT that the current AUTHOR links to via a relationship. In other words, this stores all relationships pointing from the current AUTHOR to any PUBLICATION where the PUBLICATION is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPatentOfInventor</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of PATENTS which link to the current AUTHOR via a "latest" relationship. In other words, this stores all relationships pointing to the current AUTHOR from any PUBLICATION, implying that the AUTHOR is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isCreatorOfProduct</element>
+        <scope_note>Contains all uuids of the "latest" AUTHORS that the current PRODUCT links to via a relationship. In other words, this stores all relationships pointing from the current PUBLICATION to any AUTHOR where the AUTHOR is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isCreatorOfProduct</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of AUTHORS which link to the current PRODUCT via a "latest" relationship. In other words, this stores all relationships pointing to the current PUBLICATION from an AUTHOR, implying that the PUBLICATION is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    
+     <dc-type>
+        <schema>relation</schema>
+        <element>isProductOfCreator</element>
+        <scope_note>Contains all uuids of the "latest" PRODUCT that the current AUTHOR links to via a relationship. In other words, this stores all relationships pointing from the current AUTHOR to any PUBLICATION where the PUBLICATION is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProductOfCreator</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of PRODUCTS which link to the current AUTHOR via a "latest" relationship. In other words, this stores all relationships pointing to the current AUTHOR from any PUBLICATION, implying that the AUTHOR is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
 </dspace-dc-types>

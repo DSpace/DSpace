@@ -75,6 +75,20 @@
     <dc-type>
         <schema>dspace</schema>
         <element>orcid</element>
+        <qualifier>sync-products</qualifier>
+        <scope_note>Stores the product synchronization with ORCID preference chosen by the user</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
+        <qualifier>sync-patents</qualifier>
+        <scope_note>Stores the patent synchronization with ORCID preference chosen by the user</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
         <qualifier>sync-fundings</qualifier>
         <scope_note>Stores the funding synchronization with ORCID preference chosen by the user</scope_note>
     </dc-type>
