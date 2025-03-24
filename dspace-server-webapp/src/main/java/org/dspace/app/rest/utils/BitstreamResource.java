@@ -40,15 +40,15 @@ public class BitstreamResource extends AbstractResource {
 
     private static final Logger LOG = LogManager.getLogger(BitstreamResource.class);
 
-    private final String name;
-    private final UUID uuid;
-    private final UUID currentUserUUID;
-    private final boolean shouldGenerateCoverPage;
-    private final Set<UUID> currentSpecialGroups;
+    protected final String name;
+    protected final UUID uuid;
+    protected final UUID currentUserUUID;
+    protected final boolean shouldGenerateCoverPage;
+    protected final Set<UUID> currentSpecialGroups;
 
-    private final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    private final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    private final CitationDocumentService citationDocumentService =
+    protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected final CitationDocumentService citationDocumentService =
             new DSpace().getServiceManager()
                     .getServicesByType(CitationDocumentService.class).get(0);
 

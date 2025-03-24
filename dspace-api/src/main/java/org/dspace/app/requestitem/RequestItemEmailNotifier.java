@@ -10,7 +10,6 @@ package org.dspace.app.requestitem;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;

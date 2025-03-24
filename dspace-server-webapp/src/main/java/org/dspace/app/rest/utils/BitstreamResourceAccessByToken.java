@@ -14,23 +14,13 @@ import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
-import org.dspace.disseminate.service.CitationDocumentService;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
 import org.springframework.core.io.AbstractResource;
 
 /**
@@ -47,35 +37,15 @@ import org.springframework.core.io.AbstractResource;
  */
 public class BitstreamResourceAccessByToken extends BitstreamResource {
 
-    private String name;
-    private UUID uuid;
-    private boolean shouldGenerateCoverPage;
-    private byte[] file;
-    private Set<UUID> currentSpecialGroups;
     private String accessToken;
-
-    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    private CitationDocumentService citationDocumentService =
-        new DSpace().getServiceManager()
-                    .getServicesByType(CitationDocumentService.class).get(0);
 
     private RequestItemService requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-    private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-
-    /**
-     * Initialise logger
-     */
-    Logger log = LogManager.getLogger();
 
     public BitstreamResourceAccessByToken(String name, UUID uuid, UUID currentUserUUID, Set<UUID> currentSpecialGroups,
                                           boolean shouldGenerateCoverPage, String accessToken) {
         super(name, uuid, currentUserUUID, currentSpecialGroups, shouldGenerateCoverPage);
-        this.name = name;
-        this.uuid = uuid;
-        this.currentSpecialGroups = currentSpecialGroups;
-        this.shouldGenerateCoverPage = shouldGenerateCoverPage;
         this.accessToken = accessToken;
     }
 
@@ -106,7 +76,7 @@ public class BitstreamResourceAccessByToken extends BitstreamResource {
             try {
                 // Explicitly authenticate the access request acceptance for the bitstream
                 // even if we have already done it in the REST controller and throw Authorize exception if not valid
-                requestItemService.authorizeAccessByAccessToken(fileRetrievalContext, bitstream, this.accessToken);
+                requestItemService.authorizeAccessByAccessToken(fileRetrievalContext, bitstream, accessToken);
 
             } catch (AuthorizeException e) {
                 throw new AuthorizeException("Authorization to bitstream " + uuid + " by access token FAILED");
@@ -121,7 +91,6 @@ public class BitstreamResourceAccessByToken extends BitstreamResource {
                 out = bitstreamService.retrieve(fileRetrievalContext, bitstream);
             }
 
-            this.file = null;
             return out;
 
             // This is the last line in the closeable Context try-with-resources.

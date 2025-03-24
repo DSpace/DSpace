@@ -13,12 +13,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import org.dspace.AbstractUnitTest;
+import org.dspace.eperson.factory.CaptchaServiceFactory;
 import org.dspace.eperson.service.CaptchaService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 
 /**
  * Basic tests to verity the Altcha captcha service can verify payloads from the client
@@ -28,11 +30,16 @@ import org.junit.Test;
 public class AltchaCaptchaServiceTest extends AbstractUnitTest {
 
     CaptchaService captchaService;
+    ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    @Before    @After
+    public void tearDown() {
+        configurationService.setProperty("captcha.provider", "google");
+    }
     @Before
     public void setUp() {
-        captchaService = DSpaceServicesFactory.getInstance().getServiceManager()
-                .getServiceByName("captchaService", CaptchaService.class);
+        configurationService.setProperty("captcha.provider", "altcha");
+        captchaService = CaptchaServiceFactory.getInstance().getCaptchaService();
     }
 
     @Test

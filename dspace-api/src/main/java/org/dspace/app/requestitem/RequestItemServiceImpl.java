@@ -378,7 +378,8 @@ public class RequestItemServiceImpl implements RequestItemService {
      * @return parsed date as instant
      * @throws ParseException
      */
-    public static Instant parseDateOrDelta(String dateOrDelta, Instant decisionDate) throws ParseException, DateTimeException {
+    public static Instant parseDateOrDelta(String dateOrDelta, Instant decisionDate)
+            throws ParseException, DateTimeException {
         // First, if dateOrDelta is a null string or "FOREVER", we will set the expiry
         // date to a very distant date in the future.
         if (dateOrDelta == null || dateOrDelta.equals("FOREVER")) {
@@ -393,8 +394,7 @@ public class RequestItemServiceImpl implements RequestItemService {
             dateMathParser.setNow(LocalDateTime.ofInstant(decisionDate, ZoneOffset.UTC));
             // Parse the delta (e.g. +7DAYS) and set the new access expiry date
             return dateMathParser.parseMath(dateOrDelta).toInstant(ZoneOffset.UTC);
-        }
-        else {
+        } else {
             // The expiry date was a valid formatted date string, so set the access expiry date
             return parsedExpiryDate.toInstant();
         }
