@@ -16,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
-import org.dspace.matomo.factory.MatomoRequestCookieIdentifierEnricher;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.model.Event;
 import org.dspace.usage.AbstractUsageEventListener;
@@ -59,10 +58,6 @@ public class MatomoEventListener extends AbstractUsageEventListener {
             }
 
             if (!isContentBitstream(usageEvent)) {
-                return;
-            }
-
-            if (!MatomoRequestCookieIdentifierEnricher.hasCookie(((UsageEvent) event).getRequest().getCookies())) {
                 return;
             }
 

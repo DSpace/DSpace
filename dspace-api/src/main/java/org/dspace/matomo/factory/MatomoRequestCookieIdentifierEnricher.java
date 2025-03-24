@@ -42,7 +42,7 @@ public class MatomoRequestCookieIdentifierEnricher implements MatomoRequestDetai
     }
 
     public static boolean hasCookie(Cookie[] cookies) {
-        return getCookie(cookies).isPresent();
+        return cookies != null && getCookie(cookies).isPresent();
     }
 
     public static Optional<String> getCookie(Cookie[] cookies) {
