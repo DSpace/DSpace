@@ -81,6 +81,24 @@ public class MatomoRequestDetailsEnricherFactory {
             );
     }
 
+
+    /**
+     * Factory method that creates a new instance of MatomoRequestDetailsEnricher specialized for
+     * tracker identification enrichment.
+     *
+     * This enricher is responsible for adding tracker identification parameters to Matomo tracking
+     * requests, ensuring proper tracking attribution in the Matomo analytics system.
+     *
+     * @return A MatomoRequestDetailsEnricher instance configured to add tracker identification
+     *         parameters to Matomo requests. The returned instance is specifically a
+     *         MatomoRequestTrackerIdentifierParamEnricher.
+     * @see MatomoRequestTrackerIdentifierParamEnricher
+     * @see MatomoRequestDetailsEnricher
+     */
+    public static MatomoRequestDetailsEnricher trackerIdentifierEnricher() {
+        return new MatomoRequestTrackerIdentifierParamEnricher();
+    }
+
     private static String url(DSpaceObject dso) {
         if (dso == null) {
             return "";
