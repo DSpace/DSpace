@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion.openaire;
+package org.dspace.app.suggestion.scorer;
 
 import org.dspace.app.suggestion.SuggestionEvidence;
 import org.dspace.content.Item;
@@ -32,6 +32,6 @@ public interface EvidenceScorer {
      * @return the generated suggestion evidence or null if the record should be
      *         discarded
      */
-    public SuggestionEvidence computeEvidence(Item researcher, ExternalDataObject importRecord);
+    SuggestionEvidence computeEvidence(Item researcher, ExternalDataObject importRecord);
 
 }
