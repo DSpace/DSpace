@@ -211,7 +211,7 @@ public class RequestItemEmailNotifier {
                             + "/items/" + ri.getItem().getID()
                             + "?accessToken=" + ri.getAccess_token());
                     // {7} access end date, but only add formatted date string if it is set and not "forever"
-                    if (ri.getAccess_expiry() != null && !ri.getAccess_expiry().equals(Instant.MAX)) {
+                    if (ri.getAccess_expiry() != null && !ri.getAccess_expiry().equals(RequestItemServiceImpl.getMaxTimestamp())) {
                         email.addArgument(dateTimeFormatter.format(ri.getAccess_expiry()));
                     } else {
                         email.addArgument(null);
