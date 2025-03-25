@@ -67,7 +67,7 @@ public class FrontendUrlService {
 
     private Optional<String> generateUrlWithSearchService(Item item, String uiURLStem, Context context) {
         DiscoverQuery entityQuery = new DiscoverQuery();
-        entityQuery.setQuery("search.uniqueid:\"Item-" + item.getID() + "\" and entityType:*");
+        entityQuery.setQuery("search.uniqueid:Item-" + item.getID() + " AND entityType:*");
         entityQuery.addSearchField("entityType");
 
         try {
