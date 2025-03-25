@@ -45,7 +45,7 @@ public interface RequestItemService {
      * @return the token of the request item
      * @throws SQLException if database error
      */
-    public String createRequest(Context context, Bitstream bitstream, Item item,
+    String createRequest(Context context, Bitstream bitstream, Item item,
             boolean allFiles, String reqEmail, String reqName, String reqMessage)
         throws SQLException;
 
@@ -56,7 +56,7 @@ public interface RequestItemService {
      * @return all item requests.
      * @throws SQLException passed through.
      */
-    public List<RequestItem> findAll(Context context)
+    List<RequestItem> findAll(Context context)
             throws SQLException;
 
     /**
@@ -66,7 +66,7 @@ public interface RequestItemService {
      * @param token the token identifying the request to be approved.
      * @return the matching request, or null if not found.
      */
-    public RequestItem findByToken(Context context, String token);
+    RequestItem findByToken(Context context, String token);
 
     /**
      * Retrieve a request by its access token, for use by the requester
@@ -75,14 +75,14 @@ public interface RequestItemService {
      * @param token the token identifying the request to be temporarily accessed
      * @return the matching request, or null if not found.
      */
-    public RequestItem findByAccessToken(Context context, String token);
+    RequestItem findByAccessToken(Context context, String token);
     /**
      * Retrieve a request based on the item.
      * @param context current DSpace session.
      * @param item the item to find requests for.
      * @return the matching requests, or null if not found.
      */
-    public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException;
+    Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException;
 
     /**
      * Save updates to the record. Only accept_request, decision_date, access_period are settable.
@@ -93,7 +93,7 @@ public interface RequestItemService {
      * @param context     The relevant DSpace Context.
      * @param requestItem requested item
      */
-    public void update(Context context, RequestItem requestItem);
+    void update(Context context, RequestItem requestItem);
 
     /**
      * Remove the record from the database.
@@ -101,7 +101,7 @@ public interface RequestItemService {
      * @param context current DSpace context.
      * @param request record to be removed.
      */
-    public void delete(Context context, RequestItem request);
+    void delete(Context context, RequestItem request);
 
     /**
      * Is there at least one valid READ resource policy for this object?
@@ -110,11 +110,24 @@ public interface RequestItemService {
      * @return true if a READ policy applies.
      * @throws SQLException passed through.
      */
-    public boolean isRestricted(Context context, DSpaceObject o)
+    boolean isRestricted(Context context, DSpaceObject o)
             throws SQLException;
 
+    /**
+     * Set the access expiry timestamp for a request item. After this date, the
+     * bitstream(s) will no longer be available for download even with a token.
+     * @param requestItem the request item
+     * @param accessExpiry the expiry timestamp
+     */
     void setAccessExpiry(RequestItem requestItem, Instant accessExpiry);
 
+    /**
+     * Set the access expiry timestamp for a request item by delta string.
+     * After this date, the bitstream(s) will no longer be available for download
+     * even with a token.
+     * @param requestItem the request item
+     * @param delta the delta to calculate the expiry timestamp, from the decision date
+     */
     void setAccessExpiry(RequestItem requestItem, String delta);
 
     /**
@@ -127,7 +140,7 @@ public interface RequestItemService {
      * @param accessToken the access token supplied by the user (e.g. to REST controller)
      * @throws AuthorizeException
      */
-    public void authorizeAccessByAccessToken(Context context, RequestItem requestItem, Bitstream bitstream,
+    void authorizeAccessByAccessToken(Context context, RequestItem requestItem, Bitstream bitstream,
                                              String accessToken)
             throws AuthorizeException;
 
@@ -140,7 +153,7 @@ public interface RequestItemService {
      * @param accessToken the access token supplied by the user (e.g. to REST controller)
      * @throws AuthorizeException
      */
-    public void authorizeAccessByAccessToken(Context context, Bitstream bitstream, String accessToken)
+    void authorizeAccessByAccessToken(Context context, Bitstream bitstream, String accessToken)
         throws AuthorizeException;
 
     /**

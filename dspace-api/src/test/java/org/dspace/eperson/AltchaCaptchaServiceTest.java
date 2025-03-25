@@ -32,13 +32,14 @@ public class AltchaCaptchaServiceTest extends AbstractUnitTest {
     CaptchaService captchaService;
     ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    @Before    @After
+    @After
     public void tearDown() {
         configurationService.setProperty("captcha.provider", "google");
     }
     @Before
     public void setUp() {
         configurationService.setProperty("captcha.provider", "altcha");
+        configurationService.setProperty("altcha.hmac.key", "onetwothreesecret");
         captchaService = CaptchaServiceFactory.getInstance().getCaptchaService();
     }
 

@@ -9,7 +9,6 @@ package org.dspace.app.rest.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
@@ -50,18 +49,22 @@ public class BitstreamResourceAccessByToken extends BitstreamResource {
     }
 
     /**
-     * Get the input stream using the special temporary context if the request-a-copy access request
-     * is properly authenticated and authorised
+     * Get the bitstream content using the special temporary context if the request-a-copy access request
+     * is properly authenticated and authorised. After this method is called, the bitstream content is
+     * updated so the correct input stream can be returned
      *
-     * @return input stream
      * @throws IOException
      */
     @Override
-    public InputStream getInputStream() throws IOException {
-
+    public void fetchDocument() {
         // If the feature is not enabled, throw exception
         if (configurationService.getProperty("request.item.type") == null) {
             throw new RuntimeException("Request a copy is not enabled, download via access token will not be allowed");
+        }
+
+        // If document is already set for this BitstreamResource, return
+        if (document != null) {
+            return;
         }
 
         try (Context fileRetrievalContext = initializeContext()) {
@@ -81,35 +84,22 @@ public class BitstreamResourceAccessByToken extends BitstreamResource {
             } catch (AuthorizeException e) {
                 throw new AuthorizeException("Authorization to bitstream " + uuid + " by access token FAILED");
             }
-
-            // Initialise outstream
-            InputStream out;
-
             if (shouldGenerateCoverPage) {
-                out = new ByteArrayInputStream(getCoverpageByteArray(fileRetrievalContext, bitstream));
+                var coverPage = getCoverpageByteArray(fileRetrievalContext, bitstream);
+
+                this.document = new BitstreamDocument(etag(bitstream),
+                        coverPage.length,
+                        new ByteArrayInputStream(coverPage));
             } else {
-                out = bitstreamService.retrieve(fileRetrievalContext, bitstream);
+                this.document = new BitstreamDocument(bitstream.getChecksum(),
+                        bitstream.getSizeBytes(),
+                        bitstreamService.retrieve(fileRetrievalContext, bitstream));
             }
-
-            return out;
-
-            // This is the last line in the closeable Context try-with-resources.
-            // If this scope completes, there should be no more context.
-
-        } catch (SQLException | AuthorizeException e) {
-            throw new IOException(e);
+        } catch (SQLException | AuthorizeException | IOException e) {
+            throw new RuntimeException(e);
         }
-    }
 
-    /**
-     * Initialise a new temporary context just for the use of this download
-     *
-     * @return totally new context
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    private Context initializeContext() throws SQLException, AuthorizeException {
-        return new Context();
+        LOG.debug("fetched document {} {}", shouldGenerateCoverPage, document);
     }
 
 }

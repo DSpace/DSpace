@@ -60,6 +60,7 @@ import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
 import org.exparity.hamcrest.date.LocalDateTimeMatchers;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,6 +104,11 @@ public class RequestItemRepositoryIT
 
     private Map<String, Object> altchaPayload;
 
+    @After
+    public void tearDown() {
+        configurationService.setProperty("captcha.provider", "google");
+    }
+
     @Before
     public void init()
             throws SQLException, AuthorizeException, IOException {
@@ -137,6 +143,11 @@ public class RequestItemRepositoryIT
         altchaPayload.put("number", 1);
         altchaPayload.put("signature", "f5cd3ed4161f5f3c914c5778e716d6b446fa277086bbb8fd3e2b0c4b89f18833");
         altchaPayload.put("algorithm", "SHA-256");
+
+        // Set up altcha configuration
+        configurationService.setProperty("captcha.provider", "altcha");
+        configurationService.setProperty("altcha.algorithm", "SHA-256");
+        configurationService.setProperty("altcha.hmac.key", "onetwothreesecret");
 
         context.restoreAuthSystemState();
     }
@@ -503,6 +514,7 @@ public class RequestItemRepositoryIT
         Map<String, String> parameters = Map.of(
                 "acceptRequest", "true",
                 "subject", "subject",
+                "accessPeriod", "+1DAY",
                 "responseMessage", "Request accepted",
                 "suggestOpenAccess", "true");
         String content = mapper

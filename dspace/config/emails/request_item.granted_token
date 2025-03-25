@@ -8,6 +8,9 @@
 ##  {3} name of the grantor
 ##  {4} email address of the grantor (unused)
 ##  {5} custom message sent by the grantor.
+##  {6} URL of the requested Item including the secure access token
+##  {7} expiration date of the granted access (timestamp, formatted in requestitem.cfg)
+
 #set($subject = 'Request for Copy of Restricted Document is Granted')
 Dear ${params[0]}:
 

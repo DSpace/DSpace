@@ -33,6 +33,7 @@ public class AltchaCaptchaRestControllerIT extends AbstractControllerIntegration
     @Before
     public void setup() {
         configurationService.setProperty("captcha.provider", "altcha");
+        configurationService.setProperty("altcha.hmac.key", "onetwothreesecret");
     }
 
     @After
