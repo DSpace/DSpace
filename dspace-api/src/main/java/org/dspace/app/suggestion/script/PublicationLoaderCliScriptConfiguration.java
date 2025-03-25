@@ -5,18 +5,27 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion.openaire;
+package org.dspace.app.suggestion.script;
 
 import org.apache.commons.cli.Options;
+import org.dspace.app.suggestion.runnable.PublicationLoaderRunnable;
+
 
 /**
- * Extension of {@link PublicationLoaderScriptConfiguration} for CLI.
+ * Extension of {@link org.dspace.app.suggestion.openaire.PublicationLoaderScriptConfiguration} for CLI.
  *
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  */
 public class PublicationLoaderCliScriptConfiguration<T extends PublicationLoaderRunnable>
     extends PublicationLoaderScriptConfiguration<T> {
 
+    /**
+     * Retrieves the command-line options available for this script.
+     * In addition to the options provided by {@link PublicationLoaderScriptConfiguration},
+     * this method adds a "help" option.
+     *
+     * @return The configured {@link Options} object containing all available command-line parameters.
+     */
     @Override
     public Options getOptions() {
         Options options = super.getOptions();

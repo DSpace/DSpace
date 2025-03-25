@@ -8,7 +8,7 @@
 package org.dspace.access.status;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -26,7 +26,7 @@ public interface AccessStatusHelper {
      * @return an access status value
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public String getAccessStatusFromItem(Context context, Item item, Date threshold)
+    public String getAccessStatusFromItem(Context context, Item item, LocalDate threshold)
         throws SQLException;
 
     /**
@@ -38,5 +38,5 @@ public interface AccessStatusHelper {
      * @return an embargo date
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public String getEmbargoFromItem(Context context, Item item, Date threshold) throws SQLException;
+    public String getEmbargoFromItem(Context context, Item item, LocalDate threshold) throws SQLException;
 }

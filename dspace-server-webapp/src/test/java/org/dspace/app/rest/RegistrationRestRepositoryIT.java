@@ -53,6 +53,8 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     private ConfigurationService configurationService;
     @Autowired
     private RegistrationRestRepository registrationRestRepository;
+    @Autowired
+    private ObjectMapper mapper;
 
     @Test
     public void findByTokenTestExistingUserTest() throws Exception {
@@ -111,7 +113,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     private void createTokenForEmail(String email) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(email);
         getClient().perform(post("/api/eperson/registrations")
@@ -126,7 +127,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
         assertEquals(0, registrationDataList.size());
 
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
 
@@ -182,7 +182,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             String email = "testPerson@test.com";
             registrationRest.setEmail(email);
 
-            ObjectMapper mapper = new ObjectMapper();
             getClient().perform(post("/api/eperson/registrations")
                                     .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
@@ -209,7 +208,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             String email = "testPerson@bladibla.com";
             registrationRest.setEmail(email);
 
-            ObjectMapper mapper = new ObjectMapper();
             getClient().perform(post("/api/eperson/registrations")
                                     .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
@@ -240,7 +238,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             RegistrationRest registrationRest = new RegistrationRest();
             registrationRest.setEmail(email);
 
-            ObjectMapper mapper = new ObjectMapper();
             getClient().perform(post("/api/eperson/registrations")
                                     .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
@@ -266,7 +263,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         try {
             assertEquals(0, registrationDataList.size());
 
-            ObjectMapper mapper = new ObjectMapper();
             RegistrationRest registrationRest = new RegistrationRest();
             registrationRest.setEmail(eperson.getEmail());
             getClient().perform(post("/api/eperson/registrations")
@@ -295,7 +291,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         try {
             assertEquals(0, registrationDataList.size());
 
-            ObjectMapper mapper = new ObjectMapper();
             RegistrationRest registrationRest = new RegistrationRest();
             registrationRest.setEmail(eperson.getEmail());
             getClient().perform(post("/api/eperson/registrations")
@@ -321,7 +316,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         String originVresion = configurationService.getProperty("google.recaptcha.version");
         reloadCaptchaProperties("true", "test-secret", "v2");
 
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
 
@@ -342,7 +336,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         String originVresion = configurationService.getProperty("google.recaptcha.version");
         reloadCaptchaProperties("true", "test-secret", "v2");
 
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
 
@@ -380,7 +373,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
         assertEquals(0, registrationDataList.size());
 
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
         try {
@@ -451,7 +443,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     public void accountEndpoint_WithoutAccountTypeParam() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
         getClient().perform(post("/api/eperson/registrations")
@@ -462,7 +453,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     public void accountEndpoint_WrongAccountTypeParam() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
         getClient().perform(post("/api/eperson/registrations")

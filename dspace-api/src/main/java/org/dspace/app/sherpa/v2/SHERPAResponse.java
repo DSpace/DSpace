@@ -12,8 +12,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -59,7 +59,7 @@ public class SHERPAResponse implements Serializable {
     private String uri;
 
     @JsonIgnore
-    private Date retrievalTime = new Date();
+    private Instant retrievalTime = Instant.now();
 
     // Format enum - currently only JSON is supported
     public enum SHERPAFormat {
@@ -563,7 +563,7 @@ public class SHERPAResponse implements Serializable {
         return metadata;
     }
 
-    public Date getRetrievalTime() {
+    public Instant getRetrievalTime() {
         return retrievalTime;
     }
 }

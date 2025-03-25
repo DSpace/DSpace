@@ -9,6 +9,7 @@ package org.dspace.event;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -257,7 +258,7 @@ public class Event implements Serializable {
         this.eventType = eventType;
         this.subjectType = coreTypeToMask(subjectType);
         this.subjectID = subjectID;
-        timeStamp = System.currentTimeMillis();
+        timeStamp = Instant.now().toEpochMilli();
         this.detail = detail;
         this.identifiers = (ArrayList<String>) identifiers.clone();
     }
@@ -299,7 +300,7 @@ public class Event implements Serializable {
         this.subjectID = subjectID;
         this.objectType = coreTypeToMask(objectType);
         this.objectID = objectID;
-        timeStamp = System.currentTimeMillis();
+        timeStamp = Instant.now().toEpochMilli();
         this.detail = detail;
         this.identifiers = (ArrayList<String>) identifiers.clone();
     }

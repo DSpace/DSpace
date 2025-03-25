@@ -95,6 +95,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     @Autowired
     ChoiceAuthorityService choiceAuthorityService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     /**
      * This field has been created to easily modify the tests when updating the defaultConfiguration's sidebar facets
      */
@@ -137,6 +140,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1234,6 +1238,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
             SearchFilterMatcher.hasFileNameInOriginalBundleFilter(),
             SearchFilterMatcher.hasFileDescriptionInOriginalBundleFilter(),
             SearchFilterMatcher.entityTypeFilter(),
+            SearchFilterMatcher.accessStatusFilter(),
             SearchFilterMatcher.isAuthorOfPublicationRelation(),
             SearchFilterMatcher.isProjectOfPublicationRelation(),
             SearchFilterMatcher.isOrgUnitOfPublicationRelation(),
@@ -1376,6 +1381,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1514,6 +1520,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(true),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1608,6 +1615,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(true),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1692,6 +1700,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1800,6 +1809,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1887,6 +1897,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacetsWithDsoTypeItem.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1923,6 +1934,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacetsWithDsoTypesComCol.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -1962,6 +1974,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacetsWithDsoTypesColItem.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2002,6 +2015,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacetsWithDsoTypesComColItem.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2090,6 +2104,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2315,7 +2330,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
             FacetEntryMatcher.subjectFacet(true),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
-            FacetEntryMatcher.entityTypeFacet(false)
+            FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false)
         ));
         getClient().perform(get("/api/discover/search/objects")
                 .param("size", "2")
@@ -2408,6 +2424,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2489,6 +2506,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2663,6 +2681,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2744,6 +2763,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -2935,6 +2955,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -3082,6 +3103,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -3159,6 +3181,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -3236,6 +3259,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -3312,6 +3336,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -3395,6 +3420,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacetWithMinMax(true, "Doe, Jane", "Testing, Works"),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(true),
             FacetEntryMatcher.dateIssuedFacetWithMinMax(false, "1990-02-13", "2010-10-17"),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -3482,6 +3508,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacetWithMinMax(true, "Doe, Jane", "Testing, Works"),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(true),
             FacetEntryMatcher.dateIssuedFacetWithMinMax(false, "1990-02-13", "2010-10-17"),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -3546,6 +3573,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -3622,6 +3650,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -3697,6 +3726,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -3774,6 +3804,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -3850,6 +3881,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -3926,6 +3958,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         allExpectedSidebarFacets.addAll(List.of(
             FacetEntryMatcher.authorFacet(false),
             FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false),
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -4359,7 +4392,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
             FacetEntryMatcher.subjectFacet(false),
             FacetEntryMatcher.dateIssuedFacet(false),
             FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
-            FacetEntryMatcher.entityTypeFacet(false)
+            FacetEntryMatcher.entityTypeFacet(false),
+            FacetEntryMatcher.accessStatusFacet(false)
         ));
         String[] tokens = new String[] {
             null,
@@ -6882,8 +6916,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     @Test
     public void discoverSearchObjectsNOTIFYIncomingConfigurationTest() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-
         context.turnOffAuthorisationSystem();
 
         Community community = CommunityBuilder.createCommunity(context)
@@ -6945,8 +6977,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     @Test
     public void discoverSearchObjectsNOTIFYOutgoingConfigurationTest() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-
         context.turnOffAuthorisationSystem();
 
         Community community = CommunityBuilder.createCommunity(context)

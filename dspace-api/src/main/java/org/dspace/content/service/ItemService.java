@@ -10,7 +10,7 @@ package org.dspace.content.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -246,7 +246,7 @@ public interface ItemService
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
+    Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Instant since)
         throws SQLException;
 
     /**
@@ -256,7 +256,7 @@ public interface ItemService
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
+    Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Instant since)
         throws SQLException;
 
     /**
@@ -853,7 +853,7 @@ public interface ItemService
      * @return iterator over items
      * @throws SQLException if database error
      */
-    Iterator<Item> findByLastModifiedSince(Context context, Date last)
+    Iterator<Item> findByLastModifiedSince(Context context, Instant last)
         throws SQLException;
 
     /**

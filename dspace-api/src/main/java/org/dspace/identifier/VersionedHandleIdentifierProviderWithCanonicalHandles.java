@@ -9,7 +9,7 @@ package org.dspace.identifier;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -244,7 +244,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
 
         int versionNumber = Integer.parseInt(identifier.substring(identifier.lastIndexOf(".") + 1));
         versionService
-            .createNewVersion(context, history, item, "Restoring from AIP Service", new Date(), versionNumber);
+            .createNewVersion(context, history, item, "Restoring from AIP Service", Instant.now(), versionNumber);
         Version latest = versionHistoryService.getLatestVersion(context, history);
 
 
@@ -262,7 +262,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         int versionNumber = Integer.parseInt(identifier.substring(identifier.lastIndexOf(".") + 1));
         VersionHistory history = versionHistoryService.create(context);
         versionService
-            .createNewVersion(context, history, item, "Restoring from AIP Service", new Date(), versionNumber);
+            .createNewVersion(context, history, item, "Restoring from AIP Service", Instant.now(), versionNumber);
 
         handleService.modifyHandleDSpaceObject(context, canonical, dso);
 

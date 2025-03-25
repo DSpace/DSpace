@@ -9,8 +9,9 @@ package org.dspace.app.util;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -215,7 +216,7 @@ public class SyndicationFeed {
 
         feed.setDescription(defaultDescriptionField);
         feed.setLink(objectURL);
-        feed.setPublishedDate(new Date());
+        feed.setPublishedDate(java.util.Date.from(Instant.now()));
         feed.setUri(objectURL);
 
         // add logo if we found one:
@@ -253,13 +254,14 @@ public class SyndicationFeed {
                 entry.setTitle(title == null ? localize(labels, MSG_UNTITLED) : title);
 
                 // "published" date -- should be dc.date.issued
-                String pubDate = getOneDC(item, dateField);
-                if (pubDate != null) {
-                    entry.setPublishedDate((new DCDate(pubDate)).toDate());
+                String pubDateString = getOneDC(item, dateField);
+                if (pubDateString != null) {
+                    ZonedDateTime pubDate = new DCDate(pubDateString).toDate();
+                    entry.setPublishedDate(java.util.Date.from(pubDate.toInstant()));
                     hasDate = true;
                 }
                 // date of last change to Item
-                entry.setUpdatedDate(item.getLastModified());
+                entry.setUpdatedDate(java.util.Date.from(item.getLastModified()));
 
                 StringBuilder db = new StringBuilder();
                 for (String df : descriptionFields) {
@@ -324,7 +326,8 @@ public class SyndicationFeed {
                     if (dcDateField != null && !hasDate) {
                         List<MetadataValue> v = itemService.getMetadataByMetadataString(item, dcDateField);
                         if (v.size() > 0) {
-                            dc.setDate((new DCDate(v.get(0).getValue())).toDate());
+                            ZonedDateTime dateTime = (new DCDate(v.get(0).getValue())).toDate();
+                            dc.setDate(java.util.Date.from(dateTime.toInstant()));
                         }
                     }
                     if (dcDescriptionField != null) {

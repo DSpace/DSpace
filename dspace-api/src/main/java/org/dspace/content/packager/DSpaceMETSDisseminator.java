@@ -9,8 +9,8 @@ package org.dspace.content.packager;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import edu.harvard.hul.ois.mets.Agent;
@@ -105,7 +105,7 @@ public class DSpaceMETSDisseminator
         MetsHdr metsHdr = new MetsHdr();
 
         // FIXME: CREATEDATE is now: maybe should be item create?
-        metsHdr.setCREATEDATE(new Date());
+        metsHdr.setCREATEDATE(java.util.Date.from(Instant.now()));
 
         // Agent
         Agent agent = new Agent();

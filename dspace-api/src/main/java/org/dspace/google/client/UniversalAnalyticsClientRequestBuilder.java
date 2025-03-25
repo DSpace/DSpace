@@ -12,6 +12,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,7 +62,7 @@ public class UniversalAnalyticsClientRequestBuilder implements GoogleAnalyticsCl
             "&dr=" + encodeParameter(event.getDocumentReferrer()) +
             "&dp=" + encodeParameter(event.getDocumentPath()) +
             "&dt=" + encodeParameter(event.getDocumentTitle()) +
-            "&qt=" + (System.currentTimeMillis() - event.getTime()) +
+            "&qt=" + (Instant.now().toEpochMilli() - event.getTime()) +
             "&ec=bitstream" +
             "&ea=download" +
             "&el=item";
