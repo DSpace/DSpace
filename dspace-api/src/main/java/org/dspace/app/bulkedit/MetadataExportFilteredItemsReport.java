@@ -154,9 +154,7 @@ public class MetadataExportFilteredItemsReport extends DSpaceRunnable
     }
 
     protected String getFileNameOrExportFile() {
-        return Optional.ofNullable(
-                configurationService.getProperty("contentreport.metadataquery.csv.filename.default"))
-                .orElse(DEFAULT_FILENAME);
+        return configurationService.getProperty("contentreport.metadataquery.csv.filename.default", DEFAULT_FILENAME);
     }
 
     private static Stream<String> arrayToStream(String... array) {
