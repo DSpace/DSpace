@@ -254,6 +254,7 @@
     <field name="discoverable" type="string" indexed="true" stored="true" omitNorms="true" docValues="true" />
 
     <field name="read" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
+    <field name="admin" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
 
     <!-- used to track who submitted an item -->
     <field name="submitter" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
