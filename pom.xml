@@ -22,8 +22,8 @@
         <spring.version>6.2.4</spring.version>
         <spring-boot.version>3.4.3</spring-boot.version>
         <spring-security.version>6.4.4</spring-security.version> <!-- sync with version used by spring-boot-->
-        <hibernate.version>6.4.8.Final</hibernate.version>
-        <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
+        <hibernate.version>6.6.11.Final</hibernate.version>
+        <hibernate-validator.version>8.0.2.Final</hibernate-validator.version>
         <postgresql.driver.version>42.7.5</postgresql.driver.version>
         <flyway.version>10.22.0</flyway.version>
         <solr.client.version>8.11.4</solr.client.version>
