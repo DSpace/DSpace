@@ -20,7 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Service implementation for the BitstreamLinkingService
- * This class is responsible for providing links between bitstreams via the versioning service
+ * This class is responsible for providing metadata to bitstreams that are cloned in order to track which bitstreams
+ * are copies, original, replacement, or replaced by.
  *
  * @author Nathan Buckingham at atmire.com
  */
@@ -29,10 +30,33 @@ public class BitstreamLinkingServiceImpl implements BitstreamLinkingService {
     @Autowired
     BitstreamService bitstreamService;
 
-    public static final String HAS_COPIES = "dspace.bitstream.hasCopies";
-    public static final String IS_COPY_OF = "dspace.bitstream.isCopyOf";
-    public static final String IS_REPLACED_BY = "dspace.bitstream.isReplacedBy";
-    public static final String IS_REPLACEMENT_OF = "dspace.bitstream.isReplacementOf";
+    public static final String DSPACE = "dspace";
+    public static final String BITSTREAM = "bitstream";
+    public static final String HAS_COPIES = "hasCopies";
+    public static final String IS_COPY_OF = "isCopyOf";
+    public static final String IS_REPLACED_BY = "isReplacedBy";
+    public static final String IS_REPLACEMENT_OF = "isReplacementOf";
+
+    @Override
+    public void cloneMetadata(Context context, Bitstream bitstream, Bitstream clone) throws SQLException,
+            AuthorizeException {
+        registerBitstreams(context, bitstream, clone);
+        List<MetadataValue> metadataValues = bitstreamService.getMetadata(bitstream, Item.ANY, Item.ANY, Item.ANY,
+                Item.ANY);
+
+        for (MetadataValue metadataValue : metadataValues) {
+            if (metadataValue.getMetadataField().toString().equals(DSPACE + "_" + BITSTREAM + "_" + HAS_COPIES) ||
+                metadataValue.getMetadataField().toString().equals(DSPACE + "_" + BITSTREAM + "_" + IS_COPY_OF) ||
+                metadataValue.getMetadataField().toString().equals(DSPACE + "_" + BITSTREAM + "_" + IS_REPLACED_BY) ||
+                metadataValue.getMetadataField().toString().equals(DSPACE + "_" + BITSTREAM + "_" + IS_REPLACEMENT_OF)
+                ) {
+                continue;
+            }
+            bitstreamService.addMetadata(context, clone, metadataValue.getMetadataField(),
+                    metadataValue.getLanguage(), metadataValue.getValue(), metadataValue.getAuthority(),
+                    metadataValue.getConfidence());
+        }
+    }
 
 
     @Override
@@ -76,21 +100,19 @@ public class BitstreamLinkingServiceImpl implements BitstreamLinkingService {
     }
 
     /**
-     * Inner class that is used to get all related bitstreams according to a specific metadataField
+     * Inner function that is used to get all related bitstreams according to a specific metadataField
      *
      * @param context Context
      * @param bitstream The bitstream to search from
-     * @param metadataField The metadatafield 'schema.element.qualifier' that is then split to the bitstreamService to
-     *                      find what we assume are UUIDS.
+     * @param qualifier The qualifier of the metadata key to search upon
+     *
      * @return List<Bitstream> of bitstreams that were found using the uuids found in the given metadatafield.
      * @throws SQLException If bitstreamService.find() fails to access the database
      */
-    protected List<Bitstream> getRelatedBitstreams(Context context, Bitstream bitstream, String metadataField)
-            throws SQLException {
-        String[] metadataFields = metadataField.split("\\.");
+    protected List<Bitstream> getRelatedBitstreams(Context context, Bitstream bitstream,
+                                                   String qualifier) throws SQLException {
         List<Bitstream> bitstreams = new ArrayList<>();
-        List<MetadataValue> uuids = bitstreamService.getMetadata(bitstream, metadataFields[0], metadataFields[1],
-                metadataFields[2], null);
+        List<MetadataValue> uuids = bitstreamService.getMetadata(bitstream, DSPACE, BITSTREAM, qualifier, null);
         for (MetadataValue uuid : uuids) {
             bitstreams.add(bitstreamService.find(context, UUID.fromString(uuid.getValue())));
         }

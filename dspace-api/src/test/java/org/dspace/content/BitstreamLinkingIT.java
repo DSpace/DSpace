@@ -7,6 +7,8 @@
  */
 package org.dspace.content;
 
+import static org.dspace.content.BitstreamLinkingServiceImpl.BITSTREAM;
+import static org.dspace.content.BitstreamLinkingServiceImpl.DSPACE;
 import static org.dspace.content.BitstreamLinkingServiceImpl.HAS_COPIES;
 import static org.dspace.content.BitstreamLinkingServiceImpl.IS_COPY_OF;
 import static org.dspace.content.BitstreamLinkingServiceImpl.IS_REPLACED_BY;
@@ -48,9 +50,10 @@ public class BitstreamLinkingIT extends AbstractIntegrationTestWithDatabase {
     Collection col;
     Item oldItem;
     Item newItem;
+    Item thirdItem;
     Bitstream original;
     Bitstream copy;
-
+    Bitstream secondCopy;
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -74,12 +77,17 @@ public class BitstreamLinkingIT extends AbstractIntegrationTestWithDatabase {
 
         oldItem = ItemBuilder.createItem(context, col).build();
         newItem = ItemBuilder.createItem(context, col).build();
+        thirdItem = ItemBuilder.createItem(context, col).build();
 
         Bundle oldBundle = BundleBuilder.createBundle(context, oldItem)
                 .withName("ORIGINAL")
                 .build();
 
         Bundle newBundle = BundleBuilder.createBundle(context, newItem)
+                .withName("ORIGINAL")
+                .build();
+
+        Bundle thirdBundle = BundleBuilder.createBundle(context, newItem)
                 .withName("ORIGINAL")
                 .build();
 
@@ -92,29 +100,38 @@ public class BitstreamLinkingIT extends AbstractIntegrationTestWithDatabase {
 
         String bitstreamTwoContent = "Dummy content of bitstream two";
         try (InputStream is = IOUtils.toInputStream(bitstreamTwoContent, CharEncoding.UTF_8)) {
-            copy  = BitstreamBuilder.createBitstream(context, newBundle, is)
+            copy = BitstreamBuilder.createBitstream(context, newBundle, is)
                     .withName("bistream two")
+                    .build();
+        }
+
+        String bitstreamThreeContent = "Dummy content of bitstream three";
+        try (InputStream is = IOUtils.toInputStream(bitstreamThreeContent, CharEncoding.UTF_8)) {
+            secondCopy = BitstreamBuilder.createBitstream(context, thirdBundle, is)
+                    .withName("bistream three")
                     .build();
         }
         context.restoreAuthSystemState();
     }
 
-
     @Test
     public void testCopyBitstreams() throws Exception {
         context.turnOffAuthorisationSystem();
-        bitstreamLinkingService.registerBitstreams(context, original, copy);
+        bitstreamLinkingService.cloneMetadata(context, original, copy);
 
-        String[] hasCopies = HAS_COPIES.split("\\.");
-        List<MetadataValue> copiesUUIDs = bitstreamService.getMetadata(original, hasCopies[0],
-                hasCopies[1], hasCopies[2], null);
+        List<MetadataValue> copiesUUIDs = bitstreamService.getMetadata(original, DSPACE,
+                BITSTREAM, HAS_COPIES, null);
         assertThat("Metadata amount: " + HAS_COPIES, copiesUUIDs.size(), equalTo(1));
         assertThat("Metadata value of :" + HAS_COPIES, copiesUUIDs.get(0).getValue(),
                 equalTo(copy.getID().toString()));
 
-        String[] isCopyOf = IS_COPY_OF.split("\\.");
-        List<MetadataValue> originalUUIDs = bitstreamService.getMetadata(copy, isCopyOf[0],
-                isCopyOf[1], isCopyOf[2], null);
+        List<MetadataValue> copyHasCopies = bitstreamService.getMetadata(copy, DSPACE,
+                BITSTREAM, HAS_COPIES, null);
+        //Test that metadata didn't duplicate
+        assertThat("Metadata amount: " + HAS_COPIES, copyHasCopies.size(), equalTo(0));
+
+        List<MetadataValue> originalUUIDs = bitstreamService.getMetadata(copy, DSPACE,
+                BITSTREAM, IS_COPY_OF, null);
         assertThat("Metadata amount: " + IS_COPY_OF, originalUUIDs.size(), equalTo(1));
         assertThat("Metadata value of :" + IS_COPY_OF, originalUUIDs.get(0).getValue(),
                 equalTo(original.getID().toString()));
@@ -127,25 +144,34 @@ public class BitstreamLinkingIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Original count match", originals.size(), equalTo(1));
         assertThat("Original bitstream match", originals.get(0), equalTo(original));
 
-        context.restoreAuthSystemState();
+        bitstreamLinkingService.cloneMetadata(context, copy, secondCopy);
 
+        List<MetadataValue> secondCopies = bitstreamService.getMetadata(copy, DSPACE,
+                BITSTREAM, HAS_COPIES, null);
+        assertThat("Metadata amount: " + HAS_COPIES, secondCopies.size(), equalTo(1));
+        assertThat("Metadata value of :" + HAS_COPIES, secondCopies.get(0).getValue(),
+                equalTo(secondCopy.getID().toString()));
+
+        List<MetadataValue> secondCopyHasCopies = bitstreamService.getMetadata(secondCopy, DSPACE,
+                BITSTREAM, HAS_COPIES, null);
+        //Test that metadata didn't duplicate
+        assertThat("Metadata amount: " + HAS_COPIES, secondCopyHasCopies.size(), equalTo(0));
+
+        context.restoreAuthSystemState();
     }
 
     @Test
     public void testReplacementBitstreams() throws Exception {
         context.turnOffAuthorisationSystem();
         bitstreamLinkingService.registerReplacementBitstream(context, original, copy);
-
-        String[] hasCopies = IS_REPLACED_BY.split("\\.");
-        List<MetadataValue> copiesUUIDs = bitstreamService.getMetadata(original, hasCopies[0],
-                hasCopies[1], hasCopies[2], null);
+        List<MetadataValue> copiesUUIDs = bitstreamService.getMetadata(original, DSPACE,
+                BITSTREAM, IS_REPLACED_BY, null);
         assertThat("Metadata amount: " + IS_REPLACED_BY, copiesUUIDs.size(), equalTo(1));
         assertThat("Metadata value of :" + IS_REPLACED_BY, copiesUUIDs.get(0).getValue(),
                 equalTo(copy.getID().toString()));
 
-        String[] isCopyOf = IS_REPLACEMENT_OF.split("\\.");
-        List<MetadataValue> originalUUIDs = bitstreamService.getMetadata(copy, isCopyOf[0],
-                isCopyOf[1], isCopyOf[2], null);
+        List<MetadataValue> originalUUIDs = bitstreamService.getMetadata(copy, DSPACE,
+                BITSTREAM, IS_REPLACEMENT_OF, null);
         assertThat("Metadata amount: " + IS_REPLACEMENT_OF, originalUUIDs.size(), equalTo(1));
         assertThat("Metadata value of :" + IS_REPLACEMENT_OF, originalUUIDs.get(0).getValue(),
                 equalTo(original.getID().toString()));
