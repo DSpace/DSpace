@@ -65,7 +65,13 @@ public class MatomoAsyncClientImpl extends MatomoAbstractClient<HttpClient, Http
     ) {
         httpClient
             .sendAsync(createRequest(requestBody, cookies), java.net.http.HttpResponse.BodyHandlers.ofString())
-            .thenAccept(response -> responseConsumer.accept(response, requestBody));
+            .thenAccept(response -> responseConsumer.accept(response, requestBody))
+            .exceptionally(this::logError);
+    }
+
+    private Void logError(Throwable throwable) {
+        log.error("Cannot track this request to Matomo! Check the matomo.tracking.url configured. ", throwable);
+        return null;
     }
 
     protected int getStatusCode(HttpResponse<String> response) {

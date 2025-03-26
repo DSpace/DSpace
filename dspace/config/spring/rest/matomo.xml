@@ -16,7 +16,7 @@
                 <bean id="urlEnricher" class="org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory" factory-method="urlEnricher"/>
                 <bean id="downloadEnricher" class="org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory" factory-method="downloadEnricher"/>
                 <bean id="trackerIdEnricher" class="org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory" factory-method="trackerIdentifierEnricher"/>
-                <!-- As of now these cookie enricher are not working, because we are not treating cross-domain Matomo Cookies -->
+                <!-- As of now these cookie enrichers are not working, because we are not treating cross-domain Matomo Cookies -->
 <!--
                 <bean id="cookieIdEnricher" class="org.dspace.matomo.factory.MatomoRequestCookieIdentifierEnricher"/>
                 <bean id="cookieSessionEnricher" class="org.dspace.matomo.factory.MatomoRequestCookieSessionEnricher"/>
