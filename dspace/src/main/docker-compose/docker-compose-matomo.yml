@@ -35,4 +35,5 @@ services:
       - MATOMO_DATABASE_PASSWORD=matomo
       - MATOMO_DATABASE_DBNAME=matomo
     ports:
-      - '8081:80'
+      - published: 8081
+        target: 80

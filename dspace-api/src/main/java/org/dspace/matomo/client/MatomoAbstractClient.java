@@ -131,7 +131,7 @@ public abstract class MatomoAbstractClient<C, T, U> implements MatomoClient {
                 cookiesValue.append("; ").append(requestCookies);
             }
         }
-        if (!cookiesValue.isEmpty()) {
+        if (cookiesValue.length() > 0) {
             connection.setRequestProperty("Cookie", cookiesValue.toString());
         }
     }
