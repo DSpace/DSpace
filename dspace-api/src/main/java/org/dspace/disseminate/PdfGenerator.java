@@ -38,7 +38,7 @@ public class PdfGenerator {
      * @param variables dynamic content for the template
      * @return a rendered HTML coverpage
      */
-    public String parseThymeleafTemplate(String templateName, Map<String, String> variables) {
+    public String parseTemplate(String templateName, Map<String, String> variables) {
         var templateResolver = new ClassLoaderTemplateResolver(getClass().getClassLoader());
         templateResolver.setSuffix(".html");
         templateResolver.setOrder(2);

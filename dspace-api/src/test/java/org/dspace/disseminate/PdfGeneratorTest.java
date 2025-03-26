@@ -29,7 +29,7 @@ public class PdfGeneratorTest {
         variables.put("metadata_author", "Author a; Author b; Author c; etc.");
         variables.put("metadata_editor", "Editor 1; Editor 2; Editor 3; etc.");
 
-        var html = pdf.parseThymeleafTemplate("dspace_coverpage", variables);
+        var html = pdf.parseTemplate("dspace_coverpage", variables);
 
         try (var page = pdf.generate(html)) {
             assertThat(page.getNumberOfPages(), equalTo(1));

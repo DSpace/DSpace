@@ -62,7 +62,7 @@ public class CoverPageService {
 
         LOG.debug("Rendering cover document with params = {}", parameters);
 
-        var html = pdfGenerator.parseThymeleafTemplate(coverTemplate, parameters);
+        var html = pdfGenerator.parseTemplate(coverTemplate, parameters);
 
         return pdfGenerator.generate(html);
     }
