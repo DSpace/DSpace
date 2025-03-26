@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.dspace.AbstractDSpaceTest;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
@@ -28,7 +29,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CoverPageServiceTest {
+public class CoverPageServiceTest extends AbstractDSpaceTest {
 
     @Mock
     Item item;
@@ -63,7 +64,7 @@ public class CoverPageServiceTest {
     public void pageWithSubtitle() throws Exception {
 
         givenMetadataValues("dc_title", "My title");
-        givenMetadataValues("dc_title_subtitle", "subtitle");
+        givenMetadataValues("dc_title_alternative", "subtitle");
 
         try (var coverPage = sut.renderCoverDocument(item)) {
             assertThat(coverPage.getNumberOfPages(), equalTo(1));
@@ -82,14 +83,37 @@ public class CoverPageServiceTest {
                 "dc_contributor_author",
                 "My author 1",
                 "dc_contributor_author",
-                "My author 2");
+                "My author 2",
+                "dc_creator",
+                "My author 3");
 
         try (var coverPage = sut.renderCoverDocument(item)) {
             assertThat(coverPage.getNumberOfPages(), equalTo(1));
 
             var text = new PDFTextStripper().getText(coverPage);
 
-            assertThat(text, containsString("My author 1; My author 2"));
+            assertThat(text, containsString("My author 1; My author 2; My author 3"));
+        }
+    }
+
+    @Test
+    public void multipleEditors() throws Exception {
+
+        givenMetadataValues("dc_title",
+                "My title",
+                "dc_contributor_author",
+                "My author 1",
+                "dc_contributor_editor",
+                "My editor 1",
+                "dc_contributor_editor",
+                "My editor 2");
+
+        try (var coverPage = sut.renderCoverDocument(item)) {
+            assertThat(coverPage.getNumberOfPages(), equalTo(1));
+
+            var text = new PDFTextStripper().getText(coverPage);
+
+            assertThat(text, containsString("My editor 1; My editor 2"));
         }
     }
 

@@ -13,11 +13,13 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 
     <!-- only limited subset of CSS v3 features are supported. Be careful to check the rendered result! -->
-    <style>
+    <style th:inline="css">
         /*  check the documentation for details how to configure the page size
             https://flyingsaucerproject.github.io/flyingsaucer/r8/guide/users-guide-R8.html#xil_34
         */
-        @page {  size: A4 }
+        @page {
+            size: [[${page_format}]];
+        }
 
         body {
             background: white;
@@ -56,7 +58,7 @@
         .metadata {
             margin-top: 40px;
             margin-bottom: 40px;
-            background: rgb(243, 174, 61);
+            background: rgb(233, 236, 239);
             padding: 20px;
             border-radius: 8px;
         }
@@ -109,16 +111,24 @@
             <!-- The metadata fields from the current item can be referenced here in the format schema_field_qualifier -->
             <div class="title" th:text="${metadata_title}">Test title</div>
 
-            <div class="author" th:text="${metadata_author}">Autor 1; Author 2; Author 3</div>
+            <div class="author" th:text="${metadata_author}">Author 1; Author 2; Author 3</div>
 
             <div class="editor" th:text="${metadata_editor}">Editor 1; Editor 2; Editor 3</div>
 
             <div class="issued" th:text="${dc_date_issued}">2017</div>
+
+            <div class="publisher" th:text="${dc_publisher}">Publisher Name</div>
+
+            <div class="identifier">
+                <a th:href="${dc_identifier_uri}" href="${dc_identifier_uri}" th:text="${dc_identifier_uri}">https://hdl.handle.net/123456789/12345</a>
+            </div>
+
+            <div class="citation" th:text="${dc_identifier_citation}">Author 1 (2017), Test title. Publisher Name. Retrieved from https://hdl.handle.net/123456789/12345</div>
         </div>
     </div>
 
     <div class="footer">
-        This is the footer
+        Downloaded from a DSpace repository.
 
         <a th:href="@{https://dspace.org}" href="https://dspace.org">
             https://dspace.org/

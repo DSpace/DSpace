@@ -11,26 +11,41 @@ package org.dspace.disseminate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.apache.tika.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class DefaultCoverPageContributor implements CoverPageContributor {
+    private ConfigurationService configurationService;
+
+    public DefaultCoverPageContributor() {
+        this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    }
+
     @Override
     public Map<String, String> processCoverPageParams(Item item, Map<String, String> parameters) {
+        // Set page size parameter, from configuration
+        parameters.put("page_format", configurationService.getProperty("citation-page.page_format", "LETTER"));
+
         // Title : Subtitle
         var dcTitle = parameters.get("dc_title");
-        var dcTitleSubtitle = parameters.get("dc_title_subtitle");
+        var dcTitleSubtitle = parameters.get("dc_title_alternative");
 
         if (StringUtils.isBlank(dcTitleSubtitle)) {
             parameters.put("metadata_title", dcTitle);
         } else {
             parameters.put("metadata_title", String.format("%s: %s", dcTitle, dcTitleSubtitle));
         }
-
         // join authors to list
-        var authors = getParams(item, "dc_contributor_author");
+        var authors = Stream.concat(
+            getParams(item, "dc_contributor_author").stream(),
+            getParams(item, "dc_creator").stream()
+        ).collect(Collectors.toList());
+
         parameters.put("metadata_author", join(authors, "; ", 5, " ..."));
 
         // join editors to list
