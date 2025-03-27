@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
@@ -50,6 +51,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
+import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.dspace.app.rest.matcher.CollectionMatcher;
@@ -63,6 +65,8 @@ import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -85,6 +89,8 @@ import org.dspace.content.MetadataFieldName;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -117,6 +123,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
     private GroupService groupService;
 
+    private BitstreamService bitstreamService;
+
+    private ResourcePolicyService resourcePolicyService;
+
     private Group embargoedGroups;
     private Group embargoedGroup1;
     private Group embargoedGroup2;
@@ -128,6 +138,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         super.setUp();
         context.turnOffAuthorisationSystem();
         this.groupService = EPersonServiceFactory.getInstance().getGroupService();
+        this.bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+        this.resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
 
         embargoedGroups = GroupBuilder.createGroup(context)
                 .withName("Embargoed Groups")
@@ -8603,4 +8615,222 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isCreated());
 
     }
+
+        @Test
+    public void uploadAndReplaceTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Test Collection")
+            .build();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("Test WorkspaceItem")
+            .withIssueDate("2017-10-17")
+            .build();
+        // Create file that will be replaced
+        Bitstream originalBitstream;
+        try (InputStream is = IOUtils.toInputStream("Test", CharEncoding.UTF_8)) {
+            originalBitstream = BitstreamBuilder.createBitstream(context, workspaceItem.getItem(), is)
+                .withName("Bitstream")
+                .withDescription("description")
+                .withMimeType("text/plain")
+                .build();
+        }
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        final MockMultipartFile newFile =
+            new MockMultipartFile("file", "/local/path/simple-article.pdf", "application/pdf", pdf);
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        int oldFileIndex = 0;
+        // Upload new file, to replace old one
+        getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", Integer.toString(oldFileIndex)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
+                is("simple-article.pdf")))
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
+                is("/local/path/simple-article.pdf")));
+        // Check new file metadata
+        getClient(token).perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
+                is("simple-article.pdf")))
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
+                is("/local/path/simple-article.pdf")));
+        assertNotNull(bitstreamService.find(context, originalBitstream.getID()));
+        assertTrue(bitstreamService.find(context, originalBitstream.getID()).isDeleted());
+    }
+
+    @Test
+    public void uploadAndReplaceBadParamTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Test Collection")
+            .build();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("Test WorkspaceItem")
+            .withIssueDate("2017-10-17")
+            .build();
+        // Create file that will be replaced
+        Bitstream bitstream;
+        try (InputStream is = IOUtils.toInputStream("Test", CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.createBitstream(context, workspaceItem.getItem(), is)
+                .withName("Bitstream")
+                .withDescription("description")
+                .withMimeType("text/plain")
+                .build();
+        }
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        final MockMultipartFile newFile =
+            new MockMultipartFile("file", "/local/path/simple-article.pdf", "application/pdf", pdf);
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        // Parameter cannot be empty
+        getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", ""))
+            .andExpect(status().isBadRequest());
+        // String names are not supported
+        getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", bitstream.getName()))
+            .andExpect(status().isBadRequest());
+        // UUID is not supported
+        getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", bitstream.getID().toString()))
+            .andExpect(status().isBadRequest());
+        // Parameter cannot be out of bounds
+        int fileIndexOutOfBounds = 1;
+        getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", Integer.toString(fileIndexOutOfBounds)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void uploadAndReplaceUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Test Collection")
+            .build();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("Test WorkspaceItem")
+            .withIssueDate("2017-10-17")
+            .build();
+        // Create file that will be replaced
+        try (InputStream is = IOUtils.toInputStream("Test", CharEncoding.UTF_8)) {
+            BitstreamBuilder.createBitstream(context, workspaceItem.getItem(), is)
+                .withName("Bitstream")
+                .withDescription("description")
+                .withMimeType("text/plain")
+                .build();
+        }
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        final MockMultipartFile newFile =
+            new MockMultipartFile("file", "/local/path/simple-article.pdf", "application/pdf", pdf);
+
+        context.restoreAuthSystemState();
+
+        int oldFileIndex = 0;
+        // Upload new file, to replace old one
+        getClient().perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", Integer.toString(oldFileIndex)))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void uploadAndReplaceForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        context.setCurrentUser(admin);
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Test Collection")
+            .build();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("Test WorkspaceItem")
+            .withIssueDate("2017-10-17")
+            .build();
+        // Create file that will be replaced
+        try (InputStream is = IOUtils.toInputStream("Test", CharEncoding.UTF_8)) {
+            BitstreamBuilder.createBitstream(context, workspaceItem.getItem(), is)
+                .withName("Bitstream")
+                .withDescription("description")
+                .withMimeType("text/plain")
+                .build();
+        }
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        final MockMultipartFile newFile =
+            new MockMultipartFile("file", "/local/path/simple-article.pdf", "application/pdf", pdf);
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        int oldFileIndex = 0;
+        // Upload new file, to replace old one
+        getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", Integer.toString(oldFileIndex)))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void uploadAndReplaceNoWriteRightsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Test Collection")
+            .build();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("Test WorkspaceItem")
+            .withIssueDate("2017-10-17")
+            .build();
+        // Create file that will be replaced
+        Bitstream originalFile;
+        try (InputStream is = IOUtils.toInputStream("Test", CharEncoding.UTF_8)) {
+            originalFile = BitstreamBuilder.createBitstream(context, workspaceItem.getItem(), is)
+                .withName("Bitstream")
+                .withDescription("description")
+                .withMimeType("text/plain")
+                .build();
+            resourcePolicyService.removeAllPolicies(context, originalFile);
+        }
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        final MockMultipartFile newFile =
+            new MockMultipartFile("file", "/local/path/simple-article.pdf", "application/pdf", pdf);
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        int oldFileIndex = 0;
+        // Upload new file, to replace old one
+        getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", Integer.toString(oldFileIndex)))
+            .andExpect(status().isForbidden());
+    }
+
 }

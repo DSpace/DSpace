@@ -15,6 +15,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.ConverterService;
@@ -35,6 +36,7 @@ import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.WorkflowItemRestRepository;
 import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
+import org.dspace.app.rest.submit.step.UploadStep;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
@@ -48,6 +50,7 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -95,6 +98,8 @@ public class SubmissionService {
     protected CreativeCommonsService creativeCommonsService;
     @Autowired
     private RequestService requestService;
+    @Autowired
+    private BitstreamService bitstreamService;
     @Lazy
     @Autowired
     private ConverterService converter;
@@ -326,7 +331,9 @@ public class SubmissionService {
      * @return the errors present in the resulting inprogress submission
      */
     public List<ErrorRest> uploadFileToInprogressSubmission(Context context, HttpServletRequest request,
-            AInprogressSubmissionRest wsi, InProgressSubmission source, MultipartFile file) {
+                                                            AInprogressSubmissionRest wsi, InProgressSubmission source,
+                                                            MultipartFile file)
+        throws SQLException, AuthorizeException, IOException {
         List<ErrorRest> errors = new ArrayList<ErrorRest>();
         SubmissionConfig submissionConfig =
             submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
@@ -361,14 +368,26 @@ public class SubmissionService {
         }
         for (Object[] stepInstanceAndCfg : stepInstancesAndConfigs) {
             UploadableStep uploadableStep = (UploadableStep) stepInstanceAndCfg[0];
+            Bitstream originalFile = null;
+            if (uploadableStep instanceof UploadStep) {
+                originalFile = findOriginalFile(request, (UploadStep) uploadableStep, source);
+            }
+            Bitstream newFile;
             ErrorRest err;
             try {
-                err = uploadableStep.upload(context, this, (SubmissionStepConfig) stepInstanceAndCfg[1],
+                Pair<Bitstream, ErrorRest> bitstreamAndError =
+                    uploadableStep.upload(context, this, (SubmissionStepConfig) stepInstanceAndCfg[1],
                         source, file);
+                newFile = bitstreamAndError.getLeft();
+                err = bitstreamAndError.getRight();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            if (err != null) {
+            if (err == null) {
+                if (originalFile != null && newFile != null) {
+                    bitstreamService.replace(context, originalFile, newFile);
+                }
+            } else {
                 errors.add(err);
             }
         }
@@ -461,6 +480,31 @@ public class SubmissionService {
                 step.doPostProcessing(context, source);
             }
         }
+    }
+
+    /**
+     * If {@code request} has parameter 'replaceFile', returns the file at index 'replaceFile'
+     * from the list of uploaded files in {@code submission}.
+     * Otherwise, returns null.
+     */
+    private Bitstream findOriginalFile(HttpServletRequest request, UploadStep uploadStep,
+                                       InProgressSubmission submission) throws SQLException {
+        String replaceFile = request.getParameter("replaceFile");
+        if (replaceFile == null) {
+            return null;
+        }
+        int originalFileIndex;
+        try {
+            originalFileIndex = Integer.parseInt(replaceFile);
+        } catch (NumberFormatException e) {
+            throw new DSpaceBadRequestException(e.getMessage(), e);
+        }
+        List<UploadBitstreamRest> files = uploadStep.getData(this, submission, null).getFiles();
+        if (originalFileIndex < 0 || originalFileIndex >= files.size()) {
+            throw new DSpaceBadRequestException("Provided file index is out of bounds");
+        }
+        UUID uuid = files.get(originalFileIndex).getUuid();
+        return bitstreamService.find(new Context(), uuid);
     }
 
 }
