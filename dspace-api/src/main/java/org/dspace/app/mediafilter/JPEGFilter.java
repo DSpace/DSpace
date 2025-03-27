@@ -37,7 +37,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.w3c.dom.Node;
 
 /**
  * Filter image bitstreams, scaling the image to be within the bounds of
@@ -115,25 +114,6 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats 
             default:
                 return 0;
         }
-    }
-
-    /**
-     * Helper method to find a node with given name in metadata tree
-     */
-    private static Node findNode(Node node, String name) {
-        if (node.getNodeName().equalsIgnoreCase(name)) {
-            return node;
-        }
-
-        Node child = node.getFirstChild();
-        while (child != null) {
-            Node found = findNode(child, name);
-            if (found != null) {
-                return found;
-            }
-            child = child.getNextSibling();
-        }
-        return null;
     }
 
     /**
@@ -261,14 +241,20 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats 
             }
         }
 
-        int rotation = getImageRotationUsingImageReader(new FileInputStream(tempFile));
-        // read in bitstream's image
-        BufferedImage buf = ImageIO.read(new FileInputStream(tempFile));
+        int rotation = 0;
+        try (FileInputStream fis = new FileInputStream(tempFile)) {
+            rotation = getImageRotationUsingImageReader(fis);
+        }
 
-        return getThumbDim(
-            currentItem, buf, verbose, xmax, ymax, blurring, hqscaling, brandHeight, brandFontPoint, rotation,
-            brandFont
-        );
+        try (FileInputStream fis = new FileInputStream(tempFile)) {
+            // read in bitstream's image
+            BufferedImage buf = ImageIO.read(fis);
+
+            return getThumbDim(
+                currentItem, buf, verbose, xmax, ymax, blurring, hqscaling, brandHeight, brandFontPoint, rotation,
+                brandFont
+            );
+        }
     }
 
     public InputStream getThumb(Item currentItem, BufferedImage buf, boolean verbose)
@@ -354,13 +340,14 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats 
             g2d.drawImage(brandImage, 0, ysize, xsize, 20, null);
         }
 
+
+        ByteArrayInputStream bais;
         // now create an input stream for the thumbnail buffer and return it
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        ImageIO.write(thumbnail, "jpeg", baos);
-
-        // now get the array
-        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            ImageIO.write(thumbnail, "jpeg", baos);
+            // now get the array
+            bais = new ByteArrayInputStream(baos.toByteArray());
+        }
 
         return bais; // hope this gets written out before its garbage collected!
     }
