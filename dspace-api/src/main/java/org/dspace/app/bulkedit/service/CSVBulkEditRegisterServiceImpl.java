@@ -325,15 +325,6 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
     }
 
     /**
-     * is the field is defined as authority controlled
-     */
-    private boolean isAuthorityControlledField(String md) {
-        String mdf = StringUtils.substringAfter(md, ":");
-        mdf = StringUtils.substringBefore(mdf, "[");
-        return csvBulkEditUtil.getAuthorityControlledFields().contains(mdf);
-    }
-
-    /**
      * Gets a copy of the given csv line with all entity target references resolved to UUID strings.
      * Keys being iterated over represent metadatafields or special columns to be processed.
      *
@@ -404,7 +395,7 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
             List<MetadataValue> current = itemService.getMetadata(item, metadataField.getSchema(),
                 metadataField.getElement(), metadataField.getQualifier(), metadataField.getLanguage(), false);
             for (MetadataValue dcv : current) {
-                if (dcv.getAuthority() == null || !isAuthorityControlledField(md)) {
+                if (dcv.getAuthority() == null || !csvBulkEditUtil.isAuthorityControlledField(md)) {
                     dcvalues.add(dcv.getValue());
                 } else {
                     dcvalues.add(dcv.getValue() + csv.getAuthoritySeparator() + dcv.getAuthority() +
@@ -424,7 +415,8 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
         for (int v = 0; v < fromCSV.size(); v++) {
             String value = fromCSV.get(v);
             BulkEditMetadataValue dcv = getBulkEditValueFromCSV(c, csv, metadataField, value, fromAuthority);
-            if (fromAuthority != null) {
+            if (dcv.getAuthority() != null) {
+                // Fix the CSV value to contain authority AND confidence
                 value = dcv.getValue() + csv.getAuthoritySeparator() + dcv.getAuthority() + csv
                     .getAuthoritySeparator() + dcv.getConfidence();
                 fromCSV.set(v, value);
@@ -548,7 +540,8 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
     protected Map<String, List<String>> getAuthorityCleanMetadataValues(DSpaceCSVLine line, String authoritySeparator) {
         Map<String, List<String>> metadataValues = new HashMap<>();
         for (String key : line.metadataKeys()) {
-            metadataValues.put(key, isAuthorityControlledField(key) ? line.get(key) : line.get(key).stream()
+            metadataValues.put(key, csvBulkEditUtil.isAuthorityControlledField(key) ?
+                line.get(key) : line.get(key).stream()
                 .map((value) -> StringUtils.substringBefore(value, authoritySeparator))
                 .collect(Collectors.toList()));
         }

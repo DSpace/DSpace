@@ -7,7 +7,10 @@
  */
 package org.dspace.app.bulkedit;
 
+import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 
 import java.io.BufferedWriter;
@@ -33,7 +36,12 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
+import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
@@ -43,6 +51,8 @@ import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -54,6 +64,12 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             = EPersonServiceFactory.getInstance().getEPersonService();
     private final RelationshipService relationshipService
             = ContentServiceFactory.getInstance().getRelationshipService();
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final MetadataAuthorityService metadataAuthorityService
+            = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+    private final ChoiceAuthorityService choiceAuthorityService
+            = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
 
     private Collection collection;
     private Collection publicationCollection;
@@ -88,10 +104,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             "+," + collection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
         performImportScript(csv);
         Item importedItem = findItemByName("Test Import 1");
-        assertTrue(
-            StringUtils.equals(
-                itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY).get(0).getValue(),
-                "Donald, SmithImported"));
+        assertTrue(itemHasMetadata(importedItem, "dc", "contributor", "author", Item.ANY,
+            "Donald, SmithImported", null));
         eperson = ePersonService.findByEmail(context, eperson.getEmail());
         assertEquals(importedItem.getSubmitter(), eperson);
 
@@ -106,10 +120,10 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             "+," + publicationCollection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
         performImportScript(csv, true);
         Item importedItem = findItemByName("Test Import 1");
-        assertTrue(StringUtils.equals(itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY)
-                              .get(0).getValue(), "Donald, SmithImported"));
-        assertTrue(StringUtils.equals(itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
-                              .get(0).getValue(), "Publication"));
+        assertTrue(itemHasMetadata(importedItem, "dc", "contributor", "author", Item.ANY,
+            "Donald, SmithImported", null));
+        assertTrue(itemHasMetadata(importedItem, "dspace", "entity", "type", Item.ANY,
+            "Publication", null));
         eperson = ePersonService.findByEmail(context, eperson.getEmail());
         assertEquals(importedItem.getSubmitter(), eperson);
 
@@ -124,8 +138,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             "+," + publicationCollection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
         performImportScript(csv, false);
         Item importedItem = findItemByName("Test Import 1");
-        assertTrue(StringUtils.equals(itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY)
-            .get(0).getValue(), "Donald, SmithImported"));
+        assertTrue(itemHasMetadata(importedItem, "dc", "contributor", "author", Item.ANY,
+            "Donald, SmithImported", null));
         assertEquals(0, itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
             .size());
         eperson = ePersonService.findByEmail(context, eperson.getEmail());
@@ -272,10 +286,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             .withTitle("title").build();
         context.restoreAuthSystemState();
 
-        assertTrue(
-            StringUtils.equals(
-                itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(0).getValue(),
-                "TestAuthorToRemove"));
+        assertTrue(itemHasMetadata(item, "dc", "contributor", "author", Item.ANY,
+                "TestAuthorToRemove", null));
 
         context.commit();
 
@@ -286,9 +298,117 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         assertEquals(0, itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size());
     }
 
+    @Test
+    public void metadataImportDeleteItemNotAllowedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context,publicationCollection).withTitle("title").build();
+        context.restoreAuthSystemState();
+
+        configurationService.setProperty("bulkedit.allowexpunge", false);
+
+        String[] csv = {"id,action", item.getID().toString() + ",expunge"};
+        performImportScript(csv);
+        item = findItemByName("title");
+        assertNotNull(item);
+    }
+
+    @Test
+    public void metadataImportDeleteItemAllowedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context,publicationCollection).withTitle("title").build();
+        context.restoreAuthSystemState();
+
+        configurationService.setProperty("bulkedit.allowexpunge", true);
+
+        String[] csv = {"id,action", item.getID().toString() + ",expunge"};
+        performImportScript(csv);
+        item = findItemByName("title");
+        assertNull(item);
+    }
+
+    @Test
+    public void metadataImportWithdrawItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context,publicationCollection).withTitle("title").build();
+        context.commit();
+        context.restoreAuthSystemState();
+
+        assertFalse(item.isWithdrawn());
+
+        String[] csv = {"id,action", item.getID().toString() + ",withdraw"};
+        performImportScript(csv);
+        item = findItemByName("title", true);
+        assertTrue(item.isWithdrawn());
+    }
+
+    @Test
+    public void metadataImportReinstateItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context,publicationCollection).withTitle("title").build();
+        context.commit();
+        itemService.withdraw(context, context.reloadEntity(item));
+        context.commit();
+        context.restoreAuthSystemState();
+
+        assertTrue(context.reloadEntity(item).isWithdrawn());
+
+        String[] csv = {"id,action", item.getID().toString() + ",reinstate"};
+        performImportScript(csv);
+        item = findItemByName("title", true);
+        assertFalse(item.isWithdrawn());
+    }
+
+    @Test
+    public void metadataImportAuthorityTest() throws Exception {
+        enableAuthorAuthorityControl();
+
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context,publicationCollection)
+            .withAuthor("author 1", "authorityKeyToBeChanged", Choices.CF_ACCEPTED)
+            .withAuthor("author 2", "authorityKeyToStay", Choices.CF_ACCEPTED)
+            .withAuthor("author 3", "authorityKeyUnchanged", Choices.CF_ACCEPTED)
+            .withTitle("title").build();
+        context.commit();
+        context.restoreAuthSystemState();
+
+        String[] csv = {"id,dc.title,dc.contributor.author", item.getID().toString() +
+            ",title,\"author 1::authorityKeyChanged||author 2 edited::authorityKeyToStay||" +
+            "author 3::authorityKeyUnchanged||author 4::newAuthorityKey\""};
+        performImportScript(csv);
+
+        item = findItemByName("title");
+        assertTrue(itemHasMetadata(item, "dc", "contributor", "author", Item.ANY,
+            "author 1", "authorityKeyChanged"));
+        assertTrue(itemHasMetadata(item, "dc", "contributor", "author", Item.ANY,
+            "author 2 edited", "authorityKeyToStay"));
+        assertTrue(itemHasMetadata(item, "dc", "contributor", "author", Item.ANY,
+            "author 3", "authorityKeyUnchanged"));
+        assertTrue(itemHasMetadata(item, "dc", "contributor", "author", Item.ANY,
+            "author 4", "newAuthorityKey"));
+        assertEquals(4, itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size());
+    }
+
+    private boolean itemHasMetadata(Item item, String schema, String element, String qualifier, String language,
+                                    String value, String authority) {
+        List<MetadataValue> mdValues = itemService.getMetadata(item, schema, element, qualifier, language);
+        for (MetadataValue mdValue : mdValues) {
+            String mdValueValue = mdValue.getValue();
+            String mdValueAuthority = mdValue.getAuthority();
+            if (StringUtils.equals(mdValueValue, value) && StringUtils.equals(mdValueAuthority, authority)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private Item findItemByName(String name) throws SQLException {
+        return findItemByName(name, false);
+    }
+
+    private Item findItemByName(String name, boolean unfiltered) throws SQLException {
         Item importedItem = null;
-        List<Item> allItems = IteratorUtils.toList(itemService.findAll(context));
+        List<Item> allItems = IteratorUtils.toList(unfiltered ?
+            itemService.findAllRegularItems(context) : itemService.findAll(context));
         for (Item item : allItems) {
             if (item.getName().equals(name)) {
                 importedItem = item;
@@ -326,5 +446,24 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         } finally {
             csvFile.delete();
         }
+    }
+
+    private void enableAuthorAuthorityControl() {
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "SolrAuthorAuthority");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+
+        metadataAuthorityService.clearCache();
+        choiceAuthorityService.clearCache();
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        // Ensure authority control is removed for authors
+        configurationService.setProperty("choices.plugin.dc.contributor.author", null);
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "false");
+        metadataAuthorityService.clearCache();
+        choiceAuthorityService.clearCache();
+
+        super.destroy();
     }
 }

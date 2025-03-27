@@ -7,52 +7,37 @@
  */
 package org.dspace.app.bulkedit.util;
 
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.regex.Pattern;
 
-import org.dspace.services.ConfigurationService;
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BulkEditUtil {
-    /**
-     * The prefix of the authority controlled field
-     */
-    protected static final String AC_PREFIX = "authority.controlled.";
-
     @Autowired
-    protected ConfigurationService configurationService;
+    protected MetadataAuthorityService metadataAuthorityService;
 
-    /**
-     * The authority controlled fields
-     */
-    private Set<String> authorityControlledFields;
-
-    /**
-     * Set authority controlled fields
-     */
-    protected void initialiseAuthorityControlledFields() {
-        authorityControlledFields = new HashSet<>();
-        Enumeration propertyNames = configurationService.getProperties().propertyNames();
-        while (propertyNames.hasMoreElements()) {
-            String key = ((String) propertyNames.nextElement()).trim();
-            if (key.startsWith(AC_PREFIX)
-                && configurationService.getBooleanProperty(key, false)) {
-                authorityControlledFields.add(key.substring(AC_PREFIX.length()));
-            }
-        }
-    }
-
-    public Set<String> getAuthorityControlledFields() {
-        if (authorityControlledFields == null) {
-            initialiseAuthorityControlledFields();
-        }
-        return authorityControlledFields;
+    public boolean isAuthorityControlledField(String field, String separator) {
+        return metadataAuthorityService.isAuthorityControlled(getCleanMdField(field, separator, "_"));
     }
 
     public boolean isAuthorityControlledField(String field) {
-        return getAuthorityControlledFields().contains(field);
+        return isAuthorityControlledField(field, ".");
+    }
+
+    public String getCleanMdField(String field, String originalSeparator, String newSeparator) {
+        String mdf = field;
+        if (StringUtils.contains(mdf, ":")) {
+            mdf = StringUtils.substringAfter(field, ":");
+        }
+        if (StringUtils.contains(mdf, "[")) {
+            mdf = StringUtils.substringBefore(mdf, "[");
+        }
+        if (!StringUtils.contains(mdf, newSeparator)) {
+            mdf = mdf.replaceAll(Pattern.quote(originalSeparator), newSeparator);
+        }
+        return mdf;
     }
 
     public static BulkEditUtil getInstance() {
