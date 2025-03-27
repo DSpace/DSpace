@@ -41,41 +41,33 @@ public class BitstreamLinkingServiceImpl implements BitstreamLinkingService {
     public void cloneMetadata(Context context, Bitstream bitstream, Bitstream clone) throws SQLException,
             AuthorizeException {
         registerBitstreams(context, bitstream, clone);
-        List<MetadataValue> metadataValues = bitstreamService.getMetadata(bitstream, Item.ANY, Item.ANY, Item.ANY,
-                Item.ANY);
-
-        for (MetadataValue metadataValue : metadataValues) {
-            if (metadataValue.getMetadataField().toString().equals(DSPACE + "_" + BITSTREAM + "_" + HAS_COPIES) ||
-                metadataValue.getMetadataField().toString().equals(DSPACE + "_" + BITSTREAM + "_" + IS_COPY_OF) ||
-                metadataValue.getMetadataField().toString().equals(DSPACE + "_" + BITSTREAM + "_" + IS_REPLACED_BY) ||
-                metadataValue.getMetadataField().toString().equals(DSPACE + "_" + BITSTREAM + "_" + IS_REPLACEMENT_OF)
-                ) {
-                continue;
-            }
-            bitstreamService.addMetadata(context, clone, metadataValue.getMetadataField(),
-                    metadataValue.getLanguage(), metadataValue.getValue(), metadataValue.getAuthority(),
-                    metadataValue.getConfidence());
-        }
+        skipBitstreamMetadataThenAdd(context, bitstream, clone);
     }
 
+    @Override
+    public void replaceMetadata(Context context, Bitstream bitstream, Bitstream replacedBy) throws SQLException,
+            AuthorizeException {
+        registerReplacementBitstream(context, bitstream, replacedBy);
+        skipBitstreamMetadataThenAdd(context, bitstream, replacedBy);
+    }
 
     @Override
     public void registerBitstreams(Context context, Bitstream oldCopy,
                                    Bitstream newCopy) throws SQLException, AuthorizeException {
-        bitstreamService.addMetadata(context, oldCopy, "dspace", "bitstream",
-                "hasCopies", null, newCopy.getID().toString());
-        bitstreamService.addMetadata(context, newCopy, "dspace", "bitstream",
-                "isCopyOf", null, oldCopy.getID().toString());
+        bitstreamService.addMetadata(context, oldCopy, DSPACE, BITSTREAM,
+                HAS_COPIES, null, newCopy.getID().toString());
+        bitstreamService.addMetadata(context, newCopy, DSPACE, BITSTREAM,
+                IS_COPY_OF, null, oldCopy.getID().toString());
         bitstreamService.update(context, oldCopy);
     }
 
     @Override
     public void registerReplacementBitstream(Context context, Bitstream oldCopy,
                                              Bitstream replacementCopy) throws SQLException, AuthorizeException {
-        bitstreamService.addMetadata(context, oldCopy, "dspace", "bitstream",
-                "isReplacedBy", null, replacementCopy.getID().toString());
-        bitstreamService.addMetadata(context, replacementCopy, "dspace", "bitstream",
-                "isReplacementOf", null, oldCopy.getID().toString());
+        bitstreamService.addMetadata(context, oldCopy, DSPACE, BITSTREAM,
+                IS_REPLACED_BY, null, replacementCopy.getID().toString());
+        bitstreamService.addMetadata(context, replacementCopy, DSPACE, BITSTREAM,
+                IS_REPLACEMENT_OF, null, oldCopy.getID().toString());
         bitstreamService.update(context, oldCopy);
     }
 
@@ -118,5 +110,32 @@ public class BitstreamLinkingServiceImpl implements BitstreamLinkingService {
         }
         return bitstreams;
 
+    }
+
+    /**
+     * After assigning metadata
+     *
+     * @param context Dspace Context
+     * @param bitstream DSpace original Bitstream
+     * @param clone Dspace
+     * @throws SQLException
+     */
+    private void skipBitstreamMetadataThenAdd(Context context, Bitstream bitstream, Bitstream clone)
+            throws SQLException {
+        List<MetadataValue> metadataValues = bitstreamService.getMetadata(bitstream, Item.ANY, Item.ANY, Item.ANY,
+                Item.ANY);
+
+        for (MetadataValue metadataValue : metadataValues) {
+            if (metadataValue.getMetadataField().toString().equals(DSPACE + "_" + BITSTREAM + "_" + HAS_COPIES) ||
+                metadataValue.getMetadataField().toString().equals(DSPACE + "_" + BITSTREAM + "_" + IS_COPY_OF) ||
+                metadataValue.getMetadataField().toString().equals(DSPACE + "_" + BITSTREAM + "_" + IS_REPLACED_BY) ||
+                metadataValue.getMetadataField().toString().equals(DSPACE + "_" + BITSTREAM + "_" + IS_REPLACEMENT_OF)
+            ) {
+                continue;
+            }
+            bitstreamService.addMetadata(context, clone, metadataValue.getMetadataField(),
+                    metadataValue.getLanguage(), metadataValue.getValue(), metadataValue.getAuthority(),
+                    metadataValue.getConfidence());
+        }
     }
 }

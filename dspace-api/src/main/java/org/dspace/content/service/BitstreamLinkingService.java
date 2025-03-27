@@ -25,7 +25,7 @@ public interface BitstreamLinkingService {
 
     /**
      * Clones the metadata from an old bitstream to a new one skipping the metadata that we add as a part of
-     * the register methods in this service.
+     * the registerBitstreams method in this service.
      *
      * @param context Dspace Context
      * @param bitstream Dspace bitstream
@@ -34,6 +34,19 @@ public interface BitstreamLinkingService {
      * @throws SQLException if database error
      */
     void cloneMetadata(Context context, Bitstream bitstream, Bitstream clone) throws SQLException, AuthorizeException;
+
+    /**
+     * Clones the metadata from an old bitstream to a new one skipping the metadata that we add as a part of
+     * the registerReplacement method in this service.
+     *
+     * @param context Dspace Context
+     * @param bitstream Dspace bitstream
+     * @param replacedBy The bitstream that we are cloning metadata to
+     * @throws AuthorizeException If the user inside of context is not authorized to do this
+     * @throws SQLException if database error
+     */
+    void replaceMetadata(Context context, Bitstream bitstream, Bitstream replacedBy)
+            throws SQLException, AuthorizeException;
 
     /**
      * Registers a new bitstream as a copy for an old version.

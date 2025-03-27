@@ -26,6 +26,7 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.BitstreamDAO;
 import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamLinkingService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
@@ -66,6 +67,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     protected BundleService bundleService;
     @Autowired(required = true)
     protected BitstreamStorageService bitstreamStorageService;
+    @Autowired(required = true)
+    protected BitstreamLinkingService bitstreamLinkingService;
 
     protected BitstreamServiceImpl() {
         super();
@@ -159,7 +162,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         }
         bundleService.addBitstream(context, firstBundle, newBitstream);
         String newBitstreamName = newBitstream.getName();
-        copyMetadataBetweenBitstreams(context, oldBitstream, newBitstream);
+        bitstreamLinkingService.replaceMetadata(context, oldBitstream, newBitstream);
         // If extensions differ, keep the new bitstream name
         if (!Objects.equals(FileNameUtils.getExtension(newBitstreamName),
             FileNameUtils.getExtension(oldBitstream.getName()))) {
@@ -187,25 +190,6 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         }
         delete(context, oldBitstream);
         return newBitstream;
-    }
-
-    /**
-     * Copies metadata between two bitstreams,
-     * without referencing the actual old bitstream object.
-     * @param context the current DSpace context
-     * @param oldBitstream the old bitstream object we want to copy the metadata from
-     * @param newBitstream the new bitstream obejct we want to copy the metadata to
-     */
-    private void copyMetadataBetweenBitstreams(Context context, Bitstream oldBitstream, Bitstream newBitstream)
-        throws SQLException, AuthorizeException {
-
-        List<MetadataValue> metadataValues = getMetadata(oldBitstream, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        for (MetadataValue metadataValue : metadataValues) {
-            addMetadata(context, newBitstream, metadataValue.getMetadataField(),
-                metadataValue.getLanguage(), metadataValue.getValue(), metadataValue.getAuthority(),
-                metadataValue.getConfidence());
-        }
-        update(context, newBitstream);
     }
 
     /**

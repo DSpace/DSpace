@@ -13,6 +13,9 @@ import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.app.rest.matcher.SupervisionOrderMatcher.matchSuperVisionOrder;
 import static org.dspace.authorize.ResourcePolicy.TYPE_CUSTOM;
+import static org.dspace.content.BitstreamLinkingServiceImpl.BITSTREAM;
+import static org.dspace.content.BitstreamLinkingServiceImpl.DSPACE;
+import static org.dspace.content.BitstreamLinkingServiceImpl.IS_REPLACED_BY;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -21,6 +24,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
@@ -86,6 +90,7 @@ import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
@@ -8654,6 +8659,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
                 is("simple-article.pdf")))
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dspace.bitstream.isReplacementOf'][0].value",
+                    is(originalBitstream.getID().toString())))
             .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
                 is("/local/path/simple-article.pdf")));
         // Check new file metadata
@@ -8663,6 +8670,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 is("simple-article.pdf")))
             .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
                 is("/local/path/simple-article.pdf")));
+        originalBitstream = bitstreamService.find(context, originalBitstream.getID());
+        List<MetadataValue> originalMetadata = bitstreamService.getMetadata(originalBitstream, DSPACE,
+                BITSTREAM, IS_REPLACED_BY, null);
+        assertEquals(1, originalMetadata.size());
         assertNotNull(bitstreamService.find(context, originalBitstream.getID()));
         assertTrue(bitstreamService.find(context, originalBitstream.getID()).isDeleted());
     }
