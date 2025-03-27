@@ -51,7 +51,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.HtmlUtils;
@@ -346,17 +345,11 @@ public class RequestItemRepository
         Context context = obtainContext();
         RequestItem requestItem = requestItemService.findByAccessToken(context, accessToken);
 
-        // Send 404 NOT FOUND if request item is null
-        if (null == requestItem) {
-            throw new ResourceNotFoundException("No such request item for accessToken=" + accessToken);
-        }
-
-        // Send 403 FORBIDDEN if request access has not been granted or access period is null or in the past
-        if (!requestItem.isAccept_request() ||
-                requestItem.getAccess_expiry() == null ||
-                requestItem.getAccess_expiry().isBefore(Instant.now())) {
-            throw new AccessDeniedException("Access has not been granted for this item request");
-        }
+        // Previously, a 404 was thrown if the request item was not found, and a 401 or 403 was thrown depending
+        // on authorization and validity checks. These checks are still strictly enforced in the BitstreamContoller
+        // and BitstreamResourceAccessByToken classes for actual downloads, but here we continue to pass a 200 OK
+        // response so that we can display more meaningful alerts to users in the item page rather than serve hard
+        // redirects or lose information like expiry dates and access status
 
         // Sanitize the request item (stripping personal data) for privacy
         requestItemService.sanitizeRequestItem(context, requestItem);

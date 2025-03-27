@@ -8,6 +8,8 @@
 
 package org.dspace.app.rest.converter;
 
+import java.time.Instant;
+
 import jakarta.inject.Named;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.rest.model.RequestItemRest;
@@ -47,6 +49,12 @@ public class RequestItemConverter
         requestItemRest.setToken(requestItem.getToken());
         requestItemRest.setAccessToken(requestItem.getAccess_token());
         requestItemRest.setAccessExpiry(requestItem.getAccess_expiry());
+        if ( requestItem.getAccess_expiry() == null ||
+                requestItem.getAccess_expiry().isBefore(Instant.now())) {
+            requestItemRest.setAccessExpired(true);
+        } else {
+            requestItemRest.setAccessExpired(false);
+        }
         return requestItemRest;
     }
 

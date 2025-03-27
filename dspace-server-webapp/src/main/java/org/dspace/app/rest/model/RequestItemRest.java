@@ -58,6 +58,9 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
 
     protected Instant accessExpiry;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    protected boolean accessExpired;
+
     /**
      * @return the bitstream requested.
      */
@@ -240,6 +243,13 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
         this.accessExpiry = accessExpiry;
     }
 
+    public boolean isAccessExpired() {
+        return accessExpired;
+    }
+
+    public void setAccessExpired(boolean accessExpired) {
+        this.accessExpired = accessExpired;
+    }
     /*
      * Common REST object methods.
      */
