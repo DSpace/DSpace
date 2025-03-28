@@ -1,0 +1,82 @@
+<node id="ms_id" label="MS">
+    <isComposedBy>
+        <node id="ms_alcinopolis_id" label="Alcinópolis;-53.704223,-18.325546" />
+        <node id="ms_amambai_id" label="Amambaí;-55.225327,-23.10576" />
+        <node id="ms_anastacio_id" label="Anastácio;-55.810353,-20.482292" />
+        <node id="ms_anaurilandia_id" label="Anaurilândia;-52.719056,-22.185169" />
+        <node id="ms_angelica_id" label="Angélica;-53.770789,-22.152658" />
+        <node id="ms_antonio_joao_id" label="Antônio João;-55.951681,-22.192701" />
+        <node id="ms_aparecida_do_taboado_id" label="Aparecida do Taboado;-51.096135,-20.087275" />
+        <node id="ms_aquidauana_id" label="Aquidauana;-55.786788,-20.466552" />
+        <node id="ms_aral_moreira_id" label="Aral Moreira;-55.633451,-22.938467" />
+        <node id="ms_bandeirantes_id" label="Bandeirantes;-54.358458,-19.92749" />
+        <node id="ms_bataguassu_id" label="Bataguassu;-52.422058,-21.715899" />
+        <node id="ms_bataypora_id" label="Batayporã;-53.270488,-22.294444" />
+        <node id="ms_bela_vista_id" label="Bela Vista;-56.526288,-22.107327" />
+        <node id="ms_bodoquena_id" label="Bodoquena;-56.712716,-20.536983" />
+        <node id="ms_bonito_id" label="Bonito;-56.483565,-21.126096" />
+        <node id="ms_brasilandia_id" label="Brasilândia;-52.036519,-21.254428" />
+        <node id="ms_caarapo_id" label="Caarapó;-54.820928,-22.636764" />
+        <node id="ms_camapua_id" label="Camapuã;-54.043065,-19.534672" />
+        <node id="ms_campo_grande_id" label="Campo Grande;-54.629463,-20.448589" />
+        <node id="ms_caracol_id" label="Caracol;-57.027672,-22.011017" />
+        <node id="ms_cassilandia_id" label="Cassilândia;-51.731309,-19.117867" />
+        <node id="ms_chapadao_do_sul_id" label="Chapadão do Sul;-52.626337,-18.788035" />
+        <node id="ms_corguinho_id" label="Corguinho;-54.828074,-19.824281" />
+        <node id="ms_coronel_sapucaia_id" label="Coronel Sapucaia;-55.527811,-23.272407" />
+        <node id="ms_corumba_id" label="Corumbá;-57.651036,-19.007727" />
+        <node id="ms_costa_rica_id" label="Costa Rica;-53.128732,-18.543202" />
+        <node id="ms_coxim_id" label="Coxim;-54.750991,-18.501299" />
+        <node id="ms_deodapolis_id" label="Deodápolis;-54.168163,-22.276272" />
+        <node id="ms_dois_irmaos_do_buriti_id" label="Dois Irmãos do Buriti;-55.291453,-20.684818" />
+        <node id="ms_douradina_id" label="Douradina;-54.615756,-22.040494" />
+        <node id="ms_dourados_id" label="Dourados;-54.812043,-22.223099" />
+        <node id="ms_eldorado_id" label="Eldorado;-54.283775,-23.786838" />
+        <node id="ms_figueirao_id" label="Figueirão;-53.641258,-18.682824" />
+        <node id="ms_fatima_do_sul_id" label="Fátima do Sul;-54.513069,-22.378924" />
+        <node id="ms_gloria_de_dourados_id" label="Glória de Dourados;-54.233502,-22.413628" />
+        <node id="ms_guia_lopes_da_laguna_id" label="Guia Lopes da Laguna;-56.111711,-21.458318" />
+        <node id="ms_iguatemi_id" label="Iguatemi;-54.563731,-23.673555" />
+        <node id="ms_inocencia_id" label="Inocência;-51.928098,-19.727716" />
+        <node id="ms_itapora_id" label="Itaporã;-54.793381,-22.080035" />
+        <node id="ms_itaquirai_id" label="Itaquiraí;-54.186971,-23.477868" />
+        <node id="ms_ivinhema_id" label="Ivinhema;-53.818414,-22.304571" />
+        <node id="ms_japora_id" label="Japorã;-54.405946,-23.890325" />
+        <node id="ms_jaraguari_id" label="Jaraguari;-54.399626,-20.138615" />
+        <node id="ms_jardim_id" label="Jardim;-56.148902,-21.479941" />
+        <node id="ms_jatei_id" label="Jateí;-54.307934,-22.480633" />
+        <node id="ms_juti_id" label="Juti;-54.60612,-22.859637" />
+        <node id="ms_ladario_id" label="Ladário;-57.597266,-19.008894" />
+        <node id="ms_laguna_carapa_id" label="Laguna Carapã;-55.15021,-22.544818" />
+        <node id="ms_maracaju_id" label="Maracaju;-55.167763,-21.610544" />
+        <node id="ms_miranda_id" label="Miranda;-56.374594,-20.235508" />
+        <node id="ms_mundo_novo_id" label="Mundo Novo;-54.281012,-23.93554" />
+        <node id="ms_navirai_id" label="Naviraí;-54.199465,-23.06181" />
+        <node id="ms_nioaque_id" label="Nioaque;-55.829618,-21.141882" />
+        <node id="ms_nova_alvorada_do_sul_id" label="Nova Alvorada do Sul;-54.382491,-21.465688" />
+        <node id="ms_nova_andradina_id" label="Nova Andradina;-53.343715,-22.237971" />
+        <node id="ms_novo_horizonte_do_sul_id" label="Novo Horizonte do Sul;-53.860148,-22.669322" />
+        <node id="ms_paranaiba_id" label="Paranaíba;-51.190863,-19.674648" />
+        <node id="ms_paranhos_id" label="Paranhos;-55.429018,-23.891067" />
+        <node id="ms_pedro_gomes_id" label="Pedro Gomes;-54.550663,-18.099622" />
+        <node id="ms_ponta_pora_id" label="Ponta Porã;-55.720326,-22.529617" />
+        <node id="ms_porto_murtinho_id" label="Porto Murtinho;-57.883586,-21.698078" />
+        <node id="ms_ribas_do_rio_pardo_id" label="Ribas do Rio Pardo;-53.758819,-20.444533" />
+        <node id="ms_rio_brilhante_id" label="Rio Brilhante;-54.542744,-21.803258" />
+        <node id="ms_rio_negro_id" label="Rio Negro;-54.985873,-19.447036" />
+        <node id="ms_rio_verde_de_mato_grosso_id" label="Rio Verde de Mato Grosso;-54.843357,-18.924945" />
+        <node id="ms_rochedo_id" label="Rochedo;-54.884769,-19.956488" />
+        <node id="ms_santa_rita_do_pardo_id" label="Santa Rita do Pardo;-52.833338,-21.301604" />
+        <node id="ms_selviria_id" label="Selvíria;-51.419246,-20.363733" />
+        <node id="ms_sete_quedas_id" label="Sete Quedas;-55.03984,-23.970508" />
+        <node id="ms_sidrolandia_id" label="Sidrolândia;-54.969219,-20.930212" />
+        <node id="ms_sonora_id" label="Sonora;-54.755112,-17.569775" />
+        <node id="ms_sao_gabriel_do_oeste_id" label="São Gabriel do Oeste;-54.550668,-19.388858" />
+        <node id="ms_tacuru_id" label="Tacuru;-55.014137,-23.635954" />
+        <node id="ms_taquarussu_id" label="Taquarussu;-53.351891,-22.489797" />
+        <node id="ms_terenos_id" label="Terenos;-54.864742,-20.437845" />
+        <node id="ms_tres_lagoas_id" label="Três Lagoas;-51.700731,-20.784853" />
+        <node id="ms_vicentina_id" label="Vicentina;-54.441507,-22.409801" />
+        <node id="ms_agua_clara_id" label="Água Clara;-52.87899,-20.445245" />
+    </isComposedBy>
+</node>

@@ -1,0 +1,66 @@
+<node id="am_id" label="AM">
+    <isComposedBy>
+        <node id="am_alvaraes_id" label="Alvarães;-64.800654,-3.22727" />
+        <node id="am_amatura_id" label="Amaturá;-68.200456,-3.374547" />
+        <node id="am_anama_id" label="Anamã;-61.396337,-3.566966" />
+        <node id="am_anori_id" label="Anori;-61.657485,-3.746027" />
+        <node id="am_apui_id" label="Apuí;-59.895956,-7.194091" />
+        <node id="am_atalaia_do_norte_id" label="Atalaia do Norte;-70.1967,-4.370551" />
+        <node id="am_autazes_id" label="Autazes;-59.125589,-3.585743" />
+        <node id="am_barcelos_id" label="Barcelos;-62.931053,-0.983373" />
+        <node id="am_barreirinha_id" label="Barreirinha;-57.067897,-2.798863" />
+        <node id="am_benjamin_constant_id" label="Benjamin Constant;-70.034157,-4.37768" />
+        <node id="am_beruri_id" label="Beruri;-61.36162,-3.898736" />
+        <node id="am_boa_vista_do_ramos_id" label="Boa Vista do Ramos;-57.587333,-2.974087" />
+        <node id="am_boca_do_acre_id" label="Boca do Acre;-67.391926,-8.742322" />
+        <node id="am_borba_id" label="Borba;-59.58738,-4.391539" />
+        <node id="am_caapiranga_id" label="Caapiranga;-61.220557,-3.315372" />
+        <node id="am_canutama_id" label="Canutama;-64.39528,-6.52582" />
+        <node id="am_carauari_id" label="Carauari;-66.908559,-4.881605" />
+        <node id="am_careiro_id" label="Careiro;-60.369046,-3.768027" />
+        <node id="am_careiro_da_varzea_id" label="Careiro da Várzea;-59.79639,-3.196979" />
+        <node id="am_coari_id" label="Coari;-63.144091,-4.094121" />
+        <node id="am_codajas_id" label="Codajás;-62.065787,-3.830528" />
+        <node id="am_eirunepe_id" label="Eirunepé;-69.86616,-6.656767" />
+        <node id="am_envira_id" label="Envira;-70.028143,-7.437889" />
+        <node id="am_fonte_boa_id" label="Fonte Boa;-66.094212,-2.523424" />
+        <node id="am_guajara_id" label="Guajará;-72.590713,-7.537971" />
+        <node id="am_humaita_id" label="Humaitá;-63.032743,-7.511712" />
+        <node id="am_ipixuna_id" label="Ipixuna;-71.693426,-7.047909" />
+        <node id="am_iranduba_id" label="Iranduba;-60.189953,-3.274792" />
+        <node id="am_itacoatiara_id" label="Itacoatiara;-58.444874,-3.138607" />
+        <node id="am_itamarati_id" label="Itamarati;-68.260027,-6.424591" />
+        <node id="am_itapiranga_id" label="Itapiranga;-58.029257,-2.74081" />
+        <node id="am_japura_id" label="Japurá;-66.929051,-1.882366" />
+        <node id="am_jurua_id" label="Juruá;-66.071795,-3.484384" />
+        <node id="am_jutai_id" label="Jutaí;-66.75947,-2.758144" />
+        <node id="am_labrea_id" label="Lábrea;-64.794765,-7.264133" />
+        <node id="am_manacapuru_id" label="Manacapuru;-60.621581,-3.290657" />
+        <node id="am_manaquiri_id" label="Manaquiri;-60.461239,-3.440784" />
+        <node id="am_manaus_id" label="Manaus;-60.02123,-3.118662" />
+        <node id="am_manicore_id" label="Manicoré;-61.289483,-5.804618" />
+        <node id="am_maraa_id" label="Maraã;-65.572995,-1.853129" />
+        <node id="am_maues_id" label="Maués;-57.706731,-3.392891" />
+        <node id="am_nhamunda_id" label="Nhamundá;-56.711151,-2.207932" />
+        <node id="am_nova_olinda_do_norte_id" label="Nova Olinda do Norte;-59.09404,-3.900367" />
+        <node id="am_novo_airao_id" label="Novo Airão;-60.943404,-2.636371" />
+        <node id="am_novo_aripuana_id" label="Novo Aripuanã;-60.373179,-5.125929" />
+        <node id="am_parintins_id" label="Parintins;-56.729045,-2.637412" />
+        <node id="am_pauini_id" label="Pauini;-66.992039,-7.713109" />
+        <node id="am_presidente_figueiredo_id" label="Presidente Figueiredo;-60.02338,-2.029813" />
+        <node id="am_rio_preto_da_eva_id" label="Rio Preto da Eva;-59.685793,-2.704497" />
+        <node id="am_santa_isabel_do_rio_negro_id" label="Santa Isabel do Rio Negro;-65.009205,-0.410824" />
+        <node id="am_santo_antonio_do_ica_id" label="Santo Antônio do Içá;-67.946279,-3.095443" />
+        <node id="am_silves_id" label="Silves;-58.248031,-2.81748" />
+        <node id="am_sao_gabriel_da_cachoeira_id" label="São Gabriel da Cachoeira;-67.084042,-0.11909" />
+        <node id="am_sao_paulo_de_olivenca_id" label="São Paulo de Olivença;-68.964581,-3.472919" />
+        <node id="am_sao_sebastiao_do_uatuma_id" label="São Sebastião do Uatumã;-57.873049,-2.559147" />
+        <node id="am_tabatinga_id" label="Tabatinga;-69.938273,-4.241597" />
+        <node id="am_tapaua_id" label="Tapauá;-63.1808,-5.620855" />
+        <node id="am_tefe_id" label="Tefé;-64.719343,-3.368219" />
+        <node id="am_tonantins_id" label="Tonantins;-67.791904,-2.865825" />
+        <node id="am_uarini_id" label="Uarini;-65.113298,-2.996087" />
+        <node id="am_urucara_id" label="Urucará;-57.753797,-2.529364" />
+        <node id="am_urucurituba_id" label="Urucurituba;-58.149637,-3.128412" />
+    </isComposedBy>
+</node>

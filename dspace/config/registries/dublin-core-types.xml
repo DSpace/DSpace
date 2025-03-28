@@ -647,6 +647,13 @@
         <qualifier>email</qualifier>
         <scope_note></scope_note>
     </dc-type>
-     
+  <dc-type>
+    <schema>dc</schema>
+    <element>contributor</element>
+    <qualifier>phone</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+
 
 </dspace-dc-types>

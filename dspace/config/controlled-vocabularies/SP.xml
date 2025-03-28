@@ -1,0 +1,649 @@
+<node id="sp_id" label="SP">
+    <isComposedBy>
+        <node id="sp_adamantina_id" label="Adamantina;-51.073695,-21.682012" />
+        <node id="sp_adolfo_id" label="Adolfo;-49.645128,-21.232494" />
+        <node id="sp_aguai_id" label="Aguaí;-46.973502,-22.057207" />
+        <node id="sp_agudos_id" label="Agudos;-48.98632,-22.469433" />
+        <node id="sp_alambari_id" label="Alambari;-47.897971,-23.550338" />
+        <node id="sp_alfredo_marcondes_id" label="Alfredo Marcondes;-51.413956,-21.9527" />
+        <node id="sp_altair_id" label="Altair;-49.057073,-20.524207" />
+        <node id="sp_altinopolis_id" label="Altinópolis;-47.3712,-21.021364" />
+        <node id="sp_alto_alegre_id" label="Alto Alegre;-50.16798,-21.581103" />
+        <node id="sp_aluminio_id" label="Alumínio;-47.254571,-23.530553" />
+        <node id="sp_alvinlandia_id" label="Alvinlândia;-49.762323,-22.443481" />
+        <node id="sp_americana_id" label="Americana;-47.333119,-22.73736" />
+        <node id="sp_amparo_id" label="Amparo;-46.772022,-22.70879" />
+        <node id="sp_americo_brasiliense_id" label="Américo Brasiliense;-48.11467,-21.728771" />
+        <node id="sp_americo_de_campos_id" label="Américo de Campos;-49.735904,-20.298476" />
+        <node id="sp_analandia_id" label="Analândia;-47.661939,-22.128917" />
+        <node id="sp_andradina_id" label="Andradina;-51.378568,-20.894761" />
+        <node id="sp_angatuba_id" label="Angatuba;-48.413872,-23.491733" />
+        <node id="sp_anhembi_id" label="Anhembi;-48.133595,-22.792959" />
+        <node id="sp_anhumas_id" label="Anhumas;-51.389542,-22.293414" />
+        <node id="sp_aparecida_id" label="Aparecida;-45.232496,-22.849509" />
+        <node id="sp_aparecida_d`oeste_id" label="Aparecida d`Oeste;-50.883506,-20.448734" />
+        <node id="sp_apiai_id" label="Apiaí;-48.844271,-24.510819" />
+        <node id="sp_aramina_id" label="Aramina;-47.787251,-20.088152" />
+        <node id="sp_arandu_id" label="Arandu;-49.048661,-23.138559" />
+        <node id="sp_arapei_id" label="Arapeí;-44.444127,-22.671744" />
+        <node id="sp_araraquara_id" label="Araraquara;-48.178014,-21.784511" />
+        <node id="sp_araras_id" label="Araras;-47.384235,-22.357238" />
+        <node id="sp_aracariguama_id" label="Araçariguama;-47.060825,-23.436597" />
+        <node id="sp_aracatuba_id" label="Araçatuba;-50.440106,-21.207648" />
+        <node id="sp_aracoiaba_da_serra_id" label="Araçoiaba da Serra;-47.616605,-23.502901" />
+        <node id="sp_arco-iris_id" label="Arco-Íris;-50.466018,-21.772797" />
+        <node id="sp_arealva_id" label="Arealva;-48.913511,-22.031026" />
+        <node id="sp_areias_id" label="Areias;-44.69924,-22.578597" />
+        <node id="sp_areiopolis_id" label="Areiópolis;-48.668052,-22.667216" />
+        <node id="sp_ariranha_id" label="Ariranha;-48.790418,-21.18716" />
+        <node id="sp_artur_nogueira_id" label="Artur Nogueira;-47.172679,-22.572737" />
+        <node id="sp_aruja_id" label="Arujá;-46.319983,-23.396476" />
+        <node id="sp_aspasia_id" label="Aspásia;-50.728046,-20.160028" />
+        <node id="sp_assis_id" label="Assis;-50.418307,-22.659957" />
+        <node id="sp_atibaia_id" label="Atibaia;-46.556262,-23.117059" />
+        <node id="sp_auriflama_id" label="Auriflama;-50.55719,-20.683621" />
+        <node id="sp_avanhandava_id" label="Avanhandava;-49.950893,-21.458416" />
+        <node id="sp_avare_id" label="Avaré;-48.925052,-23.106732" />
+        <node id="sp_avai_id" label="Avaí;-49.335596,-22.151409" />
+        <node id="sp_bady_bassitt_id" label="Bady Bassitt;-49.4385,-20.919689" />
+        <node id="sp_balbinos_id" label="Balbinos;-49.361906,-21.896293" />
+        <node id="sp_bananal_id" label="Bananal;-44.328114,-22.681932" />
+        <node id="sp_barbosa_id" label="Barbosa;-49.951816,-21.265661" />
+        <node id="sp_bariri_id" label="Bariri;-48.743828,-22.072955" />
+        <node id="sp_barra_bonita_id" label="Barra Bonita;-48.558349,-22.490859" />
+        <node id="sp_barra_do_chapeu_id" label="Barra do Chapéu;-49.023784,-24.472203" />
+        <node id="sp_barra_do_turvo_id" label="Barra do Turvo;-48.50126,-24.759035" />
+        <node id="sp_barretos_id" label="Barretos;-48.569832,-20.553146" />
+        <node id="sp_barrinha_id" label="Barrinha;-48.163614,-21.186374" />
+        <node id="sp_barueri_id" label="Barueri;-46.879042,-23.505689" />
+        <node id="sp_barao_de_antonina_id" label="Barão de Antonina;-49.563366,-23.628419" />
+        <node id="sp_bastos_id" label="Bastos;-50.735695,-21.920984" />
+        <node id="sp_batatais_id" label="Batatais;-47.592149,-20.892867" />
+        <node id="sp_bauru_id" label="Bauru;-49.087142,-22.324569" />
+        <node id="sp_bebedouro_id" label="Bebedouro;-48.479083,-20.949077" />
+        <node id="sp_bento_de_abreu_id" label="Bento de Abreu;-50.813959,-21.268629" />
+        <node id="sp_bernardino_de_campos_id" label="Bernardino de Campos;-49.467897,-23.016439" />
+        <node id="sp_bertioga_id" label="Bertioga;-46.139586,-23.848568" />
+        <node id="sp_bilac_id" label="Bilac;-50.47464,-21.403962" />
+        <node id="sp_birigui_id" label="Birigui;-50.343162,-21.291034" />
+        <node id="sp_biritiba-mirim_id" label="Biritiba-Mirim;-46.0407,-23.569774" />
+        <node id="sp_boa_esperanca_do_sul_id" label="Boa Esperança do Sul;-48.390622,-21.991832" />
+        <node id="sp_bocaina_id" label="Bocaina;-48.523044,-22.136538" />
+        <node id="sp_bofete_id" label="Bofete;-48.258203,-23.105543" />
+        <node id="sp_boituva_id" label="Boituva;-47.678574,-23.285531" />
+        <node id="sp_bom_jesus_dos_perdoes_id" label="Bom Jesus dos Perdões;-46.467474,-23.135579" />
+        <node id="sp_bom_sucesso_de_itarare_id" label="Bom Sucesso de Itararé;-49.145104,-24.315511" />
+        <node id="sp_boraceia_id" label="Boracéia;-48.780751,-22.192645" />
+        <node id="sp_borborema_id" label="Borborema;-49.074089,-21.621368" />
+        <node id="sp_borebi_id" label="Borebi;-48.970749,-22.572763" />
+        <node id="sp_bora_id" label="Borá;-50.540919,-22.269627" />
+        <node id="sp_botucatu_id" label="Botucatu;-48.443706,-22.883697" />
+        <node id="sp_braganca_paulista_id" label="Bragança Paulista;-46.54188,-22.952681" />
+        <node id="sp_brauna_id" label="Braúna;-50.317489,-21.499039" />
+        <node id="sp_brejo_alegre_id" label="Brejo Alegre;-50.186076,-21.165147" />
+        <node id="sp_brodowski_id" label="Brodowski;-47.657217,-20.984532" />
+        <node id="sp_brotas_id" label="Brotas;-48.125115,-22.279476" />
+        <node id="sp_buri_id" label="Buri;-48.595811,-23.797689" />
+        <node id="sp_buritama_id" label="Buritama;-50.147494,-21.066064" />
+        <node id="sp_buritizal_id" label="Buritizal;-47.709636,-20.191084" />
+        <node id="sp_balsamo_id" label="Bálsamo;-49.586487,-20.734843" />
+        <node id="sp_cabreuva_id" label="Cabreúva;-47.136251,-23.30533" />
+        <node id="sp_cabralia_paulista_id" label="Cabrália Paulista;-49.339337,-22.45756" />
+        <node id="sp_cachoeira_paulista_id" label="Cachoeira Paulista;-45.015384,-22.666498" />
+        <node id="sp_caconde_id" label="Caconde;-46.643659,-21.527995" />
+        <node id="sp_cafelandia_id" label="Cafelândia;-49.609213,-21.803112" />
+        <node id="sp_caiabu_id" label="Caiabu;-51.239408,-22.012719" />
+        <node id="sp_caieiras_id" label="Caieiras;-46.73974,-23.360729" />
+        <node id="sp_caiua_id" label="Caiuá;-51.996918,-21.832164" />
+        <node id="sp_cajamar_id" label="Cajamar;-46.878146,-23.355014" />
+        <node id="sp_cajati_id" label="Cajati;-48.122347,-24.73239" />
+        <node id="sp_cajobi_id" label="Cajobi;-48.806336,-20.877287" />
+        <node id="sp_cajuru_id" label="Cajuru;-47.303022,-21.274934" />
+        <node id="sp_campina_do_monte_alegre_id" label="Campina do Monte Alegre;-48.4758,-23.58948" />
+        <node id="sp_campinas_id" label="Campinas;-47.06595,-22.905346" />
+        <node id="sp_campo_limpo_paulista_id" label="Campo Limpo Paulista;-46.788919,-23.207791" />
+        <node id="sp_campos_novos_paulista_id" label="Campos Novos Paulista;-49.998726,-22.601952" />
+        <node id="sp_campos_do_jordao_id" label="Campos do Jordão;-45.583337,-22.729618" />
+        <node id="sp_cananeia_id" label="Cananéia;-47.934074,-25.014428" />
+        <node id="sp_canas_id" label="Canas;-45.052117,-22.700344" />
+        <node id="sp_canitar_id" label="Canitar;-49.783947,-23.004014" />
+        <node id="sp_capela_do_alto_id" label="Capela do Alto;-47.738834,-23.468471" />
+        <node id="sp_capivari_id" label="Capivari;-47.50715,-22.995144" />
+        <node id="sp_capao_bonito_id" label="Capão Bonito;-48.348222,-24.011265" />
+        <node id="sp_caraguatatuba_id" label="Caraguatatuba;-45.412533,-23.612535" />
+        <node id="sp_carapicuiba_id" label="Carapicuíba;-46.840676,-23.523471" />
+        <node id="sp_cardoso_id" label="Cardoso;-49.918322,-20.080031" />
+        <node id="sp_casa_branca_id" label="Casa Branca;-47.085245,-21.77081" />
+        <node id="sp_castilho_id" label="Castilho;-51.488394,-20.868924" />
+        <node id="sp_catanduva_id" label="Catanduva;-48.977015,-21.131381" />
+        <node id="sp_catigua_id" label="Catiguá;-49.06162,-21.051861" />
+        <node id="sp_cacapava_id" label="Caçapava;-45.707645,-23.099204" />
+        <node id="sp_cedral_id" label="Cedral;-49.266426,-20.900949" />
+        <node id="sp_cerqueira_cesar_id" label="Cerqueira César;-49.165524,-23.037999" />
+        <node id="sp_cerquilho_id" label="Cerquilho;-47.745862,-23.166487" />
+        <node id="sp_cesario_lange_id" label="Cesário Lange;-47.954453,-23.226035" />
+        <node id="sp_charqueada_id" label="Charqueada;-47.775468,-22.50958" />
+        <node id="sp_chavantes_id" label="Chavantes;-49.709616,-23.036632" />
+        <node id="sp_clementina_id" label="Clementina;-50.452476,-21.560447" />
+        <node id="sp_colina_id" label="Colina;-48.53867,-20.711443" />
+        <node id="sp_colombia_id" label="Colômbia;-48.686468,-20.176771" />
+        <node id="sp_conchal_id" label="Conchal;-47.172927,-22.337512" />
+        <node id="sp_conchas_id" label="Conchas;-48.013391,-23.01543" />
+        <node id="sp_cordeiropolis_id" label="Cordeirópolis;-47.451886,-22.477778" />
+        <node id="sp_coroados_id" label="Coroados;-50.285937,-21.352082" />
+        <node id="sp_coronel_macedo_id" label="Coronel Macedo;-49.309966,-23.626143" />
+        <node id="sp_corumbatai_id" label="Corumbataí;-47.621451,-22.221334" />
+        <node id="sp_cosmorama_id" label="Cosmorama;-49.782747,-20.475472" />
+        <node id="sp_cosmopolis_id" label="Cosmópolis;-47.192578,-22.641906" />
+        <node id="sp_cotia_id" label="Cotia;-46.91902,-23.602177" />
+        <node id="sp_cravinhos_id" label="Cravinhos;-47.732427,-21.337959" />
+        <node id="sp_cristais_paulista_id" label="Cristais Paulista;-47.420915,-20.403569" />
+        <node id="sp_cruzeiro_id" label="Cruzeiro;-44.96896,-22.572764" />
+        <node id="sp_cruzalia_id" label="Cruzália;-50.790909,-22.737309" />
+        <node id="sp_cubatao_id" label="Cubatão;-46.423968,-23.891121" />
+        <node id="sp_cunha_id" label="Cunha;-44.957559,-23.0731" />
+        <node id="sp_cassia_dos_coqueiros_id" label="Cássia dos Coqueiros;-47.164327,-21.280082" />
+        <node id="sp_candido_mota_id" label="Cândido Mota;-50.387326,-22.747093" />
+        <node id="sp_candido_rodrigues_id" label="Cândido Rodrigues;-48.632719,-21.327531" />
+        <node id="sp_descalvado_id" label="Descalvado;-47.618105,-21.900211" />
+        <node id="sp_diadema_id" label="Diadema;-46.62052,-23.681347" />
+        <node id="sp_dirce_reis_id" label="Dirce Reis;-50.607335,-20.464207" />
+        <node id="sp_divinolandia_id" label="Divinolândia;-46.736128,-21.663709" />
+        <node id="sp_dobrada_id" label="Dobrada;-48.393476,-21.515533" />
+        <node id="sp_dois_corregos_id" label="Dois Córregos;-48.381924,-22.367291" />
+        <node id="sp_dolcinopolis_id" label="Dolcinópolis;-50.514898,-20.124047" />
+        <node id="sp_dourado_id" label="Dourado;-48.317823,-22.104436" />
+        <node id="sp_dracena_id" label="Dracena;-51.535034,-21.484311" />
+        <node id="sp_duartina_id" label="Duartina;-49.408355,-22.414562" />
+        <node id="sp_dumont_id" label="Dumont;-47.975622,-21.232401" />
+        <node id="sp_echapora_id" label="Echaporã;-50.203787,-22.43256" />
+        <node id="sp_eldorado_id" label="Eldorado;-48.114085,-24.52809" />
+        <node id="sp_elias_fausto_id" label="Elias Fausto;-47.368153,-23.042822" />
+        <node id="sp_elisiario_id" label="Elisiário;-49.114594,-21.167754" />
+        <node id="sp_embauba_id" label="Embaúba;-48.832452,-20.979595" />
+        <node id="sp_embu_id" label="Embu;-46.857854,-23.643717" />
+        <node id="sp_embu-guacu_id" label="Embu-Guaçu;-46.813593,-23.829717" />
+        <node id="sp_emilianopolis_id" label="Emilianópolis;-51.483168,-21.831436" />
+        <node id="sp_engenheiro_coelho_id" label="Engenheiro Coelho;-47.211045,-22.483573" />
+        <node id="sp_espirito_santo_do_pinhal_id" label="Espírito Santo do Pinhal;-46.74767,-22.190871" />
+        <node id="sp_espirito_santo_do_turvo_id" label="Espírito Santo do Turvo;-49.434119,-22.69254" />
+        <node id="sp_estiva_gerbi_id" label="Estiva Gerbi;-46.948111,-22.271314" />
+        <node id="sp_estrela_d`oeste_id" label="Estrela d`Oeste;-50.404872,-20.28755" />
+        <node id="sp_estrela_do_norte_id" label="Estrela do Norte;-51.663203,-22.485935" />
+        <node id="sp_euclides_da_cunha_paulista_id" label="Euclides da Cunha Paulista;-52.592779,-22.55452" />
+        <node id="sp_fartura_id" label="Fartura;-49.512403,-23.391643" />
+        <node id="sp_fernando_prestes_id" label="Fernando Prestes;-48.687384,-21.266061" />
+        <node id="sp_fernandopolis_id" label="Fernandópolis;-50.247115,-20.280556" />
+        <node id="sp_fernao_id" label="Fernão;-49.518735,-22.36066" />
+        <node id="sp_ferraz_de_vasconcelos_id" label="Ferraz de Vasconcelos;-46.37097,-23.541056" />
+        <node id="sp_flora_rica_id" label="Flora Rica;-51.382107,-21.672738" />
+        <node id="sp_floreal_id" label="Floreal;-50.151282,-20.675193" />
+        <node id="sp_florinia_id" label="Florínia;-50.732976,-22.902483" />
+        <node id="sp_florida_paulista_id" label="Flórida Paulista;-51.172445,-21.612711" />
+        <node id="sp_franca_id" label="Franca;-47.403861,-20.53523" />
+        <node id="sp_francisco_morato_id" label="Francisco Morato;-46.744781,-23.279248" />
+        <node id="sp_franco_da_rocha_id" label="Franco da Rocha;-46.729011,-23.322882" />
+        <node id="sp_gabriel_monteiro_id" label="Gabriel Monteiro;-50.557321,-21.52941" />
+        <node id="sp_garca_id" label="Garça;-49.654596,-22.212516" />
+        <node id="sp_gastao_vidigal_id" label="Gastão Vidigal;-50.191183,-20.794776" />
+        <node id="sp_gaviao_peixoto_id" label="Gavião Peixoto;-48.49566,-21.836658" />
+        <node id="sp_general_salgado_id" label="General Salgado;-50.36397,-20.648458" />
+        <node id="sp_getulina_id" label="Getulina;-49.931205,-21.796117" />
+        <node id="sp_glicerio_id" label="Glicério;-50.212269,-21.381193" />
+        <node id="sp_guaimbe_id" label="Guaimbê;-49.89861,-21.909072" />
+        <node id="sp_guaicara_id" label="Guaiçara;-49.801287,-21.619537" />
+        <node id="sp_guapiara_id" label="Guapiara;-48.529549,-24.18921" />
+        <node id="sp_guapiacu_id" label="Guapiaçu;-49.217201,-20.795885" />
+        <node id="sp_guaraci_id" label="Guaraci;-48.939107,-20.49766" />
+        <node id="sp_guarani_d`oeste_id" label="Guarani d`Oeste;-50.341123,-20.074646" />
+        <node id="sp_guaranta_id" label="Guarantã;-49.591351,-21.894195" />
+        <node id="sp_guararapes_id" label="Guararapes;-50.645338,-21.254431" />
+        <node id="sp_guararema_id" label="Guararema;-46.036946,-23.411195" />
+        <node id="sp_guaratingueta_id" label="Guaratinguetá;-45.193788,-22.807534" />
+        <node id="sp_guaracai_id" label="Guaraçaí;-51.211854,-21.029173" />
+        <node id="sp_guarei_id" label="Guareí;-48.183715,-23.371359" />
+        <node id="sp_guariba_id" label="Guariba;-48.23158,-21.35938" />
+        <node id="sp_guaruja_id" label="Guarujá;-46.257959,-23.988798" />
+        <node id="sp_guarulhos_id" label="Guarulhos;-46.533347,-23.453758" />
+        <node id="sp_guara_id" label="Guará;-47.823626,-20.430162" />
+        <node id="sp_guatapara_id" label="Guatapará;-48.035588,-21.494444" />
+        <node id="sp_guaira_id" label="Guaíra;-48.31197,-20.319591" />
+        <node id="sp_guzolandia_id" label="Guzolândia;-50.664505,-20.646679" />
+        <node id="sp_galia_id" label="Gália;-49.550356,-22.291846" />
+        <node id="sp_herculandia_id" label="Herculândia;-50.390734,-22.003802" />
+        <node id="sp_holambra_id" label="Holambra;-47.048694,-22.640513" />
+        <node id="sp_hortolandia_id" label="Hortolândia;-47.214259,-22.852854" />
+        <node id="sp_iacanga_id" label="Iacanga;-49.030959,-21.889646" />
+        <node id="sp_iacri_id" label="Iacri;-50.693152,-21.857199" />
+        <node id="sp_iaras_id" label="Iaras;-49.163377,-22.868199" />
+        <node id="sp_ibate_id" label="Ibaté;-47.988211,-21.958358" />
+        <node id="sp_ibirarema_id" label="Ibirarema;-50.073901,-22.818537" />
+        <node id="sp_ibira_id" label="Ibirá;-49.244833,-21.083032" />
+        <node id="sp_ibitinga_id" label="Ibitinga;-48.831903,-21.75623" />
+        <node id="sp_ibiuna_id" label="Ibiúna;-47.223037,-23.65961" />
+        <node id="sp_icem_id" label="Icém;-49.191546,-20.339067" />
+        <node id="sp_iepe_id" label="Iepê;-51.077881,-22.660165" />
+        <node id="sp_igarapava_id" label="Igarapava;-47.746576,-20.040687" />
+        <node id="sp_igarata_id" label="Igaratá;-46.156985,-23.20366" />
+        <node id="sp_igaracu_do_tiete_id" label="Igaraçu do Tietê;-48.559672,-22.509044" />
+        <node id="sp_iguape_id" label="Iguape;-47.553659,-24.699015" />
+        <node id="sp_ilha_comprida_id" label="Ilha Comprida;-47.538275,-24.730743" />
+        <node id="sp_ilha_solteira_id" label="Ilha Solteira;-51.342552,-20.432629" />
+        <node id="sp_ilhabela_id" label="Ilhabela;-45.355226,-23.778533" />
+        <node id="sp_indaiatuba_id" label="Indaiatuba;-47.210093,-23.081591" />
+        <node id="sp_indiana_id" label="Indiana;-51.255467,-22.173779" />
+        <node id="sp_indiapora_id" label="Indiaporã;-50.290856,-19.978952" />
+        <node id="sp_inubia_paulista_id" label="Inúbia Paulista;-50.963268,-21.769471" />
+        <node id="sp_ipaussu_id" label="Ipaussu;-49.627911,-23.05753" />
+        <node id="sp_ipero_id" label="Iperó;-47.692717,-23.351296" />
+        <node id="sp_ipeuna_id" label="Ipeúna;-47.715086,-22.435513" />
+        <node id="sp_ipigua_id" label="Ipiguá;-49.384161,-20.655734" />
+        <node id="sp_iporanga_id" label="Iporanga;-48.597119,-24.584718" />
+        <node id="sp_ipua_id" label="Ipuã;-48.012881,-20.443785" />
+        <node id="sp_iracemapolis_id" label="Iracemápolis;-47.522963,-22.583234" />
+        <node id="sp_irapuru_id" label="Irapuru;-51.347171,-21.56839" />
+        <node id="sp_irapua_id" label="Irapuã;-49.416398,-21.276832" />
+        <node id="sp_itabera_id" label="Itaberá;-49.139987,-23.863827" />
+        <node id="sp_itajobi_id" label="Itajobi;-49.062863,-21.312294" />
+        <node id="sp_itaju_id" label="Itaju;-48.811549,-21.985691" />
+        <node id="sp_itanhaem_id" label="Itanhaém;-46.787986,-24.173633" />
+        <node id="sp_itapecerica_da_serra_id" label="Itapecerica da Serra;-46.857193,-23.716135" />
+        <node id="sp_itapetininga_id" label="Itapetininga;-48.048326,-23.588607" />
+        <node id="sp_itapeva_id" label="Itapeva;-48.876433,-23.978823" />
+        <node id="sp_itapevi_id" label="Itapevi;-46.932747,-23.548774" />
+        <node id="sp_itapira_id" label="Itapira;-46.822434,-22.435731" />
+        <node id="sp_itapirapua_paulista_id" label="Itapirapuã Paulista;-49.166151,-24.572033" />
+        <node id="sp_itaporanga_id" label="Itaporanga;-49.481854,-23.704273" />
+        <node id="sp_itapura_id" label="Itapura;-51.506322,-20.641911" />
+        <node id="sp_itapui_id" label="Itapuí;-48.719734,-22.232445" />
+        <node id="sp_itaquaquecetuba_id" label="Itaquaquecetuba;-46.345724,-23.483481" />
+        <node id="sp_itarare_id" label="Itararé;-49.335215,-24.108451" />
+        <node id="sp_itariri_id" label="Itariri;-47.173619,-24.283404" />
+        <node id="sp_itatiba_id" label="Itatiba;-46.846353,-23.003497" />
+        <node id="sp_itatinga_id" label="Itatinga;-48.615712,-23.104707" />
+        <node id="sp_itai_id" label="Itaí;-49.092005,-23.42129" />
+        <node id="sp_itaoca_id" label="Itaóca;-48.841285,-24.639252" />
+        <node id="sp_itirapina_id" label="Itirapina;-47.816594,-22.256239" />
+        <node id="sp_itirapua_id" label="Itirapuã;-47.219446,-20.641585" />
+        <node id="sp_itobi_id" label="Itobi;-46.9743,-21.730853" />
+        <node id="sp_itu_id" label="Itu;-47.292688,-23.254397" />
+        <node id="sp_itupeva_id" label="Itupeva;-47.059262,-23.152635" />
+        <node id="sp_ituverava_id" label="Ituverava;-47.790207,-20.335465" />
+        <node id="sp_itapolis_id" label="Itápolis;-48.81491,-21.594224" />
+        <node id="sp_jaborandi_id" label="Jaborandi;-48.411167,-20.688422" />
+        <node id="sp_jaboticabal_id" label="Jaboticabal;-48.325223,-21.252037" />
+        <node id="sp_jacarei_id" label="Jacareí;-45.965814,-23.29829" />
+        <node id="sp_jaci_id" label="Jaci;-49.579732,-20.880468" />
+        <node id="sp_jacupiranga_id" label="Jacupiranga;-48.006402,-24.696326" />
+        <node id="sp_jaguariuna_id" label="Jaguariúna;-46.985062,-22.70374" />
+        <node id="sp_jales_id" label="Jales;-50.549442,-20.267227" />
+        <node id="sp_jambeiro_id" label="Jambeiro;-45.694214,-23.252217" />
+        <node id="sp_jandira_id" label="Jandira;-46.902314,-23.527537" />
+        <node id="sp_jardinopolis_id" label="Jardinópolis;-47.760583,-21.017612" />
+        <node id="sp_jarinu_id" label="Jarinu;-46.728015,-23.103855" />
+        <node id="sp_jau_id" label="Jaú;-48.559193,-22.293585" />
+        <node id="sp_jeriquara_id" label="Jeriquara;-47.591835,-20.311567" />
+        <node id="sp_joanopolis_id" label="Joanópolis;-46.274118,-22.926999" />
+        <node id="sp_jose_bonifacio_id" label="José Bonifácio;-49.689233,-21.055062" />
+        <node id="sp_joao_ramalho_id" label="João Ramalho;-50.769359,-22.247339" />
+        <node id="sp_jumirim_id" label="Jumirim;-47.786821,-23.088361" />
+        <node id="sp_jundiai_id" label="Jundiaí;-46.897358,-23.185218" />
+        <node id="sp_junqueiropolis_id" label="Junqueirópolis;-51.434187,-21.510348" />
+        <node id="sp_juquitiba_id" label="Juquitiba;-47.065332,-23.924381" />
+        <node id="sp_juquia_id" label="Juquiá;-47.64264,-24.310084" />
+        <node id="sp_julio_mesquita_id" label="Júlio Mesquita;-49.787294,-22.011174" />
+        <node id="sp_lagoinha_id" label="Lagoinha;-45.194415,-23.084621" />
+        <node id="sp_laranjal_paulista_id" label="Laranjal Paulista;-47.837549,-23.050564" />
+        <node id="sp_lavrinhas_id" label="Lavrinhas;-44.902359,-22.570047" />
+        <node id="sp_lavinia_id" label="Lavínia;-51.041172,-21.163913" />
+        <node id="sp_leme_id" label="Leme;-47.384109,-22.180857" />
+        <node id="sp_lencois_paulista_id" label="Lençóis Paulista;-48.803683,-22.602693" />
+        <node id="sp_limeira_id" label="Limeira;-47.396987,-22.56605" />
+        <node id="sp_lindoia_id" label="Lindóia;-46.650035,-22.522562" />
+        <node id="sp_lins_id" label="Lins;-49.752555,-21.67182" />
+        <node id="sp_lorena_id" label="Lorena;-45.11968,-22.73338" />
+        <node id="sp_lourdes_id" label="Lourdes;-50.226274,-20.966025" />
+        <node id="sp_louveira_id" label="Louveira;-46.948369,-23.085572" />
+        <node id="sp_lucianopolis_id" label="Lucianópolis;-49.522002,-22.429418" />
+        <node id="sp_lucelia_id" label="Lucélia;-51.021511,-21.718203" />
+        <node id="sp_luiziania_id" label="Luiziânia;-50.329438,-21.673748" />
+        <node id="sp_lupercio_id" label="Lupércio;-49.818019,-22.41459" />
+        <node id="sp_lutecia_id" label="Lutécia;-50.394007,-22.338378" />
+        <node id="sp_luis_antonio_id" label="Luís Antônio;-47.700838,-21.550625" />
+        <node id="sp_macatuba_id" label="Macatuba;-48.710229,-22.50022" />
+        <node id="sp_macaubal_id" label="Macaubal;-49.968732,-20.802153" />
+        <node id="sp_macedonia_id" label="Macedônia;-50.197269,-20.144375" />
+        <node id="sp_magda_id" label="Magda;-50.230542,-20.644497" />
+        <node id="sp_mairinque_id" label="Mairinque;-47.184995,-23.539822" />
+        <node id="sp_mairipora_id" label="Mairiporã;-46.589695,-23.31713" />
+        <node id="sp_manduri_id" label="Manduri;-49.320164,-23.005569" />
+        <node id="sp_maraba_paulista_id" label="Marabá Paulista;-51.96167,-22.106766" />
+        <node id="sp_maracai_id" label="Maracaí;-50.671288,-22.614921" />
+        <node id="sp_marapoama_id" label="Marapoama;-49.129968,-21.258719" />
+        <node id="sp_marinopolis_id" label="Marinópolis;-50.825384,-20.4389" />
+        <node id="sp_mariapolis_id" label="Mariápolis;-51.182434,-21.79592" />
+        <node id="sp_martinopolis_id" label="Martinópolis;-51.170949,-22.146153" />
+        <node id="sp_marilia_id" label="Marília;-49.95006,-22.217108" />
+        <node id="sp_matao_id" label="Matão;-48.363968,-21.602511" />
+        <node id="sp_maua_id" label="Mauá;-46.461263,-23.66767" />
+        <node id="sp_mendonca_id" label="Mendonça;-49.579059,-21.175724" />
+        <node id="sp_meridiano_id" label="Meridiano;-50.181055,-20.357874" />
+        <node id="sp_mesopolis_id" label="Mesópolis;-50.632641,-19.968351" />
+        <node id="sp_miguelopolis_id" label="Miguelópolis;-48.030997,-20.179612" />
+        <node id="sp_mineiros_do_tiete_id" label="Mineiros do Tietê;-48.450998,-22.412007" />
+        <node id="sp_mira_estrela_id" label="Mira Estrela;-50.139039,-19.978925" />
+        <node id="sp_miracatu_id" label="Miracatu;-47.462458,-24.276639" />
+        <node id="sp_mirandopolis_id" label="Mirandópolis;-51.1035,-21.131345" />
+        <node id="sp_mirante_do_paranapanema_id" label="Mirante do Paranapanema;-51.90835,-22.290427" />
+        <node id="sp_mirassol_id" label="Mirassol;-49.52061,-20.816874" />
+        <node id="sp_mirassolandia_id" label="Mirassolândia;-49.461726,-20.617859" />
+        <node id="sp_mococa_id" label="Mococa;-47.002405,-21.464731" />
+        <node id="sp_mogi_guacu_id" label="Mogi Guaçu;-46.9428,-22.367453" />
+        <node id="sp_mogi_mirim_id" label="Mogi Mirim;-46.950514,-22.431878" />
+        <node id="sp_mogi_das_cruzes_id" label="Mogi das Cruzes;-46.18541,-23.52082" />
+        <node id="sp_mombuca_id" label="Mombuca;-47.558957,-22.928541" />
+        <node id="sp_mongagua_id" label="Mongaguá;-46.626526,-24.080901" />
+        <node id="sp_monte_alegre_do_sul_id" label="Monte Alegre do Sul;-46.68098,-22.681699" />
+        <node id="sp_monte_alto_id" label="Monte Alto;-48.497066,-21.265545" />
+        <node id="sp_monte_aprazivel_id" label="Monte Aprazível;-49.71842,-20.768015" />
+        <node id="sp_monte_azul_paulista_id" label="Monte Azul Paulista;-48.638717,-20.90649" />
+        <node id="sp_monte_castelo_id" label="Monte Castelo;-51.567889,-21.298092" />
+        <node id="sp_monte_mor_id" label="Monte Mor;-47.312182,-22.945043" />
+        <node id="sp_monteiro_lobato_id" label="Monteiro Lobato;-45.840661,-22.954413" />
+        <node id="sp_moncoes_id" label="Monções;-50.097537,-20.850949" />
+        <node id="sp_morro_agudo_id" label="Morro Agudo;-48.058084,-20.728828" />
+        <node id="sp_morungaba_id" label="Morungaba;-46.789601,-22.881071" />
+        <node id="sp_motuca_id" label="Motuca;-48.153764,-21.510287" />
+        <node id="sp_murutinga_do_sul_id" label="Murutinga do Sul;-51.277389,-20.990803" />
+        <node id="sp_nantes_id" label="Nantes;-51.239977,-22.615559" />
+        <node id="sp_narandiba_id" label="Narandiba;-51.527357,-22.405737" />
+        <node id="sp_natividade_da_serra_id" label="Natividade da Serra;-45.446764,-23.370665" />
+        <node id="sp_nazare_paulista_id" label="Nazaré Paulista;-46.398295,-23.174731" />
+        <node id="sp_neves_paulista_id" label="Neves Paulista;-49.635767,-20.842992" />
+        <node id="sp_nhandeara_id" label="Nhandeara;-50.043596,-20.69455" />
+        <node id="sp_nipoa_id" label="Nipoã;-49.783278,-20.911397" />
+        <node id="sp_nova_alianca_id" label="Nova Aliança;-49.498642,-21.015649" />
+        <node id="sp_nova_campina_id" label="Nova Campina;-48.902179,-24.122367" />
+        <node id="sp_nova_canaa_paulista_id" label="Nova Canaã Paulista;-50.948264,-20.383625" />
+        <node id="sp_nova_castilho_id" label="Nova Castilho;-50.347741,-20.761492" />
+        <node id="sp_nova_europa_id" label="Nova Europa;-48.570468,-21.77647" />
+        <node id="sp_nova_granada_id" label="Nova Granada;-49.312268,-20.532074" />
+        <node id="sp_nova_guataporanga_id" label="Nova Guataporanga;-51.644655,-21.331968" />
+        <node id="sp_nova_independencia_id" label="Nova Independência;-51.490531,-21.10263" />
+        <node id="sp_nova_luzitania_id" label="Nova Luzitânia;-50.261683,-20.855967" />
+        <node id="sp_nova_odessa_id" label="Nova Odessa;-47.294059,-22.783186" />
+        <node id="sp_novais_id" label="Novais;-48.914091,-20.98928" />
+        <node id="sp_novo_horizonte_id" label="Novo Horizonte;-49.223409,-21.465145" />
+        <node id="sp_nuporanga_id" label="Nuporanga;-47.742942,-20.729619" />
+        <node id="sp_ocaucu_id" label="Ocauçu;-49.922005,-22.437979" />
+        <node id="sp_olimpia_id" label="Olímpia;-48.910625,-20.736634" />
+        <node id="sp_onda_verde_id" label="Onda Verde;-49.292925,-20.60423" />
+        <node id="sp_oriente_id" label="Oriente;-50.097105,-22.154939" />
+        <node id="sp_orindiuva_id" label="Orindiúva;-49.346395,-20.18607" />
+        <node id="sp_orlandia_id" label="Orlândia;-47.885205,-20.716925" />
+        <node id="sp_osasco_id" label="Osasco;-46.791555,-23.53239" />
+        <node id="sp_oscar_bressane_id" label="Oscar Bressane;-50.281118,-22.314874" />
+        <node id="sp_osvaldo_cruz_id" label="Osvaldo Cruz;-50.879288,-21.796753" />
+        <node id="sp_ourinhos_id" label="Ourinhos;-49.869702,-22.979695" />
+        <node id="sp_ouro_verde_id" label="Ouro Verde;-51.702398,-21.48715" />
+        <node id="sp_ouroeste_id" label="Ouroeste;-50.376807,-20.006052" />
+        <node id="sp_pacaembu_id" label="Pacaembu;-51.265366,-21.562661" />
+        <node id="sp_palestina_id" label="Palestina;-49.430854,-20.390046" />
+        <node id="sp_palmares_paulista_id" label="Palmares Paulista;-48.803656,-21.085369" />
+        <node id="sp_palmeira_d`oeste_id" label="Palmeira d`Oeste;-50.763199,-20.414776" />
+        <node id="sp_palmital_id" label="Palmital;-50.217964,-22.785849" />
+        <node id="sp_panorama_id" label="Panorama;-51.856185,-21.353973" />
+        <node id="sp_paraguacu_paulista_id" label="Paraguaçu Paulista;-50.57316,-22.411369" />
+        <node id="sp_paraibuna_id" label="Paraibuna;-45.663943,-23.387213" />
+        <node id="sp_paranapanema_id" label="Paranapanema;-48.721435,-23.386196" />
+        <node id="sp_paranapua_id" label="Paranapuã;-50.588634,-20.104774" />
+        <node id="sp_parapua_id" label="Parapuã;-50.794882,-21.779205" />
+        <node id="sp_paraiso_id" label="Paraíso;-48.776105,-21.015911" />
+        <node id="sp_pardinho_id" label="Pardinho;-48.367942,-23.084056" />
+        <node id="sp_pariquera-acu_id" label="Pariquera-Açu;-47.874152,-24.714652" />
+        <node id="sp_parisi_id" label="Parisi;-50.016277,-20.303397" />
+        <node id="sp_patrocinio_paulista_id" label="Patrocínio Paulista;-47.280124,-20.638361" />
+        <node id="sp_pauliceia_id" label="Paulicéia;-51.832098,-21.315262" />
+        <node id="sp_paulistania_id" label="Paulistânia;-49.400845,-22.576831" />
+        <node id="sp_paulo_de_faria_id" label="Paulo de Faria;-49.400013,-20.029612" />
+        <node id="sp_paulinia_id" label="Paulínia;-47.148776,-22.754178" />
+        <node id="sp_pederneiras_id" label="Pederneiras;-48.778113,-22.351086" />
+        <node id="sp_pedra_bela_id" label="Pedra Bela;-46.44555,-22.790174" />
+        <node id="sp_pedranopolis_id" label="Pedranópolis;-50.112937,-20.247378" />
+        <node id="sp_pedregulho_id" label="Pedregulho;-47.47745,-20.253468" />
+        <node id="sp_pedreira_id" label="Pedreira;-46.894846,-22.741347" />
+        <node id="sp_pedrinhas_paulista_id" label="Pedrinhas Paulista;-50.793287,-22.817378" />
+        <node id="sp_pedro_de_toledo_id" label="Pedro de Toledo;-47.23537,-24.276391" />
+        <node id="sp_penapolis_id" label="Penápolis;-50.076855,-21.414765" />
+        <node id="sp_pereira_barreto_id" label="Pereira Barreto;-51.112268,-20.636767" />
+        <node id="sp_pereiras_id" label="Pereiras;-47.972005,-23.08037" />
+        <node id="sp_peruibe_id" label="Peruíbe;-47.0012,-24.311974" />
+        <node id="sp_piacatu_id" label="Piacatu;-50.600343,-21.592142" />
+        <node id="sp_piedade_id" label="Piedade;-47.425572,-23.713941" />
+        <node id="sp_pilar_do_sul_id" label="Pilar do Sul;-47.722151,-23.807716" />
+        <node id="sp_pindamonhangaba_id" label="Pindamonhangaba;-45.461264,-22.92463" />
+        <node id="sp_pindorama_id" label="Pindorama;-48.90861,-21.1853" />
+        <node id="sp_pinhalzinho_id" label="Pinhalzinho;-46.589679,-22.781115" />
+        <node id="sp_piquerobi_id" label="Piquerobi;-51.728164,-21.874671" />
+        <node id="sp_piquete_id" label="Piquete;-45.186919,-22.606881" />
+        <node id="sp_piracaia_id" label="Piracaia;-46.359374,-23.052545" />
+        <node id="sp_piracicaba_id" label="Piracicaba;-47.647612,-22.733801" />
+        <node id="sp_piraju_id" label="Piraju;-49.380335,-23.198066" />
+        <node id="sp_pirajui_id" label="Pirajuí;-49.460777,-21.998986" />
+        <node id="sp_pirangi_id" label="Pirangi;-48.660733,-21.0886" />
+        <node id="sp_pirapora_do_bom_jesus_id" label="Pirapora do Bom Jesus;-46.999103,-23.396487" />
+        <node id="sp_pirapozinho_id" label="Pirapozinho;-51.497635,-22.271125" />
+        <node id="sp_pirassununga_id" label="Pirassununga;-47.425746,-21.995982" />
+        <node id="sp_piratininga_id" label="Piratininga;-49.133869,-22.41416" />
+        <node id="sp_pitangueiras_id" label="Pitangueiras;-48.220951,-21.013203" />
+        <node id="sp_planalto_id" label="Planalto;-49.933034,-21.034249" />
+        <node id="sp_platina_id" label="Platina;-50.210422,-22.637142" />
+        <node id="sp_poloni_id" label="Poloni;-49.825756,-20.782909" />
+        <node id="sp_pompeia_id" label="Pompéia;-50.175964,-22.10704" />
+        <node id="sp_pongai_id" label="Pongaí;-49.360421,-21.73956" />
+        <node id="sp_pontal_id" label="Pontal;-48.042261,-21.021565" />
+        <node id="sp_pontalinda_id" label="Pontalinda;-50.525754,-20.439624" />
+        <node id="sp_pontes_gestal_id" label="Pontes Gestal;-49.706355,-20.172692" />
+        <node id="sp_populina_id" label="Populina;-50.538035,-19.945297" />
+        <node id="sp_porangaba_id" label="Porangaba;-48.119464,-23.17615" />
+        <node id="sp_porto_feliz_id" label="Porto Feliz;-47.52512,-23.209318" />
+        <node id="sp_porto_ferreira_id" label="Porto Ferreira;-47.487034,-21.849814" />
+        <node id="sp_potim_id" label="Potim;-45.255205,-22.834327" />
+        <node id="sp_potirendaba_id" label="Potirendaba;-49.381509,-21.042789" />
+        <node id="sp_poa_id" label="Poá;-46.347292,-23.533285" />
+        <node id="sp_pracinha_id" label="Pracinha;-51.086791,-21.849563" />
+        <node id="sp_pradopolis_id" label="Pradópolis;-48.067869,-21.362578" />
+        <node id="sp_praia_grande_id" label="Praia Grande;-46.412057,-24.008378" />
+        <node id="sp_pratania_id" label="Pratânia;-48.663618,-22.811183" />
+        <node id="sp_presidente_alves_id" label="Presidente Alves;-49.438133,-22.09991" />
+        <node id="sp_presidente_bernardes_id" label="Presidente Bernardes;-51.556507,-22.008198" />
+        <node id="sp_presidente_epitacio_id" label="Presidente Epitácio;-52.11114,-21.765074" />
+        <node id="sp_presidente_prudente_id" label="Presidente Prudente;-51.392526,-22.120654" />
+        <node id="sp_presidente_venceslau_id" label="Presidente Venceslau;-51.844744,-21.873233" />
+        <node id="sp_promissao_id" label="Promissão;-49.85989,-21.535572" />
+        <node id="sp_quadra_id" label="Quadra;-48.054657,-23.299332" />
+        <node id="sp_quata_id" label="Quatá;-50.696605,-22.24559" />
+        <node id="sp_queiroz_id" label="Queiroz;-50.241461,-21.796865" />
+        <node id="sp_queluz_id" label="Queluz;-44.778105,-22.531171" />
+        <node id="sp_quintana_id" label="Quintana;-50.307028,-22.069172" />
+        <node id="sp_rafard_id" label="Rafard;-47.531795,-23.010508" />
+        <node id="sp_rancharia_id" label="Rancharia;-50.893041,-22.22691" />
+        <node id="sp_redencao_da_serra_id" label="Redenção da Serra;-45.54222,-23.263763" />
+        <node id="sp_regente_feijo_id" label="Regente Feijó;-51.30545,-22.218131" />
+        <node id="sp_reginopolis_id" label="Reginópolis;-49.226782,-21.891372" />
+        <node id="sp_registro_id" label="Registro;-47.844895,-24.497942" />
+        <node id="sp_restinga_id" label="Restinga;-47.483254,-20.605593" />
+        <node id="sp_ribeira_id" label="Ribeira;-49.004409,-24.65171" />
+        <node id="sp_ribeirao_bonito_id" label="Ribeirão Bonito;-48.182041,-22.068536" />
+        <node id="sp_ribeirao_branco_id" label="Ribeirão Branco;-48.763545,-24.22058" />
+        <node id="sp_ribeirao_corrente_id" label="Ribeirão Corrente;-47.590394,-20.457872" />
+        <node id="sp_ribeirao_grande_id" label="Ribeirão Grande;-48.367931,-24.10114" />
+        <node id="sp_ribeirao_pires_id" label="Ribeirão Pires;-46.405805,-23.706669" />
+        <node id="sp_ribeirao_preto_id" label="Ribeirão Preto;-47.809875,-21.169923" />
+        <node id="sp_ribeirao_do_sul_id" label="Ribeirão do Sul;-49.933037,-22.789013" />
+        <node id="sp_ribeirao_dos_indios_id" label="Ribeirão dos Índios;-51.610343,-21.838201" />
+        <node id="sp_rifaina_id" label="Rifaina;-47.429109,-20.080256" />
+        <node id="sp_rincao_id" label="Rincão;-48.072838,-21.589429" />
+        <node id="sp_rinopolis_id" label="Rinópolis;-50.723908,-21.728402" />
+        <node id="sp_rio_claro_id" label="Rio Claro;-47.554632,-22.398378" />
+        <node id="sp_rio_grande_da_serra_id" label="Rio Grande da Serra;-46.397084,-23.743724" />
+        <node id="sp_rio_das_pedras_id" label="Rio das Pedras;-47.604657,-22.841723" />
+        <node id="sp_riolandia_id" label="Riolândia;-49.683582,-19.986789" />
+        <node id="sp_riversul_id" label="Riversul;-49.428965,-23.829003" />
+        <node id="sp_rosana_id" label="Rosana;-53.060296,-22.578173" />
+        <node id="sp_roseira_id" label="Roseira;-45.306993,-22.893834" />
+        <node id="sp_rubineia_id" label="Rubinéia;-51.007034,-20.175906" />
+        <node id="sp_rubiacea_id" label="Rubiácea;-50.729564,-21.300568" />
+        <node id="sp_sabino_id" label="Sabino;-49.575546,-21.45934" />
+        <node id="sp_sagres_id" label="Sagres;-50.959381,-21.88232" />
+        <node id="sp_sales_id" label="Sales;-49.489658,-21.342738" />
+        <node id="sp_sales_oliveira_id" label="Sales Oliveira;-47.836873,-20.769612" />
+        <node id="sp_salesopolis_id" label="Salesópolis;-45.84653,-23.528805" />
+        <node id="sp_salmourao_id" label="Salmourão;-50.861366,-21.626729" />
+        <node id="sp_saltinho_id" label="Saltinho;-47.675371,-22.844167" />
+        <node id="sp_salto_id" label="Salto;-47.293087,-23.199592" />
+        <node id="sp_salto_grande_id" label="Salto Grande;-49.983134,-22.889389" />
+        <node id="sp_salto_de_pirapora_id" label="Salto de Pirapora;-47.574322,-23.647387" />
+        <node id="sp_sandovalina_id" label="Sandovalina;-51.764822,-22.455099" />
+        <node id="sp_santa_adelia_id" label="Santa Adélia;-48.80634,-21.242662" />
+        <node id="sp_santa_albertina_id" label="Santa Albertina;-50.729713,-20.031131" />
+        <node id="sp_santa_branca_id" label="Santa Branca;-45.887521,-23.393311" />
+        <node id="sp_santa_barbara_d`oeste_id" label="Santa Bárbara d`Oeste;-47.414308,-22.755256" />
+        <node id="sp_santa_clara_d`oeste_id" label="Santa Clara d`Oeste;-50.949109,-20.090041" />
+        <node id="sp_santa_cruz_da_conceicao_id" label="Santa Cruz da Conceição;-47.451196,-22.140542" />
+        <node id="sp_santa_cruz_da_esperanca_id" label="Santa Cruz da Esperança;-47.430381,-21.295065" />
+        <node id="sp_santa_cruz_das_palmeiras_id" label="Santa Cruz das Palmeiras;-47.248023,-21.823475" />
+        <node id="sp_santa_cruz_do_rio_pardo_id" label="Santa Cruz do Rio Pardo;-49.635444,-22.89875" />
+        <node id="sp_santa_ernestina_id" label="Santa Ernestina;-48.395317,-21.461769" />
+        <node id="sp_santa_fe_do_sul_id" label="Santa Fé do Sul;-50.931958,-20.208252" />
+        <node id="sp_santa_gertrudes_id" label="Santa Gertrudes;-47.52716,-22.457229" />
+        <node id="sp_santa_isabel_id" label="Santa Isabel;-46.223668,-23.317194" />
+        <node id="sp_santa_lucia_id" label="Santa Lúcia;-48.088469,-21.684982" />
+        <node id="sp_santa_maria_da_serra_id" label="Santa Maria da Serra;-48.159288,-22.566088" />
+        <node id="sp_santa_mercedes_id" label="Santa Mercedes;-51.756353,-21.349521" />
+        <node id="sp_santa_rita_d`oeste_id" label="Santa Rita d`Oeste;-50.835781,-20.141431" />
+        <node id="sp_santa_rita_do_passa_quatro_id" label="Santa Rita do Passa Quatro;-47.478,-21.708323" />
+        <node id="sp_santa_rosa_de_viterbo_id" label="Santa Rosa de Viterbo;-47.362213,-21.477568" />
+        <node id="sp_santa_salete_id" label="Santa Salete;-50.688717,-20.242918" />
+        <node id="sp_santana_da_ponte_pensa_id" label="Santana da Ponte Pensa;-50.801357,-20.252311" />
+        <node id="sp_santana_de_parnaiba_id" label="Santana de Parnaíba;-46.922215,-23.442514" />
+        <node id="sp_santo_anastacio_id" label="Santo Anastácio;-51.652662,-21.974662" />
+        <node id="sp_santo_andre_id" label="Santo André;-46.543154,-23.67373" />
+        <node id="sp_santo_antonio_da_alegria_id" label="Santo Antônio da Alegria;-47.146372,-21.086449" />
+        <node id="sp_santo_antonio_de_posse_id" label="Santo Antônio de Posse;-46.91919,-22.602873" />
+        <node id="sp_santo_antonio_do_aracangua_id" label="Santo Antônio do Aracanguá;-50.497979,-20.933114" />
+        <node id="sp_santo_antonio_do_jardim_id" label="Santo Antônio do Jardim;-46.684487,-22.112076" />
+        <node id="sp_santo_antonio_do_pinhal_id" label="Santo Antônio do Pinhal;-45.663,-22.827" />
+        <node id="sp_santo_expedito_id" label="Santo Expedito;-51.392894,-21.846657" />
+        <node id="sp_santos_id" label="Santos;-46.335042,-23.953543" />
+        <node id="sp_santopolis_do_aguapei_id" label="Santópolis do Aguapeí;-50.504372,-21.637574" />
+        <node id="sp_sarapui_id" label="Sarapuí;-47.824863,-23.63974" />
+        <node id="sp_sarutaia_id" label="Sarutaiá;-49.476259,-23.272103" />
+        <node id="sp_sebastianopolis_do_sul_id" label="Sebastianópolis do Sul;-49.924997,-20.652323" />
+        <node id="sp_serra_azul_id" label="Serra Azul;-47.560243,-21.307381" />
+        <node id="sp_serra_negra_id" label="Serra Negra;-46.703271,-22.613941" />
+        <node id="sp_serrana_id" label="Serrana;-47.595239,-21.204336" />
+        <node id="sp_sertaozinho_id" label="Sertãozinho;-47.987496,-21.131596" />
+        <node id="sp_sete_barras_id" label="Sete Barras;-47.927943,-24.382048" />
+        <node id="sp_severinia_id" label="Severínia;-48.80538,-20.810753" />
+        <node id="sp_silveiras_id" label="Silveiras;-44.852157,-22.66384" />
+        <node id="sp_socorro_id" label="Socorro;-46.525118,-22.590264" />
+        <node id="sp_sorocaba_id" label="Sorocaba;-47.445073,-23.496886" />
+        <node id="sp_sud_mennucci_id" label="Sud Mennucci;-50.923783,-20.687225" />
+        <node id="sp_sumare_id" label="Sumaré;-47.272823,-22.820416" />
+        <node id="sp_suzano_id" label="Suzano;-46.311181,-23.544828" />
+        <node id="sp_suzanapolis_id" label="Suzanápolis;-51.026761,-20.49809" />
+        <node id="sp_sao_bento_do_sapucai_id" label="São Bento do Sapucaí;-45.728677,-22.683744" />
+        <node id="sp_sao_bernardo_do_campo_id" label="São Bernardo do Campo;-46.564617,-23.691412" />
+        <node id="sp_sao_caetano_do_sul_id" label="São Caetano do Sul;-46.554797,-23.62287" />
+        <node id="sp_sao_carlos_id" label="São Carlos;-47.885971,-22.017395" />
+        <node id="sp_sao_francisco_id" label="São Francisco;-50.695151,-20.362291" />
+        <node id="sp_sao_joaquim_da_barra_id" label="São Joaquim da Barra;-47.859316,-20.581158" />
+        <node id="sp_sao_jose_da_bela_vista_id" label="São José da Bela Vista;-47.642413,-20.593548" />
+        <node id="sp_sao_jose_do_barreiro_id" label="São José do Barreiro;-44.577437,-22.641353" />
+        <node id="sp_sao_jose_do_rio_pardo_id" label="São José do Rio Pardo;-46.887303,-21.595288" />
+        <node id="sp_sao_jose_do_rio_preto_id" label="São José do Rio Preto;-49.375767,-20.811289" />
+        <node id="sp_sao_jose_dos_campos_id" label="São José dos Campos;-45.884115,-23.189554" />
+        <node id="sp_sao_joao_da_boa_vista_id" label="São João da Boa Vista;-46.794356,-21.970747" />
+        <node id="sp_sao_joao_das_duas_pontes_id" label="São João das Duas Pontes;-50.379149,-20.387857" />
+        <node id="sp_sao_joao_de_iracema_id" label="São João de Iracema;-50.356069,-20.511059" />
+        <node id="sp_sao_joao_do_pau_d`alho_id" label="São João do Pau d`Alho;-51.667172,-21.266249" />
+        <node id="sp_sao_lourenco_da_serra_id" label="São Lourenço da Serra;-46.94316,-23.849134" />
+        <node id="sp_sao_luiz_do_paraitinga_id" label="São Luiz do Paraitinga;-45.30899,-23.220521" />
+        <node id="sp_sao_manuel_id" label="São Manuel;-48.572316,-22.732081" />
+        <node id="sp_sao_miguel_arcanjo_id" label="São Miguel Arcanjo;-47.993549,-23.878197" />
+        <node id="sp_sao_paulo_id" label="São Paulo;-46.63952,-23.532905" />
+        <node id="sp_sao_pedro_id" label="São Pedro;-47.909579,-22.548256" />
+        <node id="sp_sao_pedro_do_turvo_id" label="São Pedro do Turvo;-49.742829,-22.745286" />
+        <node id="sp_sao_roque_id" label="São Roque;-47.13567,-23.522598" />
+        <node id="sp_sao_sebastiao_id" label="São Sebastião;-45.414314,-23.795059" />
+        <node id="sp_sao_sebastiao_da_grama_id" label="São Sebastião da Grama;-46.820753,-21.704109" />
+        <node id="sp_sao_simao_id" label="São Simão;-47.551755,-21.473171" />
+        <node id="sp_sao_vicente_id" label="São Vicente;-46.388333,-23.957353" />
+        <node id="sp_tabapua_id" label="Tabapuã;-49.03074,-20.960171" />
+        <node id="sp_tabatinga_id" label="Tabatinga;-48.689577,-21.723863" />
+        <node id="sp_taboao_da_serra_id" label="Taboão da Serra;-46.752637,-23.601867" />
+        <node id="sp_taciba_id" label="Taciba;-51.288221,-22.386577" />
+        <node id="sp_taguai_id" label="Taguaí;-49.402377,-23.445242" />
+        <node id="sp_taiacu_id" label="Taiaçu;-48.511203,-21.143144" />
+        <node id="sp_taiuva_id" label="Taiúva;-48.452816,-21.122333" />
+        <node id="sp_tambau_id" label="Tambaú;-47.270344,-21.70292" />
+        <node id="sp_tanabi_id" label="Tanabi;-49.656319,-20.62279" />
+        <node id="sp_tapiratiba_id" label="Tapiratiba;-46.744825,-21.471324" />
+        <node id="sp_tapirai_id" label="Tapiraí;-47.506248,-23.961157" />
+        <node id="sp_taquaral_id" label="Taquaral;-48.412553,-21.07373" />
+        <node id="sp_taquaritinga_id" label="Taquaritinga;-48.510345,-21.404861" />
+        <node id="sp_taquarituba_id" label="Taquarituba;-49.240954,-23.530709" />
+        <node id="sp_taquarivai_id" label="Taquarivaí;-48.694769,-23.921116" />
+        <node id="sp_tarabai_id" label="Tarabai;-51.562133,-22.301612" />
+        <node id="sp_taruma_id" label="Tarumã;-50.57862,-22.742873" />
+        <node id="sp_tatui_id" label="Tatuí;-47.84612,-23.348731" />
+        <node id="sp_taubate_id" label="Taubaté;-45.55926,-23.010414" />
+        <node id="sp_tejupa_id" label="Tejupá;-49.372244,-23.342458" />
+        <node id="sp_teodoro_sampaio_id" label="Teodoro Sampaio;-52.168175,-22.529936" />
+        <node id="sp_terra_roxa_id" label="Terra Roxa;-48.331442,-20.787015" />
+        <node id="sp_tiete_id" label="Tietê;-47.716378,-23.110098" />
+        <node id="sp_timburi_id" label="Timburi;-49.609583,-23.205674" />
+        <node id="sp_torre_de_pedra_id" label="Torre de Pedra;-48.195507,-23.246173" />
+        <node id="sp_torrinha_id" label="Torrinha;-48.17314,-22.423721" />
+        <node id="sp_trabiju_id" label="Trabiju;-48.334168,-22.038783" />
+        <node id="sp_tremembe_id" label="Tremembé;-45.547526,-22.95714" />
+        <node id="sp_tres_fronteiras_id" label="Três Fronteiras;-50.890528,-20.234355" />
+        <node id="sp_tuiuti_id" label="Tuiuti;-46.693746,-22.819324" />
+        <node id="sp_tupi_paulista_id" label="Tupi Paulista;-51.575004,-21.382455" />
+        <node id="sp_tupa_id" label="Tupã;-50.519113,-21.933528" />
+        <node id="sp_turiuba_id" label="Turiúba;-50.11349,-20.942758" />
+        <node id="sp_turmalina_id" label="Turmalina;-50.479198,-20.048588" />
+        <node id="sp_ubarana_id" label="Ubarana;-49.719765,-21.164965" />
+        <node id="sp_ubatuba_id" label="Ubatuba;-45.083415,-23.433162" />
+        <node id="sp_ubirajara_id" label="Ubirajara;-49.66126,-22.527208" />
+        <node id="sp_uchoa_id" label="Uchoa;-49.171295,-20.951106" />
+        <node id="sp_uniao_paulista_id" label="União Paulista;-49.902509,-20.886227" />
+        <node id="sp_uru_id" label="Uru;-49.284846,-21.786641" />
+        <node id="sp_urupes_id" label="Urupês;-49.293103,-21.203207" />
+        <node id="sp_urania_id" label="Urânia;-50.645498,-20.245461" />
+        <node id="sp_valentim_gentil_id" label="Valentim Gentil;-50.088928,-20.421681" />
+        <node id="sp_valinhos_id" label="Valinhos;-46.997367,-22.969805" />
+        <node id="sp_valparaiso_id" label="Valparaíso;-50.869874,-21.222929" />
+        <node id="sp_vargem_id" label="Vargem;-46.412447,-22.887046" />
+        <node id="sp_vargem_grande_paulista_id" label="Vargem Grande Paulista;-47.022038,-23.599338" />
+        <node id="sp_vargem_grande_do_sul_id" label="Vargem Grande do Sul;-46.891286,-21.832194" />
+        <node id="sp_vera_cruz_id" label="Vera Cruz;-49.820735,-22.218308" />
+        <node id="sp_vinhedo_id" label="Vinhedo;-46.983312,-23.030184" />
+        <node id="sp_viradouro_id" label="Viradouro;-48.292974,-20.873382" />
+        <node id="sp_vista_alegre_do_alto_id" label="Vista Alegre do Alto;-48.628383,-21.169222" />
+        <node id="sp_vitoria_brasil_id" label="Vitória Brasil;-50.487452,-20.195582" />
+        <node id="sp_votorantim_id" label="Votorantim;-47.438753,-23.54459" />
+        <node id="sp_votuporanga_id" label="Votuporanga;-49.978112,-20.423659" />
+        <node id="sp_varzea_paulista_id" label="Várzea Paulista;-46.823444,-23.213582" />
+        <node id="sp_zacarias_id" label="Zacarias;-50.055222,-21.050554" />
+        <node id="sp_aguas_da_prata_id" label="Águas da Prata;-46.717622,-21.931935" />
+        <node id="sp_aguas_de_lindoia_id" label="Águas de Lindóia;-46.631441,-22.473305" />
+        <node id="sp_aguas_de_santa_barbara_id" label="Águas de Santa Bárbara;-49.242133,-22.881186" />
+        <node id="sp_aguas_de_sao_pedro_id" label="Águas de São Pedro;-47.873395,-22.597749" />
+        <node id="sp_alvares_florence_id" label="Álvares Florence;-49.914126,-20.320341" />
+        <node id="sp_alvares_machado_id" label="Álvares Machado;-51.47224,-22.076415" />
+        <node id="sp_alvaro_de_carvalho_id" label="Álvaro de Carvalho;-49.719044,-22.084132" />
+        <node id="sp_oleo_id" label="Óleo;-49.341924,-22.943461" />
+    </isComposedBy>
+</node>

@@ -1,0 +1,227 @@
+<node id="pb_id" label="PB">
+    <isComposedBy>
+        <node id="pb_aguiar_id" label="Aguiar;-38.168059,-7.091802" />
+        <node id="pb_alagoa_grande_id" label="Alagoa Grande;-35.620609,-7.039432" />
+        <node id="pb_alagoa_nova_id" label="Alagoa Nova;-35.759065,-7.053772" />
+        <node id="pb_alagoinha_id" label="Alagoinha;-35.533196,-6.946569" />
+        <node id="pb_alcantil_id" label="Alcantil;-36.051083,-7.736681" />
+        <node id="pb_algodao_de_jandaira_id" label="Algodão de Jandaíra;-36.012861,-6.892919" />
+        <node id="pb_alhandra_id" label="Alhandra;-34.905662,-7.42977" />
+        <node id="pb_amparo_id" label="Amparo;-37.062838,-7.555022" />
+        <node id="pb_aparecida_id" label="Aparecida;-38.080259,-6.784657" />
+        <node id="pb_arara_id" label="Arara;-35.75521,-6.828126" />
+        <node id="pb_araruna_id" label="Araruna;-35.7498,-6.548484" />
+        <node id="pb_aracagi_id" label="Araçagi;-35.373667,-6.843739" />
+        <node id="pb_areia_id" label="Areia;-35.697731,-6.963965" />
+        <node id="pb_areia_de_baraunas_id" label="Areia de Baraúnas;-36.940363,-7.117021" />
+        <node id="pb_areial_id" label="Areial;-35.931324,-7.047894" />
+        <node id="pb_aroeiras_id" label="Aroeiras;-35.706549,-7.544731" />
+        <node id="pb_assuncao_id" label="Assunção;-36.72504,-7.07231" />
+        <node id="pb_bananeiras_id" label="Bananeiras;-35.624573,-6.747749" />
+        <node id="pb_barauna_id" label="Baraúna;-36.260065,-6.634845" />
+        <node id="pb_barra_de_santa_rosa_id" label="Barra de Santa Rosa;-36.067069,-6.718164" />
+        <node id="pb_barra_de_santana_id" label="Barra de Santana;-35.991325,-7.518085" />
+        <node id="pb_barra_de_sao_miguel_id" label="Barra de São Miguel;-36.320915,-7.746031" />
+        <node id="pb_bayeux_id" label="Bayeux;-34.929336,-7.123797" />
+        <node id="pb_baia_da_traicao_id" label="Baía da Traição;-34.93806,-6.692086" />
+        <node id="pb_belem_id" label="Belém;-35.51658,-6.742614" />
+        <node id="pb_belem_do_brejo_do_cruz_id" label="Belém do Brejo do Cruz;-37.534763,-6.185146" />
+        <node id="pb_bernardino_batista_id" label="Bernardino Batista;-38.552069,-6.445718" />
+        <node id="pb_boa_ventura_id" label="Boa Ventura;-38.211347,-7.409822" />
+        <node id="pb_boa_vista_id" label="Boa Vista;-36.235706,-7.263653" />
+        <node id="pb_bom_jesus_id" label="Bom Jesus;-38.645344,-6.81601" />
+        <node id="pb_bom_sucesso_id" label="Bom Sucesso;-37.923409,-6.441761" />
+        <node id="pb_bonito_de_santa_fe_id" label="Bonito de Santa Fé;-38.513335,-7.313407" />
+        <node id="pb_boqueirao_id" label="Boqueirão;-36.130887,-7.487004" />
+        <node id="pb_borborema_id" label="Borborema;-35.618728,-6.801995" />
+        <node id="pb_brejo_do_cruz_id" label="Brejo do Cruz;-37.49434,-6.341853" />
+        <node id="pb_brejo_dos_santos_id" label="Brejo dos Santos;-37.825311,-6.370652" />
+        <node id="pb_caapora_id" label="Caaporã;-34.905514,-7.513508" />
+        <node id="pb_cabaceiras_id" label="Cabaceiras;-36.286981,-7.488991" />
+        <node id="pb_cabedelo_id" label="Cabedelo;-34.828409,-6.987314" />
+        <node id="pb_cachoeira_dos_indios_id" label="Cachoeira dos Índios;-38.67598,-6.913531" />
+        <node id="pb_cacimba_de_areia_id" label="Cacimba de Areia;-37.156288,-7.12128" />
+        <node id="pb_cacimba_de_dentro_id" label="Cacimba de Dentro;-35.777835,-6.638596" />
+        <node id="pb_cacimbas_id" label="Cacimbas;-37.060429,-7.207212" />
+        <node id="pb_caicara_id" label="Caiçara;-35.458127,-6.621151" />
+        <node id="pb_cajazeiras_id" label="Cajazeiras;-38.557722,-6.880044" />
+        <node id="pb_cajazeirinhas_id" label="Cajazeirinhas;-37.800929,-6.960164" />
+        <node id="pb_caldas_brandao_id" label="Caldas Brandão;-35.327159,-7.1025" />
+        <node id="pb_camalau_id" label="Camalaú;-36.824191,-7.885031" />
+        <node id="pb_campina_grande_id" label="Campina Grande;-35.873144,-7.221958" />
+        <node id="pb_campo_de_santana_id" label="Campo de Santana;-35.636707,-6.487585" />
+        <node id="pb_capim_id" label="Capim;-35.16725,-6.916244" />
+        <node id="pb_caraubas_id" label="Caraúbas;-36.492046,-7.720487" />
+        <node id="pb_carrapateira_id" label="Carrapateira;-38.339885,-7.034141" />
+        <node id="pb_casserengue_id" label="Casserengue;-35.817875,-6.779538" />
+        <node id="pb_catingueira_id" label="Catingueira;-37.60638,-7.120081" />
+        <node id="pb_catole_do_rocha_id" label="Catolé do Rocha;-37.746967,-6.340625" />
+        <node id="pb_caturite_id" label="Caturité;-36.030589,-7.416586" />
+        <node id="pb_conceicao_id" label="Conceição;-38.501437,-7.551063" />
+        <node id="pb_condado_id" label="Condado;-37.606036,-6.898312" />
+        <node id="pb_conde_id" label="Conde;-34.899876,-7.257464" />
+        <node id="pb_congo_id" label="Congo;-36.658059,-7.790782" />
+        <node id="pb_coremas_id" label="Coremas;-37.934638,-7.007124" />
+        <node id="pb_coxixola_id" label="Coxixola;-36.606441,-7.623653" />
+        <node id="pb_cruz_do_espirito_santo_id" label="Cruz do Espírito Santo;-35.085721,-7.139022" />
+        <node id="pb_cubati_id" label="Cubati;-36.361887,-6.866858" />
+        <node id="pb_cuitegi_id" label="Cuitegi;-35.521529,-6.890577" />
+        <node id="pb_cuite_id" label="Cuité;-36.151456,-6.476466" />
+        <node id="pb_cuite_de_mamanguape_id" label="Cuité de Mamanguape;-35.250219,-6.912922" />
+        <node id="pb_curral_velho_id" label="Curral Velho;-38.196175,-7.530751" />
+        <node id="pb_curral_de_cima_id" label="Curral de Cima;-35.263934,-6.723248" />
+        <node id="pb_damiao_id" label="Damião;-35.910136,-6.631607" />
+        <node id="pb_desterro_id" label="Desterro;-37.092525,-7.286996" />
+        <node id="pb_diamante_id" label="Diamante;-38.26151,-7.41738" />
+        <node id="pb_dona_ines_id" label="Dona Inês;-35.620479,-6.615656" />
+        <node id="pb_duas_estradas_id" label="Duas Estradas;-35.417976,-6.684988" />
+        <node id="pb_emas_id" label="Emas;-37.716276,-7.099635" />
+        <node id="pb_esperanca_id" label="Esperança;-35.859719,-7.022783" />
+        <node id="pb_fagundes_id" label="Fagundes;-35.793128,-7.344537" />
+        <node id="pb_frei_martinho_id" label="Frei Martinho;-36.452628,-6.39759" />
+        <node id="pb_gado_bravo_id" label="Gado Bravo;-35.789887,-7.582786" />
+        <node id="pb_guarabira_id" label="Guarabira;-35.484986,-6.850636" />
+        <node id="pb_gurinhem_id" label="Gurinhém;-35.422198,-7.1233" />
+        <node id="pb_gurjao_id" label="Gurjão;-36.492288,-7.248332" />
+        <node id="pb_ibiara_id" label="Ibiara;-38.405918,-7.479567" />
+        <node id="pb_igaracy_id" label="Igaracy;-38.147761,-7.17184" />
+        <node id="pb_imaculada_id" label="Imaculada;-37.507918,-7.388904" />
+        <node id="pb_inga_id" label="Ingá;-35.605,-7.281444" />
+        <node id="pb_itabaiana_id" label="Itabaiana;-35.331723,-7.331674" />
+        <node id="pb_itaporanga_id" label="Itaporanga;-38.150442,-7.302021" />
+        <node id="pb_itapororoca_id" label="Itapororoca;-35.240635,-6.823738" />
+        <node id="pb_itatuba_id" label="Itatuba;-35.637994,-7.381153" />
+        <node id="pb_jacarau_id" label="Jacaraú;-35.289032,-6.614526" />
+        <node id="pb_jerico_id" label="Jericó;-37.803641,-6.545769" />
+        <node id="pb_joao_pessoa_id" label="João Pessoa;-34.864121,-7.11509" />
+        <node id="pb_juarez_tavora_id" label="Juarez Távora;-35.568623,-7.171302" />
+        <node id="pb_juazeirinho_id" label="Juazeirinho;-36.579316,-7.060924" />
+        <node id="pb_junco_do_serido_id" label="Junco do Seridó;-36.716595,-6.992694" />
+        <node id="pb_juripiranga_id" label="Juripiranga;-35.232143,-7.361759" />
+        <node id="pb_juru_id" label="Juru;-37.815021,-7.529826" />
+        <node id="pb_lagoa_id" label="Lagoa;-37.912745,-6.585723" />
+        <node id="pb_lagoa_seca_id" label="Lagoa Seca;-35.849111,-7.155349" />
+        <node id="pb_lagoa_de_dentro_id" label="Lagoa de Dentro;-35.370641,-6.67213" />
+        <node id="pb_lastro_id" label="Lastro;-38.174199,-6.506032" />
+        <node id="pb_livramento_id" label="Livramento;-36.949116,-7.371127" />
+        <node id="pb_logradouro_id" label="Logradouro;-35.438351,-6.611912" />
+        <node id="pb_lucena_id" label="Lucena;-34.874769,-6.902578" />
+        <node id="pb_malta_id" label="Malta;-37.522067,-6.89719" />
+        <node id="pb_mamanguape_id" label="Mamanguape;-35.121316,-6.833698" />
+        <node id="pb_manaira_id" label="Manaíra;-38.152292,-7.703313" />
+        <node id="pb_marcacao_id" label="Marcação;-35.008661,-6.76535" />
+        <node id="pb_mari_id" label="Mari;-35.318044,-7.059424" />
+        <node id="pb_marizopolis_id" label="Marizópolis;-38.35283,-6.827479" />
+        <node id="pb_massaranduba_id" label="Massaranduba;-35.784768,-7.18995" />
+        <node id="pb_mataraca_id" label="Mataraca;-35.05308,-6.59673" />
+        <node id="pb_matinhas_id" label="Matinhas;-35.766922,-7.124856" />
+        <node id="pb_mato_grosso_id" label="Mato Grosso;-37.727857,-6.540181" />
+        <node id="pb_matureia_id" label="Maturéia;-37.350992,-7.261879" />
+        <node id="pb_mogeiro_id" label="Mogeiro;-35.483182,-7.285169" />
+        <node id="pb_montadas_id" label="Montadas;-35.959198,-7.088482" />
+        <node id="pb_monte_horebe_id" label="Monte Horebe;-38.583762,-7.204024" />
+        <node id="pb_monteiro_id" label="Monteiro;-37.118419,-7.883626" />
+        <node id="pb_mulungu_id" label="Mulungu;-35.460023,-7.025245" />
+        <node id="pb_mae_d`agua_id" label="Mãe d`Água;-37.432211,-7.252009" />
+        <node id="pb_natuba_id" label="Natuba;-35.558629,-7.635142" />
+        <node id="pb_nazarezinho_id" label="Nazarezinho;-38.322032,-6.911401" />
+        <node id="pb_nova_floresta_id" label="Nova Floresta;-36.205722,-6.450562" />
+        <node id="pb_nova_olinda_id" label="Nova Olinda;-38.038229,-7.472325" />
+        <node id="pb_nova_palmeira_id" label="Nova Palmeira;-36.422023,-6.671221" />
+        <node id="pb_olho_d`agua_id" label="Olho d`Água;-37.740569,-7.221175" />
+        <node id="pb_olivedos_id" label="Olivedos;-36.241033,-6.984343" />
+        <node id="pb_ouro_velho_id" label="Ouro Velho;-37.151857,-7.616037" />
+        <node id="pb_parari_id" label="Parari;-36.652248,-7.309751" />
+        <node id="pb_passagem_id" label="Passagem;-37.043302,-7.134667" />
+        <node id="pb_patos_id" label="Patos;-37.274702,-7.017427" />
+        <node id="pb_paulista_id" label="Paulista;-37.618548,-6.591381" />
+        <node id="pb_pedra_branca_id" label="Pedra Branca;-38.068882,-7.421694" />
+        <node id="pb_pedra_lavrada_id" label="Pedra Lavrada;-36.475813,-6.749974" />
+        <node id="pb_pedras_de_fogo_id" label="Pedras de Fogo;-35.106464,-7.391069" />
+        <node id="pb_pedro_regis_id" label="Pedro Régis;-35.296567,-6.633226" />
+        <node id="pb_pianco_id" label="Piancó;-37.92888,-7.192823" />
+        <node id="pb_picui_id" label="Picuí;-36.349704,-6.508451" />
+        <node id="pb_pilar_id" label="Pilar;-35.252326,-7.264034" />
+        <node id="pb_piloes_id" label="Pilões;-35.612974,-6.868269" />
+        <node id="pb_piloezinhos_id" label="Pilõezinhos;-35.531036,-6.842773" />
+        <node id="pb_pirpirituba_id" label="Pirpirituba;-35.490558,-6.779222" />
+        <node id="pb_pitimbu_id" label="Pitimbu;-34.815133,-7.466398" />
+        <node id="pb_pocinhos_id" label="Pocinhos;-36.066779,-7.06658" />
+        <node id="pb_pombal_id" label="Pombal;-37.80027,-6.766059" />
+        <node id="pb_poco_dantas_id" label="Poço Dantas;-38.490908,-6.398763" />
+        <node id="pb_poco_de_jose_de_moura_id" label="Poço de José de Moura;-38.511054,-6.564011" />
+        <node id="pb_prata_id" label="Prata;-37.080088,-7.688261" />
+        <node id="pb_princesa_isabel_id" label="Princesa Isabel;-37.988647,-7.731747" />
+        <node id="pb_puxinana_id" label="Puxinanã;-35.954301,-7.154793" />
+        <node id="pb_queimadas_id" label="Queimadas;-35.903136,-7.350288" />
+        <node id="pb_quixaba_id" label="Quixabá;-37.145833,-7.022398" />
+        <node id="pb_remigio_id" label="Remígio;-35.801124,-6.949918" />
+        <node id="pb_riacho_de_santo_antonio_id" label="Riacho de Santo Antônio;-36.157018,-7.680234" />
+        <node id="pb_riacho_dos_cavalos_id" label="Riacho dos Cavalos;-37.648339,-6.44067" />
+        <node id="pb_riachao_id" label="Riachão;-35.660966,-6.542688" />
+        <node id="pb_riachao_do_bacamarte_id" label="Riachão do Bacamarte;-35.669257,-7.253472" />
+        <node id="pb_riachao_do_poco_id" label="Riachão do Poço;-35.291431,-7.141726" />
+        <node id="pb_rio_tinto_id" label="Rio Tinto;-35.077569,-6.803828" />
+        <node id="pb_salgadinho_id" label="Salgadinho;-36.845776,-7.100984" />
+        <node id="pb_salgado_de_sao_felix_id" label="Salgado de São Félix;-35.43048,-7.353375" />
+        <node id="pb_santa_cecilia_id" label="Santa Cecília;-35.876375,-7.738901" />
+        <node id="pb_santa_cruz_id" label="Santa Cruz;-38.061748,-6.5237" />
+        <node id="pb_santa_helena_id" label="Santa Helena;-38.6427,-6.7176" />
+        <node id="pb_santa_ines_id" label="Santa Inês;-38.553995,-7.620999" />
+        <node id="pb_santa_luzia_id" label="Santa Luzia;-36.917792,-6.860922" />
+        <node id="pb_santa_rita_id" label="Santa Rita;-34.975295,-7.117242" />
+        <node id="pb_santa_teresinha_id" label="Santa Teresinha;-37.443533,-7.079637" />
+        <node id="pb_santana_de_mangueira_id" label="Santana de Mangueira;-38.323633,-7.547048" />
+        <node id="pb_santana_dos_garrotes_id" label="Santana dos Garrotes;-37.981885,-7.381615" />
+        <node id="pb_santarem_id" label="Santarém;-38.476393,-6.48362" />
+        <node id="pb_santo_andre_id" label="Santo André;-36.621339,-7.220157" />
+        <node id="pb_sape_id" label="Sapé;-35.227975,-7.093591" />
+        <node id="pb_serra_branca_id" label="Serra Branca;-36.666003,-7.480344" />
+        <node id="pb_serra_grande_id" label="Serra Grande;-38.364696,-7.209574" />
+        <node id="pb_serra_redonda_id" label="Serra Redonda;-35.684195,-7.186216" />
+        <node id="pb_serra_da_raiz_id" label="Serra da Raiz;-35.437868,-6.685274" />
+        <node id="pb_serraria_id" label="Serraria;-35.628233,-6.815693" />
+        <node id="pb_sertaozinho_id" label="Sertãozinho;-35.437159,-6.751273" />
+        <node id="pb_sobrado_id" label="Sobrado;-35.23574,-7.144288" />
+        <node id="pb_soledade_id" label="Soledade;-36.366791,-7.058292" />
+        <node id="pb_solanea_id" label="Solânea;-35.663568,-6.751606" />
+        <node id="pb_sossego_id" label="Sossêgo;-36.25382,-6.77067" />
+        <node id="pb_sousa_id" label="Sousa;-38.231059,-6.751484" />
+        <node id="pb_sume_id" label="Sumé;-36.883972,-7.66206" />
+        <node id="pb_sao_bentinho_id" label="São Bentinho;-37.724345,-6.885961" />
+        <node id="pb_sao_bento_id" label="São Bento;-37.448835,-6.485286" />
+        <node id="pb_sao_domingos_id" label="São Domingos;-37.928347,-6.812336" />
+        <node id="pb_sao_domingos_do_cariri_id" label="São Domingos do Cariri;-36.437398,-7.632733" />
+        <node id="pb_sao_francisco_id" label="São Francisco;-38.096799,-6.607728" />
+        <node id="pb_sao_jose_da_lagoa_tapada_id" label="São José da Lagoa Tapada;-38.162174,-6.936459" />
+        <node id="pb_sao_jose_de_caiana_id" label="São José de Caiana;-38.298928,-7.246359" />
+        <node id="pb_sao_jose_de_espinharas_id" label="São José de Espinharas;-37.321433,-6.839736" />
+        <node id="pb_sao_jose_de_piranhas_id" label="São José de Piranhas;-38.50198,-7.118704" />
+        <node id="pb_sao_jose_de_princesa_id" label="São José de Princesa;-38.089432,-7.736329" />
+        <node id="pb_sao_jose_do_bonfim_id" label="São José do Bonfim;-37.303625,-7.160695" />
+        <node id="pb_sao_jose_do_brejo_do_cruz_id" label="São José do Brejo do Cruz;-37.360063,-6.210543" />
+        <node id="pb_sao_jose_do_sabugi_id" label="São José do Sabugi;-36.797204,-6.762945" />
+        <node id="pb_sao_jose_dos_cordeiros_id" label="São José dos Cordeiros;-36.808494,-7.387749" />
+        <node id="pb_sao_jose_dos_ramos_id" label="São José dos Ramos;-35.372536,-7.252384" />
+        <node id="pb_sao_joao_do_cariri_id" label="São João do Cariri;-36.534457,-7.381683" />
+        <node id="pb_sao_joao_do_rio_do_peixe_id" label="São João do Rio do Peixe;-38.446829,-6.721951" />
+        <node id="pb_sao_joao_do_tigre_id" label="São João do Tigre;-36.85472,-8.077026" />
+        <node id="pb_sao_mamede_id" label="São Mamede;-37.095436,-6.923862" />
+        <node id="pb_sao_miguel_de_taipu_id" label="São Miguel de Taipu;-35.20163,-7.247643" />
+        <node id="pb_sao_sebastiao_de_lagoa_de_roca_id" label="São Sebastião de Lagoa de Roça;-35.867807,-7.11034" />
+        <node id="pb_sao_sebastiao_do_umbuzeiro_id" label="São Sebastião do Umbuzeiro;-37.013841,-8.152887" />
+        <node id="pb_sao_vicente_do_serido_id" label="São Vicente do Seridó;-36.412223,-6.854255" />
+        <node id="pb_taperoa_id" label="Taperoá;-36.824499,-7.206294" />
+        <node id="pb_tavares_id" label="Tavares;-37.871208,-7.626971" />
+        <node id="pb_teixeira_id" label="Teixeira;-37.252477,-7.221036" />
+        <node id="pb_tenorio_id" label="Tenório;-36.627336,-6.938546" />
+        <node id="pb_triunfo_id" label="Triunfo;-38.598579,-6.571305" />
+        <node id="pb_uirauna_id" label="Uiraúna;-38.412754,-6.515044" />
+        <node id="pb_umbuzeiro_id" label="Umbuzeiro;-35.658233,-7.691993" />
+        <node id="pb_vieiropolis_id" label="Vieirópolis;-38.256666,-6.506845" />
+        <node id="pb_vista_serrana_id" label="Vista Serrana;-37.570358,-6.730298" />
+        <node id="pb_varzea_id" label="Várzea;-36.991287,-6.761887" />
+        <node id="pb_zabele_id" label="Zabelê;-37.105676,-8.079012" />
+        <node id="pb_agua_branca_id" label="Água Branca;-37.635703,-7.511441" />
+    </isComposedBy>
+</node>

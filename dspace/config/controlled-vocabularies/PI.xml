@@ -1,0 +1,228 @@
+<node id="pi_id" label="PI">
+    <isComposedBy>
+        <node id="pi_acaua_id" label="Acauã;-41.083059,-8.219542" />
+        <node id="pi_agricolandia_id" label="Agricolândia;-42.666371,-5.796763" />
+        <node id="pi_alagoinha_do_piaui_id" label="Alagoinha do Piauí;-40.92817,-7.000392" />
+        <node id="pi_alegrete_do_piaui_id" label="Alegrete do Piauí;-40.856587,-7.241964" />
+        <node id="pi_alto_longa_id" label="Alto Longá;-42.209582,-5.256341" />
+        <node id="pi_altos_id" label="Altos;-42.46116,-5.038879" />
+        <node id="pi_alvorada_do_gurgueia_id" label="Alvorada do Gurguéia;-43.777016,-8.424183" />
+        <node id="pi_amarante_id" label="Amarante;-42.843343,-6.243045" />
+        <node id="pi_angical_do_piaui_id" label="Angical do Piauí;-42.740047,-6.087864" />
+        <node id="pi_antonio_almeida_id" label="Antônio Almeida;-44.188929,-7.212759" />
+        <node id="pi_anisio_de_abreu_id" label="Anísio de Abreu;-43.04941,-9.185643" />
+        <node id="pi_aroazes_id" label="Aroazes;-41.78218,-6.110221" />
+        <node id="pi_aroeiras_do_itaim_id" label="Aroeiras do Itaim;-41.564868,-7.276906" />
+        <node id="pi_arraial_id" label="Arraial;-42.541809,-6.650753" />
+        <node id="pi_assuncao_do_piaui_id" label="Assunção do Piauí;-41.038851,-5.864996" />
+        <node id="pi_avelino_lopes_id" label="Avelino Lopes;-43.956305,-10.134487" />
+        <node id="pi_baixa_grande_do_ribeiro_id" label="Baixa Grande do Ribeiro;-45.218977,-7.849031" />
+        <node id="pi_barra_d`alcantara_id" label="Barra d`Alcântara;-42.114609,-6.516453" />
+        <node id="pi_barras_id" label="Barras;-42.292161,-4.244675" />
+        <node id="pi_barreiras_do_piaui_id" label="Barreiras do Piauí;-45.470172,-9.929605" />
+        <node id="pi_barro_duro_id" label="Barro Duro;-42.514656,-5.816732" />
+        <node id="pi_batalha_id" label="Batalha;-42.07868,-4.0223" />
+        <node id="pi_bela_vista_do_piaui_id" label="Bela Vista do Piauí;-41.867522,-7.988091" />
+        <node id="pi_belem_do_piaui_id" label="Belém do Piauí;-40.968786,-7.366524" />
+        <node id="pi_beneditinos_id" label="Beneditinos;-42.36382,-5.456758" />
+        <node id="pi_bertolinia_id" label="Bertolínia;-43.949778,-7.633377" />
+        <node id="pi_betania_do_piaui_id" label="Betânia do Piauí;-40.79891,-8.143761" />
+        <node id="pi_boa_hora_id" label="Boa Hora;-42.135748,-4.414041" />
+        <node id="pi_bocaina_id" label="Bocaina;-41.316752,-6.941236" />
+        <node id="pi_bom_jesus_id" label="Bom Jesus;-44.358951,-9.071239" />
+        <node id="pi_bom_principio_do_piaui_id" label="Bom Princípio do Piauí;-41.640333,-3.196314" />
+        <node id="pi_bonfim_do_piaui_id" label="Bonfim do Piauí;-42.886482,-9.160502" />
+        <node id="pi_boqueirao_do_piaui_id" label="Boqueirão do Piauí;-42.121232,-4.481806" />
+        <node id="pi_brasileira_id" label="Brasileira;-41.785855,-4.133696" />
+        <node id="pi_brejo_do_piaui_id" label="Brejo do Piauí;-42.822917,-8.20314" />
+        <node id="pi_buriti_dos_lopes_id" label="Buriti dos Lopes;-41.869481,-3.182592" />
+        <node id="pi_buriti_dos_montes_id" label="Buriti dos Montes;-41.093349,-5.30584" />
+        <node id="pi_cabeceiras_do_piaui_id" label="Cabeceiras do Piauí;-42.306889,-4.4773" />
+        <node id="pi_cajazeiras_do_piaui_id" label="Cajazeiras do Piauí;-42.390278,-6.796667" />
+        <node id="pi_cajueiro_da_praia_id" label="Cajueiro da Praia;-41.340801,-2.931114" />
+        <node id="pi_caldeirao_grande_do_piaui_id" label="Caldeirão Grande do Piauí;-40.6366,-7.331404" />
+        <node id="pi_campinas_do_piaui_id" label="Campinas do Piauí;-41.877487,-7.659299" />
+        <node id="pi_campo_alegre_do_fidalgo_id" label="Campo Alegre do Fidalgo;-41.834399,-8.382357" />
+        <node id="pi_campo_grande_do_piaui_id" label="Campo Grande do Piauí;-41.031486,-7.128274" />
+        <node id="pi_campo_largo_do_piaui_id" label="Campo Largo do Piauí;-42.639991,-3.804411" />
+        <node id="pi_campo_maior_id" label="Campo Maior;-42.164124,-4.821697" />
+        <node id="pi_canavieira_id" label="Canavieira;-43.72333,-7.688215" />
+        <node id="pi_canto_do_buriti_id" label="Canto do Buriti;-42.951721,-8.111101" />
+        <node id="pi_capitao_gervasio_oliveira_id" label="Capitão Gervásio Oliveira;-41.813973,-8.496548" />
+        <node id="pi_capitao_de_campos_id" label="Capitão de Campos;-41.943999,-4.457" />
+        <node id="pi_caracol_id" label="Caracol;-43.328998,-9.279333" />
+        <node id="pi_caraubas_do_piaui_id" label="Caraúbas do Piauí;-41.842517,-3.475249" />
+        <node id="pi_caridade_do_piaui_id" label="Caridade do Piauí;-40.984763,-7.734349" />
+        <node id="pi_castelo_do_piaui_id" label="Castelo do Piauí;-41.549865,-5.318693" />
+        <node id="pi_caxingo_id" label="Caxingó;-41.895476,-3.419044" />
+        <node id="pi_cocal_id" label="Cocal;-41.554623,-3.472792" />
+        <node id="pi_cocal_de_telha_id" label="Cocal de Telha;-41.958668,-4.557098" />
+        <node id="pi_cocal_dos_alves_id" label="Cocal dos Alves;-41.440197,-3.620471" />
+        <node id="pi_coivaras_id" label="Coivaras;-42.207951,-5.092242" />
+        <node id="pi_colonia_do_gurgueia_id" label="Colônia do Gurguéia;-43.793999,-8.183697" />
+        <node id="pi_colonia_do_piaui_id" label="Colônia do Piauí;-42.175555,-7.226512" />
+        <node id="pi_conceicao_do_caninde_id" label="Conceição do Canindé;-41.594193,-7.876378" />
+        <node id="pi_coronel_jose_dias_id" label="Coronel José Dias;-42.523195,-8.813971" />
+        <node id="pi_corrente_id" label="Corrente;-45.163348,-10.433349" />
+        <node id="pi_cristalandia_do_piaui_id" label="Cristalândia do Piauí;-45.189262,-10.644311" />
+        <node id="pi_cristino_castro_id" label="Cristino Castro;-44.222972,-8.822731" />
+        <node id="pi_curimata_id" label="Curimatá;-44.3002,-10.032608" />
+        <node id="pi_currais_id" label="Currais;-44.406194,-9.011755" />
+        <node id="pi_curral_novo_do_piaui_id" label="Curral Novo do Piauí;-40.895704,-7.831302" />
+        <node id="pi_curralinhos_id" label="Curralinhos;-42.837602,-5.608252" />
+        <node id="pi_demerval_lobao_id" label="Demerval Lobão;-42.677583,-5.358752" />
+        <node id="pi_dirceu_arcoverde_id" label="Dirceu Arcoverde;-42.434792,-9.339386" />
+        <node id="pi_dom_expedito_lopes_id" label="Dom Expedito Lopes;-41.639632,-6.953319" />
+        <node id="pi_dom_inocencio_id" label="Dom Inocêncio;-41.969733,-9.005158" />
+        <node id="pi_domingos_mourao_id" label="Domingos Mourão;-41.268267,-4.249498" />
+        <node id="pi_elesbao_veloso_id" label="Elesbão Veloso;-42.135458,-6.199475" />
+        <node id="pi_eliseu_martins_id" label="Eliseu Martins;-43.670481,-8.096286" />
+        <node id="pi_esperantina_id" label="Esperantina;-42.232422,-3.888631" />
+        <node id="pi_fartura_do_piaui_id" label="Fartura do Piauí;-42.791176,-9.48342" />
+        <node id="pi_flores_do_piaui_id" label="Flores do Piauí;-42.918009,-7.787931" />
+        <node id="pi_floresta_do_piaui_id" label="Floresta do Piauí;-41.788328,-7.466821" />
+        <node id="pi_floriano_id" label="Floriano;-43.024136,-6.771821" />
+        <node id="pi_francinopolis_id" label="Francinópolis;-42.259062,-6.393341" />
+        <node id="pi_francisco_ayres_id" label="Francisco Ayres;-42.688149,-6.626064" />
+        <node id="pi_francisco_macedo_id" label="Francisco Macedo;-40.787999,-7.331" />
+        <node id="pi_francisco_santos_id" label="Francisco Santos;-41.128789,-6.994914" />
+        <node id="pi_fronteiras_id" label="Fronteiras;-40.614601,-7.081727" />
+        <node id="pi_geminiano_id" label="Geminiano;-41.340879,-7.154759" />
+        <node id="pi_gilbues_id" label="Gilbués;-45.342267,-9.830008" />
+        <node id="pi_guadalupe_id" label="Guadalupe;-43.559441,-6.782848" />
+        <node id="pi_guaribas_id" label="Guaribas;-43.694341,-9.386465" />
+        <node id="pi_hugo_napoleao_id" label="Hugo Napoleão;-42.559755,-5.988597" />
+        <node id="pi_ilha_grande_id" label="Ilha Grande;-41.81858,-2.857737" />
+        <node id="pi_inhuma_id" label="Inhuma;-41.704127,-6.665001" />
+        <node id="pi_ipiranga_do_piaui_id" label="Ipiranga do Piauí;-41.738086,-6.824215" />
+        <node id="pi_isaias_coelho_id" label="Isaías Coelho;-41.673495,-7.735968" />
+        <node id="pi_itainopolis_id" label="Itainópolis;-41.468713,-7.443357" />
+        <node id="pi_itaueira_id" label="Itaueira;-43.0249,-7.59989" />
+        <node id="pi_jacobina_do_piaui_id" label="Jacobina do Piauí;-41.207506,-7.930634" />
+        <node id="pi_jaicos_id" label="Jaicós;-41.137126,-7.362286" />
+        <node id="pi_jardim_do_mulato_id" label="Jardim do Mulato;-42.629999,-6.099" />
+        <node id="pi_jatoba_do_piaui_id" label="Jatobá do Piauí;-41.816965,-4.770254" />
+        <node id="pi_jerumenha_id" label="Jerumenha;-43.503319,-7.09128" />
+        <node id="pi_joaquim_pires_id" label="Joaquim Pires;-42.186462,-3.501636" />
+        <node id="pi_joca_marques_id" label="Joca Marques;-42.425517,-3.480399" />
+        <node id="pi_jose_de_freitas_id" label="José de Freitas;-42.574586,-4.751458" />
+        <node id="pi_joao_costa_id" label="João Costa;-42.426379,-8.50736" />
+        <node id="pi_juazeiro_do_piaui_id" label="Juazeiro do Piauí;-41.697561,-5.174589" />
+        <node id="pi_jurema_id" label="Jurema;-43.133676,-9.219924" />
+        <node id="pi_julio_borges_id" label="Júlio Borges;-44.238142,-10.32253" />
+        <node id="pi_lagoa_alegre_id" label="Lagoa Alegre;-42.630876,-4.515394" />
+        <node id="pi_lagoa_de_sao_francisco_id" label="Lagoa de São Francisco;-41.596883,-4.385053" />
+        <node id="pi_lagoa_do_barro_do_piaui_id" label="Lagoa do Barro do Piauí;-41.5342,-8.476734" />
+        <node id="pi_lagoa_do_piaui_id" label="Lagoa do Piauí;-42.643659,-5.418639" />
+        <node id="pi_lagoa_do_sitio_id" label="Lagoa do Sítio;-41.565304,-6.507664" />
+        <node id="pi_lagoinha_do_piaui_id" label="Lagoinha do Piauí;-42.622325,-5.830742" />
+        <node id="pi_landri_sales_id" label="Landri Sales;-43.936418,-7.259218" />
+        <node id="pi_luzilandia_id" label="Luzilândia;-42.371757,-3.468296" />
+        <node id="pi_luis_correia_id" label="Luís Correia;-41.664142,-2.88438" />
+        <node id="pi_madeiro_id" label="Madeiro;-42.498072,-3.486245" />
+        <node id="pi_manoel_emidio_id" label="Manoel Emídio;-43.87549,-8.01234" />
+        <node id="pi_marcolandia_id" label="Marcolândia;-40.660179,-7.441691" />
+        <node id="pi_marcos_parente_id" label="Marcos Parente;-43.892602,-7.115649" />
+        <node id="pi_massape_do_piaui_id" label="Massapê do Piauí;-41.110323,-7.474687" />
+        <node id="pi_matias_olimpio_id" label="Matias Olímpio;-42.550654,-3.714917" />
+        <node id="pi_miguel_alves_id" label="Miguel Alves;-42.896301,-4.168575" />
+        <node id="pi_miguel_leao_id" label="Miguel Leão;-42.743594,-5.68077" />
+        <node id="pi_milton_brandao_id" label="Milton Brandão;-41.417343,-4.682946" />
+        <node id="pi_monsenhor_gil_id" label="Monsenhor Gil;-42.607493,-5.561999" />
+        <node id="pi_monsenhor_hipolito_id" label="Monsenhor Hipólito;-41.026003,-6.992754" />
+        <node id="pi_monte_alegre_do_piaui_id" label="Monte Alegre do Piauí;-45.303735,-9.753638" />
+        <node id="pi_morro_cabeca_no_tempo_id" label="Morro Cabeça no Tempo;-43.907246,-9.718905" />
+        <node id="pi_morro_do_chapeu_do_piaui_id" label="Morro do Chapéu do Piauí;-42.302442,-3.733374" />
+        <node id="pi_murici_dos_portelas_id" label="Murici dos Portelas;-42.094,-3.319" />
+        <node id="pi_nazare_do_piaui_id" label="Nazaré do Piauí;-42.677316,-6.970235" />
+        <node id="pi_nazaria_id" label="Nazária;-42.811532,-5.352268" />
+        <node id="pi_nossa_senhora_de_nazare_id" label="Nossa Senhora de Nazaré;-42.172954,-4.630188" />
+        <node id="pi_nossa_senhora_dos_remedios_id" label="Nossa Senhora dos Remédios;-42.618408,-3.975744" />
+        <node id="pi_nova_santa_rita_id" label="Nova Santa Rita;-42.047127,-8.097073" />
+        <node id="pi_novo_oriente_do_piaui_id" label="Novo Oriente do Piauí;-41.926124,-6.44901" />
+        <node id="pi_novo_santo_antonio_id" label="Novo Santo Antônio;-41.932533,-5.287487" />
+        <node id="pi_oeiras_id" label="Oeiras;-42.128298,-7.019153" />
+        <node id="pi_olho_d`agua_do_piaui_id" label="Olho d`Água do Piauí;-42.559392,-5.841246" />
+        <node id="pi_padre_marcos_id" label="Padre Marcos;-40.899665,-7.351011" />
+        <node id="pi_paes_landim_id" label="Paes Landim;-42.247444,-7.773745" />
+        <node id="pi_pajeu_do_piaui_id" label="Pajeú do Piauí;-42.82481,-7.855085" />
+        <node id="pi_palmeira_do_piaui_id" label="Palmeira do Piauí;-44.246618,-8.730761" />
+        <node id="pi_palmeirais_id" label="Palmeirais;-43.056021,-5.970864" />
+        <node id="pi_paqueta_id" label="Paquetá;-41.700031,-7.103031" />
+        <node id="pi_parnagua_id" label="Parnaguá;-44.630018,-10.216642" />
+        <node id="pi_parnaiba_id" label="Parnaíba;-41.775388,-2.905847" />
+        <node id="pi_passagem_franca_do_piaui_id" label="Passagem Franca do Piauí;-42.44363,-5.860365" />
+        <node id="pi_patos_do_piaui_id" label="Patos do Piauí;-41.240817,-7.67231" />
+        <node id="pi_pau_d`arco_do_piaui_id" label="Pau D`Arco do Piauí;-42.390809,-5.260721" />
+        <node id="pi_paulistana_id" label="Paulistana;-41.143072,-8.134357" />
+        <node id="pi_pavussu_id" label="Pavussu;-43.228438,-7.96059" />
+        <node id="pi_pedro_ii_id" label="Pedro II;-41.448184,-4.425845" />
+        <node id="pi_pedro_laurentino_id" label="Pedro Laurentino;-42.284744,-8.068068" />
+        <node id="pi_picos_id" label="Picos;-41.467003,-7.077213" />
+        <node id="pi_pimenteiras_id" label="Pimenteiras;-41.411273,-6.238391" />
+        <node id="pi_pio_ix_id" label="Pio IX;-40.608301,-6.830017" />
+        <node id="pi_piracuruca_id" label="Piracuruca;-41.708779,-3.93335" />
+        <node id="pi_piripiri_id" label="Piripiri;-41.771569,-4.271574" />
+        <node id="pi_porto_id" label="Porto;-42.69982,-3.888154" />
+        <node id="pi_porto_alegre_do_piaui_id" label="Porto Alegre do Piauí;-44.183668,-6.964228" />
+        <node id="pi_prata_do_piaui_id" label="Prata do Piauí;-42.204644,-5.672653" />
+        <node id="pi_queimada_nova_id" label="Queimada Nova;-41.410614,-8.570637" />
+        <node id="pi_redencao_do_gurgueia_id" label="Redenção do Gurguéia;-44.581145,-9.479368" />
+        <node id="pi_regeneracao_id" label="Regeneração;-42.684193,-6.23115" />
+        <node id="pi_riacho_frio_id" label="Riacho Frio;-44.950326,-10.124378" />
+        <node id="pi_ribeira_do_piaui_id" label="Ribeira do Piauí;-42.712778,-7.690278" />
+        <node id="pi_ribeiro_goncalves_id" label="Ribeiro Gonçalves;-45.244737,-7.556505" />
+        <node id="pi_rio_grande_do_piaui_id" label="Rio Grande do Piauí;-43.136886,-7.780291" />
+        <node id="pi_santa_cruz_do_piaui_id" label="Santa Cruz do Piauí;-41.760932,-7.178499" />
+        <node id="pi_santa_cruz_dos_milagres_id" label="Santa Cruz dos Milagres;-41.950644,-5.805808" />
+        <node id="pi_santa_filomena_id" label="Santa Filomena;-45.911607,-9.112278" />
+        <node id="pi_santa_luz_id" label="Santa Luz;-44.129567,-8.948795" />
+        <node id="pi_santa_rosa_do_piaui_id" label="Santa Rosa do Piauí;-42.281375,-6.79581" />
+        <node id="pi_santana_do_piaui_id" label="Santana do Piauí;-41.517767,-6.946961" />
+        <node id="pi_santo_antonio_de_lisboa_id" label="Santo Antônio de Lisboa;-41.225202,-6.986762" />
+        <node id="pi_santo_antonio_dos_milagres_id" label="Santo Antônio dos Milagres;-42.712322,-6.046473" />
+        <node id="pi_santo_inacio_do_piaui_id" label="Santo Inácio do Piauí;-41.906252,-7.42072" />
+        <node id="pi_sebastiao_barros_id" label="Sebastião Barros;-44.833718,-10.816978" />
+        <node id="pi_sebastiao_leal_id" label="Sebastião Leal;-44.059982,-7.568029" />
+        <node id="pi_sigefredo_pacheco_id" label="Sigefredo Pacheco;-41.731123,-4.916647" />
+        <node id="pi_simplicio_mendes_id" label="Simplício Mendes;-41.907533,-7.852944" />
+        <node id="pi_simoes_id" label="Simões;-40.813731,-7.591095" />
+        <node id="pi_socorro_do_piaui_id" label="Socorro do Piauí;-42.492179,-7.86773" />
+        <node id="pi_sussuapara_id" label="Sussuapara;-41.376699,-7.036868" />
+        <node id="pi_sao_braz_do_piaui_id" label="São Braz do Piauí;-43.007646,-9.057967" />
+        <node id="pi_sao_francisco_de_assis_do_piaui_id" label="São Francisco de Assis do Piauí;-41.681028,-8.239207" />
+        <node id="pi_sao_francisco_do_piaui_id" label="São Francisco do Piauí;-42.54101,-7.246299" />
+        <node id="pi_sao_felix_do_piaui_id" label="São Félix do Piauí;-42.117179,-5.934853" />
+        <node id="pi_sao_goncalo_do_gurgueia_id" label="São Gonçalo do Gurguéia;-45.309219,-10.03195" />
+        <node id="pi_sao_goncalo_do_piaui_id" label="São Gonçalo do Piauí;-42.709537,-5.993934" />
+        <node id="pi_sao_jose_do_divino_id" label="São José do Divino;-41.830793,-3.814114" />
+        <node id="pi_sao_jose_do_peixe_id" label="São José do Peixe;-42.567162,-7.485535" />
+        <node id="pi_sao_jose_do_piaui_id" label="São José do Piauí;-41.47311,-6.87194" />
+        <node id="pi_sao_joao_da_canabrava_id" label="São João da Canabrava;-41.341483,-6.812029" />
+        <node id="pi_sao_joao_da_fronteira_id" label="São João da Fronteira;-41.256921,-3.954975" />
+        <node id="pi_sao_joao_da_serra_id" label="São João da Serra;-41.892309,-5.510805" />
+        <node id="pi_sao_joao_da_varjota_id" label="São João da Varjota;-41.888912,-6.940817" />
+        <node id="pi_sao_joao_do_arraial_id" label="São João do Arraial;-42.44586,-3.818597" />
+        <node id="pi_sao_joao_do_piaui_id" label="São João do Piauí;-42.255898,-8.354661" />
+        <node id="pi_sao_juliao_id" label="São Julião;-40.824638,-7.083906" />
+        <node id="pi_sao_lourenco_do_piaui_id" label="São Lourenço do Piauí;-42.549552,-9.164633" />
+        <node id="pi_sao_luis_do_piaui_id" label="São Luis do Piauí;-41.317454,-6.819363" />
+        <node id="pi_sao_miguel_da_baixa_grande_id" label="São Miguel da Baixa Grande;-42.193423,-5.856457" />
+        <node id="pi_sao_miguel_do_fidalgo_id" label="São Miguel do Fidalgo;-42.367591,-7.597133" />
+        <node id="pi_sao_miguel_do_tapuio_id" label="São Miguel do Tapuio;-41.316451,-5.497291" />
+        <node id="pi_sao_pedro_do_piaui_id" label="São Pedro do Piauí;-42.719211,-5.92078" />
+        <node id="pi_sao_raimundo_nonato_id" label="São Raimundo Nonato;-42.698659,-9.012412" />
+        <node id="pi_tamboril_do_piaui_id" label="Tamboril do Piauí;-42.921107,-8.409369" />
+        <node id="pi_tanque_do_piaui_id" label="Tanque do Piauí;-42.279515,-6.597869" />
+        <node id="pi_teresina_id" label="Teresina;-42.803364,-5.091944" />
+        <node id="pi_uniao_id" label="União;-42.858285,-4.585709" />
+        <node id="pi_urucui_id" label="Uruçuí;-44.557683,-7.239439" />
+        <node id="pi_valenca_do_piaui_id" label="Valença do Piauí;-41.737498,-6.403013" />
+        <node id="pi_vera_mendes_id" label="Vera Mendes;-41.467336,-7.597481" />
+        <node id="pi_vila_nova_do_piaui_id" label="Vila Nova do Piauí;-40.934514,-7.132718" />
+        <node id="pi_varzea_branca_id" label="Várzea Branca;-42.969221,-9.238003" />
+        <node id="pi_varzea_grande_id" label="Várzea Grande;-42.247973,-6.548993" />
+        <node id="pi_wall_ferraz_id" label="Wall Ferraz;-41.905037,-7.231511" />
+        <node id="pi_agua_branca_id" label="Água Branca;-42.636961,-5.888564" />
+    </isComposedBy>
+</node>

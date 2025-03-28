@@ -29,10 +29,10 @@
                     <dc-element>title</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Title</label>
+                    <label>Nome</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the file.</hint>
-                    <required>You must enter a name for this file</required>
+                    <hint>Nome do arquivo</hint>
+                    <required></required>
                 </field>
             </row>
             <row>
@@ -40,9 +40,9 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
                     <repeatable>true</repeatable>
-                    <label>Description</label>
+                    <label>Descrição</label>
                     <input-type>textarea</input-type>
-                    <hint>Enter a description for the file</hint>
+                    <hint>Descrição do arquivo</hint>
                     <required></required>
                 </field>
             </row>
@@ -108,20 +108,10 @@
                     <hint>Digite os atores.</hint>
                     <required>Campo obrigatório.</required>
                 </field>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>UF-Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>longitude-latitude</vocabulary>
-                </field>
             </row>
             <row>
                 <field>
+
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
                     <dc-qualifier>objective</dc-qualifier>
@@ -133,6 +123,413 @@
                 </field>
             </row>
         </form>
+
+        <form name="acre">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>AC</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="alagoas">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>AL</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="amazonas">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>AM</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="amapa">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>AP</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="bahia">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>BA</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="ceara">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>CE</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="distritoFederal">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>DF</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="espiritoSanto">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>ES</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="goias">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>GO</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="maranhao">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>MA</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="minasGerais">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>MG</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="matoGrossoSul">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>MS</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="matoGrosso">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>MT</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="para">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>PA</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="paraiba">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>PB</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="pernambuco">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>PE</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="piaui">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>PI</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="parana">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>PR</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="rioJaneiro">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>RJ</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="rioNorte">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>RN</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="rondonia">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>RO</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="roraima">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>RR</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="rioSul">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>RS</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="santaCatarina">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>SC</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="sergipe">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>SE</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="saoPaulo">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>SP</vocabulary>
+                </field>
+            </row>
+        </form>
+        <form name="tocantins">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>TO</vocabulary>
+                </field>
+            </row>
+        </form>
+
         <form name="regulamentacao">
             <row>
                 <field>
@@ -197,7 +594,7 @@
                  <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>contributor</dc-element>
-                    <dc-qualifier></dc-qualifier>
+                    <dc-qualifier>phone</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Telefone</label>
                     <input-type>onebox</input-type>

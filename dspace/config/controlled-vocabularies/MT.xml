@@ -1,0 +1,145 @@
+<node id="mt_id" label="MT">
+    <isComposedBy>
+        <node id="mt_acorizal_id" label="Acorizal;-56.363226,-15.194025" />
+        <node id="mt_alta_floresta_id" label="Alta Floresta;-56.086704,-9.866745" />
+        <node id="mt_alto_araguaia_id" label="Alto Araguaia;-53.218125,-17.315324" />
+        <node id="mt_alto_boa_vista_id" label="Alto Boa Vista;-51.388326,-11.673199" />
+        <node id="mt_alto_garcas_id" label="Alto Garças;-53.527209,-16.946226" />
+        <node id="mt_alto_paraguai_id" label="Alto Paraguai;-56.47763,-14.513712" />
+        <node id="mt_alto_taquari_id" label="Alto Taquari;-53.27922,-17.82405" />
+        <node id="mt_apiacas_id" label="Apiacás;-57.458677,-9.539809" />
+        <node id="mt_araguaiana_id" label="Araguaiana;-51.834112,-15.729144" />
+        <node id="mt_araguainha_id" label="Araguainha;-53.031778,-16.857016" />
+        <node id="mt_araputanga_id" label="Araputanga;-58.342461,-15.464096" />
+        <node id="mt_arenapolis_id" label="Arenápolis;-56.843724,-14.447159" />
+        <node id="mt_aripuana_id" label="Aripuanã;-59.456815,-10.172262" />
+        <node id="mt_barra_do_bugres_id" label="Barra do Bugres;-57.187784,-15.07016" />
+        <node id="mt_barra_do_garcas_id" label="Barra do Garças;-52.263953,-15.880412" />
+        <node id="mt_barao_de_melgaco_id" label="Barão de Melgaço;-55.962337,-16.20669" />
+        <node id="mt_bom_jesus_do_araguaia_id" label="Bom Jesus do Araguaia;-51.503154,-12.170571" />
+        <node id="mt_brasnorte_id" label="Brasnorte;-57.983341,-12.147402" />
+        <node id="mt_campinapolis_id" label="Campinápolis;-52.892979,-14.516182" />
+        <node id="mt_campo_novo_do_parecis_id" label="Campo Novo do Parecis;-57.890723,-13.658735" />
+        <node id="mt_campo_verde_id" label="Campo Verde;-55.162582,-15.544978" />
+        <node id="mt_campos_de_julio_id" label="Campos de Júlio;-59.285807,-13.724224" />
+        <node id="mt_canabrava_do_norte_id" label="Canabrava do Norte;-51.820883,-11.055561" />
+        <node id="mt_canarana_id" label="Canarana;-52.270493,-13.551502" />
+        <node id="mt_carlinda_id" label="Carlinda;-55.841671,-9.949118" />
+        <node id="mt_castanheira_id" label="Castanheira;-58.608076,-11.12506" />
+        <node id="mt_chapada_dos_guimaraes_id" label="Chapada dos Guimarães;-55.749857,-15.464343" />
+        <node id="mt_claudia_id" label="Cláudia;-54.883476,-11.5075" />
+        <node id="mt_cocalinho_id" label="Cocalinho;-51.00015,-14.390339" />
+        <node id="mt_colniza_id" label="Colniza;-59.225189,-9.461207" />
+        <node id="mt_colider_id" label="Colíder;-55.460981,-10.813453" />
+        <node id="mt_comodoro_id" label="Comodoro;-59.784751,-13.661436" />
+        <node id="mt_confresa_id" label="Confresa;-51.569873,-10.643695" />
+        <node id="mt_conquista_d`oeste_id" label="Conquista D`Oeste;-59.547973,-14.537072" />
+        <node id="mt_cotriguacu_id" label="Cotriguaçu;-58.419231,-9.856563" />
+        <node id="mt_cuiaba_id" label="Cuiabá;-56.097397,-15.600979" />
+        <node id="mt_curvelandia_id" label="Curvelândia;-57.913269,-15.608389" />
+        <node id="mt_caceres_id" label="Cáceres;-57.681798,-16.076414" />
+        <node id="mt_denise_id" label="Denise;-57.058262,-14.732397" />
+        <node id="mt_diamantino_id" label="Diamantino;-56.436599,-14.403673" />
+        <node id="mt_dom_aquino_id" label="Dom Aquino;-54.922298,-15.809899" />
+        <node id="mt_feliz_natal_id" label="Feliz Natal;-54.922738,-12.384985" />
+        <node id="mt_figueiropolis_d`oeste_id" label="Figueirópolis d`Oeste;-58.739149,-15.443918" />
+        <node id="mt_gaucha_do_norte_id" label="Gaúcha do Norte;-53.080914,-13.244284" />
+        <node id="mt_general_carneiro_id" label="General Carneiro;-52.757375,-15.709447" />
+        <node id="mt_gloria_d`oeste_id" label="Glória d`Oeste;-58.306121,-15.767592" />
+        <node id="mt_guaranta_do_norte_id" label="Guarantã do Norte;-54.912126,-9.962182" />
+        <node id="mt_guiratinga_id" label="Guiratinga;-53.75749,-16.345979" />
+        <node id="mt_indiavai_id" label="Indiavaí;-58.580158,-15.492115" />
+        <node id="mt_ipiranga_do_norte_id" label="Ipiranga do Norte;-56.145936,-12.240162" />
+        <node id="mt_itanhanga_id" label="Itanhangá;-56.684065,-12.166012" />
+        <node id="mt_itauba_id" label="Itaúba;-55.276574,-11.061423" />
+        <node id="mt_itiquira_id" label="Itiquira;-54.142214,-17.214693" />
+        <node id="mt_jaciara_id" label="Jaciara;-54.97332,-15.954778" />
+        <node id="mt_jangada_id" label="Jangada;-56.491693,-15.235044" />
+        <node id="mt_jauru_id" label="Jauru;-58.872267,-15.33417" />
+        <node id="mt_juara_id" label="Juara;-57.524443,-11.263925" />
+        <node id="mt_juruena_id" label="Juruena;-58.359179,-10.317805" />
+        <node id="mt_juscimeira_id" label="Juscimeira;-54.885894,-16.063307" />
+        <node id="mt_juina_id" label="Juína;-58.748314,-11.372752" />
+        <node id="mt_lambari_d`oeste_id" label="Lambari d`Oeste;-58.002856,-15.317213" />
+        <node id="mt_lucas_do_rio_verde_id" label="Lucas do Rio Verde;-55.904202,-13.058796" />
+        <node id="mt_luciara_id" label="Luciára;-50.667592,-11.221926" />
+        <node id="mt_marcelandia_id" label="Marcelândia;-54.437681,-11.046259" />
+        <node id="mt_matupa_id" label="Matupá;-54.94667,-10.182065" />
+        <node id="mt_mirassol_d`oeste_id" label="Mirassol d`Oeste;-58.090996,-15.667801" />
+        <node id="mt_nobres_id" label="Nobres;-56.328358,-14.719167" />
+        <node id="mt_nortelandia_id" label="Nortelândia;-56.794516,-14.454022" />
+        <node id="mt_nossa_senhora_do_livramento_id" label="Nossa Senhora do Livramento;-56.343242,-15.772024" />
+        <node id="mt_nova_bandeirantes_id" label="Nova Bandeirantes;-57.864687,-9.808959" />
+        <node id="mt_nova_brasilandia_id" label="Nova Brasilândia;-54.968527,-14.961215" />
+        <node id="mt_nova_canaa_do_norte_id" label="Nova Canaã do Norte;-55.953001,-10.558" />
+        <node id="mt_nova_guarita_id" label="Nova Guarita;-55.406062,-10.311992" />
+        <node id="mt_nova_lacerda_id" label="Nova Lacerda;-59.600115,-14.472726" />
+        <node id="mt_nova_marilandia_id" label="Nova Marilândia;-56.969572,-14.356757" />
+        <node id="mt_nova_maringa_id" label="Nova Maringá;-57.090769,-13.013614" />
+        <node id="mt_nova_monte_verde_id" label="Nova Monte Verde;-57.526052,-9.999982" />
+        <node id="mt_nova_mutum_id" label="Nova Mutum;-56.074316,-13.837389" />
+        <node id="mt_nova_nazare_id" label="Nova Nazaré;-51.800203,-13.948627" />
+        <node id="mt_nova_olimpia_id" label="Nova Olímpia;-57.288613,-14.788947" />
+        <node id="mt_nova_santa_helena_id" label="Nova Santa Helena;-55.1872,-10.865144" />
+        <node id="mt_nova_ubirata_id" label="Nova Ubiratã;-55.255558,-12.983411" />
+        <node id="mt_nova_xavantina_id" label="Nova Xavantina;-52.350234,-14.677063" />
+        <node id="mt_novo_horizonte_do_norte_id" label="Novo Horizonte do Norte;-57.348763,-11.408889" />
+        <node id="mt_novo_mundo_id" label="Novo Mundo;-55.20295,-9.956159" />
+        <node id="mt_novo_santo_antonio_id" label="Novo Santo Antônio;-50.96857,-12.287538" />
+        <node id="mt_novo_sao_joaquim_id" label="Novo São Joaquim;-53.019362,-14.905406" />
+        <node id="mt_paranatinga_id" label="Paranatinga;-54.052426,-14.426475" />
+        <node id="mt_paranaita_id" label="Paranaíta;-56.478623,-9.658348" />
+        <node id="mt_pedra_preta_id" label="Pedra Preta;-54.47218,-16.624505" />
+        <node id="mt_peixoto_de_azevedo_id" label="Peixoto de Azevedo;-54.979376,-10.226168" />
+        <node id="mt_planalto_da_serra_id" label="Planalto da Serra;-54.781857,-14.651773" />
+        <node id="mt_pocone_id" label="Poconé;-56.626099,-16.266037" />
+        <node id="mt_pontal_do_araguaia_id" label="Pontal do Araguaia;-52.327296,-15.927383" />
+        <node id="mt_ponte_branca_id" label="Ponte Branca;-52.836864,-16.758407" />
+        <node id="mt_pontes_e_lacerda_id" label="Pontes e Lacerda;-59.343544,-15.221868" />
+        <node id="mt_porto_alegre_do_norte_id" label="Porto Alegre do Norte;-51.635731,-10.876126" />
+        <node id="mt_porto_esperidiao_id" label="Porto Esperidião;-58.461925,-15.857026" />
+        <node id="mt_porto_estrela_id" label="Porto Estrela;-57.220403,-15.323517" />
+        <node id="mt_porto_dos_gauchos_id" label="Porto dos Gaúchos;-57.413233,-11.532999" />
+        <node id="mt_poxoreo_id" label="Poxoréo;-54.388276,-15.841012" />
+        <node id="mt_primavera_do_leste_id" label="Primavera do Leste;-54.281056,-15.543971" />
+        <node id="mt_querencia_id" label="Querência;-52.182102,-12.609294" />
+        <node id="mt_reserva_do_cabacal_id" label="Reserva do Cabaçal;-58.458533,-15.074259" />
+        <node id="mt_ribeirao_cascalheira_id" label="Ribeirão Cascalheira;-51.824421,-12.936738" />
+        <node id="mt_ribeiraozinho_id" label="Ribeirãozinho;-52.692439,-16.48563" />
+        <node id="mt_rio_branco_id" label="Rio Branco;-58.125892,-15.248331" />
+        <node id="mt_rondolandia_id" label="Rondolândia;-61.469737,-10.837556" />
+        <node id="mt_rondonopolis_id" label="Rondonópolis;-54.637173,-16.467251" />
+        <node id="mt_rosario_oeste_id" label="Rosário Oeste;-56.42357,-14.825938" />
+        <node id="mt_salto_do_ceu_id" label="Salto do Céu;-58.131721,-15.130346" />
+        <node id="mt_santa_carmem_id" label="Santa Carmem;-55.226297,-11.912542" />
+        <node id="mt_santa_cruz_do_xingu_id" label="Santa Cruz do Xingu;-52.395348,-10.153161" />
+        <node id="mt_santa_rita_do_trivelato_id" label="Santa Rita do Trivelato;-55.270564,-13.814599" />
+        <node id="mt_santa_terezinha_id" label="Santa Terezinha;-50.513986,-10.470375" />
+        <node id="mt_santo_afonso_id" label="Santo Afonso;-57.009099,-14.494474" />
+        <node id="mt_santo_antonio_do_leste_id" label="Santo Antônio do Leste;-53.638935,-14.797045" />
+        <node id="mt_santo_antonio_do_leverger_id" label="Santo Antônio do Leverger;-56.078752,-15.862409" />
+        <node id="mt_sapezal_id" label="Sapezal;-58.764473,-12.989214" />
+        <node id="mt_serra_nova_dourada_id" label="Serra Nova Dourada;-51.402543,-12.089627" />
+        <node id="mt_sinop_id" label="Sinop;-55.509062,-11.86043" />
+        <node id="mt_sorriso_id" label="Sorriso;-55.721051,-12.542527" />
+        <node id="mt_sao_felix_do_araguaia_id" label="São Félix do Araguaia;-50.670624,-11.614968" />
+        <node id="mt_sao_jose_do_povo_id" label="São José do Povo;-54.248716,-16.454946" />
+        <node id="mt_sao_jose_do_rio_claro_id" label="São José do Rio Claro;-56.721841,-13.439818" />
+        <node id="mt_sao_jose_do_xingu_id" label="São José do Xingu;-52.748589,-10.798193" />
+        <node id="mt_sao_jose_dos_quatro_marcos_id" label="São José dos Quatro Marcos;-58.177217,-15.627584" />
+        <node id="mt_sao_pedro_da_cipa_id" label="São Pedro da Cipa;-54.91758,-16.010905" />
+        <node id="mt_tabapora_id" label="Tabaporã;-56.831237,-11.300739" />
+        <node id="mt_tangara_da_serra_id" label="Tangará da Serra;-57.493278,-14.62291" />
+        <node id="mt_tapurah_id" label="Tapurah;-56.517821,-12.695014" />
+        <node id="mt_terra_nova_do_norte_id" label="Terra Nova do Norte;-55.231,-10.517" />
+        <node id="mt_tesouro_id" label="Tesouro;-53.559032,-16.080932" />
+        <node id="mt_torixoreu_id" label="Torixoréu;-52.557097,-16.200591" />
+        <node id="mt_uniao_do_sul_id" label="União do Sul;-54.361637,-11.530776" />
+        <node id="mt_vale_de_sao_domingos_id" label="Vale de São Domingos;-59.068313,-15.285975" />
+        <node id="mt_vera_id" label="Vera;-55.304497,-12.301659" />
+        <node id="mt_vila_bela_da_santissima_trindade_id" label="Vila Bela da Santíssima Trindade;-59.947256,-15.003938" />
+        <node id="mt_vila_rica_id" label="Vila Rica;-51.118599,-10.013666" />
+        <node id="mt_varzea_grande_id" label="Várzea Grande;-56.132218,-15.645816" />
+        <node id="mt_agua_boa_id" label="Água Boa;-52.160133,-14.051019" />
+    </isComposedBy>
+</node>
