@@ -424,7 +424,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             //modulo
             if ((processedCounter % batchCommitSize) == 0) {
                 log.info("Migration Commit Checkpoint: " + processedCounter);
-                context.dispatchEvents();
+                context.commit();
             }
         }
 
