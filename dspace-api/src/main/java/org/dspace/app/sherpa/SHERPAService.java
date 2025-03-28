@@ -30,6 +30,7 @@ import org.dspace.app.sherpa.v2.SHERPAPublisherResponse;
 import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.app.sherpa.v2.SHERPAUtils;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.ProxyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -63,13 +64,14 @@ public class SHERPAService {
      * Create a new HTTP builder with sensible defaults in constructor
      */
     public SHERPAService() {
-        HttpClientBuilder builder = HttpClientBuilder.create();
-        // httpclient 4.3+ doesn't appear to have any sensible defaults any more. Setting conservative defaults as
-        // not to hammer the SHERPA service too much.
-        client = builder
+        // httpclient 4.3+ doesn't appear to have any sensible defaults any
+        // more. Setting conservative defaults so as not to hammer the SHERPA
+        // service too much.
+        HttpClientBuilder builder = HttpClientBuilder.create()
             .disableAutomaticRetries()
-            .setMaxConnTotal(5)
-            .build();
+            .setMaxConnTotal(5);
+        ProxyUtils.addProxy(builder);
+        client = builder.build();
     }
 
     /**
