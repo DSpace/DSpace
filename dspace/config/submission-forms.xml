@@ -594,7 +594,7 @@
                  <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>contributor</dc-element>
-                    <dc-qualifier>phone</dc-qualifier>
+                    <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Telefone</label>
                     <input-type>onebox</input-type>
