@@ -171,7 +171,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
         List<ResourcePolicy> readPolicies = resourcePolicyService.find(context, dso, Constants.READ);
         // Filter the policies with the anonymous group
         List<ResourcePolicy> filteredPolicies = readPolicies.stream()
-            .filter(p -> StringUtils.equals(p.getGroup().getName(), Group.ANONYMOUS))
+            .filter(p -> p.getGroup() != null && StringUtils.equals(p.getGroup().getName(), Group.ANONYMOUS))
             .collect(Collectors.toList());
         return filteredPolicies;
     }
