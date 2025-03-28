@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static jakarta.mail.internet.MimeUtility.encodeText;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.codec.CharEncoding.UTF_8;
@@ -52,8 +53,11 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.time.Period;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
@@ -61,6 +65,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.dspace.app.requestitem.RequestItem;
+import org.dspace.app.requestitem.service.RequestItemService;
+import org.dspace.app.rest.model.RequestItemRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -70,6 +77,7 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RequestItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
@@ -126,6 +134,16 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
     @Autowired
     private CollectionService collectionService;
+
+    @Autowired
+    private RequestItemService requestItemService;
+
+    @Autowired
+    private ObjectMapper mapper;
+
+    public static final String requestItemUrl = REST_SERVER_URL
+            + RequestItemRest.CATEGORY + '/'
+            + RequestItemRest.PLURAL_NAME;
 
     private Bitstream bitstream;
     private BitstreamFormat supportedFormat;
@@ -1500,4 +1518,103 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         }
     }
 
+    @Test
+    public void restrictedBitstreamWithAccessTokenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson2 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .build();
+
+        Group restrictedGroup = GroupBuilder.createGroup(context)
+                .withName("Restricted Group")
+                .addMember(eperson)
+                .build();
+
+        Item item;
+
+        // Create large bitstream over threshold
+        byte[] bytes = new byte[21 * 1024 * 1024]; // 21MB
+        try (InputStream is = new ByteArrayInputStream(bytes)) {
+
+            item = ItemBuilder.createItem(context, col1)
+                    .withTitle("item 1")
+                    .withIssueDate("2013-01-17")
+                    .withAuthor("Doe, John")
+                    .build();
+            bitstream = BitstreamBuilder
+                    .createBitstream(context, item, is)
+                    .withName("Test Embargoed Bitstream")
+                    .withDescription("This bitstream is embargoed")
+                    .withMimeType("text/plain")
+                    .withReaderGroup(restrictedGroup)
+                    .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Create an item request to approve.
+        RequestItem itemRequest = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        // Create the HTTP request body.
+        Map<String, String> parameters = Map.of(
+                "acceptRequest", "true",
+                "subject", "subject",
+                "responseMessage", "Request accepted",
+                    "accessPeriod", "+1DAY",
+                "suggestOpenAccess", "true");
+        String content = mapper
+                .writer()
+                .writeValueAsString(parameters);
+
+        // Send the request to approve the request.
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        AtomicReference<String> requestTokenRef = new AtomicReference<>();
+        getClient(authToken).perform(put(requestItemUrl + '/' + itemRequest.getToken())
+                        .contentType(contentType)
+                        .content(content))
+                .andExpect(status().isOk()
+                )
+                .andDo((var result) -> requestTokenRef.set(
+                        read(result.getResponse().getContentAsString(), "token")));
+        RequestItem foundRequest
+                = requestItemService.findByToken(context, requestTokenRef.get());
+
+        // download the bitstream - 4 scenarios
+
+        // Someone in the restricted group is allowed access to the item without any access token
+        getClient(authToken).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                .andExpect(status().isOk());
+
+        checkNumberOfStatsRecords(bitstream, 1);
+
+        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), "qwerty02");
+        getClient(tokenEPerson2).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                .andExpect(status().isForbidden());
+
+        // Anonymous users CANNOT access/download Bitstreams that are restricted, without the access token
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                .andExpect(status().isUnauthorized());
+
+        // Anonymous users CANNOT access/download Bitstreams that are restricted, with an invalid access token
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content")
+                .param("accessToken", "invalid_token")).andExpect(status().isUnauthorized());
+
+        // Anonymous users CAN access/download Bitstreams that are restricted, with a valid access token
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content")
+                .param("accessToken", foundRequest.getAccess_token())).andExpect(status().isOk());
+
+        // Cleanup created request
+        RequestItemBuilder.deleteRequestItem(foundRequest.getToken());
+    }
 }
