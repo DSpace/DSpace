@@ -778,8 +778,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public boolean isComColAdmin(Context context) throws SQLException {
         return performCheck(context,
-            "(" + RESOURCE_TYPE_FIELD + ":" + IndexableCommunity.TYPE + " OR "
-                + RESOURCE_TYPE_FIELD + ":" + IndexableCollection.TYPE + ")");
+            "(" + RESOURCE_TYPE_FIELD + ":" + IndexableCommunity.TYPE + " OR " +
+            RESOURCE_TYPE_FIELD + ":" + IndexableCollection.TYPE + ")");
     }
 
     /**
