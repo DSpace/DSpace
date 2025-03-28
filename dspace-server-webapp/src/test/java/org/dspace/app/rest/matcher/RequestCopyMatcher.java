@@ -5,7 +5,6 @@
  *
  * http://www.dspace.org/license/
  */
-
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;

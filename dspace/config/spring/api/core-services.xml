@@ -109,7 +109,10 @@
     <bean class="org.dspace.eperson.RegistrationDataServiceImpl"/>
     <bean class="org.dspace.eperson.RegistrationDataMetadataServiceImpl"/>
     <bean class="org.dspace.eperson.SubscribeServiceImpl"/>
-    <bean class="org.dspace.eperson.CaptchaServiceImpl"/>
+    <!-- Use CaptchaServiceImpl for Google ReCaptcha -->
+    <bean class="org.dspace.eperson.CaptchaServiceImpl" id="googleCaptchaService"/>
+    <!-- Use AltchaCaptchaServiceImpl for ALTCHA captcha -->
+    <bean class="org.dspace.eperson.AltchaCaptchaServiceImpl" id="altchaCaptchaService"/>
     <bean class="org.dspace.event.EventServiceImpl"/>
 
     <bean class="org.dspace.handle.HandleServiceImpl"/>

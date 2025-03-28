@@ -24,6 +24,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
@@ -477,5 +479,25 @@ public final class Utils {
     public static String interpolateConfigsInString(String string) {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         return StringSubstitutor.replace(string, config.getProperties());
+    }
+
+    /**
+     * Get the maximum timestamp that can be stored in a PostgreSQL database with hibernate,
+     * for our "distant future" access expiry date.
+     * @return the maximum timestamp that can be stored with Postgres + Hibernate
+     */
+    public static Instant getMaxTimestamp() {
+        return LocalDateTime.of(294276, 12, 31, 23, 59, 59)
+                .toInstant(ZoneOffset.UTC);
+    }
+
+    /**
+     * Get the minimum timestamp that can be stored in a PostgreSQL database, for date validation or any other
+     * purpose to ensure we don't try to store a date before the epoch.
+     * @return the minimum timestamp that can be stored with Postgres + Hibernate
+     */
+    public static Instant getMinTimestamp() {
+        return LocalDateTime.of(-4713, 11, 12, 0, 0, 0)
+                .toInstant(ZoneOffset.UTC);
     }
 }
