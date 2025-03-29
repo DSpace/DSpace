@@ -46,7 +46,7 @@
 
         <!-- Specifies the provider or API for the JCloud assetstore.-->
         <!-- see https://jclouds.apache.org/reference/providers/#blobstore -->
-        <property name="providerOrApi" value="${assetstore.jcloud.provider}"/>
+        <property name="providerOrApi" value="${assetstore.jcloud.provider:aws-s3}"/>
 
         <!-- The identity (e.g., username or access key) for the JCloud assetstore. -->
         <property name="identity" value="${assetstore.jcloud.identity:#{null}}"/>
