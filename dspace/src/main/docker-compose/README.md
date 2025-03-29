@@ -48,6 +48,10 @@ Documentation for all Dockerfiles used by these compose scripts can be found in 
 - docker-compose-iiif.yml
     - Docker compose file that will start a *test/demo* Cantaloupe image server container required for enabling IIIF support.
     - ONLY useful for testing/development. NOT production ready.
+- docker-compose-matomo.yml
+  - Docker compose file that will start a *test/demo* Matomo container required for track view events on DSpace.
+  - You need to accept the Matomo cookie to see tracking events submitted on the container instance.
+  - ONLY useful for testing/development. NOT production ready.
 
 Documentation for all Dockerfiles used by these compose scripts can be found in the ["docker" folder README](../docker/README.md)
 
@@ -172,6 +176,36 @@ The remainder of these instructions assume you are using ngrok (though other pro
         ```
         DSPACE_HOSTNAME=[subdomain].ngrok.io docker compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
         ```
+## Run DSpace 8 REST and Matomo from your branch
+
+_Only useful for testing Matomo in a development environment_
+
+This Matomo container uses the port 8081 to expose its API and User Interface.
+
+You can start both DSpace and Matomo with the following commnad:
+```shell
+docker compose -p d9 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-matomo.yml up -d
+```
+
+Once started you can complete the Matomo configuration directly from the [Matomo Home Page](http://localhost:8081/matomo.php).
+
+1. You need to:
+   - Create a proper user
+   - Create a proper siteId - The first one should be always set to 1 ( `matomo.request.siteId` on `matomo.cfg`)
+   - Create a siteId - [Matomo-Docker-SiteId](http://localhost:8081/index.php?module=SitesManager&action=index&idSite=1&period=day&date=yesterday) and save it property. 
+   - Create a new authToken - [Matomo-Docker-AuthToken](http://localhost:8081/index.php?module=UsersManager&action=addNewToken&idSite=1&period=day&date=yesterday) and save it properly ( be careful since this token shouldn’t set to allow only secured requests otherwise it won't work )
+
+2. You need to set check these properties inside the `matomo.cfg` file:
+    ```properties
+    # Enables matomo integration mapped inside the MatomoEventListener
+    matomo.enabled = true
+    # Configured `siteid` inside the matomo dashboard
+    matomo.request.siteid = 1
+    # The tracking endpoint of matomo
+    matomo.async-client.baseurl = http://localhost:8081/matomo.php
+    ```
+3. Startup / Restart DSpace and try to download a bitstream that has been placed inside the ORIGINAL bundle ( default bundle configured for Matomo integration )
+4. You should see a mapped request inside your Matomo dashboard with the bitstream details - [Matomo-Docker-Dashboard](http://localhost:8081/index.php)
 
 ## Sample Test Data
 
