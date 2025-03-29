@@ -9,9 +9,7 @@
             <map>
                 <entry key="0" value-ref="localStore"/>
                 <entry key="1" value-ref="s3Store"/>
-                <!--
                 <entry key="2" value-ref="jcloudStore"/>
-                -->
             </map>
         </property>
     </bean>
@@ -40,35 +38,45 @@
     </bean>
 
     <!-- 
-        JCloudStoreService
-                
-        Configuration properties for the JCloud assetstore integration.
-
-            Properties:
-            - enabled: Determines if the JCloud assetstore is enabled. Default is false.
-            - providerOrApi: Specifies the provider or API for the JCloud assetstore.
-              see https://jclouds.apache.org/reference/providers/#blobstore
-            - identity: The identity (e.g., username or access key) for the JCloud assetstore.
-            - credentials: The credentials (e.g., password or secret key) for the JCloud assetstore.
-            - endpoint: The endpoint URL for the JCloud assetstore.
-            - container: The container name in the JCloud assetstore.
-            - subfolder: The subfolder within the container in the JCloud assetstore.
-            - useRelativePath: Indicates whether to use relative paths. Default is false.
-            - maxCounter: The maximum counter value for reseting remote connections. Default is -1 (disabled).
+        JCloudStoreService: This bean is used to configure the JCloud assetstore.
     -->
-    <!--
     <bean name="jcloudStore" class="org.dspace.storage.bitstore.JCloudBitStoreService" scope="singleton" lazy-init="true">
+        <!-- Determines if the JCloud assetstore is enabled. Default is false. -->
         <property name="enabled" value="${assetstore.jcloud.enabled:false}"/>
+
+        <!-- Specifies the provider or API for the JCloud assetstore.-->
+        <!-- see https://jclouds.apache.org/reference/providers/#blobstore -->
         <property name="providerOrApi" value="${assetstore.jcloud.provider}"/>
-        <property name="identity" value="${assetstore.jcloud.identity:}"/>
-        <property name="credentials" value="${assetstore.jcloud.credentials:}"/>
-        <property name="endpoint" value="${assetstore.jcloud.endpoint:}"/>
-        <property name="container" value="${assetstore.jcloud.container:}"/>
-        <property name="subfolder" value="${assetstore.jcloud.subfolder:}"/>
+
+        <!-- The identity (e.g., username or access key) for the JCloud assetstore. -->
+        <property name="identity" value="${assetstore.jcloud.identity:#{null}}"/>
+
+        <!-- The credentials (e.g., password or secret key) for the JCloud assetstore. -->
+        <property name="credentials" value="${assetstore.jcloud.credentials:#{null}}"/>
+
+        <!-- The endpoint URL for the JCloud assetstore. -->
+        <property name="endpoint" value="${assetstore.jcloud.endpoint:#{null}}"/>
+
+        <!-- The container name in the JCloud assetstore.  -->
+        <property name="container" value="${assetstore.jcloud.container:#{null}}"/>
+
+        <!-- The subfolder within the container in the JCloud assetstore. -->
+        <property name="subfolder" value="${assetstore.jcloud.subfolder:#{null}}"/>
+
+        <!-- Indicates whether to use relative paths. Default is false. -->
         <property name="useRelativePath" value="${assetstore.jcloud.useRelativePath:false}"/>
+
+        <!-- The maximum counter value for reseting remote connections. Default is -1 (disabled). -->
         <property name="maxCounter" value="${assetstore.jcloud.maxCounter:-1}"/>
+
+        <!-- A map of overrides for the underlying BlobstoreContext (current setting used in testing). -->
+        <property name="overrides">
+            <props>
+                <prop key="jclouds.filesystem.basedir">${assetstore.jcloud.basedir:#{null}}</prop>
+            </props>
+        </property>
+
     </bean>
-    -->
 
     <!-- <bean name="localStore2 ... -->
     <!-- <bean name="s3Store2 ... -->
