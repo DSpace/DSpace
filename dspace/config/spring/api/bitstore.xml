@@ -72,7 +72,7 @@
         <!-- A map of overrides for the underlying BlobstoreContext (current setting used in testing). -->
         <property name="overrides">
             <props>
-                <prop key="jclouds.filesystem.basedir">${assetstore.jcloud.basedir:#{null}}</prop>
+                <prop key="jclouds.filesystem.basedir">${assetstore.jcloud.basedir:target/testing/dspace}</prop>
             </props>
         </property>
 
