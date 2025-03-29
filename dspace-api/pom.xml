@@ -653,9 +653,22 @@
             <version>1.1.1</version>
         </dependency>
 
+        <!-- guava is needed by OAuth, Guice, Mockserver, ORCID, s3mock, Solr, JClouds -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>failureaccess</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
+        <!-- Gson is needed by JENA, borker-client, OAuth, Handle and JClouds -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
         </dependency>
 
         <dependency>
@@ -860,6 +873,49 @@
             </exclusions>
         </dependency>
 
+        <!-- JClouds Assetstorage Support -->
+        <dependency>
+            <groupId>org.apache.jclouds</groupId>
+            <artifactId>jclouds-core</artifactId>
+            <version>2.6.0</version>
+            <exclusions>
+               <exclusion>
+                    <groupId>com.google.code.gson</groupId>
+                    <artifactId>gson</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.annotation</groupId>
+                    <artifactId>javax.annotation-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jakarta.ws.rs</groupId>
+                    <artifactId>jakarta.ws.rs-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.jclouds</groupId>
+            <artifactId>jclouds-blobstore</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.jclouds.api</groupId>
+            <artifactId>filesystem</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.jclouds.provider</groupId>
+            <artifactId>aws-s3</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+
         <!-- required frontpage generation -->
         <dependency>
             <groupId>org.thymeleaf</groupId>
@@ -878,5 +934,6 @@
             <artifactId>flying-saucer-pdf</artifactId>
             <version>9.11.4</version>
         </dependency>
+
     </dependencies>
 </project>
