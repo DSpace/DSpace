@@ -214,7 +214,7 @@
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterFileNameInOriginalBundle" />
                 <ref bean="searchFilterFileDescriptionInOriginalBundle" />
-                <!-- <ref bean="searchFilterHasGeospatialMetadata" /> -->
+                <ref bean="searchFilterHasGeospatialMetadata" />
                 <ref bean="searchFilterEntityType"/>
                 <ref bean="searchFilterAccessStatus" />
                 <ref bean="searchFilterIsAuthorOfPublicationRelation"/>
@@ -222,7 +222,7 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
-                <!-- <ref bean="searchFilterGeospatialPoint"/> -->
+                <ref bean="searchFilterGeospatialPoint"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
