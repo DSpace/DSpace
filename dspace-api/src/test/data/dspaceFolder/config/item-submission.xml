@@ -24,6 +24,7 @@
         <name-map collection-handle="123456789/typebind-test" submission-name="typebindtest"/>
         <name-map collection-handle="123456789/accessCondition-not-discoverable" submission-name="accessConditionNotDiscoverable"/>
         <name-map collection-handle="123456789/test-hidden" submission-name="test-hidden"/>
+        <name-map collection-handle="123456789/enforced-relation" submission-name="enforcedRelation"/>
     </submission-map>
 
 
@@ -177,6 +178,12 @@
             <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
         </step-definition>
 
+        <step-definition id="publicationStep" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -255,6 +262,10 @@
             <step id="test-outside-submission-hidden"/>
             <step id="test-never-hidden"/>
             <step id="test-always-hidden"/>
+        </submission-process>
+
+        <submission-process name="enforcedRelation">
+            <step id="publicationStep"></step>
         </submission-process>
 
     </submission-definitions>

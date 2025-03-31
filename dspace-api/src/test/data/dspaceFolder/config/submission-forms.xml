@@ -465,6 +465,30 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
    </form>
 
+   <form name="publicationStep">
+     <row>
+       <relation-field>
+         <relationship-type>isAuthorOfPublication</relationship-type>
+         <search-configuration>person</search-configuration>
+         <repeatable>true</repeatable>
+         <label>Author</label>
+         <hint>Enter the author's name (Family name, Given names).</hint>
+         <linked-metadata-field>
+           <dc-schema>dc</dc-schema>
+           <dc-element>contributor</dc-element>
+           <dc-qualifier>author</dc-qualifier>
+           <input-type>onebox</input-type>
+         </linked-metadata-field>
+         <externalsources>orcid</externalsources>
+         <required>true</required>
+         <!-- You may choose to validate author names via a Regular Expression if it's appropriate for
+              your institution. The below regex requires a comma to be present in the author field.
+              However, this is disabled by default to support organizations as authors, etc. -->
+         <!--<regex>\w+(,)+\w+</regex>-->
+       </relation-field>
+     </row>
+   </form>
+
  </form-definitions>
 
 
