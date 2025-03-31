@@ -23,9 +23,15 @@ import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
+import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 
 /**
@@ -53,6 +59,11 @@ public class MetadataValidation extends AbstractValidation {
     private MetadataAuthorityService metadataAuthorityService;
 
     private ConfigurationService configurationService;
+
+    private RelationshipTypeService relationshipTypeService =
+        ContentServiceFactory.getInstance().getRelationshipTypeService();
+
+    private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
 
     @Override
     public List<ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
@@ -147,9 +158,33 @@ public class MetadataValidation extends AbstractValidation {
                         }
                     }
                 }
+                relationshipFieldCheck(ContextUtil.obtainCurrentRequestContext(), obj.getItem(), input, errors, config);
             }
         }
         return errors;
+    }
+
+    private void relationshipFieldCheck(Context context, Item item, DCInput input, List<ErrorRest> errors,
+                                        SubmissionStepConfig config) throws SQLException {
+        if (input.isRelationshipField() && input.isRequired()) {
+            String relationshipType = input.getRelationshipType();
+            if (itemService.getMetadataByMetadataString(item, "relation." + relationshipType).isEmpty()) {
+                addError(errors, ERROR_VALIDATION_REQUIRED,
+                    "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                        input.getFieldName());
+            } else if (itemService.getMetadataByMetadataString(item, "relation." + relationshipType) == null) {
+                List<RelationshipType> relationTypes =
+                    relationshipTypeService.findByLeftwardOrRightwardTypeName(context, relationshipType);
+                for (RelationshipType relationType : relationTypes) {
+                    if (relationshipService.findByItemAndRelationshipType(context, item, relationType) != null) {
+                        return;
+                    }
+                }
+                addError(errors, ERROR_VALIDATION_REQUIRED,
+                    "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                        input.getFieldName());
+            }
+        }
     }
 
 
