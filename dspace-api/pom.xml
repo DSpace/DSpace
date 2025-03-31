@@ -662,7 +662,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>failureaccess</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.3</version>
         </dependency>
 
         <!-- Gson is needed by JENA, borker-client, OAuth, Handle and JClouds -->
