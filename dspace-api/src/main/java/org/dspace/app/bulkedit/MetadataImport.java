@@ -1166,10 +1166,18 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     }
 
     private void resolveValueAndAuthority(String value, BulkEditMetadataValue dcv) {
+        // Cells with valid authority are composed of three parts ~ <value>, <authority>, <confidence>
+        // The value itself may also include the authority separator though
         String[] parts = value.split(csv.getEscapedAuthoritySeparator());
 
+        // If we don't have enough parts, assume the whole string is the value
+        if (parts.length < 3) {
+            simplyCopyValue(value, dcv);
+            return;
+        }
+
         try {
-            // If an authority value is present, require a confidence value to be present as well
+            // The last part of the cell must be a confidence value (integer)
             int confidence = Integer.parseInt(parts[parts.length - 1]);
             String authority = parts[parts.length - 2];
             String plainValue = String.join(
@@ -1182,7 +1190,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             dcv.setConfidence(confidence);
         } catch (NumberFormatException e) {
             // Otherwise assume the whole string is the value
-            dcv.setValue(value);
+            simplyCopyValue(value, dcv);
         }
     }
 
