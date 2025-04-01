@@ -41,7 +41,8 @@ public class SEOHealthIndicator extends AbstractHealthIndicator {
                    .withDetail("ssr", "OK");
         } else {
             builder.down();
-            builder.withDetail("sitemap", sitemapOk ? "OK" : "Missing or inaccessible");
+            builder.withDetail("sitemap", sitemapOk ? "OK" : "Sitemaps are missing or inaccessible. Please see the " +
+                    "DSpace Documentation on Search Engine Optimization for how to enable Sitemaps.");
 
             if (robotsTxtStatus == RobotsTxtStatus.MISSING) {
                 builder.withDetail("robots.txt", "Missing or inaccessible. Please see the DSpace Documentation on " +
@@ -51,8 +52,9 @@ public class SEOHealthIndicator extends AbstractHealthIndicator {
                         "that a proxy is failing to pass X-Forwarded headers to DSpace. Please see the DSpace " +
                         "Documentation on Search Engine Optimization for how to pass X-Forwarded headers.");
             }
-
-            builder.withDetail("ssr", ssrOk ? "OK" : "Server-side rendering might be disabled");
+            builder.withDetail("ssr", ssrOk ? "OK" : "Server-side rendering (SSR) appears to be disabled.  Most " +
+                    "search engines require enabling SSR for proper indexing. Please see the DSpace Documentation on" +
+                    " Search Engine Optimization for more details.");
         }
     }
 
