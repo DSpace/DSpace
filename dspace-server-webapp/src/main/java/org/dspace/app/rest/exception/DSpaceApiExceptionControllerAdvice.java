@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.exception;
 
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static org.springframework.web.servlet.DispatcherServlet.EXCEPTION_ATTRIBUTE;
 
 import java.io.IOException;
@@ -15,10 +15,10 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.exception.ResourceAlreadyExistsException;
@@ -33,6 +33,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.csrf.InvalidCsrfTokenException;
@@ -42,7 +43,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -92,17 +92,10 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpServletResponse.SC_FORBIDDEN);
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, MultipartException.class})
+    @ExceptionHandler({IllegalArgumentException.class, MultipartException.class, InvalidLDNMessageException.class})
     protected void handleWrongRequestException(HttpServletRequest request, HttpServletResponse response,
                                                   Exception ex) throws IOException {
         sendErrorResponse(request, response, ex, "Request is invalid or incorrect", HttpServletResponse.SC_BAD_REQUEST);
-    }
-
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    protected void handleMaxUploadSizeExceededException(HttpServletRequest request, HttpServletResponse response,
-                                               Exception ex) throws IOException {
-        sendErrorResponse(request, response, ex, "Request entity is too large",
-                          HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
     }
 
     @ExceptionHandler(SQLException.class)
@@ -132,7 +125,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                                                       Exception ex) throws IOException {
         //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
         //Using the value from HttpStatus.
-        sendErrorResponse(request, response, null,
+        sendErrorResponse(request, response, ex,
                 "Unprocessable or invalid entity",
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
@@ -140,7 +133,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @ExceptionHandler( {InvalidSearchRequestException.class})
     protected void handleInvalidSearchRequestException(HttpServletRequest request, HttpServletResponse response,
                                                       Exception ex) throws IOException {
-        sendErrorResponse(request, response, null,
+        sendErrorResponse(request, response, ex,
                 "Invalid search request",
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
@@ -180,15 +173,15 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                                                             TranslatableException ex) throws IOException {
         Context context = ContextUtil.obtainContext(request);
         sendErrorResponse(
-            request, response, null, ex.getLocalizedMessage(context), HttpStatus.UNPROCESSABLE_ENTITY.value()
+            request, response, (Exception) ex, ex.getLocalizedMessage(context), HttpStatus.UNPROCESSABLE_ENTITY.value()
         );
     }
 
     @ExceptionHandler(QueryMethodParameterConversionException.class)
     protected void ParameterConversionException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
-        // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
-        sendErrorResponse(request, response, null,
+        // we want the 400 status for missing parameters, see https://github.com/DSpace/DSpace/issues/7765
+        sendErrorResponse(request, response, ex,
                           "A required parameter is invalid",
                           HttpStatus.BAD_REQUEST.value());
     }
@@ -196,8 +189,8 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @ExceptionHandler(MissingParameterException.class)
     protected void MissingParameterException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
-        // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
-        sendErrorResponse(request, response, null,
+        // we want the 400 status for missing parameters, see https://github.com/DSpace/DSpace/issues/7765
+        sendErrorResponse(request, response, ex,
                           "A required parameter is missing",
                           HttpStatus.BAD_REQUEST.value());
     }
@@ -216,16 +209,16 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
-                                                                          HttpHeaders headers, HttpStatus status,
+                                                                          HttpHeaders headers, HttpStatusCode status,
                                                                           WebRequest request) {
-        // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
+        // we want the 400 status for missing parameters, see https://github.com/DSpace/DSpace/issues/7765
         return super.handleMissingServletRequestParameter(ex, headers, HttpStatus.BAD_REQUEST, request);
     }
 
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers,
-                                                        HttpStatus status, WebRequest request) {
-        // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
+                                                        HttpStatusCode status, WebRequest request) {
+        // we want the 400 status for missing parameters, see https://github.com/DSpace/DSpace/issues/7765
         return super.handleTypeMismatch(ex, headers, HttpStatus.BAD_REQUEST, request);
     }
 

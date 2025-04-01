@@ -316,7 +316,7 @@ public abstract class AbstractMETSDisseminator
             IllegalArgumentException, InvocationTargetException {
         long lmTime = 0;
         if (dso.getType() == Constants.ITEM) {
-            lmTime = ((Item) dso).getLastModified().getTime();
+            lmTime = ((Item) dso).getLastModified().toEpochMilli();
         }
 
         // map of extra streams to put in Zip (these are located during makeManifest())
@@ -417,7 +417,7 @@ public abstract class AbstractMETSDisseminator
             Item item = (Item) dso;
 
             //get last modified time
-            long lmTime = ((Item) dso).getLastModified().getTime();
+            long lmTime = ((Item) dso).getLastModified().toEpochMilli();
 
             List<Bundle> bundles = item.getBundles();
             for (Bundle bundle : bundles) {
@@ -628,6 +628,7 @@ public abstract class AbstractMETSDisseminator
                         // Disseminate crosswalk output to an outputstream
                         ByteArrayOutputStream disseminateOutput = new ByteArrayOutputStream();
                         sxwalk.disseminate(context, dso, disseminateOutput);
+                        disseminateOutput.close();
                         // Convert output to an inputstream, so we can write to manifest or Zip file
                         ByteArrayInputStream crosswalkedStream = new ByteArrayInputStream(
                             disseminateOutput.toByteArray());

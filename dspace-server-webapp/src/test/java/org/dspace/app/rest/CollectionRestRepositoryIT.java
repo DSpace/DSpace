@@ -101,6 +101,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     @Autowired
     CollectionService collectionService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private Community topLevelCommunityA;
     private Community subCommunityA;
     private Community communityB;
@@ -1015,8 +1018,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        ObjectMapper mapper = new ObjectMapper();
-
         CollectionRest collectionRest = collectionConverter.convert(col1, Projection.DEFAULT);
 
         collectionRest.setMetadata(new MetadataRest()
@@ -1151,8 +1152,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
         AtomicReference<String> handle = new AtomicReference<>();
         try {
-
-        ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
         // We send a name but the created collection should set this to the title
         collectionRest.setName("Collection");
@@ -1237,7 +1236,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .withLogo("ThisIsSomeDummyText")
                                           .build();
 
-        ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
         // We send a name but the created collection should set this to the title
         collectionRest.setName("Collection");
@@ -1259,7 +1257,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         authorizeService.addPolicy(context, parentCommunity, Constants.ADD, eperson);
         context.restoreAuthSystemState();
 
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
         try {
         String authToken = getAuthToken(eperson.getEmail(), password);
 
@@ -1306,7 +1304,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .withLogo("ThisIsSomeDummyText")
                                           .build();
 
-        ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
         // We send a name but the created collection should set this to the title
         collectionRest.setName("Collection");
@@ -1428,7 +1425,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
-        ObjectMapper mapper = new ObjectMapper();
 
         CollectionRest collectionRest = collectionConverter.convert(col1, Projection.DEFAULT);
 
@@ -1473,7 +1469,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        new MetadataPatchSuite().runWith(getClient(token), "/api/core/collections/" + col.getID(), expectedStatus);
+        new MetadataPatchSuite(mapper).runWith(getClient(token), "/api/core/collections/" + col.getID(),
+                                               expectedStatus);
     }
 
     @Test
@@ -1488,7 +1485,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .withLogo("ThisIsSomeDummyText")
                                           .build();
 
-        ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
         // We send a name but the created collection should set this to the title
         collectionRest.setName("Collection");
@@ -1530,7 +1526,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .withLogo("ThisIsSomeDummyText")
                                           .build();
 
-        ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
         // We send a name but the created collection should set this to the title
         collectionRest.setName("Collection");
@@ -1811,8 +1806,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
 
 
-        ResourcePolicyBuilder.createResourcePolicy(context)
-                             .withUser(eperson)
+        ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
                              .withAction(WRITE)
                              .withDspaceObject(col1)
                              .build();
@@ -2894,11 +2888,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         communityC = CommunityBuilder.createCommunity(context)
             .withName("the last community is topLevelCommunityC")
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, null, groupService.findByName(context, "COMMUNITY_" +
+                                     topLevelCommunityA.getID() + "_ADMIN"))
             .withDspaceObject(communityB)
-            .withAction(Constants.ADMIN)
-            .withGroup(groupService.findByName(context, "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
-            .build();
+            .withAction(Constants.ADMIN).build();
         collectionB = CollectionBuilder.createCollection(context, subCommunityA)
             .withName("collectionB is a very original name")
             .build();
@@ -2950,11 +2943,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .withName("the last community is topLevelCommunityC")
             .addParentCommunity(context, topLevelCommunityA)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, null, groupService.findByName(context, "COMMUNITY_"
+                                     + subCommunityA.getID() + "_ADMIN"))
             .withDspaceObject(communityB)
-            .withAction(Constants.ADMIN)
-            .withGroup(groupService.findByName(context, "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
-            .build();
+            .withAction(Constants.ADMIN).build();
         collectionB = CollectionBuilder.createCollection(context, subCommunityA)
             .withName("collectionB is a very original name")
             .build();
@@ -3012,11 +3004,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         collectionC = CollectionBuilder.createCollection(context, communityC)
             .withName("the last collection is collectionC")
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, null, groupService.findByName(context, "COLLECTION_"
+                                     + collectionA.getID() + "_ADMIN"))
             .withDspaceObject(collectionB)
-            .withAction(Constants.ADMIN)
-            .withGroup(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_ADMIN"))
-            .build();
+            .withAction(Constants.ADMIN).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -3065,11 +3056,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         collectionB = CollectionBuilder.createCollection(context, communityB)
             .withName("collectionB is a very original name")
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, null, groupService.findByName(context, "COLLECTION_"
+                                     + collectionA.getID() + "_SUBMIT"))
             .withDspaceObject(collectionB)
-            .withAction(Constants.ADD)
-            .withGroup(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
-            .build();
+            .withAction(Constants.ADD).build();
         collectionC = CollectionBuilder.createCollection(context, communityC)
             .withName("the last collection is collectionC")
             .build();
@@ -3152,7 +3142,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(token)
             .perform(patch("/api/core/collections/" + col.getID())
             .content(requestBody)
-            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(
                  jsonPath("$.metadata",
@@ -3202,15 +3192,15 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                        )))
                              .andExpect(jsonPath("$.page.totalElements", is(1)));
 
-        List<Operation> updateTitle = new ArrayList<Operation>();
-        Map<String, String> value = new HashMap<String, String>();
+        List<Operation> updateTitle = new ArrayList<>();
+        Map<String, String> value = new HashMap<>();
         value.put("value", "New Name");
         updateTitle.add(new ReplaceOperation("/metadata/dc.title/0", value));
 
         String patchBody = getPatchContent(updateTitle);
         getClient(adminToken).perform(patch("/api/core/collections/" + col.getID())
                              .content(patchBody)
-                             .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.metadata['dc.title'][0].value", is("New Name")));
 
@@ -3277,7 +3267,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         AtomicReference<UUID> idRef = new AtomicReference<>();
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(post("/api/core/collections/" + col1.getID() + "/adminGroup")

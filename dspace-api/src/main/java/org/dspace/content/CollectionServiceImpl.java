@@ -31,7 +31,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
-import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
 import org.dspace.content.dao.CollectionDAO;
 import org.dspace.content.service.BitstreamService;
@@ -121,6 +120,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
+
+    @Autowired
+    protected ItemCounter itemCounter;
 
     protected CollectionServiceImpl() {
         super();
@@ -895,10 +897,15 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public Collection findByIdOrLegacyId(Context context, String id) throws SQLException {
-        if (StringUtils.isNumeric(id)) {
-            return findByLegacyId(context, Integer.parseInt(id));
-        } else {
-            return find(context, UUID.fromString(id));
+        try {
+            if (StringUtils.isNumeric(id)) {
+                return findByLegacyId(context, Integer.parseInt(id));
+            } else {
+                return find(context, UUID.fromString(id));
+            }
+        } catch (IllegalArgumentException e) {
+            // Not a valid legacy ID or valid UUID
+            return null;
         }
     }
 
@@ -1022,6 +1029,61 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
+    public Collection retrieveCollectionWithSubmitByEntityType(Context context, Item item,
+        String entityType) throws SQLException {
+        Collection ownCollection = item.getOwningCollection();
+        return retrieveWithSubmitCollectionByEntityType(context, ownCollection.getCommunities(), entityType);
+    }
+
+    private Collection retrieveWithSubmitCollectionByEntityType(Context context, List<Community> communities,
+        String entityType) {
+
+        for (Community community : communities) {
+            Collection collection = retrieveCollectionWithSubmitByCommunityAndEntityType(context, community,
+                entityType);
+            if (collection != null) {
+                return collection;
+            }
+        }
+
+        for (Community community : communities) {
+            List<Community> parentCommunities = community.getParentCommunities();
+            Collection collection = retrieveWithSubmitCollectionByEntityType(context, parentCommunities, entityType);
+            if (collection != null) {
+                return collection;
+            }
+        }
+
+        return retrieveCollectionWithSubmitByCommunityAndEntityType(context, null, entityType);
+    }
+
+    @Override
+    public Collection retrieveCollectionWithSubmitByCommunityAndEntityType(Context context, Community community,
+        String entityType) {
+        context.turnOffAuthorisationSystem();
+        List<Collection> collections;
+        try {
+            collections = findCollectionsWithSubmit(null, context, community, entityType, 0, 1);
+        } catch (SQLException | SearchServiceException e) {
+            throw new RuntimeException(e);
+        }
+        context.restoreAuthSystemState();
+        if (collections != null && collections.size() > 0) {
+            return collections.get(0);
+        }
+        if (community != null) {
+            for (Community subCommunity : community.getSubcommunities()) {
+                Collection collection = retrieveCollectionWithSubmitByCommunityAndEntityType(context,
+                    subCommunity, entityType);
+                if (collection != null) {
+                    return collection;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
     public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community, String entityType,
             int offset, int limit) throws SQLException, SearchServiceException {
         List<Collection> collections = new ArrayList<>();
@@ -1049,35 +1111,15 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         return (int) resp.getTotalSearchResults();
     }
 
-    @Override
-    @SuppressWarnings("rawtypes")
-    public List<Collection> findAllCollectionsByEntityType(Context context, String entityType)
-            throws SearchServiceException {
-        List<Collection> collectionList = new ArrayList<>();
-
-        DiscoverQuery discoverQuery = new DiscoverQuery();
-        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
-        discoverQuery.addFilterQueries("dspace.entity.type:" + entityType);
-
-        DiscoverResult discoverResult = searchService.search(context, discoverQuery);
-        List<IndexableObject> solrIndexableObjects = discoverResult.getIndexableObjects();
-
-        for (IndexableObject solrCollection : solrIndexableObjects) {
-            Collection c = ((IndexableCollection) solrCollection).getIndexedObject();
-            collectionList.add(c);
-        }
-        return collectionList;
-    }
-
     /**
      * Returns total collection archived items
      *
+     * @param context          DSpace Context
      * @param collection       Collection
      * @return                 total collection archived items
-     * @throws ItemCountException
      */
     @Override
-    public int countArchivedItems(Collection collection) throws ItemCountException {
-        return ItemCounter.getInstance().getCount(collection);
+    public int countArchivedItems(Context context, Collection collection) {
+        return itemCounter.getCount(context, collection);
     }
 }

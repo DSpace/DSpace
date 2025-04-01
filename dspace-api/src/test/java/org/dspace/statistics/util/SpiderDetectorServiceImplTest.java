@@ -94,7 +94,7 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
 
     /**
      * Test method for
-     * {@link org.dspace.statistics.util.SpiderDetectorService#isSpider(javax.servlet.http.HttpServletRequest)}.
+     * {@link org.dspace.statistics.util.SpiderDetectorService#isSpider(jakarta.servlet.http.HttpServletRequest)}.
      */
     @Test
     public void testIsSpiderHttpServletRequest() {

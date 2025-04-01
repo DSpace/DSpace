@@ -8,7 +8,6 @@
 package org.dspace.servicemanager.config;
 
 import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.spring.ConfigurationPropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.MutablePropertySources;
 
@@ -27,8 +26,8 @@ import org.springframework.core.env.MutablePropertySources;
 public class DSpaceConfigurationPlaceholderConfigurer extends PropertySourcesPlaceholderConfigurer {
 
     public DSpaceConfigurationPlaceholderConfigurer(Configuration configuration) {
-        ConfigurationPropertySource apacheCommonsConfigPropertySource =
-            new ConfigurationPropertySource(configuration.getClass().getName(), configuration);
+        DSpaceConfigurationPropertySource apacheCommonsConfigPropertySource =
+            new DSpaceConfigurationPropertySource(configuration.getClass().getName(), configuration);
         MutablePropertySources propertySources = new MutablePropertySources();
         propertySources.addLast(apacheCommonsConfigPropertySource);
         setPropertySources(propertySources);

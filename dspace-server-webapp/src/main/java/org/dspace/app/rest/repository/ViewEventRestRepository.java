@@ -12,10 +12,10 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -31,11 +31,14 @@ import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component(ViewEventRest.CATEGORY + "." + ViewEventRest.NAME)
+@Component(ViewEventRest.CATEGORY + "." + ViewEventRest.PLURAL_NAME)
 public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired
     private EventService eventService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     private final List<String> typeList = Arrays.asList(Constants.typeText);
 
@@ -43,7 +46,6 @@ public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
 
         Context context = obtainContext();
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         ViewEventRest viewEventRest = null;
         try {
             ServletInputStream input = req.getInputStream();

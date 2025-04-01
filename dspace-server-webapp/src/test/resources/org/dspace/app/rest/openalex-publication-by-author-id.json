@@ -1,0 +1,426 @@
+{
+  "id": "https://openalex.org/W1775749144",
+  "doi": "https://doi.org/10.1016/s0021-9258(19)52451-6",
+  "title": "PROTEIN MEASUREMENT WITH THE FOLIN PHENOL REAGENT",
+  "display_name": "PROTEIN MEASUREMENT WITH THE FOLIN PHENOL REAGENT",
+  "relevance_score": 73988.195,
+  "publication_year": 1951,
+  "publication_date": "1951-11-01",
+  "ids": {
+    "openalex": "https://openalex.org/W1775749144",
+    "doi": "https://doi.org/10.1016/s0021-9258(19)52451-6",
+    "mag": "1775749144",
+    "pmid": "https://pubmed.ncbi.nlm.nih.gov/14907713"
+  },
+  "language": "en",
+  "primary_location": {
+    "is_oa": true,
+    "landing_page_url": "/primary_location/landing_page_url",
+    "pdf_url": "/primary_location/pdf_url",
+    "source": {
+      "id": "https://openalex.org/S140251998",
+      "display_name": "Journal of Biological Chemistry",
+      "issn_l": "0021-9258",
+      "issn": [
+        "0021-9258",
+        "1067-8816",
+        "1083-351X"
+      ],
+      "is_oa": true,
+      "is_in_doaj": true,
+      "is_indexed_in_scopus": true,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310320990",
+      "host_organization_name": "Elsevier BV",
+      "host_organization_lineage": [
+        "https://openalex.org/P4310320990"
+      ],
+      "host_organization_lineage_names": [
+        "Elsevier BV"
+      ],
+      "type": "journal"
+    },
+    "license": "cc-by",
+    "license_id": "https://openalex.org/licenses/cc-by",
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true
+  },
+  "type": "article",
+  "type_crossref": "journal-article",
+  "indexed_in": [
+    "crossref"
+  ],
+  "open_access": {
+    "is_oa": true,
+    "oa_status": "hybrid",
+    "oa_url": "/open_access/oa_url",
+    "any_repository_has_fulltext": true
+  },
+  "authorships": [
+    {
+      "author_position": "first",
+      "author": {
+        "id": "https://openalex.org/A5110127684",
+        "display_name": "OliverH. Lowry",
+        "orcid": "https://orcid.org/0000-0001-6187-6610"
+      },
+      "institutions": [
+        {
+          "id": "https://openalex.org/I204465549",
+          "display_name": "Washington University in St. Louis",
+          "ror": "https://ror.org/01yc7t268",
+          "country_code": "US",
+          "type": "funder",
+          "lineage": [
+            "https://openalex.org/I204465549"
+          ]
+        }
+      ],
+      "countries": [
+        "US"
+      ],
+      "is_corresponding": false,
+      "raw_author_name": "OliverH. Lowry",
+      "raw_affiliation_strings": [
+        "Washington University School of Medicine St. Louis, Missouri."
+      ],
+      "affiliations": [
+        {
+          "raw_affiliation_string": "Washington University School of Medicine St. Louis, Missouri.",
+          "institution_ids": [
+            "https://openalex.org/I204465549"
+          ]
+        }
+      ]
+    },
+    {
+      "author_position": "middle",
+      "author": {
+        "id": "https://openalex.org/A5032482932",
+        "display_name": "NiraJ. Rosebrough",
+        "orcid": null
+      },
+      "institutions": [
+        {
+          "id": "https://openalex.org/I204465549",
+          "display_name": "Washington University in St. Louis",
+          "ror": "https://ror.org/01yc7t268",
+          "country_code": "US",
+          "type": "funder",
+          "lineage": [
+            "https://openalex.org/I204465549"
+          ]
+        }
+      ],
+      "countries": [
+        "US"
+      ],
+      "is_corresponding": false,
+      "raw_author_name": "NiraJ. Rosebrough",
+      "raw_affiliation_strings": [
+        "Washington University School of Medicine St. Louis, Missouri."
+      ],
+      "affiliations": [
+        {
+          "raw_affiliation_string": "Washington University School of Medicine St. Louis, Missouri.",
+          "institution_ids": [
+            "https://openalex.org/I204465549"
+          ]
+        }
+      ]
+    },
+    {
+      "author_position": "middle",
+      "author": {
+        "id": "https://openalex.org/A5004071084",
+        "display_name": "A. Farr",
+        "orcid": "https://orcid.org/0000-0001-6187-6611"
+      },
+      "institutions": [
+        {
+          "id": "https://openalex.org/I204465549",
+          "display_name": "Washington University in St. Louis",
+          "ror": "https://ror.org/01yc7t268",
+          "country_code": "US",
+          "type": "funder",
+          "lineage": [
+            "https://openalex.org/I204465549"
+          ]
+        }
+      ],
+      "countries": [
+        "US"
+      ],
+      "is_corresponding": false,
+      "raw_author_name": "A. Lewis Farr",
+      "raw_affiliation_strings": [
+        "Washington University School of Medicine St. Louis, Missouri."
+      ],
+      "affiliations": [
+        {
+          "raw_affiliation_string": "Washington University School of Medicine St. Louis, Missouri.",
+          "institution_ids": [
+            "https://openalex.org/I204465549"
+          ]
+        }
+      ]
+    },
+    {
+      "author_position": "last",
+      "author": {
+        "id": "https://openalex.org/A5109894513",
+        "display_name": "RoseJ. Randall",
+        "orcid": null
+      },
+      "institutions": [
+        {
+          "id": "https://openalex.org/I204465549",
+          "display_name": "Washington University in St. Louis",
+          "ror": "https://ror.org/01yc7t268",
+          "country_code": "US",
+          "type": "funder",
+          "lineage": [
+            "https://openalex.org/I204465549"
+          ]
+        }
+      ],
+      "countries": [
+        "US"
+      ],
+      "is_corresponding": false,
+      "raw_author_name": "RoseJ. Randall",
+      "raw_affiliation_strings": [
+        "Washington University School of Medicine St. Louis, Missouri."
+      ],
+      "affiliations": [
+        {
+          "raw_affiliation_string": "Washington University School of Medicine St. Louis, Missouri.",
+          "institution_ids": [
+            "https://openalex.org/I204465549"
+          ]
+        }
+      ]
+    }
+  ],
+  "institution_assertions": [],
+  "countries_distinct_count": 1,
+  "institutions_distinct_count": 1,
+  "corresponding_author_ids": [],
+  "corresponding_institution_ids": [],
+  "apc_list": {
+    "value": 2500,
+    "currency": "USD",
+    "value_usd": 2500
+  },
+  "apc_paid": {
+    "value": 2500,
+    "currency": "USD",
+    "value_usd": 2500
+  },
+  "fwci": 39.496,
+  "has_fulltext": true,
+  "fulltext_origin": "pdf",
+  "cited_by_count": 319716,
+  "citation_normalized_percentile": {
+    "value": 0.999621,
+    "is_in_top_1_percent": true,
+    "is_in_top_10_percent": true
+  },
+  "cited_by_percentile_year": {
+    "min": 99,
+    "max": 100
+  },
+  "biblio": {
+    "volume": "193",
+    "issue": "1",
+    "first_page": "265",
+    "last_page": "275"
+  },
+  "is_retracted": false,
+  "is_paratext": false,
+  "topics": [
+    {
+      "id": "https://openalex.org/T10602",
+      "display_name": "Glycosylation and Glycoproteins Research",
+      "score": 0.9678,
+      "subfield": {
+        "id": "https://openalex.org/subfields/1312",
+        "display_name": "Molecular Biology"
+      },
+      "field": {
+        "id": "https://openalex.org/fields/13",
+        "display_name": "Biochemistry, Genetics and Molecular Biology"
+      },
+      "domain": {
+        "id": "https://openalex.org/domains/1",
+        "display_name": "Life Sciences"
+      }
+    },
+    {
+      "id": "https://openalex.org/T11399",
+      "display_name": "Muscle metabolism and nutrition",
+      "score": 0.951,
+      "subfield": {
+        "id": "https://openalex.org/subfields/1307",
+        "display_name": "Cell Biology"
+      },
+      "field": {
+        "id": "https://openalex.org/fields/13",
+        "display_name": "Biochemistry, Genetics and Molecular Biology"
+      },
+      "domain": {
+        "id": "https://openalex.org/domains/1",
+        "display_name": "Life Sciences"
+      }
+    },
+    {
+      "id": "https://openalex.org/T14135",
+      "display_name": "Cancer and biochemical research",
+      "score": 0.9502,
+      "subfield": {
+        "id": "https://openalex.org/subfields/1312",
+        "display_name": "Molecular Biology"
+      },
+      "field": {
+        "id": "https://openalex.org/fields/13",
+        "display_name": "Biochemistry, Genetics and Molecular Biology"
+      },
+      "domain": {
+        "id": "https://openalex.org/domains/1",
+        "display_name": "Life Sciences"
+      }
+    }
+  ],
+  "keywords": [
+    {
+      "id": "https://openalex.org/keywords/global-seaweed-distribution",
+      "display_name": "Global Seaweed Distribution",
+      "score": 0.559386
+    },
+    {
+      "id": "https://openalex.org/keywords/climate-change-impacts",
+      "display_name": "Climate Change Impacts",
+      "score": 0.535795
+    },
+    {
+      "id": "https://openalex.org/keywords/ecosystem-resilience",
+      "display_name": "Ecosystem Resilience",
+      "score": 0.502789
+    }
+  ],
+  "concepts": [
+    {
+      "id": "https://openalex.org/C40875361",
+      "wikidata": "https://www.wikidata.org/wiki/Q2356542",
+      "display_name": "Reagent",
+      "level": 2,
+      "score": 0.97429305
+    },
+    {
+      "id": "https://openalex.org/C185592680",
+      "wikidata": "https://www.wikidata.org/wiki/Q2329",
+      "display_name": "Chemistry",
+      "level": 0,
+      "score": 0.8413831
+    },
+    {
+      "id": "https://openalex.org/C2777702071",
+      "wikidata": "https://www.wikidata.org/wiki/Q130336",
+      "display_name": "Phenol",
+      "level": 2,
+      "score": 0.56796163
+    },
+    {
+      "id": "https://openalex.org/C43617362",
+      "wikidata": "https://www.wikidata.org/wiki/Q170050",
+      "display_name": "Chromatography",
+      "level": 1,
+      "score": 0.5565455
+    },
+    {
+      "id": "https://openalex.org/C178790620",
+      "wikidata": "https://www.wikidata.org/wiki/Q11351",
+      "display_name": "Organic chemistry",
+      "level": 1,
+      "score": 0.27057263
+    }
+  ],
+  "mesh": [
+    {
+      "descriptor_ui": "D017712",
+      "descriptor_name": "Peer Review, Research",
+      "qualifier_ui": "Q000379",
+      "qualifier_name": "methods",
+      "is_major_topic": false
+    },
+    {
+      "descriptor_ui": "D017712",
+      "descriptor_name": "Peer Review, Research",
+      "qualifier_ui": "Q000592",
+      "qualifier_name": "standards",
+      "is_major_topic": true
+    }
+  ],
+  "locations_count": 2,
+  "locations": [
+    {
+      "is_oa": true,
+      "landing_page_url": "/locations/landing_page_url",
+      "license": "cc-by",
+      "license_id": "https://openalex.org/licenses/cc-by",
+      "version": "publishedVersion"
+    },
+    {
+      "is_oa": true,
+      "pdf_url": "/locations/pdf_url",
+      "version": "publishedVersion"
+    }
+  ],
+  "best_oa_location": {
+    "is_oa": true,
+    "landing_page_url": "/best_oa_location/pdf_url",
+    "pdf_url": "/best_oa_location/pdf_url",
+    "source": {
+      "id": "https://openalex.org/S140251998",
+      "display_name": "Journal of Biological Chemistry",
+      "issn_l": "0021-9258",
+      "issn": [
+        "0021-9258",
+        "1067-8816",
+        "1083-351X"
+      ],
+      "is_oa": true,
+      "is_in_doaj": true,
+      "is_indexed_in_scopus": true,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310320990",
+      "host_organization_name": "Elsevier BV",
+      "host_organization_lineage": [
+        "https://openalex.org/P4310320990"
+      ],
+      "host_organization_lineage_names": [
+        "Elsevier BV"
+      ],
+      "type": "journal"
+    },
+    "license": "cc-by",
+    "license_id": "https://openalex.org/licenses/cc-by",
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true
+  },
+  "sustainable_development_goals": [
+    {
+      "score": 0.65,
+      "id": "https://metadata.un.org/sdg/6",
+      "display_name": "Clean water and sanitation"
+    }
+  ],
+  "grants": [],
+  "datasets": [],
+  "versions": [],
+  "abstract_inverted_index_v3": null,
+  "cited_by_api_url": "https://api.openalex.org/works?filter=cites:W1775749144",
+  "license": "cc-by"
+}

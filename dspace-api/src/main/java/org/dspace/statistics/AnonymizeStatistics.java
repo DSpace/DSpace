@@ -11,19 +11,16 @@ import static java.lang.Integer.parseInt;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
-import static java.util.Calendar.DAY_OF_YEAR;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.cli.Option.builder;
-import static org.apache.commons.lang.time.DateFormatUtils.format;
 import static org.apache.logging.log4j.LogManager.getLogger;
 import static org.dspace.core.LogHelper.getHeader;
-import static org.dspace.statistics.SolrLoggerServiceImpl.DATE_FORMAT_8601;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -77,13 +74,9 @@ public class AnonymizeStatistics {
     private static final Object DNS_MASK =
             configurationService.getProperty("anonymize_statistics.dns_mask", "anonymized");
 
-    private static final String TIME_LIMIT;
-
-    static {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(DAY_OF_YEAR, -configurationService.getIntProperty("anonymize_statistics.time_threshold", 90));
-        TIME_LIMIT = format(calendar, DATE_FORMAT_8601);
-    }
+    private static final String TIME_LIMIT =
+            Instant.now().minus(configurationService.getIntProperty("anonymize_statistics.time_threshold", 90),
+                                ChronoUnit.DAYS).toString();
 
     private AnonymizeStatistics() {
 
@@ -185,7 +178,7 @@ public class AnonymizeStatistics {
             long total = getDocuments().getResults().getNumFound();
             printInfo(total + " documents to update");
 
-            // The documents will be processed in seperate threads.
+            // The documents will be processed in separate threads.
             ExecutorService executorService = Executors.newFixedThreadPool(threads);
 
             QueryResponse documents;
@@ -276,7 +269,8 @@ public class AnonymizeStatistics {
                     ),
                     false
                 );
-                printInfo(updated + ": updated document with uid " + document.getFieldValue("uid") + " " + new Date());
+                printInfo(updated + ": updated document with uid " + document.getFieldValue("uid") + " " +
+                              Instant.now());
                 return true;
             } catch (Exception e) {
                 printError(e);

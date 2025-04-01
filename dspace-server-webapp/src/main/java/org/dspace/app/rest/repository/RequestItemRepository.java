@@ -12,23 +12,23 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.text.StringEscapeUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.RequestItemEmailNotifier;
 import org.dspace.app.requestitem.service.RequestItemService;
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.RequestItemConverter;
 import org.dspace.app.rest.exception.IncompleteItemRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -36,25 +36,33 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RequestItemRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.InvalidReCaptchaException;
+import org.dspace.eperson.factory.CaptchaServiceFactory;
+import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-
+import org.springframework.web.util.HtmlUtils;
 /**
- * Component to expose item requests.
+ * Component to expose item requests and handle operations like create (request), put (grant/deny), and
+ * email sending. Support for requested item access by a secure token / link is supported as well as the legacy
+ * "attach files to email" method. See dspace.cfg for configuration.
  *
  * @author Mark H. Wood <mwood@iupui.edu>
+ * @author Kim Shepherd
  */
-@Component(RequestItemRest.CATEGORY + '.' + RequestItemRest.NAME)
+@Component(RequestItemRest.CATEGORY + '.' + RequestItemRest.PLURAL_NAME)
 public class RequestItemRepository
         extends DSpaceRestRepository<RequestItemRest, String> {
     private static final Logger LOG = LogManager.getLogger();
@@ -76,6 +84,15 @@ public class RequestItemRepository
 
     @Autowired(required = true)
     protected RequestItemEmailNotifier requestItemEmailNotifier;
+    @Autowired
+    protected AuthorizeService authorizeService;
+
+    private CaptchaService captchaService = CaptchaServiceFactory.getInstance().getCaptchaService();
+
+    private static final Logger log = LogManager.getLogger();
+
+    @Autowired
+    private ObjectMapper mapper;
 
     /*
      * DSpaceRestRepository
@@ -105,6 +122,23 @@ public class RequestItemRepository
         HttpServletRequest req = getRequestService()
                 .getCurrentRequest()
                 .getHttpServletRequest();
+
+        // If captcha is configured for this action, perform validation
+        if (configurationService.getBooleanProperty("request.item.create.captcha", false)) {
+            // Get captcha payload header, if any
+            String captchaPayloadHeader = req.getHeader("x-captcha-payload");
+            if (StringUtils.isBlank(captchaPayloadHeader)) {
+                throw new AuthorizeException("Valid captcha payload is required");
+            }
+            // Validate and verify captcha payload token or proof of work
+            // Rethrow exception as authZ exception if validation fails
+            try {
+                captchaService.processResponse(captchaPayloadHeader, "request_item");
+            } catch (InvalidReCaptchaException e) {
+                throw new AuthorizeException(e.getMessage());
+            }
+        }
+
         ObjectMapper mapper = new ObjectMapper();
         RequestItemRest rir;
         try {
@@ -173,11 +207,11 @@ public class RequestItemRepository
             username = user.getFullName();
         } else { // An anonymous session may provide a name.
             // Escape username to evade nasty XSS attempts
-            username = StringEscapeUtils.escapeHtml4(rir.getRequestName());
+            username = HtmlUtils.htmlEscape(rir.getRequestName(),"UTF-8");
         }
 
         // Requester's message text, escaped to evade nasty XSS attempts
-        String message = StringEscapeUtils.escapeHtml4(rir.getRequestMessage());
+        String message = HtmlUtils.htmlEscape(rir.getRequestMessage(),"UTF-8");
 
         // Create the request.
         String token;
@@ -192,7 +226,7 @@ public class RequestItemRepository
         // Create a link back to DSpace for the approver's response.
         String responseLink;
         try {
-            responseLink = getLinkTokenEmail(ri.getToken());
+            responseLink = requestItemService.getLinkTokenEmail(ri.getToken());
         } catch (URISyntaxException | MalformedURLException e) {
             LOG.warn("Impossible URL error while composing email:  {}",
                     e::getMessage);
@@ -226,15 +260,17 @@ public class RequestItemRepository
             throw new UnprocessableEntityException("Item request not found");
         }
 
-        // Do not permit updates after a decision has been given.
-        Date decisionDate = ri.getDecision_date();
-        if (null != decisionDate) {
-            throw new UnprocessableEntityException("Request was "
-                    + (ri.isAccept_request() ? "granted" : "denied")
-                    + " on " + decisionDate + " and may not be updated.");
+        // Previously there was a check here to prevent updates after *any* decision was given.
+        // This is now updated to allow specific updates to *granted* requests, so that it is possible
+        // to revoke access tokens or alter access period
+        // Throw error only if decision date was set but was denied
+        if (null != ri.getDecision_date() && !ri.isAccept_request()) {
+            throw new UnprocessableEntityException("Item request was already denied, no further updates are possible");
         }
 
         // Make the changes
+
+        // Extract and set the 'accept' indicator
         JsonNode acceptRequestNode = requestBody.findValue("acceptRequest");
         if (null == acceptRequestNode) {
             throw new UnprocessableEntityException("acceptRequest is required");
@@ -242,14 +278,33 @@ public class RequestItemRepository
             ri.setAccept_request(acceptRequestNode.asBoolean());
         }
 
+        // Extract and set the response message to include in the email
         JsonNode responseMessageNode = requestBody.findValue("responseMessage");
-        String message = responseMessageNode.asText();
+        String message = null;
+        if (responseMessageNode != null && !responseMessageNode.isNull()) {
+            message = responseMessageNode.asText();
+        }
 
-        ri.setDecision_date(new Date());
+        // Set the decision date (now)`
+        ri.setDecision_date(Instant.now());
+
+        // If the (optional) access expiry period was included, extract it here and set accordingly
+        // We expect it to be sent either as a timestamp or as a delta math like +7DAYS
+        JsonNode accessPeriod = requestBody.findValue("accessPeriod");
+        if (accessPeriod != null && !accessPeriod.isNull()) {
+            // The request item service is responsible for parsing and setting the expiry date based
+            // on a delta like "+7DAYS" or special string like "FOREVER", or a formatted date
+            requestItemService.setAccessExpiry(ri, accessPeriod.asText());
+        }
+
+        JsonNode responseSubjectNode = requestBody.findValue("subject");
+        String subject = null;
+        if (responseSubjectNode != null && !responseSubjectNode.isNull()) {
+            subject = responseSubjectNode.asText();
+        }
         requestItemService.update(context, ri);
 
         // Send the response email
-        String subject = requestBody.findValue("subject").asText();
         try {
             requestItemEmailNotifier.sendResponse(context, ri, subject, message);
         } catch (IOException ex) {
@@ -272,28 +327,39 @@ public class RequestItemRepository
         return rir;
     }
 
+    /**
+     *
+     * @param accessToken
+     * @return
+     */
+    @PreAuthorize("permitAll()")
+    @SearchRestMethod(name = "byAccessToken")
+    public RequestItemRest findByAccessToken(@Parameter(value = "accessToken", required = true) String accessToken) {
+
+        // Send 404 NOT FOUND if access token is null
+        if (StringUtils.isBlank(accessToken)) {
+            throw new ResourceNotFoundException("No such accessToken=" + accessToken);
+        }
+
+        // Get the current context and request item
+        Context context = obtainContext();
+        RequestItem requestItem = requestItemService.findByAccessToken(context, accessToken);
+
+        // Previously, a 404 was thrown if the request item was not found, and a 401 or 403 was thrown depending
+        // on authorization and validity checks. These checks are still strictly enforced in the BitstreamContoller
+        // and BitstreamResourceAccessByToken classes for actual downloads, but here we continue to pass a 200 OK
+        // response so that we can display more meaningful alerts to users in the item page rather than serve hard
+        // redirects or lose information like expiry dates and access status
+
+        // Sanitize the request item (stripping personal data) for privacy
+        requestItemService.sanitizeRequestItem(context, requestItem);
+        // Convert and return the final request item
+        return requestItemConverter.convert(requestItem, utils.obtainProjection());
+    }
+
     @Override
     public Class<RequestItemRest> getDomainClass() {
         return RequestItemRest.class;
     }
 
-    /**
-     * Generate a link back to DSpace, to act on a request.
-     *
-     * @param token identifies the request.
-     * @return URL to the item request API, with the token as request parameter
-     *          "token".
-     * @throws URISyntaxException passed through.
-     * @throws MalformedURLException passed through.
-     */
-    private String getLinkTokenEmail(String token)
-            throws URISyntaxException, MalformedURLException {
-        final String base = configurationService.getProperty("dspace.ui.url");
-
-        URI link = new URIBuilder(base)
-                .setPathSegments("request-a-copy", token)
-                .build();
-
-        return link.toURL().toExternalForm();
-    }
 }

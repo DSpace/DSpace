@@ -14,18 +14,16 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -265,7 +263,7 @@ public class LogAnalyser {
     /**
      * process timing clock
      */
-    private static Calendar startTime = null;
+    private static Instant startTime = null;
 
     /////////////////////////
     // command line options
@@ -281,10 +279,14 @@ public class LogAnalyser {
      */
     private static String fileTemplate = "dspace\\.log.*";
 
+    private static final ConfigurationService configurationService =
+            DSpaceServicesFactory.getInstance().getConfigurationService();
+
     /**
      * the configuration file from which to configure the analyser
      */
-    private static String configFile;
+    private static String configFile = configurationService.getProperty("dspace.dir")
+            + File.separator + "config" + File.separator + "dstat.cfg";
 
     /**
      * the output file to which to write aggregation data
@@ -294,22 +296,22 @@ public class LogAnalyser {
     /**
      * the starting date of the report
      */
-    private static Date startDate = null;
+    private static LocalDate startDate = null;
 
     /**
      * the end date of the report
      */
-    private static Date endDate = null;
+    private static LocalDate endDate = null;
 
     /**
      * the starting date of the report as obtained from the log files
      */
-    private static Date logStartDate = null;
+    private static LocalDate logStartDate = null;
 
     /**
      * the end date of the report as obtained from the log files
      */
-    private static Date logEndDate = null;
+    private static LocalDate logEndDate = null;
 
     /**
      * Default constructor
@@ -327,7 +329,7 @@ public class LogAnalyser {
     public static void main(String[] argv)
         throws Exception, SQLException {
         // first, start the processing clock
-        startTime = new GregorianCalendar();
+        startTime = Instant.now();
 
         // create context as super user
         Context context = new Context();
@@ -338,8 +340,8 @@ public class LogAnalyser {
         String myFileTemplate = null;
         String myConfigFile = null;
         String myOutFile = null;
-        Date myStartDate = null;
-        Date myEndDate = null;
+        LocalDate myStartDate = null;
+        LocalDate myEndDate = null;
         boolean myLookUp = false;
 
         // Define command line options.
@@ -430,14 +432,14 @@ public class LogAnalyser {
      */
     public static String processLogs(Context context, String myLogDir,
                                      String myFileTemplate, String myConfigFile,
-                                     String myOutFile, Date myStartDate,
-                                     Date myEndDate, boolean myLookUp)
+                                     String myOutFile, LocalDate myStartDate,
+                                     LocalDate myEndDate, boolean myLookUp)
         throws IOException, SQLException, SearchServiceException {
         // FIXME: perhaps we should have all parameters and aggregators put
         // together in a single aggregating object
 
         // if the timer has not yet been started, then start it
-        startTime = new GregorianCalendar();
+        startTime = Instant.now();
 
         //instantiate aggregators
         actionAggregator = new HashMap<>();
@@ -481,7 +483,7 @@ public class LogAnalyser {
         // of the log file are sequential, but can we assume the files are
         // provided in a data sequence?
         for (i = 0; i < logFiles.length; i++) {
-            // check to see if this file is a log file agains the global regex
+            // check to see if this file is a log file against the global regex
             Matcher matchRegex = logRegex.matcher(logFiles[i].getName());
             if (matchRegex.matches()) {
                 // if it is a log file, open it up and lets have a look at the
@@ -616,8 +618,6 @@ public class LogAnalyser {
         }
 
         // now do the host name and url lookup
-        ConfigurationService configurationService
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
         hostName = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
         name = configurationService.getProperty("dspace.name").trim();
         url = configurationService.getProperty("dspace.ui.url").trim();
@@ -656,10 +656,8 @@ public class LogAnalyser {
      */
     public static void setParameters(String myLogDir, String myFileTemplate,
                                      String myConfigFile, String myOutFile,
-                                     Date myStartDate, Date myEndDate,
+                                     LocalDate myStartDate, LocalDate myEndDate,
                                      boolean myLookUp) {
-        ConfigurationService configurationService
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         if (myLogDir != null) {
             logDir = myLogDir;
@@ -673,17 +671,14 @@ public class LogAnalyser {
 
         if (myConfigFile != null) {
             configFile = myConfigFile;
-        } else {
-            configFile = configurationService.getProperty("dspace.dir")
-                    + File.separator + "config" + File.separator + "dstat.cfg";
         }
 
         if (myStartDate != null) {
-            startDate = new Date(myStartDate.getTime());
+            startDate = myStartDate;
         }
 
         if (myEndDate != null) {
-            endDate = new Date(myEndDate.getTime());
+            endDate = myEndDate;
         }
 
         if (myOutFile != null) {
@@ -725,18 +720,17 @@ public class LogAnalyser {
         summary.append("service_name=").append(name).append("\n");
 
         // output the date information if necessary
-        SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy");
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy");
         if (startDate != null) {
-            summary.append("start_date=").append(sdf.format(startDate)).append("\n");
+            summary.append("start_date=").append(formatter.format(startDate)).append("\n");
         } else if (logStartDate != null) {
-            summary.append("start_date=").append(sdf.format(logStartDate)).append("\n");
+            summary.append("start_date=").append(formatter.format(logStartDate)).append("\n");
         }
 
         if (endDate != null) {
-            summary.append("end_date=").append(sdf.format(endDate)).append("\n");
+            summary.append("end_date=").append(formatter.format(endDate)).append("\n");
         } else if (logEndDate != null) {
-            summary.append("end_date=").append(sdf.format(logEndDate)).append("\n");
+            summary.append("end_date=").append(formatter.format(logEndDate)).append("\n");
         }
 
         // write out the archive stats
@@ -816,8 +810,7 @@ public class LogAnalyser {
         }
 
         // insert the analysis processing time information
-        Calendar endTime = new GregorianCalendar();
-        long timeInMillis = (endTime.getTimeInMillis() - startTime.getTimeInMillis());
+        long timeInMillis = Instant.now().toEpochMilli() - startTime.toEpochMilli();
         summary.append("analysis_process_time=")
                 .append(Long.toString(timeInMillis / 1000)).append("\n");
 
@@ -1075,13 +1068,13 @@ public class LogAnalyser {
      * @return a date object containing the date, with the time set to
      * 00:00:00
      */
-    public static Date parseDate(String date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy'-'MM'-'dd");
-        Date parsedDate = null;
+    public static LocalDate parseDate(String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate parsedDate = null;
 
         try {
-            parsedDate = sdf.parse(date);
-        } catch (ParseException e) {
+            parsedDate = LocalDate.parse(date, formatter);
+        } catch (DateTimeParseException e) {
             System.out.println("The date is not in the correct format");
             System.exit(0);
         }
@@ -1095,11 +1088,8 @@ public class LogAnalyser {
      * @param date the date to be converted
      * @return A string of the form YYYY-MM-DD
      */
-    public static String unParseDate(Date date) {
-        // Use SimpleDateFormat
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy'-'MM'-'dd'T'hh:mm:ss'Z'");
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return sdf.format(date);
+    public static String unParseDate(LocalDate date) {
+        return DateTimeFormatter.ISO_LOCAL_DATE.format(date);
     }
 
 

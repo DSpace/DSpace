@@ -15,8 +15,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.el.MethodNotFoundException;
 
+import jakarta.el.MethodNotFoundException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -28,6 +28,9 @@ import org.dspace.importer.external.datacite.DataCiteImportMetadataSourceService
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import org.dspace.kernel.ServiceManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -44,8 +47,15 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
     @Autowired
     private LiveImportClientImpl liveImportClientImpl;
 
-    @Autowired
+    //@Autowired
     private DataCiteImportMetadataSourceServiceImpl dataCiteServiceImpl;
+
+    @Before
+    public void setup() throws Exception {
+        ServiceManager serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
+        dataCiteServiceImpl = serviceManager.getServiceByName("DataCiteImportService",
+            DataCiteImportMetadataSourceServiceImpl.class);
+    }
 
     @Test
     public void dataCiteImportMetadataGetRecordsTest() throws Exception {
@@ -146,4 +156,23 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
         return records;
     }
 
+    @Test
+    public void dataCiteImportMetadataNoResultsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        try (InputStream dataciteResp = getClass().getResourceAsStream("dataCite-noResults.json")) {
+            String dataciteTextResp = IOUtils.toString(dataciteResp, Charset.defaultCharset());
+            liveImportClientImpl.setHttpClient(httpClient);
+            CloseableHttpResponse response = mockResponse(dataciteTextResp, 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
+            context.restoreAuthSystemState();
+            int tot = dataCiteServiceImpl.getRecordsCount("nocontent");
+            assertEquals(0, tot);
+            Collection<ImportRecord> importRecords  = dataCiteServiceImpl.getRecords("nocontent", 0 , -1);
+            assertEquals(0, importRecords.size());
+        } finally {
+            liveImportClientImpl.setHttpClient(originalHttpClient);
+        }
+    }
 }

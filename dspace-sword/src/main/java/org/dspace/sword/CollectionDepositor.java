@@ -138,7 +138,7 @@ public class CollectionDepositor extends Depositor {
         DepositResult result = si.ingest(swordService, deposit, collection);
         swordService.message("Archive ingest completed successfully");
 
-        // if there's an item availalble, and we want to keep the original
+        // if there's an item available, and we want to keep the original
         // then do that
         try {
             if (swordConfig.isKeepOriginal()) {
@@ -150,11 +150,7 @@ public class CollectionDepositor extends Depositor {
                 // for a moment
                 context.turnOffAuthorisationSystem();
 
-                String bundleName = configurationService.getProperty(
-                    "sword-server", "bundle.name");
-                if (bundleName == null || "".equals(bundleName)) {
-                    bundleName = "SWORD";
-                }
+                String bundleName = configurationService.getProperty("sword-server.bundle.name", "SWORD");
                 Item item = result.getItem();
                 List<Bundle> bundles = item.getBundles();
                 Bundle swordBundle = null;

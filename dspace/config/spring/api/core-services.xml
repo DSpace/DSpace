@@ -31,6 +31,9 @@
     <bean class="org.dspace.authority.AuthorityValueServiceImpl"/>
     <bean class="org.dspace.authority.AuthorityServiceImpl"/>
 
+    <bean class="org.dspace.browse.ItemCounter"/>
+    <bean id="itemCountDAO" class="org.dspace.browse.ItemCountDAOSolr" scope="prototype"/>
+
     <bean class="org.dspace.checker.ChecksumHistoryServiceImpl"/>
     <bean class="org.dspace.checker.ChecksumResultServiceImpl"/>
     <bean class="org.dspace.checker.MostRecentChecksumServiceImpl"/>
@@ -55,6 +58,7 @@
     <bean class="org.dspace.content.RelationshipTypeServiceImpl"/>
     <bean class="org.dspace.content.RelationshipMetadataServiceImpl"/>
     <bean class="org.dspace.content.FeedbackServiceImpl"/>
+    <bean class="org.dspace.content.DuplicateDetectionServiceImpl"/>
 
     <bean class="org.dspace.scripts.ProcessServiceImpl"/>
     <bean class="org.dspace.scripts.ScriptServiceImpl"/>
@@ -77,6 +81,8 @@
         <constructor-arg name='configPrefix' value='solr'/>
     </bean>
 
+    <bean class="org.dspace.contentreport.ContentReportServiceImpl"/>
+
     <!-- Ensure PluginService is initialized properly via init() method -->
     <bean class="org.dspace.core.LegacyPluginServiceImpl" init-method="init"/>
     <bean class="org.dspace.core.LicenseServiceImpl"/>
@@ -92,6 +98,7 @@
     <bean class='org.dspace.curate.XmlWorkflowCuratorServiceImpl'/>
 
     <bean class="org.dspace.disseminate.CitationDocumentServiceImpl"/>
+    <bean class="org.dspace.disseminate.CoverPageService"/>
 
     <!-- Ensure EmbargoService and AccessStatusService are initialized properly via init() method -->
     <bean class="org.dspace.embargo.EmbargoServiceImpl" init-method="init"/>
@@ -101,8 +108,12 @@
     <bean class="org.dspace.eperson.EPersonServiceImpl"/>
     <bean class="org.dspace.eperson.GroupServiceImpl"/>
     <bean class="org.dspace.eperson.RegistrationDataServiceImpl"/>
+    <bean class="org.dspace.eperson.RegistrationDataMetadataServiceImpl"/>
     <bean class="org.dspace.eperson.SubscribeServiceImpl"/>
-    <bean class="org.dspace.eperson.CaptchaServiceImpl"/>
+    <!-- Use CaptchaServiceImpl for Google ReCaptcha -->
+    <bean class="org.dspace.eperson.CaptchaServiceImpl" id="googleCaptchaService"/>
+    <!-- Use AltchaCaptchaServiceImpl for ALTCHA captcha -->
+    <bean class="org.dspace.eperson.AltchaCaptchaServiceImpl" id="altchaCaptchaService"/>
     <bean class="org.dspace.event.EventServiceImpl"/>
 
     <bean class="org.dspace.handle.HandleServiceImpl"/>
@@ -142,6 +153,7 @@
     <bean class="org.dspace.discovery.indexobject.WorkflowItemIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.WorkspaceItemIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.MetadataFieldIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.LDNMessageEntityIndexFactoryImpl" autowire-candidate="true"/>
 
     <!-- OIDC Authentication -->
     <bean class="org.dspace.authenticate.OidcAuthenticationBean" id="oidcAuthentication"/>
@@ -151,6 +163,13 @@
     <bean class="org.dspace.authorize.RegexPasswordValidator" />
 
     <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
+
+    <bean class="org.dspace.content.ItemFilterServiceImpl"/>
+    
+    <!-- Submission Config Service -->
+    <bean class="org.dspace.submit.service.SubmissionConfigServiceImpl"/>
+
+    <bean class="org.dspace.correctiontype.service.impl.CorrectionTypeServiceImpl"/>
 
 </beans>
 

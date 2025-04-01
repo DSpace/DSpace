@@ -17,6 +17,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -69,7 +70,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
 
         // load curation tasks
         if (curationClientOptions == CurationClientOptions.TASK) {
-            long start = System.currentTimeMillis();
+            long start = Instant.now().toEpochMilli();
             handleCurationTask(curator);
             this.endScript(start);
         }
@@ -144,7 +145,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
      */
     private long runQueue(TaskQueue queue, Curator curator) throws SQLException, AuthorizeException, IOException {
         // use current time as our reader 'ticket'
-        long ticket = System.currentTimeMillis();
+        long ticket = Instant.now().toEpochMilli();
         Iterator<TaskQueueEntry> entryIter = queue.dequeue(this.queue, ticket).iterator();
         while (entryIter.hasNext()) {
             TaskQueueEntry entry = entryIter.next();
@@ -152,17 +153,10 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
                 super.handler.logInfo("Curating id: " + entry.getObjectId());
             }
             curator.clear();
-            // does entry relate to a DSO or workflow object?
-            if (entry.getObjectId().indexOf('/') > 0) {
-                for (String taskName : entry.getTaskNames()) {
-                    curator.addTask(taskName);
-                }
-                curator.curate(context, entry.getObjectId());
-            } else {
-                // TODO: Remove this exception once curation tasks are supported by configurable workflow
-                // e.g. see https://github.com/DSpace/DSpace/pull/3157
-                throw new IllegalArgumentException("curation for workflow items is no longer supported");
+            for (String taskName : entry.getTaskNames()) {
+                curator.addTask(taskName);
             }
+            curator.curate(context, entry.getObjectId());
         }
         queue.release(this.queue, ticket, true);
         return ticket;
@@ -172,12 +166,12 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
      * End of curation script; logs script time if -v verbose is set
      *
      * @param timeRun Time script was started
-     * @throws SQLException If DSpace contextx can't complete
+     * @throws SQLException If DSpace context can't complete
      */
     private void endScript(long timeRun) throws SQLException {
         context.complete();
         if (verbose) {
-            long elapsed = System.currentTimeMillis() - timeRun;
+            long elapsed = Instant.now().toEpochMilli() - timeRun;
             this.handler.logInfo("Ending curation. Elapsed time: " + elapsed);
         }
     }
@@ -192,7 +186,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         Curator curator = new Curator(handler);
         OutputStream reporterStream;
         if (null == this.reporter) {
-            reporterStream = new NullOutputStream();
+            reporterStream = NullOutputStream.NULL_OUTPUT_STREAM;
         } else if ("-".equals(this.reporter)) {
             reporterStream = System.out;
         } else {
@@ -307,9 +301,17 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         // scope
         if (this.commandLine.getOptionValue('s') != null) {
             this.scope = this.commandLine.getOptionValue('s');
-            if (this.scope != null && Curator.TxScope.valueOf(this.scope.toUpperCase()) == null) {
-                this.handler.logError("Bad transaction scope '" + this.scope + "': only 'object', 'curation' or " +
-                                      "'open' recognized");
+            boolean knownScope;
+            try {
+                Curator.TxScope.valueOf(this.scope.toUpperCase());
+                knownScope = true;
+            } catch (IllegalArgumentException | NullPointerException e) {
+                knownScope = false;
+            }
+            if (!knownScope) {
+                this.handler.logError("Bad transaction scope '"
+                        + this.scope
+                        + "': only 'object', 'curation' or 'open' recognized");
                 throw new IllegalArgumentException(
                     "Bad transaction scope '" + this.scope + "': only 'object', 'curation' or " +
                     "'open' recognized");

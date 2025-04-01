@@ -9,8 +9,8 @@ package org.dspace.app.rest.repository.handler;
 
 import java.sql.SQLException;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -73,7 +73,7 @@ public class ExternalSourceEntryArchivedItemUriListHandler extends ExternalSourc
             WorkspaceItem workspaceItem = super.createWorkspaceItem(context, request, uriList);
             return installItemService.installItem(context, workspaceItem);
         } catch (AuthorizeException | SQLException e) {
-            log.error("An error occured when trying to create item in collection with uuid: " + owningCollectionUuid,
+            log.error("An error occurred when trying to create item in collection with uuid: " + owningCollectionUuid,
                       e);
             throw e;
         }

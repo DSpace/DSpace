@@ -19,8 +19,8 @@ import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -241,7 +241,7 @@ public class DOIIdentifierProviderTest
         Random random = new Random();
         if (null == doi) {
             doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR
-                + Long.toHexString(new Date().getTime()) + "-"
+                + Long.toHexString(Instant.now().toEpochMilli()) + "-"
                 + random.nextInt(997);
         }
 
@@ -310,7 +310,7 @@ public class DOIIdentifierProviderTest
         WorkflowException {
         Item item = newItem();
         String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR
-            + Long.toHexString(new Date().getTime());
+            + Long.toHexString(Instant.now().toEpochMilli());
         context.turnOffAuthorisationSystem();
         provider.saveDOIToObject(context, item, doi);
         context.restoreAuthSystemState();
@@ -334,7 +334,7 @@ public class DOIIdentifierProviderTest
         WorkflowException {
         Item item = newItem();
         String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR
-            + Long.toHexString(new Date().getTime());
+            + Long.toHexString(Instant.now().toEpochMilli());
 
         context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, item, DOIIdentifierProvider.MD_SCHEMA,
@@ -355,7 +355,7 @@ public class DOIIdentifierProviderTest
         IllegalAccessException {
         Item item = newItem();
         String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR
-            + Long.toHexString(new Date().getTime());
+            + Long.toHexString(Instant.now().toEpochMilli());
 
         context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, item, DOIIdentifierProvider.MD_SCHEMA,
@@ -566,7 +566,7 @@ public class DOIIdentifierProviderTest
 
     /**
      * Test minting a DOI with a filter that always returns true and therefore allows the DOI to be minted
-     * (this should have hte same results as base testMint_DOI, but here we use an explicit filter rather than null)
+     * (this should have the same results as base testMint_DOI, but here we use an explicit filter rather than null)
      */
     @Test
     public void testMint_DOI_withMatchingFilter()
@@ -617,7 +617,7 @@ public class DOIIdentifierProviderTest
         DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow);
 
-        assertTrue("Reservation of DOI did not set the corret DOI status.",
+        assertTrue("Reservation of DOI did not set the correct DOI status.",
                    DOIIdentifierProvider.TO_BE_RESERVED.equals(doiRow.getStatus()));
     }
 
@@ -633,7 +633,7 @@ public class DOIIdentifierProviderTest
         DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow);
 
-        assertTrue("Registration of DOI did not set the corret DOI status.",
+        assertTrue("Registration of DOI did not set the correct DOI status.",
                    DOIIdentifierProvider.TO_BE_REGISTERED.equals(doiRow.getStatus()));
     }
 
@@ -649,7 +649,7 @@ public class DOIIdentifierProviderTest
         DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow);
 
-        assertTrue("Registration of DOI did not set the corret DOI status.",
+        assertTrue("Registration of DOI did not set the correct DOI status.",
                    DOIIdentifierProvider.TO_BE_REGISTERED.equals(doiRow.getStatus()));
     }
 
@@ -672,7 +672,7 @@ public class DOIIdentifierProviderTest
         DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
         assertNotNull("Created DOI was not stored in database.", doiRow);
 
-        assertTrue("Registration of DOI did not set the corret DOI status.",
+        assertTrue("Registration of DOI did not set the correct DOI status.",
                    DOIIdentifierProvider.TO_BE_REGISTERED.equals(doiRow.getStatus()));
     }
 

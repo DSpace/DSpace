@@ -13,11 +13,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.el.MethodNotFoundException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.el.MethodNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Implements a data source for querying Datacite
  * Mainly copied from CrossRefImportMetadataSourceServiceImpl.
  *
- * optional Affiliation informations are not part of the API request.
+ * optional Affiliation information are not part of the API request.
  * https://support.datacite.org/docs/can-i-see-more-detailed-affiliation-information-in-the-rest-api
  *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
@@ -52,6 +52,16 @@ public class DataCiteImportMetadataSourceServiceImpl
 
     @Autowired
     private ConfigurationService configurationService;
+
+    private String entityFilterQuery;
+
+    public String getEntityFilterQuery() {
+        return entityFilterQuery;
+    }
+
+    public void setEntityFilterQuery(String entityFilterQuery) {
+        this.entityFilterQuery = entityFilterQuery;
+    }
 
     @Override
     public String getImportSource() {
@@ -73,8 +83,35 @@ public class DataCiteImportMetadataSourceServiceImpl
 
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
-        Collection<ImportRecord> records = getRecords(query, 0, -1);
-        return records == null ? 0 : records.size();
+        String id = getID(query);
+        Map<String, Map<String, String>> params = new HashMap<>();
+        Map<String, String> uriParameters = new HashMap<>();
+        params.put("uriParameters", uriParameters);
+        if (StringUtils.isBlank(id)) {
+            id = query;
+        }
+        if (StringUtils.isNotBlank(getEntityFilterQuery())) {
+            id = id + " " + getEntityFilterQuery();
+        }
+        uriParameters.put("query", id);
+        uriParameters.put("page[size]", "1");
+        int timeoutMs = configurationService.getIntProperty("datacite.timeout", 180000);
+        String url = configurationService.getProperty("datacite.url", "https://api.datacite.org/dois/");
+        String responseString = liveImportClient.executeHttpGetRequest(timeoutMs, url, params);
+        JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
+        if (jsonNode == null) {
+            log.warn("DataCite returned invalid JSON");
+            throw new MetadataSourceException("Could not read datacite source");
+        }
+        JsonNode dataNode = jsonNode.at("/meta/total");
+        if (dataNode != null) {
+            try {
+                return Integer.valueOf(dataNode.toString());
+            } catch (Exception e) {
+                log.debug("Could not read integer value" + dataNode.toString());
+            }
+        }
+        return 0;
     }
 
     @Override
@@ -94,7 +131,21 @@ public class DataCiteImportMetadataSourceServiceImpl
         if (StringUtils.isBlank(id)) {
             id = query;
         }
+        if (StringUtils.isNotBlank(getEntityFilterQuery())) {
+            id = id + " " + getEntityFilterQuery();
+        }
         uriParameters.put("query", id);
+        // start = current dspace page / datacite page number starting with 1
+        // dspace rounds up/down to the next configured pagination settings.
+        if (start > 0 && count > 0) {
+            uriParameters.put("page[number]", Integer.toString((start / count) + 1));
+        }
+
+        // count = dspace page size /  default datacite page size is currently 25 https://support.datacite.org/docs/pagination
+        if (count > 0) {
+            uriParameters.put("page[size]", Integer.toString(count));
+        }
+
         int timeoutMs = configurationService.getIntProperty("datacite.timeout", 180000);
         String url = configurationService.getProperty("datacite.url", "https://api.datacite.org/dois/");
         String responseString = liveImportClient.executeHttpGetRequest(timeoutMs, url, params);
@@ -108,12 +159,16 @@ public class DataCiteImportMetadataSourceServiceImpl
             Iterator<JsonNode> iterator = dataNode.iterator();
             while (iterator.hasNext()) {
                 JsonNode singleDoiNode = iterator.next();
-                String json = singleDoiNode.at("/attributes").toString();
-                records.add(transformSourceRecords(json));
+                JsonNode singleDoiNodeAttribute = singleDoiNode.at("/attributes");
+                if (!singleDoiNodeAttribute.isMissingNode()) {
+                    records.add(transformSourceRecords(singleDoiNodeAttribute.toString()));
+                }
             }
         } else {
-            String json = dataNode.at("/attributes").toString();
-            records.add(transformSourceRecords(json));
+            JsonNode singleDoiNodeAttribute = dataNode.at("/attributes");
+            if (!singleDoiNodeAttribute.isMissingNode()) {
+                records.add(transformSourceRecords(singleDoiNodeAttribute.toString()));
+            }
         }
 
         return records;

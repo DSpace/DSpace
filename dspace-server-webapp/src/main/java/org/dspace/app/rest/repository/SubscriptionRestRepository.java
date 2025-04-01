@@ -20,11 +20,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.DiscoverableEndpointsService;
@@ -61,7 +61,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
-@Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.NAME)
+@Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.PLURAL_NAME)
 public class SubscriptionRestRepository extends DSpaceRestRepository<SubscriptionRest, Integer>
                                          implements InitializingBean {
 
@@ -79,6 +79,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     private DiscoverableEndpointsService discoverableEndpointsService;
     @Autowired
     private SubscriptionEmailNotificationService subscriptionEmailNotificationService;
+    @Autowired
+    private ObjectMapper mapper;
 
     @Override
     @PreAuthorize("hasPermission(#id, 'subscription', 'READ')")
@@ -154,7 +156,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         String dsoId = req.getParameter("resource");
 
         if (StringUtils.isBlank(dsoId) || StringUtils.isBlank(epersonId)) {
-            throw new UnprocessableEntityException("Both eperson than DSpaceObject uuids must be provieded!");
+            throw new UnprocessableEntityException("Both eperson than DSpaceObject uuids must be provided!");
         }
 
         try {
@@ -180,7 +182,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             if (dSpaceObject.getType() == COMMUNITY || dSpaceObject.getType() == COLLECTION) {
                 Subscription subscription = null;
                 ServletInputStream input = req.getInputStream();
-                SubscriptionRest subscriptionRest = new ObjectMapper().readValue(input, SubscriptionRest.class);
+                SubscriptionRest subscriptionRest = mapper.readValue(input, SubscriptionRest.class);
                 List<SubscriptionParameterRest> subscriptionParameterList = subscriptionRest
                         .getSubscriptionParameterList();
                 if (CollectionUtils.isNotEmpty(subscriptionParameterList)) {
@@ -232,7 +234,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
 
         SubscriptionRest subscriptionRest;
         try {
-            subscriptionRest = new ObjectMapper().readValue(jsonNode.toString(), SubscriptionRest.class);
+            subscriptionRest = mapper.readValue(jsonNode.toString(), SubscriptionRest.class);
         } catch (IOException e) {
             throw new UnprocessableEntityException("Error parsing subscription json: " + e.getMessage(), e);
         }
@@ -278,7 +280,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     @Override
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService.register(this, Arrays.asList(Link.of("/api/" + SubscriptionRest.CATEGORY +
-                       "/" + SubscriptionRest.NAME_PLURAL + "/search", SubscriptionRest.NAME_PLURAL + "-search")));
+                       "/" + SubscriptionRest.PLURAL_NAME + "/search", SubscriptionRest.PLURAL_NAME + "-search")));
     }
 
 }

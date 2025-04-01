@@ -3,21 +3,16 @@
     <groupId>org.dspace.modules</groupId>
     <artifactId>server</artifactId>
     <packaging>war</packaging>
-    <name>DSpace Server Webapp:: Local Customizations</name>
-    <description>Overlay customizations.
-This is probably a temporary solution to the build problems. We like to investigate about
-the possibility to remove the overlays enable a more flexible extension mechanism.
-The use of web-fragment and spring mvc technology allow us to add request handlers
-just adding new jar in the classloader</description>
-
+    <name>DSpace Server Webapp:: Tomcat deployable WAR</name>
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.6</version>
+        <version>9.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <properties>
+        <dspace.version>8.0-SNAPSHOT</dspace.version>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/../../..</root.basedir>
     </properties>
@@ -32,7 +27,7 @@ just adding new jar in the classloader</description>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack</id>
+                        <id>unpack-additions</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>unpack-dependencies</goal>
@@ -47,6 +42,20 @@ just adding new jar in the classloader</description>
                             <excludes>META-INF/**</excludes>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>unpack-server</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>runtime</includeScope>
+                            <includeGroupIds>org.dspace</includeGroupIds>
+                            <includeArtifactIds>dspace-server-webapp</includeArtifactIds>
+                            <includes>**/static/**,**/*.properties</includes>
+                            <outputDirectory>${project.build.directory}/additions</outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -54,6 +63,7 @@ just adding new jar in the classloader</description>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <archiveClasses>false</archiveClasses>
+                    <attachClasses>true</attachClasses>
                     <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <!-- Copy any 'additions' (see m-dependency-p above) into WEB-INF/classes.
@@ -155,7 +165,7 @@ just adding new jar in the classloader</description>
                                 <!-- Specify the dspace.dir to use for test environment -->
                                 <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
                                 <!-- This system property is loaded by AbstractDSpaceTest to initialize the test environment -->
-                                <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
+                                <dspace.dir>${agnostic.build.dir}/testing/dspace</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
                                 <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
@@ -224,7 +234,7 @@ just adding new jar in the classloader</description>
                             <systemPropertyVariables>
                                 <!-- Specify the dspace.dir to use for test environment -->
                                 <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
-                                <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
+                                <dspace.dir>${agnostic.build.dir}/testing/dspace</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
                                 <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
@@ -255,17 +265,12 @@ just adding new jar in the classloader</description>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-server-webapp</artifactId>
-            <classifier>classes</classifier>
         </dependency>
         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-server-webapp</artifactId>
-            <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
-            <version>${solr.client.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+            <version>${spring-boot.version}</version>
         </dependency>
 
         <!-- Test Dependencies -->
@@ -320,10 +325,24 @@ just adding new jar in the classloader</description>
             <artifactId>solr-core</artifactId>
             <version>${solr.client.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <!-- Later version provided by Hibernate -->
+                <exclusion>
+                    <groupId>org.antlr</groupId>
+                    <artifactId>antlr4-runtime</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-icu</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Include hamcrest exparity for date matcher in overlay tests -->
+        <dependency>
+            <groupId>org.exparity</groupId>
+            <artifactId>hamcrest-date</artifactId>
+            <version>2.0.8</version>
             <scope>test</scope>
         </dependency>
 

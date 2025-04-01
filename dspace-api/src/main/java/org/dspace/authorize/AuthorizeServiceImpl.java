@@ -11,9 +11,9 @@ import static org.dspace.app.util.AuthorizeUtil.canCollectionAdminManageAccounts
 import static org.dspace.app.util.AuthorizeUtil.canCommunityAdminManageAccounts;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -451,7 +451,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         if (e == null) {
             return false; // anonymous users can't be admins....
         } else {
-            return groupService.isMember(c, e, Group.ADMIN);
+            return groupService.isMember(c, e, c.getAdminGroup());
         }
     }
 
@@ -550,13 +550,11 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         List<ResourcePolicy> newPolicies = new ArrayList<>(policies.size());
 
         for (ResourcePolicy srp : policies) {
-            ResourcePolicy rp = resourcePolicyService.create(c);
+            ResourcePolicy rp = resourcePolicyService.create(c, srp.getEPerson(), srp.getGroup());
 
             // copy over values
             rp.setdSpaceObject(dest);
             rp.setAction(srp.getAction());
-            rp.setEPerson(srp.getEPerson());
-            rp.setGroup(srp.getGroup());
             rp.setStartDate(srp.getStartDate());
             rp.setEndDate(srp.getEndDate());
             rp.setRpName(srp.getRpName());
@@ -664,17 +662,16 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson,
                                                int type, String rpType, String rpName, String rpDescription,
-                                               Date startDate, Date endDate) throws SQLException, AuthorizeException {
+                                               LocalDate startDate, LocalDate endDate)
+        throws SQLException, AuthorizeException {
         if (group == null && eperson == null) {
             throw new IllegalArgumentException(
                 "We need at least an eperson or a group in order to create a resource policy.");
         }
 
-        ResourcePolicy myPolicy = resourcePolicyService.create(context);
+        ResourcePolicy myPolicy = resourcePolicyService.create(context, eperson, group);
         myPolicy.setdSpaceObject(dso);
         myPolicy.setAction(type);
-        myPolicy.setGroup(group);
-        myPolicy.setEPerson(eperson);
         myPolicy.setRpType(rpType);
         myPolicy.setRpName(rpName);
         myPolicy.setRpDescription(rpDescription);
@@ -688,7 +685,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public ResourcePolicy createOrModifyPolicy(ResourcePolicy policy, Context context, String name, Group group,
                                                EPerson ePerson,
-                                               Date embargoDate, int action, String reason, DSpaceObject dso)
+                                               LocalDate embargoDate, int action, String reason, DSpaceObject dso)
         throws AuthorizeException, SQLException {
         ResourcePolicy policyTemp = null;
         if (policy != null) {
@@ -697,7 +694,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             if (!duplicates.isEmpty()) {
                 policy = duplicates.get(0);
             }
-        } else {
+        } else if (group != null) {
             // if an identical policy (same Action and same Group) is already in place modify it...
             policyTemp = findByTypeGroupAction(context, dso, group, action);
         }
@@ -895,7 +892,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                 return true;
             }
         } catch (SearchServiceException e) {
-            log.error("Failed getting getting community/collection admin status for "
+            log.error("Failed getting community/collection admin status for "
                 + context.getCurrentUser().getEmail() + " The search error is: " + e.getMessage()
                 + " The search resourceType filter was: " + query);
         }

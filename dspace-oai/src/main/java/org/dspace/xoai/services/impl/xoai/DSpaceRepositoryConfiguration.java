@@ -11,14 +11,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
 import com.lyncode.xoai.dataprovider.core.DeleteMethod;
 import com.lyncode.xoai.dataprovider.core.Granularity;
 import com.lyncode.xoai.dataprovider.services.api.RepositoryConfiguration;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -101,16 +101,16 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration {
     }
 
     @Override
-    public Date getEarliestDate() {
+    public java.util.Date getEarliestDate() {
         // Look at the database!
         try {
-            return dateResolver.getEarliestDate(context);
+            return java.util.Date.from(dateResolver.getEarliestDate(context));
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         } catch (InvalidMetadataFieldException e) {
             log.error(e.getMessage(), e);
         }
-        return new Date();
+        return java.util.Date.from(Instant.now());
     }
 
     @Override

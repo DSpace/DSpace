@@ -13,8 +13,8 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
+import jakarta.annotation.Nullable;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -235,4 +235,14 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      */
     @Nullable
     Long getLastModified(Bitstream bitstream) throws IOException;
+
+    /**
+     * Checks if the given bitstream is inside one of the bundle
+     *
+     * @param bitstream bitstream to verify
+     * @param bundleNames names of the bundles to serch for
+     * @return true if is in one of the bundles, false otherwise
+     * @throws SQLException
+     */
+    boolean isInBundle(Bitstream bitstream, java.util.Collection<String> bundleNames) throws SQLException;
 }

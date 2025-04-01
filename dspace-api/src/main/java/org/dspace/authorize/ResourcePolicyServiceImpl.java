@@ -8,8 +8,8 @@
 package org.dspace.authorize;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -71,14 +71,22 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
      * Create a new ResourcePolicy
      *
      * @param context DSpace context object
+     * @param ePerson
+     * @param group
      * @return ResourcePolicy
      * @throws SQLException if database error
      */
     @Override
-    public ResourcePolicy create(Context context) throws SQLException {
+    public ResourcePolicy create(Context context, EPerson ePerson, Group group) throws SQLException {
         // FIXME: Check authorisation
         // Create a table row
-        ResourcePolicy resourcePolicy = resourcePolicyDAO.create(context, new ResourcePolicy());
+        ResourcePolicy policyToBeCreated = new ResourcePolicy();
+        if (ePerson == null && group == null) {
+            throw new IllegalArgumentException("A resource policy must contain a valid eperson or group");
+        }
+        policyToBeCreated.setEPerson(ePerson);
+        policyToBeCreated.setGroup(group);
+        ResourcePolicy resourcePolicy = resourcePolicyDAO.create(context, policyToBeCreated);
         return resourcePolicy;
     }
 
@@ -175,8 +183,8 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
      */
     @Override
     public boolean isDateValid(ResourcePolicy resourcePolicy) {
-        Date sd = resourcePolicy.getStartDate();
-        Date ed = resourcePolicy.getEndDate();
+        LocalDate sd = resourcePolicy.getStartDate();
+        LocalDate ed = resourcePolicy.getEndDate();
 
         // if no dates set, return true (most common case)
         if ((sd == null) && (ed == null)) {
@@ -184,16 +192,16 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
         }
 
         // one is set, now need to do some date math
-        Date now = new Date();
+        LocalDate now = LocalDate.now();
 
         // check start date first
-        if (sd != null && now.before(sd)) {
+        if (sd != null && now.isBefore(sd)) {
             // start date is set, return false if we're before it
             return false;
         }
 
         // now expiration date
-        if (ed != null && now.after(ed)) {
+        if (ed != null && now.isAfter(ed)) {
             // end date is set, return false if we're after it
             return false;
         }
@@ -205,13 +213,11 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     @Override
     public ResourcePolicy clone(Context context, ResourcePolicy resourcePolicy)
         throws SQLException, AuthorizeException {
-        ResourcePolicy clone = create(context);
-        clone.setGroup(resourcePolicy.getGroup());
-        clone.setEPerson(resourcePolicy.getEPerson());
-        clone.setStartDate((Date) ObjectUtils.clone(resourcePolicy.getStartDate()));
-        clone.setEndDate((Date) ObjectUtils.clone(resourcePolicy.getEndDate()));
-        clone.setRpType((String) ObjectUtils.clone(resourcePolicy.getRpType()));
-        clone.setRpDescription((String) ObjectUtils.clone(resourcePolicy.getRpDescription()));
+        ResourcePolicy clone = create(context, resourcePolicy.getEPerson(), resourcePolicy.getGroup());
+        clone.setStartDate(ObjectUtils.clone(resourcePolicy.getStartDate()));
+        clone.setEndDate(ObjectUtils.clone(resourcePolicy.getEndDate()));
+        clone.setRpType(ObjectUtils.clone(resourcePolicy.getRpType()));
+        clone.setRpDescription(ObjectUtils.clone(resourcePolicy.getRpDescription()));
         update(context, clone);
         return clone;
     }
@@ -411,7 +417,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
         ResourcePolicy resourcePolicy = resourcePolicyDAO.findOneById(context, id);
         Group group = resourcePolicy.getGroup();
 
-        if (resourcePolicy.getEPerson() != null && resourcePolicy.getEPerson().getID() == eperson.getID()) {
+        if (resourcePolicy.getEPerson() != null && resourcePolicy.getEPerson().getID().equals(eperson.getID())) {
             isMy = true;
         } else if (group != null && groupService.isMember(context, eperson, group)) {
             isMy = true;

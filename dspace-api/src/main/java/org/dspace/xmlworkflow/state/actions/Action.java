@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.MetadataSchemaEnum;
@@ -229,7 +229,7 @@ public abstract class Action {
      * Adds info in the metadata field dc.description.provenance about item being approved containing in which step
      * it was approved, which user approved it and the time
      *
-     * @param c   DSpace contect
+     * @param c   DSpace contact
      * @param wfi Workflow item we're adding workflow accept provenance on
      */
     public void addApprovedProvenance(Context c, XmlWorkflowItem wfi) throws SQLException, AuthorizeException {

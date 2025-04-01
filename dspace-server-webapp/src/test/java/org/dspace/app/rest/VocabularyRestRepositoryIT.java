@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -92,6 +92,11 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         // the properties that we're altering above and this is only used within the tests
         DCInputAuthority.reset();
         pluginService.clearNamedPluginClasses();
+
+        // The following line is needed to call init() method in the ChoiceAuthorityServiceImpl class, without it
+        // the `submissionConfigService` will be null what will cause a NPE in the clearCache() method
+        // https://github.com/DSpace/DSpace/issues/9292
+        cas.getChoiceAuthoritiesNames();
         cas.clearCache();
 
         context.turnOffAuthorisationSystem();
@@ -104,8 +109,8 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         person1.setFirstName("Seiko");
         person1.setValue("Shirasaka, Seiko");
         person1.setField("dc_contributor_author");
-        person1.setLastModified(new Date());
-        person1.setCreationDate(new Date());
+        person1.setLastModified(Instant.now());
+        person1.setCreationDate(Instant.now());
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().indexContent(person1);
 
         PersonAuthorityValue person2 = new PersonAuthorityValue();
@@ -114,8 +119,8 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         person2.setFirstName("Tyler E");
         person2.setValue("Miller, Tyler E");
         person2.setField("dc_contributor_author");
-        person2.setLastModified(new Date());
-        person2.setCreationDate(new Date());
+        person2.setLastModified(Instant.now());
+        person2.setCreationDate(Instant.now());
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().indexContent(person2);
 
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().commit();
@@ -392,6 +397,20 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                         .andExpect(jsonPath("$", is(
                             VocabularyMatcher.matchProperties("common_types", "common_types", true, false)
                         )));
+    }
+
+    @Test
+    public void findByMetadataAndCollectionWithMetadataWithoutVocabularyTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Test collection")
+            .build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/submission/vocabularies/search/byMetadataAndCollection")
+                .param("metadata", "dc.title")
+                .param("collection", collection.getID().toString()))
+                .andExpect(status().isNoContent());
     }
 
     @Test

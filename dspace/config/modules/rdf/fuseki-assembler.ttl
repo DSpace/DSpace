@@ -29,7 +29,7 @@
 ### Assembler initialization ###
 ################################
 # Declaration additional assembler items.
-[] ja:loadClass "com.hp.hpl.jena.tdb.TDB" .
+[] ja:loadClass "org.apache.jena.tdb.TDB" .
 
 # TDB
 tdb:DatasetTDB  rdfs:subClassOf  ja:RDFDataset .

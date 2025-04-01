@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Maria Verdonck (Atmire) on 11/12/2019
  */
-@Component(WorkflowDefinitionRest.CATEGORY + "." + WorkflowDefinitionRest.NAME)
+@Component(WorkflowDefinitionRest.CATEGORY + "." + WorkflowDefinitionRest.PLURAL_NAME)
 public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<WorkflowDefinitionRest, String> {
 
     @Autowired

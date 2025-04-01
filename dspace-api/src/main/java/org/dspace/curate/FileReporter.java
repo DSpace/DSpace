@@ -13,9 +13,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
@@ -41,9 +41,8 @@ public class FileReporter
     public FileReporter()
             throws IOException {
         // Calculate a unique(?) file name.
-        Date now = GregorianCalendar.getInstance().getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'hhmmssSSS");
-        String filename = String.format("curation-%s.report", sdf.format(now));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'hhmmssSSS");
+        String filename = String.format("curation-%s.report", formatter.format(LocalDateTime.now(ZoneOffset.UTC)));
 
         // Build a path to the directory which is to receive the file.
         ConfigurationService cfg = new DSpace().getConfigurationService();
