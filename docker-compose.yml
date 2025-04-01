@@ -85,13 +85,15 @@ services:
     - |
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
+      # UMD Customization
       java $${JPDA_OPTS} -jar /dspace/webapps/server-boot.jar --dspace.dir=/dspace
+      # End UMD Customization
   # DSpace PostgreSQL database container
   dspacedb:
     container_name: dspacedb
     # Uses a custom Postgres image with pgcrypto installed
     # UMD Customization
-    image: docker.lib.umd.edu/dspace-postgres:${DSPACE_VER:-latest}
+    image: docker.lib.umd.edu/dspace-postgres:${DSPACE_VER:-dspace-8_x}
     # End UMD Customization
     build:
       # Must build out of subdirectory to have access to install script for pgcrypto
@@ -119,7 +121,7 @@ services:
   # DSpace Solr container
   dspacesolr:
     container_name: dspacesolr
-    image: "${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-latest}"
+    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-dspace-8_x}"
     build:
       context: ./dspace/src/main/docker/dspace-solr/
       # Provide path to Solr configs necessary to build Docker image

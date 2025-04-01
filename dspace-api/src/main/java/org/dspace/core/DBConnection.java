@@ -124,28 +124,38 @@ public interface DBConnection<T> {
     public long getCacheSize() throws SQLException;
 
     /**
-     * Reload a DSpace object from the database. This will make sure the object
+     * Reload an entity from the database. This will make sure the object
      * is valid and stored in the cache.  The returned object should be used
      * henceforth instead of the passed object.
      *
-     * @param <E>    type of {@link entity}
-     * @param entity The DSpace object to reload
+     * @param <E>    type of entity.
+     * @param entity The entity to reload.
      * @return the reloaded entity.
-     * @throws java.sql.SQLException passed through.
+     * @throws SQLException passed through.
      */
     public <E extends ReloadableEntity> E reloadEntity(E entity) throws SQLException;
 
     /**
-     * Remove a DSpace object from the session cache when batch processing a
-     * large number of objects.
+     * Remove all entities from the session cache.
      *
-     * <p>Objects removed from cache are not saved in any way. Therefore, if you
-     * have modified an object, you should be sure to {@link commit()} changes
+     * <p>Entities removed from cache are not saved in any way. Therefore, if you
+     * have modified any entities, you should be sure to {@link #commit()} changes
      * before calling this method.
      *
-     * @param <E>    Type of {@link entity}
-     * @param entity The DSpace object to decache.
-     * @throws java.sql.SQLException passed through.
+     * @throws SQLException passed through.
+     */
+    public void uncacheEntities() throws SQLException;
+
+    /**
+     * Remove an entity from the session cache.
+     *
+     * <p>Entities removed from cache are not saved in any way. Therefore, if you
+     * have modified the entity, you should be sure to {@link #commit()} changes
+     * before calling this method.
+     *
+     * @param <E>    Type of entity.
+     * @param entity The entity to decache.
+     * @throws SQLException passed through.
      */
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException;
 

@@ -76,6 +76,31 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void metadataImportTestWithDuplicateHeader() {
+        String[] csv = {"id,collection,dc.title,dc.title,dc.contributor.author",
+            "+," + collection.getHandle() + ",\"Test Import 1\",\"Test Import 2\"," + "\"Donald, SmithImported\"," +
+            "+," + collection.getHandle() + ",\"Test Import 3\",\"Test Import 4\"," + "\"Donald, SmithImported\""};
+        // Should throw an exception because of duplicate header
+        try {
+            performImportScript(csv);
+        } catch (Exception e) {
+            assertTrue(e instanceof MetadataImportInvalidHeadingException);
+        }
+    }
+
+    @Test
+    public void metadataImportTestWithAnyLanguage() {
+        String[] csv = {"id,collection,dc.title[*],dc.contributor.author",
+            "+," + collection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
+        // Should throw an exception because of invalid ANY language (*) in metadata field
+        try {
+            performImportScript(csv);
+        } catch (Exception e) {
+            assertTrue(e instanceof MetadataImportInvalidHeadingException);
+        }
+    }
+
+    @Test
     public void metadataImportTest() throws Exception {
         String[] csv = {"id,collection,dc.title,dc.contributor.author",
             "+," + collection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
@@ -230,7 +255,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
                 itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(0).getValue(),
                 "TestAuthorToRemove"));
 
-        String[] csv = {"id,collection,dc.title,dc.contributor.author[*]",
+        String[] csv = {"id,collection,dc.title,dc.contributor.author",
             item.getID().toString() + "," + personCollection.getHandle() + "," + item.getName() + ","};
         performImportScript(csv);
         item = findItemByName(itemTitle);

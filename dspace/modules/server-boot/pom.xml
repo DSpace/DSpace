@@ -11,7 +11,7 @@
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>8.0-drum-6-SNAPSHOT</version>
+        <version>8.1-drum-0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -26,24 +26,14 @@
             <groupId>org.dspace.modules</groupId>
             <artifactId>additions</artifactId>
         </dependency>
-        <!-- UMD Customization
-             Sent to DSpace as https://github.com/DSpace/DSpace/pull/10043
-             This customization marker should be removed after upgrading to a
-             DSpace version that contains the changes.
-        -->
         <dependency>
             <groupId>org.dspace.modules</groupId>
             <artifactId>server</artifactId>
             <classifier>classes</classifier>
         </dependency>
-        <!-- End UMD Customization -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-server-webapp</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
         </dependency>
 
         <!-- Test Dependencies -->

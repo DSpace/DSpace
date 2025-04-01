@@ -5,7 +5,7 @@
   - An empty registry for instance-specific, local metadata. Any non-standard
   - metadata fields should be added here to avoid polluting the standard
   - namespaces.
-  -
+  - 
   -->
 <dspace-dc-types>
 

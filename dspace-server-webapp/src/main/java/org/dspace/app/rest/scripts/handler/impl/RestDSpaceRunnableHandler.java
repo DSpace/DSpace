@@ -130,7 +130,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     @Override
     public void handleException(Exception e) {
-        handleException(null, e);
+        handleException(e.getMessage(), e);
     }
 
     @Override
