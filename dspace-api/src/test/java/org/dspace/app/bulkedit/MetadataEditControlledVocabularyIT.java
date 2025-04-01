@@ -72,7 +72,6 @@ public class MetadataEditControlledVocabularyIT extends AbstractIntegrationTestW
         configurationService.setProperty("vocabulary.plugin.srsc.delimiter", "::");
         configurationService.setProperty("authority.controlled.dc.subject", "true");
         configurationService.setProperty("choices.plugin.dc.subject", "DSpaceControlledVocabulary");
-        configurationService.setProperty("authority.controlled.dc.subject", "true");
         configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
                                          new String[] {
                                              "org.dspace.content.authority.SolrAuthority = SolrAuthorAuthority",

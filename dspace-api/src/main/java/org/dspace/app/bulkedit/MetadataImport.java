@@ -90,7 +90,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     /**
      * The authority controlled fields
      */
-    protected static Set<String> authorityControlled;
+    protected Set<String> authorityControlled;
 
     /**
      * The prefix of the authority controlled field
@@ -1386,7 +1386,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     /**
      * is the field is defined as authority controlled
      */
-    private static boolean isAuthorityControlledField(String md) {
+    private boolean isAuthorityControlledField(String md) {
         String mdf = StringUtils.substringAfter(md, ":");
         mdf = StringUtils.substringBefore(mdf, "[");
         return authorityControlled.contains(mdf) || authorityControlled.contains(md);
