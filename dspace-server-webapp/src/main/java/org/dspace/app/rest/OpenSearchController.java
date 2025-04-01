@@ -21,17 +21,13 @@ import javax.xml.transform.stream.StreamResult;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.OpenSearchService;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
@@ -50,7 +46,6 @@ import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -67,12 +62,9 @@ import org.w3c.dom.Document;
 public class OpenSearchController {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
-    private static final String errorpath = "/error";
+
     private List<String> searchIndices = null;
 
-    private CommunityService communityService;
-    private CollectionService collectionService;
-    private AuthorizeService authorizeService;
     private OpenSearchService openSearchService;
 
     @Autowired
@@ -99,22 +91,28 @@ public class OpenSearchController {
                          @RequestParam(name = "format", required = false) String format,
                          @RequestParam(name = "sort", required = false) String sort,
                          @RequestParam(name = "sort_direction", required = false) String sortDirection,
-                         @RequestParam(name = "scope", required = false) String dsoObject,
-                         Model model) throws IOException, ServletException {
+                         @RequestParam(name = "scope", required = false) String dsoObject)
+        throws IOException, ServletException {
         context = ContextUtil.obtainContext(request);
-        if (start == null) {
-            start = 0;
-        }
-        if (count == null) {
-            count = -1;
-        }
+
         if (openSearchService == null) {
             openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
         }
+
         if (openSearchService.isEnabled()) {
             init();
+
+            if (start == null) {
+                start = 0;
+            }
+
+            if (count == null) {
+                count = -1;
+            }
+            count = Math.min(count, openSearchService.getMaxNumOfItemsPerRequest());
+
             // get enough request parameters to decide on action to take
-            if (format == null || "".equals(format)) {
+            if (StringUtils.isEmpty(format)) {
                 // default to atom
                 format = "atom";
             }
@@ -266,9 +264,6 @@ public class OpenSearchController {
                 searchIndices.add(sFilter.getIndexFieldName());
             }
         }
-        communityService = ContentServiceFactory.getInstance().getCommunityService();
-        collectionService = ContentServiceFactory.getInstance().getCollectionService();
-        authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     }
 
     public void setOpenSearchService(OpenSearchService oSS) {
