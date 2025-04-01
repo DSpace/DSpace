@@ -118,7 +118,7 @@ public class OpenSearchController {
             if (count == null) {
                 count = -1;
             }
-            count = Math.min(count, openSearchService.getMaxNumOfItemsPerRequest()));
+            count = Math.min(count, openSearchService.getMaxNumOfItemsPerRequest());
 
             // get enough request parameters to decide on action to take
             if (StringUtils.isEmpty(format)) {
