@@ -345,12 +345,15 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+        </dependency>
         <!-- UMD Customization -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-layout-template-json</artifactId>
             <scope>runtime</scope>
-            <artifactId>log4j-slf4j2-impl</artifactId>
         </dependency>
         <!-- End UMD Customization -->
         <dependency>
