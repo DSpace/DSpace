@@ -140,7 +140,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
                 if (query == null) {
                     query = new StringBuilder();
                     query.append("submit:(g");
-                } else {                
+                } else {
                     query.append(" OR g");
                 }
                 query.append(group.getID());
