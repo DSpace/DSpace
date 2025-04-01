@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.ProxyUtils;
 
 /**
  * MicrosoftTranslator translates metadata fields using Microsoft Translation API v2
@@ -60,7 +61,9 @@ public class MicrosoftTranslator extends AbstractTranslator {
         String url = baseUrl + "?appId=" + apiKey;
         url += "&to=" + to + "&from=" + from + "&text=" + text;
 
-        try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        ProxyUtils.addProxy(builder);
+        try (CloseableHttpClient client = builder.build()) {
             HttpGet hm = new HttpGet(url);
             HttpResponse httpResponse = client.execute(hm);
             log.debug("Response code from API call is " + httpResponse);

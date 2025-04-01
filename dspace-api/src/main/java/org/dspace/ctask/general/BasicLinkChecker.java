@@ -21,6 +21,7 @@ import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.ProxyUtils;
 
 /**
  * A basic link checker that is designed to be extended. By default this link checker
@@ -38,11 +39,8 @@ public class BasicLinkChecker extends AbstractCurationTask {
     // The status of the link checking of this item
     private int status = Curator.CURATE_UNSET;
 
-    // The results of link checking this item
-    private List<String> results = null;
-
     // The log4j logger for this class
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicLinkChecker.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     protected static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -99,7 +97,7 @@ public class BasicLinkChecker extends AbstractCurationTask {
     protected List<String> getURLs(Item item) {
         // Get URIs from anyschema.anyelement.uri.*
         List<MetadataValue> urls = itemService.getMetadata(item, Item.ANY, Item.ANY, "uri", Item.ANY);
-        ArrayList<String> theURLs = new ArrayList<String>();
+        ArrayList<String> theURLs = new ArrayList<>();
         for (MetadataValue url : urls) {
             theURLs.add(url.getValue());
         }
@@ -131,13 +129,14 @@ public class BasicLinkChecker extends AbstractCurationTask {
      * Get the response code for a URL.  If something goes wrong opening the URL, a
      * response code of 0 is returned.
      *
-     * @param url The url to open
+     * @param url The URL to open.
+     * @param redirects count of redirects we have followed so far.
      * @return The HTTP response code (e.g. 200 / 301 / 404 / 500)
      */
     protected int getResponseStatus(String url, int redirects) {
         try {
             URL theURL = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) theURL.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) theURL.openConnection(ProxyUtils.getProxy());
             connection.setInstanceFollowRedirects(true);
             int statusCode = connection.getResponseCode();
             int maxRedirect = configurationService.getIntProperty("curate.checklinks.max-redirect", 0);
@@ -149,13 +148,12 @@ public class BasicLinkChecker extends AbstractCurationTask {
                     redirects++;
                     return getResponseStatus(newUrl, redirects);
                 }
-
             }
             return statusCode;
 
         } catch (IOException ioe) {
             // Must be a bad URL
-            log.debug("Bad link: " + ioe.getMessage());
+            log.debug("Bad link: {}", ioe::getMessage);
             return 0;
         }
     }
