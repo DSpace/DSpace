@@ -132,26 +132,26 @@ public class EntityTypeServiceImpl implements EntityTypeService {
             if (currentUser != null) {
                 userId = currentUser.getID().toString();
                 query = new StringBuilder();
-                query.append("submit:(e").append(userId);    
+                query.append("submit:(e").append(userId);
             }
-            
+
             Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
             for (Group group : groups) {
                 if (query == null) {
                     query = new StringBuilder();
                     query.append("submit:(g");
-                } else {                                        
+                } else {                
                     query.append(" OR g");
                 }
                 query.append(group.getID());
             }
             query.append(")");
         }
-        
+
         SolrQuery sQuery = new SolrQuery("*:*");
         if (query != null) {
             sQuery.addFilterQuery(query.toString());
-        }                
+        }
         sQuery.addFilterQuery("search.resourcetype:" + IndexableCollection.TYPE);
         sQuery.setRows(0);
         sQuery.addFacetField("search.entitytype");
