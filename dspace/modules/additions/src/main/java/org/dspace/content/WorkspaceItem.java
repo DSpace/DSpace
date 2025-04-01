@@ -74,7 +74,7 @@ public class WorkspaceItem
     // To support mapping multiple collection
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "collection2workspaceitem", joinColumns = {
-            @JoinColumn(name = "workspace_item_id") }, inverseJoinColumns = { @JoinColumn(name = "collection_id") })
+        @JoinColumn(name = "workspace_item_id") }, inverseJoinColumns = { @JoinColumn(name = "collection_id") })
     private Set<Collection> mappedCollections = new HashSet<>();
     // End UMD Customization
 

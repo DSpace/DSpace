@@ -20,16 +20,10 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(
-                name = EPersonRest.GROUPS,
-                method = "getGroups"
-        ),
-        // UMD Customization
-        @LinkRest(
-                name = EPersonRest.LDAP,
-                method = "getLdap"
-        )
-        // End UMD Customization
+    @LinkRest(name = EPersonRest.GROUPS, method = "getGroups"),
+    // UMD Customization
+    @LinkRest(name = EPersonRest.LDAP, method = "getLdap")
+    // End UMD Customization
 })
 public class EPersonRest extends DSpaceObjectRest {
     public static final String NAME = "eperson";

@@ -41,7 +41,7 @@ public class EtdUnit extends CacheableDSpaceObject implements DSpaceObjectLegacy
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "collection2etdunit", joinColumns = { @JoinColumn(name = "etdunit_id") }, inverseJoinColumns = {
-            @JoinColumn(name = "collection_id") })
+        @JoinColumn(name = "collection_id") })
     private Set<Collection> collections = new HashSet<>();
 
     @Transient

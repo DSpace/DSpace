@@ -46,8 +46,8 @@ public class LdapServiceImpl implements LdapService {
 
     // The list of LDAP attributes to return as part of the SearchResult
     private static final String[] strRequestAttributes =
-    new String[]{"givenname", "sn", "mail", "umfaculty", "telephonenumber",
-                 "ou", "umappointment"};
+        new String[]{"givenname", "sn", "mail", "umfaculty", "telephonenumber",
+                     "ou", "umappointment"};
 
     private final static ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
