@@ -40,6 +40,10 @@
     <xsl:param name="hostinginstitution"><xsl:value-of select="$publisher" /></xsl:param>
     <!-- Please take a look into the DataCite schema documentation if you want to know how to use these elements.
          http://schema.datacite.org -->
+    <!-- Metadata-field to retrieve DOI from items -->
+    <xsl:param name="mdSchema">dc</xsl:param>
+    <xsl:param name="mdElement">identifier</xsl:param>
+    <xsl:param name="mdQualifier">uri</xsl:param>
 
     <xsl:output method="xml" indent="yes" encoding="utf-8" />
 
@@ -273,7 +277,7 @@
             </xsl:if>
             End UMD Customization -->
 
-            <!-- UMD Customization 
+            <!-- UMD Customization
                  DataCite (14)
                  Add formats.
             <xsl:if test="//dspace:field[@mdschema='dc' and @element='format'][not(@qualifier='extent')]">
@@ -553,7 +557,7 @@
                     <xsl:when test="string(text())='Other'">Other</xsl:when>
                     <!-- UMD Customization -->
                     <xsl:otherwise>Collection</xsl:otherwise>
-                    <!-- End UMD Customization -->                    
+                    <!-- End UMD Customization -->
                 </xsl:choose>
             </xsl:attribute>
             <xsl:value-of select="." />

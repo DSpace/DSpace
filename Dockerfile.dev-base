@@ -1,17 +1,24 @@
 # UMD-provided file running DSpace as part of a "Quick Build" setup
 # This file is based on "Dockerfile.dev"
+
+# This Dockerfile uses JDK17 by default.
+# To build with other versions, use "--build-arg JDK_VERSION=[value]"
 ARG JDK_VERSION=17
-ARG DSPACE_VERSION=latest
+# The Docker version tag to build from
+ARG DSPACE_VERSION=dspace-8_x
+# The Docker registry to use for DSpace images. Defaults to "docker.io"
+# NOTE: non-DSpace images are hardcoded to use "docker.io" and are not impacted by this build argument
+ARG DOCKER_REGISTRY=docker.io
 
 # Step 1 - Run Maven Build
 # UMD Customization
-FROM docker.lib.umd.edu/drum-dependencies-8_x:${DSPACE_VERSION} as build
+FROM docker.lib.umd.edu/drum-dependencies:${DSPACE_VERSION} as build
 # End UMD Customization
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
 RUN mkdir /install \
-    && chown -Rv dspace: /install  \
+    && chown -Rv dspace: /install \
     && chown -Rv dspace: /app
 USER dspace
 # Copy the DSpace source code (from local machine) into the workdir (excluding .dockerignore contents)
