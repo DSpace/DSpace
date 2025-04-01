@@ -31,19 +31,28 @@ public class SEOHealthIndicator extends AbstractHealthIndicator {
         String baseUrl = configurationService.getProperty("dspace.ui.url");
 
         boolean sitemapOk = checkUrl(baseUrl + "/sitemap_index.xml") || checkUrl(baseUrl + "/sitemap_index.html");
-        boolean robotsTxtOk = checkRobotsTxt(baseUrl + "/robots.txt");
+        RobotsTxtStatus robotsTxtStatus = checkRobotsTxt(baseUrl + "/robots.txt");
         boolean ssrOk = checkSSR(baseUrl);
 
-        if (sitemapOk && robotsTxtOk && ssrOk) {
+        if (sitemapOk && robotsTxtStatus == RobotsTxtStatus.VALID && ssrOk) {
             builder.up()
                    .withDetail("sitemap", "OK")
                    .withDetail("robots.txt", "OK")
                    .withDetail("ssr", "OK");
         } else {
-            builder.down()
-                   .withDetail("sitemap", sitemapOk ? "OK" : "Missing or inaccessible")
-                   .withDetail("robots.txt", robotsTxtOk ? "OK" : "Empty or contains local URLs")
-                   .withDetail("ssr", ssrOk ? "OK" : "Server-side rendering might be disabled");
+            builder.down();
+            builder.withDetail("sitemap", sitemapOk ? "OK" : "Missing or inaccessible");
+
+            if (robotsTxtStatus == RobotsTxtStatus.MISSING) {
+                builder.withDetail("robots.txt", "Missing or inaccessible. Please see the DSpace Documentation on " +
+                        "Search Engine Optimization for how to create a robots.txt.");
+            } else if (robotsTxtStatus == RobotsTxtStatus.INVALID) {
+                builder.withDetail("robots.txt", "Invalid because it contains localhost URLs. This is often a sign " +
+                        "that a proxy is failing to pass X-Forwarded headers to DSpace. Please see the DSpace " +
+                        "Documentation on Search Engine Optimization for how to pass X-Forwarded headers.");
+            }
+
+            builder.withDetail("ssr", ssrOk ? "OK" : "Server-side rendering might be disabled");
         }
     }
 
@@ -56,12 +65,18 @@ public class SEOHealthIndicator extends AbstractHealthIndicator {
         }
     }
 
-    private boolean checkRobotsTxt(String url) {
+    private RobotsTxtStatus checkRobotsTxt(String url) {
         try {
             String content = restTemplate.getForObject(url, String.class);
-            return StringUtils.isNotBlank(content) && !content.contains("localhost");
+            if (StringUtils.isBlank(content)) {
+                return RobotsTxtStatus.MISSING;
+            }
+            if (content.contains("localhost")) {
+                return RobotsTxtStatus.INVALID;
+            }
+            return RobotsTxtStatus.VALID;
         } catch (Exception e) {
-            return false;
+            return RobotsTxtStatus.MISSING;
         }
     }
 
@@ -72,6 +87,10 @@ public class SEOHealthIndicator extends AbstractHealthIndicator {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private enum RobotsTxtStatus {
+        VALID, MISSING, INVALID
     }
 }
 
