@@ -28,7 +28,12 @@
         <property name="description" value="export metadata from a discovery search" />
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportSearchCli" />
     </bean>
-    
+
+    <bean name="metadata-export-filtered-items-report" class="org.dspace.app.bulkedit.MetadataExportFilteredItemsReportCliScriptConfiguration">
+        <property name="description" value="Export metadata from item results in a Metadata Query Report" />
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportFilteredItemsReportCli" />
+    </bean>
+
     <bean id="retry-tracker" class="org.dspace.statistics.export.RetryFailedOpenUrlTrackerScriptConfiguration" scope="prototype">
         <property name="description" value="Retry all failed commits to the OpenURLTracker"/>
         <property name="dspaceRunnableClass" value="org.dspace.statistics.export.RetryFailedOpenUrlTracker"/>
@@ -97,9 +102,10 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkaccesscontrol.BulkAccessControlCli"/>
     </bean>
 
-    <bean id="import-openaire-suggestions" class="org.dspace.app.suggestion.openaire.PublicationLoaderCliScriptConfiguration">
-       <property name="description" value="Imports suggestions from OpenAIRE for publication claim"/>
-       <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.openaire.PublicationLoaderRunnableCli"/>
+    <bean id="import-loader-suggestions"
+          class="org.dspace.app.suggestion.script.PublicationLoaderCliScriptConfiguration">
+        <property name="description" value="Imports suggestions from external providers for publication claim"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.runnable.PublicationLoaderRunnableCli"/>
     </bean>
 
 </beans>

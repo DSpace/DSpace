@@ -182,6 +182,16 @@ public class FacetEntryMatcher {
         );
     }
 
+    public static Matcher<? super Object> accessStatusFacet(boolean hasNext) {
+        return allOf(
+            hasJsonPath("$.name", is("access_status")),
+            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/access_status")),
+            hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/access_status"))
+        );
+    }
+
     public static Matcher<? super Object> relatedItemFacet(boolean b) {
         return allOf(
             hasJsonPath("$.name", is("relateditem")),

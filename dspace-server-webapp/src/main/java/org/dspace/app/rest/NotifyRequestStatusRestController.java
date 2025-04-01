@@ -72,6 +72,9 @@ public class NotifyRequestStatusRestController implements InitializingBean {
     @Autowired
     private DiscoverableEndpointsService discoverableEndpointsService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Override
     public void afterPropertiesSet() {
         discoverableEndpointsService.register(this,
@@ -98,7 +101,7 @@ public class NotifyRequestStatusRestController implements InitializingBean {
             resultRequests, utils.obtainProjection());
 
         context.complete();
-        String result = new ObjectMapper()
+        String result = mapper
             .writerWithDefaultPrettyPrinter().writeValueAsString(resultRequestStatusRests);
 
         return new ResponseEntity<>(result, HttpStatus.OK);

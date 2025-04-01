@@ -69,6 +69,9 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
     @Autowired
     private RequestService requestService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Before
     public void setup() {
         // We're mocking a request here because we've started using the Context in the ConverterService#toRest
@@ -176,12 +179,12 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
         r0.setRestPropNotNull(restPropNotNullValue);
         r0.setRestPropRenamed(restPropRenamedValue);
         r0.setRestPropUnannotated(restPropUnannotatedValue);
-        String r0json = new ObjectMapper().writeValueAsString(r0);
+        String r0json = mapper.writeValueAsString(r0);
 
         MockObjectResource resource = converter.toResource(r0);
 
         // The default projection should not modify the wrapped object
-        assertThat(new ObjectMapper().writeValueAsString(r0), equalTo(r0json));
+        assertThat(mapper.writeValueAsString(r0), equalTo(r0json));
 
         assertHasEmbeds(resource, new String[] {
                 "restPropUnannotated" // embedded; unannotated properties can't be omitted by projections
@@ -213,7 +216,7 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
         r0.setRestPropNotNull(restPropNotNullValue);
         r0.setRestPropRenamed(restPropRenamedValue);
         r0.setRestPropUnannotated(restPropUnannotatedValue);
-        String r0json = new ObjectMapper().writeValueAsString(r0);
+        String r0json = mapper.writeValueAsString(r0);
 
         // return "mockLink" LinkRelation when getRel() is called
         when(mockLink.getRel()).thenReturn(() -> "mockLink");
@@ -222,7 +225,7 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
         MockObjectResource resource = converter.toResource(r0);
 
         // The mock projection should not modify the wrapped object
-        assertThat(new ObjectMapper().writeValueAsString(r0), equalTo(r0json));
+        assertThat(mapper.writeValueAsString(r0), equalTo(r0json));
 
         assertHasEmbeds(resource, new String[] {
                 "restPropNotNull",

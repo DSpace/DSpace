@@ -7,8 +7,10 @@
  */
 package org.dspace.app.suggestion;
 
+import org.dspace.app.suggestion.scorer.EvidenceScorer;
+
 /**
- * This DTO class is returned by an {@link org.dspace.app.suggestion.openaire.EvidenceScorer} to model the concept of
+ * This DTO class is returned by an {@link EvidenceScorer} to model the concept of
  * an evidence / fact that has been used to evaluate the precision of a suggestion increasing or decreasing the score
  * of the suggestion.
  *

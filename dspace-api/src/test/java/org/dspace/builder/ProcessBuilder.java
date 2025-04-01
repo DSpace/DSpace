@@ -9,9 +9,9 @@ package org.dspace.builder;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 
@@ -61,15 +61,22 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
         return this;
     }
 
-    public ProcessBuilder withCreationTime(Date creationTime) {
+    public ProcessBuilder withCreationTime(Instant creationTime) {
         process.setCreationTime(creationTime);
         return this;
     }
 
-    public ProcessBuilder withStartAndEndTime(String startTime, String endTime) throws ParseException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        process.setStartTime(startTime == null ? null : simpleDateFormat.parse(startTime));
-        process.setFinishedTime(endTime == null ? null : simpleDateFormat.parse(endTime));
+    /**
+     * Create a process with the given start & end dates. The dates are expected to be in YYYY-MM-DD format.
+     * @param startTime date in YYYY-MM-DD format used to represent start time
+     * @param endTime date in YYYY-MM-DD format used to represent end time
+     * @return ProcessBuilder
+     */
+    public ProcessBuilder withStartAndEndTime(String startTime, String endTime) {
+        process.setStartTime(startTime == null ? null : LocalDate.parse(startTime).atStartOfDay()
+                                                                 .atZone(ZoneId.systemDefault()).toInstant());
+        process.setFinishedTime(endTime == null ? null : LocalDate.parse(endTime).atStartOfDay()
+                                                                  .atZone(ZoneId.systemDefault()).toInstant());
         return this;
     }
 
