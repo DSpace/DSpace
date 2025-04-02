@@ -41,22 +41,6 @@ running "Dockerfile.dev".
 Finally, the "Dockerfile.ci" file supports generating a Docker image for use
 by Jenkins for continuous integration setup and testing.
 
----
-
-**Note:** Starting in DSpace 8, the stock files use Spring Boot and an
-"embedded Tomcat" server to run the back-end server. This turned out to be
-incompatible with the DSpace customization mechanism, when customizations are
-added to the "dspace/modules/server" directory (see DSpace Issue 9987 -
-<https://github.com/DSpace/DSpace/issues/9987)>).
-
-A fix to restore the the "dspace/modules/server" customizations was provided
-to DSpace in DSpace Pull 10043 (<https://github.com/DSpace/DSpace/pull/10043>).
-
-These customizations can be removed when upgrading to a DSpace version that
-contains the changes.
-
----
-
 ## .github/workflows/build.yml
 
 Commented out the "codecov" task, because UMD does not have an appropriate key
