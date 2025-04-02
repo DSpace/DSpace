@@ -139,8 +139,6 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
         DiscoverQuery discoverQuery =
             queryBuilder.buildQuery(context, dso, discoveryConfiguration, query, queryBuilderSearchFilters,
             "Item", 10, Long.getLong("0"), null, SortOption.DESCENDING);
-        // add configured limit
-        discoverQuery.setMaxResults(metadataDSpaceCsvExportService.getCsvExportLimit());
         handler.logDebug("creating iterator");
 
         Iterator<Item> itemIterator = searchService.iteratorSearch(context, dso, discoverQuery);

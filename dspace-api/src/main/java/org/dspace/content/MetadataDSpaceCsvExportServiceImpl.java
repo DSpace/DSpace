@@ -90,9 +90,11 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
         Context.Mode originalMode = context.getCurrentMode();
         context.setMode(Context.Mode.READ_ONLY);
 
-        // Process each item
+        // Process each item until we reach the limit
+        int itemExportLimit = getCsvExportLimit();
         DSpaceCSV csv = new DSpaceCSV(exportAll);
-        while (toExport.hasNext()) {
+
+        for (int itemsAdded = 0; toExport.hasNext() && itemsAdded < itemExportLimit; itemsAdded++) {
             Item item = toExport.next();
             csv.addItem(item);
             context.uncacheEntity(item);
@@ -121,16 +123,14 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
     private Iterator<Item> buildFromCommunity(Context context, Community community)
         throws SQLException {
         Set<Item> result = new HashSet<>();
-        int itemsAdded = 0;
 
         // Add all the collections
         List<Collection> collections = community.getCollections();
         for (Collection collection : collections) {
             // Never obtain more items than the configured limit
             Iterator<Item> items = itemService.findByCollection(context, collection, getCsvExportLimit(), 0);
-            while (itemsAdded <= getCsvExportLimit() && items.hasNext()) {
+            while (result.size() < getCsvExportLimit() && items.hasNext()) {
                 result.add(items.next());
-                itemsAdded++;
             }
         }
 
@@ -138,9 +138,8 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
         List<Community> communities = community.getSubcommunities();
         for (Community subCommunity : communities) {
             Iterator<Item> items = buildFromCommunity(context, subCommunity);
-            while (itemsAdded <= getCsvExportLimit() && items.hasNext()) {
+            while (result.size() < getCsvExportLimit() && items.hasNext()) {
                 result.add(items.next());
-                itemsAdded++;
             }
         }
 
