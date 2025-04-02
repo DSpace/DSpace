@@ -3019,8 +3019,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // Get the date's from their source
         //  rpDateToFormat is the startdate from our local bitstream RP
         //  restDateToFormat is the startdate we're getting returned in our rest body
-        Date rpDateToFormat = new DCDate(bitstream2RP.getStartDate()).toDate();
-        Date restDateToFormat = new DCDate(dateRef.get()).toDate();
+        Date rpDateToFormat = Date.from(new DCDate(bitstream2RP
+                .getStartDate()).toDate().toInstant());
+        Date restDateToFormat = Date.from(new DCDate(dateRef.get()).toDate().toInstant());
 
         // Format the dates to compare them accordingly
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

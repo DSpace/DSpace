@@ -348,37 +348,6 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     }
 
     /**
-     * @param context   The relevant DSpace Context.
-     * @param bitstream the bitstream to be cloned
-     * @return id of the clone bitstream.
-     * A general class of exceptions produced by failed or interrupted I/O operations.
-     * @throws SQLException       An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
-     */
-    @Override
-    public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException {
-        Bitstream clonedBitstream = null;
-        try {
-            // Update our bitstream but turn off the authorization system since permissions
-            // haven't been set at this point in time.
-            context.turnOffAuthorisationSystem();
-            clonedBitstream = bitstreamService.clone(context, bitstream);
-            clonedBitstream.setStoreNumber(bitstream.getStoreNumber());
-
-            bitstreamLinkingService.cloneMetadata(context, bitstream, clonedBitstream);
-
-            bitstreamService.update(context, clonedBitstream);
-        } catch (AuthorizeException e) {
-            log.error(e);
-            // Can never happen since we turn off authorization before we update
-        } finally {
-            context.restoreAuthSystemState();
-        }
-        return clonedBitstream;
-    }
-
-    /**
      * Migrates all assets off of one assetstore to another
      *
      * @param assetstoreSource      source assetstore
