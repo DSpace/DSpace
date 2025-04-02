@@ -29,13 +29,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
-import java.time.Period;
 import java.text.SimpleDateFormat;
+import java.time.Period;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
@@ -3068,14 +3070,15 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .withName("Bitstream2")
                 .withDescription("description2")
                 .withMimeType("text/plain")
-                .withEmbargoPeriod("2 week")
+                .withEmbargoPeriod(Period.ofWeeks(2))
                 .build();
         }
 
         List<ResourcePolicy> bitstream2ResourcePolicys = resourcePolicyService.find(context, bitstream2);
         ResourcePolicy bitstream2RP = bitstream2ResourcePolicys.get(0);
         bitstream2RP.setRpName("embargo");
-        bitstream2RP.setStartDate(new DCDate(bitstream2RP.getStartDate()).toDate());
+        bitstream2RP.setStartDate(new DCDate(bitstream2RP.getStartDate().atStartOfDay(ZoneOffset.UTC)).toDate()
+                .toLocalDate());
         resourcePolicyService.update(context, bitstream2RP);
 
         // Add another bitstream to an item
@@ -3151,8 +3154,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // Get the date's from their source
         //  rpDateToFormat is the startdate from our local bitstream RP
         //  restDateToFormat is the startdate we're getting returned in our rest body
-        Date rpDateToFormat = new DCDate(bitstream2RP.getStartDate()).toDate();
-        Date restDateToFormat = new DCDate(dateRef.get()).toDate();
+        ZonedDateTime rpDateToFormat = new DCDate(bitstream2RP.getStartDate().atStartOfDay(ZoneOffset.UTC)).toDate();
+        ZonedDateTime restDateToFormat = new DCDate(dateRef.get()).toDate();
 
         // Format the dates to compare them accordingly
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

@@ -56,6 +56,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.matcher.CollectionMatcher;

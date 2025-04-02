@@ -13,8 +13,8 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
