@@ -2993,7 +2993,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .andExpect(jsonPath("$.metadata",
                 matchMetadata("dc.description", bitstream2.getDescription())))
             .andExpect(jsonPath("$.metadata",
-                matchMetadata("dc.title", newFile.getOriginalFilename())))
+                matchMetadata("dc.title", bitstream2.getName())))
             .andExpect(jsonPath("$.metadata.['dc.title']", hasSize(1))); // The title should be replaced
 
         getClient(token)

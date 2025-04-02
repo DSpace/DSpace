@@ -87,7 +87,6 @@ public class BitstreamReplaceController {
                 String.format("Can't replace bitstream (id:%s) that isn't in a bundle", bitstream.getID()));
         }
         Bitstream newBitstream = bitstreamService.create(context, firstBundle, uploadFile.getInputStream());
-        newBitstream.setName(context, uploadFile.getOriginalFilename());
         newBitstream = bitstreamService.replace(context, bitstream, newBitstream);
         context.commit();
 
