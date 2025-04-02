@@ -44,8 +44,16 @@ public class LinksetRestMessageConverter {
             if (isNotBlank(linksetNode.getAnchor())) {
                 responseBody.append(format("; anchor=\"%s\" ", linksetNode.getAnchor()));
             }
+            if (isNotBlank(linksetNode.getProfile())) {
+                responseBody.append(format("; profile=\"%s\" ", linksetNode.getProfile()));
+            }
             responseBody.append(", ");
         });
+
+        if (responseBody.length() >= 2 && responseBody.substring(responseBody.length() - 2).equals(", ")) {
+            responseBody.delete(responseBody.length() - 2, responseBody.length());
+        }
+
         return responseBody.toString();
     }
 }

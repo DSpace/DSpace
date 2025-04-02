@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -300,13 +301,13 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             while (StringUtils.isBlank(response) && countAttempt <= attempt) {
                 countAttempt++;
 
-                long time = System.currentTimeMillis() - lastRequest;
+                long time = Instant.now().toEpochMilli() - lastRequest;
                 if ((time) < interRequestTime) {
                     Thread.sleep(interRequestTime - time);
                 }
 
                 response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
-                lastRequest = System.currentTimeMillis();
+                lastRequest = Instant.now().toEpochMilli();
             }
 
             if (StringUtils.isBlank(response)) {
@@ -333,13 +334,13 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             countAttempt = 0;
             while (StringUtils.isBlank(response2) && countAttempt <= attempt) {
                 countAttempt++;
-                long time = System.currentTimeMillis() - lastRequest;
+                long time = Instant.now().toEpochMilli() - lastRequest;
                 if ((time) < interRequestTime) {
                     Thread.sleep(interRequestTime - time);
                 }
                 response2 = liveImportClient.executeHttpGetRequest(1000, uriBuilder2.toString(), params2);
 
-                lastRequest = System.currentTimeMillis();
+                lastRequest = Instant.now().toEpochMilli();
             }
 
             if (StringUtils.isBlank(response2)) {
@@ -452,13 +453,13 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             int countAttempt = 0;
             while (StringUtils.isBlank(response) && countAttempt <= attempt) {
                 countAttempt++;
-                long time = System.currentTimeMillis() - lastRequest;
+                long time = Instant.now().toEpochMilli() - lastRequest;
                 if ((time) < interRequestTime) {
                     Thread.sleep(interRequestTime - time);
                 }
 
                 response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
-                lastRequest = System.currentTimeMillis();
+                lastRequest = Instant.now().toEpochMilli();
             }
 
             if (StringUtils.isBlank(response)) {
@@ -484,12 +485,12 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             countAttempt = 0;
             while (StringUtils.isBlank(response2) && countAttempt <= attempt) {
                 countAttempt++;
-                long time = System.currentTimeMillis() - lastRequest;
+                long time = Instant.now().toEpochMilli() - lastRequest;
                 if ((time) < interRequestTime) {
                     Thread.sleep(interRequestTime - time);
                 }
                 response2 = liveImportClient.executeHttpGetRequest(1000, uriBuilder2.toString(), params2);
-                lastRequest = System.currentTimeMillis();
+                lastRequest = Instant.now().toEpochMilli();
             }
 
             if (StringUtils.isBlank(response2)) {

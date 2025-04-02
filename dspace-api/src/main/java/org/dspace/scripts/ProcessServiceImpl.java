@@ -14,11 +14,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -83,7 +83,7 @@ public class ProcessServiceImpl implements ProcessService {
         process.setEPerson(ePerson);
         process.setName(scriptName);
         process.setParameters(DSpaceCommandLineParameter.concatenate(parameters));
-        process.setCreationTime(new Date());
+        process.setCreationTime(Instant.now());
         Optional.ofNullable(specialGroups)
             .ifPresent(sg -> {
                 // we use a set to be sure no duplicated special groups are stored with process
@@ -144,7 +144,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void start(Context context, Process process) throws SQLException {
         process.setProcessStatus(ProcessStatus.RUNNING);
-        process.setStartTime(new Date());
+        process.setStartTime(Instant.now());
         update(context, process);
         log.info(LogHelper.getHeader(context, "process_start", "Process with ID " + process.getID()
             + " and name " + process.getName() + " has started"));
@@ -154,7 +154,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void fail(Context context, Process process) throws SQLException {
         process.setProcessStatus(ProcessStatus.FAILED);
-        process.setFinishedTime(new Date());
+        process.setFinishedTime(Instant.now());
         update(context, process);
         log.info(LogHelper.getHeader(context, "process_fail", "Process with ID " + process.getID()
             + " and name " + process.getName() + " has failed"));
@@ -164,7 +164,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void complete(Context context, Process process) throws SQLException {
         process.setProcessStatus(ProcessStatus.COMPLETED);
-        process.setFinishedTime(new Date());
+        process.setFinishedTime(Instant.now());
         update(context, process);
         log.info(LogHelper.getHeader(context, "process_complete", "Process with ID " + process.getID()
             + " and name " + process.getName() + " has been completed"));
@@ -322,7 +322,7 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses,
-        Date date) throws SQLException {
+        Instant date) throws SQLException {
         return this.processDAO.findByStatusAndCreationTimeOlderThan(context, statuses, date);
     }
 
@@ -334,7 +334,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void failRunningProcesses(Context context) throws SQLException, IOException, AuthorizeException {
         List<Process> processesToBeFailed = findByStatusAndCreationTimeOlderThan(
-                context, List.of(ProcessStatus.RUNNING, ProcessStatus.SCHEDULED), new Date());
+                context, List.of(ProcessStatus.RUNNING, ProcessStatus.SCHEDULED), Instant.now());
         for (Process process : processesToBeFailed) {
             context.setCurrentUser(process.getEPerson());
             // Fail the process.
@@ -349,9 +349,8 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     private String formatLogLine(int processId, String scriptName, String output, ProcessLogLevel processLogLevel) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         StringBuilder sb = new StringBuilder();
-        sb.append(sdf.format(new Date()));
+        sb.append(DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
         sb.append(" ");
         sb.append(processLogLevel);
         sb.append(" ");

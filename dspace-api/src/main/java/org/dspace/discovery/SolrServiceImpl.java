@@ -15,12 +15,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -28,7 +25,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TimeZone;
 import java.util.UUID;
 
 import jakarta.mail.MessagingException;
@@ -41,6 +37,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.json.BucketBasedJsonFacet;
+import org.apache.solr.client.solrj.response.json.NestableJsonFacet;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -452,10 +450,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (solrSearchCore.getSolr() == null) {
                 return;
             }
-            long start = System.currentTimeMillis();
+            long start = Instant.now().toEpochMilli();
             System.out.println("SOLR Search Optimize -- Process Started:" + start);
             solrSearchCore.getSolr().optimize();
-            long finish = System.currentTimeMillis();
+            long finish = Instant.now().toEpochMilli();
             System.out.println("SOLR Search Optimize -- Process Finished:" + finish);
             System.out.println("SOLR Search Optimize -- Total time taken:" + (finish - start) + " (ms).");
         } catch (SolrServerException | IOException e) {
@@ -506,7 +504,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         Locale.getDefault(), "internal_error"));
                 email.addRecipient(recipient);
                 email.addArgument(configurationService.getProperty("dspace.ui.url"));
-                email.addArgument(new Date());
+                email.addArgument(Instant.now());
 
                 String stackTrace;
 
@@ -542,7 +540,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws IOException            io exception
      * @throws SearchServiceException if something went wrong with querying the solr server
      */
-    protected boolean requiresIndexing(String uniqueId, Date lastModified)
+    protected boolean requiresIndexing(String uniqueId, Instant lastModified)
         throws SQLException, IOException, SearchServiceException {
 
         // Check if we even have a last modified date
@@ -574,11 +572,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
             Object value = doc.getFieldValue(SearchUtils.LAST_INDEXED_FIELD);
 
-            if (value instanceof Date) {
-                Date lastIndexed = (Date) value;
+            // If it's a java.util.Date, convert to an Instant
+            if (value instanceof java.util.Date) {
+                value = ((java.util.Date) value).toInstant();
+            }
 
-                if (lastIndexed.before(lastModified)) {
-
+            if (value instanceof Instant lastIndexed) {
+                if (lastIndexed.isBefore(lastModified)) {
                     reindexItem = true;
                 }
             }
@@ -651,73 +651,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             }
         }
         return locationQuery.toString();
-    }
-
-    /**
-     * Helper function to retrieve a date using a best guess of the potential
-     * date encodings on a field
-     *
-     * @param t the string to be transformed to a date
-     * @return a date if the formatting was successful, null if not able to transform to a date
-     */
-    public Date toDate(String t) {
-        SimpleDateFormat[] dfArr;
-
-        // Choose the likely date formats based on string length
-        switch (t.length()) {
-            // case from 1 to 3 go through adding anyone a single 0. Case 4 define
-            // for all the SimpleDateFormat
-            case 1:
-                t = "0" + t;
-                // fall through
-            case 2:
-                t = "0" + t;
-                // fall through
-            case 3:
-                t = "0" + t;
-                // fall through
-            case 4:
-                dfArr = new SimpleDateFormat[] {new SimpleDateFormat("yyyy")};
-                break;
-            case 6:
-                dfArr = new SimpleDateFormat[] {new SimpleDateFormat("yyyyMM")};
-                break;
-            case 7:
-                dfArr = new SimpleDateFormat[] {new SimpleDateFormat("yyyy-MM")};
-                break;
-            case 8:
-                dfArr = new SimpleDateFormat[] {new SimpleDateFormat("yyyyMMdd"),
-                    new SimpleDateFormat("yyyy MMM")};
-                break;
-            case 10:
-                dfArr = new SimpleDateFormat[] {new SimpleDateFormat("yyyy-MM-dd")};
-                break;
-            case 11:
-                dfArr = new SimpleDateFormat[] {new SimpleDateFormat("yyyy MMM dd")};
-                break;
-            case 20:
-                dfArr = new SimpleDateFormat[] {new SimpleDateFormat(
-                    "yyyy-MM-dd'T'HH:mm:ss'Z'")};
-                break;
-            default:
-                dfArr = new SimpleDateFormat[] {new SimpleDateFormat(
-                    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")};
-                break;
-        }
-
-        for (SimpleDateFormat df : dfArr) {
-            try {
-                // Parse the date
-                df.setCalendar(Calendar
-                                   .getInstance(TimeZone.getTimeZone("UTC")));
-                df.setLenient(false);
-                return df.parse(t);
-            } catch (ParseException pe) {
-                log.error("Unable to parse date format", pe);
-            }
-        }
-
-        return null;
     }
 
     public String locationToName(Context context, String field, String value) throws SQLException {
@@ -1105,13 +1038,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      */
     private void resolveEntriesCount(DiscoverResult result, QueryResponse solrQueryResponse) {
 
-        Object facetsObj = solrQueryResponse.getResponse().get("facets");
-        if (facetsObj instanceof NamedList) {
-            NamedList<Object> facets = (NamedList<Object>) facetsObj;
-            Object bucketsInfoObj = facets.get("entries_count");
-            if (bucketsInfoObj instanceof NamedList) {
-                NamedList<Object> bucketsInfo = (NamedList<Object>) bucketsInfoObj;
-                result.setTotalEntries((int) bucketsInfo.get("numBuckets"));
+        NestableJsonFacet response = solrQueryResponse.getJsonFacetingResponse();
+        if (response != null) {
+            BucketBasedJsonFacet facet = response.getBucketBasedFacets("entries_count");
+            if (facet != null) {
+                result.setTotalEntries(facet.getNumBucketsCount());
             }
         }
     }

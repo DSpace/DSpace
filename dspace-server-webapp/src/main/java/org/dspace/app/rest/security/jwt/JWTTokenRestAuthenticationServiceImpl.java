@@ -245,7 +245,11 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         // which destroys this temporary auth cookie. So, the auth cookie only exists a few seconds.
         if (addCookie) {
             ResponseCookie cookie = ResponseCookie.from(AUTHORIZATION_COOKIE, token)
-                                                  .httpOnly(true).secure(true).sameSite("None").build();
+                                                  .httpOnly(true)
+                                                  .secure(true)
+                                                  .sameSite("None")
+                                                  .path("/server/api/authn")
+                                                  .build();
 
             // Write the cookie to the Set-Cookie header in order to send it
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

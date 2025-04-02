@@ -89,6 +89,13 @@ public class SearchFilterMatcher {
         );
     }
 
+    public static Matcher<? super Object> hasGeospatialMetadataFilter() {
+        return allOf(
+                hasJsonPath("$.filter", is("has_geospatial_metadata")),
+                checkOperators()
+        );
+    }
+
     public static Matcher<? super Object> checkOperators() {
         return allOf(
                 hasJsonPath("$.operators",  containsInAnyOrder(
@@ -111,6 +118,17 @@ public class SearchFilterMatcher {
             checkOperators()
         );
     }
+
+    public static Matcher<? super Object> accessStatusFilter() {
+        return allOf(
+            hasJsonPath("$.filter", is("access_status")),
+            hasJsonPath("$.hasFacets", is(true)),
+            hasJsonPath("$.type", is("text")),
+            hasJsonPath("$.openByDefault", is(false)),
+            checkOperators()
+        );
+    }
+
     public static Matcher<? super Object> isAuthorOfPublicationRelation() {
         return allOf(
             hasJsonPath("$.filter", is("isAuthorOfPublication")),
@@ -154,6 +172,16 @@ public class SearchFilterMatcher {
             hasJsonPath("$.type", is("text")),
             hasJsonPath("$.openByDefault", is(false)),
             checkOperators()
+        );
+    }
+
+    public static Matcher<? super Object> pointFilter() {
+        return allOf(
+                hasJsonPath("$.filter", is("point")),
+                hasJsonPath("$.hasFacets", is(false)),
+                hasJsonPath("$.type", is("text")),
+                hasJsonPath("$.openByDefault", is(false)),
+                checkOperators()
         );
     }
 }

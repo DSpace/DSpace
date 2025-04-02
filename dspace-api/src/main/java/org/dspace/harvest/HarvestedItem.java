@@ -7,7 +7,7 @@
  */
 package org.dspace.harvest;
 
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,8 +19,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
@@ -42,8 +40,7 @@ public class HarvestedItem implements ReloadableEntity<Integer> {
     private Item item;
 
     @Column(name = "last_harvested", columnDefinition = "timestamp with time zone")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastHarvested;
+    private Instant lastHarvested;
 
     @Column(name = "oai_id")
     private String oaiId;
@@ -93,14 +90,14 @@ public class HarvestedItem implements ReloadableEntity<Integer> {
     }
 
 
-    public void setHarvestDate(Date date) {
+    public void setHarvestDate(Instant date) {
         if (date == null) {
-            date = new Date();
+            date = Instant.now();
         }
         lastHarvested = date;
     }
 
-    public Date getHarvestDate() {
+    public Instant getHarvestDate() {
         return lastHarvested;
     }
 
