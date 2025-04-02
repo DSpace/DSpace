@@ -203,9 +203,8 @@ public class VersioningTest extends AbstractUnitTest {
         List<Bitstream> copies = bitstreamLinkingService.getCopies(context, originalBitstream);
         assertThat("Copies count match", copies.size(), equalTo(1));
 
-        List<Bitstream> originals = bitstreamLinkingService.getOriginals(context, copies.get(0));
-        assertThat("Original count match", originals.size(), equalTo(1));
-        assertThat("Original bitstream match", originals.get(0), equalTo(originalBitstream));
+        Bitstream original = bitstreamLinkingService.getOriginal(context, copies.get(0));
+        assertThat("Original bitstream match", original, equalTo(originalBitstream));
 
         context.restoreAuthSystemState();
     }

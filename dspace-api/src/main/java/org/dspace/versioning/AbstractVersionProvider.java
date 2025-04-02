@@ -95,7 +95,7 @@ public abstract class AbstractVersionProvider {
                 // Metadata and additional information like internal identifier,
                 // file size, checksum, and checksum algorithm are set by the bitstreamStorageService.clone(...)
                 // and respectively bitstreamService.clone(...) method.
-                Bitstream bitstreamNew =  bitstreamStorageService.clone(c, nativeBitstream);
+                Bitstream bitstreamNew =  bitstreamService.clone(c, nativeBitstream);
 
                 bundleService.addBitstream(c, bundleNew, bitstreamNew);
 

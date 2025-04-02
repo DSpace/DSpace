@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.BitstreamLinkingService;
 import org.dspace.content.service.BitstreamService;
@@ -36,6 +37,11 @@ public class BitstreamLinkingServiceImpl implements BitstreamLinkingService {
     public static final String IS_COPY_OF = "isCopyOf";
     public static final String IS_REPLACED_BY = "isReplacedBy";
     public static final String IS_REPLACEMENT_OF = "isReplacementOf";
+
+    /**
+     * log4j logger
+     */
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Override
     public void cloneMetadata(Context context, Bitstream bitstream, Bitstream clone) throws SQLException,
@@ -77,8 +83,8 @@ public class BitstreamLinkingServiceImpl implements BitstreamLinkingService {
     }
 
     @Override
-    public List<Bitstream> getOriginals(Context context, Bitstream bitstream) throws SQLException {
-        return getRelatedBitstreams(context, bitstream, IS_COPY_OF);
+    public Bitstream getOriginal(Context context, Bitstream bitstream) throws SQLException {
+        return getRelatedBitstream(context, bitstream, IS_COPY_OF);
     }
 
     @Override
@@ -87,8 +93,27 @@ public class BitstreamLinkingServiceImpl implements BitstreamLinkingService {
     }
 
     @Override
-    public List<Bitstream> getOriginalReplacement(Context context, Bitstream bitstream) throws SQLException {
-        return getRelatedBitstreams(context, bitstream, IS_REPLACEMENT_OF);
+    public Bitstream getOriginalReplacement(Context context, Bitstream bitstream) throws SQLException {
+        return getRelatedBitstream(context, bitstream, IS_REPLACEMENT_OF);
+    }
+
+    /**
+     * Gets the array of related bitstreams to the metadata given by qualifier.
+     *
+     * @param context Context
+     * @param bitstream The bitstream to search from
+     * @param qualifier The qualifier of the metadata key to search upon
+     * @return The array of related bitstreams
+     * @throws SQLException If bitstreamService.fine() fails to access the database
+     */
+    private List<Bitstream> getRelatedBitstreamArray(Context context, Bitstream bitstream, String qualifier)
+            throws SQLException {
+        List<Bitstream> bitstreams = new ArrayList<>();
+        List<MetadataValue> uuids = bitstreamService.getMetadata(bitstream, DSPACE, BITSTREAM, qualifier, null);
+        for (MetadataValue uuid : uuids) {
+            bitstreams.add(bitstreamService.find(context, UUID.fromString(uuid.getValue())));
+        }
+        return bitstreams;
     }
 
     /**
@@ -103,17 +128,31 @@ public class BitstreamLinkingServiceImpl implements BitstreamLinkingService {
      */
     protected List<Bitstream> getRelatedBitstreams(Context context, Bitstream bitstream,
                                                    String qualifier) throws SQLException {
-        List<Bitstream> bitstreams = new ArrayList<>();
-        List<MetadataValue> uuids = bitstreamService.getMetadata(bitstream, DSPACE, BITSTREAM, qualifier, null);
-        for (MetadataValue uuid : uuids) {
-            bitstreams.add(bitstreamService.find(context, UUID.fromString(uuid.getValue())));
-        }
-        return bitstreams;
-
+        return getRelatedBitstreamArray(context, bitstream, qualifier);
     }
 
     /**
-     * After assigning metadata
+     * Inner function that is used to get one related bitstreams according to a specific metadataField
+     *
+     * @param context Context
+     * @param bitstream The bitstream to search from
+     * @param qualifier The qualifier of the metadata key to search upon
+     *
+     * @return The bitstream that was found using the uuids found in the given metadatafield.
+     * @throws SQLException If bitstreamService.find() fails to access the database
+     */
+    protected Bitstream getRelatedBitstream(Context context, Bitstream bitstream,
+                                            String qualifier) throws SQLException {
+        List<Bitstream> bitstreams = getRelatedBitstreamArray(context, bitstream, qualifier);
+        if (bitstreams.size() > 1) {
+            log.warn("Related bitstream for: " + qualifier + " should only contain one bitstream, database " +
+                    "errors may be present if this is the case");
+        }
+        return bitstreams.size() > 0 ? bitstreams.get(0) : null;
+    }
+
+    /**
+     * Clones the metadata to the new bitstream without taking any bitstream linking data with it
      *
      * @param context Dspace Context
      * @param bitstream DSpace original Bitstream

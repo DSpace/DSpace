@@ -140,9 +140,8 @@ public class BitstreamLinkingIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Copies count match", copies.size(), equalTo(1));
         assertThat("Copies bitstream match", copies.get(0), equalTo(copy));
 
-        List<Bitstream> originals = bitstreamLinkingService.getOriginals(context, copy);
-        assertThat("Original count match", originals.size(), equalTo(1));
-        assertThat("Original bitstream match", originals.get(0), equalTo(original));
+        Bitstream original = bitstreamLinkingService.getOriginal(context, copy);
+        assertThat("Original bitstream match", original, equalTo(original));
 
         bitstreamLinkingService.cloneMetadata(context, copy, secondCopy);
 
@@ -180,9 +179,8 @@ public class BitstreamLinkingIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Replacement Copies count match", copies.size(), equalTo(1));
         assertThat("Replacement Copies bitstream match", copies.get(0), equalTo(copy));
 
-        List<Bitstream> originals = bitstreamLinkingService.getOriginalReplacement(context, copy);
-        assertThat("Replacement Original count match", originals.size(), equalTo(1));
-        assertThat("Replacement Original bitstream match", originals.get(0), equalTo(original));
+        Bitstream original = bitstreamLinkingService.getOriginalReplacement(context, copy);
+        assertThat("Replacement Original bitstream match", original, equalTo(original));
 
         context.restoreAuthSystemState();
 

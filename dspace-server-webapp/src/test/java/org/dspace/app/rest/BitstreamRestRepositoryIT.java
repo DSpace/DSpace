@@ -32,9 +32,9 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.Period;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -3154,8 +3154,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // Get the date's from their source
         //  rpDateToFormat is the startdate from our local bitstream RP
         //  restDateToFormat is the startdate we're getting returned in our rest body
-        ZonedDateTime rpDateToFormat = new DCDate(bitstream2RP.getStartDate().atStartOfDay(ZoneOffset.UTC)).toDate();
-        ZonedDateTime restDateToFormat = new DCDate(dateRef.get()).toDate();
+        Date rpDateToFormat = Date.from(new DCDate(bitstream2RP
+                .getStartDate().atStartOfDay(ZoneOffset.UTC)).toDate().toInstant());
+        Date restDateToFormat = Date.from(new DCDate(dateRef.get()).toDate().toInstant());
 
         // Format the dates to compare them accordingly
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

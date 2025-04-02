@@ -90,10 +90,10 @@ public interface BitstreamLinkingService {
      *
      * @param context Dspace Context
      * @param bitstream Dspace bitstream
-     * @return List of bitstreams that are the original of this item. Should only be one
+     * @return The bitstream that is the original of this item
      * @throws SQLException If database error
      */
-    List<Bitstream> getOriginals(Context context, Bitstream bitstream) throws SQLException;
+    Bitstream getOriginal(Context context, Bitstream bitstream) throws SQLException;
 
     /**
      * Gets the replacements of the given bitstream via its dspace.bitstream.isReplacedBy
@@ -110,8 +110,8 @@ public interface BitstreamLinkingService {
      *
      * @param context Dspace Context
      * @param bitstream Dspace bitstream
-     * @return List of the original bitstream that the provided bitstream replaced should only be one
+     * @return The bitstream that the provided bitstream replaced
      * @throws SQLException If database error
      */
-    List<Bitstream> getOriginalReplacement(Context context, Bitstream bitstream) throws SQLException;
+    Bitstream getOriginalReplacement(Context context, Bitstream bitstream) throws SQLException;
 }
