@@ -12,7 +12,7 @@ ARG DOCKER_REGISTRY=docker.io
 
 # Step 1 - Run Maven Build
 # UMD Customization
-FROM docker.lib.umd.edu/drum-dependencies:${DSPACE_VERSION} as build
+FROM docker.lib.umd.edu/drum-dependencies:${DSPACE_VERSION} AS build
 # End UMD Customization
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app

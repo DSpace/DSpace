@@ -12,7 +12,7 @@ ARG DOCKER_REGISTRY=docker.io
 
 # Step 1 - Run Maven Build
 # UMD Customization
-FROM docker.lib.umd.edu/drum-dependencies:${DSPACE_VERSION} as build
+FROM docker.lib.umd.edu/drum-dependencies:${DSPACE_VERSION} AS build
 # End UMD Customization
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
@@ -36,7 +36,7 @@ RUN rm -rf /install/webapps/server/
 
 # Step 2 - Run Ant Deploy
 # UMD Customization
-FROM docker.lib.umd.edu/drum-ant:latest as ant_build
+FROM docker.lib.umd.edu/drum-ant:dspace-8_x AS ant_build
 # End UMD Customization
 ARG TARGET_DIR=dspace-installer
 # COPY the /install directory from 'build' container to /dspace-src in this container
