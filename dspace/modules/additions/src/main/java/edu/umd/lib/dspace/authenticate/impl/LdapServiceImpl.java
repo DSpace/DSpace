@@ -197,7 +197,8 @@ public class LdapServiceImpl implements LdapService {
         @SuppressWarnings("BanJNDI")
         // Suppressing "BanJNDI" warning from errorprone
         // (see https://errorprone.info/bugpattern/BanJNDI)
-        // Because (based on reading of https://www.blackhat.com/docs/us-16/materials/us-16-Munoz-A-Journey-From-JNDI-LDAP-Manipulation-To-RCE.pdf)
+        // because (based on reading of
+        // https://www.blackhat.com/docs/us-16/materials/us-16-Munoz-A-Journey-From-JNDI-LDAP-Manipulation-To-RCE.pdf):
         // (a) SearchControls.getReturningObjFlag() returns false, which
         //     prevents the vulnerability
         // (b) A malicious actor would need to compromise the campus LDAP server
