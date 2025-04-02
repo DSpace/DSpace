@@ -37,6 +37,8 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
+import static org.dspace.discovery.SearchUtils.RESOURCE_TYPE_FIELD;
+
 /**
  * Command-line utility for generating HTML and Sitemaps.org protocol Sitemaps.
  *
@@ -188,7 +190,8 @@ public class GenerateSitemaps {
         try {
             DiscoverQuery discoveryQuery = new DiscoverQuery();
             discoveryQuery.setMaxResults(PAGE_SIZE);
-            discoveryQuery.setQuery("search.resourcetype:Community");
+            discoveryQuery.setQuery("*:*");
+            discoveryQuery.addFilterQueries(RESOURCE_TYPE_FIELD + ":Community");
             do {
                 discoveryQuery.setStart(offset);
                 DiscoverResult discoverResult = searchService.search(c, discoveryQuery);
@@ -212,7 +215,8 @@ public class GenerateSitemaps {
             offset = 0;
             discoveryQuery = new DiscoverQuery();
             discoveryQuery.setMaxResults(PAGE_SIZE);
-            discoveryQuery.setQuery("search.resourcetype:Collection");
+            discoveryQuery.setQuery("*:*");
+            discoveryQuery.addFilterQueries(RESOURCE_TYPE_FIELD + ":Collection");
             do {
                 discoveryQuery.setStart(offset);
                 DiscoverResult discoverResult = searchService.search(c, discoveryQuery);
@@ -236,7 +240,8 @@ public class GenerateSitemaps {
             offset = 0;
             discoveryQuery = new DiscoverQuery();
             discoveryQuery.setMaxResults(PAGE_SIZE);
-            discoveryQuery.setQuery("search.resourcetype:Item");
+            discoveryQuery.setQuery("*:*");
+            discoveryQuery.addFilterQueries(RESOURCE_TYPE_FIELD + ":Item");
             discoveryQuery.addSearchField("search.entitytype");
             do {
 
