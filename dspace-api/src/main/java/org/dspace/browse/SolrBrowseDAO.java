@@ -38,6 +38,9 @@ import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
+import static org.dspace.discovery.SearchUtils.RESOURCE_ID_FIELD;
+import static org.dspace.discovery.SearchUtils.RESOURCE_TYPE_FIELD;
+
 /**
  * @author Andrea Bollini (CILEA)
  * @author Adán Román Ruiz at arvo.es (bugfix)
