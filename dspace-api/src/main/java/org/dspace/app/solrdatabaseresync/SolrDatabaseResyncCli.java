@@ -98,7 +98,8 @@ public class SolrDatabaseResyncCli extends DSpaceRunnable<SolrDatabaseResyncCliS
 
     private void performStatusUpdate(Context context) throws SearchServiceException, SolrServerException, IOException {
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setQuery(STATUS_FIELD + ":" + STATUS_FIELD_PREDB);
+        solrQuery.setQuery("*:*");
+        solrQuery.addFilterQuery(STATUS_FIELD + ":" + STATUS_FIELD_PREDB);
         solrQuery.addFilterQuery(SearchUtils.RESOURCE_TYPE_FIELD + ":" + IndexableItem.TYPE);
         String dateRangeFilter = SearchUtils.LAST_INDEXED_FIELD + ":[* TO " + maxTime + "]";
         logDebugAndOut("Date range filter used; " + dateRangeFilter);
