@@ -19,9 +19,22 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>17</java.version>
-        <spring.version>6.2.2</spring.version>
-        <spring-boot.version>3.4.2</spring-boot.version>
-        <spring-security.version>6.4.2</spring-security.version> <!-- sync with version used by spring-boot-->
+        <!-- UMD Customization-->
+        <!--
+          Update Spring Boot version to 3.4.3 as a fix for CVE-2025-24813,
+          based on a recommendation in a March 18, 2025 email in the
+          "dspace-tech" mailing list from Tim Donohue.
+           The embedded Tomcat version should be 10.1.35 or later.
+
+           The update to the "spring.version" and "spring-security" was needed
+           in order for compatible jars to be available to Spring Boot.
+
+           This customization can be removed in future DSpace upgrades.
+        -->
+        <spring.version>6.2.3</spring.version>
+        <spring-boot.version>3.4.3</spring-boot.version>
+        <spring-security.version>6.4.3</spring-security.version> <!-- sync with version used by spring-boot-->
+        <!-- End UMD Customization-->
         <hibernate.version>6.4.8.Final</hibernate.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <postgresql.driver.version>42.7.5</postgresql.driver.version>
@@ -77,18 +90,6 @@
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
                      as it is used to reference the LICENSE.header and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
-
-        <!-- UMD Customization -->
-        <!--
-          Fix CVE-2025-24813 (from the "patch.diff" file provided on the
-          "dspace-tech" mailing list in a March 18, 2025 email from
-          mrwerdo331@gmail.com.
-
-          This customization can be removed when upgrading DRUM to a
-          version that uses a Tomcat no longer affected by the CVE.
-         -->
-        <tomcat.version>10.1.39</tomcat.version>
-        <!-- End UMD Customization -->
     </properties>
 
     <build>
@@ -1854,31 +1855,6 @@
                 <artifactId>byte-buddy</artifactId>
                 <version>1.16.1</version>
             </dependency>
-            <!-- UMD Customization -->
-            <!--
-              Fix CVE-2025-24813 (from the "patch.diff" file provided on the
-              "dspace-tech" mailing list in a March 18, 2025 email from
-              mrwerdo331@gmail.com.
-
-              This customization can be removed when upgrading DRUM to a
-              version that uses a Tomcat no longer affected by the CVE.
-            -->
-            <dependency>
-                <groupId>org.apache.tomcat.embed</groupId>
-                <artifactId>tomcat-embed-core</artifactId>
-                <version>10.1.39</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.tomcat.embed</groupId>
-                <artifactId>tomcat-embed-el</artifactId>
-                <version>10.1.39</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.tomcat.embed</groupId>
-                <artifactId>tomcat-embed-websocket</artifactId>
-                <version>10.1.39</version>
-            </dependency>
-            <!-- End UMD Customization-->
         </dependencies>
     </dependencyManagement>
 
