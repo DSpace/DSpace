@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
@@ -14,6 +15,7 @@ import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotEx
 import static org.dspace.app.rest.repository.patch.operation.BitstreamRemoveOperation.OPERATION_PATH_BITSTREAM_REMOVE;
 import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -28,8 +30,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.time.Period;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,6 +51,7 @@ import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
@@ -61,10 +66,12 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
@@ -78,7 +85,9 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -105,6 +114,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired
+    BundleService bundleService;
 
     @Test
     public void findAllTest() throws Exception {
@@ -3009,6 +3021,261 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
             .andExpect(jsonPath("$.status", notNullValue()))
             .andExpect(jsonPath("$.embargoDate", notNullValue()));
+    }
+
+    @Test
+    public void replaceBitstreamsTest() throws Exception {
+        // We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+            .withTitle("Test")
+            .withIssueDate("2022-02-10")
+            .withAuthor("Jens, Vannerum")
+            .withSubject("ExtraEntry")
+            .build();
+
+        String bitstreamContent1 = "ThisIsSomeDummyText1";
+        String bitstreamContent2 = "ThisIsSomeDummyText2";
+        String bitstreamContent3 = "ThisIsSomeDummyText3";
+        // Add a bitstream to an item
+        Bitstream bitstream = null;
+        try (InputStream is1 = IOUtils.toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                createBitstream(context, publicItem1, is1)
+                .withName("Bitstream1")
+                .withDescription("description1")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        // Add another bitstream to an item
+        Bitstream bitstream2;
+        try (InputStream is2 = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is2)
+                .withName("Bitstream2")
+                .withDescription("description2")
+                .withMimeType("text/plain")
+                .withEmbargoPeriod("2 week")
+                .build();
+        }
+
+        List<ResourcePolicy> bitstream2ResourcePolicys = resourcePolicyService.find(context, bitstream2);
+        ResourcePolicy bitstream2RP = bitstream2ResourcePolicys.get(0);
+        bitstream2RP.setRpName("embargo");
+        bitstream2RP.setStartDate(new DCDate(bitstream2RP.getStartDate()).toDate());
+        resourcePolicyService.update(context, bitstream2RP);
+
+        // Add another bitstream to an item
+        Bitstream bitstream3 = null;
+        try (InputStream is3 = IOUtils.toInputStream(bitstreamContent3, CharEncoding.UTF_8)) {
+            bitstream3 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is3)
+                .withName("Bitstream3")
+                .withDescription("description3")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        String input = "Hello, World!";
+        MockMultipartFile newFile =
+            new MockMultipartFile("file", "hello.txt",
+                org.springframework.http.MediaType.TEXT_PLAIN_VALUE, input.getBytes());
+        AtomicReference<String> dateRef = new AtomicReference<>();
+        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
+        getClient(token)
+            .perform(MockMvcRequestBuilders
+                .multipart("/api/core/bitstreams/{id}/replace", bitstream2.getID())
+                .file(newFile))
+            .andExpect(status().isCreated())
+            .andDo(result -> idRefNoEmbeds
+                .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
+
+        // Bitstreams in the bundle
+        getClient(token)
+            .perform(get("/api/core/bundles/{id}/bitstreams",
+                publicItem1.getBundles(Constants.CONTENT_BUNDLE_NAME).get(0).getID())
+                .param("projection", "full"))
+            .andExpect(status().isOk())
+            // Should be only 3 bitstreams in the bundle
+            .andExpect(jsonPath("$._embedded.bitstreams", Matchers.hasSize(3)))
+            // Make sure the old bitstream is not in the bundle anymore
+            .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(contains(
+                BitstreamMatcher.matchBitstreamEntry(bitstream2)
+            ))));
+
+        getClient(token)
+            .perform(get("/api/core/bitstreams/" + idRefNoEmbeds.get().toString()))
+            .andExpect(status().isOk()) // Does the new bitstream contain the old one's metadata
+            .andExpect(jsonPath("$.metadata",
+                matchMetadata("dc.description", bitstream2.getDescription())))
+            .andExpect(jsonPath("$.metadata",
+                matchMetadata("dc.title", bitstream2.getName())))
+            .andExpect(jsonPath("$.metadata.['dc.title']", hasSize(1))); // The title should be replaced
+
+        getClient(token)
+            .perform(get("/api/core/bitstreams/" + idRefNoEmbeds.get().toString() + "/content"))
+            // Return the new file's content, is it the new file's content we created?
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.is(input)));
+
+
+        getClient(token)
+            .perform(get("/api/authz/resourcepolicies/search/resource")
+                .param("uuid", idRefNoEmbeds.get().toString()))
+            .andDo(result -> dateRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.resourcepolicies[0].startDate")))
+            .andExpect(status().isOk()) // Check if the resourcePolicy got copied correctly
+            .andExpect(jsonPath("$._embedded.resourcepolicies[0].name",
+                Matchers.is(bitstream2RP.getRpName())))
+            .andExpect(jsonPath("$._embedded.resourcepolicies[0].policyType",
+                Matchers.is(bitstream2RP.getRpType())))
+            .andExpect(jsonPath("$._embedded.resourcepolicies[0].description",
+                Matchers.is(bitstream2RP.getRpDescription())));
+
+        // Get the date's from their source
+        //  rpDateToFormat is the startdate from our local bitstream RP
+        //  restDateToFormat is the startdate we're getting returned in our rest body
+        Date rpDateToFormat = new DCDate(bitstream2RP.getStartDate()).toDate();
+        Date restDateToFormat = new DCDate(dateRef.get()).toDate();
+
+        // Format the dates to compare them accordingly
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String local = sdf.format(rpDateToFormat);
+        String rest = sdf.format(restDateToFormat);
+        Assert.assertEquals(local, rest);
+    }
+
+    @Test
+    public void replaceBitstreamNotFoundTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity).build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("TestItem")
+            .build();
+        Bitstream bitstream;
+        try (InputStream is = IOUtils.toInputStream("TestContent", CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                createBitstream(context, item, is)
+                .withName("TestBitstream")
+                .build();
+        }
+        bitstreamService.delete(context, bitstream);
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        String input = "Hello, World!";
+        MockMultipartFile newFile =
+            new MockMultipartFile("file", "hello.txt",
+                org.springframework.http.MediaType.TEXT_PLAIN_VALUE, input.getBytes());
+        getClient(token)
+            .perform(MockMvcRequestBuilders
+                .multipart("/api/core/bitstreams/{id}/replace", bitstream.getID())
+                .file(newFile))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void replaceBitstreamUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity).build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("TestItem")
+            .build();
+        Bitstream bitstream;
+        try (InputStream is = IOUtils.toInputStream("TestContent", CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                createBitstream(context, item, is)
+                .withName("TestBitstream")
+                .build();
+        }
+        context.restoreAuthSystemState();
+
+        String input = "Hello, World!";
+        MockMultipartFile newFile =
+            new MockMultipartFile("file", "hello.txt",
+                org.springframework.http.MediaType.TEXT_PLAIN_VALUE, input.getBytes());
+        getClient()
+            .perform(MockMvcRequestBuilders
+                .multipart("/api/core/bitstreams/{id}/replace", bitstream.getID())
+                .file(newFile))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void replaceBitstreamForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity).build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("TestItem")
+            .build();
+        Bitstream bitstream;
+        try (InputStream is = IOUtils.toInputStream("TestContent", CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                createBitstream(context, item, is)
+                .withName("TestBitstream")
+                .build();
+        }
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        String input = "Hello, World!";
+        MockMultipartFile newFile =
+            new MockMultipartFile("file", "hello.txt",
+                org.springframework.http.MediaType.TEXT_PLAIN_VALUE, input.getBytes());
+        getClient(token)
+            .perform(MockMvcRequestBuilders
+                .multipart("/api/core/bitstreams/{id}/replace", bitstream.getID())
+                .file(newFile))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void replaceBitstreamNotInBundleTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity).build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("TestItem")
+            .build();
+        Bitstream bitstream;
+        try (InputStream is = IOUtils.toInputStream("TestContent", CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                createBitstream(context, item, is)
+                .withName("TestBitstream")
+                .build();
+        }
+        bundleService.removeBitstream(context, bitstream.getBundles().get(0), bitstream);
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        String input = "Hello, World!";
+        MockMultipartFile newFile =
+            new MockMultipartFile("file", "hello.txt",
+                org.springframework.http.MediaType.TEXT_PLAIN_VALUE, input.getBytes());
+        getClient(token)
+            .perform(MockMvcRequestBuilders
+                .multipart("/api/core/bitstreams/{id}/replace", bitstream.getID())
+                .file(newFile))
+            .andExpect(status().isNotFound());
     }
 
     public boolean bitstreamExists(String token, Bitstream ...bitstreams) throws Exception {

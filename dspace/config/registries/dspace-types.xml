@@ -107,4 +107,32 @@
         <scope_note>Stores the timestamp related to the last import from OpenAIRE Graph</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dspace</schema>
+        <element>bitstream</element>
+        <qualifier>hasCopies</qualifier>
+        <scope_note>Stores the UUID's of the copies of this bitstream</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>bitstream</element>
+        <qualifier>isCopyOf</qualifier>
+        <scope_note>Stores the UUID of the original copy of this bitstream</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>bitstream</element>
+        <qualifier>isReplacedBy</qualifier>
+        <scope_note>Stores the UUID of the replacement bitstream</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>bitstream</element>
+        <qualifier>isReplacementOf</qualifier>
+        <scope_note>Stores the UUID of the bitstream this replaced</scope_note>
+    </dc-type>
+
 </dspace-dc-types>

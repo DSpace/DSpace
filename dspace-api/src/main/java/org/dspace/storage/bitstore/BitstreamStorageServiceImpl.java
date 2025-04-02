@@ -25,8 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.checker.service.ChecksumHistoryService;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
+import org.dspace.content.service.BitstreamLinkingService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
@@ -71,6 +70,8 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
     protected ChecksumHistoryService checksumHistoryService;
+    @Autowired(required = true)
+    protected BitstreamLinkingService bitstreamLinkingService;
 
     /**
      * asset stores
@@ -371,14 +372,8 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             clonedBitstream = bitstreamService.clone(context, bitstream);
             clonedBitstream.setStoreNumber(bitstream.getStoreNumber());
 
-            List<MetadataValue> metadataValues = bitstreamService.getMetadata(bitstream, Item.ANY, Item.ANY, Item.ANY,
-                    Item.ANY);
+            bitstreamLinkingService.cloneMetadata(context, bitstream, clonedBitstream);
 
-            for (MetadataValue metadataValue : metadataValues) {
-                bitstreamService.addMetadata(context, clonedBitstream, metadataValue.getMetadataField(),
-                        metadataValue.getLanguage(), metadataValue.getValue(), metadataValue.getAuthority(),
-                        metadataValue.getConfidence());
-            }
             bitstreamService.update(context, clonedBitstream);
         } catch (AuthorizeException e) {
             log.error(e);
