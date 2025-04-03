@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -500,5 +501,10 @@ public class RoleIngester implements PackageIngester {
     @Override
     public String getParameterHelp() {
         return "No additional options available.";
+    }
+
+    @Override
+    public Map<String, String> getPathToNewUUID() {
+        throw new UnsupportedOperationException();
     }
 }

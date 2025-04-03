@@ -267,6 +267,23 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
+    public Item create(Context context, WorkspaceItem workspaceItem,
+                       UUID uuid) throws SQLException, AuthorizeException {
+        if (workspaceItem.getItem() != null) {
+            throw new IllegalArgumentException(
+                    "Attempting to create an item for a workspace item that already contains an item");
+        }
+        Item item = createItem(context, uuid);
+        workspaceItem.setItem(item);
+
+
+        log.info(LogManager.getHeader(context, "create_item", "item_id="
+                + item.getID()));
+
+        return item;
+    }
+
+    @Override
     public Item createTemplateItem(Context context, Collection collection) throws SQLException, AuthorizeException {
         if (collection == null || collection.getTemplateItem() != null) {
             throw new IllegalArgumentException("Collection is null or already contains template item.");

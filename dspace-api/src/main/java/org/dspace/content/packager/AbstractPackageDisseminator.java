@@ -75,6 +75,7 @@ public abstract class AbstractPackageDisseminator
      * @param params  Properties-style list of options specific to this packager
      * @param pkgFile File where initial package should be written. All other
      *                packages will be written to the same directory as this File.
+     * @param alreadyDisseminated
      * @throws PackageValidationException if package cannot be created or there is
      *                                    a fatal error in creating it.
      * @throws CrosswalkException         if crosswalk error
@@ -84,7 +85,7 @@ public abstract class AbstractPackageDisseminator
      */
     @Override
     public List<File> disseminateAll(Context context, DSpaceObject dso,
-                                     PackageParameters params, File pkgFile)
+                                     PackageParameters params, File pkgFile, List<DSpaceObject> alreadyDisseminated)
         throws PackageException, CrosswalkException,
         AuthorizeException, SQLException, IOException {
         //If unset, make sure the Parameters specifies this is a recursive dissemination
@@ -127,7 +128,7 @@ public abstract class AbstractPackageDisseminator
 
                             //disseminate all items (recursively!)
                             String childFileName = pkgDirectory + PackageUtils.getPackageName(item, fileExtension);
-                            disseminateAll(context, item, params, new File(childFileName));
+                            disseminateAll(context, item, params, new File(childFileName), alreadyDisseminated);
                         }
 
                         break;
@@ -139,7 +140,7 @@ public abstract class AbstractPackageDisseminator
                             //disseminate all sub-communities (recursively!)
                             String childFileName = pkgDirectory + PackageUtils
                                 .getPackageName(subcommunity, fileExtension);
-                            disseminateAll(context, subcommunity, params, new File(childFileName));
+                            disseminateAll(context, subcommunity, params, new File(childFileName), alreadyDisseminated);
                         }
 
                         //Also find all Collections in this Community and disseminate
@@ -148,7 +149,8 @@ public abstract class AbstractPackageDisseminator
                             //disseminate all collections (recursively!)
                             String childFileName = pkgDirectory + PackageUtils
                                 .getPackageName(collections.get(i), fileExtension);
-                            disseminateAll(context, collections.get(i), params, new File(childFileName));
+                            disseminateAll(context, collections.get(i), params,
+                                    new File(childFileName), alreadyDisseminated);
                         }
 
                         break;
@@ -159,7 +161,7 @@ public abstract class AbstractPackageDisseminator
                             //disseminate all top-level communities (recursively!)
                             String childFileName = pkgDirectory + PackageUtils
                                 .getPackageName(topCommunity, fileExtension);
-                            disseminateAll(context, topCommunity, params, new File(childFileName));
+                            disseminateAll(context, topCommunity, params, new File(childFileName), alreadyDisseminated);
                         }
 
                         break;
