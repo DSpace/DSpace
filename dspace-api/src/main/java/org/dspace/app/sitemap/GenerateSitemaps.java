@@ -7,6 +7,8 @@
  */
 package org.dspace.app.sitemap;
 
+import static org.dspace.discovery.SearchUtils.RESOURCE_TYPE_FIELD;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -36,8 +38,6 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-
-import static org.dspace.discovery.SearchUtils.RESOURCE_TYPE_FIELD;
 
 /**
  * Command-line utility for generating HTML and Sitemaps.org protocol Sitemaps.
