@@ -7,6 +7,9 @@
  */
 package org.dspace.browse;
 
+import static org.dspace.discovery.SearchUtils.RESOURCE_ID_FIELD;
+import static org.dspace.discovery.SearchUtils.RESOURCE_TYPE_FIELD;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,9 +40,6 @@ import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.factory.DSpaceServicesFactory;
-
-import static org.dspace.discovery.SearchUtils.RESOURCE_ID_FIELD;
-import static org.dspace.discovery.SearchUtils.RESOURCE_TYPE_FIELD;
 
 /**
  * @author Andrea Bollini (CILEA)
