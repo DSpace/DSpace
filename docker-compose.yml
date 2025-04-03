@@ -93,7 +93,7 @@ services:
     container_name: dspacedb
     # Uses a custom Postgres image with pgcrypto installed
     # UMD Customization
-    image: docker.lib.umd.edu/dspace-postgres:${DSPACE_VER:-dspace-8_x}
+    image: docker.lib.umd.edu/dspace-postgres:${DSPACE_VER:-latest}
     # End UMD Customization
     build:
       # Must build out of subdirectory to have access to install script for pgcrypto
@@ -121,7 +121,7 @@ services:
   # DSpace Solr container
   dspacesolr:
     container_name: dspacesolr
-    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-dspace-8_x}"
+    image: "${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-latest}"
     build:
       context: ./dspace/src/main/docker/dspace-solr/
       # Provide path to Solr configs necessary to build Docker image

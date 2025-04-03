@@ -64,10 +64,10 @@ the main branch for DRUM development.
 2) Optional: Build the dependent images.
 
     ```zsh
-    $ docker build -f Dockerfile.dependencies -t docker.lib.umd.edu/drum-dependencies:dspace-8_x .
-    $ docker build -f Dockerfile.ant -t docker.lib.umd.edu/drum-ant:dspace-8_x .
+    $ docker build -f Dockerfile.dependencies -t docker.lib.umd.edu/drum-dependencies-8_x:latest .
+    $ docker build -f Dockerfile.ant -t docker.lib.umd.edu/drum-ant:latest .
     $ cd dspace/src/main/docker/dspace-postgres-pgcrypto
-    $ docker build -t docker.lib.umd.edu/dspace-postgres:dspace-8_x .
+    $ docker build -t docker.lib.umd.edu/dspace-postgres:latest .
     $ cd -
     ```
 

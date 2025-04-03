@@ -42,7 +42,7 @@ RUN rm -rf /install/webapps/server/
 
 # Step 2 - Run Ant Deploy
 # UMD Customization
-FROM docker.lib.umd.edu/drum-ant:dspace-8_x AS ant_build
+FROM docker.lib.umd.edu/drum-ant:latest AS ant_build
 # End UMD Customization
 ARG TARGET_DIR=dspace-installer
 # COPY the /install directory from 'build' container to /dspace-src in this container
