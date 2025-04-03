@@ -53,11 +53,6 @@ dspace.server.url = ${dspace.baseUrl}/server
 # DO NOT end it with '/'.
 dspace.server.ssr.url = ${dspace.server.url}
 
-# Additional URL of DSpace backend which could be used by DSpace frontend during SSR execution.
-# May require a port number if not using standard ports (80 or 443)
-# DO NOT end it with '/'.
-dspace.server.ssr.url = ${dspace.server.url}
-
 # Public URL of DSpace frontend (Angular UI). May require a port number if not using standard ports (80 or 443)
 # DO NOT end it with '/'.
 # This is used by the backend to provide links in emails, RSS feeds, Sitemaps, etc.
@@ -344,6 +339,7 @@ identifier.doi.password =
 identifier.doi.prefix = 10.33522
 identifier.doi.datacite.host = mds.test.datacite.org
 identifier.doi.mintRandom = true
+# Set the 'identifier.doi.namespaceseparator' to empty value to override the default 'dspace/' value.
 identifier.doi.namespaceseparator =
 crosswalk.dissemination.DataCite.publisher = Digital Repository at the University of Maryland
 crosswalk.dissemination.DataCite.stylesheet = crosswalks/DIM2UmdDataCite.xsl
