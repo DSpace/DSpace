@@ -272,9 +272,4 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         runDSpaceScript("packager", "-r", "-f", "-u", "-e", "admin@email.com", "-t",
                 "AIP", outputFile.getPath());
     }
-
-    private void performZipImportScript(File outputFile) throws Exception {
-        runDSpaceScript("packager", "-r", "-f", "-z", "*", "-u", "-e", "admin@email.com", "-t",
-                "AIP", outputFile.getPath());
-    }
 }
