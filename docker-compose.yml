@@ -1,10 +1,6 @@
 networks:
   dspacenet:
-    ipam:
-      config:
-        # Define a custom subnet for our DSpace network, so that we can easily trust requests from host to container.
-        # If you customize this value, be sure to customize the 'proxies.trusted.ipranges' env variable below.
-        - subnet: 172.26.0.0/16
+    driver: bridge
 services:
   # DSpace (backend) webapp container
   dspace:
