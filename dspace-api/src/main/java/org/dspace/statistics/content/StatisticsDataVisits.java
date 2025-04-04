@@ -234,7 +234,7 @@ public class StatisticsDataVisits extends StatisticsData {
                         // the datasettimequery
                         ObjectCount[] maxObjectCounts = solrLoggerService
                             .queryFacetField(query, filterQuery, dataSetQuery.getFacetField(), dataSetQuery.getMax(),
-                                             false, null, facetMinCount);
+                                             showTotal, null, facetMinCount);
                         for (int j = 0; j < maxObjectCounts.length; j++) {
                             ObjectCount firstCount = maxObjectCounts[j];
                             String newQuery = dataSetQuery.getFacetField() + ": " + ClientUtils
@@ -286,13 +286,14 @@ public class StatisticsDataVisits extends StatisticsData {
             //Do the first query
 
             ObjectCount[] topCounts1 =
-                queryFacetField(firsDataset, firsDataset.getQueries().get(0).getQuery(), filterQuery, facetMinCount);
+                queryFacetField(firsDataset, firsDataset.getQueries().get(0).getQuery(),
+                                filterQuery, facetMinCount, showTotal);
             // Check if we have more queries that need to be done
             if (datasetQueries.size() == 2) {
                 DatasetQuery secondDataSet = datasetQueries.get(1);
                 // Now do the second one
                 ObjectCount[] topCounts2 = queryFacetField(secondDataSet, secondDataSet.getQueries().get(0).getQuery(),
-                                                           filterQuery, facetMinCount);
+                                                           filterQuery, facetMinCount, showTotal);
                 // Now that have results for both of them lets do x.y queries
                 List<String> facetQueries = new ArrayList<>();
                 for (ObjectCount count2 : topCounts2) {
@@ -478,7 +479,12 @@ public class StatisticsDataVisits extends StatisticsData {
             // First make sure our query is in order
             Query query = new Query();
             if (currentDso != null) {
-                query.setDso(currentDso, currentDso.getType());
+                if (currentDso.getType() == Constants.ITEM) {
+                    query.setDso(currentDso, currentDso.getType());
+                } else {
+                    query.setOwningDso(currentDso);
+                    query.setDsoType(Constants.ITEM);
+                }
             }
             datasetQuery.addQuery(query);
 
@@ -644,14 +650,25 @@ public class StatisticsDataVisits extends StatisticsData {
                     // item its internal id. In the last case where the bitstream is not associated
                     // with an item (such as a community logo) then reference the bitstreamID directly.
                     String identifier;
-                    if (owningItem != null && owningItem.getHandle() != null) {
-                        identifier = "handle/" + owningItem.getHandle();
-                    } else if (owningItem != null) {
-                        identifier = "item/" + owningItem.getID();
+                    String owningItemUrl;
+                    String owningItemName;
+                    if (owningItem != null) {
+                        if (owningItem.getHandle() != null) {
+                            identifier = "handle/" + owningItem.getHandle();
+                        } else {
+                            identifier = "items/" + owningItem.getID();
+                        }
+                        owningItemUrl = configurationService.getProperty("dspace.ui.url")
+                            + "/items/" + owningItem.getID();
+                        owningItemName = owningItem.getName();
                     } else {
                         identifier = "id/" + bit.getID();
+                        owningItemUrl = configurationService.getProperty("dspace.ui.url")
+                            + "/bitstream/" + identifier + "/";
+                        owningItemName = "Item missing";
                     }
 
+                    attrs.put("owningItemUrl", "<a href='" + owningItemUrl + "'>" + owningItemName + "</a>");
 
                     String url = configurationService.getProperty("dspace.ui.url") + "/bitstream/" + identifier + "/";
 
@@ -707,12 +724,12 @@ public class StatisticsDataVisits extends StatisticsData {
 
 
     protected ObjectCount[] queryFacetField(DatasetQuery dataset, String query,
-                                            String filterQuery, int facetMinCount)
+                                            String filterQuery, int facetMinCount, boolean showTotal)
             throws SolrServerException, IOException {
         String facetType = dataset.getFacetField() == null ? "id" : dataset
             .getFacetField();
         return solrLoggerService.queryFacetField(query, filterQuery, facetType,
-                                                 dataset.getMax(), false, null, facetMinCount);
+                                                 dataset.getMax(), showTotal, null, facetMinCount);
     }
 
     public static class DatasetQuery {
@@ -833,7 +850,7 @@ public class StatisticsDataVisits extends StatisticsData {
             if (owningDso != null && currentDso != null) {
                 query += (query.equals("") ? "" : " AND ");
 
-                String owningStr = "";
+                String owningStr = "id";
                 switch (currentDso.getType()) {
                     case Constants.ITEM:
                         owningStr = "owningItem";
