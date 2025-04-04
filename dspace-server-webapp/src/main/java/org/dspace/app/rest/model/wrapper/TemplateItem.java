@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model.wrapper;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,7 +42,7 @@ public class TemplateItem {
         return item.getID();
     }
 
-    public Date getLastModified() {
+    public Instant getLastModified() {
         return item.getLastModified();
     }
 

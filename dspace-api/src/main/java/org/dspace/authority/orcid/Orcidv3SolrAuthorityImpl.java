@@ -7,27 +7,22 @@
  */
 package org.dspace.authority.orcid;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.SolrAuthorityInterface;
 import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
-import org.json.JSONObject;
+import org.dspace.orcid.model.factory.OrcidFactoryUtils;
 import org.orcid.jaxb.model.v3.release.common.OrcidIdentifier;
 import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.search.Result;
@@ -50,6 +45,11 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
 
     private String accessToken;
 
+    /**
+     * Maximum retries to allow for the access token retrieval
+     */
+    private int maxClientRetries = 3;
+
     public void setOAUTHUrl(String oAUTHUrl) {
         OAUTHUrl = oAUTHUrl;
     }
@@ -62,46 +62,32 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
         this.clientSecret = clientSecret;
     }
 
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
     /**
      *  Initialize the accessToken that is required for all subsequent calls to ORCID
      */
     public void init() {
-        if (StringUtils.isBlank(accessToken)
-                && StringUtils.isNotBlank(clientSecret)
-                && StringUtils.isNotBlank(clientId)
-                && StringUtils.isNotBlank(OAUTHUrl)) {
-            String authenticationParameters = "?client_id=" + clientId +
-                    "&client_secret=" + clientSecret +
-                    "&scope=/read-public&grant_type=client_credentials";
-            try {
-                HttpPost httpPost = new HttpPost(OAUTHUrl + authenticationParameters);
-                httpPost.addHeader("Accept", "application/json");
-                httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
+        // Initialize access token at spring instantiation. If it fails, the access token will be null rather
+        // than causing a fatal Spring startup error
+        initializeAccessToken();
+    }
 
-                HttpClient httpClient = HttpClientBuilder.create().build();
-                HttpResponse getResponse = httpClient.execute(httpPost);
-
-                JSONObject responseObject = null;
-                try (InputStream is = getResponse.getEntity().getContent();
-                     BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
-                    String inputStr;
-                    while ((inputStr = streamReader.readLine()) != null && responseObject == null) {
-                        if (inputStr.startsWith("{") && inputStr.endsWith("}") && inputStr.contains("access_token")) {
-                            try {
-                                responseObject = new JSONObject(inputStr);
-                            } catch (Exception e) {
-                                //Not as valid as I'd hoped, move along
-                                responseObject = null;
-                            }
-                        }
-                    }
-                }
-                if (responseObject != null && responseObject.has("access_token")) {
-                    accessToken = (String) responseObject.get("access_token");
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("Error during initialization of the Orcid connector", e);
-            }
+    public void initializeAccessToken() {
+        // If we have reaches max retries or the access token is already set, return immediately
+        if (maxClientRetries <= 0 || org.apache.commons.lang3.StringUtils.isNotBlank(accessToken)) {
+            return;
+        }
+        try {
+            accessToken = OrcidFactoryUtils.retrieveAccessToken(clientId, clientSecret, OAUTHUrl).orElse(null);
+        } catch (IOException e) {
+            log.error("Error retrieving ORCID access token, {} retries left", --maxClientRetries);
         }
     }
 
@@ -116,7 +102,7 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
      */
     @Override
     public List<AuthorityValue> queryAuthorities(String text, int max) {
-        init();
+        initializeAccessToken();
         List<Person> bios = queryBio(text, max);
         List<AuthorityValue> result = new ArrayList<>();
         for (Person person : bios) {
@@ -135,7 +121,7 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
      */
     @Override
     public AuthorityValue queryAuthorityID(String id) {
-        init();
+        initializeAccessToken();
         Person person = getBio(id);
         AuthorityValue valueFromPerson = Orcidv3AuthorityValue.create(person);
         return valueFromPerson;
@@ -151,11 +137,14 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
         if (!isValid(id)) {
             return null;
         }
-        init();
+        if (orcidRestConnector == null) {
+            log.error("ORCID REST connector is null, returning null Person");
+            return null;
+        }
+        initializeAccessToken();
         InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"), accessToken);
         XMLtoBio converter = new XMLtoBio();
-        Person person = converter.convertSinglePerson(bioDocument);
-        return person;
+        return converter.convertSinglePerson(bioDocument);
     }
 
 
@@ -167,10 +156,16 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
      * @return List<Person>
      */
     public List<Person> queryBio(String text, int start, int rows) {
-        init();
         if (rows > 100) {
             throw new IllegalArgumentException("The maximum number of results to retrieve cannot exceed 100.");
         }
+        // Check REST connector is initialized
+        if (orcidRestConnector == null) {
+            log.error("ORCID REST connector is not initialized, returning empty list");
+            return Collections.emptyList();
+        }
+        // Check / init access token
+        initializeAccessToken();
 
         String searchPath = "search?q=" + URLEncoder.encode(text) + "&start=" + start + "&rows=" + rows;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);

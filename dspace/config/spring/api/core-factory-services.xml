@@ -63,4 +63,8 @@
 
     <bean id="submissionServiceFactory" class="org.dspace.submit.factory.SubmissionServiceFactoryImpl"/>
 
+    <bean id="contentReportServiceFactory" class="org.dspace.content.factory.ContentReportServiceFactoryImpl"/>
+
+    <bean id="captchaServiceFactory" class="org.dspace.eperson.factory.CaptchaServiceFactoryImpl"/>
+
 </beans>

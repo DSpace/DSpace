@@ -29,10 +29,10 @@
                     <dc-element>title</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Nome</label>
+                    <label>Title</label>
                     <input-type>onebox</input-type>
-                    <hint>Nome do arquivo</hint>
-                    <required></required>
+                    <hint>Enter the name of the file.</hint>
+                    <required>You must enter a name for this file</required>
                 </field>
             </row>
             <row>
@@ -40,9 +40,9 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
                     <repeatable>true</repeatable>
-                    <label>Descrição</label>
+                    <label>Description</label>
                     <input-type>textarea</input-type>
-                    <hint>Descrição do arquivo</hint>
+                    <hint>Enter a description for the file</hint>
                     <required></required>
                 </field>
             </row>
@@ -52,557 +52,135 @@
              often used when depositing normal Items (i.e. Items which are not Entities). -->
         <form name="traditionalpageone">
             <row>
-                    <field>
-                        <dc-schema>dc</dc-schema>
-                        <dc-element>title</dc-element>
-                        <dc-qualifier></dc-qualifier>
-                        <repeatable>false</repeatable>
-                        <label>Ação</label>
-                        <input-type>onebox</input-type>
-                        <hint>Insira o nome da ação.</hint>
-                        <required>Campo obrigatório.</required>
-                    </field>
-                
-                    <field>
-                        <dc-schema>dc</dc-schema>
-                        <dc-element>description</dc-element>
-                        <dc-qualifier>problem</dc-qualifier>
-                        <repeatable>false</repeatable>
-                        <label>Problemas</label>
-                        <input-type>onebox</input-type>
-                        <hint>Insira os problemas identificados.</hint>
-                        <required>Campo obrigatório.</required>
-                    </field>
-
-                    <field>
-                        <dc-schema>dc</dc-schema>
-                        <dc-element>subject</dc-element>
-                        <dc-qualifier></dc-qualifier>
-                        <repeatable>true</repeatable>
-                        <label>Núcleo Temático</label>
-                        <input-type>onebox</input-type>
-                        <hint>Insira o núcleo temático relacionado à ação.</hint>
-                        <required>Campo obrigatório.</required>
-                    </field>
-            </row>
-             <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>description</dc-element>
-                    <dc-qualifier>methodology</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Metodologia</label>
-                    <input-type>textarea</input-type>
-                    <hint>Descreva a metodologia utilizada.</hint>
-                    <required>Campo obrigatório.</required>
-                </field>
-            </row>
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>contributor</dc-element>
-                    <dc-qualifier>editor</dc-qualifier>
-                    <repeatable>true</repeatable>
-                    <label>Atores Principais</label>
-		            <input-type>onebox</input-type>
-                    <hint>Digite os atores.</hint>
-                    <required>Campo obrigatório.</required>
-                </field>
-            </row>
-            <row>
-                <field>
-
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>description</dc-element>
-                    <dc-qualifier>objective</dc-qualifier>
-                    <repeatable>true</repeatable>
-                    <label>Objetivos</label>
-                    <input-type>onebox</input-type>
-                    <hint>Adicione os objetivos da ação.</hint>
-                    <required>Campo obrigatório.</required>
-                </field>
-            </row>
-        </form>
-
-        <form name="acre">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>AC</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="alagoas">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>AL</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="amazonas">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>AM</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="amapa">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>AP</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="bahia">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>BA</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="ceara">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>CE</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="distritoFederal">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>DF</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="espiritoSanto">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>ES</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="goias">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>GO</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="maranhao">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>MA</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="minasGerais">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>MG</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="matoGrossoSul">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>MS</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="matoGrosso">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>MT</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="para">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>PA</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="paraiba">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>PB</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="pernambuco">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>PE</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="piaui">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>PI</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="parana">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>PR</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="rioJaneiro">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>RJ</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="rioNorte">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>RN</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="rondonia">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>RO</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="roraima">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>RR</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="rioSul">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>RS</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="santaCatarina">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>SC</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="sergipe">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>SE</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="saoPaulo">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>SP</vocabulary>
-                </field>
-            </row>
-        </form>
-        <form name="tocantins">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>spatial</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite um município e selecione as coordenadas</hint>
-                    <required>Campo obrigatório.</required>
-                    <vocabulary>TO</vocabulary>
-                </field>
-            </row>
-        </form>
-
-        <form name="regulamentacao">
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>description</dc-element>
-                    <dc-qualifier>regulation</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Regulamentação</label>
-                    <input-type>onebox</input-type>
-                    <hint>Não se aplica.</hint>
-                    <required>Campo obrigatório.</required>
-                </field>
-
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>subject</dc-element>
-                    <dc-qualifier>financial-resources</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Recursos Financeiros</label>
-                    <input-type>onebox</input-type>
-                    <hint>Não se aplica.</hint>
-                    <required>Campo obrigatório.</required>
-                </field>
-
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>coverage</dc-element>
-                    <dc-qualifier>funding-source</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Fonte de Recursos</label>
-                    <input-type>onebox</input-type>
-                    <hint>Não se aplica.</hint>
-                    <required>Campo obrigatório.</required>
-                </field>
-            </row>
-            </form>
-        <form name="contato">
-            <row>
-            
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>contributor</dc-element>
                     <dc-qualifier>author</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Responsável</label>
+                    <repeatable>true</repeatable>
+                    <label>Author</label>
                     <input-type>onebox</input-type>
-                    <hint>Insira o responsável pela ação.</hint>
-                    <required>Campo obrigatório.</required>
+                    <hint>Enter the author's name (Family name, Given names).</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Title</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the main title of the item.</hint>
+                    <required>You must enter a main title for this item.</required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Other Titles</label>
+                    <input-type>onebox</input-type>
+                    <hint>If the item has any alternative titles, please enter them here.</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Date of Issue</label>
+                    <style>col-sm-4</style>
+                    <input-type>date</input-type>
+                    <hint>Please give the date of previous publication or public distribution.
+                        You can leave out the day and/or month if they aren't applicable.
+                    </hint>
+                    <required>You must enter at least the year.</required>
                 </field>
 
                 <field>
                     <dc-schema>dc</dc-schema>
-                    <dc-element>contributor</dc-element>
-                    <dc-qualifier>email</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Email</label>
-                    <input-type>onebox</input-type>
-                    <hint>Insira o email do responsável.</hint>
-                    <required>Campo obrigatório.</required>
-                </field>
-
-                 <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>contributor</dc-element>
+                    <dc-element>publisher</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Telefone</label>
+                    <label>Publisher</label>
+                    <style>col-sm-8</style>
                     <input-type>onebox</input-type>
-                    <hint>Insira o número de telefone.</hint>
-                    <required>Campo obrigatório.</required>
+                    <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
+                    <required></required>
                 </field>
             </row>
-
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>citation</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Citation</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the standard citation for the previously issued instance of this item.</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>ispartofseries</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Series/Report No.</label>
+                    <input-type>series</input-type>
+                    <hint>Enter the series and number assigned to this item by your community.</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Identifiers</label>
+                    <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+                    <hint>If the item has any identification numbers or codes associated with
+                        it, please enter the types and the actual numbers or codes.
+                    </hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Type</label>
+                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <hint>Select the type of content of the item.
+                    </hint>
+                    <required>You must choose at least one type.</required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier>iso</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Language</label>
+                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+                    <hint>Select the language of the main content of the item. If the language does not appear in the
+                        list, please select 'Other'. If the content does not really have a language (for example, if it
+                        is a dataset or an image) please select 'N/A'.
+                    </hint>
+                    <required></required>
+                </field>
+            </row>
         </form>
 
         <!-- Form which defines the second page/section of the "traditional" DSpace submission process,
@@ -1554,29 +1132,6 @@
                     <externalsources>openaireFunding</externalsources>
                     <required></required>
                 </relation-field>
-            </row>
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>rights</dc-element>
-                    <repeatable>false</repeatable>
-                    <label>Access Type</label>
-                    <input-type value-pairs-name="openaire_rights">dropdown</input-type>
-                    <hint>Select the access type of the resource.</hint>
-                    <required></required>
-                </field>
-            </row>
-            <row>
-                <field>
-                    <dc-schema>oaire</dc-schema>
-                    <dc-element>license</dc-element>
-                    <dc-qualifier>condition</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>License</label>
-                    <input-type value-pairs-name="openaire_license_types">dropdown</input-type>
-                    <hint>Select the license of the resource.</hint>
-                    <required></required>
-                </field>
             </row>
             <row>
                 <field>

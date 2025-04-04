@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+
+    <bean id="matomoRequestBuilder" class="org.dspace.matomo.client.MatomoRequestBuilder"/>
+    <bean id="matomoResponseReader" class="org.dspace.matomo.client.MatomoResponseReader"/>
+
+    <bean id="matomoRequestDetailsBuilder" class="org.dspace.matomo.model.MatomoRequestDetailsBuilder">
+        <constructor-arg name="enrichers">
+            <list>
+                <bean id="userAgentEnricher" class="org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory" factory-method="userAgentEnricher"/>
+                <bean id="actionNameEnricher" class="org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory" factory-method="actionNameEnricher"/>
+                <bean id="urlEnricher" class="org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory" factory-method="urlEnricher"/>
+                <bean id="downloadEnricher" class="org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory" factory-method="downloadEnricher"/>
+                <bean id="trackerIdEnricher" class="org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory" factory-method="trackerIdentifierEnricher"/>
+                <!-- As of now these cookie enrichers are not working, because we are not treating cross-domain Matomo Cookies -->
+<!--
+                <bean id="cookieIdEnricher" class="org.dspace.matomo.factory.MatomoRequestCookieIdentifierEnricher"/>
+                <bean id="cookieSessionEnricher" class="org.dspace.matomo.factory.MatomoRequestCookieSessionEnricher"/>
+                <bean id="customVariablesEnricher" class="org.dspace.matomo.factory.MatomoRequestCustomVariablesEnricher"/>
+                <bean id="customCookiesEnricher" class="org.dspace.matomo.factory.MatomoRequestCustomCookiesEnricher">
+                        <constructor-arg name="customCookies" value="${matomo.request.customcookies.cookie-name}"/>
+                </bean>
+-->
+                <!-- These two enrichers requires a valid token set on the client -->
+<!--                <bean id="ipEnricher" class="org.dspace.matomo.factory.MatomoRequestIpAddressEnricher"/>-->
+<!--                <bean id="requestCountryEnricher" class="org.dspace.matomo.factory.MatomoRequestCountryEnricher"/>-->
+            </list>
+        </constructor-arg>
+        <constructor-arg name="siteId" value="${matomo.request.siteid}"/>
+    </bean>
+
+    <!-- Blocking HTTP client that uses the default HTTPClient provided by ApacheHttpClient -->
+    <!--
+    <bean id="matomoDefaultClient" class="org.dspace.matomo.client.MatomoClientImpl">
+        <constructor-arg name="baseUrl" value="${matomo.default-client.baseurl}"/>
+        &lt;!&ndash; Optional, so the default value will be null &ndash;&gt;
+        <constructor-arg name="token" value="${matomo.default-client.token:}"/>
+        <constructor-arg name="matomoRequestBuilder" ref="matomoRequestBuilder"/>
+        <constructor-arg name="matomoResponseReader" ref="matomoResponseReader"/>
+        <constructor-arg name="httpClient">
+            <bean class="org.apache.http.impl.client.HttpClients" factory-method="createDefault"/>
+        </constructor-arg>
+    </bean>
+    -->
+
+    <bean id="matomoAsyncClient" class="org.dspace.matomo.client.MatomoAsyncClientImpl">
+        <constructor-arg name="baseUrl" value="${matomo.async-client.baseurl}"/>
+        <!-- Optional, so the default value will be null -->
+        <constructor-arg name="token" value="${matomo.async-client.token:}"/>
+        <constructor-arg name="matomoRequestBuilder" ref="matomoRequestBuilder"/>
+        <constructor-arg name="matomoResponseReader" ref="matomoResponseReader"/>
+    </bean>
+
+    <!-- This Sync event handler tracks each view event using the async client that is non-blocking -->
+    <!--
+        You can use any combination of EventHandler / MatomoClient, all the options available are listed down here
+        but commented, you can choose the one you prefer.
+    -->
+    <bean id="matomoSyncEventHandler" class="org.dspace.matomo.MatomoSyncEventHandler">
+        <constructor-arg name="matomoClient" ref="matomoAsyncClient"/>
+        <constructor-arg name="builder" ref="matomoRequestDetailsBuilder"/>
+    </bean>
+
+    <!-- Sync Event handler that sends every event with a blocking client -->
+    <!--
+    <bean id="matomoSyncEventHandler" class="org.dspace.matomo.MatomoAsyncBulkRequestHandler">
+        <constructor-arg name="matomoClient" ref="matomoDefaultClient"/>
+        <constructor-arg name="builder" ref="matomoRequestDetailsBuilder"/>
+    </bean>
+    -->
+
+    <!-- Async Event handler that collects a bulk of events and then sends them using a non-blocking client async client -->
+    <!--
+    <bean id="matomoSyncEventHandler" class="org.dspace.matomo.MatomoAsyncBulkRequestHandler">
+        <constructor-arg name="matomoClient" ref="matomoAsyncClient"/>
+        <constructor-arg name="builder" ref="matomoRequestDetailsBuilder"/>
+    </bean>
+    -->
+
+    <!-- Async Event handler that collects a bulk of events and then sends them using a blocking client client -->
+    <!--
+    <bean id="matomoSyncEventHandler" class="org.dspace.matomo.MatomoAsyncBulkRequestHandler">
+        <constructor-arg name="matomoClient" ref="matomoDefaultClient"/>
+        <constructor-arg name="builder" ref="matomoRequestDetailsBuilder"/>
+    </bean>
+    -->
+
+</beans>

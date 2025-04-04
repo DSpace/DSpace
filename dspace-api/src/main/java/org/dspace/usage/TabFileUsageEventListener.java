@@ -12,8 +12,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,8 +44,7 @@ public class TabFileUsageEventListener
     /**
      * ISO 8601 Basic string format for record timestamps.
      */
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat(
-        "yyyyMMdd'T'HHmmssSSS");
+    private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmssSSS");
 
     /**
      * File on which to write event records.
@@ -115,7 +115,7 @@ public class TabFileUsageEventListener
 
         UsageEvent ue = (UsageEvent) event;
 
-        eventLog.append(dateFormat.format(new Date()))
+        eventLog.append(dateFormat.format(LocalDateTime.now(ZoneOffset.UTC)))
                 .append('\t').append(ue.getName()) // event type
                 .append('\t').append(Constants.typeText[ue.getObject().getType()])
                 .append('\t').append(ue.getObject().getID().toString())

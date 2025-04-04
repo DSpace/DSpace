@@ -11,10 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -22,15 +19,10 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.VersionBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.kernel.ServiceManager;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTestWithDatabase {
-    private ServiceManager serviceManager;
-    private IdentifierServiceImpl identifierService;
+public class VersionedHandleIdentifierProviderIT extends AbstractIdentifierProviderIT  {
 
     private String firstHandle;
 
@@ -45,58 +37,31 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
         super.setUp();
         context.turnOffAuthorisationSystem();
 
-        serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
-        identifierService = serviceManager.getServicesByType(IdentifierServiceImpl.class).get(0);
-        // Clean out providers to avoid any being used for creation of community and collection
-        identifierService.setProviders(new ArrayList<>());
-
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
         collection = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Collection")
                 .build();
-    }
 
-    @After
-    @Override
-    public void destroy() throws Exception {
-        super.destroy();
-        // After this test has finished running, refresh application context and
-        // set the expected 'default' versioned handle provider back to ensure other tests don't fail
-        DSpaceServicesFactory.getInstance().getServiceManager().getApplicationContext().refresh();
-    }
-
-    private void registerProvider(Class type) {
-        // Register our new provider
-        IdentifierProvider identifierProvider =
-                (IdentifierProvider) DSpaceServicesFactory.getInstance().getServiceManager()
-                        .getServiceByName(type.getName(), type);
-        if (identifierProvider == null) {
-            DSpaceServicesFactory.getInstance().getServiceManager().registerServiceClass(type.getName(), type);
-            identifierProvider = (IdentifierProvider) DSpaceServicesFactory.getInstance().getServiceManager()
-                    .getServiceByName(type.getName(), type);
-        }
-
-        // Overwrite the identifier-service's providers with the new one to ensure only this provider is used
-        identifierService = DSpaceServicesFactory.getInstance().getServiceManager()
-                .getServicesByType(IdentifierServiceImpl.class).get(0);
-        identifierService.setProviders(new ArrayList<>());
-        identifierService.setProviders(List.of(identifierProvider));
+        context.restoreAuthSystemState();
     }
 
     private void createVersions() throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+
         itemV1 = ItemBuilder.createItem(context, collection)
                 .withTitle("First version")
                 .build();
         firstHandle = itemV1.getHandle();
         itemV2 = VersionBuilder.createVersion(context, itemV1, "Second version").build().getItem();
         itemV3 = VersionBuilder.createVersion(context, itemV1, "Third version").build().getItem();
+
+        context.restoreAuthSystemState();
     }
 
     @Test
     public void testDefaultVersionedHandleProvider() throws Exception {
-        registerProvider(VersionedHandleIdentifierProvider.class);
         createVersions();
 
         // Confirm the original item only has its original handle
@@ -125,6 +90,11 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
         assertEquals(firstHandle, itemV3.getHandle());
         assertEquals(2, itemV3.getHandles().size());
         containsHandle(itemV3, firstHandle + ".3");
+
+        // Unregister this non-default provider
+        unregisterProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
+        // Re-register the default provider (for later tests)
+        registerProvider(VersionedHandleIdentifierProvider.class);
     }
 
     private void containsHandle(Item item, String handle) {
