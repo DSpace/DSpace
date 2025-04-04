@@ -1,0 +1,26 @@
+name: Deploy Backend (DSpace) - Branch tst
+
+on:
+  push:
+    branches:
+      - tst
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, Linux, X64, tst-backend-runner]
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Derrubar containers e remover imagens antigas (preservando volumes)
+        run: |
+          docker compose -p d8 down --rmi all --remove-orphans
+
+      - name: Build dos containers
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose-cli.yml build
+
+      - name: Subir os containers com Docker Compose
+        run: |
+          docker compose -p d8 up -d
