@@ -4,7 +4,7 @@ networks:
       config:
         # Define a custom subnet for our DSpace network, so that we can easily trust requests from host to container.
         # If you customize this value, be sure to customize the 'proxies.trusted.ipranges' env variable below.
-        - subnet: 172.23.0.0/16
+        - subnet: 172.26.0.0/16
 services:
   # DSpace (backend) webapp container
   dspace:
@@ -26,7 +26,7 @@ services:
       solr__P__server: http://dspacesolr:8983/solr
       # proxies.trusted.ipranges: This setting is required for a REST API running in Docker to trust requests
       # from the host machine. This IP range MUST correspond to the 'dspacenet' subnet defined above.
-      proxies__P__trusted__P__ipranges: '172.23.0'
+      proxies__P__trusted__P__ipranges: '172.26.0'
       LOGGING_CONFIG: /dspace/config/log4j2-container.xml
     image: "${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-latest-test}"
     build:
