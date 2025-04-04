@@ -158,25 +158,32 @@ public class MetadataValidation extends AbstractValidation {
                         }
                     }
                 }
-                relationshipFieldCheck(ContextUtil.obtainCurrentRequestContext(), obj.getItem(), input, errors, config);
+                relationshipRequiredFieldCheck(ContextUtil.obtainCurrentRequestContext(), obj.getItem(), input, errors,
+                    config);
             }
         }
         return errors;
     }
 
-    private void relationshipFieldCheck(Context context, Item item, DCInput input, List<ErrorRest> errors,
+    /**
+     * Checks if the relation type exists on the item. If not, sets the error state.
+     *
+     * @param context the current context
+     * @param item item in the submission
+     * @param input input field
+     * @param errors List holding all errors
+     * @param config submission step config
+     * @throws SQLException
+     */
+    private void relationshipRequiredFieldCheck(Context context, Item item, DCInput input, List<ErrorRest> errors,
                                         SubmissionStepConfig config) throws SQLException {
         if (input.isRelationshipField() && input.isRequired()) {
             String relationshipType = input.getRelationshipType();
             if (itemService.getMetadataByMetadataString(item, "relation." + relationshipType).isEmpty()) {
-                addError(errors, ERROR_VALIDATION_REQUIRED,
-                    "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                        input.getFieldName());
-            } else if (itemService.getMetadataByMetadataString(item, "relation." + relationshipType) == null) {
                 List<RelationshipType> relationTypes =
                     relationshipTypeService.findByLeftwardOrRightwardTypeName(context, relationshipType);
                 for (RelationshipType relationType : relationTypes) {
-                    if (relationshipService.findByItemAndRelationshipType(context, item, relationType) != null) {
+                    if (!relationshipService.findByItemAndRelationshipType(context, item, relationType).isEmpty()) {
                         return;
                     }
                 }

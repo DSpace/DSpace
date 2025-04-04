@@ -473,12 +473,6 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>true</repeatable>
          <label>Author</label>
          <hint>Enter the author's name (Family name, Given names).</hint>
-         <linked-metadata-field>
-           <dc-schema>dc</dc-schema>
-           <dc-element>contributor</dc-element>
-           <dc-qualifier>author</dc-qualifier>
-           <input-type>onebox</input-type>
-         </linked-metadata-field>
          <externalsources>orcid</externalsources>
          <required>true</required>
          <!-- You may choose to validate author names via a Regular Expression if it's appropriate for
