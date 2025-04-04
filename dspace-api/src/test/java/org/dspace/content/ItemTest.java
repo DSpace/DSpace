@@ -1095,7 +1095,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testRemoveDSpaceLicenseAuth() throws Exception {
         // First create a bundle for test
         context.turnOffAuthorisationSystem();
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
         context.restoreAuthSystemState();
@@ -1117,7 +1117,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testRemoveDSpaceLicenseNoAuth() throws Exception {
         // First create a bundle for test
         context.turnOffAuthorisationSystem();
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
         context.restoreAuthSystemState();
@@ -1133,7 +1133,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testRemoveLicensesAuth() throws Exception {
         // First create test content
         context.turnOffAuthorisationSystem();
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
 
@@ -1167,7 +1167,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testRemoveLicensesNoAuth() throws Exception {
         // First create test content
         context.turnOffAuthorisationSystem();
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
 
@@ -1376,7 +1376,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testReplaceAllBitstreamPolicies() throws Exception {
         context.turnOffAuthorisationSystem();
         //we add some bundles for the test
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
 
@@ -1451,7 +1451,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         }
 
         //we add some bundles for the test
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
 
