@@ -51,6 +51,8 @@ public class SEOHealthIndicator extends AbstractHealthIndicator {
                 builder.withDetail("robots.txt", "Invalid because it contains localhost URLs. This is often a sign " +
                         "that a proxy is failing to pass X-Forwarded headers to DSpace. Please see the DSpace " +
                         "Documentation on Search Engine Optimization for how to pass X-Forwarded headers.");
+            } else {
+                builder.withDetail("robots.txt", "OK");
             }
             builder.withDetail("ssr", ssrOk ? "OK" : "Server-side rendering (SSR) appears to be disabled.  Most " +
                     "search engines require enabling SSR for proper indexing. Please see the DSpace Documentation on" +
