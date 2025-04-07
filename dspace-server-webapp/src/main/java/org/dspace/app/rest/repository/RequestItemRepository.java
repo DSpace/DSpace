@@ -87,7 +87,8 @@ public class RequestItemRepository
     @Autowired
     protected AuthorizeService authorizeService;
 
-    private CaptchaService captchaService = CaptchaServiceFactory.getInstance().getCaptchaService();
+    // TODO: Work towards full coverage of captcha, so we can use getCaptchaService() instead
+    private CaptchaService captchaService = CaptchaServiceFactory.getInstance().getAltchaCaptchaService();
 
     private static final Logger log = LogManager.getLogger();
 

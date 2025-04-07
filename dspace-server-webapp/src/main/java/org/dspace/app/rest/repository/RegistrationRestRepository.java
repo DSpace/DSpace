@@ -78,7 +78,8 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     @Autowired
     private RequestService requestService;
 
-    private CaptchaService captchaService = CaptchaServiceFactory.getInstance().getCaptchaService();
+    // TODO: Work towards full coverage of captcha, so we can use getCaptchaService() here instead
+    private CaptchaService captchaService = CaptchaServiceFactory.getInstance().getGoogleCaptchaService();
 
     @Autowired
     private ConfigurationService configurationService;
