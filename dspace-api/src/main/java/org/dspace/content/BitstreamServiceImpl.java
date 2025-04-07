@@ -105,11 +105,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     public Bitstream clone(Context context, Bitstream bitstream)
             throws SQLException, AuthorizeException {
         Bitstream clonedBitstream = null;
+        context.turnOffAuthorisationSystem();
         try {
-            // Update our bitstream but turn off the authorization system since permissions
-            // haven't been set at this point in time.
-            authorizeService.authorizeAction(context, bitstream.getBundles().get(0), Constants.ADD);
-            context.turnOffAuthorisationSystem();
             // Create a new bitstream with a new ID.
             clonedBitstream = bitstreamDAO.create(context, new Bitstream());
             // Set the internal identifier, file size, checksum, and
@@ -122,10 +119,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             clonedBitstream.setStoreNumber(bitstream.getStoreNumber());
 
             bitstreamLinkingService.cloneMetadata(context, bitstream, clonedBitstream);
-
             update(context, clonedBitstream);
-        } catch (AuthorizeException e) {
-            throw new AuthorizeException(e);
         } finally {
             context.restoreAuthSystemState();
         }
