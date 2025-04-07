@@ -73,7 +73,7 @@ env:
   REDEPLOY_DEMO_URL: ${{ secrets.REDEPLOY_DEMO_URL }}
   # Current DSpace branches (and architecture) which are deployed to demo.dspace.org & sandbox.dspace.org respectively
   DEPLOY_DEMO_BRANCH: 'dspace-8_x'
-  DEPLOY_SANDBOX_BRANCH: 'main'
+  DEPLOY_SANDBOX_BRANCH: 'dspace-9.0-testathon'
   DEPLOY_ARCH: 'linux/amd64'
   # Registry used during building of Docker images. (All images are later copied to docker.io registry)
   # We use GitHub's Container Registry to avoid aggressive rate limits at DockerHub.
