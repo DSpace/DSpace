@@ -26,7 +26,6 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -42,8 +41,6 @@ public abstract class AbstractVersionProvider {
     protected AuthorizeService authorizeService;
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
-    @Autowired(required = true)
-    protected BitstreamStorageService bitstreamStorageService;
     @Autowired(required = true)
     protected BundleService bundleService;
     @Autowired(required = true)
