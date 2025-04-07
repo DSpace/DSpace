@@ -631,24 +631,25 @@ public class Packager {
                 if (getDSOTypeFromUUID(context, pathToNewUUID.get(path)) == Constants.ITEM) {
                     PackagerFileService.FileNode fileNode = packagerFileService
                             .getFileNodeTree(context, path, scope).get(0);
-                    Map<String, Map<String, List<String>>> pathToRelMap = fileNode.getPathToRelMap();
-                    Map<String, List<String>> relToUUID = new HashMap<>();
-                    List<String> paths = new ArrayList<>();
+                    Map<String, Map<String, Map<String, Map<Integer, Integer>>>> pathToRelMap =
+                            fileNode.getPathToRelMap();
+                    Map<String, Map<String, Map<Integer, Integer>>> relToUUID = new HashMap<>();
+                    Map<String, Map<Integer, Integer>> paths = new HashMap<>();
                     if (pathToRelMap.size() > 0) {
                         for (String relation : pathToRelMap.get(path).keySet()) {
                             paths = pathToRelMap.get(path).get(relation);
-                            List<String> uuids = new ArrayList<>();
-                            for (String relPath : paths) {
+                            Map<String, Map<Integer, Integer>> uuids = new HashMap<>();
+                            for (String relPath : paths.keySet()) {
                                 //Check for varrying paths but file NAMES should line up
                                 if (pathToNewUUID.get(relPath) == null) {
                                     for (String pathCheck : pathToNewUUID.keySet()) {
                                         if (pathCheck.contains(relPath)) {
-                                            uuids.add(pathToNewUUID.get(pathCheck));
+                                            uuids.put(pathToNewUUID.get(pathCheck), paths.get(relPath));
                                             break;
                                         }
                                     }
                                 } else {
-                                    uuids.add(pathToNewUUID.get(relPath));
+                                    uuids.put(pathToNewUUID.get(relPath), paths.get(relPath));
                                 }
                             }
                             relToUUID.put(relation, uuids);
@@ -920,16 +921,15 @@ public class Packager {
                 PackagerFileService.FileNode fileNode = packagerFileService
                         .getFileNodeTree(context, sourceFile, pkgParams.getProperty("scope")).get(0);
                 Map<String, List<String>> parentRelationshipMap = new HashMap<>();
-                fileNode.getRelMap(parentRelationshipMap);
                 if (!parentRelationshipMap.isEmpty()) {
-                    addRelationships(context, parentRelationshipMap, fileNode.uuid);
+                    //addRelationships(context, fileNode.getPathToRelMap(), fileNode.uuid);
                 }
             }
         }
     }
 
-    public void addRelationships(Context context, Map<String, List<String>> relsMap, String initUUID)
-            throws SQLException, AuthorizeException {
+    public void addRelationships(Context context, Map<String, Map<String, Map<Integer, Integer>>> relsMap,
+                                 String initUUID) throws SQLException, AuthorizeException {
         //All IDs at this point should resolve as Items in the DB
         //We're adding relations ships TO `initUUID as Item` derived FROM the relsMap
         RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
@@ -941,7 +941,7 @@ public class Packager {
                 .getMetadataFirstValue(parentItem, "dspace", "entity", "type", null);
         for (String key : relsMap.keySet()) {
             //This list will be in place order with respect to relationship side
-            for (String childUUIDString : relsMap.get(key)) {
+            for (String childUUIDString : relsMap.get(key).keySet()) {
                 Item childItem = itemService.find(context, UUID.fromString(childUUIDString));
                 String childEntityTypeLabel = itemService.getMetadataFirstValue(
                         childItem, "dspace", "entity", "type", null);
@@ -972,12 +972,21 @@ public class Packager {
                     if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(parentEntityTypeLabel)) {
                         isParentLeft = true;
                     }
+
+                    int leftOrder = 0;
+                    int rightOrder = 0;
+
+                    Map<Integer, Integer> orders = relsMap.get(key).get(childUUIDString);
+                    for (int left : orders.keySet()) {
+                        leftOrder = left;
+                        rightOrder = orders.get(left);
+                    }
                     if (isParentLeft) {
                         persistedRelationship = relationshipService.create(context, parentItem, childItem,
-                                relationshipType, -1, -1);
+                                relationshipType, leftOrder, rightOrder);
                     } else {
                         persistedRelationship = relationshipService.create(context, childItem, parentItem,
-                                relationshipType, -1, -1);
+                                relationshipType, leftOrder, rightOrder);
                     }
                     relationshipService.update(context, persistedRelationship);
                 }

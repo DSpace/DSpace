@@ -1596,17 +1596,16 @@ public abstract class AbstractMETSDisseminator
                     String value = "";
                     Item otherItem;
                     if (relationship.getRightItem() == item) {
-                        place = relationship.getRightPlace();
                         value = relationship.getRightwardValue();
                         otherItem = relationship.getLeftItem();
                     } else {
-                        place = relationship.getLeftPlace();
                         value = relationship.getLeftwardValue();
                         otherItem = relationship.getRightItem();
                     }
                     if (otherItem.isArchived()) {
                         Div divChild = new Div();
-                        divChild.setORDER(place);
+                        divChild.setORDER(relationship.getLeftPlace());
+                        divChild.setID(String.valueOf(relationship.getRightPlace()));
                         if (value == null || !value.equalsIgnoreCase("")) {
                             divChild.setLABEL(value);
                         }

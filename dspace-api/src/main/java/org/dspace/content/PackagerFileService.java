@@ -195,6 +195,8 @@ public class PackagerFileService {
             String handle;
             String path;
             String uuid = null;
+            int leftOrder;
+            int rightOrder;
             String relName = relElement.getAttributeValue("ID").split("_")[1];
             int type;
             if (scope.containsKey(relName) || scope.containsKey("*")) {
@@ -202,10 +204,13 @@ public class PackagerFileService {
                 for (Object relElementChildren : relElement.getChildren()) {
                     //The children of relElementChildrenElement are that items MPTR elements
                     Element relElementChildrenElement = (Element) relElementChildren;
+
                     handle = getMPTRData(relElementChildrenElement.getChildren(), "HANDLE");
                     path = setRelPath(sourceFilePath,
                             getMPTRData(relElementChildrenElement.getChildren(), "URL"));
                     uuid = getMPTRData(relElementChildrenElement.getChildren(), "URN").split(":")[2];
+                    rightOrder = Integer.parseInt(((Element) relElementChildren).getAttributeValue("ID"));
+                    leftOrder = Integer.parseInt(((Element) relElementChildren).getAttributeValue("ORDER"));
                     List<FileNode> relatedItems = rels.get(relName);
                     type = initType(sourceFilePath);
                     if (relatedItems == null) {
@@ -241,9 +246,9 @@ public class PackagerFileService {
                         FileNode fileNode;
                         if (new File(path).exists()) {
                             fileNode = new FileNode(handle, path,
-                                    getRels(context, path, childScope, filesInTree), uuid, type);
+                                    getRels(context, path, childScope, filesInTree), uuid, type, leftOrder, rightOrder);
                         } else {
-                            fileNode = new FileNode(handle, path, Map.of(), uuid, type);
+                            fileNode = new FileNode(handle, path, Map.of(), uuid, type, leftOrder, rightOrder);
                             fileNode.setAction(PackagerIngestAction.SKIP_RELATED_FILE_NOT_FOUND);
                         }
                         if (fileNode.action == null) {
@@ -329,6 +334,8 @@ public class PackagerFileService {
         public String handle;
         public String path;
         public String uuid = "";
+        public int leftOrder;
+        public int rightOrder;
         public PackagerIngestAction action;
         int type;
         Map<String, List<FileNode>> rels;
@@ -343,12 +350,41 @@ public class PackagerFileService {
             }
         }
 
+        public FileNode(String handle, String path, Map<String, List<FileNode>> rels, String uuid,
+                        int type, int leftOrder, int rightOrder) {
+            this.handle = handle;
+            this.path = path;
+            this.rels = rels;
+            this.type = type;
+            this.leftOrder = leftOrder;
+            this.rightOrder = rightOrder;
+            if (uuid != null) {
+                this.uuid = uuid;
+            }
+        }
+
         public void setUuid(String uuid) {
             this.uuid = uuid;
         }
 
         public void setAction(PackagerIngestAction action) {
             this.action = action;
+        }
+
+        public int getLeftOrder() {
+            return leftOrder;
+        }
+
+        public void setLeftOrder(int leftOrder) {
+            this.leftOrder = leftOrder;
+        }
+
+        public int getRightOrder() {
+            return rightOrder;
+        }
+
+        public void setRightOrder(int rightOrder) {
+            this.rightOrder = rightOrder;
         }
 
         public void print(PrintStream printStream) {
@@ -380,13 +416,15 @@ public class PackagerFileService {
             }
         }
 
-        public Map<String, Map<String,List<String>>> getPathToRelMap() {
-            Map<String, Map<String,List<String>>> pathToRelMap = new HashMap<>();
+        public Map<String, Map<String,Map<String, Map<Integer, Integer>>>> getPathToRelMap() {
+            Map<String, Map<String,Map<String, Map<Integer, Integer>>>> pathToRelMap = new HashMap<>();
             for (String relation : rels.keySet()) {
-                Map<String, List<String>> relPath = new HashMap<>();
-                List<String> paths = new ArrayList<>();
+                Map<String, Map<String, Map<Integer, Integer>>> relPath = new HashMap<>();
+                Map<String, Map<Integer, Integer>> paths = new HashMap<>();
                 for (FileNode childNode : rels.get(relation)) {
-                    paths.add(childNode.path);
+                    Map<Integer, Integer> order = new HashMap<>();
+                    order.put(childNode.getLeftOrder(), childNode.getRightOrder());
+                    paths.put(childNode.path, order);
                 }
                 relPath.put(relation, paths);
                 pathToRelMap.put(path, relPath);
