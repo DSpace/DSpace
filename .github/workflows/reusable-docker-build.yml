@@ -87,17 +87,16 @@ jobs:
       matrix:
         # Architectures / Platforms for which we will build Docker images
         arch: [ 'linux/amd64', 'linux/arm64' ]
-        os: [ ubuntu-latest ]
         isPr:
           - ${{ github.event_name == 'pull_request' }}
         # If this is a PR, we ONLY build for AMD64. For PRs we only do a sanity check test to ensure Docker builds work.
         # The below exclude therefore ensures we do NOT build ARM64 for PRs.
         exclude:
           - isPr: true
-            os: ubuntu-latest
             arch: linux/arm64
 
-    runs-on: ${{ matrix.os }}
+    # If ARM64, then use the Ubuntu ARM64 runner. Otherwise, use the Ubuntu AMD64 runner
+    runs-on: ${{ matrix.arch == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
 
     steps:
       # This step converts the slashes in the "arch" matrix values above into dashes & saves to env.ARCH_NAME
@@ -122,10 +121,6 @@ jobs:
           registry: ${{ env.DOCKER_BUILD_REGISTRY }}
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      # https://github.com/docker/setup-qemu-action
-      - name: Set up QEMU emulation to build for multiple architectures
-        uses: docker/setup-qemu-action@v3
 
       # https://github.com/docker/setup-buildx-action
       - name: Setup Docker Buildx
