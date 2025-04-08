@@ -1,0 +1,250 @@
+<node id="go_id" label="GO">
+    <isComposedBy>
+        <node id="go_abadia_de_goias_id" label="Abadia de Goiás;-49.441156,-16.757326" />
+        <node id="go_abadiania_id" label="Abadiânia;-48.705672,-16.196973" />
+        <node id="go_acreuna_id" label="Acreúna;-50.374903,-17.39599" />
+        <node id="go_adelandia_id" label="Adelândia;-50.165699,-16.4127" />
+        <node id="go_alexania_id" label="Alexânia;-48.507609,-16.083405" />
+        <node id="go_aloandia_id" label="Aloândia;-49.476895,-17.729197" />
+        <node id="go_alto_horizonte_id" label="Alto Horizonte;-49.337836,-14.197811" />
+        <node id="go_alto_paraiso_de_goias_id" label="Alto Paraíso de Goiás;-47.510016,-14.130478" />
+        <node id="go_alvorada_do_norte_id" label="Alvorada do Norte;-46.491036,-14.479688" />
+        <node id="go_amaralina_id" label="Amaralina;-49.296241,-13.92362" />
+        <node id="go_americano_do_brasil_id" label="Americano do Brasil;-49.983129,-16.251449" />
+        <node id="go_amorinopolis_id" label="Amorinópolis;-51.09193,-16.615094" />
+        <node id="go_anhanguera_id" label="Anhanguera;-48.220363,-18.333875" />
+        <node id="go_anicuns_id" label="Anicuns;-49.961695,-16.464164" />
+        <node id="go_anapolis_id" label="Anápolis;-48.952958,-16.328095" />
+        <node id="go_aparecida_de_goiania_id" label="Aparecida de Goiânia;-49.246856,-16.819804" />
+        <node id="go_aparecida_do_rio_doce_id" label="Aparecida do Rio Doce;-51.151606,-18.294071" />
+        <node id="go_apore_id" label="Aporé;-51.923184,-18.960729" />
+        <node id="go_aragarcas_id" label="Aragarças;-52.237231,-15.89546" />
+        <node id="go_aragoiania_id" label="Aragoiânia;-49.447649,-16.908699" />
+        <node id="go_araguapaz_id" label="Araguapaz;-50.631511,-15.090853" />
+        <node id="go_aracu_id" label="Araçu;-49.680424,-16.356306" />
+        <node id="go_arenopolis_id" label="Arenópolis;-51.55628,-16.383726" />
+        <node id="go_aruana_id" label="Aruanã;-51.075008,-14.916604" />
+        <node id="go_aurilandia_id" label="Aurilândia;-50.464123,-16.67726" />
+        <node id="go_avelinopolis_id" label="Avelinópolis;-49.757866,-16.467241" />
+        <node id="go_baliza_id" label="Baliza;-52.539253,-16.196606" />
+        <node id="go_barro_alto_id" label="Barro Alto;-48.908586,-14.965817" />
+        <node id="go_bela_vista_de_goias_id" label="Bela Vista de Goiás;-48.951307,-16.969295" />
+        <node id="go_bom_jardim_de_goias_id" label="Bom Jardim de Goiás;-52.172793,-16.206266" />
+        <node id="go_bom_jesus_de_goias_id" label="Bom Jesus de Goiás;-49.73999,-18.217254" />
+        <node id="go_bonfinopolis_id" label="Bonfinópolis;-48.96157,-16.617271" />
+        <node id="go_bonopolis_id" label="Bonópolis;-49.810639,-13.632893" />
+        <node id="go_brazabrantes_id" label="Brazabrantes;-49.386252,-16.428131" />
+        <node id="go_britania_id" label="Britânia;-51.160206,-15.24276" />
+        <node id="go_buriti_alegre_id" label="Buriti Alegre;-49.040441,-18.137788" />
+        <node id="go_buriti_de_goias_id" label="Buriti de Goiás;-50.430223,-16.179199" />
+        <node id="go_buritinopolis_id" label="Buritinópolis;-46.407588,-14.477184" />
+        <node id="go_cabeceiras_id" label="Cabeceiras;-46.926499,-15.799546" />
+        <node id="go_cachoeira_alta_id" label="Cachoeira Alta;-50.943243,-18.761827" />
+        <node id="go_cachoeira_dourada_id" label="Cachoeira Dourada;-49.476603,-18.485893" />
+        <node id="go_cachoeira_de_goias_id" label="Cachoeira de Goiás;-50.646041,-16.663516" />
+        <node id="go_caiaponia_id" label="Caiapônia;-51.809076,-16.953878" />
+        <node id="go_caldas_novas_id" label="Caldas Novas;-48.624579,-17.74406" />
+        <node id="go_caldazinha_id" label="Caldazinha;-49.00126,-16.711665" />
+        <node id="go_campestre_de_goias_id" label="Campestre de Goiás;-49.69497,-16.762418" />
+        <node id="go_campinacu_id" label="Campinaçu;-48.570384,-13.786997" />
+        <node id="go_campinorte_id" label="Campinorte;-49.151093,-14.31367" />
+        <node id="go_campo_alegre_de_goias_id" label="Campo Alegre de Goiás;-47.776815,-17.636346" />
+        <node id="go_campo_limpo_de_goias_id" label="Campo Limpo de Goiás;-49.079073,-16.302822" />
+        <node id="go_campos_belos_id" label="Campos Belos;-46.768112,-13.034984" />
+        <node id="go_campos_verdes_id" label="Campos Verdes;-49.652795,-14.244197" />
+        <node id="go_carmo_do_rio_verde_id" label="Carmo do Rio Verde;-49.707975,-15.354914" />
+        <node id="go_castelandia_id" label="Castelândia;-50.203036,-18.092103" />
+        <node id="go_catalao_id" label="Catalão;-47.944043,-18.165633" />
+        <node id="go_caturai_id" label="Caturaí;-49.493573,-16.444725" />
+        <node id="go_cavalcante_id" label="Cavalcante;-47.45659,-13.797564" />
+        <node id="go_cacu_id" label="Caçu;-51.132798,-18.559382" />
+        <node id="go_ceres_id" label="Ceres;-49.600006,-15.306109" />
+        <node id="go_cezarina_id" label="Cezarina;-49.775814,-16.971829" />
+        <node id="go_chapadao_do_ceu_id" label="Chapadão do Céu;-52.548986,-18.407326" />
+        <node id="go_cidade_ocidental_id" label="Cidade Ocidental;-47.925211,-16.076469" />
+        <node id="go_cocalzinho_de_goias_id" label="Cocalzinho de Goiás;-48.774742,-15.791438" />
+        <node id="go_colinas_do_sul_id" label="Colinas do Sul;-48.075988,-14.152816" />
+        <node id="go_corumbaiba_id" label="Corumbaíba;-48.562607,-18.141487" />
+        <node id="go_corumba_de_goias_id" label="Corumbá de Goiás;-48.811706,-15.924473" />
+        <node id="go_cristalina_id" label="Cristalina;-47.613128,-16.767608" />
+        <node id="go_cristianopolis_id" label="Cristianópolis;-48.703447,-17.198663" />
+        <node id="go_crixas_id" label="Crixás;-49.973977,-14.541194" />
+        <node id="go_crominia_id" label="Cromínia;-49.379778,-17.288322" />
+        <node id="go_cumari_id" label="Cumari;-48.151134,-18.264437" />
+        <node id="go_corrego_do_ouro_id" label="Córrego do Ouro;-50.550301,-16.291774" />
+        <node id="go_damianopolis_id" label="Damianópolis;-46.178024,-14.560381" />
+        <node id="go_damolandia_id" label="Damolândia;-49.363098,-16.254372" />
+        <node id="go_davinopolis_id" label="Davinópolis;-47.556795,-18.150084" />
+        <node id="go_diorama_id" label="Diorama;-51.254332,-16.232936" />
+        <node id="go_divinopolis_de_goias_id" label="Divinópolis de Goiás;-46.399879,-13.285314" />
+        <node id="go_doverlandia_id" label="Doverlândia;-52.31886,-16.718819" />
+        <node id="go_edealina_id" label="Edealina;-49.664401,-17.423942" />
+        <node id="go_edeia_id" label="Edéia;-49.929544,-17.340601" />
+        <node id="go_estrela_do_norte_id" label="Estrela do Norte;-49.071592,-13.866451" />
+        <node id="go_faina_id" label="Faina;-50.362205,-15.447297" />
+        <node id="go_fazenda_nova_id" label="Fazenda Nova;-50.778111,-16.18337" />
+        <node id="go_firminopolis_id" label="Firminópolis;-50.304007,-16.57778" />
+        <node id="go_flores_de_goias_id" label="Flores de Goiás;-47.041694,-14.445115" />
+        <node id="go_formosa_id" label="Formosa;-47.336999,-15.539991" />
+        <node id="go_formoso_id" label="Formoso;-48.877548,-13.649906" />
+        <node id="go_gameleira_de_goias_id" label="Gameleira de Goiás;-48.644369,-16.483064" />
+        <node id="go_goiandira_id" label="Goiandira;-48.087453,-18.135158" />
+        <node id="go_goianira_id" label="Goianira;-49.426998,-16.494746" />
+        <node id="go_goianapolis_id" label="Goianápolis;-49.023435,-16.509768" />
+        <node id="go_goianesia_id" label="Goianésia;-49.1162,-15.311827" />
+        <node id="go_goiatuba_id" label="Goiatuba;-49.365807,-18.010531" />
+        <node id="go_goias_id" label="Goiás;-50.139963,-15.933305" />
+        <node id="go_goiania_id" label="Goiânia;-49.264346,-16.686439" />
+        <node id="go_gouvelandia_id" label="Gouvelândia;-50.080499,-18.623801" />
+        <node id="go_guapo_id" label="Guapó;-49.534531,-16.829656" />
+        <node id="go_guarani_de_goias_id" label="Guarani de Goiás;-46.486784,-13.942141" />
+        <node id="go_guaraita_id" label="Guaraíta;-50.026528,-15.612137" />
+        <node id="go_guarinos_id" label="Guarinos;-49.700609,-14.729215" />
+        <node id="go_heitorai_id" label="Heitoraí;-49.826826,-15.718986" />
+        <node id="go_hidrolina_id" label="Hidrolina;-49.463404,-14.726103" />
+        <node id="go_hidrolandia_id" label="Hidrolândia;-49.226535,-16.962587" />
+        <node id="go_iaciara_id" label="Iaciara;-46.633452,-14.101101" />
+        <node id="go_inaciolandia_id" label="Inaciolândia;-49.988758,-18.486896" />
+        <node id="go_indiara_id" label="Indiara;-49.986162,-17.138739" />
+        <node id="go_inhumas_id" label="Inhumas;-49.500111,-16.361057" />
+        <node id="go_ipameri_id" label="Ipameri;-48.158118,-17.721544" />
+        <node id="go_ipiranga_de_goias_id" label="Ipiranga de Goiás;-49.671844,-15.170417" />
+        <node id="go_ipora_id" label="Iporá;-51.118049,-16.439764" />
+        <node id="go_israelandia_id" label="Israelândia;-50.908722,-16.314389" />
+        <node id="go_itaberai_id" label="Itaberaí;-49.806034,-16.020551" />
+        <node id="go_itaguari_id" label="Itaguari;-49.607084,-15.918044" />
+        <node id="go_itaguaru_id" label="Itaguaru;-49.635375,-15.75647" />
+        <node id="go_itaja_id" label="Itajá;-51.549514,-19.067338" />
+        <node id="go_itapaci_id" label="Itapaci;-49.551122,-14.952235" />
+        <node id="go_itapirapua_id" label="Itapirapuã;-50.609434,-15.8205" />
+        <node id="go_itapuranga_id" label="Itapuranga;-49.948957,-15.560589" />
+        <node id="go_itaruma_id" label="Itarumã;-51.348516,-18.764553" />
+        <node id="go_itaucu_id" label="Itauçu;-49.610929,-16.202899" />
+        <node id="go_itumbiara_id" label="Itumbiara;-49.215845,-18.409267" />
+        <node id="go_ivolandia_id" label="Ivolândia;-50.792076,-16.599526" />
+        <node id="go_jandaia_id" label="Jandaia;-50.145322,-17.048144" />
+        <node id="go_jaragua_id" label="Jaraguá;-49.334428,-15.752948" />
+        <node id="go_jatai_id" label="Jataí;-51.720424,-17.878383" />
+        <node id="go_jaupaci_id" label="Jaupaci;-50.950766,-16.177289" />
+        <node id="go_jesupolis_id" label="Jesúpolis;-49.373942,-15.948362" />
+        <node id="go_joviania_id" label="Joviânia;-49.619687,-17.801983" />
+        <node id="go_jussara_id" label="Jussara;-50.866818,-15.865877" />
+        <node id="go_lagoa_santa_id" label="Lagoa Santa;-51.399333,-19.185113" />
+        <node id="go_leopoldo_de_bulhoes_id" label="Leopoldo de Bulhões;-48.742755,-16.619048" />
+        <node id="go_luziania_id" label="Luziânia;-47.95,-16.253" />
+        <node id="go_mairipotaba_id" label="Mairipotaba;-49.489819,-17.297538" />
+        <node id="go_mambai_id" label="Mambaí;-46.116491,-14.482291" />
+        <node id="go_mara_rosa_id" label="Mara Rosa;-49.177652,-14.014816" />
+        <node id="go_marzagao_id" label="Marzagão;-48.641519,-17.982978" />
+        <node id="go_matrincha_id" label="Matrinchã;-50.745644,-15.434171" />
+        <node id="go_maurilandia_id" label="Maurilândia;-50.338836,-17.971859" />
+        <node id="go_mimoso_de_goias_id" label="Mimoso de Goiás;-48.161149,-15.051489" />
+        <node id="go_minacu_id" label="Minaçu;-48.22058,-13.530413" />
+        <node id="go_mineiros_id" label="Mineiros;-52.553672,-17.565388" />
+        <node id="go_moipora_id" label="Moiporá;-50.73904,-16.543374" />
+        <node id="go_monte_alegre_de_goias_id" label="Monte Alegre de Goiás;-46.892813,-13.255206" />
+        <node id="go_montes_claros_de_goias_id" label="Montes Claros de Goiás;-51.397878,-16.005946" />
+        <node id="go_montividiu_id" label="Montividiu;-51.172815,-17.443934" />
+        <node id="go_montividiu_do_norte_id" label="Montividiu do Norte;-48.685316,-13.348471" />
+        <node id="go_morrinhos_id" label="Morrinhos;-49.105908,-17.733369" />
+        <node id="go_morro_agudo_de_goias_id" label="Morro Agudo de Goiás;-50.055281,-15.31843" />
+        <node id="go_mossamedes_id" label="Mossâmedes;-50.213615,-16.123982" />
+        <node id="go_mozarlandia_id" label="Mozarlândia;-50.571321,-14.745705" />
+        <node id="go_mundo_novo_id" label="Mundo Novo;-50.281378,-13.772943" />
+        <node id="go_mutunopolis_id" label="Mutunópolis;-49.274549,-13.730338" />
+        <node id="go_nazario_id" label="Nazário;-49.881671,-16.580769" />
+        <node id="go_neropolis_id" label="Nerópolis;-49.222708,-16.404708" />
+        <node id="go_niquelandia_id" label="Niquelândia;-48.459887,-14.466192" />
+        <node id="go_nova_america_id" label="Nova América;-49.895297,-15.020589" />
+        <node id="go_nova_aurora_id" label="Nova Aurora;-48.255172,-18.059652" />
+        <node id="go_nova_crixas_id" label="Nova Crixás;-50.32996,-14.095676" />
+        <node id="go_nova_gloria_id" label="Nova Glória;-49.573713,-15.144957" />
+        <node id="go_nova_iguacu_de_goias_id" label="Nova Iguaçu de Goiás;-49.387191,-14.286829" />
+        <node id="go_nova_roma_id" label="Nova Roma;-46.873369,-13.738781" />
+        <node id="go_nova_veneza_id" label="Nova Veneza;-49.316789,-16.369518" />
+        <node id="go_novo_brasil_id" label="Novo Brasil;-50.711279,-16.031326" />
+        <node id="go_novo_gama_id" label="Novo Gama;-48.041662,-16.059185" />
+        <node id="go_novo_planalto_id" label="Novo Planalto;-49.506025,-13.242382" />
+        <node id="go_orizona_id" label="Orizona;-48.29641,-17.033356" />
+        <node id="go_ouro_verde_de_goias_id" label="Ouro Verde de Goiás;-49.194154,-16.218107" />
+        <node id="go_ouvidor_id" label="Ouvidor;-47.83548,-18.227669" />
+        <node id="go_padre_bernardo_id" label="Padre Bernardo;-48.283303,-15.160492" />
+        <node id="go_palestina_de_goias_id" label="Palestina de Goiás;-51.530885,-16.739221" />
+        <node id="go_palmeiras_de_goias_id" label="Palmeiras de Goiás;-49.924029,-16.804446" />
+        <node id="go_palmelo_id" label="Palmelo;-48.42603,-17.325819" />
+        <node id="go_palminopolis_id" label="Palminópolis;-50.16524,-16.79243" />
+        <node id="go_panama_id" label="Panamá;-49.354994,-18.178264" />
+        <node id="go_paranaiguara_id" label="Paranaiguara;-50.653928,-18.914055" />
+        <node id="go_parauna_id" label="Paraúna;-50.448357,-16.946259" />
+        <node id="go_perolandia_id" label="Perolândia;-52.064987,-17.525835" />
+        <node id="go_petrolina_de_goias_id" label="Petrolina de Goiás;-49.336371,-16.096849" />
+        <node id="go_pilar_de_goias_id" label="Pilar de Goiás;-49.578356,-14.760837" />
+        <node id="go_piracanjuba_id" label="Piracanjuba;-49.01701,-17.302038" />
+        <node id="go_piranhas_id" label="Piranhas;-51.823472,-16.425807" />
+        <node id="go_pirenopolis_id" label="Pirenópolis;-48.95843,-15.8507" />
+        <node id="go_pires_do_rio_id" label="Pires do Rio;-48.276756,-17.301901" />
+        <node id="go_planaltina_id" label="Planaltina;-47.608885,-15.452033" />
+        <node id="go_pontalina_id" label="Pontalina;-49.44894,-17.522513" />
+        <node id="go_porangatu_id" label="Porangatu;-49.150282,-13.439102" />
+        <node id="go_porteirao_id" label="Porteirão;-50.165322,-17.81428" />
+        <node id="go_portelandia_id" label="Portelândia;-52.679939,-17.355381" />
+        <node id="go_posse_id" label="Posse;-46.370407,-14.085943" />
+        <node id="go_professor_jamil_id" label="Professor Jamil;-49.244004,-17.249665" />
+        <node id="go_quirinopolis_id" label="Quirinópolis;-50.454698,-18.447186" />
+        <node id="go_rialma_id" label="Rialma;-49.581399,-15.314482" />
+        <node id="go_rianapolis_id" label="Rianápolis;-49.511399,-15.445649" />
+        <node id="go_rio_quente_id" label="Rio Quente;-48.772462,-17.773988" />
+        <node id="go_rio_verde_id" label="Rio Verde;-50.919195,-17.792266" />
+        <node id="go_rubiataba_id" label="Rubiataba;-49.804792,-15.161744" />
+        <node id="go_sanclerlandia_id" label="Sanclerlândia;-50.312374,-16.197039" />
+        <node id="go_santa_barbara_de_goias_id" label="Santa Bárbara de Goiás;-49.695385,-16.571363" />
+        <node id="go_santa_cruz_de_goias_id" label="Santa Cruz de Goiás;-48.48095,-17.315512" />
+        <node id="go_santa_fe_de_goias_id" label="Santa Fé de Goiás;-51.103706,-15.766426" />
+        <node id="go_santa_helena_de_goias_id" label="Santa Helena de Goiás;-50.597664,-17.81152" />
+        <node id="go_santa_isabel_id" label="Santa Isabel;-49.425931,-15.295849" />
+        <node id="go_santa_rita_do_araguaia_id" label="Santa Rita do Araguaia;-53.201236,-17.32691" />
+        <node id="go_santa_rita_do_novo_destino_id" label="Santa Rita do Novo Destino;-49.120254,-15.135072" />
+        <node id="go_santa_rosa_de_goias_id" label="Santa Rosa de Goiás;-49.495326,-16.083983" />
+        <node id="go_santa_tereza_de_goias_id" label="Santa Tereza de Goiás;-49.014405,-13.713812" />
+        <node id="go_santa_terezinha_de_goias_id" label="Santa Terezinha de Goiás;-49.709099,-14.432649" />
+        <node id="go_santo_antonio_da_barra_id" label="Santo Antônio da Barra;-50.634543,-17.558499" />
+        <node id="go_santo_antonio_de_goias_id" label="Santo Antônio de Goiás;-49.309607,-16.481534" />
+        <node id="go_santo_antonio_do_descoberto_id" label="Santo Antônio do Descoberto;-48.257761,-15.941247" />
+        <node id="go_senador_canedo_id" label="Senador Canedo;-49.091398,-16.708401" />
+        <node id="go_serranopolis_id" label="Serranópolis;-51.958637,-18.306722" />
+        <node id="go_silvania_id" label="Silvânia;-48.608326,-16.659972" />
+        <node id="go_simolandia_id" label="Simolândia;-46.484681,-14.464402" />
+        <node id="go_sao_domingos_id" label="São Domingos;-46.318968,-13.403749" />
+        <node id="go_sao_francisco_de_goias_id" label="São Francisco de Goiás;-49.260519,-15.925646" />
+        <node id="go_sao_joao_d`alianca_id" label="São João d`Aliança;-47.522783,-14.704831" />
+        <node id="go_sao_joao_da_parauna_id" label="São João da Paraúna;-50.409243,-16.812622" />
+        <node id="go_sao_luis_de_montes_belos_id" label="São Luís de Montes Belos;-50.372628,-16.521064" />
+        <node id="go_sao_luiz_do_norte_id" label="São Luíz do Norte;-49.328495,-14.860804" />
+        <node id="go_sao_miguel_do_araguaia_id" label="São Miguel do Araguaia;-50.163402,-13.27305" />
+        <node id="go_sao_miguel_do_passa_quatro_id" label="São Miguel do Passa Quatro;-48.661981,-17.058201" />
+        <node id="go_sao_patricio_id" label="São Patrício;-49.818,-15.35" />
+        <node id="go_sao_simao_id" label="São Simão;-50.546968,-18.99603" />
+        <node id="go_sitio_d`abadia_id" label="Sítio d`Abadia;-46.250628,-14.79924" />
+        <node id="go_taquaral_de_goias_id" label="Taquaral de Goiás;-49.603859,-16.052057" />
+        <node id="go_teresina_de_goias_id" label="Teresina de Goiás;-47.265896,-13.780056" />
+        <node id="go_terezopolis_de_goias_id" label="Terezópolis de Goiás;-49.079695,-16.394529" />
+        <node id="go_trindade_id" label="Trindade;-49.492667,-16.651708" />
+        <node id="go_trombas_id" label="Trombas;-48.74171,-13.50789" />
+        <node id="go_tres_ranchos_id" label="Três Ranchos;-47.775977,-18.353897" />
+        <node id="go_turvelandia_id" label="Turvelândia;-50.302376,-17.850215" />
+        <node id="go_turvania_id" label="Turvânia;-50.136894,-16.612535" />
+        <node id="go_uirapuru_id" label="Uirapuru;-49.920061,-14.283538" />
+        <node id="go_uruana_id" label="Uruana;-49.686137,-15.499323" />
+        <node id="go_uruacu_id" label="Uruaçu;-49.139633,-14.52384" />
+        <node id="go_urutai_id" label="Urutaí;-48.201481,-17.465097" />
+        <node id="go_valparaiso_de_goias_id" label="Valparaíso de Goiás;-47.975675,-16.065078" />
+        <node id="go_varjao_id" label="Varjão;-49.631229,-17.047062" />
+        <node id="go_vianopolis_id" label="Vianópolis;-48.515914,-16.740532" />
+        <node id="go_vicentinopolis_id" label="Vicentinópolis;-49.804747,-17.732204" />
+        <node id="go_vila_boa_id" label="Vila Boa;-47.052029,-15.038705" />
+        <node id="go_vila_propicio_id" label="Vila Propício;-48.88191,-15.454161" />
+        <node id="go_agua_fria_de_goias_id" label="Água Fria de Goiás;-47.78229,-14.977837" />
+        <node id="go_agua_limpa_id" label="Água Limpa;-48.760304,-18.077082" />
+        <node id="go_aguas_lindas_de_goias_id" label="Águas Lindas de Goiás;-48.281611,-15.761746" />
+    </isComposedBy>
+</node>

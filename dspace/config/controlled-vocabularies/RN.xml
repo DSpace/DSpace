@@ -1,0 +1,171 @@
+<node id="rn_id" label="RN">
+    <isComposedBy>
+        <node id="rn_acari_id" label="Acari;-36.634719,-6.428201" />
+        <node id="rn_afonso_bezerra_id" label="Afonso Bezerra;-36.507469,-5.492294" />
+        <node id="rn_alexandria_id" label="Alexandria;-38.01423,-6.405335" />
+        <node id="rn_almino_afonso_id" label="Almino Afonso;-37.763574,-6.147496" />
+        <node id="rn_alto_do_rodrigues_id" label="Alto do Rodrigues;-36.749971,-5.281857" />
+        <node id="rn_angicos_id" label="Angicos;-36.609434,-5.65792" />
+        <node id="rn_antonio_martins_id" label="Antônio Martins;-37.883363,-6.213666" />
+        <node id="rn_apodi_id" label="Apodi;-37.794593,-5.653489" />
+        <node id="rn_areia_branca_id" label="Areia Branca;-37.125226,-4.952537" />
+        <node id="rn_ares_id" label="Arês;-35.160823,-6.18831" />
+        <node id="rn_acu_id" label="Açu;-36.907538,-5.565024" />
+        <node id="rn_barauna_id" label="Baraúna;-37.612911,-5.06977" />
+        <node id="rn_barcelona_id" label="Barcelona;-35.924653,-5.94284" />
+        <node id="rn_baia_formosa_id" label="Baía Formosa;-35.00327,-6.371607" />
+        <node id="rn_bento_fernandes_id" label="Bento Fernandes;-35.812996,-5.699057" />
+        <node id="rn_boa_saude_id" label="Boa Saúde;-35.596566,-6.154793" />
+        <node id="rn_bodo_id" label="Bodó;-36.416706,-5.980269" />
+        <node id="rn_bom_jesus_id" label="Bom Jesus;-35.579196,-5.986479" />
+        <node id="rn_brejinho_id" label="Brejinho;-35.359113,-6.185662" />
+        <node id="rn_caico_id" label="Caicó;-37.106723,-6.454415" />
+        <node id="rn_caicara_do_norte_id" label="Caiçara do Norte;-36.07169,-5.070913" />
+        <node id="rn_caicara_do_rio_do_vento_id" label="Caiçara do Rio do Vento;-35.993772,-5.765412" />
+        <node id="rn_campo_grande_id" label="Campo Grande;-37.310572,-5.8536" />
+        <node id="rn_campo_redondo_id" label="Campo Redondo;-36.188768,-6.23829" />
+        <node id="rn_canguaretama_id" label="Canguaretama;-35.128059,-6.371927" />
+        <node id="rn_caraubas_id" label="Caraúbas;-37.558629,-5.783867" />
+        <node id="rn_carnaubais_id" label="Carnaubais;-36.833489,-5.341808" />
+        <node id="rn_carnauba_dos_dantas_id" label="Carnaúba dos Dantas;-36.586818,-6.550153" />
+        <node id="rn_ceara-mirim_id" label="Ceará-Mirim;-35.419741,-5.640061" />
+        <node id="rn_cerro_cora_id" label="Cerro Corá;-36.350278,-6.03503" />
+        <node id="rn_coronel_ezequiel_id" label="Coronel Ezequiel;-36.222346,-6.374801" />
+        <node id="rn_coronel_joao_pessoa_id" label="Coronel João Pessoa;-38.44415,-6.249736" />
+        <node id="rn_cruzeta_id" label="Cruzeta;-36.778239,-6.408939" />
+        <node id="rn_currais_novos_id" label="Currais Novos;-36.514648,-6.254843" />
+        <node id="rn_doutor_severiano_id" label="Doutor Severiano;-38.379407,-6.080819" />
+        <node id="rn_encanto_id" label="Encanto;-38.30328,-6.106912" />
+        <node id="rn_equador_id" label="Equador;-36.716957,-6.938355" />
+        <node id="rn_espirito_santo_id" label="Espírito Santo;-35.305217,-6.335634" />
+        <node id="rn_espirito_santo_do_oeste_id" label="Espírito Santo do Oeste;-37.103187,-5.768931" />
+        <node id="rn_extremoz_id" label="Extremoz;-35.30484,-5.701433" />
+        <node id="rn_felipe_guerra_id" label="Felipe Guerra;-37.687518,-5.592737" />
+        <node id="rn_fernando_pedroza_id" label="Fernando Pedroza;-36.528193,-5.690955" />
+        <node id="rn_florania_id" label="Florânia;-36.822624,-6.122645" />
+        <node id="rn_francisco_dantas_id" label="Francisco Dantas;-38.121209,-6.072339" />
+        <node id="rn_frutuoso_gomes_id" label="Frutuoso Gomes;-37.837493,-6.156686" />
+        <node id="rn_galinhos_id" label="Galinhos;-36.275449,-5.090901" />
+        <node id="rn_goianinha_id" label="Goianinha;-35.194289,-6.264864" />
+        <node id="rn_governador_dix-sept_rosado_id" label="Governador Dix-Sept Rosado;-37.518265,-5.448867" />
+        <node id="rn_grossos_id" label="Grossos;-37.16208,-4.98068" />
+        <node id="rn_guamare_id" label="Guamaré;-36.322172,-5.106194" />
+        <node id="rn_ielmo_marinho_id" label="Ielmo Marinho;-35.549952,-5.824469" />
+        <node id="rn_ipanguacu_id" label="Ipanguaçu;-36.850137,-5.489844" />
+        <node id="rn_ipueira_id" label="Ipueira;-37.204541,-6.805962" />
+        <node id="rn_itaja_id" label="Itajá;-36.871176,-5.638936" />
+        <node id="rn_itau_id" label="Itaú;-37.991249,-5.836301" />
+        <node id="rn_jandaira_id" label="Jandaíra;-36.127836,-5.352106" />
+        <node id="rn_janduis_id" label="Janduís;-37.40482,-6.014739" />
+        <node id="rn_japi_id" label="Japi;-35.934551,-6.46544" />
+        <node id="rn_jardim_de_angicos_id" label="Jardim de Angicos;-35.971287,-5.649993" />
+        <node id="rn_jardim_de_piranhas_id" label="Jardim de Piranhas;-37.349643,-6.376649" />
+        <node id="rn_jardim_do_serido_id" label="Jardim do Seridó;-36.773574,-6.580474" />
+        <node id="rn_jacana_id" label="Jaçanã;-36.203081,-6.418559" />
+        <node id="rn_jose_da_penha_id" label="José da Penha;-38.282277,-6.310947" />
+        <node id="rn_joao_camara_id" label="João Câmara;-35.812186,-5.54094" />
+        <node id="rn_joao_dias_id" label="João Dias;-37.788546,-6.272154" />
+        <node id="rn_jucurutu_id" label="Jucurutu;-37.00902,-6.030599" />
+        <node id="rn_jundia_id" label="Jundiá;-35.349469,-6.268657" />
+        <node id="rn_lagoa_nova_id" label="Lagoa Nova;-36.47027,-6.093386" />
+        <node id="rn_lagoa_salgada_id" label="Lagoa Salgada;-35.472394,-6.122954" />
+        <node id="rn_lagoa_d`anta_id" label="Lagoa d`Anta;-35.594904,-6.394926" />
+        <node id="rn_lagoa_de_pedras_id" label="Lagoa de Pedras;-35.429888,-6.150815" />
+        <node id="rn_lagoa_de_velhos_id" label="Lagoa de Velhos;-35.872928,-6.011897" />
+        <node id="rn_lajes_id" label="Lajes;-36.24704,-5.693222" />
+        <node id="rn_lajes_pintadas_id" label="Lajes Pintadas;-36.117088,-6.149429" />
+        <node id="rn_lucrecia_id" label="Lucrécia;-37.813365,-6.105248" />
+        <node id="rn_luis_gomes_id" label="Luís Gomes;-38.389865,-6.405883" />
+        <node id="rn_macau_id" label="Macau;-36.631842,-5.107947" />
+        <node id="rn_macaiba_id" label="Macaíba;-35.355184,-5.852295" />
+        <node id="rn_major_sales_id" label="Major Sales;-38.324019,-6.399485" />
+        <node id="rn_marcelino_vieira_id" label="Marcelino Vieira;-38.164162,-6.284595" />
+        <node id="rn_martins_id" label="Martins;-37.907973,-6.08279" />
+        <node id="rn_maxaranguape_id" label="Maxaranguape;-35.263082,-5.521809" />
+        <node id="rn_messias_targino_id" label="Messias Targino;-37.515817,-6.071935" />
+        <node id="rn_montanhas_id" label="Montanhas;-35.284158,-6.485217" />
+        <node id="rn_monte_alegre_id" label="Monte Alegre;-35.325337,-6.07063" />
+        <node id="rn_monte_das_gameleiras_id" label="Monte das Gameleiras;-35.783133,-6.43698" />
+        <node id="rn_mossoro_id" label="Mossoró;-37.347446,-5.183737" />
+        <node id="rn_natal_id" label="Natal;-35.198604,-5.793567" />
+        <node id="rn_nova_cruz_id" label="Nova Cruz;-35.428615,-6.475115" />
+        <node id="rn_nisia_floresta_id" label="Nísia Floresta;-35.19913,-6.093288" />
+        <node id="rn_olho-d`agua_do_borges_id" label="Olho-d`Água do Borges;-37.704696,-5.948597" />
+        <node id="rn_ouro_branco_id" label="Ouro Branco;-36.94279,-6.6958" />
+        <node id="rn_parana_id" label="Paraná;-38.305701,-6.475645" />
+        <node id="rn_parazinho_id" label="Parazinho;-35.839787,-5.222758" />
+        <node id="rn_parelhas_id" label="Parelhas;-36.656626,-6.684908" />
+        <node id="rn_parnamirim_id" label="Parnamirim;-35.271,-5.911156" />
+        <node id="rn_passa_e_fica_id" label="Passa e Fica;-35.644179,-6.430183" />
+        <node id="rn_passagem_id" label="Passagem;-35.370037,-6.272684" />
+        <node id="rn_patu_id" label="Patu;-37.635638,-6.106559" />
+        <node id="rn_pau_dos_ferros_id" label="Pau dos Ferros;-38.207714,-6.104976" />
+        <node id="rn_pedra_grande_id" label="Pedra Grande;-35.876018,-5.149882" />
+        <node id="rn_pedra_preta_id" label="Pedra Preta;-36.108367,-5.573524" />
+        <node id="rn_pedro_avelino_id" label="Pedro Avelino;-36.386653,-5.516099" />
+        <node id="rn_pedro_velho_id" label="Pedro Velho;-35.219539,-6.4356" />
+        <node id="rn_pendencias_id" label="Pendências;-36.70955,-5.2564" />
+        <node id="rn_piloes_id" label="Pilões;-38.04605,-6.263635" />
+        <node id="rn_portalegre_id" label="Portalegre;-37.986524,-6.02064" />
+        <node id="rn_porto_do_mangue_id" label="Porto do Mangue;-36.78871,-5.054413" />
+        <node id="rn_poco_branco_id" label="Poço Branco;-35.663535,-5.622326" />
+        <node id="rn_pureza_id" label="Pureza;-35.555374,-5.463933" />
+        <node id="rn_rafael_fernandes_id" label="Rafael Fernandes;-38.221116,-6.189871" />
+        <node id="rn_rafael_godeiro_id" label="Rafael Godeiro;-37.715961,-6.072441" />
+        <node id="rn_riacho_da_cruz_id" label="Riacho da Cruz;-37.949047,-5.926543" />
+        <node id="rn_riacho_de_santana_id" label="Riacho de Santana;-38.311576,-6.251392" />
+        <node id="rn_riachuelo_id" label="Riachuelo;-35.821515,-5.821555" />
+        <node id="rn_rio_do_fogo_id" label="Rio do Fogo;-35.379437,-5.276498" />
+        <node id="rn_rodolfo_fernandes_id" label="Rodolfo Fernandes;-38.057886,-5.783929" />
+        <node id="rn_ruy_barbosa_id" label="Ruy Barbosa;-35.933039,-5.887454" />
+        <node id="rn_santa_cruz_id" label="Santa Cruz;-36.019297,-6.224752" />
+        <node id="rn_santa_maria_id" label="Santa Maria;-35.691409,-5.838022" />
+        <node id="rn_santana_do_matos_id" label="Santana do Matos;-36.657763,-5.946055" />
+        <node id="rn_santana_do_serido_id" label="Santana do Seridó;-36.731201,-6.76643" />
+        <node id="rn_santo_antonio_id" label="Santo Antônio;-35.473868,-6.311951" />
+        <node id="rn_senador_eloi_de_souza_id" label="Senador Elói de Souza;-35.697813,-6.033343" />
+        <node id="rn_senador_georgino_avelino_id" label="Senador Georgino Avelino;-35.129912,-6.157598" />
+        <node id="rn_serra_caiada_id" label="Serra Caiada;-35.716327,-6.105987" />
+        <node id="rn_serra_negra_do_norte_id" label="Serra Negra do Norte;-37.399601,-6.660306" />
+        <node id="rn_serra_de_sao_bento_id" label="Serra de São Bento;-35.703258,-6.417616" />
+        <node id="rn_serra_do_mel_id" label="Serra do Mel;-37.024219,-5.177245" />
+        <node id="rn_serrinha_id" label="Serrinha;-35.500038,-6.281811" />
+        <node id="rn_serrinha_dos_pintos_id" label="Serrinha dos Pintos;-37.954799,-6.110873" />
+        <node id="rn_severiano_melo_id" label="Severiano Melo;-37.95698,-5.776659" />
+        <node id="rn_sao_bento_do_norte_id" label="São Bento do Norte;-35.958705,-5.092594" />
+        <node id="rn_sao_bento_do_trairi_id" label="São Bento do Trairí;-36.086332,-6.337979" />
+        <node id="rn_sao_fernando_id" label="São Fernando;-37.186362,-6.379745" />
+        <node id="rn_sao_francisco_do_oeste_id" label="São Francisco do Oeste;-38.151944,-5.974722" />
+        <node id="rn_sao_goncalo_do_amarante_id" label="São Gonçalo do Amarante;-35.325729,-5.790682" />
+        <node id="rn_sao_jose_de_mipibu_id" label="São José de Mipibu;-35.241692,-6.077303" />
+        <node id="rn_sao_jose_do_campestre_id" label="São José do Campestre;-35.706681,-6.310871" />
+        <node id="rn_sao_jose_do_serido_id" label="São José do Seridó;-36.874644,-6.44002" />
+        <node id="rn_sao_joao_do_sabugi_id" label="São João do Sabugi;-37.202676,-6.713867" />
+        <node id="rn_sao_miguel_id" label="São Miguel;-38.494696,-6.202833" />
+        <node id="rn_sao_miguel_do_gostoso_id" label="São Miguel do Gostoso;-35.641429,-5.125882" />
+        <node id="rn_sao_paulo_do_potengi_id" label="São Paulo do Potengi;-35.764229,-5.899401" />
+        <node id="rn_sao_pedro_id" label="São Pedro;-35.631687,-5.905588" />
+        <node id="rn_sao_rafael_id" label="São Rafael;-36.87777,-5.797907" />
+        <node id="rn_sao_tome_id" label="São Tomé;-36.079798,-5.964037" />
+        <node id="rn_sao_vicente_id" label="São Vicente;-36.682696,-6.218931" />
+        <node id="rn_sitio_novo_id" label="Sítio Novo;-35.908974,-6.111322" />
+        <node id="rn_taboleiro_grande_id" label="Taboleiro Grande;-38.036693,-5.91948" />
+        <node id="rn_taipu_id" label="Taipu;-35.5918,-5.630576" />
+        <node id="rn_tangara_id" label="Tangará;-35.798888,-6.19649" />
+        <node id="rn_tenente_ananias_id" label="Tenente Ananias;-38.181981,-6.458229" />
+        <node id="rn_tenente_laurentino_cruz_id" label="Tenente Laurentino Cruz;-36.713515,-6.137797" />
+        <node id="rn_tibau_id" label="Tibau;-37.255358,-4.837292" />
+        <node id="rn_tibau_do_sul_id" label="Tibau do Sul;-35.08662,-6.19176" />
+        <node id="rn_timbauba_dos_batistas_id" label="Timbaúba dos Batistas;-37.274519,-6.457678" />
+        <node id="rn_touros_id" label="Touros;-35.462102,-5.201821" />
+        <node id="rn_triunfo_potiguar_id" label="Triunfo Potiguar;-37.178606,-5.85408" />
+        <node id="rn_umarizal_id" label="Umarizal;-37.818031,-5.982379" />
+        <node id="rn_upanema_id" label="Upanema;-37.263485,-5.637611" />
+        <node id="rn_venha-ver_id" label="Venha-Ver;-38.487378,-6.314789" />
+        <node id="rn_vera_cruz_id" label="Vera Cruz;-35.427979,-6.043989" />
+        <node id="rn_vila_flor_id" label="Vila Flor;-35.067023,-6.312868" />
+        <node id="rn_vicosa_id" label="Viçosa;-37.946236,-5.982529" />
+        <node id="rn_varzea_id" label="Várzea;-35.373182,-6.346412" />
+        <node id="rn_agua_nova_id" label="Água Nova;-38.29414,-6.203514" />
+    </isComposedBy>
+</node>

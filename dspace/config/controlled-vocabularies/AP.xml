@@ -1,0 +1,20 @@
+<node id="ap_id" label="AP">
+    <isComposedBy>
+        <node id="ap_amapa_id" label="Amapá;-50.795653,2.052669" />
+        <node id="ap_calcoene_id" label="Calçoene;-50.951233,2.504747" />
+        <node id="ap_cutias_id" label="Cutias;-50.799169,0.987565" />
+        <node id="ap_ferreira_gomes_id" label="Ferreira Gomes;-51.179523,0.857256" />
+        <node id="ap_itaubal_id" label="Itaubal;-50.670828,0.596137" />
+        <node id="ap_laranjal_do_jari_id" label="Laranjal do Jari;-52.452962,-0.804911" />
+        <node id="ap_macapa_id" label="Macapá;-51.069395,0.034934" />
+        <node id="ap_mazagao_id" label="Mazagão;-51.28913,-0.11336" />
+        <node id="ap_oiapoque_id" label="Oiapoque;-51.833123,3.84074" />
+        <node id="ap_pedra_branca_do_amapari_id" label="Pedra Branca do Amaparí;-51.950306,0.777424" />
+        <node id="ap_porto_grande_id" label="Porto Grande;-51.415499,0.71243" />
+        <node id="ap_pracuuba_id" label="Pracuúba;-50.789248,1.745427" />
+        <node id="ap_santana_id" label="Santana;-51.172924,-0.045434" />
+        <node id="ap_serra_do_navio_id" label="Serra do Navio;-52.003636,0.901357" />
+        <node id="ap_tartarugalzinho_id" label="Tartarugalzinho;-50.90874,1.506519" />
+        <node id="ap_vitoria_do_jari_id" label="Vitória do Jari;-52.424001,-0.938" />
+    </isComposedBy>
+</node>

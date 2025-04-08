@@ -611,5 +611,47 @@
         <qualifier>openalex</qualifier>
         <scope_note>The OpenAlex identifier</scope_note>
     </dc-type>
+  <dc-type>
+    <schema>dc</schema>
+    <element>description</element>
+    <qualifier>problem</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  <dc-type>
+    <schema>dc</schema>
+    <element>description</element>
+    <qualifier>methodology</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
 
+  <dc-type>
+    <schema>dc</schema>
+    <element>description</element>
+    <qualifier>objective</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  <dc-type>
+    <schema>dc</schema>
+    <element>description</element>
+    <qualifier>regulation</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  <dc-type>
+    <schema>dc</schema>
+    <element>subject</element>
+    <qualifier>financial-resources</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  <dc-type>
+    <schema>dc</schema>
+    <element>coverage</element>
+    <qualifier>funding-source</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+  <dc-type>
+    <schema>dc</schema>
+    <element>contributor</element>
+    <qualifier>email</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
 </dspace-dc-types>

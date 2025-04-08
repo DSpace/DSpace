@@ -1,0 +1,421 @@
+<node id="ba_id" label="BA">
+    <isComposedBy>
+        <node id="ba_abare_id" label="Abaré;-39.116178,-8.720734" />
+        <node id="ba_abaira_id" label="Abaíra;-41.661869,-13.24883" />
+        <node id="ba_acajutiba_id" label="Acajutiba;-38.019737,-11.657522" />
+        <node id="ba_adustina_id" label="Adustina;-38.111265,-10.54369" />
+        <node id="ba_aiquara_id" label="Aiquara;-39.893653,-14.126918" />
+        <node id="ba_alagoinhas_id" label="Alagoinhas;-38.420772,-12.133526" />
+        <node id="ba_alcobaca_id" label="Alcobaça;-39.203609,-17.519468" />
+        <node id="ba_almadina_id" label="Almadina;-39.641491,-14.708869" />
+        <node id="ba_amargosa_id" label="Amargosa;-39.601966,-13.021462" />
+        <node id="ba_amelia_rodrigues_id" label="Amélia Rodrigues;-38.756289,-12.391429" />
+        <node id="ba_america_dourada_id" label="América Dourada;-41.439007,-11.442938" />
+        <node id="ba_anage_id" label="Anagé;-41.135569,-14.61512" />
+        <node id="ba_andarai_id" label="Andaraí;-41.329658,-12.804916" />
+        <node id="ba_andorinha_id" label="Andorinha;-39.839142,-10.348214" />
+        <node id="ba_angical_id" label="Angical;-44.700272,-12.006313" />
+        <node id="ba_anguera_id" label="Anguera;-39.246186,-12.146157" />
+        <node id="ba_antas_id" label="Antas;-38.340118,-10.385621" />
+        <node id="ba_antonio_cardoso_id" label="Antônio Cardoso;-39.117555,-12.433493" />
+        <node id="ba_antonio_goncalves_id" label="Antônio Gonçalves;-40.278489,-10.576686" />
+        <node id="ba_apora_id" label="Aporá;-38.081418,-11.657708" />
+        <node id="ba_apuarema_id" label="Apuarema;-39.750148,-13.854241" />
+        <node id="ba_aracatu_id" label="Aracatu;-41.464783,-14.427986" />
+        <node id="ba_araci_id" label="Araci;-38.958385,-11.325316" />
+        <node id="ba_aramari_id" label="Aramari;-38.496937,-12.088399" />
+        <node id="ba_arataca_id" label="Arataca;-39.419017,-15.265099" />
+        <node id="ba_aratuipe_id" label="Aratuípe;-39.003763,-13.071595" />
+        <node id="ba_aracas_id" label="Araças;-38.202658,-12.220038" />
+        <node id="ba_aurelino_leal_id" label="Aurelino Leal;-39.329035,-14.320954" />
+        <node id="ba_baianopolis_id" label="Baianópolis;-44.538829,-12.301641" />
+        <node id="ba_baixa_grande_id" label="Baixa Grande;-40.16897,-11.951884" />
+        <node id="ba_banzae_id" label="Banzaê;-38.621243,-10.578784" />
+        <node id="ba_barra_id" label="Barra;-43.145913,-11.0859" />
+        <node id="ba_barra_da_estiva_id" label="Barra da Estiva;-41.334697,-13.623699" />
+        <node id="ba_barra_do_choca_id" label="Barra do Choça;-40.579058,-14.865423" />
+        <node id="ba_barra_do_mendes_id" label="Barra do Mendes;-42.058999,-11.81" />
+        <node id="ba_barra_do_rocha_id" label="Barra do Rocha;-39.599098,-14.199994" />
+        <node id="ba_barreiras_id" label="Barreiras;-44.996838,-12.143864" />
+        <node id="ba_barro_alto_id" label="Barro Alto;-41.905441,-11.760493" />
+        <node id="ba_barro_preto_id" label="Barro Preto;-39.476029,-14.794773" />
+        <node id="ba_barrocas_id" label="Barrocas;-39.077594,-11.527222" />
+        <node id="ba_belmonte_id" label="Belmonte;-38.87578,-15.860789" />
+        <node id="ba_belo_campo_id" label="Belo Campo;-41.265172,-15.033362" />
+        <node id="ba_biritinga_id" label="Biritinga;-38.805055,-11.607156" />
+        <node id="ba_boa_nova_id" label="Boa Nova;-40.206444,-14.359754" />
+        <node id="ba_boa_vista_do_tupim_id" label="Boa Vista do Tupim;-40.606376,-12.649774" />
+        <node id="ba_bom_jesus_da_lapa_id" label="Bom Jesus da Lapa;-43.410754,-13.250571" />
+        <node id="ba_bom_jesus_da_serra_id" label="Bom Jesus da Serra;-40.512556,-14.366312" />
+        <node id="ba_boninal_id" label="Boninal;-41.828604,-12.706887" />
+        <node id="ba_bonito_id" label="Bonito;-41.264698,-11.966768" />
+        <node id="ba_boquira_id" label="Boquira;-42.732354,-12.820536" />
+        <node id="ba_botupora_id" label="Botuporã;-42.516301,-13.377235" />
+        <node id="ba_brejolandia_id" label="Brejolândia;-43.967855,-12.481547" />
+        <node id="ba_brejoes_id" label="Brejões;-39.798797,-13.103948" />
+        <node id="ba_brotas_de_macaubas_id" label="Brotas de Macaúbas;-42.632609,-11.991452" />
+        <node id="ba_brumado_id" label="Brumado;-41.669592,-14.202127" />
+        <node id="ba_buerarema_id" label="Buerarema;-39.302849,-14.959497" />
+        <node id="ba_buritirama_id" label="Buritirama;-43.630231,-10.717055" />
+        <node id="ba_caatiba_id" label="Caatiba;-40.409156,-14.969854" />
+        <node id="ba_cabaceiras_do_paraguacu_id" label="Cabaceiras do Paraguaçu;-39.190231,-12.531694" />
+        <node id="ba_cachoeira_id" label="Cachoeira;-38.958695,-12.599443" />
+        <node id="ba_cacule_id" label="Caculé;-42.222872,-14.500281" />
+        <node id="ba_caetanos_id" label="Caetanos;-40.917506,-14.334745" />
+        <node id="ba_caetite_id" label="Caetité;-42.486133,-14.068422" />
+        <node id="ba_cafarnaum_id" label="Cafarnaum;-41.468823,-11.691399" />
+        <node id="ba_cairu_id" label="Cairu;-39.046525,-13.490377" />
+        <node id="ba_caldeirao_grande_id" label="Caldeirão Grande;-40.295577,-11.020798" />
+        <node id="ba_camacan_id" label="Camacan;-39.491937,-15.414157" />
+        <node id="ba_camamu_id" label="Camamu;-39.107082,-13.939773" />
+        <node id="ba_camacari_id" label="Camaçari;-38.326265,-12.699638" />
+        <node id="ba_campo_alegre_de_lourdes_id" label="Campo Alegre de Lourdes;-43.01258,-9.522212" />
+        <node id="ba_campo_formoso_id" label="Campo Formoso;-40.320031,-10.51055" />
+        <node id="ba_canarana_id" label="Canarana;-41.767705,-11.685831" />
+        <node id="ba_canavieiras_id" label="Canavieiras;-38.953648,-15.672205" />
+        <node id="ba_candeal_id" label="Candeal;-39.120277,-11.804851" />
+        <node id="ba_candeias_id" label="Candeias;-38.547152,-12.671566" />
+        <node id="ba_candiba_id" label="Candiba;-42.866694,-14.409738" />
+        <node id="ba_cansancao_id" label="Cansanção;-39.494388,-10.664713" />
+        <node id="ba_canudos_id" label="Canudos;-39.147059,-9.900135" />
+        <node id="ba_canapolis_id" label="Canápolis;-44.200949,-13.072454" />
+        <node id="ba_capela_do_alto_alegre_id" label="Capela do Alto Alegre;-39.834912,-11.665797" />
+        <node id="ba_capim_grosso_id" label="Capim Grosso;-40.008951,-11.379659" />
+        <node id="ba_caravelas_id" label="Caravelas;-39.259679,-17.726839" />
+        <node id="ba_caraibas_id" label="Caraíbas;-41.260336,-14.717677" />
+        <node id="ba_cardeal_da_silva_id" label="Cardeal da Silva;-37.946905,-11.947191" />
+        <node id="ba_carinhanha_id" label="Carinhanha;-43.772349,-14.298524" />
+        <node id="ba_casa_nova_id" label="Casa Nova;-40.973977,-9.164083" />
+        <node id="ba_castro_alves_id" label="Castro Alves;-39.424753,-12.75795" />
+        <node id="ba_catolandia_id" label="Catolândia;-44.864808,-12.310013" />
+        <node id="ba_catu_id" label="Catu;-38.379108,-12.351274" />
+        <node id="ba_caturama_id" label="Caturama;-42.290385,-13.323938" />
+        <node id="ba_caem_id" label="Caém;-40.432039,-11.067693" />
+        <node id="ba_central_id" label="Central;-42.111625,-11.137576" />
+        <node id="ba_chorrocho_id" label="Chorrochó;-39.097942,-8.969498" />
+        <node id="ba_cipo_id" label="Cipó;-38.517942,-11.103172" />
+        <node id="ba_coaraci_id" label="Coaraci;-39.555609,-14.636996" />
+        <node id="ba_cocos_id" label="Cocos;-44.53522,-14.18136" />
+        <node id="ba_conceicao_da_feira_id" label="Conceição da Feira;-38.997823,-12.507835" />
+        <node id="ba_conceicao_do_almeida_id" label="Conceição do Almeida;-39.171466,-12.783579" />
+        <node id="ba_conceicao_do_coite_id" label="Conceição do Coité;-39.280827,-11.559953" />
+        <node id="ba_conceicao_do_jacuipe_id" label="Conceição do Jacuípe;-38.768433,-12.326831" />
+        <node id="ba_conde_id" label="Conde;-37.613094,-11.817937" />
+        <node id="ba_condeuba_id" label="Condeúba;-41.971829,-14.902227" />
+        <node id="ba_contendas_do_sincora_id" label="Contendas do Sincorá;-41.047953,-13.75369" />
+        <node id="ba_coracao_de_maria_id" label="Coração de Maria;-38.748654,-12.233332" />
+        <node id="ba_cordeiros_id" label="Cordeiros;-41.930796,-15.035641" />
+        <node id="ba_coribe_id" label="Coribe;-44.458593,-13.823216" />
+        <node id="ba_coronel_joao_sa_id" label="Coronel João Sá;-37.919825,-10.2847" />
+        <node id="ba_correntina_id" label="Correntina;-44.633335,-13.347674" />
+        <node id="ba_cotegipe_id" label="Cotegipe;-44.256559,-12.022761" />
+        <node id="ba_cravolandia_id" label="Cravolândia;-39.803083,-13.353063" />
+        <node id="ba_cristopolis_id" label="Cristópolis;-44.421358,-12.224899" />
+        <node id="ba_crisopolis_id" label="Crisópolis;-38.15148,-11.505929" />
+        <node id="ba_cruz_das_almas_id" label="Cruz das Almas;-39.100787,-12.667516" />
+        <node id="ba_curaca_id" label="Curaçá;-39.899671,-8.984577" />
+        <node id="ba_candido_sales_id" label="Cândido Sales;-41.241438,-15.499309" />
+        <node id="ba_cicero_dantas_id" label="Cícero Dantas;-38.379377,-10.589664" />
+        <node id="ba_dias_d`avila_id" label="Dias d`Ávila;-38.292645,-12.61875" />
+        <node id="ba_dom_basilio_id" label="Dom Basílio;-41.767663,-13.756499" />
+        <node id="ba_dom_macedo_costa_id" label="Dom Macedo Costa;-39.192259,-12.901582" />
+        <node id="ba_dario_meira_id" label="Dário Meira;-39.903129,-14.4229" />
+        <node id="ba_elisio_medrado_id" label="Elísio Medrado;-39.519087,-12.941743" />
+        <node id="ba_encruzilhada_id" label="Encruzilhada;-40.912432,-15.530168" />
+        <node id="ba_entre_rios_id" label="Entre Rios;-38.087125,-11.939164" />
+        <node id="ba_esplanada_id" label="Esplanada;-37.943216,-11.794215" />
+        <node id="ba_euclides_da_cunha_id" label="Euclides da Cunha;-39.015286,-10.507754" />
+        <node id="ba_eunapolis_id" label="Eunápolis;-39.582122,-16.371498" />
+        <node id="ba_feira_da_mata_id" label="Feira da Mata;-44.274424,-14.204405" />
+        <node id="ba_feira_de_santana_id" label="Feira de Santana;-38.966293,-12.266429" />
+        <node id="ba_filadelfia_id" label="Filadélfia;-40.14371,-10.740475" />
+        <node id="ba_firmino_alves_id" label="Firmino Alves;-39.926859,-14.982334" />
+        <node id="ba_floresta_azul_id" label="Floresta Azul;-39.657877,-14.862934" />
+        <node id="ba_formosa_do_rio_preto_id" label="Formosa do Rio Preto;-45.19298,-11.032812" />
+        <node id="ba_fatima_id" label="Fátima;-38.223891,-10.616013" />
+        <node id="ba_gandu_id" label="Gandu;-39.474651,-13.744101" />
+        <node id="ba_gaviao_id" label="Gavião;-39.775751,-11.468796" />
+        <node id="ba_gentio_do_ouro_id" label="Gentio do Ouro;-42.507652,-11.434233" />
+        <node id="ba_gloria_id" label="Glória;-38.254397,-9.343822" />
+        <node id="ba_gongogi_id" label="Gongogi;-39.46899,-14.319481" />
+        <node id="ba_governador_mangabeira_id" label="Governador Mangabeira;-39.041207,-12.599415" />
+        <node id="ba_guajeru_id" label="Guajeru;-41.938064,-14.54668" />
+        <node id="ba_guanambi_id" label="Guanambi;-42.779943,-14.223066" />
+        <node id="ba_guaratinga_id" label="Guaratinga;-39.784713,-16.583276" />
+        <node id="ba_heliopolis_id" label="Heliópolis;-38.290664,-10.682539" />
+        <node id="ba_iacu_id" label="Iaçu;-40.205609,-12.766637" />
+        <node id="ba_ibiassuce_id" label="Ibiassucê;-42.257026,-14.271126" />
+        <node id="ba_ibicarai_id" label="Ibicaraí;-39.591434,-14.857877" />
+        <node id="ba_ibicoara_id" label="Ibicoara;-41.283989,-13.405918" />
+        <node id="ba_ibicui_id" label="Ibicuí;-39.987915,-14.84496" />
+        <node id="ba_ibipeba_id" label="Ibipeba;-42.019515,-11.643775" />
+        <node id="ba_ibipitanga_id" label="Ibipitanga;-42.485568,-12.880435" />
+        <node id="ba_ibiquera_id" label="Ibiquera;-40.933774,-12.644354" />
+        <node id="ba_ibirapitanga_id" label="Ibirapitanga;-39.378737,-14.164898" />
+        <node id="ba_ibirapua_id" label="Ibirapuã;-40.112907,-17.683151" />
+        <node id="ba_ibirataia_id" label="Ibirataia;-39.645935,-14.064316" />
+        <node id="ba_ibitiara_id" label="Ibitiara;-42.217946,-12.650181" />
+        <node id="ba_ibitita_id" label="Ibititá;-41.97481,-11.541426" />
+        <node id="ba_ibotirama_id" label="Ibotirama;-43.21669,-12.177876" />
+        <node id="ba_ichu_id" label="Ichu;-39.190523,-11.743065" />
+        <node id="ba_igapora_id" label="Igaporã;-42.715508,-13.774025" />
+        <node id="ba_igrapiuna_id" label="Igrapiúna;-39.136129,-13.829543" />
+        <node id="ba_iguai_id" label="Iguaí;-40.089417,-14.752754" />
+        <node id="ba_ilheus_id" label="Ilhéus;-39.04602,-14.793045" />
+        <node id="ba_inhambupe_id" label="Inhambupe;-38.355048,-11.780955" />
+        <node id="ba_ipecaeta_id" label="Ipecaetá;-39.306921,-12.302846" />
+        <node id="ba_ipiau_id" label="Ipiaú;-39.735252,-14.12263" />
+        <node id="ba_ipira_id" label="Ipirá;-39.735941,-12.156057" />
+        <node id="ba_ipupiara_id" label="Ipupiara;-42.617913,-11.821881" />
+        <node id="ba_irajuba_id" label="Irajuba;-40.08482,-13.256331" />
+        <node id="ba_iramaia_id" label="Iramaia;-40.959471,-13.290186" />
+        <node id="ba_iraquara_id" label="Iraquara;-41.615504,-12.24288" />
+        <node id="ba_irara_id" label="Irará;-38.763139,-12.050449" />
+        <node id="ba_irece_id" label="Irecê;-41.853462,-11.303317" />
+        <node id="ba_itabela_id" label="Itabela;-39.559318,-16.573188" />
+        <node id="ba_itaberaba_id" label="Itaberaba;-40.305897,-12.524182" />
+        <node id="ba_itabuna_id" label="Itabuna;-39.278056,-14.787573" />
+        <node id="ba_itacare_id" label="Itacaré;-38.99591,-14.278422" />
+        <node id="ba_itaete_id" label="Itaeté;-40.96774,-12.983121" />
+        <node id="ba_itagi_id" label="Itagi;-40.013112,-14.1615" />
+        <node id="ba_itagiba_id" label="Itagibá;-39.844945,-14.278239" />
+        <node id="ba_itagimirim_id" label="Itagimirim;-39.613317,-16.081919" />
+        <node id="ba_itaguacu_da_bahia_id" label="Itaguaçu da Bahia;-42.399671,-11.014672" />
+        <node id="ba_itaju_do_colonia_id" label="Itaju do Colônia;-39.728298,-15.136598" />
+        <node id="ba_itajuipe_id" label="Itajuípe;-39.369823,-14.678766" />
+        <node id="ba_itamaraju_id" label="Itamaraju;-39.538569,-17.03782" />
+        <node id="ba_itamari_id" label="Itamari;-39.682959,-13.778192" />
+        <node id="ba_itambe_id" label="Itambé;-40.629955,-15.242913" />
+        <node id="ba_itanagra_id" label="Itanagra;-38.043595,-12.261435" />
+        <node id="ba_itanhem_id" label="Itanhém;-40.332139,-17.164207" />
+        <node id="ba_itaparica_id" label="Itaparica;-38.67995,-12.893205" />
+        <node id="ba_itapebi_id" label="Itapebi;-39.532863,-15.955063" />
+        <node id="ba_itapetinga_id" label="Itapetinga;-40.248236,-15.247533" />
+        <node id="ba_itapicuru_id" label="Itapicuru;-38.226229,-11.308836" />
+        <node id="ba_itapitanga_id" label="Itapitanga;-39.565654,-14.413932" />
+        <node id="ba_itape_id" label="Itapé;-39.423858,-14.887641" />
+        <node id="ba_itaquara_id" label="Itaquara;-39.937767,-13.44589" />
+        <node id="ba_itarantim_id" label="Itarantim;-40.06496,-15.652819" />
+        <node id="ba_itatim_id" label="Itatim;-39.695199,-12.709888" />
+        <node id="ba_itirucu_id" label="Itiruçu;-40.147186,-13.529043" />
+        <node id="ba_itiuba_id" label="Itiúba;-39.844616,-10.694761" />
+        <node id="ba_itororo_id" label="Itororó;-40.068401,-15.109988" />
+        <node id="ba_ituacu_id" label="Ituaçu;-41.300284,-13.810651" />
+        <node id="ba_itubera_id" label="Ituberá;-39.148059,-13.724936" />
+        <node id="ba_iuiu_id" label="Iuiú;-43.559547,-14.405424" />
+        <node id="ba_jaborandi_id" label="Jaborandi;-44.425537,-13.607082" />
+        <node id="ba_jacaraci_id" label="Jacaraci;-42.432878,-14.85409" />
+        <node id="ba_jacobina_id" label="Jacobina;-40.511693,-11.181217" />
+        <node id="ba_jaguaquara_id" label="Jaguaquara;-39.964009,-13.524834" />
+        <node id="ba_jaguarari_id" label="Jaguarari;-40.199938,-10.256859" />
+        <node id="ba_jaguaripe_id" label="Jaguaripe;-38.893891,-13.110924" />
+        <node id="ba_jandaira_id" label="Jandaíra;-37.785274,-11.561614" />
+        <node id="ba_jequie_id" label="Jequié;-40.087704,-13.850888" />
+        <node id="ba_jeremoabo_id" label="Jeremoabo;-38.347097,-10.06848" />
+        <node id="ba_jiquirica_id" label="Jiquiriçá;-39.57365,-13.262101" />
+        <node id="ba_jitauna_id" label="Jitaúna;-39.896892,-14.013085" />
+        <node id="ba_joao_dourado_id" label="João Dourado;-41.654799,-11.348642" />
+        <node id="ba_juazeiro_id" label="Juazeiro;-40.503251,-9.416217" />
+        <node id="ba_jucurucu_id" label="Jucuruçu;-40.164074,-16.848752" />
+        <node id="ba_jussara_id" label="Jussara;-41.970235,-11.043084" />
+        <node id="ba_jussari_id" label="Jussari;-39.490962,-15.19201" />
+        <node id="ba_jussiape_id" label="Jussiape;-41.588209,-13.515514" />
+        <node id="ba_lafaiete_coutinho_id" label="Lafaiete Coutinho;-40.21189,-13.6541" />
+        <node id="ba_lagoa_real_id" label="Lagoa Real;-42.132764,-14.033443" />
+        <node id="ba_laje_id" label="Laje;-39.421264,-13.167327" />
+        <node id="ba_lajedinho_id" label="Lajedinho;-40.904752,-12.352889" />
+        <node id="ba_lajedo_do_tabocal_id" label="Lajedo do Tabocal;-40.220429,-13.466286" />
+        <node id="ba_lajedao_id" label="Lajedão;-40.338307,-17.605641" />
+        <node id="ba_lamarao_id" label="Lamarão;-38.887009,-11.773013" />
+        <node id="ba_lapao_id" label="Lapão;-41.828615,-11.385096" />
+        <node id="ba_lauro_de_freitas_id" label="Lauro de Freitas;-38.321008,-12.8978" />
+        <node id="ba_lencois_id" label="Lençóis;-41.392825,-12.561604" />
+        <node id="ba_licinio_de_almeida_id" label="Licínio de Almeida;-42.509527,-14.684215" />
+        <node id="ba_livramento_de_nossa_senhora_id" label="Livramento de Nossa Senhora;-41.843187,-13.636868" />
+        <node id="ba_luis_eduardo_magalhaes_id" label="Luis Eduardo Magalhaes;-45.786555,-12.095638" />
+        <node id="ba_macajuba_id" label="Macajuba;-40.357058,-12.132592" />
+        <node id="ba_macarani_id" label="Macarani;-40.420888,-15.564563" />
+        <node id="ba_macaubas_id" label="Macaúbas;-42.694515,-13.018601" />
+        <node id="ba_macurure_id" label="Macururé;-39.051784,-9.162258" />
+        <node id="ba_madre_de_deus_id" label="Madre de Deus;-38.615316,-12.744621" />
+        <node id="ba_maetinga_id" label="Maetinga;-41.49146,-14.662335" />
+        <node id="ba_maiquinique_id" label="Maiquinique;-40.258722,-15.623985" />
+        <node id="ba_mairi_id" label="Mairi;-40.143732,-11.710704" />
+        <node id="ba_malhada_id" label="Malhada;-43.768634,-14.337134" />
+        <node id="ba_malhada_de_pedras_id" label="Malhada de Pedras;-41.88422,-14.384673" />
+        <node id="ba_manoel_vitorino_id" label="Manoel Vitorino;-40.239895,-14.147617" />
+        <node id="ba_mansidao_id" label="Mansidão;-44.042798,-10.722707" />
+        <node id="ba_maracas_id" label="Maracás;-40.432333,-13.435468" />
+        <node id="ba_maragogipe_id" label="Maragogipe;-38.917519,-12.77602" />
+        <node id="ba_marau_id" label="Maraú;-39.013656,-14.103549" />
+        <node id="ba_marcionilio_souza_id" label="Marcionílio Souza;-40.529457,-13.006437" />
+        <node id="ba_mascote_id" label="Mascote;-39.301602,-15.554159" />
+        <node id="ba_mata_de_sao_joao_id" label="Mata de São João;-38.300898,-12.530685" />
+        <node id="ba_matina_id" label="Matina;-42.843914,-13.910917" />
+        <node id="ba_medeiros_neto_id" label="Medeiros Neto;-40.223776,-17.370676" />
+        <node id="ba_miguel_calmon_id" label="Miguel Calmon;-40.603084,-11.429891" />
+        <node id="ba_milagres_id" label="Milagres;-39.861092,-12.864635" />
+        <node id="ba_mirangaba_id" label="Mirangaba;-40.573996,-10.960983" />
+        <node id="ba_mirante_id" label="Mirante;-40.771799,-14.238469" />
+        <node id="ba_monte_santo_id" label="Monte Santo;-39.332077,-10.437413" />
+        <node id="ba_morpara_id" label="Morpará;-43.276566,-11.556892" />
+        <node id="ba_morro_do_chapeu_id" label="Morro do Chapéu;-41.156461,-11.548804" />
+        <node id="ba_mortugaba_id" label="Mortugaba;-42.372663,-15.022454" />
+        <node id="ba_mucuge_id" label="Mucugê;-41.370271,-13.0053" />
+        <node id="ba_mucuri_id" label="Mucuri;-39.556467,-18.075392" />
+        <node id="ba_mulungu_do_morro_id" label="Mulungu do Morro;-41.637352,-11.964776" />
+        <node id="ba_mundo_novo_id" label="Mundo Novo;-40.47139,-11.85408" />
+        <node id="ba_muniz_ferreira_id" label="Muniz Ferreira;-39.109247,-13.009227" />
+        <node id="ba_muquem_de_sao_francisco_id" label="Muquém de São Francisco;-43.543808,-12.063376" />
+        <node id="ba_muritiba_id" label="Muritiba;-38.992052,-12.632901" />
+        <node id="ba_mutuipe_id" label="Mutuípe;-39.504367,-13.228381" />
+        <node id="ba_nazare_id" label="Nazaré;-39.010835,-13.023491" />
+        <node id="ba_nilo_pecanha_id" label="Nilo Peçanha;-39.109111,-13.603992" />
+        <node id="ba_nordestina_id" label="Nordestina;-39.429705,-10.819169" />
+        <node id="ba_nova_canaa_id" label="Nova Canaã;-40.1458,-14.791242" />
+        <node id="ba_nova_fatima_id" label="Nova Fátima;-39.630215,-11.603116" />
+        <node id="ba_nova_ibia_id" label="Nova Ibiá;-39.618174,-13.811995" />
+        <node id="ba_nova_itarana_id" label="Nova Itarana;-40.065267,-13.024055" />
+        <node id="ba_nova_redencao_id" label="Nova Redenção;-41.074785,-12.815001" />
+        <node id="ba_nova_soure_id" label="Nova Soure;-38.487103,-11.232948" />
+        <node id="ba_nova_vicosa_id" label="Nova Viçosa;-39.374331,-17.892648" />
+        <node id="ba_novo_horizonte_id" label="Novo Horizonte;-42.168172,-12.808318" />
+        <node id="ba_novo_triunfo_id" label="Novo Triunfo;-38.401374,-10.318235" />
+        <node id="ba_olindina_id" label="Olindina;-38.337863,-11.349693" />
+        <node id="ba_oliveira_dos_brejinhos_id" label="Oliveira dos Brejinhos;-42.896872,-12.313183" />
+        <node id="ba_ouricangas_id" label="Ouriçangas;-38.616624,-12.017497" />
+        <node id="ba_ourolandia_id" label="Ourolândia;-41.075576,-10.957848" />
+        <node id="ba_palmas_de_monte_alto_id" label="Palmas de Monte Alto;-43.16086,-14.267562" />
+        <node id="ba_palmeiras_id" label="Palmeiras;-41.580886,-12.505865" />
+        <node id="ba_paramirim_id" label="Paramirim;-42.239502,-13.438849" />
+        <node id="ba_paratinga_id" label="Paratinga;-43.179794,-12.686974" />
+        <node id="ba_paripiranga_id" label="Paripiranga;-37.862561,-10.685885" />
+        <node id="ba_pau_brasil_id" label="Pau Brasil;-39.645794,-15.457226" />
+        <node id="ba_paulo_afonso_id" label="Paulo Afonso;-38.22156,-9.398296" />
+        <node id="ba_pedro_alexandre_id" label="Pedro Alexandre;-37.893178,-10.012005" />
+        <node id="ba_pedrao_id" label="Pedrão;-38.648715,-12.14914" />
+        <node id="ba_piata_id" label="Piatã;-41.770177,-13.146549" />
+        <node id="ba_pilao_arcado_id" label="Pilão Arcado;-42.493607,-10.005079" />
+        <node id="ba_pindai_id" label="Pindaí;-42.685984,-14.492128" />
+        <node id="ba_pindobacu_id" label="Pindobaçu;-40.367472,-10.743338" />
+        <node id="ba_pintadas_id" label="Pintadas;-39.900859,-11.811712" />
+        <node id="ba_pirai_do_norte_id" label="Piraí do Norte;-39.383592,-13.758962" />
+        <node id="ba_piripa_id" label="Piripá;-41.716841,-14.944379" />
+        <node id="ba_piritiba_id" label="Piritiba;-40.558739,-11.730008" />
+        <node id="ba_planaltino_id" label="Planaltino;-40.369519,-13.261789" />
+        <node id="ba_planalto_id" label="Planalto;-40.471843,-14.66537" />
+        <node id="ba_pojuca_id" label="Pojuca;-38.337436,-12.430336" />
+        <node id="ba_ponto_novo_id" label="Ponto Novo;-40.131144,-10.8653" />
+        <node id="ba_porto_seguro_id" label="Porto Seguro;-39.064251,-16.443473" />
+        <node id="ba_potiragua_id" label="Potiraguá;-39.863846,-15.59429" />
+        <node id="ba_pocoes_id" label="Poções;-40.363354,-14.523391" />
+        <node id="ba_prado_id" label="Prado;-39.222721,-17.336357" />
+        <node id="ba_presidente_dutra_id" label="Presidente Dutra;-41.984341,-11.292345" />
+        <node id="ba_presidente_janio_quadros_id" label="Presidente Jânio Quadros;-41.679792,-14.688485" />
+        <node id="ba_presidente_tancredo_neves_id" label="Presidente Tancredo Neves;-39.420267,-13.447064" />
+        <node id="ba_pe_de_serra_id" label="Pé de Serra;-39.611037,-11.831289" />
+        <node id="ba_queimadas_id" label="Queimadas;-39.629347,-10.973561" />
+        <node id="ba_quijingue_id" label="Quijingue;-39.213694,-10.750519" />
+        <node id="ba_quixabeira_id" label="Quixabeira;-40.120045,-11.403061" />
+        <node id="ba_rafael_jambeiro_id" label="Rafael Jambeiro;-39.500658,-12.405257" />
+        <node id="ba_remanso_id" label="Remanso;-42.084839,-9.61944" />
+        <node id="ba_retirolandia_id" label="Retirolândia;-39.423358,-11.483198" />
+        <node id="ba_riacho_de_santana_id" label="Riacho de Santana;-42.939675,-13.605941" />
+        <node id="ba_riachao_das_neves_id" label="Riachão das Neves;-44.914259,-11.750755" />
+        <node id="ba_riachao_do_jacuipe_id" label="Riachão do Jacuípe;-39.381812,-11.806681" />
+        <node id="ba_ribeira_do_amparo_id" label="Ribeira do Amparo;-38.424211,-11.042071" />
+        <node id="ba_ribeira_do_pombal_id" label="Ribeira do Pombal;-38.538152,-10.837299" />
+        <node id="ba_ribeirao_do_largo_id" label="Ribeirão do Largo;-40.744137,-15.450775" />
+        <node id="ba_rio_real_id" label="Rio Real;-37.933243,-11.48137" />
+        <node id="ba_rio_de_contas_id" label="Rio de Contas;-41.804764,-13.585218" />
+        <node id="ba_rio_do_antonio_id" label="Rio do Antônio;-42.072103,-14.407144" />
+        <node id="ba_rio_do_pires_id" label="Rio do Pires;-42.290166,-13.11853" />
+        <node id="ba_rodelas_id" label="Rodelas;-38.77999,-8.850214" />
+        <node id="ba_ruy_barbosa_id" label="Ruy Barbosa;-40.493101,-12.281612" />
+        <node id="ba_salinas_da_margarida_id" label="Salinas da Margarida;-38.756164,-12.873014" />
+        <node id="ba_salvador_id" label="Salvador;-38.501068,-12.97178" />
+        <node id="ba_santa_brigida_id" label="Santa Brígida;-38.120935,-9.732273" />
+        <node id="ba_santa_barbara_id" label="Santa Bárbara;-38.968085,-11.95149" />
+        <node id="ba_santa_cruz_cabralia_id" label="Santa Cruz Cabrália;-39.029495,-16.282529" />
+        <node id="ba_santa_cruz_da_vitoria_id" label="Santa Cruz da Vitória;-39.811503,-14.963975" />
+        <node id="ba_santa_ines_id" label="Santa Inês;-39.813979,-13.2793" />
+        <node id="ba_santa_luzia_id" label="Santa Luzia;-39.328678,-15.434188" />
+        <node id="ba_santa_maria_da_vitoria_id" label="Santa Maria da Vitória;-44.201057,-13.385867" />
+        <node id="ba_santa_rita_de_cassia_id" label="Santa Rita de Cássia;-44.525496,-11.006253" />
+        <node id="ba_santa_teresinha_id" label="Santa Teresinha;-39.520111,-12.76913" />
+        <node id="ba_santaluz_id" label="Santaluz;-39.375005,-11.250826" />
+        <node id="ba_santana_id" label="Santana;-44.05064,-12.979217" />
+        <node id="ba_santanopolis_id" label="Santanópolis;-38.869372,-12.031109" />
+        <node id="ba_santo_amaro_id" label="Santo Amaro;-38.713679,-12.547206" />
+        <node id="ba_santo_antonio_de_jesus_id" label="Santo Antônio de Jesus;-39.258403,-12.961387" />
+        <node id="ba_santo_estevao_id" label="Santo Estêvão;-39.250541,-12.427981" />
+        <node id="ba_sapeacu_id" label="Sapeaçu;-39.182426,-12.720764" />
+        <node id="ba_saubara_id" label="Saubara;-38.762473,-12.738664" />
+        <node id="ba_saude_id" label="Saúde;-40.415458,-10.94279" />
+        <node id="ba_seabra_id" label="Seabra;-41.772159,-12.416905" />
+        <node id="ba_sebastiao_laranjeiras_id" label="Sebastião Laranjeiras;-42.943438,-14.571002" />
+        <node id="ba_senhor_do_bonfim_id" label="Senhor do Bonfim;-40.186532,-10.459354" />
+        <node id="ba_sento_se_id" label="Sento Sé;-41.878563,-9.741378" />
+        <node id="ba_serra_dourada_id" label="Serra Dourada;-43.950434,-12.759004" />
+        <node id="ba_serra_preta_id" label="Serra Preta;-39.33049,-12.156039" />
+        <node id="ba_serra_do_ramalho_id" label="Serra do Ramalho;-43.592907,-13.565889" />
+        <node id="ba_serrinha_id" label="Serrinha;-39.009976,-11.658407" />
+        <node id="ba_serrolandia_id" label="Serrolândia;-40.298327,-11.408476" />
+        <node id="ba_simoes_filho_id" label="Simões Filho;-38.402944,-12.786587" />
+        <node id="ba_sobradinho_id" label="Sobradinho;-40.81455,-9.450243" />
+        <node id="ba_souto_soares_id" label="Souto Soares;-41.642717,-12.088046" />
+        <node id="ba_satiro_dias_id" label="Sátiro Dias;-38.593822,-11.592928" />
+        <node id="ba_sao_desiderio_id" label="São Desidério;-44.976881,-12.357196" />
+        <node id="ba_sao_domingos_id" label="São Domingos;-39.526792,-11.464927" />
+        <node id="ba_sao_felipe_id" label="São Felipe;-39.08932,-12.839439" />
+        <node id="ba_sao_francisco_do_conde_id" label="São Francisco do Conde;-38.678601,-12.618345" />
+        <node id="ba_sao_felix_id" label="São Félix;-38.97271,-12.610433" />
+        <node id="ba_sao_felix_do_coribe_id" label="São Félix do Coribe;-44.183708,-13.401883" />
+        <node id="ba_sao_gabriel_id" label="São Gabriel;-41.884267,-11.217453" />
+        <node id="ba_sao_goncalo_dos_campos_id" label="São Gonçalo dos Campos;-38.966294,-12.433096" />
+        <node id="ba_sao_jose_da_vitoria_id" label="São José da Vitória;-39.343685,-15.078666" />
+        <node id="ba_sao_jose_do_jacuipe_id" label="São José do Jacuípe;-39.866934,-11.41368" />
+        <node id="ba_sao_miguel_das_matas_id" label="São Miguel das Matas;-39.457844,-13.043387" />
+        <node id="ba_sao_sebastiao_do_passe_id" label="São Sebastião do Passé;-38.490513,-12.512264" />
+        <node id="ba_sitio_do_mato_id" label="Sítio do Mato;-43.468921,-13.080149" />
+        <node id="ba_sitio_do_quinto_id" label="Sítio do Quinto;-38.221325,-10.354453" />
+        <node id="ba_tabocas_do_brejo_velho_id" label="Tabocas do Brejo Velho;-44.007449,-12.702634" />
+        <node id="ba_tanhacu_id" label="Tanhaçu;-41.247271,-14.019662" />
+        <node id="ba_tanque_novo_id" label="Tanque Novo;-42.493412,-13.548509" />
+        <node id="ba_tanquinho_id" label="Tanquinho;-39.103312,-11.967965" />
+        <node id="ba_taperoa_id" label="Taperoá;-39.100948,-13.532133" />
+        <node id="ba_tapiramuta_id" label="Tapiramutá;-40.792656,-11.84748" />
+        <node id="ba_teixeira_de_freitas_id" label="Teixeira de Freitas;-39.739962,-17.539915" />
+        <node id="ba_teodoro_sampaio_id" label="Teodoro Sampaio;-38.634738,-12.294998" />
+        <node id="ba_teofilandia_id" label="Teofilândia;-38.991264,-11.482719" />
+        <node id="ba_teolandia_id" label="Teolândia;-39.483986,-13.589639" />
+        <node id="ba_terra_nova_id" label="Terra Nova;-38.623804,-12.388754" />
+        <node id="ba_tremedal_id" label="Tremedal;-41.414198,-14.973625" />
+        <node id="ba_tucano_id" label="Tucano;-38.789407,-10.958388" />
+        <node id="ba_uaua_id" label="Uauá;-39.479396,-9.833247" />
+        <node id="ba_ubaitaba_id" label="Ubaitaba;-39.322166,-14.302971" />
+        <node id="ba_ubata_id" label="Ubatã;-39.520696,-14.206336" />
+        <node id="ba_ubaira_id" label="Ubaíra;-39.665991,-13.271414" />
+        <node id="ba_uibai_id" label="Uibaí;-42.135381,-11.33942" />
+        <node id="ba_umburanas_id" label="Umburanas;-41.323428,-10.733902" />
+        <node id="ba_una_id" label="Una;-39.076507,-15.279076" />
+        <node id="ba_urandi_id" label="Urandi;-42.649766,-14.767799" />
+        <node id="ba_urucuca_id" label="Uruçuca;-39.285085,-14.596268" />
+        <node id="ba_utinga_id" label="Utinga;-41.095432,-12.078277" />
+        <node id="ba_valente_id" label="Valente;-39.456953,-11.406233" />
+        <node id="ba_valenca_id" label="Valença;-39.072953,-13.366948" />
+        <node id="ba_varzedo_id" label="Varzedo;-39.391874,-12.967153" />
+        <node id="ba_vera_cruz_id" label="Vera Cruz;-38.615295,-12.956845" />
+        <node id="ba_vereda_id" label="Vereda;-40.097368,-17.218256" />
+        <node id="ba_vitoria_da_conquista_id" label="Vitória da Conquista;-40.844159,-14.861466" />
+        <node id="ba_varzea_nova_id" label="Várzea Nova;-40.943173,-11.255685" />
+        <node id="ba_varzea_da_roca_id" label="Várzea da Roça;-40.132829,-11.600463" />
+        <node id="ba_varzea_do_poco_id" label="Várzea do Poço;-40.314941,-11.527307" />
+        <node id="ba_wagner_id" label="Wagner;-41.171476,-12.281901" />
+        <node id="ba_wanderley_id" label="Wanderley;-43.895787,-12.114375" />
+        <node id="ba_wenceslau_guimaraes_id" label="Wenceslau Guimarães;-39.476178,-13.690825" />
+        <node id="ba_xique-xique_id" label="Xique-Xique;-42.724545,-10.82296" />
+        <node id="ba_agua_fria_id" label="Água Fria;-38.763863,-11.861836" />
+        <node id="ba_erico_cardoso_id" label="Érico Cardoso;-42.1352,-13.421467" />
+    </isComposedBy>
+</node>

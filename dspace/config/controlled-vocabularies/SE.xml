@@ -1,0 +1,79 @@
+<node id="se_id" label="SE">
+    <isComposedBy>
+        <node id="se_amparo_de_sao_francisco_id" label="Amparo de São Francisco;-36.934993,-10.134842" />
+        <node id="se_aquidaba_id" label="Aquidabã;-37.014768,-10.278043" />
+        <node id="se_aracaju_id" label="Aracaju;-37.06766,-10.909133" />
+        <node id="se_araua_id" label="Arauá;-37.620058,-11.261391" />
+        <node id="se_areia_branca_id" label="Areia Branca;-37.325063,-10.758005" />
+        <node id="se_barra_dos_coqueiros_id" label="Barra dos Coqueiros;-37.032317,-10.899623" />
+        <node id="se_boquim_id" label="Boquim;-37.619466,-11.13972" />
+        <node id="se_brejo_grande_id" label="Brejo Grande;-36.461102,-10.429713" />
+        <node id="se_campo_do_brito_id" label="Campo do Brito;-37.495369,-10.739248" />
+        <node id="se_canhoba_id" label="Canhoba;-36.980639,-10.136465" />
+        <node id="se_caninde_de_sao_francisco_id" label="Canindé de São Francisco;-37.792294,-9.648823" />
+        <node id="se_capela_id" label="Capela;-37.062847,-10.506928" />
+        <node id="se_carira_id" label="Carira;-37.700241,-10.352361" />
+        <node id="se_carmopolis_id" label="Carmópolis;-36.988742,-10.644869" />
+        <node id="se_cedro_de_sao_joao_id" label="Cedro de São João;-36.885641,-10.253441" />
+        <node id="se_cristinapolis_id" label="Cristinápolis;-37.758494,-11.466778" />
+        <node id="se_cumbe_id" label="Cumbe;-37.184622,-10.351979" />
+        <node id="se_divina_pastora_id" label="Divina Pastora;-37.150557,-10.678161" />
+        <node id="se_estancia_id" label="Estância;-37.448381,-11.265922" />
+        <node id="se_feira_nova_id" label="Feira Nova;-37.314672,-10.261645" />
+        <node id="se_frei_paulo_id" label="Frei Paulo;-37.527934,-10.551292" />
+        <node id="se_gararu_id" label="Gararu;-37.086921,-9.972202" />
+        <node id="se_general_maynard_id" label="General Maynard;-36.983758,-10.683471" />
+        <node id="se_graccho_cardoso_id" label="Graccho Cardoso;-37.200559,-10.225233" />
+        <node id="se_ilha_das_flores_id" label="Ilha das Flores;-36.547935,-10.442506" />
+        <node id="se_indiaroba_id" label="Indiaroba;-37.514979,-11.515746" />
+        <node id="se_itabaiana_id" label="Itabaiana;-37.427287,-10.682555" />
+        <node id="se_itabaianinha_id" label="Itabaianinha;-37.787505,-11.269268" />
+        <node id="se_itabi_id" label="Itabi;-37.105558,-10.124808" />
+        <node id="se_itaporanga_d`ajuda_id" label="Itaporanga d`Ajuda;-37.307822,-10.989955" />
+        <node id="se_japaratuba_id" label="Japaratuba;-36.941765,-10.584913" />
+        <node id="se_japoata_id" label="Japoatã;-36.804504,-10.347719" />
+        <node id="se_lagarto_id" label="Lagarto;-37.668948,-10.913628" />
+        <node id="se_laranjeiras_id" label="Laranjeiras;-37.173123,-10.798121" />
+        <node id="se_macambira_id" label="Macambira;-37.541303,-10.661871" />
+        <node id="se_malhada_dos_bois_id" label="Malhada dos Bois;-36.925188,-10.341837" />
+        <node id="se_malhador_id" label="Malhador;-37.300437,-10.664926" />
+        <node id="se_maruim_id" label="Maruim;-37.085598,-10.730762" />
+        <node id="se_moita_bonita_id" label="Moita Bonita;-37.35121,-10.576908" />
+        <node id="se_monte_alegre_de_sergipe_id" label="Monte Alegre de Sergipe;-37.561605,-10.025574" />
+        <node id="se_muribeca_id" label="Muribeca;-36.95882,-10.427146" />
+        <node id="se_neopolis_id" label="Neópolis;-36.584952,-10.321503" />
+        <node id="se_nossa_senhora_aparecida_id" label="Nossa Senhora Aparecida;-37.451699,-10.394387" />
+        <node id="se_nossa_senhora_da_gloria_id" label="Nossa Senhora da Glória;-37.421125,-10.215809" />
+        <node id="se_nossa_senhora_das_dores_id" label="Nossa Senhora das Dores;-37.196285,-10.48536" />
+        <node id="se_nossa_senhora_de_lourdes_id" label="Nossa Senhora de Lourdes;-37.061528,-10.077168" />
+        <node id="se_nossa_senhora_do_socorro_id" label="Nossa Senhora do Socorro;-37.123113,-10.846822" />
+        <node id="se_pacatuba_id" label="Pacatuba;-36.653078,-10.453811" />
+        <node id="se_pedra_mole_id" label="Pedra Mole;-37.692189,-10.613439" />
+        <node id="se_pedrinhas_id" label="Pedrinhas;-37.67749,-11.190174" />
+        <node id="se_pinhao_id" label="Pinhão;-37.724246,-10.567664" />
+        <node id="se_pirambu_id" label="Pirambu;-36.854427,-10.721516" />
+        <node id="se_porto_da_folha_id" label="Porto da Folha;-37.284233,-9.916264" />
+        <node id="se_poco_redondo_id" label="Poço Redondo;-37.683263,-9.806155" />
+        <node id="se_poco_verde_id" label="Poço Verde;-38.181294,-10.715129" />
+        <node id="se_propria_id" label="Propriá;-36.844153,-10.213773" />
+        <node id="se_riachuelo_id" label="Riachuelo;-37.196551,-10.735008" />
+        <node id="se_riachao_do_dantas_id" label="Riachão do Dantas;-37.730985,-11.072904" />
+        <node id="se_ribeiropolis_id" label="Ribeirópolis;-37.438035,-10.535669" />
+        <node id="se_rosario_do_catete_id" label="Rosário do Catete;-37.03569,-10.690432" />
+        <node id="se_salgado_id" label="Salgado;-37.480385,-11.028833" />
+        <node id="se_santa_luzia_do_itanhy_id" label="Santa Luzia do Itanhy;-37.458642,-11.353596" />
+        <node id="se_santa_rosa_de_lima_id" label="Santa Rosa de Lima;-37.193123,-10.643362" />
+        <node id="se_santana_do_sao_francisco_id" label="Santana do São Francisco;-36.610539,-10.292233" />
+        <node id="se_santo_amaro_das_brotas_id" label="Santo Amaro das Brotas;-37.05643,-10.789225" />
+        <node id="se_simao_dias_id" label="Simão Dias;-37.809746,-10.738652" />
+        <node id="se_siriri_id" label="Siriri;-37.113068,-10.596488" />
+        <node id="se_sao_cristovao_id" label="São Cristóvão;-37.20436,-11.008443" />
+        <node id="se_sao_domingos_id" label="São Domingos;-37.568515,-10.791613" />
+        <node id="se_sao_francisco_id" label="São Francisco;-36.886907,-10.344151" />
+        <node id="se_sao_miguel_do_aleixo_id" label="São Miguel do Aleixo;-37.38356,-10.384662" />
+        <node id="se_telha_id" label="Telha;-36.881778,-10.206424" />
+        <node id="se_tobias_barreto_id" label="Tobias Barreto;-37.999451,-11.179799" />
+        <node id="se_tomar_do_geru_id" label="Tomar do Geru;-37.843338,-11.369391" />
+        <node id="se_umbauba_id" label="Umbaúba;-37.662347,-11.380921" />
+    </isComposedBy>
+</node>

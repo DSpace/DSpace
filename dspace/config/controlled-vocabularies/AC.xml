@@ -1,0 +1,26 @@
+<node id="ac_id" label="AC">
+    <isComposedBy>
+        <node id="ac_acrelandia_id" label="Acrelândia;-66.897166,-9.825808" />
+        <node id="ac_assis_brasil_id" label="Assis Brasil;-69.573794,-10.929765" />
+        <node id="ac_brasileia_id" label="Brasiléia;-68.749696,-10.994994" />
+        <node id="ac_bujari_id" label="Bujari;-67.955029,-9.815277" />
+        <node id="ac_capixaba_id" label="Capixaba;-67.686006,-10.566031" />
+        <node id="ac_cruzeiro_do_sul_id" label="Cruzeiro do Sul;-72.675582,-7.627625" />
+        <node id="ac_epitaciolandia_id" label="Epitaciolândia;-68.734109,-11.018771" />
+        <node id="ac_feijo_id" label="Feijó;-70.350973,-8.170536" />
+        <node id="ac_jordao_id" label="Jordão;-71.897391,-9.430912" />
+        <node id="ac_manoel_urbano_id" label="Manoel Urbano;-69.267862,-8.832911" />
+        <node id="ac_marechal_thaumaturgo_id" label="Marechal Thaumaturgo;-72.799704,-8.938983" />
+        <node id="ac_mancio_lima_id" label="Mâncio Lima;-72.899708,-7.616575" />
+        <node id="ac_placido_de_castro_id" label="Plácido de Castro;-67.137133,-10.28064" />
+        <node id="ac_porto_acre_id" label="Porto Acre;-67.547815,-9.581378" />
+        <node id="ac_porto_walter_id" label="Porto Walter;-72.753747,-8.263233" />
+        <node id="ac_rio_branco_id" label="Rio Branco;-67.824348,-9.97499" />
+        <node id="ac_rodrigues_alves_id" label="Rodrigues Alves;-72.661015,-7.738638" />
+        <node id="ac_santa_rosa_do_purus_id" label="Santa Rosa do Purus;-70.49025,-9.446515" />
+        <node id="ac_sena_madureira_id" label="Sena Madureira;-68.671278,-9.063499" />
+        <node id="ac_senador_guiomard_id" label="Senador Guiomard;-67.736185,-10.149686" />
+        <node id="ac_tarauaca_id" label="Tarauacá;-70.772154,-8.156975" />
+        <node id="ac_xapuri_id" label="Xapuri;-68.496857,-10.651598" />
+    </isComposedBy>
+</node>
