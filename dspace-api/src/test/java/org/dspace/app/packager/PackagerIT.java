@@ -35,6 +35,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipMetadataService;
 import org.dspace.content.RelationshipMetadataValue;
 import org.dspace.content.RelationshipType;
@@ -46,7 +48,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom2.Element;
@@ -64,17 +66,20 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    private WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
     protected static final InstallItemService installItemService = ContentServiceFactory.getInstance()
             .getInstallItemService();
     protected ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
     protected RelationshipMetadataService relationshipMetadataService = ContentServiceFactory
             .getInstance().getRelationshipMetadataService();
+    protected RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
     protected Community child1;
     protected Collection col1;
+    protected Collection col2;
     protected Item article;
     protected Item author;
+    protected Relationship relationship;
     File tempFile;
+    File resultFile;
 
     @Before
     public void setup() throws IOException {
@@ -88,13 +93,24 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
                                 .withEntityType("Publication").build();
 
+        col2 = CollectionBuilder.createCollection(context, parentCommunity).withName("Authors")
+                                .withEntityType("Person").build();
+
         // Create a new Publication (which is an Article)
         article = ItemBuilder.createItem(context, col1)
                 .withTitle("Article")
                 .withIssueDate("2017-10-17")
                 .build();
 
+        author = ItemBuilder.createItem(context, col2)
+                .withPersonIdentifierLastName("familyName")
+                .withPersonIdentifierFirstName("firstName")
+                .build();
+
         tempFile = File.createTempFile("packagerExportTest", ".zip");
+        String path = tempFile.getAbsolutePath().split("\\.")[0];
+        resultFile = new File(path + "_ITEM@" +
+                article.getHandle().replace("/", "-") + ".zip");
         context.restoreAuthSystemState();
     }
 
@@ -102,6 +118,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     @Override
     public void destroy() throws Exception {
         tempFile.delete();
+        resultFile.delete();
         super.destroy();
     }
 
@@ -110,7 +127,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         performExportScript(article.getHandle(), tempFile);
-        assertTrue(tempFile.length() > 0);
+        assertTrue(resultFile.length() > 0);
         String idStr = getID();
         assertEquals(idStr, article.getID().toString());
     }
@@ -123,7 +140,8 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         performExportScript(article.getHandle(), tempFile);
         String idStr = getID();
         itemService.delete(context, article);
-        performImportScript(tempFile);
+        performImportScript(resultFile);
+        context.commit();
         Item item = itemService.find(context, UUID.fromString(idStr));
         assertNotNull(item);
     }
@@ -134,9 +152,13 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         configService.setProperty("upload.temp.dir",tempFile.getParent());
 
         performExportScript(col1.getHandle(), tempFile);
+        String path = tempFile.getAbsolutePath().split("\\.")[0];
+        resultFile = new File(path + "_COLLECTION@" +
+                col1.getHandle().replace("/", "-") + ".zip");
         String idStr = getID();
         collectionService.delete(context, col1);
-        performImportScript(tempFile);
+        performImportScript(resultFile);
+        context.commit();
         Collection collection = collectionService.find(context, UUID.fromString(idStr));
         assertNotNull(collection);
     }
@@ -148,9 +170,13 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
 
         //Community
         performExportScript(child1.getHandle(), tempFile);
+        String path = tempFile.getAbsolutePath().split("\\.")[0];
+        resultFile = new File(path + "_COMMUNITY@" +
+                child1.getHandle().replace("/", "-") + ".zip");
         String idStr = getID();
         communityService.delete(context, child1);
-        performImportScript(tempFile);
+        performImportScript(resultFile);
+        context.commit();
         Community community = communityService.find(context, UUID.fromString(idStr));
         assertNotNull(community);
     }
@@ -161,7 +187,8 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
 
         //Item should be overwritten if UUID already Exists
         performExportScript(article.getHandle(), tempFile);
-        performImportScript(tempFile);
+        performImportScript(resultFile);
+        context.commit();
         Iterator<Item> items = itemService.findByCollection(context, col1);
         assertEquals(1, Iterators.size(items));
     }
@@ -175,7 +202,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         itemService.delete(context, article);
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col1, id).build();
         installItemService.installItem(context, workspaceItem, "123456789/0100");
-        performImportNoForceScript(tempFile);
+        performImportNoForceScript(resultFile);
         Iterator<Item> items = itemService.findByCollection(context, col1);
         Item testItem = items.next();
         assertFalse(items.hasNext()); //check to make sure there is only 1 item
@@ -191,19 +218,32 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         createRels();
         context.turnOffAuthorisationSystem();
         performExportScript(article.getHandle(), tempFile);
+        // For some reason if you don't commit here relationshipBuilder.deleteRelationship fails because
+        // relationshipService.find(context, id) says that the relationship doesn't exist
+        context.commit();
         List<RelationshipMetadataValue> leftList = relationshipMetadataService
                 .getRelationshipMetadata(article, true);
-        assertThat(leftList.size(), equalTo(2));
-        assertThat(leftList.get(0).getValue(), equalTo("familyName, firstName"));
-        String id = getID();
-        performImportScript(tempFile);
+        assertThat(leftList.size(), equalTo(3));
+        assertThat(leftList.get(1).getValue(), equalTo("familyName, firstName"));
+        performImportScript(resultFile);
+        context.commit();
         //get the new item create by the import
-        Item item2 = itemService.findByIdOrLegacyId(context, id);
+        Item item2 = itemService.findByIdOrLegacyId(context, article.getID().toString());
         leftList = relationshipMetadataService
                 .getRelationshipMetadata(item2, true);
+        List<Relationship> relationships = relationshipService.findByItem(context, item2);
+        List<MetadataValue> virtual = itemService.getMetadata(item2, "dc", "contributor", "author", Item.ANY, true);
+
+        assertThat(virtual.size(), equalTo(1));
+        assertThat(virtual.get(0).getValue(), equalTo("familyName, firstName"));
+        assertThat(virtual.get(0).getAuthority(), equalTo("virtual::2"));
+        assertThat(relationships.size(), equalTo(1));
+        assertThat(relationships.get(0).getLeftPlace(), equalTo(0));
+        assertThat(relationships.get(0).getRightPlace(), equalTo(0));
         //check to see if the metadata exists in the new item
-        assertThat(leftList.size(), equalTo(2));
-        assertThat(leftList.get(0).getValue(), equalTo("familyName, firstName"));
+        assertThat(leftList.size(), equalTo(3));
+        assertThat(leftList.get(1).getValue(), equalTo("familyName, firstName"));
+        context.commit();
     }
 
     @Test
@@ -212,9 +252,10 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         //required to do a relationship restore
         context.turnOffAuthorisationSystem();
         createRels();
+        context.restoreAuthSystemState();
         performExportScript(article.getHandle(), tempFile);
         METSManifest manifest = null;
-        ZipFile zip = new ZipFile(tempFile);
+        ZipFile zip = new ZipFile(resultFile);
         ZipEntry manifestEntry = zip.getEntry(METSManifest.MANIFEST_FILE);
         if (manifestEntry != null) {
             // parse the manifest and sanity-check it.
@@ -226,23 +267,25 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
                 assertTrue(element.getValue().contains("familyName"));
             }
         }
+        context.commit();
     }
 
     protected void createRels() {
-        //created the entity types needed for creating relations and related them to the items created previously
+        // Created the entity types needed for creating relations and related them to the items created previously
         EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType authorEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
         RelationshipType isAuthorOfPublication =
                 RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publicationEntityType, authorEntityType,
                         "isAuthorOfPublication", "isPublicationOfAuthor",
-                        null, null, null, null).build();
-        RelationshipBuilder.createRelationshipBuilder(context, article, author, isAuthorOfPublication).build();
+                        0, 10, 0, 10).build();
+        relationship = RelationshipBuilder.createRelationshipBuilder(context, article,
+                author, isAuthorOfPublication).build();
     }
 
     private String getID() throws IOException, MetadataValidationException {
-        //this method gets the UUID from the mets file that's stored in the attribute element
+        // This method gets the UUID from the mets file that is stored in the attribute element
         METSManifest manifest = null;
-        ZipFile zip = new ZipFile(tempFile);
+        ZipFile zip = new ZipFile(resultFile);
         ZipEntry manifestEntry = zip.getEntry(METSManifest.MANIFEST_FILE);
         if (manifestEntry != null) {
             // parse the manifest and sanity-check it.

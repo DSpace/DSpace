@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -393,7 +394,19 @@ public class Packager {
                 try {
                     //replace the object from the source file
                     dirAndFilePathBuilder(sourceFileIngest, sourceFiles);
-                    myPackager.replace(context, sip, pkgParams, sourceFileIngest, objToReplace, dryRun);
+                    if (identifier == null) {
+                        String[] itemParts = sourceFileIngest.get(0).split("_ITEM@");
+                        if (itemParts.length <= 1) {
+                            myPackager.replace(context, sip, pkgParams, sourceFileIngest, objToReplace, dryRun);
+                        } else {
+                            String handle = itemParts[1].split(".zip")[0].replace('-', '/');
+                            objToReplace = HandleServiceFactory.getInstance().getHandleService()
+                                    .resolveToObject(context, handle);
+                            myPackager.replace(context, sip, pkgParams, sourceFileIngest, objToReplace, dryRun);
+                        }
+                    } else {
+                        myPackager.replace(context, sip, pkgParams, sourceFileIngest, objToReplace, dryRun);
+                    }
 
                     //commit all changes & exit successfully
                     context.complete();
@@ -903,6 +916,20 @@ public class Packager {
                             }
                         } else {
                             //otherwise, just one object to replace
+                            if (objToReplace != null) {
+                                String[] itemParts = pkgFile.getAbsolutePath().split("_ITEM@");
+                                if (itemParts.length > 1) {
+                                    String handle = itemParts[1].split(".zip")[0].replace('-', '/');
+                                    if (!Objects.equals(objToReplace.getHandle(), handle)) {
+                                        objToReplace = HandleServiceFactory.getInstance().getHandleService()
+                                                .resolveToObject(context, handle);
+                                        if (objToReplace == null) {
+                                            throw new IllegalArgumentException("Bad identifier/handle -- "
+                                                    + "Cannot resolve handle \"" + handle + "\"");
+                                        }
+                                    }
+                                }
+                            }
                             DSpaceObject dso = sip.replace(context, objToReplace, pkgFile, pkgParams);
 
                             if (dso != null) {
