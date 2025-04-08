@@ -354,7 +354,10 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider implem
         if (changed) {
             try {
                 itemService.clearMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, Item.ANY);
-                itemService.addMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, newIdentifiers);
+                // Checks if Array newIdentifiers is empty to avoid adding null values to the metadata field.
+                if (!newIdentifiers.isEmpty()) {
+                    itemService.addMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, newIdentifiers);
+                }
                 itemService.update(c, item);
             } catch (SQLException ex) {
                 throw new RuntimeException("A problem with the database connection occured.", ex);

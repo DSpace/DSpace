@@ -85,7 +85,9 @@ services:
     - |
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
+      # UMD Customization
       java $${JPDA_OPTS} -jar /dspace/webapps/server-boot.jar --dspace.dir=/dspace
+      # End UMD Customization
   # DSpace PostgreSQL database container
   dspacedb:
     container_name: dspacedb

@@ -46,8 +46,8 @@ public class LdapServiceImpl implements LdapService {
 
     // The list of LDAP attributes to return as part of the SearchResult
     private static final String[] strRequestAttributes =
-    new String[]{"givenname", "sn", "mail", "umfaculty", "telephonenumber",
-                 "ou", "umappointment"};
+        new String[]{"givenname", "sn", "mail", "umfaculty", "telephonenumber",
+                     "ou", "umappointment"};
 
     private final static ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -194,6 +194,14 @@ public class LdapServiceImpl implements LdapService {
          * @return an Ldap object returned by an LDAP server for the given user
          * id, or null, of the user id is not found.
          */
+        @SuppressWarnings("BanJNDI")
+        // Suppressing "BanJNDI" warning from errorprone
+        // (see https://errorprone.info/bugpattern/BanJNDI)
+        // because (based on reading of
+        // https://www.blackhat.com/docs/us-16/materials/us-16-Munoz-A-Journey-From-JNDI-LDAP-Manipulation-To-RCE.pdf):
+        // (a) SearchControls.getReturningObjFlag() returns false, which
+        //     prevents the vulnerability
+        // (b) A malicious actor would need to compromise the campus LDAP server
         public Ldap queryLdapService(String strUid) throws NamingException {
             if (ctx == null) {
                 return null;

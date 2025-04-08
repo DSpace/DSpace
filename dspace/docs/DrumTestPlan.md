@@ -376,6 +376,9 @@ above, as well as additional files containing the metadata.
 
 ### 12) Batch Import (Zip)
 
+**Note:** This step cannot be tested in the local development environment,
+unless a local handle server is available.
+
 12.1) Download the "drum_batch_import.zip" file attached to
 <https://umd-dit.atlassian.net/browse/LIBDRUM-897> to the local workstation.
 
@@ -410,6 +413,10 @@ need to refresh the page).
 
 and verify that a “DSpace OAI-PMH Data Provider” page with repository
 information is displayed.
+
+**Note:** In the local development environment, go to
+<https://api.drum-local.lib.umd.edu/server/oai/request?verb=Identify>
+instead.
 
 ### 14) JSON-LD
 
@@ -459,7 +466,13 @@ are displayed with information about the dataset and the DRUM website.
 
 and verify that an XML file can be downloaded, and contains item information.
 
+**Note:** In the local development environment, go to
+<https://api.drum-local.lib.umd.edu/server/opensearch/search?query=author:smith>
+instead.
+
 ### 16) robots.txt
+
+**Note:** This step cannot be tested in the local development environment.
 
 16.1) In a web browser go to
 
@@ -479,6 +492,8 @@ Disallow: /browse/*
 and verify that the "robots.txt" file disallows all crawling.
 
 ### 17) sitemap.xml
+
+**Note:** This step cannot be tested in the local development environment.
 
 17.1) In a web browser go to
 

@@ -17,10 +17,7 @@ import org.dspace.app.rest.RestResourceController;
  * @author Mohamed Abdul Rasheed (mohideen at umd.edu)
  */
 @LinksRest(links = {
-        @LinkRest(
-                name = CommunityGroupRest.COMMUNITIES,
-                method = "getCommunities"
-        )
+    @LinkRest(name = CommunityGroupRest.COMMUNITIES, method = "getCommunities")
 })
 public class CommunityGroupRest extends BaseObjectRest<Integer> {
     public static final String NAME = "communitygroup";

@@ -4,11 +4,19 @@
 # This Dockerfile uses JDK17 by default.
 # To build with other versions, use "--build-arg JDK_VERSION=[value]"
 ARG JDK_VERSION=17
+# The Docker version tag to build from
+# UMD Customization
+# Continuing to use "latest" because this allows a new image to be easily
+# created and pushed to the Nexus
 ARG DSPACE_VERSION=latest
+# End UMD Customization
+# The Docker registry to use for DSpace images. Defaults to "docker.io"
+# NOTE: non-DSpace images are hardcoded to use "docker.io" and are not impacted by this build argument
+ARG DOCKER_REGISTRY=docker.io
 
 # Step 1 - Run Maven Build
 # UMD Customization
-FROM docker.lib.umd.edu/drum-dependencies-8_x:${DSPACE_VERSION} as build
+FROM docker.lib.umd.edu/drum-dependencies-8_x:${DSPACE_VERSION} AS build
 # End UMD Customization
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
@@ -32,7 +40,7 @@ RUN rm -rf /install/webapps/server/
 
 # Step 2 - Run Ant Deploy
 # UMD Customization
-FROM docker.lib.umd.edu/drum-ant:latest as ant_build
+FROM docker.lib.umd.edu/drum-ant:latest AS ant_build
 # End UMD Customization
 ARG TARGET_DIR=dspace-installer
 # COPY the /install directory from 'build' container to /dspace-src in this container
@@ -47,14 +55,19 @@ WORKDIR /dspace-src
 RUN ant init_installation update_configs update_code update_webapps
 
 # Step 3 - Start up DSpace via Runnable JAR
-FROM eclipse-temurin:${JDK_VERSION}
+FROM docker.io/eclipse-temurin:${JDK_VERSION}
 # NOTE: DSPACE_INSTALL must align with the "dspace.dir" default configuration.
 ENV DSPACE_INSTALL=/dspace
 # Copy the /dspace directory from 'ant_build' container to /dspace in this container
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 WORKDIR $DSPACE_INSTALL
-# Expose Tomcat port
-EXPOSE 8080
+# Need host command for "[dspace]/bin/make-handle-config"
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends host \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
+# Expose Tomcat port (8080) & Handle Server HTTP port (8000)
+EXPOSE 8080 8000
 # Give java extra memory (2GB)
 ENV JAVA_OPTS=-Xmx2000m
 

@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Import;
 /**
  * Define the Spring Boot Application settings itself to be runned using an
  * embedded application server.
- *
+ * 
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
