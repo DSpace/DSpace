@@ -57,33 +57,33 @@
             - - - - - -
         -->
 
-        <name-map collection-handle="123456789/83" submission-name="Acre"/>
-        <name-map collection-handle="123456789/93" submission-name="Alagoas"/>
-        <name-map collection-handle="123456789/59" submission-name="Amazonas"/>
-        <name-map collection-handle="123456789/55" submission-name="Amapa"/>
-        <name-map collection-handle="123456789/61" submission-name="Bahia"/>
-        <name-map collection-handle="123456789/30" submission-name="Ceara"/>
-        <name-map collection-handle="123456789/78" submission-name="DistritoFederal"/>
-        <name-map collection-handle="123456789/65" submission-name="EspiritoSanto"/>
-        <name-map collection-handle="123456789/72" submission-name="Goias"/>
-        <name-map collection-handle="123456789/33" submission-name="Maranhao"/>
-        <name-map collection-handle="123456789/67" submission-name="MinasGerais"/>
-        <name-map collection-handle="123456789/100" submission-name="MatoGrossoSul"/>
-        <name-map collection-handle="123456789/75" submission-name="MatoGrosso"/>
-        <name-map collection-handle="123456789/99" submission-name="Para"/>
-        <name-map collection-handle="123456789/94" submission-name="Paraiba"/>
-        <name-map collection-handle="123456789/44" submission-name="Pernambuco"/>
-        <name-map collection-handle="123456789/95" submission-name="Piaui"/>
-        <name-map collection-handle="123456789/47" submission-name="Parana"/>
-        <name-map collection-handle="123456789/63" submission-name="RioJaneiro"/>
-        <name-map collection-handle="123456789/96" submission-name="RioNorte"/>
-        <name-map collection-handle="123456789/98" submission-name="Rondonia"/>
-        <name-map collection-handle="123456789/57" submission-name="Roraima"/>
-        <name-map collection-handle="123456789/70" submission-name="RioSul"/>
-        <name-map collection-handle="123456789/101" submission-name="SantaCatarina"/>
-        <name-map collection-handle="123456789/97" submission-name="Sergipe"/>
-        <name-map collection-handle="123456789/50" submission-name="SaoPaulo"/>
-        <name-map collection-handle="123456789/52" submission-name="Tocantins"/>
+        <name-map collection-handle="123456789/15" submission-name="Acre"/>
+        <name-map collection-handle="123456789/8" submission-name="Alagoas"/>
+        <name-map collection-handle="123456789/17" submission-name="Amazonas"/>
+        <name-map collection-handle="123456789/16" submission-name="Amapa"/>
+        <name-map collection-handle="123456789/9" submission-name="Bahia"/>
+        <name-map collection-handle="123456789/6" submission-name="Ceara"/>
+        <name-map collection-handle="123456789/32" submission-name="DistritoFederal"/>
+        <name-map collection-handle="123456789/25" submission-name="EspiritoSanto"/>
+        <name-map collection-handle="123456789/29" submission-name="Goias"/>
+        <name-map collection-handle="123456789/7" submission-name="Maranhao"/>
+        <name-map collection-handle="123456789/26" submission-name="MinasGerais"/>
+        <name-map collection-handle="123456789/31" submission-name="MatoGrossoSul"/>
+        <name-map collection-handle="123456789/30" submission-name="MatoGrosso"/>
+        <name-map collection-handle="123456789/18" submission-name="Para"/>
+        <name-map collection-handle="123456789/10" submission-name="Paraiba"/>
+        <name-map collection-handle="123456789/11" submission-name="Pernambuco"/>
+        <name-map collection-handle="123456789/12" submission-name="Piaui"/>
+        <name-map collection-handle="123456789/22" submission-name="Parana"/>
+        <name-map collection-handle="123456789/27" submission-name="RioJaneiro"/>
+        <name-map collection-handle="123456789/13" submission-name="RioNorte"/>
+        <name-map collection-handle="123456789/19" submission-name="Rondonia"/>
+        <name-map collection-handle="123456789/20" submission-name="Roraima"/>
+        <name-map collection-handle="123456789/24" submission-name="RioSul"/>
+        <name-map collection-handle="123456789/23" submission-name="SantaCatarina"/>
+        <name-map collection-handle="123456789/14" submission-name="Sergipe"/>
+        <name-map collection-handle="123456789/28" submission-name="SaoPaulo"/>
+        <name-map collection-handle="123456789/21" submission-name="Tocantins"/>
 
 
 
