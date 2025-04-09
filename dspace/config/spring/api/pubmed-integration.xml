@@ -57,7 +57,7 @@
         <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
     </bean>
 
-    <bean id="abstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+    <bean id="abstractContrib" class="org.dspace.importer.external.pubmed.metadatamapping.contributor.PubmedAbstractMetadatumContributor">
         <property name="field" ref="dc.description.abstract"/>
         <property name="query" value="descendant::AbstractText"/>
         <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
