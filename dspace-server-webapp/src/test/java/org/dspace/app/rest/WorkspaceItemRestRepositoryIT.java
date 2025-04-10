@@ -2185,6 +2185,54 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     /**
+     * Test the exposition of validation error for multiple metadata values, on a non-repeatable field
+     * both at the creation time than on existent workspaceitems
+     *
+     * @throws Exception
+     */
+    public void validationErrorsNotRepeatableMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Collection 1")
+            .withSubmitterGroup(eperson)
+            .build();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        WorkspaceItem workspaceItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+            .withTitle("Workspace Item 1")
+            .withIssueDate("2017-10-17")
+            .grantLicense()
+            .build();
+
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+            .withTitle("Workspace Item 2")
+            .grantLicense()
+            .build();
+
+        itemService.addMetadata(context, workspaceItem2.getItem(), "dc", "title", null, null, "Workspace Item 3");
+        // disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.restoreAuthSystemState();
+
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + workspaceItem1.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors").doesNotExist());
+
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + workspaceItem2.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.not.repeatable')]",
+                contains(hasJsonPath("$.paths", contains(hasJsonPath(
+                    "$", Matchers.is("/sections/traditionalpageone/dc.title")))))));
+
+    }
+
+    @Test
+    /**
      * Test the update of metadata
      *
      * @throws Exception

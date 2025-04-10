@@ -44,6 +44,8 @@ public class MetadataValidation extends AbstractValidation {
 
     private static final String ERROR_VALIDATION_REGEX = "error.validation.regex";
 
+    private static final String ERROR_VALIDATION_NOT_REPEATABLE = "error.validation.not.repeatable";
+
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataValidation.class);
 
     private DCInputsReader inputReader;
@@ -144,6 +146,16 @@ public class MetadataValidation extends AbstractValidation {
                             addError(errors, ERROR_VALIDATION_REQUIRED, "/"
                                     + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
                                             input.getFieldName());
+                        }
+                    }
+                    // If there are multiple values for a visible input that is non-repeatable
+                    //   Then add a validation error
+                    if ((!input.isRepeatable() && mdv.size() > 1) && input.isVisible(DCInput.SUBMISSION_SCOPE)
+                            && !valuesRemoved) {
+                        if (input.isAllowedFor(documentTypeValue)) {
+                            addError(errors, ERROR_VALIDATION_NOT_REPEATABLE, "/"
+                                    + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                                    input.getFieldName());
                         }
                     }
                 }
