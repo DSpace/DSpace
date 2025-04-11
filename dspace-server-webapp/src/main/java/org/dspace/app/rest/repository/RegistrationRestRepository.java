@@ -158,31 +158,33 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
                               + registrationRest.getEmail(), e);
             }
         } else if (accountType.equalsIgnoreCase(TYPE_REGISTER)) {
-            try {
-                String email = registrationRest.getEmail();
-                if (!AuthorizeUtil.authorizeNewAccountRegistration(context, request)) {
-                    throw new AccessDeniedException(
-                        "Registration is disabled, you are not authorized to create a new Authorization");
-                }
+            if (eperson == null) {
+                try {
+                    String email = registrationRest.getEmail();
+                    if (!AuthorizeUtil.authorizeNewAccountRegistration(context, request)) {
+                        throw new AccessDeniedException(
+                                "Registration is disabled, you are not authorized to create a new Authorization");
+                    }
 
-                if (!authenticationService.canSelfRegister(context, request, registrationRest.getEmail())) {
-                    throw new UnprocessableEntityException(
-                        String.format("Registration is not allowed with email address" +
-                                          " %s", email));
-                }
+                    if (!authenticationService.canSelfRegister(context, request, registrationRest.getEmail())) {
+                        throw new UnprocessableEntityException(
+                                String.format("Registration is not allowed with email address" +
+                                        " %s", email));
+                    }
 
-                accountService.sendRegistrationInfo(context, registrationRest.getEmail());
-            } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
-                log.error("Something went wrong with sending registration info email: "
-                              + registrationRest.getEmail(), e);
-            }
-        } else {
-            // if an eperson with this email already exists then send "forgot password" email instead
-            try {
-                accountService.sendForgotPasswordInfo(context, registrationRest.getEmail());
-            }  catch (SQLException | IOException | MessagingException | AuthorizeException e) {
-                log.error("Something went wrong with sending forgot password info email: "
-                              + registrationRest.getEmail(), e);
+                    accountService.sendRegistrationInfo(context, registrationRest.getEmail());
+                } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
+                    log.error("Something went wrong with sending registration info email: "
+                            + registrationRest.getEmail(), e);
+                }
+            } else {
+                // if an eperson with this email already exists then send "forgot password" email instead
+                try {
+                    accountService.sendForgotPasswordInfo(context, registrationRest.getEmail());
+                }  catch (SQLException | IOException | MessagingException | AuthorizeException e) {
+                    log.error("Something went wrong with sending forgot password info email: "
+                            + registrationRest.getEmail(), e);
+                }
             }
         }
         return null;

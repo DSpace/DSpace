@@ -221,6 +221,45 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
+    public void registrationWithExistingEmailTest() throws Exception {
+        List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        assertEquals(0, registrationDataList.size());
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(eperson.getEmail());
+
+        try {
+            // First registration
+            getClient().perform(post("/api/eperson/registrations")
+                            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+                            .content(mapper.writeValueAsBytes(registrationRest))
+                            .contentType(contentType))
+                    .andExpect(status().isCreated());
+
+            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            assertEquals(1, registrationDataList.size());
+            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
+
+            // Try to register the same email again
+            getClient().perform(post("/api/eperson/registrations")
+                            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+                            .content(mapper.writeValueAsBytes(registrationRest))
+                            .contentType(contentType))
+                    .andExpect(status().isCreated()); // or .isUnprocessableEntity() depending on API behavior
+
+            // Make sure the duplicate was not created
+            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            assertEquals(1, registrationDataList.size());
+        } finally {
+            Iterator<RegistrationData> iterator = registrationDataList.iterator();
+            while (iterator.hasNext()) {
+                RegistrationData registrationData = iterator.next();
+                registrationDataDAO.delete(context, registrationData);
+            }
+        }
+    }
+
+    @Test
     public void testRegisterDomainRegistered() throws Exception {
         List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
         try {
