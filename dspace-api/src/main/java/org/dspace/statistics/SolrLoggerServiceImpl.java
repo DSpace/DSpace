@@ -1034,7 +1034,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             return null;
         }
 
-        // System.out.println("QUERY");
         SolrQuery solrQuery = new SolrQuery().setRows(rows).setQuery(query)
                                              .setFacetMinCount(facetMinCount);
         addAdditionalSolrYearCores(solrQuery);
