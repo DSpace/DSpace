@@ -192,7 +192,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
 
     @Override
     public WorkflowItemRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
-                                   MultipartFile file) throws SQLException {
+                                   MultipartFile file) throws SQLException, AuthorizeException, IOException {
 
         Context context = obtainContext();
         WorkflowItemRest wsi = findOne(context, id);
