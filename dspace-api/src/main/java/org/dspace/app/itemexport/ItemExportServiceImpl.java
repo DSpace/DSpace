@@ -714,6 +714,9 @@ public class ItemExportServiceImpl implements ItemExportService {
                         }
 
                         // now zip up the export directory created above
+                        logInfo("Zipping up export directory " + workParentDir + " and creating file " + downloadDir
+                            + System.getProperty("file.separator")
+                            + fileName + ".zip");
                         zip(workParentDir, downloadDir
                             + System.getProperty("file.separator")
                             + fileName + ".zip");
