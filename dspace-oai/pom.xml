@@ -16,7 +16,6 @@
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
         <xoai.version>3.4.0</xoai.version>
-        <jtwig.version>5.87.0.RELEASE</jtwig.version>
     </properties>
 
     <build>
@@ -87,18 +86,16 @@
             </exclusions>
         </dependency>
 
-        <!-- Templating Engine -->
+        <!-- Spring Boot Thymeleaf templating -->
         <dependency>
-            <groupId>org.jtwig</groupId>
-            <artifactId>jtwig-spring-boot-starter</artifactId>
-            <version>${jtwig.version}</version>
-            <exclusions>
-                <!-- We don't need spring-boot-starter-web, it is provided by our Spring Boot webapp -->
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <version>${spring-boot.version}</version>
         </dependency>
 
         <!-- Internal -->
