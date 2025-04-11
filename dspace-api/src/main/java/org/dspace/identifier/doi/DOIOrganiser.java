@@ -448,28 +448,28 @@ public class DOIOrganiser {
                                        + " is successfully registered.");
             }
         } catch (IdentifierException ex) {
+            String message;
             if (!(ex instanceof DOIIdentifierException)) {
-                LOG.error("It wasn't possible to register this identifier: "
-                              + DOI.SCHEME + doiRow.getDoi()
-                              + " online. ", ex);
+                message = "It wasn't possible to register this identifier: "
+                    + DOI.SCHEME + doiRow.getDoi()
+                    + " online. ";
+            } else {
+                DOIIdentifierException doiIdentifierException = (DOIIdentifierException) ex;
+                message = "It wasn't possible to register this identifier : "
+                    + DOI.SCHEME + doiRow.getDoi()
+                    + " online. Exceptions code: "
+                    + DOIIdentifierException.codeToString(doiIdentifierException.getCode());
             }
-
-            DOIIdentifierException doiIdentifierException = (DOIIdentifierException) ex;
 
             try {
                 sendAlertMail("Register", dso,
                               DOI.SCHEME + doiRow.getDoi(),
-                              doiIdentifierException.codeToString(doiIdentifierException
-                                                                      .getCode()));
+                              message);
             } catch (IOException ioe) {
                 LOG.error("Couldn't send mail", ioe);
             }
 
-            LOG.error("It wasn't possible to register this identifier : "
-                          + DOI.SCHEME + doiRow.getDoi()
-                          + " online. Exceptions code: "
-                          + doiIdentifierException
-                .codeToString(doiIdentifierException.getCode()), ex);
+            LOG.error(message, ex);
 
             if (!quiet) {
                 System.err.println("It wasn't possible to register this identifier: "
@@ -541,27 +541,27 @@ public class DOIOrganiser {
                 System.out.println("This identifier : " + DOI.SCHEME + doiRow.getDoi() + " is successfully reserved.");
             }
         } catch (IdentifierException ex) {
+            String message;
             if (!(ex instanceof DOIIdentifierException)) {
-                LOG.error("It wasn't possible to register this identifier : "
-                              + DOI.SCHEME + doiRow.getDoi()
-                              + " online. ", ex);
+                message = "It wasn't possible to register this identifier : "
+                    + DOI.SCHEME + doiRow.getDoi()
+                    + " online. ";
+            } else {
+                DOIIdentifierException doiIdentifierException = (DOIIdentifierException) ex;
+                message = "It wasn't possible to reserve the identifier online. "
+                    + " Exceptions code:  "
+                    + DOIIdentifierException.codeToString(doiIdentifierException.getCode());
             }
-
-            DOIIdentifierException doiIdentifierException = (DOIIdentifierException) ex;
 
             try {
                 sendAlertMail("Reserve", dso,
                               DOI.SCHEME + doiRow.getDoi(),
-                              DOIIdentifierException.codeToString(
-                                  doiIdentifierException.getCode()));
+                              message);
             } catch (IOException ioe) {
                 LOG.error("Couldn't send mail", ioe);
             }
 
-            LOG.error("It wasn't possible to reserve the identifier online. "
-                          + " Exceptions code:  "
-                          + DOIIdentifierException
-                .codeToString(doiIdentifierException.getCode()), ex);
+            LOG.error(message, ex);
 
             if (!quiet) {
                 System.err.println("It wasn't possible to reserve this identifier: " + DOI.SCHEME + doiRow.getDoi());
@@ -606,27 +606,27 @@ public class DOIOrganiser {
                                        + doiRow.getDoi() + ".");
             }
         } catch (IdentifierException ex) {
+            String message;
             if (!(ex instanceof DOIIdentifierException)) {
-                LOG.error("Registering DOI {} for object {}:  the registrar returned an error.",
-                        doiRow.getDoi(), dso.getID(), ex);
+                message = String.format("Registering DOI %s for object %s:  the registrar returned an error.",
+                                        doiRow.getDoi(), dso.getID());
+            } else {
+                DOIIdentifierException doiIdentifierException = (DOIIdentifierException) ex;
+                message = "It wasn't possible to update this identifier:  "
+                    + DOI.SCHEME + doiRow.getDoi()
+                    + " Exceptions code:  "
+                    + DOIIdentifierException.codeToString(doiIdentifierException.getCode());
             }
-
-            DOIIdentifierException doiIdentifierException = (DOIIdentifierException) ex;
 
             try {
                 sendAlertMail("Update", dso,
                               DOI.SCHEME + doiRow.getDoi(),
-                              doiIdentifierException.codeToString(doiIdentifierException
-                                                                      .getCode()));
+                              message);
             } catch (IOException ioe) {
                 LOG.error("Couldn't send mail", ioe);
             }
 
-            LOG.error("It wasn't possible to update this identifier:  "
-                          + DOI.SCHEME + doiRow.getDoi()
-                          + " Exceptions code:  "
-                          + doiIdentifierException
-                .codeToString(doiIdentifierException.getCode()), ex);
+            LOG.error(message, ex);
 
             if (!quiet) {
                 System.err.println("It wasn't possible to update this identifier: " + DOI.SCHEME + doiRow.getDoi());
