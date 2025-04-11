@@ -16,9 +16,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.DSpaceObjectUtilsImpl;
+import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -33,6 +36,8 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.dspace.util.UUIDUtils;
+import org.dspace.utils.DSpace;
 
 /**
  * Curator orchestrates and manages the application of a one or more curation
@@ -250,6 +255,20 @@ public class Curator {
             curationCtx.set(c);
 
             DSpaceObject dso = handleService.resolveToObject(c, id);
+            if (dso == null) {
+                UUID uuid = null;
+                try {
+                    uuid = UUIDUtils.fromString(id);
+                } catch (IllegalArgumentException ex) {
+                    // couldn't parse uuid, setting it null
+                    uuid = null;
+                }
+                if (uuid != null) {
+                    DSpaceObjectUtils dSpaceObjectUtils = new DSpace().getServiceManager()
+                            .getServiceByName(DSpaceObjectUtilsImpl.class.getName(), DSpaceObjectUtilsImpl.class);
+                    dso = dSpaceObjectUtils.findDSpaceObject(c, uuid);
+                }
+            }
             if (dso != null) {
                 curate(dso);
             } else {
