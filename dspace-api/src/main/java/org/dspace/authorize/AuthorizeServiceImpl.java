@@ -820,7 +820,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + RESOURCE_TYPE_FIELD + ":" +
                                                               IndexableCommunity.TYPE,
-            null, null, null, null);
+            null, 0, null, null);
         return discoverResult.getTotalSearchResults();
     }
 
@@ -867,7 +867,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + RESOURCE_TYPE_FIELD + ":" +
                                                               IndexableCollection.TYPE,
-            null, null, null, null);
+            null, 0, null, null);
         return discoverResult.getTotalSearchResults();
     }
 
