@@ -932,7 +932,7 @@
         <dependency>
             <groupId>org.xhtmlrenderer</groupId>
             <artifactId>flying-saucer-pdf</artifactId>
-            <version>9.11.4</version>
+            <version>9.11.6</version>
         </dependency>
 
     </dependencies>
