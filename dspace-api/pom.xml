@@ -877,7 +877,7 @@
         <dependency>
             <groupId>org.apache.jclouds</groupId>
             <artifactId>jclouds-core</artifactId>
-            <version>2.6.0</version>
+            <version>${jclouds.version}</version>
             <exclusions>
                <exclusion>
                     <groupId>com.google.code.gson</groupId>
@@ -901,19 +901,25 @@
         <dependency>
             <groupId>org.apache.jclouds</groupId>
             <artifactId>jclouds-blobstore</artifactId>
-            <version>2.6.0</version>
+            <version>${jclouds.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jakarta.ws.rs</groupId>
+                    <artifactId>jakarta.ws.rs-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.apache.jclouds.api</groupId>
             <artifactId>filesystem</artifactId>
-            <version>2.6.0</version>
+            <version>${jclouds.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.jclouds.provider</groupId>
             <artifactId>aws-s3</artifactId>
-            <version>2.7.0</version>
+            <version>${jclouds.version}</version>
         </dependency>
 
         <!-- required frontpage generation -->
