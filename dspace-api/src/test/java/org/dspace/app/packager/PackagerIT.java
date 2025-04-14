@@ -77,7 +77,11 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     protected Collection col2;
     protected Item article;
     protected Item author;
-    protected Relationship relationship;
+    protected Item author2;
+    protected Item author3;
+    protected Item author4;
+    protected Item author5;
+    protected Item author6;
     File tempFile;
     File resultFile;
 
@@ -104,6 +108,31 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
 
         author = ItemBuilder.createItem(context, col2)
                 .withPersonIdentifierLastName("familyName")
+                .withPersonIdentifierFirstName("firstName")
+                .build();
+
+        author2 = ItemBuilder.createItem(context, col2)
+                .withPersonIdentifierLastName("2")
+                .withPersonIdentifierFirstName("firstName")
+                .build();
+
+        author3 = ItemBuilder.createItem(context, col2)
+                .withPersonIdentifierLastName("3")
+                .withPersonIdentifierFirstName("firstName")
+                .build();
+
+        author4 = ItemBuilder.createItem(context, col2)
+                .withPersonIdentifierLastName("4")
+                .withPersonIdentifierFirstName("firstName")
+                .build();
+
+        author5 = ItemBuilder.createItem(context, col2)
+                .withPersonIdentifierLastName("5")
+                .withPersonIdentifierFirstName("firstName")
+                .build();
+
+        author6 = ItemBuilder.createItem(context, col2)
+                .withPersonIdentifierLastName("6")
                 .withPersonIdentifierFirstName("firstName")
                 .build();
 
@@ -223,27 +252,37 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
         List<RelationshipMetadataValue> leftList = relationshipMetadataService
                 .getRelationshipMetadata(article, true);
-        assertThat(leftList.size(), equalTo(3));
-        assertThat(leftList.get(1).getValue(), equalTo("familyName, firstName"));
+        assertThat(leftList.size(), equalTo(18));
         performImportScript(resultFile);
-        context.commit();
         //get the new item create by the import
         Item item2 = itemService.findByIdOrLegacyId(context, article.getID().toString());
         leftList = relationshipMetadataService
                 .getRelationshipMetadata(item2, true);
         List<Relationship> relationships = relationshipService.findByItem(context, item2);
         List<MetadataValue> virtual = itemService.getMetadata(item2, "dc", "contributor", "author", Item.ANY, true);
+        MetadataValue familyValue = null;
 
-        assertThat(virtual.size(), equalTo(1));
-        assertThat(virtual.get(0).getValue(), equalTo("familyName, firstName"));
-        assertThat(virtual.get(0).getAuthority(), equalTo("virtual::2"));
-        assertThat(relationships.size(), equalTo(1));
+        for (MetadataValue value : virtual) {
+            if (!value.getValue().equals("familyName, firstName")) {
+                continue;
+            }
+            familyValue = value;
+        }
+        assertNotNull(familyValue);
+        assertThat(familyValue.getValue(), equalTo("familyName, firstName"));
+        assertThat(familyValue.getAuthority(), equalTo("virtual::7"));
+        assertThat(relationships.size(), equalTo(6));
         assertThat(relationships.get(0).getLeftPlace(), equalTo(0));
         assertThat(relationships.get(0).getRightPlace(), equalTo(0));
+        assertThat(itemService.getMetadataFirstValue(relationships.get(0).getRightItem(),
+                "person", "familyName", null, Item.ANY), equalTo("familyName"));
+        assertThat(itemService.getMetadataFirstValue(relationships.get(5).getRightItem(),
+                "person", "familyName", null, Item.ANY), equalTo("6"));
+        assertThat(relationships.get(5).getLeftPlace(), equalTo(5));
+        assertThat(relationships.get(5).getRightPlace(), equalTo(0));
+
         //check to see if the metadata exists in the new item
-        assertThat(leftList.size(), equalTo(3));
-        assertThat(leftList.get(1).getValue(), equalTo("familyName, firstName"));
-        context.commit();
+        assertThat(leftList.size(), equalTo(18));
     }
 
     @Test
@@ -278,8 +317,12 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
                 RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publicationEntityType, authorEntityType,
                         "isAuthorOfPublication", "isPublicationOfAuthor",
                         0, 10, 0, 10).build();
-        relationship = RelationshipBuilder.createRelationshipBuilder(context, article,
-                author, isAuthorOfPublication).build();
+        RelationshipBuilder.createRelationshipBuilder(context, article, author, isAuthorOfPublication).build();
+        RelationshipBuilder.createRelationshipBuilder(context, article, author2, isAuthorOfPublication).build();
+        RelationshipBuilder.createRelationshipBuilder(context, article, author3, isAuthorOfPublication).build();
+        RelationshipBuilder.createRelationshipBuilder(context, article, author4, isAuthorOfPublication).build();
+        RelationshipBuilder.createRelationshipBuilder(context, article, author5, isAuthorOfPublication).build();
+        RelationshipBuilder.createRelationshipBuilder(context, article, author6, isAuthorOfPublication).build();
     }
 
     private String getID() throws IOException, MetadataValidationException {

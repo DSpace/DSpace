@@ -1592,7 +1592,6 @@ public abstract class AbstractMETSDisseminator
                 Div divParent = new Div();
                 divParent.setID("rels_" + key);
                 for (Relationship relationship : relsMap.get(key)) {
-                    int place = 0;
                     String value = "";
                     Item otherItem;
                     if (relationship.getRightItem() == item) {
@@ -1604,8 +1603,6 @@ public abstract class AbstractMETSDisseminator
                     }
                     if (otherItem.isArchived()) {
                         Div divChild = new Div();
-                        divChild.setORDER(relationship.getLeftPlace());
-                        divChild.setID(String.valueOf(relationship.getRightPlace()));
                         if (value == null || !value.equalsIgnoreCase("")) {
                             divChild.setLABEL(value);
                         }
@@ -1625,9 +1622,14 @@ public abstract class AbstractMETSDisseminator
                         Mptr mptrUrn = new Mptr();
                         mptrUrn.setXlinkHref("urn:uuid:" + otherItem.getID().toString());
                         mptrUrn.setLOCTYPE(Loctype.URN);
+                        Mptr mptrOther = new Mptr();
+                        mptrOther.setXlinkHref(relationship.getLeftPlace() + ":" + relationship.getRightPlace());
+                        mptrOther.setOTHERLOCTYPE(otherItem.getID().toString());
+                        mptrOther.setLOCTYPE(Loctype.OTHER);
                         divChild.getContent().add(mptrHandle);
                         divChild.getContent().add(mptrURL);
                         divChild.getContent().add(mptrUrn);
+                        divChild.getContent().add(mptrOther);
                         divParent.getContent().add(divChild);
                     }
                 }

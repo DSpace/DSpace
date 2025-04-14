@@ -25,6 +25,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.packager.METSManifest;
@@ -43,8 +46,8 @@ import org.jdom2.Element;
  */
 public class PackagerFileService {
 
-    private static org.apache.logging.log4j.Logger log =
-            org.apache.logging.log4j.LogManager.getLogger(PackagerFileService.class);
+    private static Logger log =
+            LogManager.getLogger(PackagerFileService.class);
 
     private PackageParameters params = null;
     private boolean keepExist = false;
@@ -195,8 +198,8 @@ public class PackagerFileService {
             String handle;
             String path;
             String uuid = null;
-            int leftOrder;
-            int rightOrder;
+            int leftOrder = -1;
+            int rightOrder = -1;
             String relName = relElement.getAttributeValue("ID").split("_")[1];
             int type;
             if (scope.containsKey(relName) || scope.containsKey("*")) {
@@ -209,8 +212,14 @@ public class PackagerFileService {
                     path = setRelPath(sourceFilePath,
                             getMPTRData(relElementChildrenElement.getChildren(), "URL"));
                     uuid = getMPTRData(relElementChildrenElement.getChildren(), "URN").split(":")[2];
-                    rightOrder = Integer.parseInt(((Element) relElementChildren).getAttributeValue("ID"));
-                    leftOrder = Integer.parseInt(((Element) relElementChildren).getAttributeValue("ORDER"));
+                    String orderData = getMPTRData(relElementChildrenElement.getChildren(), "OTHER");
+                    if (!StringUtils.isEmpty(orderData)) {
+                        String[] leftRight = orderData.split(":");
+                        if (leftRight.length == 2) {
+                            leftOrder = Integer.parseInt(leftRight[0]);
+                            rightOrder = Integer.parseInt(leftRight[1]);
+                        }
+                    }
                     List<FileNode> relatedItems = rels.get(relName);
                     type = initType(sourceFilePath);
                     if (relatedItems == null) {
