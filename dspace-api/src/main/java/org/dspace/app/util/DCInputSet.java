@@ -225,4 +225,42 @@ public class DCInputSet {
         return allowedFieldNames;
     }
 
+    public List<String> populateAllowedFieldNames(List<String> documentTypeValues) {
+        List<String> allowedFieldNames = new ArrayList<>();
+        // Before iterating each input for validation, run through all inputs + fields and populate a lookup
+        // map with inputs for this type. Because an input can be configured repeatedly in a form (for example
+        // it could be required for type Book, and allowed but not required for type Article), allowed=true will
+        // always take precedence
+        for (DCInput[] row : inputs) {
+            for (DCInput input : row) {
+                if (input.isQualdropValue()) {
+                    List<Object> inputPairs = input.getPairs();
+                    //starting from the second element of the list and skipping one every time because the display
+                    // values are also in the list and before the stored values.
+                    for (int i = 1; i < inputPairs.size(); i += 2) {
+                        String fullFieldname = input.getFieldName() + "." + inputPairs.get(i);
+                        if ((documentTypeValues.isEmpty() && input.isAllowedFor("")) || documentTypeValues.stream()
+                            .anyMatch(input::isAllowedFor)) {
+                            if (!allowedFieldNames.contains(fullFieldname)) {
+                                allowedFieldNames.add(fullFieldname);
+                            }
+                            // For the purposes of qualdrop, we have to add the field name without the qualifier
+                            // too, or a required qualdrop will get confused and incorrectly reject a value
+                            if (!allowedFieldNames.contains(input.getFieldName())) {
+                                allowedFieldNames.add(input.getFieldName());
+                            }
+                        }
+                    }
+                } else {
+                    if (((documentTypeValues.isEmpty() && input.isAllowedFor("")) || documentTypeValues.stream()
+                        .anyMatch(input::isAllowedFor)) &&
+                        !allowedFieldNames.contains(input.getFieldName())) {
+                        allowedFieldNames.add(input.getFieldName());
+                    }
+                }
+            }
+        }
+        return allowedFieldNames;
+    }
+
 }
