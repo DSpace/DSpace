@@ -16,11 +16,11 @@ import org.apache.commons.logging.LogFactory;
  * consisting of a key and and string value to be appended at the end of
  * log entries.
  * <p>
- * This is done by placing "#<key>:<value>#" in the pattern provided to the
- * valve. For example, to have "logFile:accessLo.log" included in the log
+ * This is done by placing "#<KEY>:<VALUE>#" in the pattern provided to the
+ * valve. For example, to have "logFile:access.log" included in the log
  * entries, the pattern would be:
  * <p>
- * {@code "%h %s %b #logFile:accesslog.log#"}
+ * {@code "%h %s %b #logFile:access.log#"}
  * <p>
  * This class has the following limitations:
  * <p>
@@ -47,7 +47,7 @@ public class UmdExtendedJsonAccessLogValve extends JsonAccessLogValve {
 
         logger.debug("matcher.matches()=" + matcher.matches());
         if (!matcher.matches()) {
-            // No "#<key>:<value>#" pattern present -- delegate to superclass.
+            // No "#<KEY>:<VALUE>#" pattern present -- delegate to superclass.
             this.keyValueElement = null;
             super.setPattern(pattern);
             return;
