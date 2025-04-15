@@ -659,12 +659,6 @@
             <artifactId>guava</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>failureaccess</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-
         <!-- Gson is needed by JENA, borker-client, OAuth, Handle and JClouds -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
