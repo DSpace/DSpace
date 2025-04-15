@@ -68,12 +68,12 @@ class has been customized to include the "UmdTomcatWebServerFactoryCustomizer"
 class has part of its configuration.
 
 JSON logging is enabled by setting the
-"umd.server.tomcat.accesslog.json.enabled" property to "true". This property
-is used in place of the stock "server.tomcat.accesslog.enabled" property
+"umd.server.tomcat.accesslog.json.enabled" property to "true". The
+stock "server.tomcat.accesslog.enabled" should be set to "false"
 to prevent double-logging from the stock Spring Boot AccessLogValve.
 
 The appended JSON attribute is added to the stock JsonAccessLogValve patten
-using an attribute formatted as "#<KEY>:<VALUE>#". The
+using an attribute formatted as "#\<KEY>:\<VALUE>#". The
 following example adds a "logFile:dspace.log" JSON attribute:
 
 ```text
@@ -114,6 +114,8 @@ Kubernetes), do the following:
 
    ```text
    # Tomcat access log
+   # Disable stock AccessLogValve
+   server.tomcat.accesslog.enabled=false
    # Set umd.server.tomcat.accesslog.json.enabled to "true" for JSON logging
    umd.server.tomcat.accesslog.json.enabled=true
    server.tomcat.accesslog.directory=/dev
@@ -152,7 +154,9 @@ The JSON-formatted Tomcat access log is enabled by the
 "overlays/\<NAMESPACE>/local.cfg" file:
 
 ```text
-# Tomcat access log
+# Disable stock AccessLogValve
+server.tomcat.accesslog.enabled=false
+# Set umd.server.tomcat.accesslog.json.enabled to "true" for JSON logging
 umd.server.tomcat.accesslog.json.enabled=true
 server.tomcat.accesslog.directory=/dev
 server.tomcat.accesslog.prefix=stdout

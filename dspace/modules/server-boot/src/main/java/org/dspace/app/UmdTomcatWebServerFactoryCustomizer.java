@@ -33,6 +33,9 @@ public class UmdTomcatWebServerFactoryCustomizer implements WebServerFactoryCust
      * Adds the UmdExtendedJsonAccessLogValve to the Tomcat configuration,
      * enabling logs to be output in the JSON format.
      * <p>
+     * The UmdExtendedJsonAccessLogValve allows a single additional
+     * JSON attribute to be added, typically used to identify the log file.
+     * <p>
      * The valve is enabled by a UMD custom
      * {@code "umd.server.tomcat.accesslog.json.enabled"} property
      * <p>
@@ -40,8 +43,8 @@ public class UmdTomcatWebServerFactoryCustomizer implements WebServerFactoryCust
      * "server.tomcat.accesslog.enabled" property is used to prevent
      * double-logging from the stock Spring Book AccessLogValve
      * <p>
-     * The UmdExtendedJsonAccessLogValve allows a single additional
-     * JSON attribute to be added, typically used to identify the log file.
+     * The "server.tomcat.accesslog.enabled" property should be set to "false"
+     * when using this valve.
      *
      * @param factory the TomcatServletWebServerFactory to configure
      */
