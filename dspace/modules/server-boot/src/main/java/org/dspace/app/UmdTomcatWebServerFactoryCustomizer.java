@@ -30,15 +30,21 @@ public class UmdTomcatWebServerFactoryCustomizer implements WebServerFactoryCust
     }
 
     /**
-     * Adds the JsonAccessLogValve to the Tomcat configuration, enabling logs
-     * to be output in the JSON format.
-     *
+     * Adds the UmdExtendedJsonAccessLogValve to the Tomcat configuration,
+     * enabling logs to be output in the JSON format.
+     * <p>
+     * The UmdExtendedJsonAccessLogValve allows a single additional
+     * JSON attribute to be added, typically used to identify the log file.
+     * <p>
      * The valve is enabled by a UMD custom
-     * "umd.server.tomcat.accesslog.json.enabled" property
-     *
+     * {@code "umd.server.tomcat.accesslog.json.enabled"} property
+     * <p>
      * A custom  property, instead of the Spring Boot standard
      * "server.tomcat.accesslog.enabled" property is used to prevent
      * double-logging from the stock Spring Book AccessLogValve
+     * <p>
+     * The "server.tomcat.accesslog.enabled" property should be set to "false"
+     * when using this valve.
      *
      * @param factory the TomcatServletWebServerFactory to configure
      */
@@ -46,7 +52,7 @@ public class UmdTomcatWebServerFactoryCustomizer implements WebServerFactoryCust
         // Control enabling of the JsonAccessLogValve based on UMD custom
         // "umd.server.tomcat.accesslog.json.enabled" property, instead of
         // the Spring Boot standard "server.tomcat.accesslog.enabled" to prevent
-        // double-logging from the stock Spring Book AccessLogValve
+        // double-logging from the stock Spring Boot AccessLogValve
         boolean jsonLoggerEnabled = Boolean
                 .parseBoolean(configurationService.getProperty("umd.server.tomcat.accesslog.json.enabled", "false"));
 
@@ -56,9 +62,14 @@ public class UmdTomcatWebServerFactoryCustomizer implements WebServerFactoryCust
         // Copied from spring-boot-project/spring-boot-autoconfigure/
         //   src/main/java/org/springframework/boot/autoconfigure/web/embedded/TomcatWebServerFactoryCustomizer.java
         ServerProperties.Tomcat tomcatProperties = this.serverProperties.getTomcat();
-        JsonAccessLogValve valve = new JsonAccessLogValve();
         PropertyMapper map = PropertyMapper.get();
         Accesslog accessLogConfig = tomcatProperties.getAccesslog();
+
+        // Use UmdExtendedJsonAccessLogValve as the log value to enable
+        // appending a JSON attribute identifying the log to the log entries
+        // Attribute is appended via "#<KEY>:<VALUE>#" in the configured log
+        // pattern.
+        JsonAccessLogValve valve = new UmdExtendedJsonAccessLogValve();
 
         map.from(accessLogConfig.getConditionIf()).to(valve::setConditionIf);
         map.from(accessLogConfig.getConditionUnless()).to(valve::setConditionUnless);
