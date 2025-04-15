@@ -7,7 +7,9 @@ import static org.mockito.Mockito.when;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -22,6 +24,8 @@ import org.junit.Test;
 public class UmdExtendedJsonAccessLogValveTest {
     private StringWriter logOutput;
     private TestableUmdExtendedJsonAccessLogValve valve;
+    // Timestamps for requests will be epoch start (January 1, 1970)
+    private String expectedTime = getTimestamp(0l);
 
     @Before
     public void setUp() throws Exception {
@@ -141,8 +145,8 @@ public class UmdExtendedJsonAccessLogValveTest {
 
         assertEquals(
             """
-            {"host":"192.168.1.1","logicalUserName":"-","user":"-","time":"[31/Dec/1969:19:00:00 -0500]","request":"%s","statusCode":"200","size":"5123"}
-            """.formatted(requestLine),
+            {"host":"192.168.1.1","logicalUserName":"-","user":"-","time":"[%s]","request":"%s","statusCode":"200","size":"5123"}
+            """.formatted(expectedTime, requestLine),
             logOutput.toString()
         );
     }
@@ -157,8 +161,8 @@ public class UmdExtendedJsonAccessLogValveTest {
 
         assertEquals(
             """
-            {"host":"192.168.1.1","logicalUserName":"-","user":"-","time":"[31/Dec/1969:19:00:00 -0500]","request":"%s","statusCode":"200","size":"5123","logFile":"access.log"}
-            """.formatted(requestLine),
+            {"host":"192.168.1.1","logicalUserName":"-","user":"-","time":"[%s]","request":"%s","statusCode":"200","size":"5123","logFile":"access.log"}
+            """.formatted(expectedTime, requestLine),
             logOutput.toString()
         );
     }
@@ -176,8 +180,8 @@ public class UmdExtendedJsonAccessLogValveTest {
 
         assertEquals(
             """
-            {"host":"192.168.1.1","logicalUserName":"-","user":"-","time":"[31/Dec/1969:19:00:00 -0500]","request":"%s","statusCode":"200","size":"5123","requestHeaders": {"Referer":"%s","User-Agent":"%s"}}
-            """.formatted(requestLine, referer, userAgent),
+            {"host":"192.168.1.1","logicalUserName":"-","user":"-","time":"[%s]","request":"%s","statusCode":"200","size":"5123","requestHeaders": {"Referer":"%s","User-Agent":"%s"}}
+            """.formatted(expectedTime, requestLine, referer, userAgent),
             logOutput.toString()
         );
     }
@@ -195,8 +199,8 @@ public class UmdExtendedJsonAccessLogValveTest {
 
         assertEquals(
             """
-            {"host":"192.168.1.1","logicalUserName":"-","user":"-","time":"[31/Dec/1969:19:00:00 -0500]","request":"%s","statusCode":"200","size":"5123","requestHeaders": {"Referer":"%s","User-Agent":"%s"},"logFile":"access.log"}
-            """.formatted(requestLine, referer, userAgent),
+            {"host":"192.168.1.1","logicalUserName":"-","user":"-","time":"[%s]","request":"%s","statusCode":"200","size":"5123","requestHeaders": {"Referer":"%s","User-Agent":"%s"},"logFile":"access.log"}
+            """.formatted(expectedTime, requestLine, referer, userAgent),
             logOutput.toString()
         );
     }
@@ -263,6 +267,16 @@ public class UmdExtendedJsonAccessLogValveTest {
 
         // Invoke the logging logic of the JsonAccessLogValve
         valve.log(mockRequest, mockResponse, bytes);
+    }
+
+    /**
+     * Returns the expected timestamp string from the given epoch timestamp
+     *
+     * @param epochMillis the number of milliseconds since the epoch
+     */
+    private String getTimestamp(long epochMillis) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z");
+        return formatter.format(new Date(epochMillis));
     }
 }
 
