@@ -932,7 +932,14 @@
         <dependency>
             <groupId>org.xhtmlrenderer</groupId>
             <artifactId>flying-saucer-pdf</artifactId>
-            <version>9.11.4</version>
+            <version>9.11.6</version>
+            <exclusions>
+                <!-- Conflicts with Hibernate. Use version that is brought in via Hibernate -->
+                <exclusion>
+                    <groupId>net.bytebuddy</groupId>
+                    <artifactId>byte-buddy</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>
