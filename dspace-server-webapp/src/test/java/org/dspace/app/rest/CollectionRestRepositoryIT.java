@@ -698,6 +698,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withName("Testing autocomplete in submission")
                                            .withSubmitterGroup(eperson2)
                                            .build();
+        Collection col5 = CollectionBuilder.createCollection(context, child2)
+                                            .withName("Colección de prueba")
+                                            .withSubmitterGroup(eperson2)
+                                            .build();
         context.restoreAuthSystemState();
 
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
@@ -741,7 +745,19 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(tokenEPerson2).perform(get("/api/core/collections/search/findSubmitAuthorized")
                  .param("query", "testing auto"))
                  .andExpect(status().isOk())
-                 .andExpect(jsonPath("$.page.totalElements", is(0)));
+            .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
+                CollectionMatcher.matchProperties(col4.getName(), col4.getID(), col4.getHandle())
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // Diacritics test
+        getClient(tokenEPerson2).perform(get("/api/core/collections/search/findSubmitAuthorized")
+                .param("query", "coléccion de"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
+                CollectionMatcher.matchProperties(col5.getName(), col5.getID(), col5.getHandle())
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorized")
