@@ -22,10 +22,10 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +82,7 @@ public class CaptchaServiceImpl implements CaptchaService {
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpClient httpClient = DSpaceHttpClientFactory.getInstance().build();
         HttpResponse httpResponse;
         GoogleCaptchaResponse googleResponse;
         final ObjectMapper objectMapper = new ObjectMapper();

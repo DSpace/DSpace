@@ -31,9 +31,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.util.Util;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,7 +120,7 @@ public class OpenaireRestConnector {
         params.add(new BasicNameValuePair("grant_type", "client_credentials"));
         httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 
-        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpClient httpClient = DSpaceHttpClientFactory.getInstance().build();
         HttpResponse getResponse = httpClient.execute(httpPost);
 
         JSONObject responseObject = null;
@@ -171,7 +171,7 @@ public class OpenaireRestConnector {
                 httpGet.addHeader("Authorization", "Bearer " + accessToken);
             }
 
-            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpClient httpClient = DSpaceHttpClientFactory.getInstance().build();
             getResponse = httpClient.execute(httpGet);
 
             StatusLine status = getResponse.getStatusLine();

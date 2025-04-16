@@ -18,9 +18,9 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -37,11 +37,7 @@ public class SendLDNMessageAction implements LDNAction {
     private CloseableHttpClient client = null;
 
     public SendLDNMessageAction() {
-        HttpClientBuilder builder = HttpClientBuilder.create();
-        client = builder
-            .disableAutomaticRetries()
-            .setMaxConnTotal(5)
-            .build();
+        client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5);
     }
 
     public SendLDNMessageAction(CloseableHttpClient client) {

@@ -34,9 +34,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -257,7 +257,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     protected int callService(String value, Item item, StringBuilder resultSb) throws IOException {
 
         String callUrl = urlTemplate.replaceAll("\\{" + templateParam + "\\}", value);
-        CloseableHttpClient client = HttpClientBuilder.create().build();
+        CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build();
         HttpGet req = new HttpGet(callUrl);
         for (Map.Entry<String, String> entry : headers.entrySet()) {
             req.addHeader(entry.getKey(), entry.getValue());

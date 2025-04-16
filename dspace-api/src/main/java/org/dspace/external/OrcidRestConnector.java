@@ -15,9 +15,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 
 /**
  * @author Antoine Snyers (antoine at atmire.com)
@@ -50,7 +50,7 @@ public class OrcidRestConnector {
             httpGet.addHeader("Authorization","Bearer " + accessToken);
         }
         try {
-            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpClient httpClient = DSpaceHttpClientFactory.getInstance().build();
             getResponse = httpClient.execute(httpGet);
             //do not close this httpClient
             result = getResponse.getEntity().getContent();

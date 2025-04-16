@@ -26,8 +26,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authenticate.oidc.OidcClient;
 import org.dspace.authenticate.oidc.OidcClientException;
 import org.dspace.authenticate.oidc.model.OidcTokenResponseDTO;
@@ -84,7 +84,7 @@ public class OidcClientImpl implements OidcClient {
 
     private <T> T executeAndParseJson(HttpUriRequest httpUriRequest, Class<T> clazz) {
 
-        HttpClient client = HttpClientBuilder.create().build();
+        HttpClient client = DSpaceHttpClientFactory.getInstance().build();
 
         return executeAndReturns(() -> {
 

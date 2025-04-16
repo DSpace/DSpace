@@ -23,9 +23,9 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.sherpa.v2.SHERPAPublisherResponse;
 import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.app.sherpa.v2.SHERPAUtils;
@@ -63,13 +63,9 @@ public class SHERPAService {
      * Create a new HTTP builder with sensible defaults in constructor
      */
     public SHERPAService() {
-        HttpClientBuilder builder = HttpClientBuilder.create();
         // httpclient 4.3+ doesn't appear to have any sensible defaults any more. Setting conservative defaults as
         // not to hammer the SHERPA service too much.
-        client = builder
-            .disableAutomaticRetries()
-            .setMaxConnTotal(5)
-            .build();
+        client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5);
     }
 
     /**

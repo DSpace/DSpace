@@ -28,9 +28,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.services.ConfigurationService;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -70,12 +70,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        HttpClientBuilder builder = HttpClientBuilder.create();
-
-        client = builder
-                .disableAutomaticRetries()
-                .setMaxConnTotal(5)
-                .build();
+        client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5);
 
         // disallow DTD parsing to ensure no XXE attacks can occur.
         // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
