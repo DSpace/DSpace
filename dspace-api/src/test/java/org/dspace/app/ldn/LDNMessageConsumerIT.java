@@ -434,6 +434,7 @@ public class LDNMessageConsumerIT extends AbstractIntegrationTestWithDatabase {
     @Override
     @After
     public void destroy() throws Exception {
+        // Remove all created LDN Messages & commit changes
         List<LDNMessageEntity> ldnMessageEntities = ldnMessageService.findAll(context);
         if (CollectionUtils.isNotEmpty(ldnMessageEntities)) {
             ldnMessageEntities.forEach(ldnMessage -> {
@@ -444,7 +445,7 @@ public class LDNMessageConsumerIT extends AbstractIntegrationTestWithDatabase {
                 }
             });
         }
-
+        context.commit();
         super.destroy();
     }
 }
