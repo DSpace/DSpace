@@ -18,9 +18,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.core.Context;
 import org.dspace.statistics.export.OpenURLTracker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,9 +75,7 @@ public class OpenUrlServiceImpl implements OpenUrlService {
     }
 
     protected HttpClient getHttpClient(RequestConfig requestConfig) {
-        return HttpClientBuilder.create()
-            .setDefaultRequestConfig(requestConfig)
-            .build();
+        return DSpaceHttpClientFactory.getInstance().buildWithRequestConfig(requestConfig);
     }
 
     protected RequestConfig getHttpClientRequestConfig() {

@@ -40,8 +40,8 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.exception.OrcidClientException;
 import org.dspace.orcid.model.OrcidEntityType;
@@ -76,9 +76,12 @@ public class OrcidClientImpl implements OrcidClient {
 
     private final ObjectMapper objectMapper;
 
-    public OrcidClientImpl(OrcidConfiguration orcidConfiguration) {
+    private final DSpaceHttpClientFactory httpClientFactory;
+
+    public OrcidClientImpl(OrcidConfiguration orcidConfiguration, DSpaceHttpClientFactory httpClientFactory) {
         this.orcidConfiguration = orcidConfiguration;
         this.objectMapper = new ObjectMapper();
+        this.httpClientFactory = httpClientFactory;
     }
 
     private static Map<Class<?>, String> initializePathsMap() {
@@ -255,7 +258,7 @@ public class OrcidClientImpl implements OrcidClient {
 
     private void executeSuccessful(HttpUriRequest httpUriRequest) {
         try {
-            HttpClient client = HttpClientBuilder.create().build();
+            HttpClient client = httpClientFactory.build();
             HttpResponse response = client.execute(httpUriRequest);
 
             if (isNotSuccessfull(response)) {
@@ -273,7 +276,7 @@ public class OrcidClientImpl implements OrcidClient {
 
     private <T> T executeAndParseJson(HttpUriRequest httpUriRequest, Class<T> clazz) {
 
-        HttpClient client = HttpClientBuilder.create().build();
+        HttpClient client = httpClientFactory.build();
 
         return executeAndReturns(() -> {
 
@@ -302,7 +305,7 @@ public class OrcidClientImpl implements OrcidClient {
      */
     private <T> T executeAndUnmarshall(HttpUriRequest httpUriRequest, boolean handleNotFoundAsNull, Class<T> clazz) {
 
-        HttpClient client = HttpClientBuilder.create().build();
+        HttpClient client = httpClientFactory.build();
 
         return executeAndReturns(() -> {
 
@@ -322,7 +325,7 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     private OrcidResponse execute(HttpUriRequest httpUriRequest, boolean handleNotFoundAsNull) {
-        HttpClient client = HttpClientBuilder.create().build();
+        HttpClient client = httpClientFactory.build();
 
         return executeAndReturns(() -> {
 

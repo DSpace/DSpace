@@ -24,9 +24,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.model.ExternalDataObject;
@@ -87,7 +87,7 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
             httpPost.addHeader("Accept", "application/json");
             httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpClient httpClient = DSpaceHttpClientFactory.getInstance().build();
             HttpResponse getResponse = httpClient.execute(httpPost);
 
             JSONObject responseObject = null;
