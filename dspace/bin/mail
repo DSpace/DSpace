@@ -9,14 +9,16 @@ my $properties = Config::Properties->new();
 $properties->load($fh);
 $host = $properties->getProperty('dspace.hostname');
 $from_address = "cron@" . $host;
+$smtp_host = $properties->getProperty('mail.server');
+$smtp_port = $properties->getProperty('mail.server.port');
 
 $mail=0;
 while(<STDIN>) {
     if (! $mail) {
-	$mail = 1;
-    @args = ('-r', $from_address, '-S', 'smtp=libsmtp.umd.edu:25');
-    push(@args, @ARGV);
-	open(PROC, "|-", "/usr/bin/s-nail", @args) || die;
+        $mail = 1;
+        @args = ('-r', $from_address, '-S', "mta=smtp://$smtp_host:$smtp_port", '-S', 'v15-compat', '-S', 'smtp-auth=none');
+        push(@args, @ARGV);
+        open(PROC, "|-", "/usr/bin/s-nail", @args) || die;
     }
     print PROC;
 }
