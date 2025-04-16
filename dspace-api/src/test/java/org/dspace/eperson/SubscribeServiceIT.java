@@ -213,6 +213,7 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
                                                               secondCollection, 100, 0);
 
         assertEquals(subscriptions.size(), 1);
+        assertThat(subscribeService.isSubscribed(context, subscribingUser, secondCollection), is(true));
 
 
         subscribeService.unsubscribe(context, subscribingUser, secondCollection);
@@ -222,6 +223,7 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
                                                               secondCollection, 100, 0);
 
         assertEquals(subscriptions.size(), 0);
+        assertThat(subscribeService.isSubscribed(context, subscribingUser, secondCollection), is(false));
     }
 
     @Test(expected = AuthorizeException.class)
