@@ -11,8 +11,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -21,7 +19,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -1312,11 +1314,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // we will assume all external files are available via URLs.
             try {
                 // attempt to open a connection to given URL
-                URL fileURL = new URL(path);
-                URLConnection connection = fileURL.openConnection();
+                CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build();
+                CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(path));
 
                 // open stream to access file contents
-                return connection.getInputStream();
+                return httpResponse.getEntity().getContent();
             } catch (IOException io) {
                 log
                     .error("Unable to retrieve external file from URL '"
