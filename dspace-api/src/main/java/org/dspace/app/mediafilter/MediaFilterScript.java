@@ -7,8 +7,11 @@
  */
 package org.dspace.app.mediafilter;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -60,6 +63,7 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
     private String[] filterNames;
     private String[] skipIds = null;
     private Map<String, List<String>> filterFormats = new HashMap<>();
+    private LocalDate fromDate = null;
 
     public MediaFilterScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager()
@@ -112,6 +116,9 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
             skipIds = commandLine.getOptionValues('s');
         }
 
+        if (commandLine.hasOption('d')) {
+            fromDate = LocalDate.parse(commandLine.getOptionValue('d'));
+        }
 
     }
 
@@ -213,6 +220,10 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
         if (skipIds != null && skipIds.length > 0) {
             //save to a global skip list
             mediaFilterService.setSkipList(Arrays.asList(skipIds));
+        }
+
+        if (fromDate != null) {
+            mediaFilterService.setFromDate(Date.from(fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
         }
 
         Context c = null;
