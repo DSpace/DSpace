@@ -767,11 +767,15 @@
         <dependency>
             <groupId>org.orcid</groupId>
             <artifactId>orcid-model</artifactId>
-            <version>3.0.2</version>
+            <version>3.3.6</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.validation</groupId>
                     <artifactId>validation-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
+                    <artifactId>jackson-datatype-jsr310</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -788,6 +792,14 @@
                 <exclusion>
                 	<groupId>io.swagger</groupId>
                 	<artifactId>swagger-jersey-jaxrs</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jakarta.xml.bind</groupId>
+                    <artifactId>jakarta.xml.bind-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
