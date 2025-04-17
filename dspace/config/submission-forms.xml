@@ -1325,6 +1325,174 @@
             </row>
         </form>
 
+        <form name="patentStep">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <label>Patent Number</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint>The patent number</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <label>Publication Date</label>
+                    <input-type>date</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint>Date on which the application was physically received at the Patent Authority. Also named Filling Date.</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <label>Title</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required>You must enter a main title for this item.</required>
+                    <hint>Enter the main title of the item.</hint>
+                </field>
+            </row>
+            <row>
+                <relation-field>
+                    <relationship-type>isInventorOfPatent</relationship-type>
+                    <search-configuration>person</search-configuration>
+                    <repeatable>true</repeatable>
+                    <label>Inventor</label>
+                    <hint>Select the person who invented this patent.</hint>
+                    <linked-metadata-field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>contributor</dc-element>
+                        <dc-qualifier>author</dc-qualifier>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                    <externalsources>orcid</externalsources>
+                </relation-field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <label>Issuer</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>true</repeatable>
+                    <required />
+                    <hint>The issuer of the patent: the patent office</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <label>Type</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required></required>
+                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                </field>
+            </row>
+        </form>
+        <form name="productStep">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <label>Identifiers</label>
+                    <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+                    <repeatable>true</repeatable>
+                    <required />
+                    <hint>If the item has any identification numbers or codes associated with
+                        it, please enter the types and the actual numbers or codes.</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <label>Title</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required>You must enter a main title for this item.</required>
+                    <hint>Enter the main title of the item.</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <label>Other Titles</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>true</repeatable>
+                    <required />
+                    <hint>If the item has any alternative titles, please enter them here.</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <label>Date of Issue</label>
+                    <input-type>date</input-type>
+                    <repeatable>false</repeatable>
+                    <required>You must enter at least the year.</required>
+                    <hint>Please give the date of previous publication or public distribution.
+                        You can leave out the day and/or month if they aren't applicable.
+                    </hint>
+                    <required>You must enter at least the year.</required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>version</dc-qualifier>
+                    <label>Version</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint>If applicable, the version of the product</hint>
+                </field>
+            </row>
+            <row>
+                <relation-field>
+                    <relationship-type>isCreatorOfProduct</relationship-type>
+                    <search-configuration>person</search-configuration>
+                    <repeatable>true</repeatable>
+                    <label>Creator</label>
+                    <hint>Select the person who created this product.</hint>
+                    <linked-metadata-field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>contributor</dc-element>
+                        <dc-qualifier>author</dc-qualifier>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                    <externalsources>orcid</externalsources>
+                </relation-field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <label>Type</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                </field>
+            </row>
+        </form>
+
+
     </form-definitions>
 
 
