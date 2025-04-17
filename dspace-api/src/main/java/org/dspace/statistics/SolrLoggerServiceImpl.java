@@ -1303,7 +1303,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                         + "."
                         + i
                         + ".csv");
-                try (CloseableHttpClient hc = DSpaceHttpClientFactory.getInstance().build()) {
+                try (CloseableHttpClient hc = DSpaceHttpClientFactory.getInstance().buildWithoutProxy()) {
                     HttpResponse response = hc.execute(get);
                     csvInputstream = response.getEntity().getContent();
                     //Write the csv ouput to a file !
@@ -1445,7 +1445,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
                 HttpGet get = new HttpGet(solrRequestUrl);
                 List<String[]> rows;
-                try (CloseableHttpClient hc = DSpaceHttpClientFactory.getInstance().build()) {
+                try (CloseableHttpClient hc = DSpaceHttpClientFactory.getInstance().buildWithoutProxy()) {
                     HttpResponse response = hc.execute(get);
                     InputStream csvOutput = response.getEntity().getContent();
                     Reader csvReader = new InputStreamReader(csvOutput);
