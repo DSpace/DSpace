@@ -112,4 +112,10 @@ public interface OpenSearchService {
 
     public DSpaceObject resolveScope(Context context, String scope) throws SQLException;
 
+    /**
+     * Retrieves the maximum number of items that can be included in a single opensearch request.
+     *
+     * @return the maximum number of items allowed per request
+     */
+    int getMaxNumOfItemsPerRequest();
 }
