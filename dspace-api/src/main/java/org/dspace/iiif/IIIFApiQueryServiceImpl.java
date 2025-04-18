@@ -38,8 +38,7 @@ public class IIIFApiQueryServiceImpl implements IIIFApiQueryService {
         int[] arr = new int[2];
         String path = IIIFSharedUtils.getInfoJsonPath(bitstream);
         BufferedReader in = null;
-        try {
-            CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build();
+        try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
             CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(path));
             in = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
             String inputLine;
