@@ -164,8 +164,10 @@
 
     <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
 
+    <bean class="org.dspace.content.BitstreamLinkingServiceImpl"/>
+
     <bean class="org.dspace.content.ItemFilterServiceImpl"/>
-    
+
     <!-- Submission Config Service -->
     <bean class="org.dspace.submit.service.SubmissionConfigServiceImpl"/>
 
