@@ -55,7 +55,6 @@ public class LiveImportClientImpl implements LiveImportClient {
                                         .orElse(DSpaceHttpClientFactory.getInstance().buildWithRequestConfig(config))) {
             String uri = buildUrl(URL, params.get(URI_PARAMETERS));
             method = new HttpGet(uri);
-            method.setConfig(config);
 
             Map<String, String> headerParams = params.get(HEADER_PARAMETERS);
             if (MapUtils.isNotEmpty(headerParams)) {
