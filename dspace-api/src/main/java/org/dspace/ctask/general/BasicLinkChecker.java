@@ -139,9 +139,8 @@ public class BasicLinkChecker extends AbstractCurationTask {
      * @return The HTTP response code (e.g. 200 / 301 / 404 / 500)
      */
     protected int getResponseStatus(String url, int redirects) {
-        try {
-            RequestConfig config = RequestConfig.custom().setRedirectsEnabled(true).build();
-            CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().buildWithRequestConfig(config);
+        RequestConfig config = RequestConfig.custom().setRedirectsEnabled(true).build();
+        try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().buildWithRequestConfig(config)) {
             CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(url));
             int statusCode = httpResponse.getStatusLine().getStatusCode();
             int maxRedirect = configurationService.getIntProperty("curate.checklinks.max-redirect", 0);

@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.Logger;
@@ -78,7 +78,7 @@ public class WebAppServiceImpl implements WebAppService {
                 method = new HttpHead(app.getUrl());
                 int status;
                 try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
-                    HttpResponse response = client.execute(method);
+                    CloseableHttpResponse response = client.execute(method);
                     status = response.getStatusLine().getStatusCode();
                 }
                 if (status != HttpStatus.SC_OK) {
