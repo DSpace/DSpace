@@ -171,5 +171,7 @@
 
     <bean class="org.dspace.correctiontype.service.impl.CorrectionTypeServiceImpl"/>
 
+    <bean class="org.dspace.content.RelationshipTreeService"/>
+
 </beans>
 
