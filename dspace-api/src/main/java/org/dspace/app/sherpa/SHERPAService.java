@@ -17,9 +17,9 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -45,8 +45,6 @@ import org.springframework.cache.annotation.Cacheable;
  */
 public class SHERPAService {
 
-    private CloseableHttpClient client = null;
-
     private int maxNumberOfTries;
     private long sleepBetweenTimeouts;
     private int timeout = 5000;
@@ -58,15 +56,6 @@ public class SHERPAService {
 
     @Autowired
     ConfigurationService configurationService;
-
-    /**
-     * Create a new HTTP builder with sensible defaults in constructor
-     */
-    public SHERPAService() {
-        // httpclient 4.3+ doesn't appear to have any sensible defaults any more. Setting conservative defaults as
-        // not to hammer the SHERPA service too much.
-        client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5);
-    }
 
     /**
      * Complete initialization of the Bean.
@@ -128,14 +117,14 @@ public class SHERPAService {
                 timeout,
                 sleepBetweenTimeouts));
 
-            try {
+            try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
                 Thread.sleep(sleepBetweenTimeouts);
 
                 // Construct a default HTTP method (first result)
                 method = constructHttpGet(type, field, predicate, value, start, limit);
 
                 // Execute the method
-                HttpResponse response = client.execute(method);
+                CloseableHttpResponse response = client.execute(method);
                 int statusCode = response.getStatusLine().getStatusCode();
 
                 log.debug(response.getStatusLine().getStatusCode() + ": "
@@ -231,14 +220,14 @@ public class SHERPAService {
                 timeout,
                 sleepBetweenTimeouts));
 
-            try {
+            try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
                 Thread.sleep(sleepBetweenTimeouts);
 
                 // Construct a default HTTP method (first result)
                 method = constructHttpGet(type, field, predicate, value, start, limit);
 
                 // Execute the method
-                HttpResponse response = client.execute(method);
+                CloseableHttpResponse response = client.execute(method);
                 int statusCode = response.getStatusLine().getStatusCode();
 
                 log.debug(response.getStatusLine().getStatusCode() + ": "

@@ -1312,9 +1312,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         if (params.getBooleanProperty("manifestOnly", false)) {
             // NOTE: since we are only dealing with a METS manifest,
             // we will assume all external files are available via URLs.
-            try {
+            try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
                 // attempt to open a connection to given URL
-                CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build();
                 CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(path));
 
                 // open stream to access file contents

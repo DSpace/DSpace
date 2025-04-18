@@ -326,8 +326,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
     public Document retrieveLicenseRDFDoc(String licenseURI) throws IOException {
         String ccLicenseUrl = configurationService.getProperty("cc.api.rooturl");
         String issueUrl = ccLicenseUrl + "/details?license-uri=" + licenseURI;
-        try {
-            CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build();
+        try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
             CloseableHttpResponse httpResponse = httpClient.execute(new HttpPost(issueUrl));
             // parsing document from input stream
             InputStream stream = httpResponse.getEntity().getContent();
