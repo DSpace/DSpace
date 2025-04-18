@@ -1,0 +1,118 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@type": "sc:Manifest",
+  "@id": "http://localhost:8080/server/iiif/5029580c-8c21-491e-88fc-ceb0e2270831/manifest",
+  "label": "Lily in Spider Web Costume (edited)",
+  "metadata": [
+    {
+      "label": "Title",
+      "value": "Lily in Spider Web Costume (edited)"
+    },
+    {
+      "label": "Issue Date",
+      "value": "2016"
+    },
+    {
+      "label": "Authors",
+      "value": "User, Demo"
+    },
+    {
+      "label": "Comment",
+      "value": "This manifest was edited manually and uploaded to DSpace in this items \"IIIF_MANIFEST\" bundle"
+    }
+  ],
+  "seeAlso": {
+    "@id": "http://localhost:8080/server/iiif/5029580c-8c21-491e-88fc-ceb0e2270831/manifest/seeAlso",
+    "@type": "sc:AnnotationList",
+    "label": "More descriptions of this resource"
+  },
+  "sequences": [
+    {
+      "@id": "http://localhost:8080/server/iiif/5029580c-8c21-491e-88fc-ceb0e2270831/sequence/s0",
+      "@type": "sc:Sequence",
+      "canvases": [
+        {
+          "@id": "http://localhost:8080/server/iiif/5029580c-8c21-491e-88fc-ceb0e2270831/canvas/c0",
+          "@type": "sc:Canvas",
+          "label": "Page 1",
+          "metadata": [
+            {
+              "label": "File name",
+              "value": "IMG_9030.jpg"
+            },
+            {
+              "label": "Description",
+              "value": ""
+            },
+            {
+              "label": "Format",
+              "value": "JPEG"
+            },
+            {
+              "label": "Mime Type",
+              "value": "image/jpeg"
+            },
+            {
+              "label": "File size",
+              "value": "212 KB"
+            },
+            {
+              "label": "Checksum",
+              "value": "dc20c3a06654ac3e1ee4cf5987d84994 (MD5)"
+            }
+          ],
+          "thumbnail": {
+            "@id": "http://localhost:8182/iiif/2/f24280f7-745c-49c1-b73b-defdb997a19e/full/90,/0/default.jpg",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "http://localhost:8182/iiif/2/f24280f7-745c-49c1-b73b-defdb997a19e",
+              "profile": "http://iiif.io/api/image/2/level0.json",
+              "protocol": "http://iiif.io/api/image"
+            },
+            "format": "image/jpeg"
+          },
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "http://localhost:8182/iiif/2/f24280f7-745c-49c1-b73b-defdb997a19e/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "http://localhost:8182/iiif/2/f24280f7-745c-49c1-b73b-defdb997a19e",
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg"
+              },
+              "on": "http://localhost:8080/server/iiif/5029580c-8c21-491e-88fc-ceb0e2270831/canvas/c0"
+            }
+          ],
+          "width": 2200,
+          "height": 1600
+        }
+      ]
+    }
+  ],
+  "thumbnail": {
+    "@id": "http://localhost:8182/iiif/2/f24280f7-745c-49c1-b73b-defdb997a19e/full/90,/0/default.jpg",
+    "service": {
+      "@context": "http://iiif.io/api/image/2/context.json",
+      "@id": "http://localhost:8182/iiif/2/f24280f7-745c-49c1-b73b-defdb997a19e",
+      "profile": "http://iiif.io/api/image/2/level0.json",
+      "protocol": "http://iiif.io/api/image"
+    },
+    "format": "image/jpeg"
+  },
+  "logo": {
+    "@id": "http://localhost:4000/assets/images/dspace-logo.svg",
+    "format": "image/svg+xml"
+  },
+  "viewingHint": "individuals",
+  "related": {
+    "@id": "http://localhost:4000/items/5029580c-8c21-491e-88fc-ceb0e2270831",
+    "label": "DSpace item view",
+    "format": "text/html"
+  }
+}
