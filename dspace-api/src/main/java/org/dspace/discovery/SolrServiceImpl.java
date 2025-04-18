@@ -71,6 +71,7 @@ import org.dspace.discovery.indexobject.IndexableCommunity;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
+import org.dspace.discovery.indexobject.factory.ItemIndexFactory;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
@@ -340,6 +341,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         try {
             final List<IndexFactory> indexableObjectServices = indexObjectServiceFactory.
                 getIndexFactories();
+            int indexObject = 0;
             for (IndexFactory indexableObjectService : indexableObjectServices) {
                 if (type == null || StringUtils.equals(indexableObjectService.getType(), type)) {
                     final Iterator<IndexableObject> indexableObjects = indexableObjectService.findAll(context);
@@ -347,6 +349,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         final IndexableObject indexableObject = indexableObjects.next();
                         indexContent(context, indexableObject, force);
                         context.uncacheEntity(indexableObject.getIndexedObject());
+                        indexObject++;
+                        if ((indexObject % 100) == 0 && indexableObjectService instanceof ItemIndexFactory) {
+                            context.uncacheEntities();
+                        }
                     }
                 }
             }
