@@ -39,6 +39,7 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xoai.data.DSpaceItem;
@@ -194,7 +195,8 @@ public class ItemUtils {
             resourcePolicyEl.getField().add(createValue("group", groupName));
             resourcePolicyEl.getField().add(createValue("user", user));
             resourcePolicyEl.getField().add(createValue("action", action));
-            if (startDate != null) {
+            // Only add start-date if group is different to anonymous, or there is an active embargo
+            if (startDate != null && (!groupName.equals(Group.ANONYMOUS) || startDate.isAfter(LocalDate.now()))) {
                 resourcePolicyEl.getField().add(createValue("start-date", formatter.format(startDate)));
             }
             if (endDate != null) {
