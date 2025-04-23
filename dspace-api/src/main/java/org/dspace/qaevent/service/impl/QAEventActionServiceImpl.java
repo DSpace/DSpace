@@ -114,19 +114,19 @@ public class QAEventActionServiceImpl implements QAEventActionService {
      * Make acknowledgement to the configured urls for the event status.
      */
     private void makeAcknowledgement(String eventId, String source, String status) {
-        String[] ackwnoledgeCallbacks = configurationService
+        String[] acknowledgeCallbacks = configurationService
             .getArrayProperty("qaevents." + source + ".acknowledge-url");
-        if (ackwnoledgeCallbacks != null) {
-            for (String ackwnoledgeCallback : ackwnoledgeCallbacks) {
-                if (StringUtils.isNotBlank(ackwnoledgeCallback)) {
+        if (acknowledgeCallbacks != null) {
+            for (String acknowledgeCallback : acknowledgeCallbacks) {
+                if (StringUtils.isNotBlank(acknowledgeCallback)) {
                     ObjectNode node = jsonMapper.createObjectNode();
                     node.put("eventId", eventId);
                     node.put("status", status);
                     StringEntity requestEntity = new StringEntity(node.toString(), ContentType.APPLICATION_JSON);
-                    try (CloseableHttpClient httpclient = DSpaceHttpClientFactory.getInstance().buildWithoutProxy()) {
-                        HttpPost postMethod = new HttpPost(ackwnoledgeCallback);
+                    try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().buildWithoutProxy()) {
+                        HttpPost postMethod = new HttpPost(acknowledgeCallback);
                         postMethod.setEntity(requestEntity);
-                        httpclient.execute(postMethod);
+                        httpClient.execute(postMethod);
                     } catch (IOException e) {
                         log.error(e.getMessage(), e);
                     }

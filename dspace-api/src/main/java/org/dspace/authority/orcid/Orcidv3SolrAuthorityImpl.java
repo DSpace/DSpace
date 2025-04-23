@@ -83,7 +83,8 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
                          BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
                         String inputStr;
                         while ((inputStr = streamReader.readLine()) != null && responseObject == null) {
-                            if (inputStr.startsWith("{") && inputStr.endsWith("}") && inputStr.contains("access_token")) {
+                            if (inputStr.startsWith("{") && inputStr.endsWith("}") &&
+                                    inputStr.contains("access_token")) {
                                 try {
                                     responseObject = new JSONObject(inputStr);
                                 } catch (Exception e) {

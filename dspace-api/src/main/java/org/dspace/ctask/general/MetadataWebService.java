@@ -270,8 +270,8 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
                         // boiler-plate handling taken from Apache 4.1 javadoc
                         InputStream instream = entity.getContent();
                         try {
-                            // This next line triggers a false-positive XXE warning from LGTM, even though we disallow DTD
-                            // parsing during initialization of docBuilder in init()
+                            // This next line triggers a false-positive XXE warning from LGTM, even though
+                            // we disallow DTD parsing during initialization of docBuilder in init()
                             Document doc = docBuilder.parse(instream);  // lgtm [java/xxe]
                             status = processResponse(doc, item, resultSb);
                         } catch (SAXException saxE) {
