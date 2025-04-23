@@ -7,22 +7,24 @@
  */
 package org.dspace.external.provider.impl;
 
-import org.dspace.AbstractDSpaceTest;
-import org.dspace.external.OrcidRestConnector;
-import org.dspace.external.model.ExternalDataObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.AllOf.allOf;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import org.dspace.AbstractDSpaceTest;
+import org.dspace.external.OrcidRestConnector;
+import org.dspace.external.model.ExternalDataObject;
+import org.junit.Before;
+import org.junit.Test;
+
 
 /**
  * Unit tests for {@link OrcidV3AuthorDataProvider}.
@@ -60,10 +62,11 @@ public class OrcidV3AuthorDataProviderTest extends AbstractDSpaceTest {
         InputStream person2XmlStream = getClass().getClassLoader().getResourceAsStream(PERSON2_XML_PATH);
         InputStream person3XmlStream = getClass().getClassLoader().getResourceAsStream(PERSON3_XML_PATH);
 
-        when(mockRestConnector.get("search?q=search%3Fq%3D0000-0000-0000-0000&start=0&rows=10",null )).thenReturn(searchXmlStream);
-        when(mockRestConnector.get("0000-0000-0000-0001/person",null )).thenReturn(person1XmlStream);
-        when(mockRestConnector.get("0000-0000-0000-0002/person",null )).thenReturn(person2XmlStream);
-        when(mockRestConnector.get("0000-0000-0000-0003/person",null )).thenReturn(person3XmlStream);
+        when(mockRestConnector.get("search?q=search%3Fq%3D0000-0000-0000-0000&start=0&rows=10", null))
+                .thenReturn(searchXmlStream);
+        when(mockRestConnector.get("0000-0000-0000-0001/person", null)).thenReturn(person1XmlStream);
+        when(mockRestConnector.get("0000-0000-0000-0002/person", null)).thenReturn(person2XmlStream);
+        when(mockRestConnector.get("0000-0000-0000-0003/person", null)).thenReturn(person3XmlStream);
 
     }
 
