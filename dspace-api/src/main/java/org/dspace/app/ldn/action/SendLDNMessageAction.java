@@ -34,17 +34,13 @@ public class SendLDNMessageAction implements LDNAction {
 
     private static final Logger log = LogManager.getLogger(SendLDNMessageAction.class);
 
-    private CloseableHttpClient client = null;
+    private CloseableHttpClient client;
 
     public SendLDNMessageAction() {
-        client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5);
     }
 
     public SendLDNMessageAction(CloseableHttpClient client) {
-        this();
-        if (client != null) {
-            this.client = client;
-        }
+        this.client = client;
     }
 
     @Override
@@ -62,9 +58,10 @@ public class SendLDNMessageAction implements LDNAction {
         // NOTE: Github believes there is a "Potential server-side request forgery due to a user-provided value"
         // This is a false positive because the LDN Service URL is configured by the user from DSpace.
         // See the frontend configuration at [dspace.ui.url]/admin/ldn/services
-        try (
-            CloseableHttpResponse response = client.execute(httpPost);
-            ) {
+        if (client == null) {
+            client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5);
+        }
+        try (CloseableHttpResponse response = client.execute(httpPost)) {
             if (isSuccessful(response.getStatusLine().getStatusCode())) {
                 result = LDNActionStatus.CONTINUE;
             } else if (isRedirect(response.getStatusLine().getStatusCode())) {
@@ -73,6 +70,7 @@ public class SendLDNMessageAction implements LDNAction {
         } catch (Exception e) {
             log.error(e);
         }
+        client.close();
         return result;
     }
 
@@ -87,9 +85,9 @@ public class SendLDNMessageAction implements LDNAction {
             statusCode == HttpStatus.SC_TEMPORARY_REDIRECT;
     }
 
-    private LDNActionStatus handleRedirect(CloseableHttpResponse oldresponse,
+    private LDNActionStatus handleRedirect(CloseableHttpResponse oldResponse,
                                         HttpPost request) throws HttpException {
-        Header[] urls = oldresponse.getHeaders(HttpHeaders.LOCATION);
+        Header[] urls = oldResponse.getHeaders(HttpHeaders.LOCATION);
         String url = urls.length > 0 && urls[0] != null ? urls[0].getValue() : null;
         if (url == null) {
             throw new HttpException("Error following redirect, unable to reach"
@@ -98,17 +96,14 @@ public class SendLDNMessageAction implements LDNAction {
         LDNActionStatus result = LDNActionStatus.ABORT;
         try {
             request.setURI(new URI(url));
-            try (
-                CloseableHttpResponse response = client.execute(request);
-                ) {
+            try (CloseableHttpResponse response = client.execute(request)) {
                 if (isSuccessful(response.getStatusLine().getStatusCode())) {
-                    return LDNActionStatus.CONTINUE;
+                    result = LDNActionStatus.CONTINUE;
                 }
             }
         } catch (Exception e) {
             log.error("Error following redirect:", e);
         }
-
-        return LDNActionStatus.ABORT;
+        return result;
     }
 }
