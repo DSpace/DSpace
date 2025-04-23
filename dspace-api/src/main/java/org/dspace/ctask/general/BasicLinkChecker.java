@@ -141,21 +141,19 @@ public class BasicLinkChecker extends AbstractCurationTask {
     protected int getResponseStatus(String url, int redirects) {
         RequestConfig config = RequestConfig.custom().setRedirectsEnabled(true).build();
         try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().buildWithRequestConfig(config)) {
-            CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(url));
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            int maxRedirect = configurationService.getIntProperty("curate.checklinks.max-redirect", 0);
-            if ((statusCode == HttpURLConnection.HTTP_MOVED_TEMP || statusCode == HttpURLConnection.HTTP_MOVED_PERM ||
-                    statusCode == HttpURLConnection.HTTP_SEE_OTHER)) {
-                httpClient.close();
-                String newUrl = httpResponse.getFirstHeader("Location").getValue();
-                if (newUrl != null && (maxRedirect >= redirects || maxRedirect == -1)) {
-                    redirects++;
-                    return getResponseStatus(newUrl, redirects);
+            try (CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(url))) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                int maxRedirect = configurationService.getIntProperty("curate.checklinks.max-redirect", 0);
+                if ((statusCode == HttpURLConnection.HTTP_MOVED_TEMP || statusCode == HttpURLConnection.HTTP_MOVED_PERM ||
+                        statusCode == HttpURLConnection.HTTP_SEE_OTHER)) {
+                    String newUrl = httpResponse.getFirstHeader("Location").getValue();
+                    if (newUrl != null && (maxRedirect >= redirects || maxRedirect == -1)) {
+                        redirects++;
+                        return getResponseStatus(newUrl, redirects);
+                    }
                 }
-
+                return statusCode;
             }
-            return statusCode;
-
         } catch (IOException ioe) {
             // Must be a bad URL
             log.debug("Bad link: " + ioe.getMessage());

@@ -123,10 +123,9 @@ public class QAEventActionServiceImpl implements QAEventActionService {
                     node.put("eventId", eventId);
                     node.put("status", status);
                     StringEntity requestEntity = new StringEntity(node.toString(), ContentType.APPLICATION_JSON);
-                    CloseableHttpClient httpclient = DSpaceHttpClientFactory.getInstance().buildWithoutProxy();
-                    HttpPost postMethod = new HttpPost(ackwnoledgeCallback);
-                    postMethod.setEntity(requestEntity);
-                    try {
+                    try (CloseableHttpClient httpclient = DSpaceHttpClientFactory.getInstance().buildWithoutProxy()) {
+                        HttpPost postMethod = new HttpPost(ackwnoledgeCallback);
+                        postMethod.setEntity(requestEntity);
                         httpclient.execute(postMethod);
                     } catch (IOException e) {
                         log.error(e.getMessage(), e);

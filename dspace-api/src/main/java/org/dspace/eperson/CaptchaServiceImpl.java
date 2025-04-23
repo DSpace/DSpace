@@ -17,11 +17,11 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -82,18 +82,17 @@ public class CaptchaServiceImpl implements CaptchaService {
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        HttpClient httpClient = DSpaceHttpClientFactory.getInstance().build();
-        HttpResponse httpResponse;
-        GoogleCaptchaResponse googleResponse;
-        final ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            httpResponse = httpClient.execute(httpPost);
-            googleResponse = objectMapper.readValue(httpResponse.getEntity().getContent(), GoogleCaptchaResponse.class);
+        try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
+            final ObjectMapper objectMapper = new ObjectMapper();
+            try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
+                GoogleCaptchaResponse googleResponse = objectMapper.readValue(httpResponse.getEntity().getContent(),
+                        GoogleCaptchaResponse.class);
+                validateGoogleResponse(googleResponse, action);
+            }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException("Error during verify google recaptcha site", e);
         }
-        validateGoogleResponse(googleResponse, action);
     }
 
     private boolean responseSanityCheck(String response) {

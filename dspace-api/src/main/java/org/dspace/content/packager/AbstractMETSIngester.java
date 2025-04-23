@@ -1314,10 +1314,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // we will assume all external files are available via URLs.
             try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
                 // attempt to open a connection to given URL
-                CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(path));
-
-                // open stream to access file contents
-                return httpResponse.getEntity().getContent();
+                try (CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(path))) {
+                    // open stream to access file contents
+                    return httpResponse.getEntity().getContent();
+                }
             } catch (IOException io) {
                 log
                     .error("Unable to retrieve external file from URL '"
