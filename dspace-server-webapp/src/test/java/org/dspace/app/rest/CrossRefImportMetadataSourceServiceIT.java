@@ -163,7 +163,8 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
                 "State of Awareness of Freshers’ Groups Chortkiv State"
                 + " Medical College of Prevention of Iodine Deficiency Diseases");
         MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "Senyuk, L.V.");
-        MetadatumDTO type = createMetadatumDTO("dc", "type", null, "journal-article");
+        // is expected the dc.type to be mapped from journal-article to Article
+        MetadatumDTO type = createMetadatumDTO("dc", "type", null, "Article");
         MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2016-05-19");
         MetadatumDTO ispartof = createMetadatumDTO("dc", "relation", "ispartof",
                                    "Ukraïnsʹkij žurnal medicini, bìologìï ta sportu");
@@ -192,7 +193,8 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         MetadatumDTO title2 = createMetadatumDTO("dc", "title", null,
                 "Ischemic Heart Disease and Role of Nurse of Cardiology Department");
         MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "Kozak, K. І.");
-        MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "journal-article");
+        // is expected the dc.type to be mapped from journal-article to Article
+        MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "Article");
         MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2016-05-19");
         MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof",
                                      "Ukraïnsʹkij žurnal medicini, bìologìï ta sportu");

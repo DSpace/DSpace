@@ -62,6 +62,14 @@ public class RequestCopyFeature implements AuthorizationFeature {
     @Autowired
     private ConfigurationService configurationService;
 
+    /**
+     * Check if the user is authorized to request a copy of a bitstream belonging to a given item
+     * @param context
+     *            the DSpace Context
+     * @param object the item for which we are requesting a copy
+     * @return
+     * @throws SQLException
+     */
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         String requestType = configurationService.getProperty("request.item.type");

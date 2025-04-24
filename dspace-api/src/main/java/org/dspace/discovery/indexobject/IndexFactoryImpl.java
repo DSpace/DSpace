@@ -10,7 +10,7 @@ package org.dspace.discovery.indexobject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import org.apache.commons.collections4.ListUtils;
@@ -54,7 +54,7 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
         SolrInputDocument doc = new SolrInputDocument();
         // want to be able to check when last updated
         // (not tokenized, but it is indexed)
-        doc.addField(SearchUtils.LAST_INDEXED_FIELD, SolrUtils.getDateFormatter().format(new Date()));
+        doc.addField(SearchUtils.LAST_INDEXED_FIELD, SolrUtils.getDateFormatter().format(Instant.now()));
 
         // New fields to weaken the dependence on handles, and allow for faster
         // list display
@@ -181,6 +181,11 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
      */
     protected void addFacetIndex(SolrInputDocument document, String field, String sortValue, String authority,
                                  String fvalue) {
+        // If facet value is null/blank, then we cannot index
+        if (StringUtils.isBlank(fvalue)) {
+            return;
+        }
+
         // the separator for the filter can be eventually configured
         String separator = DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getProperty("discovery.solr.facets.split.char");
