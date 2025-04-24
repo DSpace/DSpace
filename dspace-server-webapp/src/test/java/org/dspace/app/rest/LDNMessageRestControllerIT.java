@@ -51,6 +51,9 @@ public class LDNMessageRestControllerIT extends AbstractControllerIntegrationTes
     @Autowired
     private LDNMessageService ldnMessageService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Test
     public void findByItemUnAuthorizedTest() throws Exception {
         getClient()
@@ -103,7 +106,6 @@ public class LDNMessageRestControllerIT extends AbstractControllerIntegrationTes
         String message = announceEndorsement.replaceAll("<<object>>", object);
         message = message.replaceAll("<<object_handle>>", object);
 
-        ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
             .perform(post("/ldn/inbox")

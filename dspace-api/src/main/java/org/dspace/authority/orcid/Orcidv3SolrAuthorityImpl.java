@@ -17,12 +17,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.SolrAuthorityInterface;
 import org.dspace.external.OrcidRestConnector;
@@ -73,30 +73,31 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
             String authenticationParameters = "?client_id=" + clientId +
                     "&client_secret=" + clientSecret +
                     "&scope=/read-public&grant_type=client_credentials";
-            try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
+            try {
                 HttpPost httpPost = new HttpPost(OAUTHUrl + authenticationParameters);
                 httpPost.addHeader("Accept", "application/json");
                 httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
-                try (CloseableHttpResponse getResponse = httpClient.execute(httpPost)) {
-                    JSONObject responseObject = null;
-                    try (InputStream is = getResponse.getEntity().getContent();
-                         BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
-                        String inputStr;
-                        while ((inputStr = streamReader.readLine()) != null && responseObject == null) {
-                            if (inputStr.startsWith("{") && inputStr.endsWith("}") &&
-                                    inputStr.contains("access_token")) {
-                                try {
-                                    responseObject = new JSONObject(inputStr);
-                                } catch (Exception e) {
-                                    //Not as valid as I'd hoped, move along
-                                    responseObject = null;
-                                }
+
+                HttpClient httpClient = HttpClientBuilder.create().build();
+                HttpResponse getResponse = httpClient.execute(httpPost);
+
+                JSONObject responseObject = null;
+                try (InputStream is = getResponse.getEntity().getContent();
+                     BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
+                    String inputStr;
+                    while ((inputStr = streamReader.readLine()) != null && responseObject == null) {
+                        if (inputStr.startsWith("{") && inputStr.endsWith("}") && inputStr.contains("access_token")) {
+                            try {
+                                responseObject = new JSONObject(inputStr);
+                            } catch (Exception e) {
+                                //Not as valid as I'd hoped, move along
+                                responseObject = null;
                             }
                         }
                     }
-                    if (responseObject != null && responseObject.has("access_token")) {
-                        accessToken = (String) responseObject.get("access_token");
-                    }
+                }
+                if (responseObject != null && responseObject.has("access_token")) {
+                    accessToken = (String) responseObject.get("access_token");
                 }
             } catch (Exception e) {
                 throw new RuntimeException("Error during initialization of the Orcid connector", e);

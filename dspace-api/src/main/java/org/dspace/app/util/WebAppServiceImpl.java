@@ -9,8 +9,8 @@ package org.dspace.app.util;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpStatus;
@@ -44,7 +44,7 @@ public class WebAppServiceImpl implements WebAppService {
     }
 
     @Override
-    public WebApp create(Context context, String appName, String url, Date started, int isUI) throws SQLException {
+    public WebApp create(Context context, String appName, String url, Instant started, int isUI) throws SQLException {
         WebApp webApp = webAppDAO.create(context, new WebApp());
         webApp.setAppName(appName);
         webApp.setUrl(url);

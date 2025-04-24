@@ -51,6 +51,9 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
     @Autowired
     private AuthorizeService authorizeService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected SystemWideAlertRest createAndReturn(Context context) throws SQLException, AuthorizeException {
@@ -110,7 +113,7 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
 
         SystemWideAlertRest systemWideAlertRest;
         try {
-            systemWideAlertRest = new ObjectMapper().readValue(jsonNode.toString(), SystemWideAlertRest.class);
+            systemWideAlertRest = mapper.readValue(jsonNode.toString(), SystemWideAlertRest.class);
         } catch (JsonProcessingException e) {
             throw new UnprocessableEntityException("Cannot parse JSON in request body", e);
         }
@@ -153,7 +156,6 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
 
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         SystemWideAlertRest systemWideAlertRest;
         try {
             ServletInputStream input = req.getInputStream();

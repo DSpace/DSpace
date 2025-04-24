@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.repository.patch.operation.resourcePolicy;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.Operation;
@@ -109,11 +109,11 @@ public class ResourcePolicyUtils {
      */
     public void checkResourcePolicyForConsistentStartDateValue(ResourcePolicy resource, Operation operation) {
         String dateS = (String) operation.getValue();
-        Date date = MultiFormatDateParser.parse(dateS);
+        ZonedDateTime date = MultiFormatDateParser.parse(dateS);
         if (date == null) {
             throw new DSpaceBadRequestException("Invalid startDate value " + dateS);
         }
-        if (resource.getEndDate() != null && resource.getEndDate().before(date)) {
+        if (resource.getEndDate() != null && resource.getEndDate().isBefore(date.toLocalDate())) {
             throw new DSpaceBadRequestException("Attempting to set an invalid startDate greater than the endDate.");
         }
     }
@@ -130,11 +130,11 @@ public class ResourcePolicyUtils {
      */
     public void checkResourcePolicyForConsistentEndDateValue(ResourcePolicy resource, Operation operation) {
         String dateS = (String) operation.getValue();
-        Date date = MultiFormatDateParser.parse(dateS);
+        ZonedDateTime date = MultiFormatDateParser.parse(dateS);
         if (date == null) {
             throw new DSpaceBadRequestException("Invalid endDate value " + dateS);
         }
-        if (resource.getStartDate() != null && resource.getStartDate().after(date)) {
+        if (resource.getStartDate() != null && resource.getStartDate().isAfter(date.toLocalDate())) {
             throw new DSpaceBadRequestException("Attempting to set an invalid endDate smaller than the startDate.");
         }
     }

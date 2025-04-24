@@ -76,6 +76,8 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
     private ProcessService processService;
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
+    @Autowired
+    private ObjectMapper mapper;
     private Collection collection;
     private Path workDir;
 
@@ -327,7 +329,7 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
 
             getClient(token)
                 .perform(multipart("/api/system/scripts/export/processes")
-                        .param("properties", new ObjectMapper().writeValueAsString(list)))
+                        .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                         ProcessMatcher.matchProcess("export",

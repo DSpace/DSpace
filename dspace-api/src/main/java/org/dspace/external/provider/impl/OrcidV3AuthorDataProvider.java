@@ -22,11 +22,11 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.model.ExternalDataObject;
@@ -87,27 +87,26 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
             httpPost.addHeader("Accept", "application/json");
             httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-            try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
-                HttpResponse getResponse = httpClient.execute(httpPost);
+            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpResponse getResponse = httpClient.execute(httpPost);
 
-                JSONObject responseObject = null;
-                try (InputStream is = getResponse.getEntity().getContent();
-                     BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
-                    String inputStr;
-                    while ((inputStr = streamReader.readLine()) != null && responseObject == null) {
-                        if (inputStr.startsWith("{") && inputStr.endsWith("}") && inputStr.contains("access_token")) {
-                            try {
-                                responseObject = new JSONObject(inputStr);
-                            } catch (Exception e) {
-                                //Not as valid as I'd hoped, move along
-                                responseObject = null;
-                            }
+            JSONObject responseObject = null;
+            try (InputStream is = getResponse.getEntity().getContent();
+                 BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
+                String inputStr;
+                while ((inputStr = streamReader.readLine()) != null && responseObject == null) {
+                    if (inputStr.startsWith("{") && inputStr.endsWith("}") && inputStr.contains("access_token")) {
+                        try {
+                            responseObject = new JSONObject(inputStr);
+                        } catch (Exception e) {
+                            //Not as valid as I'd hoped, move along
+                            responseObject = null;
                         }
                     }
                 }
-                if (responseObject != null && responseObject.has("access_token")) {
-                    accessToken = (String) responseObject.get("access_token");
-                }
+            }
+            if (responseObject != null && responseObject.has("access_token")) {
+                accessToken = (String) responseObject.get("access_token");
             }
         }
     }

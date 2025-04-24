@@ -8,7 +8,7 @@
 package org.dspace.checker;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,8 +16,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -45,13 +43,11 @@ public class MostRecentChecksum implements Serializable {
     @Column(name = "current_checksum", nullable = false)
     private String currentChecksum;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_process_start_date", nullable = false)
-    private Date processStartDate;
+    private Instant processStartDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_process_end_date", nullable = false)
-    private Date processEndDate;
+    private Instant processEndDate;
 
     @Column(name = "checksum_algorithm", nullable = false)
     private String checksumAlgorithm;
@@ -108,19 +104,19 @@ public class MostRecentChecksum implements Serializable {
         this.currentChecksum = currentChecksum;
     }
 
-    public Date getProcessStartDate() {
+    public Instant getProcessStartDate() {
         return processStartDate;
     }
 
-    public void setProcessStartDate(Date processStartDate) {
+    public void setProcessStartDate(Instant processStartDate) {
         this.processStartDate = processStartDate;
     }
 
-    public Date getProcessEndDate() {
+    public Instant getProcessEndDate() {
         return processEndDate;
     }
 
-    public void setProcessEndDate(Date processEndDate) {
+    public void setProcessEndDate(Instant processEndDate) {
         this.processEndDate = processEndDate;
     }
 

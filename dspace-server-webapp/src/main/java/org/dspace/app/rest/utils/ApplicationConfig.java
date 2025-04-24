@@ -32,10 +32,13 @@ import org.springframework.context.annotation.Configuration;
     "org.dspace.app.rest.converter",
     "org.dspace.app.rest.repository",
     "org.dspace.app.rest.utils",
+    "org.dspace.app.rest.link",
+    "org.dspace.app.rest.converter.factory",
     "org.dspace.app.configuration",
     "org.dspace.iiif",
     "org.dspace.app.iiif",
-    "org.dspace.app.ldn"
+    "org.dspace.app.ldn",
+    "org.dspace.app.scheduler"
 })
 public class ApplicationConfig {
     // Allowed CORS origins ("Access-Control-Allow-Origin" header)
