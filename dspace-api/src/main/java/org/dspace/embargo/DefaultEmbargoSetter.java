@@ -9,7 +9,7 @@ package org.dspace.embargo;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -94,16 +94,16 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
             if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn
                 .equals(CreativeCommonsServiceImpl.CC_BUNDLE_NAME))) {
                 //AuthorizeManager.removePoliciesActionFilter(context, bn, Constants.READ);
-                generatePolicies(context, liftDate.toDate(), null, bn, item.getOwningCollection());
+                generatePolicies(context, liftDate.toDate().toLocalDate(), null, bn, item.getOwningCollection());
                 for (Bitstream bs : bn.getBitstreams()) {
                     //AuthorizeManager.removePoliciesActionFilter(context, bs, Constants.READ);
-                    generatePolicies(context, liftDate.toDate(), null, bs, item.getOwningCollection());
+                    generatePolicies(context, liftDate.toDate().toLocalDate(), null, bs, item.getOwningCollection());
                 }
             }
         }
     }
 
-    protected void generatePolicies(Context context, Date embargoDate,
+    protected void generatePolicies(Context context, LocalDate embargoDate,
                                     String reason, DSpaceObject dso, Collection owningCollection)
         throws SQLException, AuthorizeException {
 

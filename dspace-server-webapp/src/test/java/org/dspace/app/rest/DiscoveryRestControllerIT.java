@@ -99,6 +99,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     @Autowired
     ChoiceAuthorityService choiceAuthorityService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Test
     public void rootDiscoverTest() throws Exception {
 
@@ -6577,8 +6580,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     @Test
     public void discoverSearchObjectsNOTIFYIncomingConfigurationTest() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-
         context.turnOffAuthorisationSystem();
 
         Community community = CommunityBuilder.createCommunity(context)
@@ -6632,8 +6633,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     @Test
     public void discoverSearchObjectsNOTIFYOutgoingConfigurationTest() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-
         context.turnOffAuthorisationSystem();
 
         Community community = CommunityBuilder.createCommunity(context)

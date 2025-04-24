@@ -205,6 +205,11 @@
                 </dependency>
                 <dependency>
                     <groupId>org.dspace</groupId>
+                    <artifactId>dspace-saml2</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
                     <artifactId>dspace-iiif</artifactId>
                     <scope>compile</scope>
                 </dependency>

@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read  #  to fetch code (actions/checkout)
+  packages: write #  to write images to GitHub Container Registry (GHCR)
 
 jobs:
   ####################################################
@@ -148,3 +149,101 @@ jobs:
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+  #################################################################################
+  # Test Deployment via Docker to ensure newly built images are working properly
+  #################################################################################
+  docker-deploy:
+    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    if: github.repository == 'dspace/dspace'
+    runs-on: ubuntu-latest
+    # Must run after all major images are built
+    needs: [dspace, dspace-test, dspace-cli, dspace-postgres-pgcrypto, dspace-solr]
+    env:
+      # Override defaults dspace.server.url because backend starts at http://127.0.0.1:8080
+      dspace__P__server__P__url: http://127.0.0.1:8080/server
+      # Enable all optional modules / controllers for this test deployment.
+      # This helps check for errors in deploying these modules via Spring Boot
+      iiif__P__enabled: true
+      ldn__P__enabled: true
+      oai__P__enabled: true
+      rdf__P__enabled: true
+      signposting__P__enabled: true
+      sword__D__server__P__enabled: true
+      swordv2__D__server__P__enabled: true
+      # If this is a PR against main (default branch), use "latest".
+      # Else if this is a PR against a different branch, used the base branch name.
+      # Else if this is a commit on main (default branch), use the "latest" tag.
+      # Else, just use the branch name.
+      # NOTE: DSPACE_VER is used because our docker compose scripts default to using the "-test" image.
+      DSPACE_VER: ${{ (github.event_name == 'pull_request' && github.event.pull_request.base.ref == github.event.repository.default_branch && 'latest') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref) || (github.ref_name == github.event.repository.default_branch && 'latest') || github.ref_name }}
+      # Docker Registry to use for Docker compose scripts below.
+      # We use GitHub's Container Registry to avoid aggressive rate limits at DockerHub.
+      DOCKER_REGISTRY: ghcr.io
+    steps:
+      # Checkout our codebase (to get access to Docker Compose scripts)
+      - name: Checkout codebase
+        uses: actions/checkout@v4
+      # Download Docker image artifacts (which were just built by reusable-docker-build.yml)
+      - name: Download Docker image artifacts
+        uses: actions/download-artifact@v4
+        with:
+          # Download all amd64 Docker images (TAR files) into the /tmp/docker directory
+          pattern: docker-image-*-linux-amd64
+          path: /tmp/docker
+          merge-multiple: true
+      # Load each of the images into Docker by calling "docker image load" for each.
+      # This ensures we are using the images just built & not any prior versions on DockerHub
+      - name: Load all downloaded Docker images
+        run: |
+          find /tmp/docker -type f -name "*.tar" -exec docker image load --input "{}" \;
+          docker image ls -a
+      # Start backend using our compose script in the codebase.
+      - name: Start backend in Docker
+        run: |
+          docker compose -f docker-compose.yml up -d
+          sleep 10
+          docker container ls
+      # Create a test admin account. Load test data from a simple set of AIPs as defined in cli.ingest.yml
+      - name: Load test data into Backend
+        run: |
+          docker compose -f docker-compose-cli.yml run --rm dspace-cli create-administrator -e test@test.edu -f admin -l user -p admin -c en
+          docker compose -f docker-compose-cli.yml -f dspace/src/main/docker-compose/cli.ingest.yml run --rm dspace-cli
+      # Verify backend started successfully.
+      # 1. Make sure root endpoint is responding (check for dspace.name defined in docker-compose.yml)
+      # 2. Also check /collections endpoint to ensure the test data loaded properly (check for a collection name in AIPs)
+      - name: Verify backend is responding properly
+        run: |
+          result=$(wget -O- -q http://127.0.0.1:8080/server/api)
+          echo "$result"
+          echo "$result" |  grep -oE "\"DSpace Started with Docker Compose\","
+          result=$(wget -O- -q http://127.0.0.1:8080/server/api/core/collections)
+          echo "$result"
+          echo "$result" |  grep -oE "\"Dog in Yard\","
+      # Verify Handle Server can be stared and is working properly
+      # 1. First generate the "[dspace]/handle-server" folder with the sitebndl.zip
+      # 2. Start the Handle Server (and wait 20 seconds to let it start up)
+      # 3. Verify logs do NOT include "Exception" in the text (as that means an error occurred)
+      # 4. Check that Handle Proxy HTML page is responding on default port (8000)
+      - name: Verify Handle Server is working properly
+        run: |
+          docker exec -i dspace /dspace/bin/make-handle-config
+          echo "Starting Handle Server..."
+          docker exec -i dspace /dspace/bin/start-handle-server
+          sleep 20
+          echo "Checking for errors in error.log"
+          result=$(docker exec -i dspace sh -c "cat /dspace/handle-server/logs/error.log* || echo ''")
+          echo "$result"
+          echo "$result" | grep -vqz "Exception"
+          echo "Checking for errors in handle-server.log..."
+          result=$(docker exec -i dspace cat /dspace/log/handle-server.log)
+          echo "$result"
+          echo "$result" | grep -vqz "Exception"
+          echo "Checking to see if Handle Proxy webpage is available..."
+          result=$(wget -O- -q http://127.0.0.1:8000/)
+          echo "$result"
+          echo "$result" | grep -oE "Handle Proxy"
+      # Shutdown our containers
+      - name: Shutdown Docker containers
+        run: |
+          docker compose -f docker-compose.yml down

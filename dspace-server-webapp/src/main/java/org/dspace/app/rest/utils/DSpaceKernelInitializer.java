@@ -81,6 +81,7 @@ public class DSpaceKernelInitializer implements ApplicationContextInitializer<Co
      * Initially look for JNDI Resource called "java:/comp/env/dspace.dir".
      * If not found, use value provided in "dspace.dir" in Spring Environment
      */
+    @SuppressWarnings("BanJNDI")
     private String getDSpaceHome(ConfigurableEnvironment environment) {
         // Load the "dspace.dir" property from Spring Boot's Configuration (application.properties)
         // This gives us the location of our DSpace configurations, necessary to start the kernel

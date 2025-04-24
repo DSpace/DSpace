@@ -523,9 +523,9 @@ public class AuthorizeUtil {
 
         for (Collection coll : colls) {
             if (!AuthorizeConfiguration
-                .canCollectionAdminPerformItemReinstatiate()) {
+                .canCollectionAdminPerformItemReinstate()) {
                 if (AuthorizeConfiguration
-                    .canCommunityAdminPerformItemReinstatiate()
+                    .canCommunityAdminPerformItemReinstate()
                     && authorizeService.authorizeActionBoolean(context,
                                                                coll.getCommunities().get(0), Constants.ADMIN)) {
                     // authorized

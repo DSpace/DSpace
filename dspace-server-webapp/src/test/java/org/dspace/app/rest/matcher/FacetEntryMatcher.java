@@ -76,6 +76,7 @@ public class FacetEntryMatcher {
             hasJsonPath("$.name", is("author")),
             hasJsonPath("$.facetType", is("text")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/author")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/author"))
         );
@@ -88,6 +89,7 @@ public class FacetEntryMatcher {
             hasJsonPath("$.facetLimit", any(Integer.class)),
             hasJsonPath("$.minValue", is(min)),
             hasJsonPath("$.maxValue", is(max)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/author")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/author"))
         );
@@ -98,6 +100,7 @@ public class FacetEntryMatcher {
             hasJsonPath("$.name", is("subject")),
             hasJsonPath("$.facetType", is("hierarchical")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/subject")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/subject"))
 
@@ -109,6 +112,7 @@ public class FacetEntryMatcher {
             hasJsonPath("$.name", is("submitter")),
             hasJsonPath("$.facetType", is("authority")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/submitter")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/submitter"))
 
@@ -120,6 +124,7 @@ public class FacetEntryMatcher {
             hasJsonPath("$.name", is("supervisedBy")),
             hasJsonPath("$.facetType", is("authority")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/supervisedBy")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/supervisedBy"))
 
@@ -131,6 +136,7 @@ public class FacetEntryMatcher {
             hasJsonPath("$.name", is("dateIssued")),
             hasJsonPath("$.facetType", is("date")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/dateIssued")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/dateIssued"))
         );
@@ -143,6 +149,7 @@ public class FacetEntryMatcher {
             hasJsonPath("$.facetLimit", any(Integer.class)),
             hasJsonPath("$.minValue", is(min)),
             hasJsonPath("$.maxValue", is(max)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/dateIssued")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/dateIssued"))
         );
@@ -153,6 +160,7 @@ public class FacetEntryMatcher {
             hasJsonPath("$.name", is("has_content_in_original_bundle")),
             hasJsonPath("$.facetType", is("standard")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/has_content_in_original_bundle")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/has_content_in_original_bundle"))
         );
@@ -163,6 +171,7 @@ public class FacetEntryMatcher {
                 hasJsonPath("$.name", is(name)),
                 hasJsonPath("$.facetType", is(facetType)),
                 hasJsonPath("$.facetLimit", any(Integer.class)),
+                hasJsonPath("$.openByDefault", any(Boolean.class)),
                 hasJsonPath("$._links.self.href", containsString("api/discover/facets/" + name)),
                 hasJsonPath("$._links", matchNextLink("api/discover/facets/" + name))
         );
@@ -179,6 +188,7 @@ public class FacetEntryMatcher {
                 hasJsonPath("$.name", is("itemtype")),
                 hasJsonPath("$.facetType", is("text")),
                 hasJsonPath("$.facetLimit", any(Integer.class)),
+                hasJsonPath("$.openByDefault", any(Boolean.class)),
                 hasJsonPath("$._links.self.href", containsString("api/discover/facets/itemtype")),
                 hasJsonPath("$._links", matchNextLink("api/discover/facets/itemtype"))
             );
@@ -195,6 +205,7 @@ public class FacetEntryMatcher {
                 hasJsonPath("$.name", is("namedresourcetype")),
                 hasJsonPath("$.facetType", is("authority")),
                 hasJsonPath("$.facetLimit", any(Integer.class)),
+                hasJsonPath("$.openByDefault", any(Boolean.class)),
                 hasJsonPath("$._links.self.href", containsString("api/discover/facets/namedresourcetype")),
                 hasJsonPath("$._links", matchNextLink("api/discover/facets/namedresourcetype"))
             );
@@ -209,6 +220,7 @@ public class FacetEntryMatcher {
         return allOf(
             hasJsonPath("$.name", is("entityType")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/entityType")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/entityType"))
         );
@@ -219,8 +231,19 @@ public class FacetEntryMatcher {
             hasJsonPath("$.name", is("relateditem")),
             hasJsonPath("$.facetType", is("text")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/relateditem")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/relateditem"))
+        );
+    }
+
+    public static Matcher<? super Object> accessStatusFacet(boolean hasNext) {
+        return allOf(
+                hasJsonPath("$.name", is("access_status")),
+                hasJsonPath("$.facetType", is("text")),
+                hasJsonPath("$.facetLimit", any(Integer.class)),
+                hasJsonPath("$._links.self.href", containsString("api/discover/facets/access_status")),
+                hasJsonPath("$._links", matchNextLink("api/discover/facets/access_status"))
         );
     }
 
@@ -229,6 +252,7 @@ public class FacetEntryMatcher {
             hasJsonPath("$.name", is("origin")),
             hasJsonPath("$.facetType", is("text")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/origin")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/origin"))
         );
@@ -239,6 +263,7 @@ public class FacetEntryMatcher {
             hasJsonPath("$.name", is("target")),
             hasJsonPath("$.facetType", is("text")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/target")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/target"))
         );
@@ -249,6 +274,7 @@ public class FacetEntryMatcher {
             hasJsonPath("$.name", is("queue_status")),
             hasJsonPath("$.facetType", is("text")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/queue_status")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/queue_status"))
         );
@@ -259,6 +285,7 @@ public class FacetEntryMatcher {
             hasJsonPath("$.name", is("activity_stream_type")),
             hasJsonPath("$.facetType", is("text")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/activity_stream_type")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/activity_stream_type"))
         );
@@ -269,6 +296,7 @@ public class FacetEntryMatcher {
             hasJsonPath("$.name", is("coar_notify_type")),
             hasJsonPath("$.facetType", is("text")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/coar_notify_type")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/coar_notify_type"))
         );
@@ -279,6 +307,7 @@ public class FacetEntryMatcher {
             hasJsonPath("$.name", is("notification_type")),
             hasJsonPath("$.facetType", is("text")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/notification_type")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/notification_type"))
         );

@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -165,7 +165,7 @@ public class WorkflowUtils extends Util {
 
                 email.addRecipient(recipient);
                 email.addArgument(configurationService.getProperty("dspace.ui.url"));
-                email.addArgument(new Date());
+                email.addArgument(Instant.now());
                 email.addArgument(request.getSession().getId());
                 email.addArgument(logInfo);
 

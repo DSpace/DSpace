@@ -52,6 +52,13 @@ public class SearchFilterMatcher {
         return sidebarFacets.stream().anyMatch(f -> f.equals(sf));
     }
 
+    public static Matcher<? super Object> hasGeospatialMetadataFilter() {
+        return allOf(
+                hasJsonPath("$.filter", is("has_geospatial_metadata")),
+                checkOperators()
+        );
+    }
+
     public static Matcher<? super Object> checkOperators() {
         return allOf(
                 hasJsonPath("$.operators",  containsInAnyOrder(
