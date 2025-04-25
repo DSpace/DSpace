@@ -262,7 +262,8 @@ public class SyndicationFeed {
                         entry.setPublishedDate(java.util.Date.from(pubDate.toInstant()));
                         hasDate = true;
                     } else {
-                        log.warn("Publication date value for item {} could not be parsed: {}", item.getID(), pubDateString);
+                        log.warn("Date field {} for item {} could not be parsed: {}", dateField, item.getID(),
+                                 pubDateString);
                     }
                 }
                 // date of last change to Item
