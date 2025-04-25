@@ -30,18 +30,32 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public class CurationTaskConsumer extends NamedConsumer {
 
     ScriptService scriptService;
-
     Logger log = LogManager.getLogger();
-
+    /**
+     * Name of the curation task which this consumer will execute
+     */
     private String curationTaskName;
 
+    /**
+     * Iniitalize the consumer, getting curation task details from named consumer configuration
+     * @throws Exception
+     */
     @Override
     public void initialize() throws Exception {
         this.scriptService = ScriptServiceFactory.getInstance().getScriptService();
         this.curationTaskName = DSpaceServicesFactory.getInstance().getConfigurationService()
-                .getProperty("event.consumer.curationtask.taskname");
+                .getProperty("event.consumer." + name + ".taskname");
+        if (this.curationTaskName == null) {
+            throw new Exception("No curation task name configured for consumer " + name);
+        }
     }
 
+    /**
+     * Resolve and execute the configured curation task for this event's subject
+     * @param ctx   the current DSpace session
+     * @param event the content event
+     * @throws Exception
+     */
     @Override
     public void consume(Context ctx, Event event) throws Exception {
         log.debug("Consumer Event " + event.toString());
