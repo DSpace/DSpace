@@ -12,8 +12,11 @@ import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
 
 /**
  * This class' purpose is to convert the SearchFilter object into a SearchResultsRest.AppliedFilter object
@@ -37,11 +40,23 @@ public class SearchFilterToAppliedFilterConverter {
             // https://jira.duraspace.org/browse/DS-4209
             authorityValue = authorityValueService.findByUID(context, searchFilter.getValue());
         }
+        // Set SearchFilter to default value
+        String label = searchFilter.getValue();
+
+        // Searches the configuration to see if a facet has a label configured.
+        String[] canDisplayLabel = DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getArrayProperty("discovery.facet.hasLabels");
+        if (canDisplayLabel != null && canDisplayLabel.length > 0 && Arrays.asList(canDisplayLabel).contains(searchFilter.getName())) {
+            String labelProperty = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("discovery.facet."+searchFilter.getName()+"."+searchFilter.getValue()+"."+"label");
+            if (labelProperty != null) {
+                label = labelProperty;
+            }
+        }
 
         SearchResultsRest.AppliedFilter appliedFilter;
         if (authorityValue == null) {
             appliedFilter = new SearchResultsRest.AppliedFilter(searchFilter.getName(), searchFilter.getOperator(),
-                                                                searchFilter.getValue(), searchFilter.getValue());
+                    searchFilter.getValue(), label);
         } else {
             appliedFilter = new SearchResultsRest.AppliedFilter(searchFilter.getName(), searchFilter.getOperator(),
                                                                 searchFilter.getValue(), authorityValue.getValue());
