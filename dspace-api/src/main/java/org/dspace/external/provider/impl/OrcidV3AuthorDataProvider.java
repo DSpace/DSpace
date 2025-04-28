@@ -7,24 +7,17 @@
  */
 package org.dspace.external.provider.impl;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.dto.MetadataValueDTO;
@@ -32,7 +25,7 @@ import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
-import org.json.JSONObject;
+import org.dspace.orcid.model.factory.OrcidFactoryUtils;
 import org.orcid.jaxb.model.v3.release.common.OrcidIdentifier;
 import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.search.Result;
@@ -60,6 +53,11 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
 
     private XMLtoBio converter;
 
+    /**
+     * Maximum retries to allow for the access token retrieval
+     */
+    private int maxClientRetries = 3;
+
     public static final String ORCID_ID_SYNTAX = "\\d{4}-\\d{4}-\\d{4}-(\\d{3}X|\\d{4})";
     private static final int MAX_INDEX = 10000;
 
@@ -78,47 +76,37 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
      * @throws java.io.IOException passed through from HTTPclient.
      */
     public void init() throws IOException {
-        if (StringUtils.isNotBlank(clientSecret) && StringUtils.isNotBlank(clientId)
-            && StringUtils.isNotBlank(OAUTHUrl)) {
-            String authenticationParameters = "?client_id=" + clientId +
-                    "&client_secret=" + clientSecret +
-                    "&scope=/read-public&grant_type=client_credentials";
-            HttpPost httpPost = new HttpPost(OAUTHUrl + authenticationParameters);
-            httpPost.addHeader("Accept", "application/json");
-            httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
+        // Initialize access token at spring instantiation. If it fails, the access token will be null rather
+        // than causing a fatal Spring startup error
+        initializeAccessToken();
+    }
 
-            HttpClient httpClient = HttpClientBuilder.create().build();
-            HttpResponse getResponse = httpClient.execute(httpPost);
-
-            JSONObject responseObject = null;
-            try (InputStream is = getResponse.getEntity().getContent();
-                 BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
-                String inputStr;
-                while ((inputStr = streamReader.readLine()) != null && responseObject == null) {
-                    if (inputStr.startsWith("{") && inputStr.endsWith("}") && inputStr.contains("access_token")) {
-                        try {
-                            responseObject = new JSONObject(inputStr);
-                        } catch (Exception e) {
-                            //Not as valid as I'd hoped, move along
-                            responseObject = null;
-                        }
-                    }
-                }
-            }
-            if (responseObject != null && responseObject.has("access_token")) {
-                accessToken = (String) responseObject.get("access_token");
-            }
+    /**
+     * Initialize access token, logging an error and decrementing remaining retries if an IOException is thrown.
+     * If the optional access token result is empty, set to null instead.
+     */
+    public void initializeAccessToken() {
+        // If we have reaches max retries or the access token is already set, return immediately
+        if (maxClientRetries <= 0 || StringUtils.isNotBlank(accessToken)) {
+            return;
+        }
+        try {
+            accessToken = OrcidFactoryUtils.retrieveAccessToken(clientId, clientSecret, OAUTHUrl).orElse(null);
+        } catch (IOException e) {
+            log.error("Error retrieving ORCID access token, {} retries left", --maxClientRetries);
         }
     }
 
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String id) {
+        initializeAccessToken();
         Person person = getBio(id);
         ExternalDataObject externalDataObject = convertToExternalDataObject(person);
         return Optional.of(externalDataObject);
     }
 
     protected ExternalDataObject convertToExternalDataObject(Person person) {
+        initializeAccessToken();
         ExternalDataObject externalDataObject = new ExternalDataObject(sourceIdentifier);
         if (person.getName() != null) {
             String lastName = "";
@@ -167,6 +155,11 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
         if (!isValid(id)) {
             return null;
         }
+        if (orcidRestConnector == null) {
+            log.error("ORCID REST connector is null, returning null ORCID Person Bio");
+            return null;
+        }
+        initializeAccessToken();
         InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"), accessToken);
         Person person = converter.convertSinglePerson(bioDocument);
         try {
@@ -188,11 +181,17 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
 
     @Override
     public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
+        initializeAccessToken();
         if (limit > 100) {
             throw new IllegalArgumentException("The maximum number of results to retrieve cannot exceed 100.");
         }
         if (start > MAX_INDEX) {
             throw new IllegalArgumentException("The starting number of results to retrieve cannot exceed 10000.");
+        }
+        // Check REST connector is initialized
+        if (orcidRestConnector == null) {
+            log.error("ORCID REST connector is not initialized, returning empty list");
+            return Collections.emptyList();
         }
 
         String searchPath = "search?q=" + URLEncoder.encode(query, StandardCharsets.UTF_8)
@@ -218,9 +217,6 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
-        if (Objects.isNull(bios)) {
-            return Collections.emptyList();
-        }
         return bios.stream().map(bio -> convertToExternalDataObject(bio)).collect(Collectors.toList());
     }
 
@@ -231,6 +227,11 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
 
     @Override
     public int getNumberOfResults(String query) {
+        if (orcidRestConnector == null) {
+            log.error("ORCID REST connector is null, returning 0");
+            return 0;
+        }
+        initializeAccessToken();
         String searchPath = "search?q=" + URLEncoder.encode(query, StandardCharsets.UTF_8)
                 + "&start=" + 0
                 + "&rows=" + 0;
