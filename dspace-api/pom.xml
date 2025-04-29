@@ -774,6 +774,7 @@
             <version>1.19.0</version>
             <scope>test</scope>
         </dependency>
+
         <!-- Used for Solr core export/import -->
         <dependency>
             <groupId>com.opencsv</groupId>
@@ -873,7 +874,7 @@
             <artifactId>jclouds-core</artifactId>
             <version>${jclouds.version}</version>
             <exclusions>
-               <exclusion>
+                <exclusion>
                     <groupId>com.google.code.gson</groupId>
                     <artifactId>gson</artifactId>
                 </exclusion>
@@ -942,5 +943,10 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
