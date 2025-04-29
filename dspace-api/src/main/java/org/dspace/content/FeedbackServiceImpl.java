@@ -7,7 +7,7 @@
  */
 package org.dspace.content;
 import java.io.IOException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Objects;
 
 import jakarta.mail.MessagingException;
@@ -37,7 +37,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         }
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "feedback"));
         email.addRecipient(recipientEmail);
-        email.addArgument(new Date());         // Date
+        email.addArgument(Instant.now());      // Date
         email.addArgument(senderEmail);       // Email
         email.addArgument(currentUserEmail); // Logged in as
         email.addArgument(page);            // Referring page

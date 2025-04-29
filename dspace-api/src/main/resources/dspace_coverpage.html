@@ -1,0 +1,141 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+
+    <!-- only limited subset of CSS v3 features are supported. Be careful to check the rendered result! -->
+    <style th:inline="css">
+        /*  check the documentation for details how to configure the page size
+            https://flyingsaucerproject.github.io/flyingsaucer/r8/guide/users-guide-R8.html#xil_34
+        */
+        @page {
+            size: [[${page_format}]];
+        }
+
+        body {
+            background: white;
+            height: 100%; /* Ensure the html and body are full height */
+        }
+
+        .page {
+            min-height: 100%; /* Ensure the page container takes up the full height */
+            position: relative; /* Allow positioning the footer relative to this container */
+        }
+
+        .body {
+            padding-bottom: 100px; /* Add bottom padding equal to footer height to prevent overlap */
+        }
+
+        .footer {
+            position: absolute;
+            top: 22cm;
+            width: 100%;
+        }
+
+        * {
+            font-family: sans-serif;
+        }
+
+        .header img {
+            width: 206px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #495A63;
+            font-family: Verdana, sans-serif;
+        }
+
+        .metadata {
+            margin-top: 40px;
+            margin-bottom: 40px;
+            background: rgb(233, 236, 239);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        /* 18pt */
+        .metadata .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* 13pt */
+        .metadata .author {
+            padding-top: 5px;
+            font-size: 17.3px;
+            font-weight: bold;
+        }
+
+        /* 13pt */
+        .metadata .editor {
+            padding-top: 5px;
+            font-size: 17.3px;
+            font-weight: bold;
+        }
+
+        /* 13pt */
+        .metadata .issued {
+            padding-top: 5px;
+
+            font-size: 17.3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+    <div class="header">
+        <img th:src="@{classpath:dspace_logo.png}" src="dspace_logo.png"/>
+
+        <div>
+            <a th:href="@{https://dspace.org/}" href="https://dspace.org">
+                https://dspace.org/
+            </a>
+        </div>
+    </div>
+
+    <div class="body">
+        <div class="metadata">
+            <!-- The metadata fields from the current item can be referenced here in the format schema_field_qualifier -->
+            <div class="title" th:text="${metadata_title}">Test title</div>
+
+            <div class="author" th:text="${metadata_author}">Author 1; Author 2; Author 3</div>
+
+            <div class="editor" th:text="${metadata_editor}">Editor 1; Editor 2; Editor 3</div>
+
+            <div class="issued" th:text="${dc_date_issued}">2017</div>
+
+            <div class="publisher" th:text="${dc_publisher}">Publisher Name</div>
+
+            <div class="identifier">
+                <a th:href="${dc_identifier_uri}" href="${dc_identifier_uri}" th:text="${dc_identifier_uri}">https://hdl.handle.net/123456789/12345</a>
+            </div>
+
+            <div class="citation" th:text="${dc_identifier_citation}">Author 1 (2017), Test title. Publisher Name. Retrieved from https://hdl.handle.net/123456789/12345</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Downloaded from a DSpace repository.
+
+        <a th:href="@{https://dspace.org}" href="https://dspace.org">
+            https://dspace.org/
+        </a>
+    </div>
+</div>
+
+
+</body>
+</html>
