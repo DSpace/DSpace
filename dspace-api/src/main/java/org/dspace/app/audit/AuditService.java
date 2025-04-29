@@ -281,13 +281,13 @@ public class AuditService {
         if (from == null) {
             fromDate = "*";
         } else {
-            fromDate = SolrUtils.getDateFormatter().format(from);
+            fromDate = SolrUtils.getDateFormatter().format(from.toInstant());
         }
         String toDate;
         if (to == null) {
             toDate = "*";
         } else {
-            toDate = SolrUtils.getDateFormatter().format(to);
+            toDate = SolrUtils.getDateFormatter().format(to.toInstant());
         }
         return DATETIME_FIELD + ":[" + fromDate + " TO " + toDate + "]";
     }
