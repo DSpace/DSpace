@@ -7,6 +7,7 @@
  */
 package org.dspace.external;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
@@ -51,7 +52,11 @@ public class OrcidRestConnector {
         }
         try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
             getResponse = httpClient.execute(httpGet);
-            result = getResponse.getEntity().getContent();
+            try (InputStream responseStream = getResponse.getEntity().getContent()) {
+                // Read all the content of the response stream into a byte array to prevent TruncatedChunkException
+                byte[] content = responseStream.readAllBytes();
+                result = new ByteArrayInputStream(content);
+            }
         } catch (Exception e) {
             getGotError(e, fullPath);
         }
