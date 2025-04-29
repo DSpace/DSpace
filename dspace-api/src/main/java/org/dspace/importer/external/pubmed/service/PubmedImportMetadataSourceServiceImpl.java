@@ -235,6 +235,8 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
         try {
             SAXBuilder saxBuilder = new SAXBuilder();
+            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            saxBuilder.setFeature("http://xml.org/sax/features/external-general-entities", false);
             Document document = saxBuilder.build(new StringReader(src));
             Element root = document.getRootElement();
 
