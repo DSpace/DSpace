@@ -25,6 +25,8 @@ import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.output.NullOutputStream;
+import org.dspace.app.util.DSpaceObjectUtilsImpl;
+import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -36,6 +38,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.util.UUIDUtils;
 import org.dspace.utils.DSpace;
 
 /**
@@ -355,6 +358,24 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
                     super.handler.logError("SQLException trying to resolve handle " + id + " to a valid dso");
                     throw new IllegalArgumentException(
                         "SQLException trying to resolve handle " + id + " to a valid dso");
+                }
+                if (dso == null) {
+                    UUID uuid = null;
+                    try {
+                        uuid = UUIDUtils.fromString(id);
+                    } catch (IllegalArgumentException ex) {
+                        // couldn't parse uuid, setting it null
+                        uuid = null;
+                    }
+                    if (uuid != null) {
+                        DSpaceObjectUtils dSpaceObjectUtils = new DSpace().getServiceManager()
+                                .getServiceByName(DSpaceObjectUtilsImpl.class.getName(), DSpaceObjectUtilsImpl.class);
+                        try {
+                            dso = dSpaceObjectUtils.findDSpaceObject(context, uuid);
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
                 }
                 if (dso == null) {
                     super.handler.logError("Id must be specified: a valid dso handle or 'all'; " + this.id + " could " +
