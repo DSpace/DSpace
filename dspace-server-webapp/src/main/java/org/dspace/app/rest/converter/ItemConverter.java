@@ -76,7 +76,7 @@ public class ItemConverter
         try {
             if (obj.isWithdrawn() && (Objects.isNull(context) ||
                                       Objects.isNull(context.getCurrentUser()) ||
-                !(authorizeService.isAdmin(context) || authorizeService.isAdmin(context, obj)))) {
+                !authorizeService.isAdmin(context, obj))) {
                 return new MetadataValueList(List.of());
             }
             if (context != null && (authorizeService.isAdmin(context) || itemService.canEdit(context, obj))) {
