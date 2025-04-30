@@ -188,7 +188,7 @@ public class Event implements Serializable {
      * lifecycle versions of the changed objects in the context) would provide
      * for more complex consumer abilities that are beyond our purview.
      */
-    private String detail;
+    private EventDetail detail;
 
     /**
      * Contains all identifiers of the DSpaceObject that was changed (added,
@@ -234,14 +234,14 @@ public class Event implements Serializable {
      * Constructor.
      *
      * You should consider to use
-     * {@link Event#Event(int, int, UUID, java.lang.String)}.
+     * {@link Event#Event(int, int, UUID, EventDetail)}.
      *
      * @param eventType   action type, e.g. Event.ADD.
      * @param subjectType DSpace Object Type of subject e.g. Constants.ITEM.
      * @param subjectID   database ID of subject instance.
      * @param detail      detail information that depends on context.
      */
-    public Event(int eventType, int subjectType, UUID subjectID, String detail) {
+    public Event(int eventType, int subjectType, UUID subjectID, EventDetail detail) {
         this(eventType, subjectType, subjectID, detail, new ArrayList<String>());
     }
 
@@ -254,7 +254,7 @@ public class Event implements Serializable {
      * @param detail      detail information that depends on context.
      * @param identifiers array containing all identifiers of the dso or an empty array
      */
-    public Event(int eventType, int subjectType, UUID subjectID, String detail, ArrayList<String> identifiers) {
+    public Event(int eventType, int subjectType, UUID subjectID, EventDetail detail, ArrayList<String> identifiers) {
         this.eventType = eventType;
         this.subjectType = coreTypeToMask(subjectType);
         this.subjectID = subjectID;
@@ -267,7 +267,7 @@ public class Event implements Serializable {
      * Constructor.
      *
      * You should consider to use
-     * {@link Event#Event(int, int, UUID, int, UUID, java.lang.String)} instead.
+     * {@link Event#Event(int, int, UUID, int, UUID, EventDetail)} instead.
      *
      * @param eventType   action type, e.g. Event.ADD.
      * @param subjectType DSpace Object Type of subject e.g. Constants.ITEM.
@@ -277,7 +277,7 @@ public class Event implements Serializable {
      * @param detail      detail information that depends on context.
      */
     public Event(int eventType, int subjectType, UUID subjectID, int objectType,
-                 UUID objectID, String detail) {
+                 UUID objectID, EventDetail detail) {
         this(eventType, subjectType, subjectID, objectType, objectID, detail,
              new ArrayList<String>());
     }
@@ -294,7 +294,7 @@ public class Event implements Serializable {
      * @param identifiers array containing all identifiers of the dso or an empty array
      */
     public Event(int eventType, int subjectType, UUID subjectID, int objectType,
-                 UUID objectID, String detail, ArrayList<String> identifiers) {
+                 UUID objectID, EventDetail detail, ArrayList<String> identifiers) {
         this.eventType = eventType;
         this.subjectType = coreTypeToMask(subjectType);
         this.subjectID = subjectID;
@@ -536,7 +536,7 @@ public class Event implements Serializable {
     /**
      * @return value of detail element of the event.
      */
-    public String getDetail() {
+    public EventDetail getDetail() {
         return detail;
     }
 
