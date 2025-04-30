@@ -195,7 +195,7 @@ public class ItemUtils {
             resourcePolicyEl.getField().add(createValue("user", user));
             resourcePolicyEl.getField().add(createValue("action", action));
             // Only add start-date if group is different to anonymous, or there is an active embargo
-            if (startDate != null && startDate.isAfter(LocalDate.now())) {
+            if (startDate != null && startDate.after(new Date())) {
                 resourcePolicyEl.getField().add(createValue("start-date", formatter.format(startDate)));
             }
             if (endDate != null) {
