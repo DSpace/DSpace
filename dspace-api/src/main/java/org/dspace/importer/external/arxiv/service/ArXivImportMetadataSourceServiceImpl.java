@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
-import javax.el.MethodNotFoundException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
@@ -162,7 +161,7 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
         // FIXME: we need this method?
-        throw new MethodNotFoundException("This method is not implemented for ArXiv");
+        throw new UnsupportedOperationException("This method is not implemented for ArXiv");
     }
 
     /**
