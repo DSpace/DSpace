@@ -23,7 +23,6 @@ import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jakarta.el.MethodNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -152,7 +151,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item)
             throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for Scopus");
+        throw new UnsupportedOperationException("This method is not implemented for Scopus");
     }
 
     @Override
