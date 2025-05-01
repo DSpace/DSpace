@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.el.MethodNotFoundException;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -109,17 +108,17 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for WOS");
+        throw new UnsupportedOperationException("This method is not implemented for WOS");
     }
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for WOS");
+        throw new UnsupportedOperationException("This method is not implemented for WOS");
     }
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for WOS");
+        throw new UnsupportedOperationException("This method is not implemented for WOS");
     }
 
     /**
