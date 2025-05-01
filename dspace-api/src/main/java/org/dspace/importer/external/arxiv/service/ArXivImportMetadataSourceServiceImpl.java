@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import jakarta.el.MethodNotFoundException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Invocation;
@@ -162,7 +161,7 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
         // FIXME: we need this method?
-        throw new MethodNotFoundException("This method is not implemented for ArXiv");
+        throw new UnsupportedOperationException("This method is not implemented for ArXiv");
     }
 
     /**
