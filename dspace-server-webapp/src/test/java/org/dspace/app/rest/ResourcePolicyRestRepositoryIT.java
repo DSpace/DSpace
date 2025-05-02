@@ -191,7 +191,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void findOneNotFoundTest() throws Exception {
 
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + UUID.randomUUID().toString()))
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + UUID.randomUUID()))
             .andExpect(status().isNotFound());
     }
 
@@ -1743,11 +1743,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         String authcolAdmin2Token = getAuthToken(colAdmin2.getEmail(), password);
         String authSubmitterToken = getAuthToken(submitter.getEmail(), password);
 
-        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context, submitter, null)
                                                  .withDspaceObject(bitstream)
                                                  .withAction(Constants.READ)
                                                  .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-                                                 .withUser(submitter)
                                                  .build();
 
         // submitter can't delete own policy
@@ -1826,11 +1825,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context, submitter, null)
                                                  .withDspaceObject(publication)
                                                  .withAction(Constants.WRITE)
                                                  .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-                                                 .withUser(submitter)
                                                  .build();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
