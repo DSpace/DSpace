@@ -86,9 +86,8 @@ public class SHERPADataProviderTest extends AbstractDSpaceTest {
             if (metadataValue.getSchema().equalsIgnoreCase("dc") &&
             metadataValue.getElement().equalsIgnoreCase("title")) {
                 title = metadataValue.getValue();
-            } else if (metadataValue.getSchema().equalsIgnoreCase("dc")
-                && metadataValue.getElement().equalsIgnoreCase("identifier")
-                && metadataValue.getQualifier().equalsIgnoreCase("issn")) {
+            } else if (metadataValue.getSchema().equalsIgnoreCase("creativeworkseries")
+                && metadataValue.getElement().equalsIgnoreCase("issn")) {
                 identifier = metadataValue.getValue();
             }
         }
@@ -135,9 +134,8 @@ public class SHERPADataProviderTest extends AbstractDSpaceTest {
             if (metadataValue.getSchema().equalsIgnoreCase("dc") &&
                 metadataValue.getElement().equalsIgnoreCase("title")) {
                 title = metadataValue.getValue();
-            } else if (metadataValue.getSchema().equalsIgnoreCase("dc")
-                && metadataValue.getElement().equalsIgnoreCase("identifier")
-                && metadataValue.getQualifier().equalsIgnoreCase("issn")) {
+            } else if (metadataValue.getSchema().equalsIgnoreCase("creativeworkseries")
+                && metadataValue.getElement().equalsIgnoreCase("issn")) {
                 identifier = metadataValue.getValue();
             }
         }
