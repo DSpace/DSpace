@@ -55,13 +55,13 @@ public class UploadStep extends AbstractProcessingStep
         DataUpload result = new DataUpload();
         List<Bundle> bundles = itemService.getBundles(obj.getItem(), Constants.CONTENT_BUNDLE_NAME);
         for (Bundle bundle : bundles) {
+            Bitstream primaryBitstream = bundle.getPrimaryBitstream();
+            if (Objects.nonNull(primaryBitstream)) {
+                result.setPrimary(primaryBitstream.getID());
+            }
             for (Bitstream source : bundle.getBitstreams()) {
-                Bitstream primaryBitstream = bundle.getPrimaryBitstream();
                 UploadBitstreamRest b = submissionService.buildUploadBitstream(configurationService, source);
                 result.getFiles().add(b);
-                if (Objects.nonNull(primaryBitstream)) {
-                    result.setPrimary(primaryBitstream.getID());
-                }
             }
         }
         return result;
