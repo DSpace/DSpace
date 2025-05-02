@@ -385,7 +385,8 @@ public class SubmissionService {
             }
             if (err == null) {
                 if (originalFile != null && newFile != null) {
-                    bitstreamService.replace(context, originalFile, newFile);
+                    boolean replaceName = Boolean.parseBoolean(request.getParameter("replaceName"));
+                    bitstreamService.replace(context, originalFile, newFile, replaceName);
                 }
             } else {
                 errors.add(err);

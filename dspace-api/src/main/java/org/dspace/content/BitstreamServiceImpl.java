@@ -12,13 +12,11 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -149,7 +147,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
-    public Bitstream replace(Context context, Bitstream oldBitstream, Bitstream newBitstream)
+    public Bitstream replace(Context context, Bitstream oldBitstream, Bitstream newBitstream, boolean replaceName)
         throws SQLException, AuthorizeException, IOException {
 
         Bundle firstBundle = oldBitstream.getBundles().get(0);
@@ -158,12 +156,13 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
                 String.format("Can't replace bitstream (id:%s) that isn't in a bundle", oldBitstream.getID()));
         }
         bundleService.addBitstream(context, firstBundle, newBitstream);
-        String newBitstreamName = newBitstream.getName();
+        String newBitstreamTitle = newBitstream.getName();
         copyMetadataBetweenBitstreams(context, oldBitstream, newBitstream);
-        // If extensions differ, keep the new bitstream name
-        if (!Objects.equals(FileNameUtils.getExtension(newBitstreamName),
-            FileNameUtils.getExtension(oldBitstream.getName()))) {
-            newBitstream.setName(context, newBitstreamName);
+        if (replaceName) {
+            // Undo title change of copy function
+            newBitstream.setName(context, newBitstreamTitle);
+        } else {
+            newBitstream.setName(context, oldBitstream.getName());
         }
         // Move bitstream policies
         List<ResourcePolicy> oldResourcePolicies = oldBitstream.getResourcePolicies();
