@@ -11,7 +11,6 @@ import static org.dspace.content.Item.ANY;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -21,7 +20,7 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -34,7 +33,10 @@ public class SubscriptionDsoMetadataForEmailCompose implements StreamDisseminati
     private List<String> metadata = new ArrayList<>();
 
     @Autowired
-    private ItemService itemService;
+    ItemService itemService;
+
+    @Autowired
+    HandleService handleService;
 
     @Override
     public boolean canDisseminate(Context context, DSpaceObject dso) {
@@ -42,25 +44,23 @@ public class SubscriptionDsoMetadataForEmailCompose implements StreamDisseminati
     }
 
     @Override
-    public void disseminate(Context context, DSpaceObject dso, OutputStream out) throws SQLException {
+    public void disseminate(Context context, DSpaceObject dso, OutputStream out) {
         if (dso.getType() == Constants.ITEM) {
             Item item = (Item) dso;
-            PrintStream printStream = new PrintStream(out);
-            for (String actualMetadata : metadata) {
-                String[] split = actualMetadata.split("\\.");
-                String qualifier = null;
-                if (split.length == 3) {
-                    qualifier = split[2];
+            try (PrintStream printStream = new PrintStream(out)) {
+                for (String actualMetadata : metadata) {
+                    String[] split = actualMetadata.split("\\.");
+                    String qualifier = null;
+                    if (split.length == 3) {
+                        qualifier = split[2];
+                    }
+                    var metadataValue = itemService.getMetadataFirstValue(item, split[0], split[1], qualifier, ANY);
+                    printStream.print(metadataValue + " ");
                 }
-                var metadataValue = itemService.getMetadataFirstValue(item, split[0], split[1], qualifier, ANY);
-                printStream.print(metadataValue + " ");
+                String itemURL = handleService.getCanonicalForm(item.getHandle());
+                printStream.print(itemURL);
+                printStream.print("\n");
             }
-            String itemURL = HandleServiceFactory.getInstance()
-                                                 .getHandleService()
-                                                 .resolveToURL(context, item.getHandle());
-            printStream.print(itemURL);
-            printStream.print("\n");
-            printStream.close();
         }
     }
 
