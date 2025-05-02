@@ -57,7 +57,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     private static final String AI_PATTERN  = "^AI=(.*)";
     private static final Pattern ISI_PATTERN = Pattern.compile("^\\d{15}$");
 
-    private int timeout = 1000;
+    private final int timeout = 1000;
 
     private String url;
     private String urlSearch;
@@ -127,7 +127,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
      */
     private class SearchNBByQueryCallable implements Callable<Integer> {
 
-        private String query;
+        private final String query;
 
         private SearchNBByQueryCallable(String queryString) {
             this.query = queryString;
@@ -156,7 +156,8 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 Element tot = xpath.evaluateFirst(root);
                 return Integer.valueOf(tot.getValue());
             }
-            return null;
+            log.warn("API key is missing: cannot execute count request.");
+            return 0;
         }
     }
 
@@ -167,7 +168,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
      */
     private class FindByIdCallable implements Callable<List<ImportRecord>> {
 
-        private String doi;
+        private final String doi;
 
         private FindByIdCallable(String doi) {
             this.doi = URLEncoder.encode(doi, StandardCharsets.UTF_8);
@@ -186,6 +187,8 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 for (Element record : elements) {
                     results.add(transformSourceRecords(record));
                 }
+            } else {
+                log.warn("API key is missing: cannot execute live import request.");
             }
             return results;
         }
@@ -203,7 +206,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
      */
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
 
-        private Query query;
+        private final Query query;
 
         private SearchByQueryCallable(String queryString, Integer maxResult, Integer start) {
             query = new Query();
@@ -233,6 +236,8 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 for (Element el : omElements) {
                     results.add(transformSourceRecords(el));
                 }
+            } else {
+                log.warn("API key is missing: cannot execute live import request.");
             }
             return results;
         }
@@ -271,9 +276,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         } else if (isIsi(query)) {
             return "UT=(" + query + ")";
         }
-        StringBuilder queryBuilder =  new StringBuilder("TS=(");
-        queryBuilder.append(query).append(")");
-        return queryBuilder.toString();
+        return "TS=(" + query + ")";
     }
 
     private boolean isIsi(String query) {
