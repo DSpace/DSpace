@@ -97,7 +97,7 @@ public class SHERPAv2JournalDataProvider extends AbstractExternalDataProvider {
         if (CollectionUtils.isNotEmpty(sherpaJournal.getIssns())) {
             String issn = sherpaJournal.getIssns().get(0);
             externalDataObject.addMetadata(new MetadataValueDTO(
-                    "dc", "identifier", "issn", null, issn));
+                "creativeworkseries", "issn", null, null, issn));
 
         }
 
