@@ -37,6 +37,12 @@ public class SHERPADataProviderTest extends AbstractDSpaceTest {
     ExternalDataProvider sherpaPublisherProvider;
     ExternalDataProvider sherpaJournalIssnProvider;
 
+    private static final MetadataFieldRef TITLE_FIELD = new MetadataFieldRef("dc", "title", null);
+    private static final MetadataFieldRef ISSN_FIELD = new MetadataFieldRef("creativeworkseries", "issn", null);
+    private static final MetadataFieldRef SHERPA_PUBLISHER_FIELD =
+        new MetadataFieldRef("dc", "identifier", "sherpaPublisher");
+    private static final MetadataFieldRef OTHER_FIELD = new MetadataFieldRef("dc", "identifier", "other");
+
     @BeforeClass
     public static void setUpClass() {
     }
@@ -83,12 +89,9 @@ public class SHERPADataProviderTest extends AbstractDSpaceTest {
         String title = null;
         String identifier = null;
         for (MetadataValueDTO metadataValue : dataObject.getMetadata()) {
-            if (metadataValue.getSchema().equalsIgnoreCase("dc") &&
-            metadataValue.getElement().equalsIgnoreCase("title")) {
+            if (TITLE_FIELD.matches(metadataValue)) {
                 title = metadataValue.getValue();
-            } else if (metadataValue.getSchema().equalsIgnoreCase("dc")
-                && metadataValue.getElement().equalsIgnoreCase("identifier")
-                && metadataValue.getQualifier().equalsIgnoreCase("issn")) {
+            } else if (ISSN_FIELD.matches(metadataValue)) {
                 identifier = metadataValue.getValue();
             }
         }
@@ -132,12 +135,9 @@ public class SHERPADataProviderTest extends AbstractDSpaceTest {
         String title = null;
         String identifier = null;
         for (MetadataValueDTO metadataValue : dataObject.getMetadata()) {
-            if (metadataValue.getSchema().equalsIgnoreCase("dc") &&
-                metadataValue.getElement().equalsIgnoreCase("title")) {
+            if (TITLE_FIELD.matches(metadataValue)) {
                 title = metadataValue.getValue();
-            } else if (metadataValue.getSchema().equalsIgnoreCase("dc")
-                && metadataValue.getElement().equalsIgnoreCase("identifier")
-                && metadataValue.getQualifier().equalsIgnoreCase("issn")) {
+            } else if (ISSN_FIELD.matches(metadataValue)) {
                 identifier = metadataValue.getValue();
             }
         }
@@ -173,12 +173,9 @@ public class SHERPADataProviderTest extends AbstractDSpaceTest {
         String title = null;
         String identifier = null;
         for (MetadataValueDTO metadataValue : dataObject.getMetadata()) {
-            if (metadataValue.getSchema().equalsIgnoreCase("dc") &&
-                metadataValue.getElement().equalsIgnoreCase("title")) {
+            if (TITLE_FIELD.matches(metadataValue)) {
                 title = metadataValue.getValue();
-            } else if (metadataValue.getSchema().equalsIgnoreCase("dc")
-                && metadataValue.getElement().equalsIgnoreCase("identifier")
-                && metadataValue.getQualifier().equalsIgnoreCase("issn")) {
+            } else if (ISSN_FIELD.matches(metadataValue)) {
                 identifier = metadataValue.getValue();
             }
         }
@@ -223,12 +220,9 @@ public class SHERPADataProviderTest extends AbstractDSpaceTest {
         String title = null;
         String identifier = null;
         for (MetadataValueDTO metadataValue : dataObject.getMetadata()) {
-            if (metadataValue.getSchema().equalsIgnoreCase("dc") &&
-                metadataValue.getElement().equalsIgnoreCase("title")) {
+            if (TITLE_FIELD.matches(metadataValue)) {
                 title = metadataValue.getValue();
-            } else if (metadataValue.getSchema().equalsIgnoreCase("dc")
-                && metadataValue.getElement().equalsIgnoreCase("identifier")
-                && metadataValue.getQualifier().equalsIgnoreCase("issn")) {
+            } else if (ISSN_FIELD.matches(metadataValue)) {
                 identifier = metadataValue.getValue();
             }
         }
@@ -269,16 +263,11 @@ public class SHERPADataProviderTest extends AbstractDSpaceTest {
         String identifier = null;
         String url = null;
         for (MetadataValueDTO metadataValue : dataObject.getMetadata()) {
-            if (metadataValue.getSchema().equalsIgnoreCase("dc") &&
-                metadataValue.getElement().equalsIgnoreCase("title")) {
+            if (TITLE_FIELD.matches(metadataValue)) {
                 title = metadataValue.getValue();
-            } else if (metadataValue.getSchema().equalsIgnoreCase("dc")
-                && metadataValue.getElement().equalsIgnoreCase("identifier")
-                && metadataValue.getQualifier().equalsIgnoreCase("sherpaPublisher")) {
+            } else if (SHERPA_PUBLISHER_FIELD.matches(metadataValue)) {
                 identifier = metadataValue.getValue();
-            } else if (metadataValue.getSchema().equalsIgnoreCase("dc")
-                && metadataValue.getElement().equalsIgnoreCase("identifier")
-                && metadataValue.getQualifier().equalsIgnoreCase("other")) {
+            } else if (OTHER_FIELD.matches(metadataValue)) {
                 url = metadataValue.getValue();
             }
         }
@@ -329,16 +318,11 @@ public class SHERPADataProviderTest extends AbstractDSpaceTest {
         String identifier = null;
         String url = null;
         for (MetadataValueDTO metadataValue : dataObject.getMetadata()) {
-            if (metadataValue.getSchema().equalsIgnoreCase("dc") &&
-                metadataValue.getElement().equalsIgnoreCase("title")) {
+            if (TITLE_FIELD.matches(metadataValue)) {
                 title = metadataValue.getValue();
-            } else if (metadataValue.getSchema().equalsIgnoreCase("dc")
-                && metadataValue.getElement().equalsIgnoreCase("identifier")
-                && metadataValue.getQualifier().equalsIgnoreCase("sherpaPublisher")) {
+            } else if (SHERPA_PUBLISHER_FIELD.matches(metadataValue)) {
                 identifier = metadataValue.getValue();
-            } else if (metadataValue.getSchema().equalsIgnoreCase("dc")
-                && metadataValue.getElement().equalsIgnoreCase("identifier")
-                && metadataValue.getQualifier().equalsIgnoreCase("other")) {
+            } else if (OTHER_FIELD.matches(metadataValue)) {
                 url = metadataValue.getValue();
             }
         }
@@ -351,5 +335,28 @@ public class SHERPADataProviderTest extends AbstractDSpaceTest {
 
         // Does dc.identifier.other match the expected value?
         assertEquals("Publisher URL must equal " + validUrl, validUrl, url);
+    }
+
+    private static class MetadataFieldRef {
+        public final String schema;
+        public final String element;
+        public final String qualifier;
+
+        public MetadataFieldRef(String schema, String element, String qualifier) {
+            this.schema = schema;
+            this.element = element;
+            this.qualifier = qualifier;
+        }
+
+        public boolean matches(MetadataValueDTO value) {
+            return schema.equalsIgnoreCase(value.getSchema()) &&
+                element.equalsIgnoreCase(value.getElement()) &&
+                (qualifier == null ? value.getQualifier() == null
+                    : qualifier.equalsIgnoreCase(value.getQualifier()));
+        }
+
+        public MetadataValueDTO toMetadata(String value) {
+            return new MetadataValueDTO(schema, element, qualifier, null, value);
+        }
     }
 }
