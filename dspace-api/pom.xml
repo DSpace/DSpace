@@ -809,7 +809,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <dependency>
           <groupId>eu.openaire</groupId>
           <artifactId>broker-client</artifactId>
