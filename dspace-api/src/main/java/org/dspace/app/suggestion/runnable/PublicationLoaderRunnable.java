@@ -121,6 +121,8 @@ public class PublicationLoaderRunnable
                 Item researcher = researchers.next();
                 publicationLoader.importRecords(context, researcher);
                 setLastImportMetadataValue(researcher);
+                context.commit();
+                context.uncacheEntity(researcher);
             }
         } finally {
             context.restoreAuthSystemState();
