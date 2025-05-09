@@ -21,9 +21,9 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.service.ClientInfoService;
@@ -56,7 +56,7 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
 
     public GoogleRecorderEventListener() {
         // httpclient is threadsafe so we only need one.
-        httpclient = HttpClients.createDefault();
+        httpclient = DSpaceHttpClientFactory.getInstance().build();
     }
 
     @Autowired
