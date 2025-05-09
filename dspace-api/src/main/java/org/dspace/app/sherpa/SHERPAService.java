@@ -17,15 +17,15 @@ import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.sherpa.v2.SHERPAPublisherResponse;
 import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.app.sherpa.v2.SHERPAUtils;
@@ -45,8 +45,6 @@ import org.springframework.cache.annotation.Cacheable;
  */
 public class SHERPAService {
 
-    private CloseableHttpClient client = null;
-
     private int maxNumberOfTries;
     private long sleepBetweenTimeouts;
     private int timeout = 5000;
@@ -60,25 +58,12 @@ public class SHERPAService {
     ConfigurationService configurationService;
 
     /**
-     * Create a new HTTP builder with sensible defaults in constructor
-     */
-    public SHERPAService() {
-        HttpClientBuilder builder = HttpClientBuilder.create();
-        // httpclient 4.3+ doesn't appear to have any sensible defaults any more. Setting conservative defaults as
-        // not to hammer the SHERPA service too much.
-        client = builder
-            .disableAutomaticRetries()
-            .setMaxConnTotal(5)
-            .build();
-    }
-
-    /**
      * Complete initialization of the Bean.
      */
     @SuppressWarnings("unused")
     @PostConstruct
     private void init() {
-        // Get endoint and API key from configuration
+        // Get endpoint and API key from configuration
         endpoint = configurationService.getProperty("sherpa.romeo.url",
             "https://v2.sherpa.ac.uk/cgi/retrieve");
         apiKey = configurationService.getProperty("sherpa.romeo.apikey");
@@ -132,46 +117,47 @@ public class SHERPAService {
                 timeout,
                 sleepBetweenTimeouts));
 
-            try {
+            try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5)) {
                 Thread.sleep(sleepBetweenTimeouts);
 
                 // Construct a default HTTP method (first result)
                 method = constructHttpGet(type, field, predicate, value, start, limit);
 
                 // Execute the method
-                HttpResponse response = client.execute(method);
-                int statusCode = response.getStatusLine().getStatusCode();
+                try (CloseableHttpResponse response = client.execute(method)) {
+                    int statusCode = response.getStatusLine().getStatusCode();
 
-                log.debug(response.getStatusLine().getStatusCode() + ": "
-                    + response.getStatusLine().getReasonPhrase());
+                    log.debug(response.getStatusLine().getStatusCode() + ": "
+                            + response.getStatusLine().getReasonPhrase());
 
-                if (statusCode != HttpStatus.SC_OK) {
-                    sherpaResponse = new SHERPAPublisherResponse("SHERPA/RoMEO return not OK status: "
-                        + statusCode);
-                    String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-                    log.error("Error from SHERPA HTTP request: " + errorBody);
-                }
-
-                HttpEntity responseBody = response.getEntity();
-
-                // If the response body is valid, pass to SHERPAResponse for parsing as JSON
-                if (null != responseBody) {
-                    log.debug("Non-null SHERPA resonse received for query of " + value);
-                    InputStream content = null;
-                    try {
-                        content = responseBody.getContent();
-                        sherpaResponse =
-                            new SHERPAPublisherResponse(content, SHERPAPublisherResponse.SHERPAFormat.JSON);
-                    } catch (IOException e) {
-                        log.error("Encountered exception while contacting SHERPA/RoMEO: " + e.getMessage(), e);
-                    } finally {
-                        if (content != null) {
-                            content.close();
-                        }
+                    if (statusCode != HttpStatus.SC_OK) {
+                        sherpaResponse = new SHERPAPublisherResponse("SHERPA/RoMEO return not OK status: "
+                                + statusCode);
+                        String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+                        log.error("Error from SHERPA HTTP request: " + errorBody);
                     }
-                } else {
-                    log.debug("Empty SHERPA response body for query on " + value);
-                    sherpaResponse = new SHERPAPublisherResponse("SHERPA/RoMEO returned no response");
+
+                    HttpEntity responseBody = response.getEntity();
+
+                    // If the response body is valid, pass to SHERPAResponse for parsing as JSON
+                    if (null != responseBody) {
+                        log.debug("Non-null SHERPA response received for query of " + value);
+                        InputStream content = null;
+                        try {
+                            content = responseBody.getContent();
+                            sherpaResponse =
+                                    new SHERPAPublisherResponse(content, SHERPAPublisherResponse.SHERPAFormat.JSON);
+                        } catch (IOException e) {
+                            log.error("Encountered exception while contacting SHERPA/RoMEO: " + e.getMessage(), e);
+                        } finally {
+                            if (content != null) {
+                                content.close();
+                            }
+                        }
+                    } else {
+                        log.debug("Empty SHERPA response body for query on " + value);
+                        sherpaResponse = new SHERPAPublisherResponse("SHERPA/RoMEO returned no response");
+                    }
                 }
             } catch (URISyntaxException e) {
                 String errorMessage = "Error building SHERPA v2 API URI: " + e.getMessage();
@@ -235,45 +221,46 @@ public class SHERPAService {
                 timeout,
                 sleepBetweenTimeouts));
 
-            try {
+            try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5)) {
                 Thread.sleep(sleepBetweenTimeouts);
 
                 // Construct a default HTTP method (first result)
                 method = constructHttpGet(type, field, predicate, value, start, limit);
 
                 // Execute the method
-                HttpResponse response = client.execute(method);
-                int statusCode = response.getStatusLine().getStatusCode();
+                try (CloseableHttpResponse response = client.execute(method)) {
+                    int statusCode = response.getStatusLine().getStatusCode();
 
-                log.debug(response.getStatusLine().getStatusCode() + ": "
-                    + response.getStatusLine().getReasonPhrase());
+                    log.debug(response.getStatusLine().getStatusCode() + ": "
+                            + response.getStatusLine().getReasonPhrase());
 
-                if (statusCode != HttpStatus.SC_OK) {
-                    sherpaResponse = new SHERPAResponse("SHERPA/RoMEO return not OK status: "
-                        + statusCode);
-                    String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-                    log.error("Error from SHERPA HTTP request: " + errorBody);
-                }
-
-                HttpEntity responseBody = response.getEntity();
-
-                // If the response body is valid, pass to SHERPAResponse for parsing as JSON
-                if (null != responseBody) {
-                    log.debug("Non-null SHERPA resonse received for query of " + value);
-                    InputStream content = null;
-                    try {
-                        content = responseBody.getContent();
-                        sherpaResponse = new SHERPAResponse(content, SHERPAResponse.SHERPAFormat.JSON);
-                    } catch (IOException e) {
-                        log.error("Encountered exception while contacting SHERPA/RoMEO: " + e.getMessage(), e);
-                    } finally {
-                        if (content != null) {
-                            content.close();
-                        }
+                    if (statusCode != HttpStatus.SC_OK) {
+                        sherpaResponse = new SHERPAResponse("SHERPA/RoMEO return not OK status: "
+                                + statusCode);
+                        String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+                        log.error("Error from SHERPA HTTP request: " + errorBody);
                     }
-                } else {
-                    log.debug("Empty SHERPA response body for query on " + value);
-                    sherpaResponse = new SHERPAResponse("SHERPA/RoMEO returned no response");
+
+                    HttpEntity responseBody = response.getEntity();
+
+                    // If the response body is valid, pass to SHERPAResponse for parsing as JSON
+                    if (null != responseBody) {
+                        log.debug("Non-null SHERPA response received for query of " + value);
+                        InputStream content = null;
+                        try {
+                            content = responseBody.getContent();
+                            sherpaResponse = new SHERPAResponse(content, SHERPAResponse.SHERPAFormat.JSON);
+                        } catch (IOException e) {
+                            log.error("Encountered exception while contacting SHERPA/RoMEO: " + e.getMessage(), e);
+                        } finally {
+                            if (content != null) {
+                                content.close();
+                            }
+                        }
+                    } else {
+                        log.debug("Empty SHERPA response body for query on " + value);
+                        sherpaResponse = new SHERPAResponse("SHERPA/RoMEO returned no response");
+                    }
                 }
             } catch (URISyntaxException e) {
                 String errorMessage = "Error building SHERPA v2 API URI: " + e.getMessage();
@@ -283,7 +270,7 @@ public class SHERPAService {
                 String errorMessage = "Encountered exception while contacting SHERPA/RoMEO: " + e.getMessage();
                 log.error(errorMessage, e);
                 sherpaResponse = new SHERPAResponse(errorMessage);
-            }  catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 String errorMessage = "Encountered exception while sleeping thread: " + e.getMessage();
                 log.error(errorMessage, e);
                 sherpaResponse = new SHERPAResponse(errorMessage);
