@@ -727,7 +727,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.12.782</version>
+            <version>1.12.783</version>
         </dependency>
 
         <!-- TODO: This may need to be replaced with the "orcid-model" artifact once this ticket is resolved:
@@ -768,7 +768,7 @@
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>5.10</version>
+            <version>5.11</version>
         </dependency>
 
         <!-- Email templating -->
