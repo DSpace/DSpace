@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.util.dao.WebAppDAO;
 import org.dspace.app.util.service.WebAppService;
 import org.dspace.core.Context;
@@ -77,8 +77,8 @@ public class WebAppServiceImpl implements WebAppService {
             for (WebApp app : webApps) {
                 method = new HttpHead(app.getUrl());
                 int status;
-                try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
-                    HttpResponse response = client.execute(method);
+                try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
+                    CloseableHttpResponse response = client.execute(method);
                     status = response.getStatusLine().getStatusCode();
                 }
                 if (status != HttpStatus.SC_OK) {

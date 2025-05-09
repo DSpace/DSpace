@@ -14,13 +14,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.core.Context;
 import org.dspace.statistics.export.OpenURLTracker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,16 +68,16 @@ public class OpenUrlServiceImpl implements OpenUrlService {
      * @throws IOException
      */
     protected int getResponseCodeFromUrl(final String urlStr) throws IOException {
-        HttpGet httpGet = new HttpGet(urlStr);
-        HttpClient httpClient = getHttpClient(getHttpClientRequestConfig());
-        HttpResponse httpResponse = httpClient.execute(httpGet);
-        return httpResponse.getStatusLine().getStatusCode();
+        try (CloseableHttpClient httpClient = getHttpClient(getHttpClientRequestConfig())) {
+            HttpGet httpGet = new HttpGet(urlStr);
+            try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
+                return httpResponse.getStatusLine().getStatusCode();
+            }
+        }
     }
 
-    protected HttpClient getHttpClient(RequestConfig requestConfig) {
-        return HttpClientBuilder.create()
-            .setDefaultRequestConfig(requestConfig)
-            .build();
+    protected CloseableHttpClient getHttpClient(RequestConfig requestConfig) {
+        return DSpaceHttpClientFactory.getInstance().buildWithRequestConfig(requestConfig);
     }
 
     protected RequestConfig getHttpClientRequestConfig() {
