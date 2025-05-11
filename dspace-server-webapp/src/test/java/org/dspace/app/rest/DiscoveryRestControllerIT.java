@@ -909,9 +909,114 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         ;
     }
 
+    @Test
+    public void discoverFacetsTestWithScopeWithInvalidUuidFormat() throws Exception {
+        //We turn off the authorization system in order to create the structure defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2016-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2016-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withSubject("AnotherTest").withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the author results by the facet
+        //With a certain scope
+        getClient().perform(get("/api/discover/facets")
+                        .param("scope", "testScope"))
+
+                //** THEN **
+                //The status has to be 404 Not Found
+                .andExpect(status().isNotFound());
+
+    }
+
+    public void discoverFacetsTestWithScopeWithUnknownUUID() throws Exception {
+        //We turn off the authorization system in order to create the structure defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2016-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2016-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withSubject("AnotherTest").withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the author results by the facet
+        //With a certain scope
+        getClient().perform(get("/api/discover/facets")
+                        .param("scope", UUID.randomUUID().toString()))
+
+                //** THEN **
+                //The status has to be 404 Not Found
+                .andExpect(status().isNotFound());
+
+    }
+
 
     @Test
-    public void discoverFacetsTestWithScope() throws Exception {
+    public void discoverFacetsNameTestWithScopeWithInvalidUuidFormat() throws Exception {
         //We turn off the authorization system in order to create the structure defined below
         context.turnOffAuthorisationSystem();
 
@@ -958,55 +1063,61 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .param("scope", "testScope"))
 
                 //** THEN **
-                //The status has to be 200 OK
-                .andExpect(status().isOk())
-                //The type has to be 'discover'
-                .andExpect(jsonPath("$.type", is("discover")))
-                //The name has to be author as that's the facet that we've called
-                .andExpect(jsonPath("$.name", is("author")))
-                //The facetType has to be 'text' as that's the default configuration for this facet
-                .andExpect(jsonPath("$.facetType", is("text")))
-                //The scope has to be the same as the one that we've given in the parameters
-                .andExpect(jsonPath("$.scope", is("testScope")))
-                //There always needs to be a self link available
-                .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author?scope=testScope")))
-                //These are all the authors for the items that were created and thus they have to be present in
-                // the embedded values section
-                .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
-                        FacetValueMatcher.entryAuthor("Doe, Jane"),
-                        FacetValueMatcher.entryAuthor("Smith, Maria"),
-                        FacetValueMatcher.entryAuthor("Doe, John"),
-                        FacetValueMatcher.entryAuthor("Smith, Donald")
-                )));
+                //The status has to be 404 Not Found
+                .andExpect(status().isNotFound());
+
+    }
+
+    public void discoverFacetsNameTestWithScopeWithUnknownUUID() throws Exception {
+        //We turn off the authorization system in order to create the structure defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2016-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2016-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withSubject("AnotherTest").withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the author results by the facet
         //With a certain scope
-        //And a size of 2
         getClient().perform(get("/api/discover/facets/author")
-                .param("scope", "testScope")
-                .param("size", "2"))
+                        .param("scope", UUID.randomUUID().toString()))
+
                 //** THEN **
-                //The status has to be 200 OK
-                .andExpect(status().isOk())
-                //The type has to be 'discover'
-                .andExpect(jsonPath("$.type", is("discover")))
-                //The name has to be 'author' as that's the facet that we called
-                .andExpect(jsonPath("$.name", is("author")))
-                //The facetType has to be 'text' as that's the default configuration for this facet
-                .andExpect(jsonPath("$.facetType", is("text")))
-                //The scope has to be same as the param that we've entered
-                .andExpect(jsonPath("$.scope", is("testScope")))
-                //There always needs to be a self link available
-                .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author?scope=testScope")))
-                .andExpect(jsonPath("$._links.next.href",
-                     containsString("api/discover/facets/author?scope=testScope&page=1&size=2")))
-                //These are the values that need to be present as it's ordered by count and these authors are the
-                // most common ones in the items that we've created
-                .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
-                        FacetValueMatcher.entryAuthor("Doe, Jane"),
-                        FacetValueMatcher.entryAuthor("Smith, Maria")
-                )))
-        ;
+                //The status has to be 404 Not Found
+                .andExpect(status().isNotFound());
+
     }
 
     @Test
@@ -1681,8 +1792,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
 
+    @SuppressWarnings("checkstyle:RegexpSingleline")
     @Test
-    public void discoverSearchObjectsTestWithScope() throws Exception {
+    public void discoverSearchObjectsTestWithScopeWithInvalidUuidFormat() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
 
@@ -1730,33 +1842,276 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .param("scope", "test"))
 
                 //** THEN **
-                //The status has to be 200 OK
-                .andExpect(status().isOk())
-                //The type has to be 'discover'
-                .andExpect(jsonPath("$.type", is("discover")))
-                //The page element has to look like this because it contains all the elements we've just created
-                .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
-                )))
-                //The scope property has to be set to the value we entered in the parameters
-                .andExpect(jsonPath("$.scope", is("test")))
-                //All the elements created in the structure above have to be present in the embedded.objects section
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
-                        SearchResultMatcher.match("core", "community", "communities"),
-                        SearchResultMatcher.match("core", "community", "communities"),
-                        //Collections are specified like this because they don't have any special properties
-                        SearchResultMatcher.match(),
-                        SearchResultMatcher.match(),
-                        SearchResultMatcher.match("core", "item", "items"),
-                        SearchResultMatcher.match("core", "item", "items"),
-                        SearchResultMatcher.match("core", "item", "items")
-                )))
-                //These facets have to show up in the embedded.facets section as well with the given hasMore
-                // property because we don't exceed their default limit for a hasMore true (the default is 10)
-                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(defaultFacetMatchers)))
-                //There always needs to be a self link available
-                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
-        ;
+                //The status has to be 404 Not Found
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void discoverSearchObjectsTestWithScopeWithUnknownUUID() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Testing, Works")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                .withSubject("AnotherTest").withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the objects in the system
+        //With a scope 'test'
+        getClient().perform(get("/api/discover/search/objects")
+                        .param("scope", UUID.randomUUID().toString()))
+
+                //** THEN **
+                //The status has to be 404 Not Found
+                .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void discoverSearchTestWithScopeWithInvalidUuidFormat() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Testing, Works")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                .withSubject("AnotherTest").withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the objects in the system
+        //With a scope 'test'
+        getClient().perform(get("/api/discover/search")
+                        .param("scope", "test"))
+
+                //** THEN **
+                //The status has to be 404 Not Found
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void discoverSearchTestWithScopeWithUnknownUUID() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Testing, Works")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                .withSubject("AnotherTest").withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the objects in the system
+        //With a scope 'test'
+        getClient().perform(get("/api/discover/search")
+                        .param("scope", UUID.randomUUID().toString()))
+
+                //** THEN **
+                //The status has to be 404 Not Found
+                .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void discoverSearchFacetsTestWithScopeWithInvalidUuidFormat() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Testing, Works")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                .withSubject("AnotherTest").withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the objects in the system
+        //With a scope 'test'
+        getClient().perform(get("/api/discover/search/facets")
+                        .param("scope", "test"))
+
+                //** THEN **
+                //The status has to be 404 Not Found
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void discoverSearchFacetsTestWithScopeWithUnknownUUID() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Testing, Works")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                .withSubject("AnotherTest").withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the objects in the system
+        //With a scope 'test'
+        getClient().perform(get("/api/discover/search/facets")
+                        .param("scope", UUID.randomUUID().toString()))
+
+                //** THEN **
+                //The status has to be 404 Not Found
+                .andExpect(status().isNotFound());
+
     }
 
     @Test
