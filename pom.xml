@@ -1354,6 +1354,26 @@
                 <artifactId>gson</artifactId>
                 <version>2.11.0</version>
             </dependency>
+            <dependency>
+                <groupId>com.google.http-client</groupId>
+                <artifactId>google-http-client</artifactId>
+                <version>1.45.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.http-client</groupId>
+                <artifactId>google-http-client-gson</artifactId>
+                <version>1.45.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.j2objc</groupId>
+                <artifactId>j2objc-annotations</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-context</artifactId>
+                <version>1.27.2</version>
+            </dependency>
 
             <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
              otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
