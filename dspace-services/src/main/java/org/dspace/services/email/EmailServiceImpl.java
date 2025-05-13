@@ -37,7 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * Added OAuth2 Gmail support via refresh tokens.
  *
- * See <a href="https://javaee.github.io/javamail/docs/api/com/sun/mail/smtp/package-summary.html">JavaMail SMTP API</a>
+ * See <a href=
+ * "https://javaee.github.io/javamail/docs/api/com/sun/mail/smtp/package-summary.html">JavaMail
+ * SMTP API</a>
  * for more details on all available SMTP parameters.
  *
  * @author mwoodiupui
@@ -118,61 +120,61 @@ public class EmailServiceImpl
                         props.put(key, value);
                     }
                 }
-                // 3) Try OAuth2 with Refresh Token flow
-                logger.debug("Checking for OAuth2 credentials");
+            }
+            // 3) Try OAuth2 with Refresh Token flow
+            logger.debug("Checking for OAuth2 credentials");
 
-                // Try to get credentials from environment variables first, then fall back to
-                // config properties
-                String clientId = StringUtils.defaultIfBlank(System.getenv("OAUTH2_CLIENT_ID"),
-                        cfg.getProperty("mail.oauth2.clientId"));
-                String clientSecret = StringUtils.defaultIfBlank(System.getenv("OAUTH2_CLIENT_SECRET"),
-                        cfg.getProperty("mail.oauth2.clientSecret"));
-                String refreshToken = StringUtils.defaultIfBlank(System.getenv("OAUTH2_REFRESH_TOKEN"),
-                        cfg.getProperty("mail.oauth2.refreshToken"));
+            // Try to get credentials from environment variables first, then fall back to
+            // config properties
+            String clientId = StringUtils.defaultIfBlank(System.getenv("OAUTH2_CLIENT_ID"),
+                    cfg.getProperty("mail.oauth2.clientId"));
+            String clientSecret = StringUtils.defaultIfBlank(System.getenv("OAUTH2_CLIENT_SECRET"),
+                    cfg.getProperty("mail.oauth2.clientSecret"));
+            String refreshToken = StringUtils.defaultIfBlank(System.getenv("OAUTH2_REFRESH_TOKEN"),
+                    cfg.getProperty("mail.oauth2.refreshToken"));
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("OAuth2 client ID available: {}", StringUtils.isNotBlank(clientId));
-                    logger.debug("OAuth2 client secret available: {}", StringUtils.isNotBlank(clientSecret));
-                    logger.debug("OAuth2 refresh token available: {}", StringUtils.isNotBlank(refreshToken));
-                }
+            if (logger.isDebugEnabled()) {
+                logger.debug("OAuth2 client ID available: {}", StringUtils.isNotBlank(clientId));
+                logger.debug("OAuth2 client secret available: {}", StringUtils.isNotBlank(clientSecret));
+                logger.debug("OAuth2 refresh token available: {}", StringUtils.isNotBlank(refreshToken));
+            }
 
-                if (StringUtils.isNotBlank(clientId)
-                        && StringUtils.isNotBlank(clientSecret)
-                        && StringUtils.isNotBlank(refreshToken)) {
-                    try {
-                        // fetch a fresh access token
-                        String accessToken = new GoogleRefreshTokenRequest(
-                                HTTP_TRANSPORT, GSON_FACTORY,
-                                refreshToken, clientId, clientSecret).execute().getAccessToken();
+            if (StringUtils.isNotBlank(clientId)
+                    && StringUtils.isNotBlank(clientSecret)
+                    && StringUtils.isNotBlank(refreshToken)) {
+                try {
+                    // fetch a fresh access token
+                    String accessToken = new GoogleRefreshTokenRequest(
+                            HTTP_TRANSPORT, GSON_FACTORY,
+                            refreshToken, clientId, clientSecret).execute().getAccessToken();
 
-                        // cache it for JavaMail
-                        cfg.setProperty("mail.server.oauth2.token", accessToken);
+                    // cache it for JavaMail
+                    cfg.setProperty("mail.server.oauth2.token", accessToken);
 
-                        // set up XOAUTH2
-                        props.put("mail.smtp.auth", "true");
-                        props.put("mail.smtp.auth.mechanisms", "XOAUTH2");
-                        props.put("mail.smtp.auth.login.disable", "true");
-                        props.put("mail.smtp.auth.plain.disable", "true");
-
-                        session = Session.getInstance(props, this);
-                        logger.info("Initialized SMTP session with OAuth2 token");
-                        return;
-
-                    } catch (IOException e) {
-                        logger.error("Failed to refresh Gmail OAuth2 token", e);
-                    }
-                }
-
-                // 4) Fallback to basic username/password
-                String username = cfg.getProperty("mail.server.username");
-                if (StringUtils.isNotBlank(username)) {
+                    // set up XOAUTH2
                     props.put("mail.smtp.auth", "true");
+                    props.put("mail.smtp.auth.mechanisms", "XOAUTH2");
+                    props.put("mail.smtp.auth.login.disable", "true");
+                    props.put("mail.smtp.auth.plain.disable", "true");
+
                     session = Session.getInstance(props, this);
-                    logger.info("Initialized SMTP session with basic auth (username/password)");
-                } else {
-                    session = Session.getInstance(props);
-                    logger.info("Initialized SMTP session without authentication");
+                    logger.info("Initialized SMTP session with OAuth2 token");
+                    return;
+
+                } catch (IOException e) {
+                    logger.error("Failed to refresh Gmail OAuth2 token", e);
                 }
+            }
+
+            // 4) Fallback to basic username/password
+            String username = cfg.getProperty("mail.server.username");
+            if (StringUtils.isNotBlank(username)) {
+                props.put("mail.smtp.auth", "true");
+                session = Session.getInstance(props, this);
+                logger.info("Initialized SMTP session with basic auth (username/password)");
+            } else {
+                session = Session.getInstance(props);
+                logger.info("Initialized SMTP session without authentication");
             }
         }
     }
