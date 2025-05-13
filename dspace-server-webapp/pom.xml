@@ -364,7 +364,7 @@
         <dependency>
             <groupId>org.webjars.npm</groupId>
             <artifactId>json-editor__json-editor</artifactId>
-            <version>2.15.1</version>
+            <version>2.15.2</version>
         </dependency>
         <!-- Also pull in current version of Bootstrap via WebJars.
              This is used by BOTH our HAL Browser and our OAI-PMH interface.
