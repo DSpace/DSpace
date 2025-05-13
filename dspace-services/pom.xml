@@ -31,14 +31,14 @@
             <build>
                 <plugins>
                     <!-- This plugin allows us to run a Groovy script in our Maven POM
-                         (see: https://groovy.github.io/gmaven/groovy-maven-plugin/execute.html )
-                         We are generating a OS-agnostic version (agnostic.build.dir) of
-                         the ${project.build.directory} property (full path of target dir).
-                         This is needed by the Surefire plugin (see below) to
-                         initialize the Unit Test environment's dspace.dir setting.
-                         Otherwise, the Unit Test Framework will not work on Windows OS.
-                         This Groovy code was mostly borrowed from:
-                         http://stackoverflow.com/questions/3872355/how-to-convert-file-separator-in-maven
+                        (see: https://groovy.github.io/gmaven/groovy-maven-plugin/execute.html )
+                        We are generating a OS-agnostic version (agnostic.build.dir) of
+                        the ${project.build.directory} property (full path of target dir).
+                        This is needed by the Surefire plugin (see below) to
+                        initialize the Unit Test environment's dspace.dir setting.
+                        Otherwise, the Unit Test Framework will not work on Windows OS.
+                        This Groovy code was mostly borrowed from:
+                        http://stackoverflow.com/questions/3872355/how-to-convert-file-separator-in-maven
                     -->
                     <plugin>
                         <groupId>org.codehaus.gmaven</groupId>
@@ -68,7 +68,7 @@
                                 <!-- Specify the dspace.dir to use for test environment -->
                                 <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
                                 <!-- For "dspace-services" we don't need a full test environment, we just need
-                                     a valid "config-definition.xml" which exists in target/test-classes/ -->
+                                    a valid "config-definition.xml" which exists in target/test-classes/ -->
                                 <dspace.dir>${agnostic.build.dir}/test-classes</dspace.dir>
                             </systemPropertyVariables>
                         </configuration>
@@ -146,6 +146,16 @@
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>2.7.2</version>
+        </dependency>
+    
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.10.0.pr1</version>
+        </dependency>
     </dependencies>
 </project>
