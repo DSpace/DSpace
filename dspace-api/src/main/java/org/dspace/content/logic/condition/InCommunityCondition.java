@@ -49,27 +49,28 @@ public class InCommunityCondition extends AbstractCondition {
         List<Collection> itemCollections = new ArrayList<>();
         itemCollections.addAll(item.getCollections());
 
-        // do we have a worskpace or workflowitem?
-        WorkspaceItem wsi = null;
-        try {
-            wsi = ContentServiceFactory.getInstance().getWorkspaceItemService().findByItem(context, item);
-        } catch (SQLException ex) {
-            log.warn("Caught and SQLException", ex);
+        if (!item.isArchived()) {
+            // do we have a worskpace or workflowitem?
+            WorkspaceItem wsi = null;
+            try {
+                wsi = ContentServiceFactory.getInstance().getWorkspaceItemService().findByItem(context, item);
+            } catch (SQLException ex) {
+                log.warn("Caught and SQLException", ex);
+            }
+            if (wsi != null && wsi.getCollection() != null) {
+                itemCollections.add(wsi.getCollection());
+            }
+            // do we have a workflowItem?
+            WorkflowItem wfi = null;
+            try {
+                wfi = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
+            } catch (SQLException ex) {
+                log.warn("Caught and SQLException", ex);
+            }
+            if (wfi != null && wfi.getCollection() != null) {
+                itemCollections.add(wfi.getCollection());
+            }
         }
-        if (wsi != null && wsi.getCollection() != null) {
-            itemCollections.add(wsi.getCollection());
-        }
-        // do we have a workflowItem?
-        WorkflowItem wfi = null;
-        try {
-            wfi = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
-        } catch (SQLException ex) {
-            log.warn("Caught and SQLException", ex);
-        }
-        if (wfi != null && wfi.getCollection() != null) {
-            itemCollections.add(wfi.getCollection());
-        }
-
         // Check communities of item.getCollections() - this will only see collections if the item is archived
         for (Collection collection : itemCollections) {
             try {

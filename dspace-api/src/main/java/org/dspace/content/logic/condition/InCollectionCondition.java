@@ -51,28 +51,29 @@ public class InCollectionCondition extends AbstractCondition {
         List<Collection> itemCollections = new ArrayList<>();
         itemCollections.addAll(item.getCollections());
 
-        // do we have a worskpace or workflowitem?
-        WorkspaceItem wsi = null;
-        try {
-            wsi = ContentServiceFactory.getInstance().getWorkspaceItemService().findByItem(context, item);
-        } catch (SQLException ex) {
-            log.warn("Caught and SQLException", ex);
-        }
-        if (wsi != null && wsi.getCollection() != null) {
-            itemCollections.add(wsi.getCollection());
-        }
+        if (!item.isArchived()) {
+            // do we have a worskpace or workflowitem?
+            WorkspaceItem wsi = null;
+            try {
+                wsi = ContentServiceFactory.getInstance().getWorkspaceItemService().findByItem(context, item);
+            } catch (SQLException ex) {
+                log.warn("Caught and SQLException", ex);
+            }
+            if (wsi != null && wsi.getCollection() != null) {
+                itemCollections.add(wsi.getCollection());
+            }
 
-        // do we have a workflowItem?
-        WorkflowItem wfi = null;
-        try {
-            wfi = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
-        } catch (SQLException ex) {
-            log.warn("Caught and SQLException", ex);
+            // do we have a workflowItem?
+            WorkflowItem wfi = null;
+            try {
+                wfi = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
+            } catch (SQLException ex) {
+                log.warn("Caught and SQLException", ex);
+            }
+            if (wfi != null && wfi.getCollection() != null) {
+                itemCollections.add(wfi.getCollection());
+            }
         }
-        if (wfi != null && wfi.getCollection() != null) {
-            itemCollections.add(wfi.getCollection());
-        }
-
         // check if any of the collection found is in the list of collections we are looking for
         for (Collection collection : itemCollections) {
             if (collectionHandles.contains(collection.getHandle())) {

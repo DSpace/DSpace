@@ -60,6 +60,9 @@ import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -81,6 +84,8 @@ public class LogicalFilterTest extends AbstractUnitTest {
     private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
     private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    private XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory.getInstance()
+        .getXmlWorkflowItemService();
 
     // Logger
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(LogicalFilterTest.class);
@@ -90,9 +95,15 @@ public class LogicalFilterTest extends AbstractUnitTest {
     Community communityTwo;
     Collection collectionOne;
     Collection collectionTwo;
+    Collection collection1WithWorkflow;
+    Collection collection2WithWorkflow;
     Item itemOne;
     Item itemTwo;
     Item itemThree;
+    WorkspaceItem workspaceItemOne;
+    WorkspaceItem workspaceItemTwo;
+    XmlWorkflowItem xmlWorkflowItemOne;
+    XmlWorkflowItem xmlWorkflowItemTwo;
 
     // Some simple statement lists for testing
     List<LogicalStatement> trueStatements;
@@ -125,6 +136,12 @@ public class LogicalFilterTest extends AbstractUnitTest {
             // Set up first community, collection and item
             this.communityOne = communityService.create(null, context);
             this.collectionOne = collectionService.create(context, communityOne);
+            int step = 1;
+            Group g = groupService.create(context);
+            collection1WithWorkflow = collectionService.create(context, communityOne);
+            collection1WithWorkflow.setWorkflowGroup(context, step, g);
+            collection2WithWorkflow = collectionService.create(context, communityOne);
+            collection2WithWorkflow.setWorkflowGroup(context, step, g);
             WorkspaceItem workspaceItem = workspaceItemService.create(context, collectionOne, false);
             this.itemOne = installItemService.installItem(context, workspaceItem);
             // Add one bitstream to item one, but put it in THUMBNAIL bundle
@@ -160,6 +177,14 @@ public class LogicalFilterTest extends AbstractUnitTest {
             // Initialise metadata field for later testing with both items
             this.metadataField = metadataFieldService.findByElement(context,
                 MetadataSchemaEnum.DC.getName(), element, qualifier);
+            workspaceItemOne = workspaceItemService.create(context, collectionOne, false);
+            workspaceItemTwo = workspaceItemService.create(context, collectionTwo, false);
+            Item itemInWorkflow1 = installItemService.installItem(context,
+                workspaceItemService.create(context, collectionOne, false));
+            xmlWorkflowItemOne = xmlWorkflowItemService.create(context, itemInWorkflow1, collectionOne);
+            Item itemInWorkflow2 = installItemService.installItem(context,
+                workspaceItemService.create(context, collectionTwo, false));
+            xmlWorkflowItemTwo = xmlWorkflowItemService.create(context, itemInWorkflow2, collectionTwo);
             context.restoreAuthSystemState();
         } catch (AuthorizeException | SQLException | IOException e) {
             log.error("Error encountered during init", e);
@@ -482,6 +507,76 @@ public class LogicalFilterTest extends AbstractUnitTest {
             // Test the filter on the second item - this item is NOT in collectionOne: expected outcome is false
             assertFalse("itemTwo unexpectedly matched the 'item in collectionOne' test",
                 filter.getResult(context, itemTwo));
+        } catch (LogicalStatementException e) {
+            log.error(e.getMessage());
+            fail("LogicalStatementException thrown testing the InCollectionCondition filter" + e.getMessage());
+        }
+    }
+
+    /**
+     * Test a simple filter with a single logical statement: the InCollectionCondition
+     * looking for a workspaceitem that is in collectionOne, and one that is not in collectionOne
+     */
+    @Test
+    public void testInCollectionConditionWorkspaceItem() {
+        // Instantiate new filter for testing this condition
+        DefaultFilter filter = new DefaultFilter();
+        Condition condition = new InCollectionCondition();
+        condition.setItemService(ContentServiceFactory.getInstance().getItemService());
+        Map<String, Object> parameters = new HashMap<>();
+
+        // Add collectionOne handle to the collections parameter - ie. we are testing to see if the item is
+        // in collectionOne only
+        List<String> collections = new ArrayList<>();
+        collections.add(collectionOne.getHandle());
+        parameters.put("collections", collections);
+
+        try {
+            // Set parameters and condition
+            condition.setParameters(parameters);
+            filter.setStatement(condition);
+
+            // Test the filter on the first item - this item is in collectionOne: expected outcome is true
+            assertTrue("itemOne unexpectedly did not match the 'item in collectionOne' test",
+                filter.getResult(context, workspaceItemOne.getItem()));
+            // Test the filter on the second item - this item is NOT in collectionOne: expected outcome is false
+            assertFalse("itemTwo unexpectedly matched the 'item in collectionOne' test",
+                filter.getResult(context, workspaceItemTwo.getItem()));
+        } catch (LogicalStatementException e) {
+            log.error(e.getMessage());
+            fail("LogicalStatementException thrown testing the InCollectionCondition filter" + e.getMessage());
+        }
+    }
+
+    /**
+     * Test a simple filter with a single logical statement: the InCollectionCondition
+     * looking for a workspaceitem that is in collectionOne, and one that is not in collectionOne
+     */
+    @Test
+    public void testInCollectionConditionWorkflowItem() {
+        // Instantiate new filter for testing this condition
+        DefaultFilter filter = new DefaultFilter();
+        Condition condition = new InCollectionCondition();
+        condition.setItemService(ContentServiceFactory.getInstance().getItemService());
+        Map<String, Object> parameters = new HashMap<>();
+
+        // Add collectionOne handle to the collections parameter - ie. we are testing to see if the item is
+        // in collectionOne only
+        List<String> collections = new ArrayList<>();
+        collections.add(collectionOne.getHandle());
+        parameters.put("collections", collections);
+
+        try {
+            // Set parameters and condition
+            condition.setParameters(parameters);
+            filter.setStatement(condition);
+
+            // Test the filter on the first item - this item is in collectionOne: expected outcome is true
+            assertTrue("itemOne unexpectedly did not match the 'item in collectionOne' test",
+                filter.getResult(context, xmlWorkflowItemOne.getItem()));
+            // Test the filter on the second item - this item is NOT in collectionOne: expected outcome is false
+            assertFalse("itemTwo unexpectedly matched the 'item in collectionOne' test",
+                filter.getResult(context, xmlWorkflowItemTwo.getItem()));
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the InCollectionCondition filter" + e.getMessage());
