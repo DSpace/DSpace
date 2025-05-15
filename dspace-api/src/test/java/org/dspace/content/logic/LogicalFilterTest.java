@@ -208,8 +208,14 @@ public class LogicalFilterTest extends AbstractUnitTest {
             itemService.delete(context, itemOne);
             itemService.delete(context, itemTwo);
             itemService.delete(context, itemThree);
+            workspaceItemService.deleteAll(context, workspaceItemOne);
+            workspaceItemService.deleteAll(context, workspaceItemTwo);
+            xmlWorkflowItemService.delete(context, xmlWorkflowItemOne);
+            xmlWorkflowItemService.delete(context, xmlWorkflowItemTwo);
             collectionService.delete(context, collectionOne);
             collectionService.delete(context, collectionTwo);
+            collectionService.delete(context, collection1WithWorkflow);
+            collectionService.delete(context, collection2WithWorkflow);
             communityService.delete(context, communityOne);
             communityService.delete(context, communityTwo);
         } catch (Exception e) {
