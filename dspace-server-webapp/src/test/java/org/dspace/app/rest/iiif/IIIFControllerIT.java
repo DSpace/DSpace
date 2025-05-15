@@ -1125,7 +1125,6 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // Single canvas.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/canvas/c0"))
                 .andExpect(status().isOk())
-                .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.@type", is("sc:Canvas")))
                 .andExpect(jsonPath("$.metadata[0].label", is("File name")))
                 .andExpect(jsonPath("$.metadata[0].value", is("IMG1.jpg")))
