@@ -55,6 +55,17 @@ public interface ProvenanceService {
                                      BulkAccessControlInput accessControl);
 
     /**
+     * Add a provenance message to the item when a bitstream policy is set
+     *
+     * @param context DSpace context object
+     * @param bitstream to which the policy is set
+     * @param item to which the bitstream belongs
+     * @param accConditionsStr the access control input as string
+     */
+    void setBitstreamPolicies(Context context, Bitstream bitstream, Item item,
+                              String accConditionsStr);
+
+    /**
      * Add a provenance message to the item when an item's license is edited
      *
      * @param context DSpace context object

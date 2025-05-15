@@ -98,13 +98,24 @@ public class ProvenanceServiceImpl implements ProvenanceService {
                                      BulkAccessControlInput accessControl) {
         String accConditionsStr = extractAccessConditions(accessControl.getBitstream().getAccessConditions());
         if (StringUtils.isNotBlank(accConditionsStr)) {
-            String msg = messageProvider.getMessage(context, ProvenanceMessageTemplates.ACCESS_CONDITION.getTemplate(),
-                    accConditionsStr, "bitstream", bitstream.getID());
-            try {
-                addProvenanceMetadata(context, item, msg);
-            } catch (SQLException | AuthorizeException e) {
-                log.error("Unable to add new provenance metadata when setting bitstream policies.", e);
-            }
+            this.setBitstreamPolicies(context, bitstream, item, accConditionsStr);
+        }
+    }
+
+    @Override
+    public void setBitstreamPolicies(Context context, Bitstream bitstream, Item item, String accConditionsStr) {
+        String msg = messageProvider.getMessage(
+                context,
+                ProvenanceMessageTemplates.ACCESS_CONDITION.getTemplate(),
+                accConditionsStr,
+                "bitstream",
+                bitstream.getID()
+        );
+
+        try {
+            addProvenanceMetadata(context, item, msg);
+        } catch (SQLException | AuthorizeException e) {
+            log.error("Unable to add new provenance metadata when setting bitstream policies.", e);
         }
     }
 
