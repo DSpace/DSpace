@@ -23,6 +23,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -36,6 +37,11 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
     @Autowired
     private DSpaceObjectUtils dSpaceObjectUtils;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
+    private int csxExportLimit = -1;
+
     @Override
     public DSpaceCSV handleExport(Context context, boolean exportAllItems, boolean exportAllMetadata, String identifier,
                                   DSpaceRunnableHandler handler) throws Exception {
@@ -43,7 +49,7 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
 
         if (exportAllItems) {
             handler.logInfo("Exporting whole repository WARNING: May take some time!");
-            toExport = itemService.findAll(context);
+            toExport = itemService.findAll(context, getCsvExportLimit(), 0);
         } else {
             DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
                 .resolveToObject(context, identifier);
@@ -63,7 +69,7 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
             } else if (dso.getType() == Constants.COLLECTION) {
                 handler.logInfo("Exporting collection '" + dso.getName() + "' (" + identifier + ")");
                 Collection collection = (Collection) dso;
-                toExport = itemService.findByCollection(context, collection);
+                toExport = itemService.findByCollection(context, collection, getCsvExportLimit(), 0);
             } else if (dso.getType() == Constants.COMMUNITY) {
                 handler.logInfo("Exporting community '" + dso.getName() + "' (" + identifier + ")");
                 toExport = buildFromCommunity(context, (Community) dso);
@@ -74,18 +80,21 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
             }
         }
 
-        DSpaceCSV csv = this.export(context, toExport, exportAllMetadata);
+        DSpaceCSV csv = this.export(context, toExport, exportAllMetadata, handler);
         return csv;
     }
 
     @Override
-    public DSpaceCSV export(Context context, Iterator<Item> toExport, boolean exportAll) throws Exception {
+    public DSpaceCSV export(Context context, Iterator<Item> toExport,
+                            boolean exportAll, DSpaceRunnableHandler handler) throws Exception {
         Context.Mode originalMode = context.getCurrentMode();
         context.setMode(Context.Mode.READ_ONLY);
 
-        // Process each item
+        // Process each item until we reach the limit
+        int itemExportLimit = getCsvExportLimit();
         DSpaceCSV csv = new DSpaceCSV(exportAll);
-        while (toExport.hasNext()) {
+
+        for (int itemsAdded = 0; toExport.hasNext() && itemsAdded < itemExportLimit; itemsAdded++) {
             Item item = toExport.next();
             csv.addItem(item);
             context.uncacheEntity(item);
@@ -97,8 +106,9 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
     }
 
     @Override
-    public DSpaceCSV export(Context context, Community community, boolean exportAll) throws Exception {
-        return export(context, buildFromCommunity(context, community), exportAll);
+    public DSpaceCSV export(Context context, Community community,
+                            boolean exportAll, DSpaceRunnableHandler handler) throws Exception {
+        return export(context, buildFromCommunity(context, community), exportAll, handler);
     }
 
     /**
@@ -117,21 +127,30 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
         // Add all the collections
         List<Collection> collections = community.getCollections();
         for (Collection collection : collections) {
-            Iterator<Item> items = itemService.findByCollection(context, collection);
-            while (items.hasNext()) {
+            // Never obtain more items than the configured limit
+            Iterator<Item> items = itemService.findByCollection(context, collection, getCsvExportLimit(), 0);
+            while (result.size() < getCsvExportLimit() && items.hasNext()) {
                 result.add(items.next());
             }
         }
 
-    // Add all the sub-communities
+        // Add all the sub-communities
         List<Community> communities = community.getSubcommunities();
         for (Community subCommunity : communities) {
             Iterator<Item> items = buildFromCommunity(context, subCommunity);
-            while (items.hasNext()) {
+            while (result.size() < getCsvExportLimit() && items.hasNext()) {
                 result.add(items.next());
             }
         }
 
         return result.iterator();
+    }
+
+    @Override
+    public int getCsvExportLimit() {
+        if (csxExportLimit == -1) {
+            csxExportLimit = configurationService.getIntProperty("bulkedit.export.max.items", 500);
+        }
+        return csxExportLimit;
     }
 }

@@ -11,8 +11,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
@@ -185,16 +185,17 @@ public class ItemUtils {
             String groupName = policy.getGroup() != null ? policy.getGroup().getName() : null;
             String user = policy.getEPerson() != null ? policy.getEPerson().getName() : null;
             String action = Constants.actionText[policy.getAction()];
-            Date startDate = policy.getStartDate();
-            Date endDate = policy.getEndDate();
+            LocalDate startDate = policy.getStartDate();
+            LocalDate endDate = policy.getEndDate();
 
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
             Element resourcePolicyEl = create("resourcePolicy");
             resourcePolicyEl.getField().add(createValue("group", groupName));
             resourcePolicyEl.getField().add(createValue("user", user));
             resourcePolicyEl.getField().add(createValue("action", action));
-            if (startDate != null) {
+            // Only add start-date if group is different to anonymous, or there is an active embargo
+            if (startDate != null && startDate.isAfter(LocalDate.now())) {
                 resourcePolicyEl.getField().add(createValue("start-date", formatter.format(startDate)));
             }
             if (endDate != null) {

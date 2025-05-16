@@ -8,10 +8,12 @@
 
 package org.dspace.importer.external.pubmed.metadatamapping.contributor;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -110,17 +112,21 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
                 String resultDateString = "";
                 String dateString = "";
 
-                SimpleDateFormat resultFormatter = null;
+                DateTimeFormatter resultFormatter;
+                String resultType;
                 if (monthList.size() > i && dayList.size() > i) {
                     dateString = yearList.get(i).getValue() + "-" + monthList.get(i).getValue() +
                         "-" + dayList.get(i).getValue();
-                    resultFormatter = new SimpleDateFormat("yyyy-MM-dd");
+                    resultFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                    resultType = "DAY";
                 } else if (monthList.size() > i) {
                     dateString = yearList.get(i).getValue() + "-" + monthList.get(i).getValue();
-                    resultFormatter = new SimpleDateFormat("yyyy-MM");
+                    resultFormatter = DateTimeFormatter.ofPattern("yyyy-MM");
+                    resultType = "MONTH";
                 } else {
                     dateString = yearList.get(i).getValue();
-                    resultFormatter = new SimpleDateFormat("yyyy");
+                    resultFormatter = DateTimeFormatter.ofPattern("yyyy");
+                    resultType = "YEAR";
                 }
 
                 int j = 0;
@@ -128,10 +134,18 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
                 while (j < dateFormatsToAttempt.size() && StringUtils.isBlank(resultDateString)) {
                     String dateFormat = dateFormatsToAttempt.get(j);
                     try {
-                        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-                        Date date = formatter.parse(dateString);
-                        resultDateString = resultFormatter.format(date);
-                    } catch (ParseException e) {
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat);
+                        if (resultType.equals("DAY")) {
+                            LocalDate parsedDate = LocalDate.parse(dateString, formatter);
+                            resultDateString = resultFormatter.format(parsedDate);
+                        } else if (resultType.equals("MONTH")) {
+                            YearMonth parsedMonth = YearMonth.parse(dateString, formatter);
+                            resultDateString = resultFormatter.format(parsedMonth);
+                        } else if (resultType.equals("YEAR")) {
+                            Year parsedYear = Year.parse(dateString, formatter);
+                            resultDateString = resultFormatter.format(parsedYear);
+                        }
+                    } catch (DateTimeParseException e) {
                         // Multiple dateformats can be configured, we don't want to print the entire stacktrace every
                         // time one of those formats fails.
                         log.debug(

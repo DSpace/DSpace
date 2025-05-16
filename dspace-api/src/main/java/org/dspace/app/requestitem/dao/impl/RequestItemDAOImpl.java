@@ -42,6 +42,17 @@ public class RequestItemDAOImpl extends AbstractHibernateDAO<RequestItem> implem
         criteriaQuery.where(criteriaBuilder.equal(requestItemRoot.get(RequestItem_.token), token));
         return uniqueResult(context, criteriaQuery, false, RequestItem.class);
     }
+
+    @Override
+    public RequestItem findByAccessToken(Context context, String accessToken) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RequestItem.class);
+        Root<RequestItem> requestItemRoot = criteriaQuery.from(RequestItem.class);
+        criteriaQuery.select(requestItemRoot);
+        criteriaQuery.where(criteriaBuilder.equal(requestItemRoot.get(RequestItem_.access_token), accessToken));
+        return uniqueResult(context, criteriaQuery, true, RequestItem.class);
+    }
+
     @Override
     public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);

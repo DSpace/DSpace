@@ -11,7 +11,7 @@ import static org.dspace.content.QAEvent.DSPACE_USERS_SOURCE;
 import static org.dspace.core.Constants.READ;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -91,7 +91,7 @@ public class WithdrawnCorrectionType implements CorrectionType, InitializingBean
                                       this.getTopic(),
                                       1.0,
                                       reasonJson.toString(),
-                                      new Date()
+                                      Instant.now()
                                       );
 
         qaEventService.store(context, qaEvent);

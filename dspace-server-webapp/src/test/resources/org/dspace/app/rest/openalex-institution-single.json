@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "count": 2932,
+    "db_response_time_ms": 72,
+    "page": 1,
+    "per_page": 1,
+    "groups_count": null
+  },
+  "results": [
+    {
+      "id": "https://openalex.org/I1294671590",
+      "ror": "https://ror.org/02feahw73",
+      "display_name": "Centre National de la Recherche Scientifique",
+      "country_code": "FR",
+      "type": "government",
+      "type_id": "https://openalex.org/institution-types/government",
+      "lineage": [
+        "https://openalex.org/I1294671590"
+      ],
+      "display_name_acronyms": [
+        "CNRS"
+      ],
+      "display_name_alternatives": [
+        "French National Centre for Scientific Research"
+      ],
+      "ids": {
+        "openalex": "https://openalex.org/I1294671590",
+        "ror": "https://ror.org/02feahw73",
+        "mag": "1294671590",
+        "grid": "grid.4444.0",
+        "wikipedia": "https://en.wikipedia.org/wiki/French%20National%20Centre%20for%20Scientific%20Research",
+        "wikidata": "https://www.wikidata.org/wiki/Q280413",
+        "rid": "https://www.rid.org/wiki/1234",
+        "isni": "https://www.isni.org/wiki/1234"
+      },
+      "geo": {
+        "city": "Paris",
+        "geonames_city_id": "2988507",
+        "region": "Test Region",
+        "country_code": "FR",
+        "country": "France",
+        "latitude": 48.85341,
+        "longitude": 2.3488
+      }
+    }
+  ],
+  "group_by": []
+}
