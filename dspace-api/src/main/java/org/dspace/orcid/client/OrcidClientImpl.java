@@ -35,13 +35,15 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.dspace.app.client.DSpaceHttpClientFactory;
+import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.exception.OrcidClientException;
 import org.dspace.orcid.model.OrcidEntityType;
 import org.dspace.orcid.model.OrcidProfileSectionType;
@@ -179,6 +181,16 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     @Override
+    public void revokeToken(OrcidToken orcidToken) {
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("client_id", orcidConfiguration.getClientId()));
+        params.add(new BasicNameValuePair("client_secret", orcidConfiguration.getClientSecret()));
+        params.add(new BasicNameValuePair("token", orcidToken.getAccessToken()));
+
+        executeSuccessful(buildPostForRevokeToken(new UrlEncodedFormEntity(params, Charset.defaultCharset())));
+    }
+
+    @Override
     public OrcidTokenResponseDTO getReadPublicAccessToken() {
         return getClientCredentialsAccessToken("/read-public");
     }
@@ -220,6 +232,14 @@ public class OrcidClientImpl implements OrcidClient {
             .build();
     }
 
+    private HttpUriRequest buildPostForRevokeToken(HttpEntity entity) {
+        return post(orcidConfiguration.getRevokeUrl())
+            .addHeader("Accept", "application/json")
+            .addHeader("Content-Type", "application/x-www-form-urlencoded")
+            .setEntity(entity)
+            .build();
+    }
+
     private HttpUriRequest buildPutUriRequest(String accessToken, String relativePath, Object object) {
         return put(orcidConfiguration.getApiUrl() + relativePath.trim())
             .addHeader("Content-Type", "application/vnd.orcid+xml")
@@ -234,22 +254,34 @@ public class OrcidClientImpl implements OrcidClient {
             .build();
     }
 
-    private <T> T executeAndParseJson(HttpUriRequest httpUriRequest, Class<T> clazz) {
-
-        HttpClient client = HttpClientBuilder.create().build();
-
-        return executeAndReturns(() -> {
-
-            HttpResponse response = client.execute(httpUriRequest);
-
+    private void executeSuccessful(HttpUriRequest httpUriRequest) {
+        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
+            CloseableHttpResponse response = client.execute(httpUriRequest);
             if (isNotSuccessfull(response)) {
-                throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
+                throw new OrcidClientException(
+                    getStatusCode(response),
+                    "Operation " + httpUriRequest.getMethod() + " for the resource " + httpUriRequest.getURI() +
+                    " was not successful: " + new String(response.getEntity().getContent().readAllBytes(),
+                                                         StandardCharsets.UTF_8)
+                );
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-            return objectMapper.readValue(response.getEntity().getContent(), clazz);
-
-        });
-
+    private <T> T executeAndParseJson(HttpUriRequest httpUriRequest, Class<T> clazz) {
+        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
+            return executeAndReturns(() -> {
+                CloseableHttpResponse response = client.execute(httpUriRequest);
+                if (isNotSuccessfull(response)) {
+                    throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
+                }
+                return objectMapper.readValue(response.getEntity().getContent(), clazz);
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -264,44 +296,37 @@ public class OrcidClientImpl implements OrcidClient {
      * @throws OrcidClientException if the incoming response is not successful
      */
     private <T> T executeAndUnmarshall(HttpUriRequest httpUriRequest, boolean handleNotFoundAsNull, Class<T> clazz) {
-
-        HttpClient client = HttpClientBuilder.create().build();
-
-        return executeAndReturns(() -> {
-
-            HttpResponse response = client.execute(httpUriRequest);
-
-            if (handleNotFoundAsNull && isNotFound(response)) {
-                return null;
-            }
-
-            if (isNotSuccessfull(response)) {
-                throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
-            }
-
-            return unmarshall(response.getEntity(), clazz);
-
-        });
+        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
+            return executeAndReturns(() -> {
+                CloseableHttpResponse response = client.execute(httpUriRequest);
+                if (handleNotFoundAsNull && isNotFound(response)) {
+                    return null;
+                }
+                if (isNotSuccessfull(response)) {
+                    throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
+                }
+                return unmarshall(response.getEntity(), clazz);
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private OrcidResponse execute(HttpUriRequest httpUriRequest, boolean handleNotFoundAsNull) {
-        HttpClient client = HttpClientBuilder.create().build();
-
-        return executeAndReturns(() -> {
-
-            HttpResponse response = client.execute(httpUriRequest);
-
-            if (handleNotFoundAsNull && isNotFound(response)) {
-                return new OrcidResponse(getStatusCode(response), null, getContent(response));
-            }
-
-            if (isNotSuccessfull(response)) {
-                throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
-            }
-
-            return new OrcidResponse(getStatusCode(response), getPutCode(response), getContent(response));
-
-        });
+        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
+            return executeAndReturns(() -> {
+                CloseableHttpResponse response = client.execute(httpUriRequest);
+                if (handleNotFoundAsNull && isNotFound(response)) {
+                    return new OrcidResponse(getStatusCode(response), null, getContent(response));
+                }
+                if (isNotSuccessfull(response)) {
+                    throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
+                }
+                return new OrcidResponse(getStatusCode(response), getPutCode(response), getContent(response));
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private <T> T executeAndReturns(ThrowingSupplier<T, Exception> supplier) {

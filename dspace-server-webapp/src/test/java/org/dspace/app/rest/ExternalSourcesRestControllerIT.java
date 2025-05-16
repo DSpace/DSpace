@@ -52,9 +52,25 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource(
                                         "pubmed", "pubmed", false),
                                 ExternalSourceMatcher.matchExternalSource(
-                                        "openaireFunding", "openaireFunding", false)
+                                    "openaireFunding", "openaireFunding", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPublication", "openalexPublication", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPublicationByAuthorId", "openalexPublicationByAuthorId", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPublicationByDOI", "openalexPublicationByDOI", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPerson", "openalexPerson", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexInstitution", "openalexInstitution", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPublisher", "openalexPublisher", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexFunder", "openalexFunder", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexJournal", "openalexJournal", false)
                             )))
-                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(11)));
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(20)));
     }
 
     @Test

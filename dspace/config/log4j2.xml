@@ -44,26 +44,6 @@
             </DefaultRolloverStrategy>
             -->
         </Appender>
-
-        <!-- A2 is for the checksum checker -->
-        <Appender name='A2'
-                  filePattern="${log.dir}/checker.log-%d{yyyy-MM-dd}"
-                  type='RollingFile'
-                  fileName='${log.dir}/checker.log'>
-            <Layout type='PatternLayout'
-                    pattern='%m%n'/>
-            <policies>
-                <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
-            </policies>
-            <!-- Sample deletion policy:  keep last 30 archived files
-            <DefaultRolloverStrategy>
-                <Delete basePath='${log.dir}'>
-                    <IfFileName glob='checker.log-*'/>
-                    <IfAccumulatedFileCount exceeds='30'/>
-                </Delete>
-            </DefaultRolloverStrategy>
-            -->
-        </Appender>
     </Appenders>
 
     <Loggers>
@@ -73,13 +53,6 @@
                 level='${loglevel.dspace}'
                 additivity='false'>
             <AppenderRef ref='A1'/>
-        </Logger>
-
-        <!-- The checksum checker -->
-        <Logger name='org.dspace.checker'
-                level='INFO'
-                additivity='false'>
-            <AppenderRef ref='A2'/>
         </Logger>
 
         <!-- Block services logging except on exceptions -->

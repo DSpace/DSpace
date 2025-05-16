@@ -40,6 +40,11 @@ dspace.dir=/dspace
 # It corresponds to the URL that you would type into your browser to access the REST API.
 dspace.server.url = http://localhost:8080/server
 
+# Additional URL of DSpace backend which could be used by DSpace frontend during SSR execution.
+# May require a port number if not using standard ports (80 or 443)
+# DO NOT end it with '/'.
+dspace.server.ssr.url = ${dspace.server.url}
+
 # Public URL of DSpace frontend (Angular UI). May require a port number if not using standard ports (80 or 443)
 # DO NOT end it with '/'.
 # This is used by the backend to provide links in emails, RSS feeds, Sitemaps, etc.
@@ -197,6 +202,9 @@ db.password = dspace
 
 # X.509 certificate authentication. See authentication-x509.cfg for default configuration.
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.X509Authentication
+
+# SAML authentication/authorization. See authenication-saml.cfg for default configuration.
+#plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.SamlAuthentication
 
 # Authentication by Password (encrypted in DSpace's database). See authentication-password.cfg for default configuration.
 # Enabled by default in authentication.cfg

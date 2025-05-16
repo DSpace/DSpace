@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
        default-lazy-init="true">
@@ -271,4 +280,116 @@
             </list>
         </property>
     </bean>
+
+    <bean id="dataciteProjectLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="DataCiteProjectImportService"/>
+        <property name="sourceIdentifier" value="dataciteProject"/>
+        <property name="recordIdMetadata" value="dc.identifier"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Project</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="openalexPublicationLiveImportDataProvider"
+          class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openalexImportPublicationService"/>
+        <property name="sourceIdentifier" value="openalexPublication"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="openalexPublicationByAuthorIdLiveImportDataProvider"
+          class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openalexImportPublicationByAuthorIdService"/>
+        <property name="sourceIdentifier" value="openalexPublicationByAuthorId"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="openalexPublicationByDOILiveImportDataProvider"
+          class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openalexImportPublicationByDOIService"/>
+        <property name="sourceIdentifier" value="openalexPublicationByDOI"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="openalexPersonLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openalexImportPersonService"/>
+        <property name="sourceIdentifier" value="openalexPerson"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Person</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="openalexJournalLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openalexImportJournalService"/>
+        <property name="sourceIdentifier" value="openalexJournal"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Journal</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="openalexInstitutionLiveImportDataProvider"
+          class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openalexImportInstitutionService"/>
+        <property name="sourceIdentifier" value="openalexInstitution"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>OrgUnit</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="openalexPublisherLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openalexImportPublisherService"/>
+        <property name="sourceIdentifier" value="openalexPublisher"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>OrgUnit</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="openalexFunderLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openalexImportFunderService"/>
+        <property name="sourceIdentifier" value="openalexFunder"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>OrgUnit</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
 </beans>
