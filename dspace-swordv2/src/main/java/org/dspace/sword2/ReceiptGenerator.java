@@ -8,7 +8,7 @@
 package org.dspace.sword2;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +109,7 @@ public class ReceiptGenerator {
         receipt.addEditMediaIRI(
             urlManager.getContentUrl(result.getItem()), "application/zip");
         receipt.setMediaFeedIRI(urlManager.getMediaFeedUrl(result.getItem()));
-        receipt.setLastModified(result.getItem().getLastModified());
+        receipt.setLastModified(java.util.Date.from(result.getItem().getLastModified()));
 
         if (mediaResourceLocation) {
             receipt.setLocation(urlManager.getContentUrl(result.getItem()));
@@ -201,7 +201,7 @@ public class ReceiptGenerator {
         receipt.addEditMediaIRI(
             urlManager.getContentUrl(item), "application/zip");
         receipt.setMediaFeedIRI(urlManager.getMediaFeedUrl(item));
-        receipt.setLastModified(item.getLastModified());
+        receipt.setLastModified(java.util.Date.from(item.getLastModified()));
 
         // add the category information to the sword entry
         this.addCategories(item, receipt);
@@ -283,8 +283,8 @@ public class ReceiptGenerator {
         List<MetadataValue> dcv = itemService.getMetadataByMetadataString(
             result.getItem(), "dc.date.issued");
         if (dcv != null && !dcv.isEmpty()) {
-            Date published = MultiFormatDateParser.parse(dcv.get(0).getValue());
-            receipt.getWrappedEntry().setPublished(published);
+            ZonedDateTime published = MultiFormatDateParser.parse(dcv.get(0).getValue());
+            receipt.getWrappedEntry().setPublished(java.util.Date.from(published.toInstant()));
         }
     }
 
@@ -298,8 +298,8 @@ public class ReceiptGenerator {
         List<MetadataValue> dcv = itemService.getMetadataByMetadataString(
             item, "dc.date.issued");
         if (dcv != null && dcv.size() == 1) {
-            Date published = MultiFormatDateParser.parse(dcv.get(0).getValue());
-            receipt.getWrappedEntry().setPublished(published);
+            ZonedDateTime published = MultiFormatDateParser.parse(dcv.get(0).getValue());
+            receipt.getWrappedEntry().setPublished(java.util.Date.from(published.toInstant()));
         }
     }
 
@@ -316,8 +316,8 @@ public class ReceiptGenerator {
         List<MetadataValue> dcv = itemService.getMetadataByMetadataString(
             result.getItem(), config);
         if (dcv != null && dcv.size() == 1) {
-            Date updated = MultiFormatDateParser.parse(dcv.get(0).getValue());
-            receipt.getWrappedEntry().setUpdated(updated);
+            ZonedDateTime updated = MultiFormatDateParser.parse(dcv.get(0).getValue());
+            receipt.getWrappedEntry().setUpdated(java.util.Date.from(updated.toInstant()));
         }
     }
 
@@ -333,8 +333,8 @@ public class ReceiptGenerator {
         List<MetadataValue> dcv = itemService.getMetadataByMetadataString(
             item, config);
         if (dcv != null && dcv.size() == 1) {
-            Date updated = MultiFormatDateParser.parse(dcv.get(0).getValue());
-            receipt.getWrappedEntry().setUpdated(updated);
+            ZonedDateTime updated = MultiFormatDateParser.parse(dcv.get(0).getValue());
+            receipt.getWrappedEntry().setUpdated(java.util.Date.from(updated.toInstant()));
         }
     }
 }

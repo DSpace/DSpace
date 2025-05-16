@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
-import jakarta.el.MethodNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.client.ClientProtocolException;
@@ -153,7 +152,7 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for PubMed Europe");
+        throw new UnsupportedOperationException("This method is not implemented for PubMed Europe");
     }
 
     @Override

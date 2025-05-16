@@ -30,6 +30,7 @@
     	<property name="tokenEndpointUrl" value="${orcid.token-url}" />
     	<property name="authorizeEndpointUrl" value="${orcid.authorize-url}" />
     	<property name="scopes" value="${orcid.scope}" />
+		<property name="revokeUrl" value="${orcid.revoke-url}" />
     </bean>
     
     <bean class="org.dspace.orcid.client.OrcidClientImpl" />

@@ -51,6 +51,9 @@ public class HdlResolverRestController {
     @Autowired
     private HdlResolverService hdlResolverService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @GetMapping(
         value = "**",
         produces = "application/json;charset=UTF-8"
@@ -187,7 +190,7 @@ public class HdlResolverRestController {
         String json = "null";
         if (jsonList != null && !jsonList.isEmpty()) {
             try {
-                json = new ObjectMapper().writeValueAsString(jsonList);
+                json = mapper.writeValueAsString(jsonList);
             } catch (JsonProcessingException e) {
                 log.error("Error during conversion of response!", e);
             }

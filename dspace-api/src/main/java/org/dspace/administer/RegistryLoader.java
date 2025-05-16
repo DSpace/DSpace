@@ -21,6 +21,13 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
@@ -41,7 +48,7 @@ import org.xml.sax.SAXException;
  * <P>
  * <code>RegistryLoader -bitstream bitstream-formats.xml</code>
  * <P>
- * <code>RegistryLoader -dc dc-types.xml</code>
+ * <code>RegistryLoader -metadata dc-types.xml</code>
  *
  * @author Robert Tansley
  * @version $Revision$
@@ -50,7 +57,7 @@ public class RegistryLoader {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(RegistryLoader.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RegistryLoader.class);
 
     protected static BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
                                                                                           .getBitstreamFormatService();
@@ -67,48 +74,97 @@ public class RegistryLoader {
      * @throws Exception if error
      */
     public static void main(String[] argv) throws Exception {
-        String usage = "Usage: " + RegistryLoader.class.getName()
-            + " (-bitstream | -metadata) registry-file.xml";
-
-        Context context = null;
+        // Set up command-line options and parse arguments
+        CommandLineParser parser = new DefaultParser();
+        Options options = createCommandLineOptions();
 
         try {
-            context = new Context();
+            CommandLine line = parser.parse(options, argv);
+
+            // Check if help option was entered or no options provided
+            if (line.hasOption('h') || line.getOptions().length == 0) {
+                printHelp(options);
+                System.exit(0);
+            }
+
+            Context context = new Context();
 
             // Can't update registries anonymously, so we need to turn off
             // authorisation
             context.turnOffAuthorisationSystem();
 
-            // Work out what we're loading
-            if (argv[0].equalsIgnoreCase("-bitstream")) {
-                RegistryLoader.loadBitstreamFormats(context, argv[1]);
-            } else if (argv[0].equalsIgnoreCase("-metadata")) {
-                // Call MetadataImporter, as it handles Metadata schema updates
-                MetadataImporter.loadRegistry(argv[1], true);
-            } else {
-                System.err.println(usage);
+            try {
+                // Work out what we're loading
+                if (line.hasOption('b')) {
+                    String filename = line.getOptionValue('b');
+                    if (StringUtils.isEmpty(filename)) {
+                        System.err.println("No file path provided for bitstream format registry");
+                        printHelp(options);
+                        System.exit(1);
+                    }
+                    RegistryLoader.loadBitstreamFormats(context, filename);
+                } else if (line.hasOption('m')) {
+                    String filename = line.getOptionValue('m');
+                    if (StringUtils.isEmpty(filename)) {
+                        System.err.println("No file path provided for metadata registry");
+                        printHelp(options);
+                        System.exit(1);
+                    }
+                    // Call MetadataImporter, as it handles Metadata schema updates
+                    MetadataImporter.loadRegistry(filename, true);
+                } else {
+                    System.err.println("No registry type specified");
+                    printHelp(options);
+                    System.exit(1);
+                }
+
+                // Commit changes and close Context
+                context.complete();
+                System.exit(0);
+            } catch (Exception e) {
+                log.fatal(LogHelper.getHeader(context, "error_loading_registries", ""), e);
+                System.err.println("Error: \n - " + e.getMessage());
+                System.exit(1);
+            } finally {
+                // Clean up our context, if it still exists & it was never completed
+                if (context != null && context.isValid()) {
+                    context.abort();
+                }
             }
-
-            // Commit changes and close Context
-            context.complete();
-
-            System.exit(0);
-        } catch (ArrayIndexOutOfBoundsException ae) {
-            System.err.println(usage);
-
+        } catch (ParseException e) {
+            System.err.println("Error parsing command-line arguments: " + e.getMessage());
+            printHelp(options);
             System.exit(1);
-        } catch (Exception e) {
-            log.fatal(LogHelper.getHeader(context, "error_loading_registries",
-                                           ""), e);
-
-            System.err.println("Error: \n - " + e.getMessage());
-            System.exit(1);
-        } finally {
-            // Clean up our context, if it still exists & it was never completed
-            if (context != null && context.isValid()) {
-                context.abort();
-            }
         }
+    }
+
+    /**
+     * Create the command-line options
+     * @return the command-line options
+     */
+    private static Options createCommandLineOptions() {
+        Options options = new Options();
+
+        options.addOption("b", "bitstream", true, "load bitstream format registry from specified file");
+        options.addOption("m", "metadata", true, "load metadata registry from specified file");
+        options.addOption("h", "help", false, "print this help message");
+
+        return options;
+    }
+
+    /**
+     * Print the help message
+     * @param options the command-line options
+     */
+    private static void printHelp(Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("RegistryLoader",
+                            "Load bitstream format or metadata registries into the database\n",
+                            options,
+                            "\nExamples:\n" +
+                            " RegistryLoader -b bitstream-formats.xml\n" +
+                            " RegistryLoader -m dc-types.xml",
+                            true);
     }
 
     /**
@@ -221,7 +277,7 @@ public class RegistryLoader {
      * contains:
      * <P>
      * <code>
-     * &lt;foo&gt;&lt;mimetype&gt;application/pdf&lt;/mimetype&gt;&lt;/foo&gt;
+     * <foo><mimetype>application/pdf</mimetype></foo>
      * </code>
      * passing this the <code>foo</code> node and <code>mimetype</code> will
      * return <code>application/pdf</code>.
@@ -262,10 +318,10 @@ public class RegistryLoader {
      * document contains:
      * <P>
      * <code>
-     * &lt;foo&gt;
-     * &lt;bar&gt;val1&lt;/bar&gt;
-     * &lt;bar&gt;val2&lt;/bar&gt;
-     * &lt;/foo&gt;
+     * <foo>
+     * <bar>val1</bar>
+     * <bar>val2</bar>
+     * </foo>
      * </code>
      * passing this the <code>foo</code> node and <code>bar</code> will
      * return <code>val1</code> and <code>val2</code>.

@@ -51,9 +51,19 @@
     <bean id="DataCiteImportService"
           class="org.dspace.importer.external.datacite.DataCiteImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="DataCiteMetadataFieldMapping"/>
+        <property name="entityFilterQuery" value="${datacite.publicationimport.entityfilterquery}" />
     </bean>
     <bean id="DataCiteMetadataFieldMapping"
           class="org.dspace.importer.external.datacite.DataCiteFieldMapping">
+    </bean>
+
+    <bean id="DataCiteProjectImportService"
+          class="org.dspace.importer.external.datacite.DataCiteProjectImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="DataCiteProjectMetadataFieldMapping"/>
+        <property name="entityFilterQuery" value="${datacite.projectimport.entityfilterquery}" />
+    </bean>
+    <bean id="DataCiteProjectMetadataFieldMapping"
+          class="org.dspace.importer.external.datacite.DataCiteProjectFieldMapping">
     </bean>
 
     <bean id="ArXivImportService"
@@ -150,7 +160,7 @@
     <bean id="openairePublicationMetadataFieldMapping"
           class="org.dspace.importer.external.openaire.metadatamapping.OpenAIREPublicationFieldMapping">
     </bean>
-    
+
     <bean id="CrossRefImportService" class="org.dspace.importer.external.crossref.CrossRefImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="CrossRefMetadataFieldMapping"/>
         <property name="url" value="${crossref.url}"/>
@@ -178,7 +188,7 @@
         <property name="viewMode" value="${scopus.search-api.viewMode}"/>
     </bean>
     <bean id="scopusMetadataFieldMapping" class="org.dspace.importer.external.scopus.service.ScopusFieldMapping"/>
-    
+
     <bean id="rorImportService" class="org.dspace.importer.external.ror.service.RorImportMetadataSourceServiceImpl">
           <property name="metadataFieldMapping" ref="rorMetadataFieldMapping"/>
           <property name="url" value="${ror.orgunit-import.api-url}"/>
@@ -232,6 +242,79 @@
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
     <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.other"/>
+    </bean>
+
+    <bean id="openalexImportPublicationService"
+          class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="openalexPublicationMetadataFieldMapping"/>
+        <property name="url" value="${openalex.url.works}"/>
+    </bean>
+
+    <bean id="openalexImportPublicationByAuthorIdService"
+          class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="openalexPublicationMetadataFieldMapping"/>
+        <property name="url" value="${openalex.url.works}?filter=authorships.author.id:"/>
+    </bean>
+
+    <bean id="openalexImportPublicationByDOIService"
+          class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="openalexPublicationMetadataFieldMapping"/>
+        <property name="url" value="${openalex.url.works}?filter=doi:"/>
+    </bean>
+
+    <bean id="openalexImportPersonService"
+          class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="openalexPersonMetadataFieldMapping"/>
+        <property name="url" value="${openalex.url.authors}"/>
+    </bean>
+
+    <bean id="openalexImportJournalService"
+          class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="openalexJournalMetadataFieldMapping"/>
+        <property name="url" value="${openalex.url.sources}"/>
+    </bean>
+
+    <bean id="openalexImportInstitutionService"
+          class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="openalexInstitutionMetadataFieldMapping"/>
+        <property name="url" value="${openalex.url.institutions}"/>
+    </bean>
+
+    <bean id="openalexImportPublisherService"
+          class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="openalexPublisherMetadataFieldMapping"/>
+        <property name="url" value="${openalex.url.publishers}"/>
+    </bean>
+
+    <bean id="openalexImportFunderService"
+          class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="openalexFunderMetadataFieldMapping"/>
+        <property name="url" value="${openalex.url.funders}"/>
+    </bean>
+
+
+    <bean id="openalexPublicationMetadataFieldMapping"
+          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexPublicationFieldMapping">
+    </bean>
+
+    <bean id="openalexPersonMetadataFieldMapping"
+          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexPersonFieldMapping">
+    </bean>
+
+    <bean id="openalexJournalMetadataFieldMapping"
+          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexJournalFieldMapping">
+    </bean>
+
+    <bean id="openalexInstitutionMetadataFieldMapping"
+          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexInstitutionFieldMapping">
+    </bean>
+
+    <bean id="openalexPublisherMetadataFieldMapping"
+          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexPublisherFieldMapping">
+    </bean>
+
+    <bean id="openalexFunderMetadataFieldMapping"
+          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexFunderFieldMapping">
     </bean>
 
 </beans>
