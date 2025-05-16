@@ -462,6 +462,15 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
     }
 
     @Test
+    public void testExactSearchWithApostrophe() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(
+                                 get("/api/submission/vocabularies/srsc/entries?filter=Children's language&exact=true"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("_embedded.entries[0].display").value("Children's language"));
+    }
+
+    @Test
     public void testSearchWithQuote() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/submission/vocabularies/srsc/entries?filter=test\"test&exact=false"))

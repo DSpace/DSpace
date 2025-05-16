@@ -63,7 +63,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     protected static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
         "'abcdefghijklmnopqrstuvwxyz'),%s)]";
     protected static String idTemplate = "//node[@id = '%s']";
-    protected static String labelTemplate = "//node[@label = '%s']";
+    protected static String labelTemplate = "//node[@label = %s]";
     protected static String idParentTemplate = "//node[@id = '%s']/parent::isComposedBy/parent::node";
     protected static String rootTemplate = "/node";
     protected static String idAttribute = "id";
@@ -206,7 +206,8 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         String xpathExpression = "";
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
         for (int i = 0; i < textHierarchy.length; i++) {
-            xpathExpression += String.format(valueTemplate, textHierarchy[i]);
+            String formattedText = escapeQuotes(textHierarchy[i].toLowerCase());
+            xpathExpression += String.format(valueTemplate, formattedText);
         }
         XPath xpath = XPathFactory.newInstance().newXPath();
         List<Choice> choices = new ArrayList<Choice>();
