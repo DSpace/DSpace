@@ -107,4 +107,12 @@
         <scope_note>Stores the timestamp related to the last import from OpenAIRE Graph</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dspace</schema>
+        <element>accessibility</element>
+        <qualifier>settings</qualifier>
+        <scope_note>Metadata field storing the user-configured accessibility settings values for the EPerson.</scope_note>
+    </dc-type>
+
+
 </dspace-dc-types>
