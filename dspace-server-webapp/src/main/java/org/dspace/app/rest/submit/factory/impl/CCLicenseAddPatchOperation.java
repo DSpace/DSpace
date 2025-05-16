@@ -6,13 +6,18 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.submit.factory.impl;
-
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.atlas.json.JsonValue;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.model.patch.JsonValueEvaluator;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.license.CreativeCommonsServiceImpl;
 import org.dspace.license.service.CreativeCommonsService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,6 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class CCLicenseAddPatchOperation extends AddPatchOperation<String> {
 
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CreativeCommonsServiceImpl.class);
+
     @Autowired
     CreativeCommonsService creativeCommonsService;
 
@@ -45,20 +52,23 @@ public class CCLicenseAddPatchOperation extends AddPatchOperation<String> {
     }
 
     @Override
-    void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object value)
+    void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object licensemap)
             throws Exception {
-        String licenseUri = null;
-        if (value instanceof String) {
-            licenseUri = (String) value;
+        String licenseRights = "";
+        String licenseUri = "";
+        if (licensemap instanceof String){
+            licenseUri = (String) licensemap;
         }
-
-        if (StringUtils.isBlank(licenseUri)) {
-            throw new IllegalArgumentException(
-                    "Value is not a valid license URI");
+        else if (licensemap instanceof JsonValueEvaluator) {
+            JsonNode cclicense = ((JsonValueEvaluator) licensemap).getValueNode();
+            licenseUri = cclicense.get("uri").asText();
+            licenseRights = cclicense.get("rights").asText();
         }
-
+        if (StringUtils.isBlank(licenseUri) && StringUtils.isBlank(licenseRights)) {
+            throw new IllegalArgumentException("Values for dc.rights and dc.rights.uri cannot both be empty.");
+        }
         Item item = source.getItem();
-        boolean updateLicense = creativeCommonsService.updateLicense(context, licenseUri, item);
+        boolean updateLicense = creativeCommonsService.updateLicense(context, licenseUri, licenseRights, item);
         if (!updateLicense) {
             throw new IllegalArgumentException("The license uri: " + licenseUri + ", could not be resolved to a " +
                                                        "CC license");

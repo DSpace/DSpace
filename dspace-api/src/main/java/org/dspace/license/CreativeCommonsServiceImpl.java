@@ -120,7 +120,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         try {
             templates = TransformerFactory.newInstance().newTemplates(
                     new StreamSource(CreativeCommonsServiceImpl.class
-                                             .getResourceAsStream("CreativeCommons.xsl")));
+                            .getResourceAsStream("CreativeCommons.xsl")));
         } catch (TransformerConfigurationException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -182,8 +182,8 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     /**
      * Removes the license file from the item
      *
-     * @param context   - The relevant DSpace Context
-     * @param item      - The item from which the license file needs to be removed
+     * @param context - The relevant DSpace Context
+     * @param item    - The item from which the license file needs to be removed
      * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException
@@ -226,7 +226,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     /**
      * Returns the stored license uri of the item
      *
-     * @param item  - The item for which to retrieve the stored license uri
+     * @param item - The item for which to retrieve the stored license uri
      * @return the stored license uri of the item
      */
     @Override
@@ -244,14 +244,32 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     /**
      * Returns the stored license name of the item
      *
-     * @param item  - The item for which to retrieve the stored license name
+     * @param item - The item for which to retrieve the stored license name
      * @return the stored license name of the item
      */
     @Override
-    public String getLicenseName( Item item) {
+    public String getLicenseName(Item item) {
         String licenseNameField = getCCField("name");
         if (StringUtils.isNotBlank(licenseNameField)) {
             String metadata = itemService.getMetadata(item, licenseNameField);
+            if (StringUtils.isNotBlank(metadata)) {
+                return metadata;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the stored license rights of the item
+     *
+     * @param item - The item for which to retrieve the stored license rights
+     * @return the stored license rights of the item
+     */
+    @Override
+    public String getLicenseRights(Item item) {
+        String licenseRightsField = getCCField("name");
+        if (StringUtils.isNotBlank(licenseRightsField)) {
+            String metadata = itemService.getMetadata(item, licenseRightsField);
             if (StringUtils.isNotBlank(metadata)) {
                 return metadata;
             }
@@ -278,7 +296,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     /**
      * This helper method takes some bytes and stores them as a bitstream for an
      * item, under the CC bundle, with the given bitstream name
-     *
+     * <p>
      * Note: This helper method assumes that the CC
      * bitstreams are short and easily expressed as byte arrays in RAM
      *
@@ -310,7 +328,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     /**
      * This helper method wraps a String around a byte array returned from the
      * bitstream method further down
-     *
+     * <p>
      * Note: This helper method assumes that the CC
      * bitstreams are short and easily expressed as byte arrays in RAM
      *
@@ -396,8 +414,8 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     /**
      * Remove license information, delete also the bitstream
      *
-     * @param context   - DSpace Context
-     * @param item      - the item
+     * @param context - DSpace Context
+     * @param item    - the item
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
@@ -409,18 +427,17 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
         String uriField = getCCField("uri");
         String nameField = getCCField("name");
+        String rightsField = getCCField("rights");
 
-        String licenseUri = itemService.getMetadata(item, uriField);
-
-        // only remove any previous licenses
-        if (licenseUri != null) {
-            removeLicenseField(context, item, uriField);
-            if (configurationService.getBooleanProperty("cc.submit.setname")) {
-                removeLicenseField(context, item, nameField);
-            }
-            if (configurationService.getBooleanProperty("cc.submit.addbitstream")) {
-                removeLicenseFile(context, item);
-            }
+        removeLicenseField(context, item, uriField);
+        if (configurationService.getBooleanProperty("cc.submit.setname")) {
+            removeLicenseField(context, item, nameField);
+        }
+        if (configurationService.getBooleanProperty("cc.submit.setrights")) {
+            removeLicenseField(context, item, rightsField);
+        }
+        if (configurationService.getBooleanProperty("cc.submit.addbitstream")) {
+            removeLicenseFile(context, item);
         }
     }
 
@@ -431,7 +448,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     }
 
     private void addLicenseField(Context context, Item item, String field, String language, String value)
-        throws SQLException {
+            throws SQLException {
         String[] params = splitField(field);
         itemService.addMetadata(context, item, params[0], params[1], params[2], language, value);
 
@@ -526,8 +543,40 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      */
     @Override
     public String retrieveLicenseUri(String licenseId, String language, Map<String, String> answerMap) {
-        return ccLicenseConnectorService.retrieveRightsByQuestion(licenseId, language, answerMap);
-
+        if (licenseId.equals("publicdomain") || licenseId.equals("zero")) {
+            return "http://creativecommons.org/publicdomain/zero/1.0/";
+        } else if (licenseId.equals("none")) {
+            return "All Rights Reserved";
+        } else if (licenseId.equals("standard")) {
+            String sa = "", nc = "", nd = "";
+            if (answerMap.get("commercial").equals("n")) {
+                nc = "-nc";
+            }
+            if (answerMap.get("derivatives").equals("n")) {
+                nd = "-nd";
+            } else if (answerMap.get("sharealike").equals("y")) {
+                sa = "-sa";
+            }
+            return "http://creativecommons.org/licenses/by" + nc + nd + sa + "/4.0/";
+        } else if (licenseId.equals("known")) {
+            String answer = answerMap.get("knownlicense");
+            if (answer.equals("by")) {
+                return "http://creativecommons.org/licenses/by/4.0/";
+            } else if (answer.equals("by-sa")) {
+                return "http://creativecommons.org/licenses/by-sa/4.0/";
+            } else if (answer.equals("by-nd")) {
+                return "http://creativecommons.org/licenses/by-nd/4.0/";
+            } else if (answer.equals("by-nc")) {
+                return "http://creativecommons.org/licenses/by-nc/4.0/";
+            } else if (answer.equals("by-nc-sa")) {
+                return "http://creativecommons.org/licenses/by-nc-sa/4.0/";
+            } else if (answer.equals("by-nc-nd")) {
+                return "http://creativecommons.org/licenses/by-nc-nd/4.0/";
+            }
+        } else {
+            log.error("Error while retrieving the license uri for license : " + licenseId + " with answers " + answerMap.toString());
+        }
+        return null;
     }
 
     /**
@@ -643,9 +692,9 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     /**
      * Update the license of the item with a new one based on the provided license URI
      *
-     * @param context       - The relevant DSpace context
-     * @param licenseUri    - The license URI to be used in the update
-     * @param item          - The item for which to update the license
+     * @param context    - The relevant DSpace context
+     * @param licenseUri - The license URI to be used in the update
+     * @param item       - The item for which to update the license
      * @return true when the update was successful, false when not
      * @throws AuthorizeException
      * @throws SQLException
@@ -653,21 +702,29 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     @Override
     public boolean updateLicense(final Context context, final String licenseUri, final Item item)
             throws AuthorizeException, SQLException {
+        return updateLicense(context, licenseUri, "", item);
+    }
+
+    @Override
+    public boolean updateLicense(final Context context, final String licenseUri, final String licenseRights, final Item item)
+            throws AuthorizeException, SQLException {
         try {
-            Document doc = ccLicenseConnectorService.retrieveLicenseRDFDoc(licenseUri);
-            if (doc == null) {
-                return false;
-            }
-            String licenseName = ccLicenseConnectorService.retrieveLicenseName(doc);
-            if (StringUtils.isBlank(licenseName)) {
-                return false;
-            }
-
+            //if (licenseUri.equals("All Rights Reserved")) {
+            String licenseName = "";
+            String rights = licenseRights;
             removeLicense(context, item);
-            addLicense(context, item, licenseUri, licenseName, doc);
-
+            if (StringUtils.isBlank(licenseUri) && StringUtils.isBlank(rights)) { return false; }
+            Document doc = null;
+            if (licenseUri.contains("http://creativecommons.org")) {
+                doc = ccLicenseConnectorService.retrieveLicenseRDFDoc(licenseUri);
+                if (doc != null) {
+                    licenseName = ccLicenseConnectorService.retrieveLicenseName(doc);
+                    rights = ccLicenseConnectorService.retrieveLicenseRights(doc);
+                    if (StringUtils.isBlank(licenseName)) { return false; }
+                }
+            }
+            addLicense(context, item, licenseUri, licenseName, rights, doc);
             return true;
-
         } catch (IOException e) {
             log.error("Error while updating the license of item: " + item.getID(), e);
         }
@@ -681,23 +738,28 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      * @param item          - The item to which the license will be added
      * @param licenseUri    - The license URI to add
      * @param licenseName   - The license name to add
+     * @param licenseRights - The license rights to add
      * @param doc           - The license to document to add
      * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException
      */
     @Override
-    public void addLicense(Context context, Item item, String licenseUri, String licenseName, Document doc)
+    public void addLicense(Context context, Item item, String licenseUri, String licenseName, String licenseRights, Document doc)
             throws SQLException, IOException, AuthorizeException {
         String uriField = getCCField("uri");
         String nameField = getCCField("name");
+        String rightsField = getCCField("rights");
 
         addLicenseField(context, item, uriField, null, licenseUri);
-        if (configurationService.getBooleanProperty("cc.submit.addbitstream")) {
+        if (configurationService.getBooleanProperty("cc.submit.addbitstream") && doc != null) {
             setLicenseRDF(context, item, fetchLicenseRDF(doc));
         }
         if (configurationService.getBooleanProperty("cc.submit.setname")) {
-            addLicenseField(context, item, nameField, "en", licenseName);
+            addLicenseField(context, item, nameField, null, licenseName);
+        }
+        if (configurationService.getBooleanProperty("cc.submit.setrights")) {
+            addLicenseField(context, item, rightsField, null, licenseRights);
         }
     }
 
