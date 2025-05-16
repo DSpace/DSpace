@@ -63,7 +63,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     protected static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
         "'abcdefghijklmnopqrstuvwxyz'),%s)]";
     protected static String idTemplate = "//node[@id = '%s']";
-    protected static String labelTemplate = "//node[@label = %s]";
+    protected static String labelTemplate = "//node[@label = '%s']";
     protected static String idParentTemplate = "//node[@id = '%s']/parent::isComposedBy/parent::node";
     protected static String rootTemplate = "/node";
     protected static String idAttribute = "id";
@@ -181,7 +181,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         String xpathExpression = "";
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
         for (int i = 0; i < textHierarchy.length; i++) {
-            String formattedText = escapeQuotes(textHierarchy[i].toLowerCase());
+            String formattedText = escapeQuotes(textHierarchy[i].toLowerCase(), xpathTemplate);
             xpathExpression += String.format(xpathTemplate, formattedText);
         }
         XPath xpath = XPathFactory.newInstance().newXPath();
@@ -206,8 +206,16 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         String xpathExpression = "";
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
         for (int i = 0; i < textHierarchy.length; i++) {
-            String formattedText = escapeQuotes(textHierarchy[i].toLowerCase());
-            xpathExpression += String.format(valueTemplate, formattedText);
+            // If the text contains an apostrophe (') and the XPath template uses single quotes around %s:
+            // Strip the single quotes from the template, let escapeQuotes handle that
+            if (textHierarchy[i].contains("'") && valueTemplate.contains("'%s'")) {
+                String template = valueTemplate.replace("'%s'", "%s");
+                String formattedText = escapeQuotes(textHierarchy[i], template);
+                xpathExpression += String.format(template, formattedText);
+            } else {
+                String formattedText = escapeQuotes(textHierarchy[i], valueTemplate);
+                xpathExpression += String.format(valueTemplate, formattedText);
+            }
         }
         XPath xpath = XPathFactory.newInstance().newXPath();
         List<Choice> choices = new ArrayList<Choice>();
@@ -237,18 +245,23 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
      * @param text
      * @return
      */
-    private String escapeQuotes(String text) {
-        // If we don't have any quote then enquote string in single quote
-        if (!text.contains("'")) {
-            return String.format("'%s'", text);
+    private String escapeQuotes(String text, String template) {
+        // Check if the template wraps the placeholder in single quotes
+        boolean isTemplateSingleQuoted = template.contains("'%s'");
+
+        // Case 1: No quotes in the text
+        if (!text.contains("'") && !text.contains("\"")) {
+            // If template already wraps with single quotes, return raw (unquoted) text
+            // Otherwise, wrap it manually in single quotes
+            return isTemplateSingleQuoted ? text : String.format("'%s'", text);
         }
 
-        // If we have some quote but no apostrophe then enquote in double quote
+        // Case 2: The text has apostrophes but no double quotes → safe to wrap in double quotes
         if (!text.contains("\"")) {
             return String.format("\"%s\"", text);
         }
 
-        // If input contains both " and ' in the string so must use concat
+        // Case 3: If input contains both " and ' in the string so must use concat to avoid quote conflicts
         // We will build the XPath like below and let the XPath evaluation handle the concatenation
         // Example: concat('Administr"', '"ati'on')
         StringBuilder sb = new StringBuilder("concat(");
