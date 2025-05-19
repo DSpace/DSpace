@@ -15,7 +15,7 @@
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
-        <xoai.version>3.4.0</xoai.version>
+        <xoai.version>3.4.1</xoai.version>
         <jtwig.version>5.87.0.RELEASE</jtwig.version>
     </properties>
 
