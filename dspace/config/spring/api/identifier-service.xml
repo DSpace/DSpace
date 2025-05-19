@@ -19,11 +19,11 @@
     </bean>
     -->
 
-      <!-- If you enabled versioning, you should use one of the versioned
-           handle identifier provider instead of the default one.
-           The VersionedHandleIdentifierProvider creates a new versioned
-           handle for every new version.
-           -->
+    <!-- If you enabled versioning, you should use one of the versioned
+         handle identifier provider instead of the default one.
+         The VersionedHandleIdentifierProvider creates a new versioned
+         handle for every new version.
+         -->
     <bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider" scope="singleton">
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
     </bean>
