@@ -148,7 +148,7 @@ public class BitstreamLinkingServiceImpl implements BitstreamLinkingService {
             log.warn("Related bitstream for: " + qualifier + " should only contain one bitstream, database " +
                     "errors may be present if this is the case");
         }
-        return bitstreams.size() > 0 ? bitstreams.get(0) : null;
+        return !bitstreams.isEmpty() ? bitstreams.get(0) : null;
     }
 
     /**

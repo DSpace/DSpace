@@ -163,7 +163,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
-    public Bitstream replace(Context context, Bitstream oldBitstream, Bitstream newBitstream)
+    public Bitstream replace(Context context, Bitstream oldBitstream, Bitstream newBitstream, boolean replaceName)
         throws SQLException, AuthorizeException, IOException {
 
         Bundle firstBundle = oldBitstream.getBundles().get(0);
@@ -174,10 +174,17 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         bundleService.addBitstream(context, firstBundle, newBitstream);
         String newBitstreamName = newBitstream.getName();
         bitstreamLinkingService.replaceMetadata(context, oldBitstream, newBitstream);
-        // If extensions differ, keep the new bitstream name
-        if (!Objects.equals(FileNameUtils.getExtension(newBitstreamName),
-            FileNameUtils.getExtension(oldBitstream.getName()))) {
+        if (replaceName) {
+            // Undo title change of copy function
             newBitstream.setName(context, newBitstreamName);
+        } else {
+            if (!Objects.equals(FileNameUtils.getExtension(newBitstreamName),
+                FileNameUtils.getExtension(oldBitstream.getName()))) {
+                newBitstream.setName(context, String.join(".",
+                    FileNameUtils.getBaseName(oldBitstream.getName()), FileNameUtils.getExtension(newBitstreamName)));
+            } else {
+                newBitstream.setName(context, oldBitstream.getName());
+            }
         }
         // Move bitstream policies
         List<ResourcePolicy> oldResourcePolicies = oldBitstream.getResourcePolicies();

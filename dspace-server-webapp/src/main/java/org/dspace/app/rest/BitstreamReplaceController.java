@@ -73,7 +73,8 @@ public class BitstreamReplaceController {
     public ResponseEntity<RepresentationModel<?>> replaceBitstream(
                 HttpServletRequest request,
                 @PathVariable UUID uuid,
-                @RequestParam(value = "file") MultipartFile uploadFile)
+                @RequestParam(value = "file") MultipartFile uploadFile,
+                @RequestParam(value = "replaceName", defaultValue = "true") boolean replaceName)
             throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -87,7 +88,8 @@ public class BitstreamReplaceController {
                 String.format("Can't replace bitstream (id:%s) that isn't in a bundle", bitstream.getID()));
         }
         Bitstream newBitstream = bitstreamService.create(context, firstBundle, uploadFile.getInputStream());
-        newBitstream = bitstreamService.replace(context, bitstream, newBitstream);
+        newBitstream.setName(context, uploadFile.getOriginalFilename());
+        newBitstream = bitstreamService.replace(context, bitstream, newBitstream, replaceName);
         context.commit();
 
         BitstreamRest bitstreamRest = converter.toRest(context.reloadEntity(newBitstream), utils.obtainProjection());
