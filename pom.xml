@@ -224,7 +224,7 @@
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
                         <argLine>${test.argLine} ${surefireJacoco}</argLine>
-                        <argLine>@{argLine} -javaagent:${com.ginsberg:junit5-system-exit:jar}</argLine>
+                        <argLine>${test.argLine} -javaagent:${com.ginsberg:junit5-system-exit:jar}</argLine>
                         <!-- tests whose name starts by Abstract will be ignored -->
                         <excludes>
                             <exclude>**/Abstract*</exclude>
