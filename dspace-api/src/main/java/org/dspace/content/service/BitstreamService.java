@@ -94,7 +94,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * @param oldBitstream the bitstream object we want to replace
      * @param newBitstream the new bitstream that will replace the old one
      */
-    public Bitstream replace(Context context, Bitstream oldBitstream, Bitstream newBitstream, boolean replaceFile)
+    public Bitstream replace(Context context, Bitstream oldBitstream, Bitstream newBitstream, boolean replaceName)
         throws SQLException, AuthorizeException, IOException;
 
     /**

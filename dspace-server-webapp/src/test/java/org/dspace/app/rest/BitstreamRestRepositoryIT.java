@@ -3119,7 +3119,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .andExpect(jsonPath("$.metadata",
                 matchMetadata("dc.description", bitstream2.getDescription())))
             .andExpect(jsonPath("$.metadata",
-                matchMetadata("dc.title", bitstream2.getName())))
+                matchMetadata("dc.title", newFile.getOriginalFilename())))
             .andExpect(jsonPath("$.metadata.['dc.title']", hasSize(1))); // The title should be replaced
 
         getClient(token)
@@ -3285,12 +3285,12 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         Bitstream bitstream2;
         try (InputStream is = IOUtils.toInputStream("TestContent1", CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
-                .withName("OldBitstream1")
+                .withName("OldBitstream1.txt")
                 .build();
         }
         try (InputStream is = IOUtils.toInputStream("TestContent2", CharEncoding.UTF_8)) {
             bitstream2 = BitstreamBuilder.createBitstream(context, item, is)
-                .withName("OldBitstream2")
+                .withName("OldBitstream2.txt")
                 .build();
         }
         context.restoreAuthSystemState();
