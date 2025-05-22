@@ -36,7 +36,7 @@ import org.hibernate.type.SqlTypes;
  */
 @Entity
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Table(name = "relationship_type")
 public class RelationshipType implements ReloadableEntity<Integer> {
 
