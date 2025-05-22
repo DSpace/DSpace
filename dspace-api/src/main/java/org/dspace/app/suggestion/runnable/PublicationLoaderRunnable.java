@@ -119,8 +119,11 @@ public class PublicationLoaderRunnable
             DiscoverResultItemIterator researchers = findResearchers();
             while (researchers.hasNext()) {
                 Item researcher = researchers.next();
+                researcher = context.reloadEntity(researcher);
                 publicationLoader.importRecords(context, researcher);
                 setLastImportMetadataValue(researcher);
+                context.commit();
+                context.uncacheEntity(researcher);
             }
         } finally {
             context.restoreAuthSystemState();

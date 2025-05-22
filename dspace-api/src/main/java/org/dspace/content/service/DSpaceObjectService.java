@@ -202,7 +202,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * Get the value(s) of a metadata field.
      * @param dSpaceObject the object whose metadata are sought.
      * @param mdString the name of the field:  {@code schema.element.qualifier}.
-     * @param authority name of the authority which controls these values, or null.
+     * @param authority name of the authority which controls these values, or Item.ANY, or null.
      * @return all matching metadata values, or null if none.
      */
     public List<MetadataValue> getMetadata(T dSpaceObject, String mdString, String authority);
@@ -216,7 +216,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @param lang the language of the requested field value(s),
      *              null if explicitly no language,
      *              or {@link org.dspace.content.Item.ANY} to match all languages.
-     * @param authority name of the authority which controls these values, or null.
+     * @param authority name of the authority which controls these values, or Item.ANY, or null.
      * @return value(s) of the indicated field for the given DSO, or null.
      */
     public List<MetadataValue> getMetadata(T dSpaceObject, String schema,
