@@ -224,7 +224,6 @@
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
                         <argLine>${test.argLine} ${surefireJacoco}</argLine>
-                        <argLine>@{argLine} -javaagent:${com.ginsberg:junit5-system-exit:jar}</argLine>
                         <!-- tests whose name starts by Abstract will be ignored -->
                         <excludes>
                             <exclude>**/Abstract*</exclude>
@@ -255,7 +254,7 @@
                         <excludes>
                             <exclude>**/Abstract*</exclude>
                         </excludes>
-                         <!-- Detailed logs in failsafe-reports/testName-output.txt instead of stdout -->
+                        <!-- Detailed logs in failsafe-reports/testName-output.txt instead of stdout -->
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <!-- Ensure full stacktrace is logged (when errors occur) -->
                         <trimStackTrace>false</trimStackTrace>
@@ -396,8 +395,8 @@
                         <failOnError>false</failOnError>
                         <detectLinks />
                         <links>
-                          <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
-                          <link>https://docs.spring.io/spring-security/site/docs/current/api/</link>
+                            <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
+                            <link>https://docs.spring.io/spring-security/site/docs/current/api/</link>
                         </links>
                     </configuration>
                 </plugin>
@@ -679,6 +678,25 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <!-- Set up junit5-system-exit javaagent property -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>prepare-junit5-system-exit-agent</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>build-classpath</goal>
+                                </goals>
+                                <configuration>
+                                    <includeGroupIds>com.ginsberg</includeGroupIds>
+                                    <includeArtifactIds>junit5-system-exit</includeArtifactIds>
+                                    <outputProperty>junit5SystemExitAgent</outputProperty>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -718,6 +736,25 @@
                                         for JaCoCo runtime agent.
                                     -->
                                     <propertyName>failsafeJacoco</propertyName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Set up junit5-system-exit javaagent property -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>prepare-junit5-system-exit-agent</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>build-classpath</goal>
+                                </goals>
+                                <configuration>
+                                    <includeGroupIds>com.ginsberg</includeGroupIds>
+                                    <includeArtifactIds>junit5-system-exit</includeArtifactIds>
+                                    <outputProperty>junit5SystemExitAgentIT</outputProperty>
                                 </configuration>
                             </execution>
                         </executions>
@@ -1786,6 +1823,14 @@
                 <version>4.13.2</version>
                 <scope>test</scope>
             </dependency>
+            <!-- JUnit 5 dependencies - all aligned to same version -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.12.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>com.ginsberg</groupId>
                 <artifactId>junit5-system-exit</artifactId>
@@ -1795,7 +1840,7 @@
             <dependency>
                 <groupId>com.github.stefanbirkner</groupId>
                 <artifactId>system-lambda</artifactId>
-                <version>1.0.0</version>
+                <version>1.2.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
