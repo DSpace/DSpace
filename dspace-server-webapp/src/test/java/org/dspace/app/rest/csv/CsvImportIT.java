@@ -10,9 +10,9 @@ package org.dspace.app.rest.csv;
 import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -52,7 +52,7 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -228,7 +228,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         Item item = itemIteratorItem.next();
 
         List<Relationship> relationships = relationshipService.findByItem(context, item);
-        assertEquals(reasonAssertCheck, sizeToCheck, relationships.size());
+        assertEquals(sizeToCheck, relationships.size(), reasonAssertCheck);
         getClient().perform(get("/api/core/items/" + item.getID())).andExpect(status().isOk());
         getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID()).param("projection", "full"))
                    .andExpect(status().isOk())

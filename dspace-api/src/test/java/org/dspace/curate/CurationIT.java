@@ -7,6 +7,9 @@
  */
 package org.dspace.curate;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+
 import org.apache.commons.cli.ParseException;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
@@ -18,35 +21,37 @@ import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CurationIT extends AbstractIntegrationTestWithDatabase {
 
-    @Test(expected = ParseException.class)
-    public void curationWithoutEPersonParameterTest() throws Exception {
+    @Test
+    public void curationWithoutEPersonParameterTest() {
+        assertThrows(ParseException.class, () -> {
 
-        context.turnOffAuthorisationSystem();
-        Community community = CommunityBuilder.createCommunity(context)
-                                              .build();
-        Collection collection = CollectionBuilder.createCollection(context, community)
-                                                 .build();
-        context.restoreAuthSystemState();
-        String[] args = new String[] {"curate", "-t", CurationClientOptions.getTaskOptions().get(0),
-            "-i", collection.getHandle()};
-        TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+            context.turnOffAuthorisationSystem();
+            Community community = CommunityBuilder.createCommunity(context)
+                .build();
+            Collection collection = CollectionBuilder.createCollection(context, community)
+                .build();
+            context.restoreAuthSystemState();
+            String[] args = new String[]{"curate", "-t", CurationClientOptions.getTaskOptions().get(0),
+                "-i", collection.getHandle()};
+            TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
 
-        ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
-        ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
+            ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
+            ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
 
-        DSpaceRunnable script = null;
-        if (scriptConfiguration != null) {
-            script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
-        }
-        if (script != null) {
-            if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
-                script.run();
+            DSpaceRunnable script = null;
+            if (scriptConfiguration != null) {
+                script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
             }
-        }
+            if (script != null) {
+                if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
+                    script.run();
+                }
+            }
+        });
     }
 
     @Test

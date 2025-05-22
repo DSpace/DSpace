@@ -10,9 +10,10 @@ package org.dspace.app.sword2;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -27,11 +28,10 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.ContentDisposition;
@@ -78,10 +78,10 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
      * Create a global temporary upload folder which will be cleaned up automatically by JUnit.
      * NOTE: As a ClassRule, this temp folder is shared by ALL tests below.
      **/
-    @ClassRule
-    public static final TemporaryFolder uploadTempFolder = new TemporaryFolder();
+    @TempDir
+    public static File uploadTempFolder;
 
-    @Before
+    @BeforeEach
     public void onlyRunIfConfigExists() {
         // These integration tests REQUIRE that SWORDv2WebConfig is found/available (as this class deploys SWORDv2)
         // If this class is not available, the below "Assume" will cause all tests to be SKIPPED
@@ -89,7 +89,7 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
         try {
             Class.forName("org.dspace.app.configuration.SWORDv2WebConfig");
         } catch (ClassNotFoundException ce) {
-            Assume.assumeNoException(ce);
+            Assumptions.assumeNoException(ce);
         }
 
         // Ensure SWORDv2 URL configurations are set correctly (based on our integration test server's paths)
@@ -101,7 +101,7 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
         // Override default value of SWORD upload directory to point at our JUnit TemporaryFolder (see above).
         // This ensures uploaded files are saved in a place where JUnit can clean them up automatically.
         configurationService.setProperty("swordv2-server.upload.tempdir",
-                                         uploadTempFolder.getRoot().getAbsolutePath());
+                                         uploadTempFolder.getAbsolutePath());
 
         // MUST be set to allow DELETE requests on Items which are in the archive.  (This isn't enabled by default)
         configurationService.setProperty("plugin.single.org.dspace.sword2.WorkflowManager",

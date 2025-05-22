@@ -20,6 +20,14 @@
         <root.basedir>${basedir}/../..</root.basedir>
         <license.skip>true</license.skip>
     </properties>
+ <dependencies>
+  <dependency>
+   <groupId>org.hamcrest</groupId>
+   <artifactId>hamcrest-junit</artifactId>
+   <version>2.0.0.0</version>
+   <scope>test</scope>
+  </dependency>
+ </dependencies>
 
     <!-- The 'additions' module must *always* be built, as it is included
          as a dependency in most other modules in [src]/dspace/modules -->

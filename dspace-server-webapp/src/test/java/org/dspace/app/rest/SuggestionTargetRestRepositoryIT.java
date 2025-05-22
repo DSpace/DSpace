@@ -27,8 +27,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration Tests against the /api/integration/suggestiontargets endpoint
@@ -37,7 +37,7 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
     private Collection colPeople;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         // We turn off the authorization system in order to create the structure as

@@ -23,7 +23,7 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.FeedbackServiceImpl;
 import org.dspace.content.service.FeedbackService;
 import org.dspace.services.ConfigurationService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

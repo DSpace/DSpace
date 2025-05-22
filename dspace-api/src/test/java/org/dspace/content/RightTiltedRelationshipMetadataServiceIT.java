@@ -19,7 +19,7 @@ import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class carries out the same test cases as {@link RelationshipMetadataServiceIT} with a few modifications.

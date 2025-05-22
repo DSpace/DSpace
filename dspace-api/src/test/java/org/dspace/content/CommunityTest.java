@@ -13,10 +13,11 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -42,9 +43,9 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -77,7 +78,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -117,7 +118,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         context.turnOffAuthorisationSystem();
@@ -162,7 +163,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         //the item created by default has no name set
         assertThat("testCreate 2", sub, notNullValue());
         assertThat("testCreate 3", sub.getName(), equalTo(""));
-        assertTrue("testCreate 4", communityService.getAllParents(context, sub).size() == 1);
+        assertTrue(communityService.getAllParents(context, sub).size() == 1, "testCreate 4");
         assertThat("testCreate 5", communityService.getAllParents(context, sub).get(0), equalTo(c));
     }
 
@@ -188,22 +189,24 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         //the item created by default has no name set
         assertThat("testCreate 2", son, notNullValue());
         assertThat("testCreate 3", son.getName(), equalTo(""));
-        assertTrue("testCreate 4", communityService.getAllParents(context, son).size() == 1);
+        assertTrue(communityService.getAllParents(context, son).size() == 1, "testCreate 4");
         assertThat("testCreate 5", communityService.getAllParents(context, son).get(0), equalTo(created));
     }
 
     /**
      * Test of create method, of class Community.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testCreateNoAuth() throws Exception {
-        // Disallow full Admin perms
-        when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
+    @Test
+    public void testCreateNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow full Admin perms
+            when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
 
-        // test creating community with no parent (as a non-admin)
-        // this should throw an exception
-        communityService.create(null, context);
-        fail("Exception expected");
+            // test creating community with no parent (as a non-admin)
+            // this should throw an exception
+            communityService.create(null, context);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -239,18 +242,20 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     /**
      * Test of create method (with specified invalid handle), of class Community.
      */
-    @Test(expected = IllegalStateException.class)
-    public void testCreateWithInvalidHandle() throws Exception {
-        // Allow full Admin perms
-        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
+    @Test
+    public void testCreateWithInvalidHandle() {
+        assertThrows(IllegalStateException.class, () -> {
+            // Allow full Admin perms
+            when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
-        //get handle of our default created community
-        String inUseHandle = c.getHandle();
+            //get handle of our default created community
+            String inUseHandle = c.getHandle();
 
-        // test creating community with a specified handle which IS already in use
-        // This should throw an exception
-        communityService.create(null, context, inUseHandle);
-        fail("Exception expected");
+            // test creating community with a specified handle which IS already in use
+            // This should throw an exception
+            communityService.create(null, context, inUseHandle);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -260,7 +265,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     public void testFindAll() throws Exception {
         List<Community> all = communityService.findAll(context);
         assertThat("testFindAll 0", all, notNullValue());
-        assertTrue("testFindAll 1", all.size() >= 1);
+        assertTrue(all.size() >= 1, "testFindAll 1");
 
         boolean added = false;
         for (Community cm : all) {
@@ -268,7 +273,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
                 added = true;
             }
         }
-        assertTrue("testFindAll 2", added);
+        assertTrue(added, "testFindAll 2");
     }
 
     /**
@@ -278,7 +283,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     public void testFindAllTop() throws Exception {
         List<Community> all = communityService.findAllTop(context);
         assertThat("testFindAllTop 0", all, notNullValue());
-        assertTrue("testFindAllTop 1", all.size() >= 1);
+        assertTrue(all.size() >= 1, "testFindAllTop 1");
         for (Community cm : all) {
             assertThat("testFindAllTop for", communityService.getAllParents(context, cm).size(), equalTo(0));
         }
@@ -289,7 +294,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
                 added = true;
             }
         }
-        assertTrue("testFindAllTop 2", added);
+        assertTrue(added, "testFindAllTop 2");
     }
 
     /**
@@ -298,12 +303,12 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     @Test
     @Override
     public void testGetID() {
-        assertTrue("testGetID 0", c.getID() != null);
+        assertTrue(c.getID() != null, "testGetID 0");
     }
 
     @Test
     public void testLegacyID() {
-        assertTrue("testGetLegacyID 0", c.getLegacyId() == null);
+        assertTrue(c.getLegacyId() == null, "testGetLegacyID 0");
     }
 
     /**
@@ -313,7 +318,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     @Override
     public void testGetHandle() {
         //default instance has a random handle
-        assertTrue("testGetHandle 0", c.getHandle().contains("123456789/"));
+        assertTrue(c.getHandle().contains("123456789/"), "testGetHandle 0");
     }
 
     /**
@@ -339,16 +344,21 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         communityService.setMetadataSingleValue(context, c,
                 CommunityService.MD_SIDEBAR_TEXT, null, sidebar);
 
-        assertEquals("Name not set properly.", name,
-                communityService.getMetadataFirstValue(c, CommunityService.MD_NAME, Item.ANY));
-        assertEquals("Short description not set properly.", sdesc,
-                communityService.getMetadataFirstValue(c, CommunityService.MD_SHORT_DESCRIPTION, Item.ANY));
-        assertEquals("Introductory text not set properly.", itext,
-                communityService.getMetadataFirstValue(c, CommunityService.MD_INTRODUCTORY_TEXT, Item.ANY));
-        assertEquals("Copyright text not set properly.", copy,
-                communityService.getMetadataFirstValue(c, CommunityService.MD_COPYRIGHT_TEXT, Item.ANY));
-        assertEquals("Sidebar text not set properly.", sidebar,
-                communityService.getMetadataFirstValue(c, CommunityService.MD_SIDEBAR_TEXT, Item.ANY));
+        assertEquals(name,
+                communityService.getMetadataFirstValue(c, CommunityService.MD_NAME, Item.ANY),
+                "Name not set properly.");
+        assertEquals(sdesc,
+                communityService.getMetadataFirstValue(c, CommunityService.MD_SHORT_DESCRIPTION, Item.ANY),
+                "Short description not set properly.");
+        assertEquals(itext,
+                communityService.getMetadataFirstValue(c, CommunityService.MD_INTRODUCTORY_TEXT, Item.ANY),
+                "Introductory text not set properly.");
+        assertEquals(copy,
+                communityService.getMetadataFirstValue(c, CommunityService.MD_COPYRIGHT_TEXT, Item.ANY),
+                "Copyright text not set properly.");
+        assertEquals(sidebar,
+                communityService.getMetadataFirstValue(c, CommunityService.MD_SIDEBAR_TEXT, Item.ANY),
+                "Sidebar text not set properly.");
     }
 
     /**
@@ -389,27 +399,31 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     /**
      * Test of setLogo method, of class Community.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testSetLogoNoAuth() throws Exception {
-        // Disallow current Community WRITE perms
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE);
+    @Test
+    public void testSetLogoNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow current Community WRITE perms
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE);
 
-        File f = new File(testProps.get("test.bitstream").toString());
-        communityService.setLogo(context, c, new FileInputStream(f));
-        fail("Exception expected");
+            File f = new File(testProps.get("test.bitstream").toString());
+            communityService.setLogo(context, c, new FileInputStream(f));
+            fail("Exception expected");
+        });
     }
 
     /**
      * Test of update method, of class Community.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testUpdateNoAuth() throws Exception {
-        // Disallow current Community WRITE perms
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE);
+    @Test
+    public void testUpdateNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow current Community WRITE perms
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE);
 
-        //TODO: we need to verify the update, how?
-        communityService.update(context, c);
-        fail("Exception must be thrown");
+            //TODO: we need to verify the update, how?
+            communityService.update(context, c);
+            fail("Exception must be thrown");
+        });
     }
 
     /**
@@ -440,10 +454,12 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     /**
      * Test of createAdministrators method, of class Community.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testCreateAdministratorsNoAuth() throws Exception {
-        communityService.createAdministrators(context, c);
-        fail("Exception should have been thrown");
+    @Test
+    public void testCreateAdministratorsNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            communityService.createAdministrators(context, c);
+            fail("Exception should have been thrown");
+        });
     }
 
 
@@ -469,20 +485,22 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     /**
      * Test of removeAdministrators method, of class Community.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testRemoveAdministratorsNoAuth() throws Exception {
-        // Allow Community ADMIN perms (Community Admins cannot delete their Admin Group)
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADMIN);
+    @Test
+    public void testRemoveAdministratorsNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Allow Community ADMIN perms (Community Admins cannot delete their Admin Group)
+            doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADMIN);
 
-        // Ensure admin group is created first
-        context.turnOffAuthorisationSystem();
-        Group result = communityService.createAdministrators(context, c);
-        context.restoreAuthSystemState();
+            // Ensure admin group is created first
+            context.turnOffAuthorisationSystem();
+            Group result = communityService.createAdministrators(context, c);
+            context.restoreAuthSystemState();
 
-        assertThat("testRemoveAdministratorsAuth 0", c.getAdministrators(), notNullValue());
-        assertThat("testRemoveAdministratorsAuth 1", c.getAdministrators(), equalTo(result));
-        communityService.removeAdministrators(context, c);
-        fail("Should have thrown exception");
+            assertThat("testRemoveAdministratorsAuth 0", c.getAdministrators(), notNullValue());
+            assertThat("testRemoveAdministratorsAuth 1", c.getAdministrators(), equalTo(result));
+            communityService.removeAdministrators(context, c);
+            fail("Should have thrown exception");
+        });
     }
 
     /**
@@ -501,7 +519,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     public void testGetCollections() throws Exception {
         //empty by default
         assertThat("testGetCollections 0", c.getCollections(), notNullValue());
-        assertTrue("testGetCollections 1", c.getCollections().size() == 0);
+        assertTrue(c.getCollections().size() == 0, "testGetCollections 1");
 
         context.turnOffAuthorisationSystem();
         Collection collection = collectionService.create(context, c);
@@ -520,9 +538,9 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         context.restoreAuthSystemState();
 
         //sorted
-        assertTrue("testGetCollections 2", c.getCollections().get(0).getName().equals("collection A"));
-        assertTrue("testGetCollections 3", c.getCollections().get(1).getName().equals("collection B"));
-        assertTrue("testGetCollections 4", c.getCollections().get(2).getName().equals("collection C"));
+        assertTrue(c.getCollections().get(0).getName().equals("collection A"), "testGetCollections 2");
+        assertTrue(c.getCollections().get(1).getName().equals("collection B"), "testGetCollections 3");
+        assertTrue(c.getCollections().get(2).getName().equals("collection C"), "testGetCollections 4");
     }
 
     /**
@@ -532,7 +550,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     public void testGetSubcommunities() throws Exception {
         //empty by default
         assertThat("testGetSubcommunities 0", c.getSubcommunities(), notNullValue());
-        assertTrue("testGetSubcommunities 1", c.getSubcommunities().size() == 0);
+        assertTrue(c.getSubcommunities().size() == 0, "testGetSubcommunities 1");
 
         context.turnOffAuthorisationSystem();
         Community community = communityService.create(c, context);
@@ -551,9 +569,9 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         context.restoreAuthSystemState();
 
         //get Subcommunities sorted
-        assertTrue("testGetCollections 2", c.getSubcommunities().get(0).getName().equals("subcommunity A"));
-        assertTrue("testGetCollections 3", c.getSubcommunities().get(1).getName().equals("subcommunity B"));
-        assertTrue("testGetCollections 4", c.getSubcommunities().get(2).getName().equals("subcommunity C"));
+        assertTrue(c.getSubcommunities().get(0).getName().equals("subcommunity A"), "testGetCollections 2");
+        assertTrue(c.getSubcommunities().get(1).getName().equals("subcommunity B"), "testGetCollections 3");
+        assertTrue(c.getSubcommunities().get(2).getName().equals("subcommunity C"), "testGetCollections 4");
     }
 
     /**
@@ -579,14 +597,14 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     public void testGetAllParents() throws Exception {
         //empty by default
         assertThat("testGetAllParents 0", communityService.getAllParents(context, c), notNullValue());
-        assertTrue("testGetAllParents 1", communityService.getAllParents(context, c).size() == 0);
+        assertTrue(communityService.getAllParents(context, c).size() == 0, "testGetAllParents 1");
 
         //community with parent
         context.turnOffAuthorisationSystem();
         Community son = communityService.create(c, context);
         context.restoreAuthSystemState();
         assertThat("testGetAllParents 2", communityService.getAllParents(context, son), notNullValue());
-        assertTrue("testGetAllParents 3", communityService.getAllParents(context, son).size() == 1);
+        assertTrue(communityService.getAllParents(context, son).size() == 1, "testGetAllParents 3");
         assertThat("testGetAllParents 4", communityService.getAllParents(context, son).get(0), equalTo(c));
     }
 
@@ -597,7 +615,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     public void testGetAllCollections() throws Exception {
         //empty by default
         assertThat("testGetAllCollections 0", communityService.getAllCollections(context, c), notNullValue());
-        assertTrue("testGetAllCollections 1", communityService.getAllCollections(context, c).isEmpty());
+        assertTrue(communityService.getAllCollections(context, c).isEmpty(), "testGetAllCollections 1");
 
         //community has a collection and a subcommunity, subcommunity has a collection
         context.turnOffAuthorisationSystem();
@@ -606,7 +624,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         Collection collOfSub = collectionService.create(context, sub);
         context.restoreAuthSystemState();
         assertThat("testGetAllCollections 2", communityService.getAllCollections(context, c), notNullValue());
-        assertTrue("testGetAllCollections 3", communityService.getAllCollections(context, c).size() == 2);
+        assertTrue(communityService.getAllCollections(context, c).size() == 2, "testGetAllCollections 3");
         assertThat("testGetAllCollections 4", communityService.getAllCollections(context, c).get(0),
                    equalTo(collOfSub));
         assertThat("testGetAllCollections 5", communityService.getAllCollections(context, c).get(1), equalTo(collOfC));
@@ -630,13 +648,15 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     /**
      * Test of createCollection method, of class Community.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testCreateCollectionNoAuth() throws Exception {
-        // Disallow current Community ADD perms
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
+    @Test
+    public void testCreateCollectionNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow current Community ADD perms
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
 
-        collectionService.create(context, c);
-        fail("Exception expected");
+            collectionService.create(context, c);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -657,14 +677,16 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     /**
      * Test of addCollection method, of class Community.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testAddCollectionNoAuth() throws Exception {
-        // Disallow current Community ADD perms
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
+    @Test
+    public void testAddCollectionNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow current Community ADD perms
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
 
-        Collection col = collectionService.create(context, c);
-        c.addCollection(col);
-        fail("Exception expected");
+            Collection col = collectionService.create(context, c);
+            c.addCollection(col);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -679,20 +701,22 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
 
         Community result = communityService.createSubcommunity(context, c);
         assertThat("testCreateSubcommunityAuth 0", c.getSubcommunities(), notNullValue());
-        assertTrue("testCreateSubcommunityAuth 1", c.getSubcommunities().size() == 1);
+        assertTrue(c.getSubcommunities().size() == 1, "testCreateSubcommunityAuth 1");
         assertThat("testCreateSubcommunityAuth 2", c.getSubcommunities().get(0), equalTo(result));
     }
 
     /**
      * Test of createSubcommunity method, of class Community.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testCreateSubcommunityNoAuth() throws Exception {
-        // Disallow current Community ADD perms
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
+    @Test
+    public void testCreateSubcommunityNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow current Community ADD perms
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
 
-        communityService.createSubcommunity(context, c);
-        fail("Exception expected");
+            communityService.createSubcommunity(context, c);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -710,22 +734,24 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
 
         communityService.addSubcommunity(context, c, result);
         assertThat("testAddSubcommunityAuth 0", c.getSubcommunities(), notNullValue());
-        assertTrue("testAddSubcommunityAuth 1", c.getSubcommunities().size() == 1);
+        assertTrue(c.getSubcommunities().size() == 1, "testAddSubcommunityAuth 1");
         assertThat("testAddSubcommunityAuth 2", c.getSubcommunities().get(0), equalTo(result));
     }
 
     /**
      * Test of addSubcommunity method, of class Community.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testAddSubcommunityNoAuth() throws Exception {
-        // Turn off authorization temporarily to create a new top-level community
-        context.turnOffAuthorisationSystem();
-        Community result = communityService.create(null, context);
-        context.restoreAuthSystemState();
+    @Test
+    public void testAddSubcommunityNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Turn off authorization temporarily to create a new top-level community
+            context.turnOffAuthorisationSystem();
+            Community result = communityService.create(null, context);
+            context.restoreAuthSystemState();
 
-        communityService.addSubcommunity(context, c, result);
-        fail("Exception expected");
+            communityService.addSubcommunity(context, c, result);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -738,7 +764,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         Collection col = collectionService.create(context, c);
         context.restoreAuthSystemState();
         assertThat("testRemoveCollectionAuth 0", c.getCollections(), notNullValue());
-        assertTrue("testRemoveCollectionAuth 1", c.getCollections().size() == 1);
+        assertTrue(c.getCollections().size() == 1, "testRemoveCollectionAuth 1");
         assertThat("testRemoveCollectionAuth 2", c.getCollections().get(0), equalTo(col));
 
         // Allow current Community REMOVE perms (to remove Collection from Community & delete)
@@ -751,27 +777,29 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         // Note that this will *also* delete the collection (hence the extra permissions provided above)
         communityService.removeCollection(context, c, col);
         assertThat("testRemoveCollectionAuth 3", c.getCollections(), notNullValue());
-        assertTrue("testRemoveCollectionAuth 4", c.getCollections().size() == 0);
+        assertTrue(c.getCollections().size() == 0, "testRemoveCollectionAuth 4");
     }
 
     /**
      * Test of removeCollection method, of class Community.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testRemoveCollectionNoAuth() throws Exception {
-        // Disallow current Community REMOVE perms
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.REMOVE);
+    @Test
+    public void testRemoveCollectionNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow current Community REMOVE perms
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.REMOVE);
 
-        // Turn off authorization temporarily to create a new Collection
-        context.turnOffAuthorisationSystem();
-        Collection col = collectionService.create(context, c);
-        context.restoreAuthSystemState();
-        assertThat("testRemoveCollectionNoAuth 0", c.getCollections(), notNullValue());
-        assertTrue("testRemoveCollectionNoAuth 1", c.getCollections().size() == 1);
-        assertThat("testRemoveCollectionNoAuth 2", c.getCollections().get(0), equalTo(col));
+            // Turn off authorization temporarily to create a new Collection
+            context.turnOffAuthorisationSystem();
+            Collection col = collectionService.create(context, c);
+            context.restoreAuthSystemState();
+            assertThat("testRemoveCollectionNoAuth 0", c.getCollections(), notNullValue());
+            assertTrue(c.getCollections().size() == 1, "testRemoveCollectionNoAuth 1");
+            assertThat("testRemoveCollectionNoAuth 2", c.getCollections().get(0), equalTo(col));
 
-        communityService.removeCollection(context, c, col);
-        fail("Exception expected");
+            communityService.removeCollection(context, c, col);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -796,12 +824,12 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
 
         communityService.addSubcommunity(context, c, com);
         assertThat("testRemoveSubcommunityAuth 0", c.getSubcommunities(), notNullValue());
-        assertTrue("testRemoveSubcommunityAuth 1", c.getSubcommunities().size() == 1);
+        assertTrue(c.getSubcommunities().size() == 1, "testRemoveSubcommunityAuth 1");
         assertThat("testRemoveSubcommunityAuth 2", c.getSubcommunities().get(0), equalTo(com));
 
         communityService.removeSubcommunity(context, c, com);
         assertThat("testRemoveSubcommunityAuth 3", c.getSubcommunities(), notNullValue());
-        assertTrue("testRemoveSubcommunityAuth 4", c.getSubcommunities().size() == 0);
+        assertTrue(c.getSubcommunities().size() == 0, "testRemoveSubcommunityAuth 4");
     }
 
     /**
@@ -930,15 +958,17 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     /**
      * Test of delete method, of class Community.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testDeleteNoAuth() throws Exception {
-        // Disallow current Community DELETE perms
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy)
-                                         .authorizeAction(any(Context.class), any(Community.class),
-                                                          eq(Constants.DELETE));
+    @Test
+    public void testDeleteNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow current Community DELETE perms
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy)
+                .authorizeAction(any(Context.class), any(Community.class),
+                    eq(Constants.DELETE));
 
-        communityService.delete(context, c);
-        fail("Exception expected");
+            communityService.delete(context, c);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -951,9 +981,9 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         doReturn(true).when(authorizeServiceSpy).isAdmin(eq(context));
         doReturn(true).when(authorizeServiceSpy).isAdmin(eq(context), any(EPerson.class));
 
-        assertFalse("testEquals 0", c.equals(null));
-        assertFalse("testEquals 1", c.equals(communityService.create(null, context)));
-        assertTrue("testEquals 2", c.equals(c));
+        assertFalse(c.equals(null), "testEquals 0");
+        assertFalse(c.equals(communityService.create(null, context)), "testEquals 1");
+        assertTrue(c.equals(c), "testEquals 2");
     }
 
     /**
@@ -974,7 +1004,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         doNothing().when(authorizeServiceSpy)
                    .authorizeAction(context, c, Constants.WRITE);
 
-        assertTrue("testCanEditBooleanAuth 0", communityService.canEditBoolean(context, c));
+        assertTrue(communityService.canEditBoolean(context, c), "testCanEditBooleanAuth 0");
     }
 
     /**
@@ -985,7 +1015,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         // Disallow current Community WRITE perms
         doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE);
 
-        assertFalse("testCanEditBooleanNoAuth 0", communityService.canEditBoolean(context, c));
+        assertFalse(communityService.canEditBoolean(context, c), "testCanEditBooleanNoAuth 0");
     }
 
     /**
@@ -1002,13 +1032,15 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     /**
      * Test of canEdit method, of class Community.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testCanEditNoAuth() throws Exception {
-        // Disallow current Community WRITE perms
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c,Constants.WRITE);
+    @Test
+    public void testCanEditNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow current Community WRITE perms
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE);
 
-        communityService.canEdit(context, c);
-        fail("Exception expected");
+            communityService.canEdit(context, c);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -1017,7 +1049,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     @Test
     public void testCountItems() throws Exception {
         //0 by default
-        assertTrue("testCountItems 0", itemService.countItems(context, c) == 0);
+        assertTrue(itemService.countItems(context, c) == 0, "testCountItems 0");
 
         //NOTE: a more thorough test of item counting is in ITCommunityCollection integration test
     }

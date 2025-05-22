@@ -7,16 +7,16 @@
  */
 package org.dspace.eperson;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.util.FakeConsoleServiceImpl;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -67,7 +67,7 @@ public class EPersonCLIToolIT
         instance.main(argv);
 
         String newPasswordHash = eperson.getPassword();
-        assertNotEquals("Password hash did not change", oldPasswordHash, newPasswordHash);
+        assertNotEquals(oldPasswordHash, newPasswordHash, "Password hash did not change");
     }
 
     /**
@@ -102,11 +102,11 @@ public class EPersonCLIToolIT
         instance.main(argv);
 
         String newPasswordHash = eperson.getPassword();
-        assertEquals("Password hash changed", oldPasswordHash, newPasswordHash);
+        assertEquals(oldPasswordHash, newPasswordHash, "Password hash changed");
 
         String stderr = sysErr.getLog();
-        assertTrue("Standard error did not mention 'empty'",
-                stderr.contains(EPersonCLITool.ERR_PASSWORD_EMPTY));
+        assertTrue(stderr.contains(EPersonCLITool.ERR_PASSWORD_EMPTY),
+                "Standard error did not mention 'empty'");
     }
 
     /**
@@ -144,10 +144,10 @@ public class EPersonCLIToolIT
         instance.main(argv);
 
         String newPasswordHash = eperson.getPassword();
-        assertEquals("Password hash changed", oldPasswordHash, newPasswordHash);
+        assertEquals(oldPasswordHash, newPasswordHash, "Password hash changed");
 
         String stderr = sysErr.getLog();
-        assertTrue("Standard error did not indicate password mismatch",
-                stderr.contains(EPersonCLITool.ERR_PASSWORD_NOMATCH));
+        assertTrue(stderr.contains(EPersonCLITool.ERR_PASSWORD_NOMATCH),
+                "Standard error did not indicate password mismatch");
     }
 }

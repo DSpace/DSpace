@@ -21,8 +21,8 @@ import org.dspace.content.Item;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -46,7 +46,7 @@ public class AnonymousAdditionalAuthorizationFilterIT extends AbstractController
     Item staffAccessItem1;
     Group staff;
 
-    @Before
+    @BeforeEach
     public void setup() {
         context.turnOffAuthorisationSystem();
 

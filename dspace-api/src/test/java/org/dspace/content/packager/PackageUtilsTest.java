@@ -9,9 +9,9 @@ package org.dspace.content.packager;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.SQLException;
 
@@ -33,11 +33,11 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Andrea Schweer schweer@waikato.ac.nz
@@ -67,7 +67,7 @@ public class PackageUtilsTest extends AbstractUnitTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         try {
             Context context = new Context();
@@ -118,7 +118,7 @@ public class PackageUtilsTest extends AbstractUnitTest {
     /**
      * This method will be run once at the very end
      */
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
         try {
             Context context = new Context();
@@ -146,7 +146,7 @@ public class PackageUtilsTest extends AbstractUnitTest {
     /**
      * Pass through initialisation; turn off authorisation
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         // call init() from AbstractUnitTest to initialize testing framework
@@ -166,12 +166,14 @@ public class PackageUtilsTest extends AbstractUnitTest {
 
         String exportName = PackageUtils.translateGroupNameForExport(context,
                                                                      testGroup.getName());
-        assertEquals("Group name without underscore unchanged by translation for export", testGroup.getName(),
-                     exportName);
+        assertEquals(testGroup.getName(),
+                     exportName,
+                     "Group name without underscore unchanged by translation for export");
 
         String importName = PackageUtils.translateGroupNameForImport(context, exportName);
-        assertEquals("Exported Group name without underscore unchanged by translation for import", exportName,
-                     importName);
+        assertEquals(exportName,
+                     importName,
+                     "Exported Group name without underscore unchanged by translation for import");
 
         testCollection.setWorkflowGroup(context, 1, originalFirstStepWorkflowGroup);
     }
@@ -188,12 +190,14 @@ public class PackageUtilsTest extends AbstractUnitTest {
 
         String exportName = PackageUtils.translateGroupNameForExport(context,
                                                                      testGroup.getName());
-        assertEquals("Group name with underscores but no DSO unchanged by translation for export", testGroup.getName(),
-                     exportName);
+        assertEquals(testGroup.getName(),
+                     exportName,
+                     "Group name with underscores but no DSO unchanged by translation for export");
 
         String importName = PackageUtils.translateGroupNameForImport(context, exportName);
-        assertEquals("Exported Group name with underscores but no DSO unchanged by translation for import", exportName,
-                     importName);
+        assertEquals(exportName,
+                     importName,
+                     "Exported Group name with underscores but no DSO unchanged by translation for import");
 
         testCollection.setWorkflowGroup(context, 1, originalFirstStepWorkflowGroup);
     }
@@ -207,17 +211,16 @@ public class PackageUtilsTest extends AbstractUnitTest {
 
         String exportName = PackageUtils.translateGroupNameForExport(context,
                                                                      group.getName());
-        assertNotEquals("Exported group name should differ from original", group.getName(), exportName);
+        assertNotEquals(group.getName(), exportName, "Exported group name should differ from original");
         assertThat("Exported group name should contain '_hdl:' substring", exportName, containsString("_hdl:"));
 
         String importName = PackageUtils.translateGroupNameForImport(context, exportName);
-        assertEquals("Exported Group name with dso unchanged by roundtrip translation for export/import",
-                     group.getName(), importName);
+        assertEquals(group.getName(), importName, "Exported Group name with dso unchanged by roundtrip translation for export/import");
 
         testCollection.setWorkflowGroup(context, 1, originalFirstStepWorkflowGroup);
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         context.abort();

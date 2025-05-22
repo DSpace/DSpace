@@ -7,7 +7,7 @@
  */
 package org.dspace.content.virtual;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,13 +19,16 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class CollectedTest {
 
     @InjectMocks
@@ -43,7 +46,7 @@ public class CollectedTest {
     @Test
     public void testGetFields() {
         // The reported Class should match our mocked fields class
-        assertEquals("TestGetFields 0", fields.getClass(), collected.getFields().getClass());
+        assertEquals(fields.getClass(), collected.getFields().getClass(), "TestGetFields 0");
     }
 
     @Test
@@ -52,7 +55,7 @@ public class CollectedTest {
         collected.setFields(fields);
 
         // The reported fields should math our defined fields
-        assertEquals("TestSetFields 0", fields, collected.getFields());
+        assertEquals(fields, collected.getFields(), "TestSetFields 0");
 
     }
 
@@ -62,7 +65,7 @@ public class CollectedTest {
         collected.setUseForPlace(true);
 
         // collected.getUseForPlace() should return true
-        assertEquals("TestSetUseForPlace 0", true, collected.getUseForPlace());
+        assertEquals(true, collected.getUseForPlace(), "TestSetUseForPlace 0");
     }
 
     @Test
@@ -72,7 +75,7 @@ public class CollectedTest {
         collected.setUseForPlace(true);
 
         // The reported boolean should math our defined bool
-        assertEquals("TestGetUseForPlace 0", bool, collected.getUseForPlace());
+        assertEquals(bool, collected.getUseForPlace(), "TestGetUseForPlace 0");
     }
 
     @Test
@@ -92,12 +95,12 @@ public class CollectedTest {
 
         // Mock the state of objects utilized in getValues() to meet the success criteria of an invocation
         when(itemService.getMetadata(item, splittedString.size() > 0 ? splittedString.get(0) : null,
-                                     splittedString.size() > 1 ? splittedString.get(1) : null,
-                                     splittedString.size() > 2 ? splittedString.get(2) : null,
-                                     Item.ANY, false)).thenReturn(metadataValueList);
+            splittedString.size() > 1 ? splittedString.get(1) : null,
+            splittedString.size() > 2 ? splittedString.get(2) : null,
+            Item.ANY, false)).thenReturn(metadataValueList);
         when(metadataValue.getValue()).thenReturn("TestValue");
 
         // The reported value(s) should match our valueList
-        assertEquals("TestGetValues 0", valueList, collected.getValues(context, item));
+        assertEquals(valueList, collected.getValues(context, item), "TestGetValues 0");
     }
 }

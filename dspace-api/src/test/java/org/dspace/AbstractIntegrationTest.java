@@ -17,9 +17,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 import org.dspace.utils.DSpace;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 
 /**
  * This is the base class for Integration Tests. It inherits from the class
@@ -31,7 +31,7 @@ import org.junit.Ignore;
  *
  * @author pvillega
  */
-@Ignore
+@Disabled
 public class AbstractIntegrationTest extends AbstractUnitTest {
 
     /**
@@ -51,7 +51,7 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
     private boolean localCfgChanged = false;
 
     @Override
-    @Before
+    @BeforeEach
     /**
      * Extend the {@link AbstractUnitTest#init} method to deal with extra
      * configuration that can be manipulated at runtime during the Integration Test
@@ -70,7 +70,7 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
     }
 
     @Override
-    @After
+    @AfterEach
     /**
      * Extend the {@link AbstractUnitTest#destroy} method to deal with extra
      * configurations that can be manipulated at runtime during the Integration Test

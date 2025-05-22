@@ -7,8 +7,8 @@
  */
 package org.dspace.content;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Iterator;
 import java.util.List;
@@ -23,8 +23,8 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.service.MetadataDSpaceCsvExportService;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.utils.DSpace;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -39,7 +39,7 @@ public class MetadataDSpaceCsvExportServiceImplIT
      * Test of handleExport method, of class MetadataDSpaceCsvExportServiceImpl.
      * @throws java.lang.Exception passed through.
      */
-    @Ignore
+    @Disabled
     @Test
     public void testHandleExport()
             throws Exception {
@@ -61,7 +61,7 @@ public class MetadataDSpaceCsvExportServiceImplIT
      * Test of export method, of class MetadataDSpaceCsvExportServiceImpl.
      * @throws java.lang.Exception passed through.
      */
-    @Ignore
+    @Disabled
     @Test
     public void testExport_3args_1()
             throws Exception {
@@ -113,7 +113,6 @@ public class MetadataDSpaceCsvExportServiceImplIT
 
         // Examine the result.
         List<DSpaceCSVLine> csvLines = result.getCSVLines();
-        assertEquals("One item mapped twice should produce one line",
-                1, csvLines.size());
+        assertEquals(1, csvLines.size(), "One item mapped twice should produce one line");
     }
 }

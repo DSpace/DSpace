@@ -7,8 +7,8 @@
  */
 package org.dspace.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -25,9 +25,9 @@ import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.BeforeClass;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.junit.MockServerRule;
 
@@ -44,7 +44,7 @@ public class HttpConnectionPoolServiceTest
 
     private MockServerClient mockServerClient;
 
-    @BeforeClass
+    @BeforeAll
     public static void initClass() {
         configurationService = DSpaceServicesFactory.getInstance()
                 .getConfigurationService();
@@ -76,7 +76,7 @@ public class HttpConnectionPoolServiceTest
         );
 
         try (CloseableHttpClient httpClient = instance.getClient()) {
-            assertNotNull("getClient should always return a client", httpClient);
+            assertNotNull(httpClient, "getClient should always return a client");
 
             URI uri = new URIBuilder()
                     .setScheme("http")
@@ -88,8 +88,9 @@ public class HttpConnectionPoolServiceTest
             HttpUriRequest request = RequestBuilder.get(uri)
                     .build();
             try (CloseableHttpResponse response = httpClient.execute(request)) {
-                assertEquals("Response status should be OK", HttpStatus.OK_200,
-                        response.getStatusLine().getStatusCode());
+                assertEquals(HttpStatus.OK_200,
+                        response.getStatusLine().getStatusCode(),
+                        "Response status should be OK");
             }
         }
     }

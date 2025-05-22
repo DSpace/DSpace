@@ -41,10 +41,10 @@ import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.google.client.GoogleAnalyticsClient;
 import org.dspace.services.ConfigurationService;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -73,7 +73,7 @@ public class GoogleAsyncEventListenerIT extends AbstractControllerIntegrationTes
 
     private GoogleAnalyticsClient secondGaClientMock = mock(GoogleAnalyticsClient.class);
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -106,7 +106,7 @@ public class GoogleAsyncEventListenerIT extends AbstractControllerIntegrationTes
 
     }
 
-    @After
+    @AfterEach
     public void cleanup() {
         googleAsyncEventListener.setGoogleAnalyticsClients(originalGoogleAnalyticsClients);
     }
@@ -171,7 +171,7 @@ public class GoogleAsyncEventListenerIT extends AbstractControllerIntegrationTes
 
         assertThat(getStoredEventsAsList(), hasSize(3));
 
-        IllegalStateException illegalStateException = Assert.assertThrows(IllegalStateException.class,
+        IllegalStateException illegalStateException = Assertions.assertThrows(IllegalStateException.class,
             () -> googleAsyncEventListener.sendCollectedEvents());
 
         assertThat(illegalStateException.getMessage(), is("No Google Analytics Client supports key G-123456"));
@@ -196,7 +196,7 @@ public class GoogleAsyncEventListenerIT extends AbstractControllerIntegrationTes
 
         assertThat(getStoredEventsAsList(), hasSize(3));
 
-        IllegalStateException exception = Assert.assertThrows(IllegalStateException.class,
+        IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
             () -> googleAsyncEventListener.sendCollectedEvents());
 
         assertThat(exception.getMessage(), is("More than one Google Analytics Client supports key G-123456"));

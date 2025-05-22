@@ -20,7 +20,7 @@ import javax.xml.transform.stream.StreamSource;
 import com.lyncode.xoai.util.XSLPipeline;
 import org.apache.commons.io.IOUtils;
 import org.dspace.xoai.tests.support.XmlMatcherBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class PipelineTest {
     private static TransformerFactory factory = TransformerFactory.newInstance();

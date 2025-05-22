@@ -31,8 +31,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -69,7 +69,7 @@ public class CanCreateCollectionsIT extends AbstractControllerIntegrationTest {
     private AuthorizationFeature canCreateCollectionsFeature;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
 

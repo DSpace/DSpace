@@ -619,15 +619,16 @@
             <artifactId>json-path-assert</artifactId>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
+  <dependency>
+   <groupId>org.hamcrest</groupId>
+   <artifactId>hamcrest-junit</artifactId>
+   <version>2.0.0.0</version>
+   <scope>test</scope>
+  </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -638,6 +639,12 @@
             <artifactId>mockito-inline</artifactId>
             <scope>test</scope>
         </dependency>
+  <dependency>
+   <groupId>org.mockito</groupId>
+   <artifactId>mockito-junit-jupiter</artifactId>
+   <version>4.11.0</version>
+   <scope>test</scope>
+  </dependency>
         <!-- Solr Core is needed for Integration Tests (to run a MockSolrServer)     -->
         <!-- The following Solr / Lucene dependencies also support integration tests -->
         <dependency>

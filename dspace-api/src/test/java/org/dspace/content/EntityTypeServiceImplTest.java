@@ -7,7 +7,7 @@
  */
 package org.dspace.content;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
@@ -18,15 +18,18 @@ import java.util.List;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.EntityTypeDAO;
 import org.dspace.core.Context;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-@RunWith(MockitoJUnitRunner.class)
-public class EntityTypeServiceImplTest   {
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
+public class EntityTypeServiceImplTest {
 
     @InjectMocks
     private EntityTypeServiceImpl entityTypeService;
@@ -51,7 +54,7 @@ public class EntityTypeServiceImplTest   {
         when(entityTypeDAO.findByEntityType(context, "TestType")).thenReturn(entityType);
 
         // The EntityType reported from our TestType parameter should match our mocked EntityType
-        assertEquals("TestFindByEntityType 0", entityType, entityTypeService.findByEntityType(context, "TestType"));
+        assertEquals(entityType, entityTypeService.findByEntityType(context, "TestType"), "TestFindByEntityType 0");
     }
 
 
@@ -61,7 +64,7 @@ public class EntityTypeServiceImplTest   {
         List<EntityType> entityTypeList = new ArrayList<>();
 
         // The EntityType(s) reported from our mocked state should match our entityTypeList
-        assertEquals("TestFindAll 0", entityTypeList, entityTypeService.findAll(context));
+        assertEquals(entityTypeList, entityTypeService.findAll(context), "TestFindAll 0");
     }
 
 
@@ -78,9 +81,9 @@ public class EntityTypeServiceImplTest   {
         when(entityTypeDAO.create(any(), any())).thenReturn(entityType);
 
         // The newly created EntityType's label should match our mocked EntityType's label
-        assertEquals("TestCreate 0", entityType.getLabel(), entityTypeService.create(context, "Test").getLabel());
+        assertEquals(entityType.getLabel(), entityTypeService.create(context, "Test").getLabel(), "TestCreate 0");
         // The newly created EntityType should match our mocked EntityType
-        assertEquals("TestCreate 1", entityType, entityTypeService.create(context));
+        assertEquals(entityType, entityTypeService.create(context), "TestCreate 1");
     }
 
     @Test
@@ -89,7 +92,7 @@ public class EntityTypeServiceImplTest   {
         when(entityTypeDAO.findByID(context, EntityType.class, 0)).thenReturn(entityType);
 
         // The reported EntityType should match our mocked entityType
-        assertEquals("TestFind 0", entityType, entityTypeService.find(context, 0));
+        assertEquals(entityType, entityTypeService.find(context, 0), "TestFind 0");
     }
 
     @Test
@@ -106,7 +109,7 @@ public class EntityTypeServiceImplTest   {
         entityTypeService.update(context, entityTypeList);
 
         // Verify entityTypeDAO.save was invoked twice to confirm proper invocation of both impls of update()
-        Mockito.verify(entityTypeDAO,times(2)).save(context, entityType);
+        Mockito.verify(entityTypeDAO, times(2)).save(context, entityType);
     }
 
     @Test
@@ -118,7 +121,7 @@ public class EntityTypeServiceImplTest   {
         entityTypeService.delete(context, entityType);
 
         // Verify entityTypeDAO.delete() ran once to confirm proper invocation of delete()
-        Mockito.verify(entityTypeDAO,times(1)).delete(context, entityType);
+        Mockito.verify(entityTypeDAO, times(1)).delete(context, entityType);
     }
 
     /**

@@ -7,7 +7,8 @@
  */
 package org.dspace.app.csv;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -45,8 +46,8 @@ import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by: Andrew Wood
@@ -70,7 +71,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
      * Setup testing environment.
      * @throws java.sql.SQLException passed through.
      */
-    @Before
+    @BeforeEach
     public void setup() throws SQLException {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -382,176 +383,196 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     /**
      * Test failure when referring to item by non unique metadata in the csv file.
      */
-    @Test(expected = MetadataImportException.class)
-    public void testNonUniqueMDRefInCsv() throws Exception {
-        String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
-            "+,Person,," + col1.getHandle() + ",1",
-            "+,Person,," + col1.getHandle() + ",1",
-            "+,Publication,dc.identifier.other:1," + col1.getHandle() + ",2"};
-        performImportScript(csv, true);
+    @Test
+    public void testNonUniqueMDRefInCsv() {
+        assertThrows(MetadataImportException.class, () -> {
+            String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
+                "+,Person,," + col1.getHandle() + ",1",
+                "+,Person,," + col1.getHandle() + ",1",
+                "+,Publication,dc.identifier.other:1," + col1.getHandle() + ",2"};
+            performImportScript(csv, true);
+        });
     }
 
     /**
      * Test failure when referring to item by non unique metadata in the csv file.
      */
-    @Test(expected = MetadataImportException.class)
-    public void testNonUniqueRowName() throws Exception {
-        String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other,rowName",
-            "+,Person,," + col1.getHandle() + ",1,value",
-            "+,Person,," + col1.getHandle() + ",1,value",
-            "+,Publication,rowName:value," + col1.getHandle() + ",2"};
-        performImportScript(csv, true);
+    @Test
+    public void testNonUniqueRowName() {
+        assertThrows(MetadataImportException.class, () -> {
+            String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other,rowName",
+                "+,Person,," + col1.getHandle() + ",1,value",
+                "+,Person,," + col1.getHandle() + ",1,value",
+                "+,Publication,rowName:value," + col1.getHandle() + ",2"};
+            performImportScript(csv, true);
+        });
     }
 
     /**
      * Test failure when referring to item by non unique metadata in the database.
      * @throws java.lang.Exception passed through.
      */
-    @Test(expected = MetadataImportException.class)
-    public void testNonUniqueMDRefInDb() throws Exception {
-        context.turnOffAuthorisationSystem();
-        ItemBuilder.createItem(context, col1)
-                                 .withTitle("Person")
-                                 .withIssueDate("2017-10-17")
-                                 .withAuthor("Smith, Donald")
-                                 .withPersonIdentifierLastName("Smith")
-                                 .withPersonIdentifierFirstName("Donald")
-                                 .withIdentifierOther("1")
-                                 .build();
-        ItemBuilder.createItem(context, col1)
-                                 .withTitle("Person2")
-                                 .withIssueDate("2017-10-17")
-                                 .withAuthor("Smith, John")
-                                 .withPersonIdentifierLastName("Smith")
-                                 .withPersonIdentifierFirstName("John")
-                                 .withIdentifierOther("1")
-                                 .build();
+    @Test
+    public void testNonUniqueMDRefInDb() {
+        assertThrows(MetadataImportException.class, () -> {
+            context.turnOffAuthorisationSystem();
+            ItemBuilder.createItem(context, col1)
+                .withTitle("Person")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald")
+                .withPersonIdentifierLastName("Smith")
+                .withPersonIdentifierFirstName("Donald")
+                .withIdentifierOther("1")
+                .build();
+            ItemBuilder.createItem(context, col1)
+                .withTitle("Person2")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, John")
+                .withPersonIdentifierLastName("Smith")
+                .withPersonIdentifierFirstName("John")
+                .withIdentifierOther("1")
+                .build();
 
-        context.restoreAuthSystemState();
-        String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
-            "+,Publication,dc.identifier.other:1," + col1.getHandle() + ",2"};
-        performImportScript(csv, true);
+            context.restoreAuthSystemState();
+            String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
+                "+,Publication,dc.identifier.other:1," + col1.getHandle() + ",2"};
+            performImportScript(csv, true);
+        });
     }
 
     /**
      * Test failure when referring to item by non unique metadata in the csv and database.
      */
-    @Test(expected = MetadataImportException.class)
-    public void testNonUniqueMDRefInBoth() throws Exception {
-        context.turnOffAuthorisationSystem();
-        ItemBuilder.createItem(context, col1)
-                                 .withTitle("Person")
-                                 .withIssueDate("2017-10-17")
-                                 .withAuthor("Smith, Donald")
-                                 .withPersonIdentifierLastName("Smith")
-                                 .withPersonIdentifierFirstName("Donald")
-                                 .withIdentifierOther("1")
-                                 .build();
-        context.restoreAuthSystemState();
-        String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
-            "+,Person,," + col1.getHandle() + ",1",
-            "+,Publication,dc.identifier.other:1," + col1.getHandle() + ",2"};
-        performImportScript(csv, true);
+    @Test
+    public void testNonUniqueMDRefInBoth() {
+        assertThrows(MetadataImportException.class, () -> {
+            context.turnOffAuthorisationSystem();
+            ItemBuilder.createItem(context, col1)
+                .withTitle("Person")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald")
+                .withPersonIdentifierLastName("Smith")
+                .withPersonIdentifierFirstName("Donald")
+                .withIdentifierOther("1")
+                .build();
+            context.restoreAuthSystemState();
+            String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
+                "+,Person,," + col1.getHandle() + ",1",
+                "+,Publication,dc.identifier.other:1," + col1.getHandle() + ",2"};
+            performImportScript(csv, true);
+        });
     }
 
     /**
      * Test failure when referring to item by metadata that does not exist in the relation column
      */
-    @Test(expected = Exception.class)
-    public void testNonExistMdRef() throws Exception {
-        String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
-            "+,Person,," + col1.getHandle() + ",1",
-            "+,Publication,dc.identifier.other:8675309," + col1.getHandle() + ",2"};
-        performImportScript(csv, false);
+    @Test
+    public void testNonExistMdRef() {
+        assertThrows(Exception.class, () -> {
+            String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
+                "+,Person,," + col1.getHandle() + ",1",
+                "+,Publication,dc.identifier.other:8675309," + col1.getHandle() + ",2"};
+            performImportScript(csv, false);
+        });
     }
 
     /**
      * Test failure when referring to an item in the CSV that hasn't been created yet due to it's order in the CSV
      */
-    @Test(expected = Exception.class)
-    public void testCSVImportWrongOrder() throws Exception {
-        String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
-            "+,Publication,dc.identifier.other:8675309," + col1.getHandle() + ",2",
-            "+,Person,," + col1.getHandle() + ",8675309",};
-        performImportScript(csv, false);
+    @Test
+    public void testCSVImportWrongOrder() {
+        assertThrows(Exception.class, () -> {
+            String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
+                "+,Publication,dc.identifier.other:8675309," + col1.getHandle() + ",2",
+                "+,Person,," + col1.getHandle() + ",8675309",};
+            performImportScript(csv, false);
+        });
     }
 
     /**
      * Test failure when referring to an item in the CSV that hasn't been created yet due to it's order in the CSV
      */
-    @Test(expected = Exception.class)
-    public void testCSVImportWrongOrderRowName() throws Exception {
-        String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other,rowName",
-            "+,Publication,rowName:row2," + col1.getHandle() + ",2,row1",
-            "+,Person,," + col1.getHandle() + ",8675309,row2",};
-        performImportScript(csv, false);
+    @Test
+    public void testCSVImportWrongOrderRowName() {
+        assertThrows(Exception.class, () -> {
+            String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other,rowName",
+                "+,Publication,rowName:row2," + col1.getHandle() + ",2,row1",
+                "+,Person,," + col1.getHandle() + ",8675309,row2",};
+            performImportScript(csv, false);
+        });
     }
 
     /**
      * Test relationship validation with invalid relationship definition
      */
-    @Test(expected = MetadataImportException.class)
-    public void testCSVImportInvalidRelationship() throws Exception {
-        String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName",
-            "+,Publication,," + col1.getHandle() + ",row1",
-            "+,Unit,rowName:row1," + col1.getHandle() + ",row2",};
-        performImportScript(csv, true);
+    @Test
+    public void testCSVImportInvalidRelationship() {
+        assertThrows(MetadataImportException.class, () -> {
+            String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName",
+                "+,Publication,," + col1.getHandle() + ",row1",
+                "+,Unit,rowName:row1," + col1.getHandle() + ",row2",};
+            performImportScript(csv, true);
+        });
     }
 
     /**
      * Test relationship validation with invalid relationship definition and with an archived origin referrer.
      */
-    @Test(expected = MetadataImportInvalidHeadingException.class)
-    public void testInvalidRelationshipArchivedOrigin() throws Exception {
-        context.turnOffAuthorisationSystem();
+    @Test
+    public void testInvalidRelationshipArchivedOrigin() {
+        assertThrows(MetadataImportInvalidHeadingException.class, () -> {
+            context.turnOffAuthorisationSystem();
 
-        Community rootCommunity = CommunityBuilder.createCommunity(context)
-                                                  .withName("Parent Community")
-                                                  .build();
+            Community rootCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
 
-        Collection orgUnitCollection = CollectionBuilder.createCollection(context, rootCommunity)
-                                                        .withEntityType("OrgUnit")
-                                                        .withName("Collection 1")
-                                                        .build();
+            Collection orgUnitCollection = CollectionBuilder.createCollection(context, rootCommunity)
+                .withEntityType("OrgUnit")
+                .withName("Collection 1")
+                .build();
 
-        Item testItem = ItemBuilder.createItem(context, orgUnitCollection)
-                                 .withTitle("OrgUnit")
-                                 .withIssueDate("2017-10-17")
-                                 .build();
+            Item testItem = ItemBuilder.createItem(context, orgUnitCollection)
+                .withTitle("OrgUnit")
+                .withIssueDate("2017-10-17")
+                .build();
 
-        context.restoreAuthSystemState();
-        String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName",
-            "+,Person,," + col1.getHandle() + ",1" +
-                testItem.getID().toString() + ",,rowName:1," + col1.getHandle() + ",2"};
-        performImportScript(csv, false);
+            context.restoreAuthSystemState();
+            String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName",
+                "+,Person,," + col1.getHandle() + ",1" +
+                    testItem.getID().toString() + ",,rowName:1," + col1.getHandle() + ",2"};
+            performImportScript(csv, false);
+        });
     }
 
     /**
      * Test relationship validation with invalid relationship definition and with archived target reference
      */
-    @Test(expected = MetadataImportInvalidHeadingException.class)
-    public void testInvalidRelationshipArchivedTarget() throws Exception {
-        context.turnOffAuthorisationSystem();
+    @Test
+    public void testInvalidRelationshipArchivedTarget() {
+        assertThrows(MetadataImportInvalidHeadingException.class, () -> {
+            context.turnOffAuthorisationSystem();
 
-        Community rootCommunity = CommunityBuilder.createCommunity(context)
-                                                  .withName("Parent Community")
-                                                  .build();
+            Community rootCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
 
-        Collection orgUnitCollection = CollectionBuilder.createCollection(context, rootCommunity)
-                                                        .withEntityType("OrgUnit")
-                                                        .withName("Collection 1")
-                                                        .build();
+            Collection orgUnitCollection = CollectionBuilder.createCollection(context, rootCommunity)
+                .withEntityType("OrgUnit")
+                .withName("Collection 1")
+                .build();
 
-        Item testItem = ItemBuilder.createItem(context, orgUnitCollection)
-                                   .withTitle("OrgUnit")
-                                   .withIssueDate("2017-10-17")
-                                   .build();
+            Item testItem = ItemBuilder.createItem(context, orgUnitCollection)
+                .withTitle("OrgUnit")
+                .withIssueDate("2017-10-17")
+                .build();
 
-        context.restoreAuthSystemState();
-        String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName",
-            testItem.getID().toString() + ",Person,," + col1.getHandle() + ",1" +
-                "+,OrgUnit,rowName:1," + col1.getHandle() + ",2"};
-        performImportScript(csv, false);
+            context.restoreAuthSystemState();
+            String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName",
+                testItem.getID().toString() + ",Person,," + col1.getHandle() + ",1" +
+                    "+,OrgUnit,rowName:1," + col1.getHandle() + ",2"};
+            performImportScript(csv, false);
+        });
     }
 
     /**
@@ -647,30 +668,32 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     /**
      * Test relationship validation with invalid relationship definition by incorrect typeName usage
      */
-    @Test(expected = MetadataImportException.class)
-    public void testInvalidTypeNameDefined() throws Exception {
-        context.turnOffAuthorisationSystem();
+    @Test
+    public void testInvalidTypeNameDefined() {
+        assertThrows(MetadataImportException.class, () -> {
+            context.turnOffAuthorisationSystem();
 
-        Community rootCommunity = CommunityBuilder.createCommunity(context)
-                                                  .withName("Parent Community")
-                                                  .build();
+            Community rootCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
 
-        Collection publicationCollection = CollectionBuilder.createCollection(context, rootCommunity)
-                                                            .withEntityType("Publication")
-                                                            .withName("Collection 1")
-                                                            .build();
+            Collection publicationCollection = CollectionBuilder.createCollection(context, rootCommunity)
+                .withEntityType("Publication")
+                .withName("Collection 1")
+                .build();
 
-        Item testItem = ItemBuilder.createItem(context, publicationCollection)
-                                 .withTitle("Publication")
-                                 .withIssueDate("2017-10-17")
-                                 .build();
+            Item testItem = ItemBuilder.createItem(context, publicationCollection)
+                .withTitle("Publication")
+                .withIssueDate("2017-10-17")
+                .build();
 
-        context.restoreAuthSystemState();
-        String[] csv = {"id,collection,dspace.entity.type,dc.title," +
-            "relation.isProjectOfPublication,relation.isPublicationOfProject",
-            "+," + col1.getHandle() + ",Project,Title," +
-                testItem.getID().toString() + "," + testItem.getID().toString()};
-        performImportScript(csv, true);
+            context.restoreAuthSystemState();
+            String[] csv = {"id,collection,dspace.entity.type,dc.title," +
+                "relation.isProjectOfPublication,relation.isPublicationOfProject",
+                "+," + col1.getHandle() + ",Project,Title," +
+                    testItem.getID().toString() + "," + testItem.getID().toString()};
+            performImportScript(csv, true);
+        });
     }
 
     /**

@@ -46,7 +46,8 @@ import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -90,6 +91,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
     private final String item2IssueDate = "2012-10-17";
     private EPerson anotherEPerson;
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

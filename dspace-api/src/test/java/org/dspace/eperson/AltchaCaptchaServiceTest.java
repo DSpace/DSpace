@@ -7,7 +7,8 @@
  */
 package org.dspace.eperson;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -18,9 +19,9 @@ import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Basic tests to verity the Altcha captcha service can verify payloads from the client
@@ -32,11 +33,11 @@ public class AltchaCaptchaServiceTest extends AbstractUnitTest {
     CaptchaService captchaService;
     ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    @After
+    @AfterEach
     public void tearDown() {
         configurationService.setProperty("captcha.provider", "google");
     }
-    @Before
+    @BeforeEach
     public void setUp() {
         configurationService.setProperty("captcha.provider", "altcha");
         configurationService.setProperty("altcha.hmac.key", "onetwothreesecret");
@@ -59,19 +60,21 @@ public class AltchaCaptchaServiceTest extends AbstractUnitTest {
         captchaService.processResponse(payload, "validate");
     }
 
-    @Test(expected = InvalidReCaptchaException.class)
+    @Test
     public void testInvalidCaptchaPayloadValidation() {
-        // Create raw JSON first
-        JSONObject json = new JSONObject();
-        json.put("algorithm", "SHA-256");
-        json.put("challenge", "abcdefg");
-        json.put("salt", "salt123");
-        json.put("number", 1);
-        json.put("signature", "123123123123");
-        String payload = Base64.getEncoder().encodeToString(json.toString().getBytes(StandardCharsets.UTF_8));
-        // Ask the captcha service to validate the payload
-        captchaService.processResponse(payload, "validate");
-        // If we got here, something is off - an exception should have been thrown
-        fail("Invalid captcha payload should have failed with IllegalReCaptchaException");
+        assertThrows(InvalidReCaptchaException.class, () -> {
+            // Create raw JSON first
+            JSONObject json = new JSONObject();
+            json.put("algorithm", "SHA-256");
+            json.put("challenge", "abcdefg");
+            json.put("salt", "salt123");
+            json.put("number", 1);
+            json.put("signature", "123123123123");
+            String payload = Base64.getEncoder().encodeToString(json.toString().getBytes(StandardCharsets.UTF_8));
+            // Ask the captcha service to validate the payload
+            captchaService.processResponse(payload, "validate");
+            // If we got here, something is off - an exception should have been thrown
+            fail("Invalid captcha payload should have failed with IllegalReCaptchaException");
+        });
     }
 }

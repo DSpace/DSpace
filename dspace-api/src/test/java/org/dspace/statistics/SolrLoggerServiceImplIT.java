@@ -7,9 +7,9 @@
  */
 package org.dspace.statistics;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -35,11 +35,11 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test some methods of SolrLoggerServiceImpl.
@@ -78,7 +78,7 @@ public class SolrLoggerServiceImplIT
     private static Path testAddressesPath;
     private static Path testAgentsPath;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass()
             throws IOException {
         Path spidersPath = Paths.get(cfg.getProperty("dspace.dir"), "config", "spiders");
@@ -102,18 +102,18 @@ public class SolrLoggerServiceImplIT
                 .close();
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass()
             throws IOException {
         Files.deleteIfExists(testAddressesPath);
         Files.deleteIfExists(testAgentsPath);
     }
 
-    @Before
+    @BeforeEach
     public void setUpTest() {
     }
 
-    @After
+    @AfterEach
     public void tearDownTest() {
     }
 
@@ -200,11 +200,11 @@ public class SolrLoggerServiceImplIT
             boolean isBot = (null == isBotRaw) ? false : (Boolean) isBotRaw;
 
             if (NOT_BOT_IP.equals(ip) && NOT_BOT_AGENT.equals(agent)) {
-                assertFalse(String.format("IP %s plus Agent %s is marked as bot --", ip, agent),
-                        isBot);
+                assertFalse(isBot,
+                        String.format("IP %s plus Agent %s is marked as bot --", ip, agent));
             } else {
-                assertTrue(String.format("IP %s or Agent %s is not marked as bot --", ip, agent),
-                        isBot);
+                assertTrue(isBot,
+                        String.format("IP %s or Agent %s is not marked as bot --", ip, agent));
             }
 
             nDocs++;
@@ -212,8 +212,8 @@ public class SolrLoggerServiceImplIT
                 nGood++;
             }
         }
-        assertEquals("Wrong number of documents", 4, nDocs);
-        assertEquals("Wrong number of non-bot views", 1, nGood);
+        assertEquals(4, nDocs, "Wrong number of documents");
+        assertEquals(1, nGood, "Wrong number of non-bot views");
     }
 
     /**
@@ -298,9 +298,8 @@ public class SolrLoggerServiceImplIT
             Object isBotRaw = document.getFieldValue(F_IS_BOT);
             boolean isBot = (null == isBotRaw) ? false : (Boolean) isBotRaw;
 
-            assertEquals("Marked document was not removed --",
-                    false, isBot);
+            assertEquals(false, isBot, "Marked document was not removed --");
         }
-        assertEquals("Wrong number of documents remaining --", 1, nDocs);
+        assertEquals(1, nDocs, "Wrong number of documents remaining --");
     }
 }

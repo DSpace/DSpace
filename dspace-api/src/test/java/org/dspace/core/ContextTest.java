@@ -12,10 +12,10 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -33,8 +33,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -59,7 +59,7 @@ public class ContextTest extends AbstractUnitTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -272,8 +272,8 @@ public class ContextTest extends AbstractUnitTest {
 
         // By default, we should have a new DB connection, so let's make sure it is there
         assertThat("HibernateDBConnection should exist", instance.getDBConnection(), notNullValue());
-        assertTrue("Context should be valid", instance.isValid());
-        assertTrue("Transaction should be open", instance.isTransactionAlive());
+        assertTrue(instance.isValid(), "Context should be valid");
+        assertTrue(instance.isTransactionAlive(), "Transaction should be open");
 
         // Allow full Admin perms (in new context)
         when(authorizeServiceSpy.isAdmin(instance)).thenReturn(true);
@@ -293,14 +293,14 @@ public class ContextTest extends AbstractUnitTest {
         // We expect our DB connection to still exist
         assertThat("HibernateDBConnection should still be open", instance.getDBConnection(), notNullValue());
         // We expect the Context to be valid
-        assertTrue("Context should still be valid", instance.isValid());
+        assertTrue(instance.isValid(), "Context should still be valid");
         // However, the transaction should now be closed
-        assertFalse("DB transaction should be closed", instance.isTransactionAlive());
+        assertFalse(instance.isTransactionAlive(), "DB transaction should be closed");
 
         // ReloadEntity and verify changes saved
         // NOTE: reloadEntity() is required, see commit() method Javadocs
         newUser = instance.reloadEntity(newUser);
-        assertEquals("New user should be created", newUser.getEmail(), createdEmail);
+        assertEquals(newUser.getEmail(), createdEmail, "New user should be created");
 
         // Change the email and commit again (a Context should support multiple commit() calls)
         String newEmail = "myrealemail@example.com";
@@ -309,7 +309,7 @@ public class ContextTest extends AbstractUnitTest {
 
         // Reload entity and new value should be there.
         newUser = instance.reloadEntity(newUser);
-        assertEquals("New email address should be saved", newUser.getEmail(), newEmail);
+        assertEquals(newUser.getEmail(), newEmail, "New email address should be saved");
 
         // Cleanup our new object & context
         ePersonService.delete(instance, newUser);
@@ -562,7 +562,7 @@ public class ContextTest extends AbstractUnitTest {
     public void testUncacheEntities() throws Throwable {
         // To set up the test, ensure the cache contains more than the current user entity
         groupService.findByName(context, Group.ANONYMOUS);
-        assertTrue("Cache size should be greater than one", context.getDBConnection().getCacheSize() > 1);
+        assertTrue(context.getDBConnection().getCacheSize() > 1, "Cache size should be greater than one");
 
         context.uncacheEntities();
 

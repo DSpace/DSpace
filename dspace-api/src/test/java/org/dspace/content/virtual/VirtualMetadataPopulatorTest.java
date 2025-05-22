@@ -7,7 +7,7 @@
  */
 package org.dspace.content.virtual;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -15,12 +15,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dspace.content.RelationshipType;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class VirtualMetadataPopulatorTest {
 
     @InjectMocks
@@ -37,7 +40,7 @@ public class VirtualMetadataPopulatorTest {
         virtualMetadataPopulator.setMap(map);
 
         // The returned map should match our defined map
-        assertEquals("TestSetMap 0", map, virtualMetadataPopulator.getMap());
+        assertEquals(map, virtualMetadataPopulator.getMap(), "TestSetMap 0");
     }
 
     @Test
@@ -51,7 +54,7 @@ public class VirtualMetadataPopulatorTest {
         virtualMetadataPopulator.setMap(map);
 
         // The returned map should match our defined map
-        assertEquals("TestGetMap 0", map, virtualMetadataPopulator.getMap());
+        assertEquals(map, virtualMetadataPopulator.getMap(), "TestGetMap 0");
     }
 
     @Test
@@ -73,10 +76,12 @@ public class VirtualMetadataPopulatorTest {
         when(relationshipType.getRightwardType()).thenReturn("RightwardType");
 
         // Assert that the useForPlace for our mocked relationshipType is false
-        assertEquals("TestGetFields 0", false,
-                virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationshipType, false));
+        assertEquals(false,
+            virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationshipType, false),
+            "TestGetFields 0");
         // Assert that the useForPlace for our mocked relationshipType is true
-        assertEquals("TestGetFields 1", true,
-                virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationshipType, true));
+        assertEquals(true,
+            virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationshipType, true),
+            "TestGetFields 1");
     }
 }

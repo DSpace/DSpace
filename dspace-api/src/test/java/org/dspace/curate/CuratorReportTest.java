@@ -23,12 +23,12 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Site;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.services.ConfigurationService;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Drive the Curator and check results.
@@ -42,19 +42,19 @@ public class CuratorReportTest
     public CuratorReportTest() {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -99,17 +99,17 @@ public class CuratorReportTest
         }
         Pattern pattern;
         pattern = Pattern.compile(String.format("task1.*%s", site.getHandle()));
-        Assert.assertTrue("A report should mention 'task1' and site's handle",
-                reportMatcher(report, pattern));
+        Assertions.assertTrue(reportMatcher(report, pattern),
+                "A report should mention 'task1' and site's handle");
         pattern = Pattern.compile(String.format("task1.*%s", community.getHandle()));
-        Assert.assertTrue("A report should mention 'task1' and the community's handle",
-                reportMatcher(report, pattern));
+        Assertions.assertTrue(reportMatcher(report, pattern),
+                "A report should mention 'task1' and the community's handle");
         pattern = Pattern.compile(String.format("task2.*%s", site.getHandle()));
-        Assert.assertTrue("A report should mention 'task2' and the Site's handle",
-                reportMatcher(report, pattern));
+        Assertions.assertTrue(reportMatcher(report, pattern),
+                "A report should mention 'task2' and the Site's handle");
         pattern = Pattern.compile(String.format("task2.*%s", community.getHandle()));
-        Assert.assertTrue("A report should mention 'task2' and the community's handle",
-                reportMatcher(report, pattern));
+        Assertions.assertTrue(reportMatcher(report, pattern),
+                "A report should mention 'task2' and the community's handle");
     }
 
     /**

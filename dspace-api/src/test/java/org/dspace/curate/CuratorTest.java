@@ -7,7 +7,7 @@
  */
 package org.dspace.curate;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -22,7 +22,7 @@ import org.dspace.content.service.SiteService;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.ctask.general.NoOpCurationTask;
 import org.dspace.services.ConfigurationService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mhwood
@@ -83,10 +83,9 @@ public class CuratorTest extends AbstractUnitTest {
             TASK_NAME, instance.getResult(TASK_NAME));
         System.out.format("Task %s status was %d%n",
             TASK_NAME, instance.getStatus(TASK_NAME));
-        assertEquals("Unexpected task status",
-            Curator.CURATE_SUCCESS, instance.getStatus(TASK_NAME));
-        assertEquals("Wrong run parameter", RUN_PARAMETER_VALUE, runParameter);
-        assertEquals("Wrong task property", TASK_PROPERTY_VALUE, taskProperty);
+        assertEquals(Curator.CURATE_SUCCESS, instance.getStatus(TASK_NAME), "Unexpected task status");
+        assertEquals(RUN_PARAMETER_VALUE, runParameter, "Wrong run parameter");
+        assertEquals(TASK_PROPERTY_VALUE, taskProperty, "Wrong task property");
     }
 
     @Test

@@ -7,9 +7,8 @@
  */
 
 package org.dspace.app.bulkedit;
-
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -46,9 +45,9 @@ import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MetadataEditControlledVocabularyIT extends AbstractIntegrationTestWithDatabase {
     ConfigurationService configurationService = new DSpace().getConfigurationService();
@@ -62,7 +61,7 @@ public class MetadataEditControlledVocabularyIT extends AbstractIntegrationTestW
 
     private File file;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -97,7 +96,7 @@ public class MetadataEditControlledVocabularyIT extends AbstractIntegrationTestW
         context.restoreAuthSystemState();
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         super.destroy();
@@ -124,8 +123,8 @@ public class MetadataEditControlledVocabularyIT extends AbstractIntegrationTestW
 
         runExport(item);
         assertNull(
-            "Export should succeed",
-            handler.getException()
+            handler.getException(),
+            "Export should succeed"
         );
 
         String exportedContent = readFile();
@@ -139,8 +138,8 @@ public class MetadataEditControlledVocabularyIT extends AbstractIntegrationTestW
 
         runImport();
         assertNull(
-            "Re-import should succeed",
-            handler.getException()
+            handler.getException(),
+            "Re-import should succeed"
         );
 
         // Note: we need to re-retrieve the Item to see the newly updated metadata
@@ -170,8 +169,8 @@ public class MetadataEditControlledVocabularyIT extends AbstractIntegrationTestW
 
         runExport(item);
         assertNull(
-            "Export should succeed",
-            handler.getException()
+            handler.getException(),
+            "Export should succeed"
         );
 
         String exportedContent = readFile();
@@ -187,8 +186,8 @@ public class MetadataEditControlledVocabularyIT extends AbstractIntegrationTestW
 
         runImport();
         assertNull(
-            "Re-import should succeed",
-            handler.getException()
+            handler.getException(),
+            "Re-import should succeed"
         );
 
         // Note: we need to re-retrieve the Item to see the newly updated metadata

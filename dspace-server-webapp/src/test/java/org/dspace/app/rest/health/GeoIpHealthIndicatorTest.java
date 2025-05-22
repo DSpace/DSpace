@@ -17,11 +17,13 @@ import java.util.Map;
 import com.maxmind.geoip2.DatabaseReader;
 import org.dspace.app.rest.configuration.ActuatorConfiguration;
 import org.dspace.statistics.GeoIpService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
 
@@ -31,7 +33,8 @@ import org.springframework.boot.actuate.health.Status;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class GeoIpHealthIndicatorTest {
 
     @Mock

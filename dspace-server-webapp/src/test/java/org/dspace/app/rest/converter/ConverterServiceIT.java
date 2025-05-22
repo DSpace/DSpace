@@ -9,10 +9,11 @@ package org.dspace.app.rest.converter;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -34,8 +35,8 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
@@ -72,7 +73,7 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
     @Autowired
     private ObjectMapper mapper;
 
-    @Before
+    @BeforeEach
     public void setup() {
         // We're mocking a request here because we've started using the Context in the ConverterService#toRest
         // method by invoking the DSpacePermissionEvaluator. This will traverse the RestPermissionEvaluatorPlugins
@@ -107,10 +108,12 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
      * When calling {@code toRest} and the inferred return type is incompatible with the converter's output,
      * it should throw a {@link ClassCastException}.
      */
-    @Test(expected = ClassCastException.class)
+    @Test
     public void toRestWrongReturnType() {
-        @SuppressWarnings("unused")
-        String restObject = converter.toRest(MockObject.create(0), Projection.DEFAULT);
+        assertThrows(ClassCastException.class, () -> {
+            @SuppressWarnings("unused")
+            String restObject = converter.toRest(MockObject.create(0), Projection.DEFAULT);
+        });
     }
 
     /**
@@ -160,10 +163,12 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
      * When calling {@code toResource} and the inferred return type is incompatible with the resource constructor,
      * it should throw a {@link ClassCastException}.
      */
-    @Test(expected = ClassCastException.class)
+    @Test
     public void toResourceWrongReturnType() {
-        @SuppressWarnings("unused")
-        MockHalResource mockHalResource = converter.toResource(MockObjectRest.create(0));
+        assertThrows(ClassCastException.class, () -> {
+            @SuppressWarnings("unused")
+            MockHalResource mockHalResource = converter.toResource(MockObjectRest.create(0));
+        });
     }
 
     /**
@@ -273,8 +278,8 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
             } else if (value == null) {
                 fail("got null value, but expected a " + expectedClass + " for embed: " + rel);
             } else {
-                assertTrue("got a " + value.getClass() + " value, but expected a "
-                        + expectedClass + " for embed: " + rel, expectedClass.isAssignableFrom(value.getClass()));
+                assertTrue(expectedClass.isAssignableFrom(value.getClass()), "got a " + value.getClass() + " value, but expected a "
+                        + expectedClass + " for embed: " + rel);
             }
         }
     }

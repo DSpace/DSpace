@@ -7,7 +7,7 @@
  */
 package org.dspace;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -40,9 +40,9 @@ import org.dspace.statistics.MockSolrStatisticsCore;
 import org.dspace.statistics.SolrStatisticsCore;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.jdom2.Document;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Abstract Test class that will initialize the in-memory database
@@ -89,7 +89,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      * This method builds on the initialization in AbstractDSpaceIntegrationTest, and
      * initializes the in-memory database for tests that need it.
      */
-    @BeforeClass
+    @BeforeAll
     public static void initDatabase() {
         try {
             // Update/Initialize the database to latest version (via Flyway)
@@ -116,7 +116,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         try {
             //Start a new context
@@ -177,7 +177,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      *
      * @throws java.lang.Exception passed through.
      */
-    @After
+    @AfterEach
     public void destroy() throws Exception {
         // Cleanup our global context object
         try {

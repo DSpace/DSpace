@@ -7,8 +7,8 @@
  */
 package org.dspace.saml2;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,9 +24,9 @@ import org.dspace.AbstractDSpaceTest;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -42,12 +42,12 @@ public class DSpaceSamlAuthenticationSuccessHandlerTest extends AbstractDSpaceTe
     private RequestDispatcher requestDispatcher;
     private HttpServletResponse response;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeAll() {
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     }
 
-    @Before
+    @BeforeEach
     public void beforeEach() {
         resetConfigurationService();
 

@@ -7,7 +7,8 @@
  */
 package org.dspace.discovery;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.AbstractUnitTest;
@@ -18,7 +19,7 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.discovery.indexobject.IndexableMetadataField;
 import org.dspace.discovery.indexobject.MetadataFieldIndexFactoryImpl;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class for {@link MetadataFieldIndexFactoryImpl}

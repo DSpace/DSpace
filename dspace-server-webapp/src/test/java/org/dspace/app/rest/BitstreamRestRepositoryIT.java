@@ -18,7 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -74,9 +74,9 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -161,7 +161,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     //TODO Re-enable test after https://jira.duraspace.org/browse/DS-3774 is fixed
-    @Ignore
+    @Disabled
     @Test
     public void findAllWithDeletedTest() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
@@ -2495,7 +2495,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String patchBody = getPatchContent(ops);
         String token = getAuthToken(admin.getEmail(), password);
 
-        Assert.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
+        Assertions.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
 
         getClient(token).perform(patch("/api/core/bitstreams")
                                      .content(patchBody)
@@ -2503,8 +2503,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                         .andExpect(status().isNoContent());
 
         // Verify that only the three bitstreams were deleted and the fourth one still exists
-        Assert.assertTrue(bitstreamNotFound(token, bitstream1, bitstream2, bitstream3));
-        Assert.assertTrue(bitstreamExists(token, bitstream4));
+        Assertions.assertTrue(bitstreamNotFound(token, bitstream1, bitstream2, bitstream3));
+        Assertions.assertTrue(bitstreamExists(token, bitstream4));
     }
 
     @Test
@@ -2561,7 +2561,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String patchBody = getPatchContent(ops);
         String token = getAuthToken(admin.getEmail(), password);
 
-        Assert.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
+        Assertions.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
 
         MvcResult result = getClient(token).perform(patch("/api/core/bitstreams")
                                      .content(patchBody)
@@ -2574,7 +2574,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                             result.getResponse().getErrorMessage());
 
         // Verify that no bitstreams were deleted since the request was invalid
-        Assert.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
+        Assertions.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
     }
 
     @Test
@@ -2630,7 +2630,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String patchBody = getPatchContent(ops);
         String token = getAuthToken(admin.getEmail(), password);
 
-        Assert.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
+        Assertions.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
         DSpaceServicesFactory.getInstance().getConfigurationService().setProperty("rest.patch.operations.limit", 2);
 
         getClient(token).perform(patch("/api/core/bitstreams")
@@ -2639,7 +2639,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                         .andExpect(status().isBadRequest());
 
         // Verify that no bitstreams were deleted since the request was invalid
-        Assert.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
+        Assertions.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
     }
 
     @Test
@@ -2694,7 +2694,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String patchBody = getPatchContent(ops);
         String token = getAuthToken(admin.getEmail(), password);
 
-        Assert.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
+        Assertions.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
 
         getClient().perform(patch("/api/core/bitstreams")
                                      .content(patchBody)
