@@ -6,4 +6,4 @@
 -- http://www.dspace.org/license/
 --
 
-CREATE INDEX entity_type_label_upper_idx ON entity_type (UPPER(label));
+CREATE INDEX entity_type_label_upper_idx ON entity_type (label);
