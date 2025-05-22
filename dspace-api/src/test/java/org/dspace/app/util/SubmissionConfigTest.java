@@ -7,8 +7,8 @@
  */
 package org.dspace.app.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -17,11 +17,11 @@ import java.util.List;
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.Collection;
 import org.dspace.submit.factory.SubmissionServiceFactory;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 /**
@@ -36,20 +36,20 @@ public class SubmissionConfigTest extends AbstractUnitTest {
     @Mock
     private Collection col1;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws DCInputsReaderException {
         inputReader = new DCInputsReader();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         inputReader = null;
     }

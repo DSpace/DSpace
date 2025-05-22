@@ -11,10 +11,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -41,11 +41,13 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.workflow.MockWorkflowItem;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -53,7 +55,8 @@ import org.springframework.test.util.ReflectionTestUtils;
  *
  * @author pvillega
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class WorkspaceItemTest extends AbstractUnitTest {
 
     /**
@@ -87,7 +90,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -125,7 +128,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         wi = null;
@@ -168,7 +171,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     public void testCreateAuth() throws Exception {
         // Allow Collection ADD perms
         doNothing().when(authorizeServiceSpy).authorizeAction(any(Context.class),
-                                                              any(Collection.class), eq(Constants.ADD));
+            any(Collection.class), eq(Constants.ADD));
 
         boolean template;
         WorkspaceItem created;
@@ -176,23 +179,25 @@ public class WorkspaceItemTest extends AbstractUnitTest {
         template = false;
         created = workspaceItemService.create(context, collection, template);
         assertThat("testCreate 0", created, notNullValue());
-        assertTrue("testCreate 1", created.getID() >= 0);
+        assertTrue(created.getID() >= 0, "testCreate 1");
         assertThat("testCreate 2", created.getCollection(), equalTo(collection));
 
         template = true;
         created = workspaceItemService.create(context, collection, template);
         assertThat("testCreate 3", created, notNullValue());
-        assertTrue("testCreate 4", created.getID() >= 0);
+        assertTrue(created.getID() >= 0, "testCreate 4");
         assertThat("testCreate 5", created.getCollection(), equalTo(collection));
     }
 
     /**
      * Test of create method, of class WorkspaceItem.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testCreateNoAuth() throws Exception {
-        workspaceItemService.create(context, collection, false);
-        fail("Exception expected");
+    @Test
+    public void testCreateNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            workspaceItemService.create(context, collection, false);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -203,14 +208,14 @@ public class WorkspaceItemTest extends AbstractUnitTest {
         EPerson ep = context.getCurrentUser();
         List<WorkspaceItem> found = workspaceItemService.findByEPerson(context, ep);
         assertThat("testFindByEPerson 0", found, notNullValue());
-        assertTrue("testFindByEPerson 1", found.size() >= 1);
+        assertTrue(found.size() >= 1, "testFindByEPerson 1");
         boolean exists = false;
         for (WorkspaceItem w : found) {
             if (w.equals(wi)) {
                 exists = true;
             }
         }
-        assertTrue("testFindByEPerson 2", exists);
+        assertTrue(exists, "testFindByEPerson 2");
     }
 
     /**
@@ -221,7 +226,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
         Collection c = wi.getCollection();
         List<WorkspaceItem> found = workspaceItemService.findByCollection(context, c);
         assertThat("testFindByCollection 0", found, notNullValue());
-        assertTrue("testFindByCollection 1", found.size() >= 1);
+        assertTrue(found.size() >= 1, "testFindByCollection 1");
         assertThat("testFindByCollection 2", found.get(0).getID(), equalTo(wi.getID()));
         assertThat("testFindByCollection 3", found.get(0), equalTo(wi));
         assertThat("testFindByCollection 4", found.get(0).getCollection(), equalTo(wi.getCollection()));
@@ -233,7 +238,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     @Test
     public void testFindAll() throws Exception {
         List<WorkspaceItem> found = workspaceItemService.findAll(context);
-        assertTrue("testFindAll 0", found.size() >= 1);
+        assertTrue(found.size() >= 1, "testFindAll 0");
         boolean added = false;
         for (WorkspaceItem f : found) {
             assertThat("testFindAll 1", f, notNullValue());
@@ -243,7 +248,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
                 added = true;
             }
         }
-        assertTrue("testFindAll 4", added);
+        assertTrue(added, "testFindAll 4");
     }
 
     /**
@@ -251,7 +256,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
      */
     @Test
     public void testGetID() {
-        assertTrue("testGetID 0", wi.getID() >= 0);
+        assertTrue(wi.getID() >= 0, "testGetID 0");
     }
 
     /**
@@ -259,7 +264,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
      */
     @Test
     public void testGetStageReached() {
-        assertTrue("testGetStageReached 0", wi.getStageReached() == -1);
+        assertTrue(wi.getStageReached() == -1, "testGetStageReached 0");
     }
 
     /**
@@ -268,7 +273,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     @Test
     public void testSetStageReached() {
         wi.setStageReached(4);
-        assertTrue("testSetStageReached 0", wi.getStageReached() == 4);
+        assertTrue(wi.getStageReached() == 4, "testSetStageReached 0");
     }
 
     /**
@@ -276,7 +281,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
      */
     @Test
     public void testGetPageReached() {
-        assertTrue("testGetPageReached 0", wi.getPageReached() == -1);
+        assertTrue(wi.getPageReached() == -1, "testGetPageReached 0");
     }
 
     /**
@@ -285,7 +290,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     @Test
     public void testSetPageReached() {
         wi.setPageReached(4);
-        assertTrue("testSetPageReached 0", wi.getPageReached() == 4);
+        assertTrue(wi.getPageReached() == 4, "testSetPageReached 0");
     }
 
     /**
@@ -301,38 +306,40 @@ public class WorkspaceItemTest extends AbstractUnitTest {
 
         // Reload our WorkspaceItem
         wi = workspaceItemService.find(context, wi.getID());
-        assertTrue("testUpdate", pBefore != wi.isPublishedBefore());
+        assertTrue(pBefore != wi.isPublishedBefore(), "testUpdate");
     }
 
     /**
      * Test of update method, of class WorkspaceItem with no WRITE auth.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testUpdateNoAuth() throws Exception {
-        // Create a new Eperson to be the current user
-        context.turnOffAuthorisationSystem();
-        EPerson eperson = ePersonService.create(context);
-        eperson.setEmail("jane@smith.org");
-        eperson.setFirstName(context, "Jane");
-        eperson.setLastName(context, "Smith");
-        ePersonService.update(context, eperson);
+    @Test
+    public void testUpdateNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Create a new Eperson to be the current user
+            context.turnOffAuthorisationSystem();
+            EPerson eperson = ePersonService.create(context);
+            eperson.setEmail("jane@smith.org");
+            eperson.setFirstName(context, "Jane");
+            eperson.setLastName(context, "Smith");
+            ePersonService.update(context, eperson);
 
-        // Update our session to be logged in as new users
-        EPerson currentUser = context.getCurrentUser();
-        context.setCurrentUser(eperson);
-        context.restoreAuthSystemState();
+            // Update our session to be logged in as new users
+            EPerson currentUser = context.getCurrentUser();
+            context.setCurrentUser(eperson);
+            context.restoreAuthSystemState();
 
-        // Try and update the workspace item. A different EPerson should have no rights
-        try {
-            boolean pBefore = wi.isPublishedBefore();
-            wi.setPublishedBefore(!pBefore);
-            workspaceItemService.update(context, wi);
-        } finally {
-            // Restore the current user
-            context.setCurrentUser(currentUser);
-        }
+            // Try and update the workspace item. A different EPerson should have no rights
+            try {
+                boolean pBefore = wi.isPublishedBefore();
+                wi.setPublishedBefore(!pBefore);
+                workspaceItemService.update(context, wi);
+            } finally {
+                // Restore the current user
+                context.setCurrentUser(currentUser);
+            }
 
-        fail("Exception expected");
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -385,13 +392,15 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     /**
      * Test of deleteWrapper method, of class WorkspaceItem.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testDeleteWrapperNoAuth() throws Exception {
-        // Disallow Item WRITE perms
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy)
-                                         .authorizeAction(context, wi.getItem(), Constants.WRITE);
-        workspaceItemService.deleteWrapper(context, wi);
-        fail("Exception expected");
+    @Test
+    public void testDeleteWrapperNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow Item WRITE perms
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy)
+                .authorizeAction(context, wi.getItem(), Constants.WRITE);
+            workspaceItemService.deleteWrapper(context, wi);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -424,7 +433,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
      */
     @Test
     public void testHasMultipleFiles() {
-        assertFalse("testHasMultipleFiles 0", wi.hasMultipleFiles());
+        assertFalse(wi.hasMultipleFiles(), "testHasMultipleFiles 0");
     }
 
     /**
@@ -433,7 +442,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     @Test
     public void testSetMultipleFiles() {
         wi.setMultipleFiles(true);
-        assertTrue("testSetMultipleFiles 0", wi.hasMultipleFiles());
+        assertTrue(wi.hasMultipleFiles(), "testSetMultipleFiles 0");
     }
 
     /**
@@ -441,7 +450,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
      */
     @Test
     public void testHasMultipleTitles() {
-        assertFalse("testHasMultipleTitles 0", wi.hasMultipleTitles());
+        assertFalse(wi.hasMultipleTitles(), "testHasMultipleTitles 0");
     }
 
     /**
@@ -450,7 +459,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     @Test
     public void testSetMultipleTitles() {
         wi.setMultipleTitles(true);
-        assertTrue("testSetMultipleTitles 0", wi.hasMultipleTitles());
+        assertTrue(wi.hasMultipleTitles(), "testSetMultipleTitles 0");
     }
 
     /**
@@ -458,7 +467,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
      */
     @Test
     public void testIsPublishedBefore() {
-        assertFalse("testIsPublishedBefore 0", wi.isPublishedBefore());
+        assertFalse(wi.isPublishedBefore(), "testIsPublishedBefore 0");
     }
 
     /**
@@ -467,7 +476,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     @Test
     public void testSetPublishedBefore() {
         wi.setPublishedBefore(true);
-        assertTrue("testSetPublishedBefore 0", wi.isPublishedBefore());
+        assertTrue(wi.isPublishedBefore(), "testSetPublishedBefore 0");
     }
 
     @Test

@@ -31,7 +31,7 @@ import org.dspace.builder.MetadataSchemaBuilder;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

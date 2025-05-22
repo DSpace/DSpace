@@ -12,18 +12,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.contrib.java.lang.system.Assertion;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for configuration utilities.
@@ -66,7 +66,7 @@ public class ConfigurationIT
     /**
      * Create some expected properties before all tests.
      */
-    @BeforeClass
+    @BeforeAll
     public static void setupSuite() {
         cfg = kernelImpl.getConfigurationService();
 
@@ -79,7 +79,7 @@ public class ConfigurationIT
     /**
      * After all tests, remove the properties that were created at entry.
      */
-    @AfterClass
+    @AfterAll
     public static void teardownSuite() {
         if (null != cfg) {
             cfg.setProperty(SINGLE_PROPERTY, null);
@@ -240,7 +240,7 @@ public class ConfigurationIT
             String outputs = systemOutRule.getLogWithNormalizedLineSeparator();
             String[] output = outputs.split("\n");
             assertThat(output, arrayWithSize(1));
-            assertEquals("--first should return first value", output[0], ARRAY_VALUE[0]);
+            assertEquals(output[0], ARRAY_VALUE[0], "--first should return first value");
         });
         systemOutRule.enableLog();
         Configuration.main(argv);
@@ -260,7 +260,7 @@ public class ConfigurationIT
             String outputs = systemOutRule.getLogWithNormalizedLineSeparator();
             String[] output = outputs.split("\n");
             assertThat(output, arrayWithSize(1));
-            assertEquals("--first should return only value", output[0], SINGLE_VALUE);
+            assertEquals(output[0], SINGLE_VALUE, "--first should return only value");
         });
         systemOutRule.enableLog();
         Configuration.main(argv);

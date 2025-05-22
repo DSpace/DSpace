@@ -7,7 +7,7 @@
  */
 package org.dspace.identifier;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -23,8 +23,8 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class VersionedHandleIdentifierProviderIT extends AbstractIdentifierProviderIT  {
 
@@ -36,7 +36,7 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIdentifierProvi
     private Item itemV2;
     private Item itemV3;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

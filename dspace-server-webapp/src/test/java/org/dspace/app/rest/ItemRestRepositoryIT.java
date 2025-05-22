@@ -101,7 +101,7 @@ import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItem;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
 

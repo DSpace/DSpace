@@ -81,6 +81,14 @@
                      as it is used to reference the LICENSE.header and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
     </properties>
+ <dependencies>
+  <dependency>
+   <groupId>org.hamcrest</groupId>
+   <artifactId>hamcrest-junit</artifactId>
+   <version>2.0.0.0</version>
+   <scope>test</scope>
+  </dependency>
+ </dependencies>
 
     <build>
         <!-- Define Maven Plugin Settings that should be inherited to ALL submodule POMs.
@@ -409,6 +417,43 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>0.8.13</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.openrewrite.maven</groupId>
+                    <artifactId>rewrite-maven-plugin</artifactId>
+                    <version>6.9.0</version>
+                    <configuration>
+                        <exportDatatables>true</exportDatatables>
+                        <activeRecipes>
+                            <!--<recipe>org.dspace.refactor.JUnit4to5AssertArguments</recipe>-->
+                            <!--<recipe>org.openrewrite.java.testing.junit5.JUnit4to5Migration</recipe>-->
+                            <recipe>org.openrewrite.java.spring.boot2.SpringBoot2JUnit4to5Migration</recipe>
+                        </activeRecipes>
+                        <exclusions>
+                            <!--
+                            <exclusion>dspace-services</exclusion>
+                            <exclusion>**/dspace-services/**</exclusion>
+                            <exclusion>**/dspace-services/*.java</exclusion>
+                            -->
+                        </exclusions>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.openrewrite.recipe</groupId>
+                            <artifactId>rewrite-spring</artifactId>
+                            <version>6.7.0</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.dspace.refactor</groupId>
+                            <artifactId>dspace-junit-4-to-5</artifactId>
+                            <version>0.0.1-SNAPSHOT</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.openrewrite.recipe</groupId>
+                            <artifactId>rewrite-testing-frameworks</artifactId>
+                            <version>3.9.0</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -1109,6 +1154,11 @@
                 <version>[9.0.0,10.0.0)</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.dspace.refactor</groupId>
+                <artifactId>dspace-junit-4-to-5</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
             <!-- DSpace third Party Dependencies -->
 
             <dependency>
@@ -1729,7 +1779,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-inline</artifactId>
-                <version>3.12.4</version>
+                <version>4.11.0</version>
                 <scope>test</scope>
             </dependency>
             <!-- H2 is an in-memory database used for Unit/Integration tests -->

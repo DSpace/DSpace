@@ -20,14 +20,17 @@ import java.util.Random;
 
 import org.dspace.content.dao.RelationshipTypeDAO;
 import org.dspace.core.Context;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class RelationshipTypeTest {
     @InjectMocks
     private RelationshipTypeServiceImpl relationshipTypeService;
@@ -40,7 +43,7 @@ public class RelationshipTypeTest {
 
     private Context context;
 
-    @Before
+    @BeforeEach
     public void init() {
         // Default state of firstRelationshipType
         firstRelationshipType = mock(RelationshipType.class);
@@ -84,12 +87,12 @@ public class RelationshipTypeTest {
     public void testRelationshipTypeFindByTypesAndLabels() throws Exception {
         // Mock DAO to return our firstRelationshipType
         when(relationshipTypeDAO.findbyTypesAndTypeName(any(), any(), any(), any(), any()))
-                .thenReturn(firstRelationshipType);
+            .thenReturn(firstRelationshipType);
 
         // Declare objects utilized for this test
         RelationshipType found = relationshipTypeService.findbyTypesAndTypeName(context, mock(EntityType.class),
-                mock(EntityType.class),
-                "mock", "mock");
+            mock(EntityType.class),
+            "mock", "mock");
 
         // Pass expected and actual RelationshipTypes into comparator method
         checkRelationshipTypeValues(found, firstRelationshipType);
@@ -142,7 +145,7 @@ public class RelationshipTypeTest {
 
         // Invoke findByEntityType()
         List<RelationshipType> found = relationshipTypeService
-                .findByEntityType(context, mock(EntityType.class), -1, -1);
+            .findByEntityType(context, mock(EntityType.class), -1, -1);
 
         // Assert that our expected list contains our expected RelationshipType and nothing more
         assertThat(found, notNullValue());

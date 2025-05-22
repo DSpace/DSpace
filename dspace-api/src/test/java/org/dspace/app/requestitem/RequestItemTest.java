@@ -7,12 +7,13 @@
  */
 package org.dspace.app.requestitem;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -47,10 +48,10 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit testing for RequestItem and RequestItemService ("Request-a-copy" feature)
@@ -70,7 +71,7 @@ public class RequestItemTest extends AbstractUnitTest {
     private Bitstream bitstream;
     private Context context;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass()
             throws SQLException {
         AbstractBuilder.init(); // AbstractUnitTest doesn't do this for us.
@@ -80,7 +81,7 @@ public class RequestItemTest extends AbstractUnitTest {
         ctx.complete();
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
         // AbstractUnitTest doesn't do this for us.
         AbstractBuilder.cleanupObjects();
@@ -88,7 +89,7 @@ public class RequestItemTest extends AbstractUnitTest {
     }
 
    // @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         //super.setUp();
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -141,7 +142,7 @@ public class RequestItemTest extends AbstractUnitTest {
                 .build();
 
         // Since we are over the threshold, the token should not be null
-        assertNotNull("Request token should not be null", request.getAccess_token());
+        assertNotNull(request.getAccess_token(), "Request token should not be null");
     }
 
     @Test
@@ -160,7 +161,7 @@ public class RequestItemTest extends AbstractUnitTest {
 
         // Since we are under the threshold, the token should be null and
         // the item will be sent via email attachment
-        assertNull("Request token should be null", request.getAccess_token());
+        assertNull(request.getAccess_token(), "Request token should be null");
     }
 
     @Test
@@ -183,10 +184,11 @@ public class RequestItemTest extends AbstractUnitTest {
         }
     }
 
-    @Test(expected = AuthorizeException.class)
-    public void testAuthorizeWithExpiredPeriod() throws Exception {
-        Instant decisionDate = getYesterdayAsInstant();
-        RequestItem request = RequestItemBuilder
+    @Test
+    public void testAuthorizeWithExpiredPeriod() {
+        assertThrows(AuthorizeException.class, () -> {
+            Instant decisionDate = getYesterdayAsInstant();
+            RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .withAcceptRequest(true)
                 .withAccessToken("test-token")
@@ -194,26 +196,30 @@ public class RequestItemTest extends AbstractUnitTest {
                 .withAccessExpiry(getExpiryAsInstant("+1DAY", decisionDate)) // 1 day period
                 .build();
 
-        // The access token should not be valid so we expect to catch an AuthorizeException
-        // when we call RequestItemService.authorizeByAccessToken
-        requestItemService.authorizeAccessByAccessToken(context, request, bitstream, request.getAccess_token());
+            // The access token should not be valid so we expect to catch an AuthorizeException
+            // when we call RequestItemService.authorizeByAccessToken
+            requestItemService.authorizeAccessByAccessToken(context, request, bitstream, request.getAccess_token());
+        });
     }
 
 
-    @Test(expected = AuthorizeException.class)
-    public void testAuthorizeWithNullToken() throws Exception {
-        requestItemService.authorizeAccessByAccessToken(context, bitstream, null);
+    @Test
+    public void testAuthorizeWithNullToken() {
+        assertThrows(AuthorizeException.class, () ->
+            requestItemService.authorizeAccessByAccessToken(context, bitstream, null));
     }
 
-    @Test(expected = AuthorizeException.class)
-    public void testAuthorizeWithInvalidToken() throws Exception {
-        requestItemService.authorizeAccessByAccessToken(context, bitstream, "invalid-token-123");
+    @Test
+    public void testAuthorizeWithInvalidToken() {
+        assertThrows(AuthorizeException.class, () ->
+            requestItemService.authorizeAccessByAccessToken(context, bitstream, "invalid-token-123"));
     }
 
-    @Test(expected = AuthorizeException.class)
-    public void testAuthorizeWithMismatchedToken() throws Exception {
-        Instant decisionDate = getYesterdayAsInstant();
-        RequestItem request = RequestItemBuilder
+    @Test
+    public void testAuthorizeWithMismatchedToken() {
+        assertThrows(AuthorizeException.class, () -> {
+            Instant decisionDate = getYesterdayAsInstant();
+            RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .withAcceptRequest(true)
                 .withAccessToken("test-token")
@@ -221,49 +227,54 @@ public class RequestItemTest extends AbstractUnitTest {
                 .withAccessExpiry(getExpiryAsInstant("FOREVER", decisionDate)) // forever
                 .build();
 
-        // The access token should NOT valid so we expect to catch an AuthorizeException
-        // when we call RequestItemService.authorizeByAccessToken
-        requestItemService.authorizeAccessByAccessToken(context, request, bitstream, "invalid-token-123");
+            // The access token should NOT valid so we expect to catch an AuthorizeException
+            // when we call RequestItemService.authorizeByAccessToken
+            requestItemService.authorizeAccessByAccessToken(context, request, bitstream, "invalid-token-123");
+        });
     }
-    @Test(expected = AuthorizeException.class)
-    public void testAuthorizeWithMismatchedBitstream() throws Exception {
-        // Create request for one bitstream
-        RequestItem request = RequestItemBuilder
+    @Test
+    public void testAuthorizeWithMismatchedBitstream() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Create request for one bitstream
+            RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .withAcceptRequest(true)
                 .withAccessToken("test-token")
                 .build();
 
-        // Create different bitstream
-        InputStream is = new ByteArrayInputStream(new byte[0]);
-        Bitstream otherBitstream = BitstreamBuilder
+            // Create different bitstream
+            InputStream is = new ByteArrayInputStream(new byte[0]);
+            Bitstream otherBitstream = BitstreamBuilder
                 .createBitstream(context, item, is)
                 .withName("OtherBitstream")
                 .build();
 
-        // Try to authorize access to different bitstream
-        requestItemService.authorizeAccessByAccessToken(context, request, otherBitstream, request.getAccess_token());
+            // Try to authorize access to different bitstream
+            requestItemService.authorizeAccessByAccessToken(context, request, otherBitstream, request.getAccess_token());
+        });
     }
 
-    @Test(expected = AuthorizeException.class)
-    public void testAuthorizeWithAllFilesDisabled() throws Exception {
-        // Create request for specific bitstream
-        RequestItem request = RequestItemBuilder
+    @Test
+    public void testAuthorizeWithAllFilesDisabled() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Create request for specific bitstream
+            RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .withAcceptRequest(true)
                 .withAccessToken("test-token")
                 .withAllFiles(false)
                 .build();
 
-        // Create different bitstream
-        InputStream is = new ByteArrayInputStream(new byte[0]);
-        Bitstream otherBitstream = BitstreamBuilder
+            // Create different bitstream
+            InputStream is = new ByteArrayInputStream(new byte[0]);
+            Bitstream otherBitstream = BitstreamBuilder
                 .createBitstream(context, item, is)
                 .withName("OtherBitstream")
                 .build();
 
-        // Try to access different bitstream when allfiles=false
-        requestItemService.authorizeAccessByAccessToken(context, request, otherBitstream, request.getAccess_token());
+            // Try to access different bitstream when allfiles=false
+            requestItemService.authorizeAccessByAccessToken(context, request, otherBitstream, request.getAccess_token());
+        });
     }
 
     @Test
