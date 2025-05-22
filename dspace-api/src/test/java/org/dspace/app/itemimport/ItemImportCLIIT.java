@@ -7,8 +7,8 @@
  */
 package org.dspace.app.itemimport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -35,9 +35,9 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.flywaydb.core.internal.util.ExceptionUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Basic integration testing for the SAF Import feature via CLI {@link ItemImportCLI}.
@@ -60,7 +60,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     private Path workDir;
     private static final String TEMP_DIR = ItemImport.TEMP_DIR;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -89,7 +89,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
         workDir = Path.of(file.getAbsolutePath());
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         PathUtils.deleteOnExit(tempDir);

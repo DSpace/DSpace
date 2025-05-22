@@ -16,10 +16,11 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -76,9 +77,9 @@ import org.dspace.orcid.client.OrcidConfiguration;
 import org.dspace.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -139,7 +140,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     private final String feature = CanChangePasswordFeature.NAME;
 
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         super.setUp();
 
@@ -283,7 +284,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    @Ignore
+    @Disabled
     // Ignored until an endpoint is added to return all groups. Anonymous is not considered a direct group.
     public void testStatusAuthenticatedAsNormalUser() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
@@ -428,8 +429,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         // Verify that the token in the returned header has the *same claims* as the auth Cookie token
         // NOTE: We test claim equality because the token's expiration date may change during this request. If it does
         // change, then the tokens will look different even though the claims are the same.
-        assertTrue("Check tokens " + token + " and " + headerToken + " have same claims",
-                   tokenClaimsEqual(token, headerToken));
+        assertTrue(tokenClaimsEqual(token, headerToken),
+                   "Check tokens " + token + " and " + headerToken + " have same claims");
 
         // Now that the auth cookie is cleared, all future requests (from UI)
         // should be made via the Authorization header. So, this tests the token is still valid if sent via header.
@@ -533,8 +534,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         // Verify that the token in the returned header has the *same claims* as the auth Cookie token
         // NOTE: We test claim equality because the token's expiration date may change during this request. If it does
         // change, then the tokens will look different even though the claims are the same.
-        assertTrue("Check tokens " + token + " and " + headerToken + " have same claims",
-                   tokenClaimsEqual(token, headerToken));
+        assertTrue(tokenClaimsEqual(token, headerToken),
+                   "Check tokens " + token + " and " + headerToken + " have same claims");
 
         // Now that the auth cookie is cleared, all future requests (from UI)
         // should be made via the Authorization header. So, this tests the token is still valid if sent via header.
@@ -564,8 +565,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         assertNotEquals(token1, token2);
 
         // However, tokens should contain the same claims
-        assertTrue("Check tokens " + token1 + " and " + token2 + " have same claims",
-                   tokenClaimsEqual(token1, token2));
+        assertTrue(tokenClaimsEqual(token1, token2),
+                   "Check tokens " + token1 + " and " + token2 + " have same claims");
 
         // BOTH tokens should be valid, as they represent the same authenticated user's "session".
         getClient(token1).perform(get("/api/authn/status").param("projection", "full"))
@@ -757,8 +758,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         assertNotEquals(token, newToken);
 
         // However, tokens should contain the same claims
-        assertTrue("Check tokens " + token + " and " + newToken + " have same claims",
-                   tokenClaimsEqual(token, newToken));
+        assertTrue(tokenClaimsEqual(token, newToken),
+                   "Check tokens " + token + " and " + newToken + " have same claims");
 
         // Verify new token is valid
         getClient(newToken).perform(get("/api/authn/status"))
@@ -1076,7 +1077,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    @Ignore
+    @Disabled
     // Ignored until an endpoint is added to return all groups
     public void testShibbolethLoginRequestAttribute() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -1134,7 +1135,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    @Ignore
+    @Disabled
     // Ignored until an endpoint is added to return all groups
     public void testShibbolethLoginRequestHeaderWithIpAuthentication() throws Exception {
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_AND_IP);
@@ -1506,19 +1507,21 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     // TODO: fix the exception. For now we want to verify a short lived token can't be used to login
-    @Test(expected = Exception.class)
-    public void testLoginWithShortLivedToken() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
-        String shortLivedToken = getShortLivedToken(token);
+    @Test
+    public void testLoginWithShortLivedToken() {
+        assertThrows(Exception.class, () -> {
+            String token = getAuthToken(eperson.getEmail(), password);
+            String shortLivedToken = getShortLivedToken(token);
 
-        getClient().perform(post("/api/authn/login?authentication-token=" + shortLivedToken))
-            .andExpect(status().isInternalServerError());
-        // TODO: This internal server error needs to be fixed. This should actually produce a forbidden status
-        //.andExpect(status().isForbidden());
+            getClient().perform(post("/api/authn/login?authentication-token=" + shortLivedToken))
+                .andExpect(status().isInternalServerError());
+            // TODO: This internal server error needs to be fixed. This should actually produce a forbidden status
+            //.andExpect(status().isForbidden());
 
-        // Logout, invalidating token
-        getClient(token).perform(post("/api/authn/logout"))
+            // Logout, invalidating token
+            getClient(token).perform(post("/api/authn/logout"))
                 .andExpect(status().isNoContent());
+        });
     }
 
     @Test
@@ -1606,8 +1609,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
             .andReturn().getResponse()
             .getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
 
-        assertTrue("Check tokens " + token + " and " + headerToken + " have same claims",
-            tokenClaimsEqual(token, headerToken));
+        assertTrue(tokenClaimsEqual(token, headerToken),
+            "Check tokens " + token + " and " + headerToken + " have same claims");
 
         getClient(headerToken).perform(get("/api/authn/status").header("Origin", uiURL))
             .andExpect(status().isOk())

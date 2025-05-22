@@ -7,7 +7,8 @@
  */
 package org.dspace.app.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
@@ -29,8 +30,8 @@ import org.dspace.importer.external.liveimportclient.service.LiveImportClientImp
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
     //@Autowired
     private DataCiteImportMetadataSourceServiceImpl dataCiteServiceImpl;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         ServiceManager serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
         dataCiteServiceImpl = serviceManager.getServiceByName("DataCiteImportService",
@@ -122,24 +123,26 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
         }
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void dataCiteImportMetadataFindMatchingRecordsTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+    @Test
+    public void dataCiteImportMetadataFindMatchingRecordsTest() {
+        assertThrows(UnsupportedOperationException.class, () -> {
+            context.turnOffAuthorisationSystem();
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
 
-        org.dspace.content.Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                                              .withName("Collection 1")
-                                                              .build();
+            org.dspace.content.Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .build();
 
-        Item testItem = ItemBuilder.createItem(context, col1)
-                                   .withTitle("test item")
-                                   .withIssueDate("2021")
-                                   .build();
+            Item testItem = ItemBuilder.createItem(context, col1)
+                .withTitle("test item")
+                .withIssueDate("2021")
+                .build();
 
-        context.restoreAuthSystemState();
-        dataCiteServiceImpl.findMatchingRecords(testItem);
+            context.restoreAuthSystemState();
+            dataCiteServiceImpl.findMatchingRecords(testItem);
+        });
     }
 
     private ArrayList<ImportRecord> getRecords() {

@@ -67,7 +67,7 @@ import org.dspace.qaevent.dao.QAEventsDAO;
 import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

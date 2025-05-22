@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -23,8 +23,8 @@ import org.dspace.google.GoogleAnalyticsEvent;
 import org.dspace.services.ConfigurationService;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link GoogleAnalytics4ClientRequestBuilder}.
@@ -38,7 +38,7 @@ public class GoogleAnalytics4ClientRequestBuilderTest {
 
     private ConfigurationService configurationService = mock(ConfigurationService.class);
 
-    @Before
+    @BeforeEach
     public void setup() {
         requestBuilder = new GoogleAnalytics4ClientRequestBuilder("https://google-analytics/test");
         requestBuilder.setConfigurationService(configurationService);
@@ -57,16 +57,14 @@ public class GoogleAnalytics4ClientRequestBuilderTest {
     @Test
     public void testGetEndpointUrlWithNotSupportedKey() {
 
-        assertThrows("Only keys with G- prefix are supported",
-            IllegalArgumentException.class, () -> requestBuilder.getEndpointUrl("UA-12345"));
+        assertThrows(IllegalArgumentException.class, () -> requestBuilder.getEndpointUrl("UA-12345"), "Only keys with G- prefix are supported");
 
     }
 
     @Test
     public void testGetEndpointUrlWithoutApiSecretConfigured() {
 
-        assertThrows("The API secret must be configured to sent GA4 events",
-            GoogleAnalyticsClientException.class, () -> requestBuilder.getEndpointUrl("G-12345"));
+        assertThrows(GoogleAnalyticsClientException.class, () -> requestBuilder.getEndpointUrl("G-12345"), "The API secret must be configured to sent GA4 events");
 
     }
 

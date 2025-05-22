@@ -27,8 +27,8 @@ import org.jclouds.blobstore.domain.Blob;
 import org.jclouds.blobstore.domain.BlobBuilder;
 import org.jclouds.blobstore.domain.BlobBuilder.PayloadBlobBuilder;
 import org.jclouds.io.Payload;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -51,7 +51,7 @@ public class JCloudBitStoreServiceTest extends AbstractUnitTest {
     @Mock
     private Bitstream bitstream;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.jCloudBitStoreService = new JCloudBitStoreService(blobStoreContext, "filesystem");
     }

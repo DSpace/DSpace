@@ -20,7 +20,7 @@ import org.dspace.app.rest.matcher.VocabularyEntryDetailsMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * 

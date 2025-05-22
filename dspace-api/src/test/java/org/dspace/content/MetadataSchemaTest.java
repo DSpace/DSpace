@@ -12,8 +12,9 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -26,8 +27,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataSchemaService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -63,7 +64,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -160,26 +161,30 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     /**
      * Test of create method, of class MetadataSchema.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testCreateNoAuth() throws Exception {
-        String namespace = "namespace";
-        String name = "name";
-        metadataSchemaService.create(context, name, namespace);
-        fail("Exception expected");
+    @Test
+    public void testCreateNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            String namespace = "namespace";
+            String name = "name";
+            metadataSchemaService.create(context, name, namespace);
+            fail("Exception expected");
+        });
     }
 
     /**
      * Test of create method, of class MetadataSchema.
      */
-    @Test(expected = NonUniqueMetadataException.class)
-    public void testCreateRepeated() throws Exception {
-        // Allow full Admin perms
-        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
+    @Test
+    public void testCreateRepeated() {
+        assertThrows(NonUniqueMetadataException.class, () -> {
+            // Allow full Admin perms
+            when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
-        String namespace = ms.getNamespace();
-        String name = ms.getName();
-        metadataSchemaService.create(context, name, namespace);
-        fail("Exception expected");
+            String namespace = ms.getNamespace();
+            String name = ms.getName();
+            metadataSchemaService.create(context, name, namespace);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -214,28 +219,32 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     /**
      * Test of update method, of class MetadataSchema.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testUpdateNoAuth() throws Exception {
-        metadataSchemaService.update(context, ms);
-        fail("Exception expected");
+    @Test
+    public void testUpdateNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            metadataSchemaService.update(context, ms);
+            fail("Exception expected");
+        });
     }
 
     /**
      * Test of update method, of class MetadataSchema.
      */
-    @Test(expected = NonUniqueMetadataException.class)
-    public void testUpdateRepeated() throws Exception {
-        // Allow full Admin perms
-        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
+    @Test
+    public void testUpdateRepeated() {
+        assertThrows(NonUniqueMetadataException.class, () -> {
+            // Allow full Admin perms
+            when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
-        String namespace = ms.getNamespace();
-        String name = ms.getName();
-        MetadataSchema m = metadataSchemaService.create(context, name, namespace);
+            String namespace = ms.getNamespace();
+            String name = ms.getName();
+            MetadataSchema m = metadataSchemaService.create(context, name, namespace);
 
-        m.setName(name);
-        m.setNamespace(namespace);
-        metadataSchemaService.update(context, m);
-        fail("Exception expected");
+            m.setName(name);
+            m.setNamespace(namespace);
+            metadataSchemaService.update(context, m);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -259,14 +268,16 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     /**
      * Test of delete method, of class MetadataSchema.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testDeleteNoAuth() throws Exception {
-        String namespace = "namespace3";
-        String name = "name3";
-        MetadataSchema m = metadataSchemaService.create(context, name, namespace);
+    @Test
+    public void testDeleteNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            String namespace = "namespace3";
+            String name = "name3";
+            MetadataSchema m = metadataSchemaService.create(context, name, namespace);
 
-        metadataSchemaService.delete(context, m);
-        fail("Exception expected");
+            metadataSchemaService.delete(context, m);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -276,7 +287,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     public void testFindAll() throws Exception {
         List<MetadataSchema> found = metadataSchemaService.findAll(context);
         assertThat("testFindAll 0", found, notNullValue());
-        assertTrue("testFindAll 1", found.size() >= 1);
+        assertTrue(found.size() >= 1, "testFindAll 1");
 
         boolean added = false;
         for (MetadataSchema msc : found) {
@@ -284,7 +295,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
                 added = true;
             }
         }
-        assertTrue("testFindAll 2", added);
+        assertTrue(added, "testFindAll 2");
     }
 
     /**
