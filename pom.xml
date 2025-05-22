@@ -224,6 +224,7 @@
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
                         <argLine>${test.argLine} ${surefireJacoco}</argLine>
+                        <argLine>@{argLine} -javaagent:${com.ginsberg:junit5-system-exit:jar}</argLine>
                         <!-- tests whose name starts by Abstract will be ignored -->
                         <excludes>
                             <exclude>**/Abstract*</exclude>
@@ -360,6 +361,13 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>3.8.1</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>properties</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1776,6 +1784,18 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.13.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.ginsberg</groupId>
+                <artifactId>junit5-system-exit</artifactId>
+                <version>2.0.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.github.stefanbirkner</groupId>
+                <artifactId>system-lambda</artifactId>
+                <version>1.0.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
