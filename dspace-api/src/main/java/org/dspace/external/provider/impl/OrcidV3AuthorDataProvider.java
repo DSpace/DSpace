@@ -27,6 +27,7 @@ import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
 import org.dspace.orcid.model.factory.OrcidFactoryUtils;
 import org.orcid.jaxb.model.v3.release.common.OrcidIdentifier;
+import org.orcid.jaxb.model.v3.release.record.Email;
 import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.search.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,13 +115,20 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
             if (person.getName().getFamilyName() != null) {
                 lastName = person.getName().getFamilyName().getContent();
                 externalDataObject.addMetadata(new MetadataValueDTO("person", "familyName", null, null,
-                                                                    lastName));
+                        lastName));
             }
             if (person.getName().getGivenNames() != null) {
                 firstName = person.getName().getGivenNames().getContent();
                 externalDataObject.addMetadata(new MetadataValueDTO("person", "givenName", null, null,
-                                                                    firstName));
-
+                        firstName));
+            }
+            if (person.getEmails().getEmails() != null && !person.getEmails().getEmails().isEmpty()) {
+                Email email = person.getEmails().getEmails().get(0);
+                if (person.getEmails().getEmails().size() > 1) {
+                    email = person.getEmails().getEmails().stream().filter(Email::isPrimary).findFirst().orElse(email);
+                }
+                externalDataObject.addMetadata(new MetadataValueDTO("person", "email", null,
+                        null, email.getEmail()));
             }
             externalDataObject.setId(person.getName().getPath());
             externalDataObject
@@ -128,7 +136,7 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
                             new MetadataValueDTO("person", "identifier", "orcid", null, person.getName().getPath()));
             externalDataObject
                     .addMetadata(new MetadataValueDTO("dc", "identifier", "uri", null,
-                                                      orcidUrl + "/" + person.getName().getPath()));
+                            orcidUrl + "/" + person.getName().getPath()));
             if (!StringUtils.isBlank(lastName) && !StringUtils.isBlank(firstName)) {
                 externalDataObject.setDisplayValue(lastName + ", " + firstName);
                 externalDataObject.setValue(lastName + ", " + firstName);
@@ -139,8 +147,8 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
                 externalDataObject.setDisplayValue(firstName);
                 externalDataObject.setValue(firstName);
             }
-        } else if (person.getPath() != null ) {
-            externalDataObject.setId(StringUtils.substringBetween(person.getPath(),"/","/person"));
+        } else if (person.getPath() != null) {
+            externalDataObject.setId(StringUtils.substringBetween(person.getPath(), "/", "/person"));
         }
         return externalDataObject;
     }
@@ -161,13 +169,7 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
         }
         initializeAccessToken();
         InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"), accessToken);
-        Person person = converter.convertSinglePerson(bioDocument);
-        try {
-            bioDocument.close();
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
-        return person;
+        return converter.convertSinglePerson(bioDocument);
     }
 
     /**
@@ -204,18 +206,13 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
         for (Result result : results) {
             OrcidIdentifier orcidIdentifier = result.getOrcidIdentifier();
             if (orcidIdentifier != null) {
-                log.debug("Found OrcidId=" + orcidIdentifier.toString());
+                log.debug("Found OrcidId=" + orcidIdentifier.getPath());
                 String orcid = orcidIdentifier.getPath();
                 Person bio = getBio(orcid);
                 if (bio != null) {
                     bios.add(bio);
                 }
             }
-        }
-        try {
-            bioDocument.close();
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
         }
         return bios.stream().map(bio -> convertToExternalDataObject(bio)).collect(Collectors.toList());
     }

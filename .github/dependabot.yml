@@ -13,6 +13,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      time: "02:00"
     # Allow up to 10 open PRs for dependencies
     open-pull-requests-limit: 10
     # Group together some upgrades in a single PR

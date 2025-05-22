@@ -27,7 +27,7 @@ import com.google.common.io.Files;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import org.apache.commons.lang3.function.TriFunction;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -52,7 +52,7 @@ public class MetadataExportFilteredItemsReportIT extends AbstractIntegrationTest
     private int[][] itemCountPerSubjectThenPerAuthor = {{12, 15}, {9, 4}};
 
     private String filename;
-    private Logger logger = Logger.getLogger(MetadataExportFilteredItemsReportIT.class);
+    private Logger logger = org.apache.logging.log4j.LogManager.getLogger();
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     @Override

@@ -25,6 +25,8 @@ import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.output.NullOutputStream;
+import org.dspace.app.util.DSpaceObjectUtilsImpl;
+import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -36,6 +38,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
 /**
@@ -46,7 +49,9 @@ import org.dspace.utils.DSpace;
 public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
 
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-
+    protected DSpaceObjectUtils dspaceObjectUtils = DSpaceServicesFactory.getInstance().getServiceManager()
+            .getServiceByName(DSpaceObjectUtilsImpl.class.getName(), DSpaceObjectUtilsImpl.class);
+    HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected Context context;
     private CurationClientOptions curationClientOptions;
 
@@ -346,9 +351,29 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
 
         if (this.commandLine.hasOption('i')) {
             this.id = this.commandLine.getOptionValue('i').toLowerCase();
+            DSpaceObject dso;
             if (!this.id.equalsIgnoreCase("all")) {
-                HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
-                DSpaceObject dso;
+                // First, try to parse the id as a UUID. If that fails, treat it as a handle.
+                UUID uuid = null;
+                try {
+                    uuid = UUID.fromString(id);
+                } catch (Exception e) {
+                    // It's not a UUID, proceed to treat it as a handle.
+                }
+                if (uuid != null) {
+                    try {
+                        dso = dspaceObjectUtils.findDSpaceObject(context, uuid);
+                        if (dso != null) {
+                            // We already resolved an object, return early
+                            return;
+                        }
+                    } catch (SQLException e) {
+                        String error = "SQLException trying to find dso with uuid " + uuid;
+                        super.handler.logError(error);
+                        throw new RuntimeException(error, e);
+                    }
+                }
+                // If we get here, the id is not a UUID, so we assume it's a handle.
                 try {
                     dso = handleService.resolveToObject(this.context, id);
                 } catch (SQLException e) {

@@ -40,7 +40,7 @@ public class AltchaCaptchaServiceTest extends AbstractUnitTest {
     public void setUp() {
         configurationService.setProperty("captcha.provider", "altcha");
         configurationService.setProperty("altcha.hmac.key", "onetwothreesecret");
-        captchaService = CaptchaServiceFactory.getInstance().getCaptchaService();
+        captchaService = CaptchaServiceFactory.getInstance().getAltchaCaptchaService();
     }
 
     @Test
