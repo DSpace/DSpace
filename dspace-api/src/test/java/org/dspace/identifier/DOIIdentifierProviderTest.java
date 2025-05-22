@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.api.Assumptions.assumeNotNull;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
@@ -614,7 +613,7 @@ public class DOIIdentifierProviderTest
         provider.reserve(context, item, doi);
 
         DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
-        assumeNotNull(doiRow);
+        assertNotNull(doiRow);
 
         assertTrue(DOIIdentifierProvider.TO_BE_RESERVED.equals(doiRow.getStatus()),
                    "Reservation of DOI did not set the correct DOI status.");
@@ -630,7 +629,7 @@ public class DOIIdentifierProviderTest
         provider.register(context, item, doi);
 
         DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
-        assumeNotNull(doiRow);
+        assertNotNull(doiRow);
 
         assertTrue(DOIIdentifierProvider.TO_BE_REGISTERED.equals(doiRow.getStatus()),
                    "Registration of DOI did not set the correct DOI status.");
@@ -646,7 +645,7 @@ public class DOIIdentifierProviderTest
         provider.register(context, item, doi);
 
         DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
-        assumeNotNull(doiRow);
+        assertNotNull(doiRow);
 
         assertTrue(DOIIdentifierProvider.TO_BE_REGISTERED.equals(doiRow.getStatus()),
                    "Registration of DOI did not set the correct DOI status.");
@@ -707,12 +706,12 @@ public class DOIIdentifierProviderTest
         assertTrue(foundDOI2, "Removed wrong DOI from item metadata.");
 
         DOI doiRow1 = doiService.findByDoi(context, doi1.substring(DOI.SCHEME.length()));
-        assumeNotNull(doiRow1);
+        assertNotNull(doiRow1);
         assertTrue(DOIIdentifierProvider.TO_BE_DELETED.equals(doiRow1.getStatus()),
                    "Status of deleted DOI was not set correctly.");
 
         DOI doiRow2 = doiService.findByDoi(context, doi2.substring(DOI.SCHEME.length()));
-        assumeNotNull(doiRow2);
+        assertNotNull(doiRow2);
         assertTrue(DOIIdentifierProvider.IS_REGISTERED.equals(doiRow2.getStatus()),
                    "While deleting a DOI the status of another changed.");
     }
@@ -749,12 +748,12 @@ public class DOIIdentifierProviderTest
         assertFalse(foundDOI2, "Did not removed all DOIs from item metadata.");
 
         DOI doiRow1 = doiService.findByDoi(context, doi1.substring(DOI.SCHEME.length()));
-        assumeNotNull(doiRow1);
+        assertNotNull(doiRow1);
         assertTrue(DOIIdentifierProvider.TO_BE_DELETED.equals(doiRow1.getStatus()),
                    "Status of deleted DOI was not set correctly.");
 
         DOI doiRow2 = doiService.findByDoi(context, doi1.substring(DOI.SCHEME.length()));
-        assumeNotNull(doiRow2);
+        assertNotNull(doiRow2);
         assertTrue(DOIIdentifierProvider.TO_BE_DELETED.equals(doiRow2.getStatus()),
                    "Did not set the status of all deleted DOIs as expected.");
     }
