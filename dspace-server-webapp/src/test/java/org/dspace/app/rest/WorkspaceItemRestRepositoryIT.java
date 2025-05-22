@@ -8634,7 +8634,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         Bitstream originalBitstream;
         try (InputStream is = IOUtils.toInputStream("Test", CharEncoding.UTF_8)) {
             originalBitstream = BitstreamBuilder.createBitstream(context, workspaceItem.getItem(), is)
-                .withName("Bitstream")
+                .withName("Bitstream.txt")
                 .withDescription("description")
                 .withMimeType("text/plain")
                 .build();
@@ -8650,7 +8650,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // Upload new file, to replace old one
         getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
                 .file(newFile)
-                .param("replaceFile", Integer.toString(oldFileIndex)))
+                .param("replaceFile", Integer.toString(oldFileIndex))
+                .param("replaceName", "true"))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
                 is("simple-article.pdf")))
