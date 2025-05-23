@@ -19,11 +19,9 @@ import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Logger;
-import org.apache.pdfbox.cos.COSDocument;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.io.MemoryUsageSetting;
-import org.apache.pdfbox.io.RandomAccessBufferedFileInputStream;
-import org.apache.pdfbox.io.ScratchFile;
-import org.apache.pdfbox.pdfparser.PDFParser;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.dspace.authorize.AuthorizeException;
@@ -328,112 +326,93 @@ public class PDFPackager
 
     private void crosswalkPDF(Context context, Item item, InputStream metadata)
         throws CrosswalkException, IOException, SQLException, AuthorizeException {
-        COSDocument cos = null;
+        /* PDF to DC "crosswalk":
+         *
+         * NOTE: This is not in a crosswalk plugin because (a) it isn't
+         * useful anywhere else, and more importantly, (b) the source
+         * data is not XML so it doesn't fit the plugin's interface.
+         *
+         * pattern of crosswalk -- PDF dict entries to DC:
+         *   Title -> title.null
+         *   Author -> contributor.author
+         *   CreationDate -> date.created
+         *   ModDate -> date.created
+         *   Creator -> description.provenance (application that created orig)
+         *   Producer -> description.provenance (converter to pdf)
+         *   Subject -> description.abstract
+         *   Keywords -> subject.other
+         *    date is java.util.Calendar
+         */
+        long useRAM = Runtime.getRuntime().freeMemory() * 80 / 100; // use up to 80% of JVM free memory
+        MemoryUsageSetting memorySetting = MemoryUsageSetting.setupMixed(useRAM);
+        PDDocument pd = Loader.loadPDF(new RandomAccessReadBuffer(metadata), "", null, null,
+                                       memorySetting.streamCache);
+        // sanity check: PDFBox breaks on encrypted documents, so give up.
+        if (pd.isEncrypted()) {
+            throw new MetadataValidationException("This packager cannot accept an encrypted PDF document.");
+        }
 
-        try {
-            ScratchFile scratchFile = null;
-            try {
-                long useRAM = Runtime.getRuntime().freeMemory() * 80 / 100; // use up to 80% of JVM free memory
-                scratchFile = new ScratchFile(
-                    MemoryUsageSetting.setupMixed(useRAM)); // then fallback to temp file (unlimited size)
-            } catch (IOException ioe) {
-                log.warn("Error initializing scratch file: " + ioe.getMessage());
-            }
+        PDDocumentInformation docinfo = pd.getDocumentInformation();
+        String title = docinfo.getTitle();
 
-            PDFParser parser = new PDFParser(new RandomAccessBufferedFileInputStream(metadata), scratchFile);
-            parser.parse();
-            cos = parser.getDocument();
-
-            // sanity check: PDFBox breaks on encrypted documents, so give up.
-            if (cos.getEncryptionDictionary() != null) {
-                throw new MetadataValidationException("This packager cannot accept an encrypted PDF document.");
-            }
-
-            /* PDF to DC "crosswalk":
-             *
-             * NOTE: This is not in a crosswalk plugin because (a) it isn't
-             * useful anywhere else, and more importantly, (b) the source
-             * data is not XML so it doesn't fit the plugin's interface.
-             *
-             * pattern of crosswalk -- PDF dict entries to DC:
-             *   Title -> title.null
-             *   Author -> contributor.author
-             *   CreationDate -> date.created
-             *   ModDate -> date.created
-             *   Creator -> description.provenance (application that created orig)
-             *   Producer -> description.provenance (converter to pdf)
-             *   Subject -> description.abstract
-             *   Keywords -> subject.other
-             *    date is java.util.Calendar
-             */
-            PDDocument pd = new PDDocument(cos);
-            PDDocumentInformation docinfo = pd.getDocumentInformation();
-            String title = docinfo.getTitle();
-
-            // sanity check: item must have a title.
-            if (title == null) {
-                throw new MetadataValidationException(
-                    "This PDF file is unacceptable, it does not have a value for \"Title\" in its Info dictionary.");
-            }
+        // sanity check: item must have a title.
+        if (title == null) {
+            throw new MetadataValidationException(
+                "This PDF file is unacceptable, it does not have a value for \"Title\" in its Info dictionary.");
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("PDF Info dict title=\"" + title + "\"");
+        }
+        itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "title", null, "en", title);
+        String value = docinfo.getAuthor();
+        if (value != null) {
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                    "contributor", "author", null, value);
             if (log.isDebugEnabled()) {
-                log.debug("PDF Info dict title=\"" + title + "\"");
-            }
-            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "title", null, "en", title);
-            String value = docinfo.getAuthor();
-            if (value != null) {
-                itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
-                                        "contributor", "author", null, value);
-                if (log.isDebugEnabled()) {
-                    log.debug("PDF Info dict author=\"" + value + "\"");
-                }
-            }
-
-            value = docinfo.getCreator();
-            if (value != null) {
-                itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
-                                        "description", "provenance", "en",
-                                        "Application that created the original document: " + value);
-            }
-
-            value = docinfo.getProducer();
-            if (value != null) {
-                itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
-                                        "description", "provenance", "en",
-                                        "Original document converted to PDF by: " + value);
-            }
-
-            value = docinfo.getSubject();
-            if (value != null) {
-                itemService
-                    .addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
-                                 "description", "abstract", null, value);
-            }
-
-            value = docinfo.getKeywords();
-            if (value != null) {
-                itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
-                                        "subject", "other", null, value);
-            }
-
-            // Take either CreationDate or ModDate as "date.created",
-            // Too bad there's no place to put "last modified" in the DC.
-            java.util.Calendar calValue = docinfo.getCreationDate();
-            if (calValue == null) {
-                calValue = docinfo.getModificationDate();
-            }
-
-            if (calValue != null) {
-                itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "date", "created", null,
-                                        new DCDate(
-                                            ZonedDateTime.ofInstant(calValue.toInstant(), ZoneOffset.UTC)
-                                        ).toString());
-            }
-            itemService.update(context, item);
-        } finally {
-            if (cos != null) {
-                cos.close();
+                log.debug("PDF Info dict author=\"" + value + "\"");
             }
         }
+
+        value = docinfo.getCreator();
+        if (value != null) {
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                    "description", "provenance", "en",
+                                    "Application that created the original document: " + value);
+        }
+
+        value = docinfo.getProducer();
+        if (value != null) {
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                    "description", "provenance", "en",
+                                    "Original document converted to PDF by: " + value);
+        }
+
+        value = docinfo.getSubject();
+        if (value != null) {
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                    "description", "abstract", null, value);
+        }
+
+        value = docinfo.getKeywords();
+        if (value != null) {
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                    "subject", "other", null, value);
+        }
+
+        // Take either CreationDate or ModDate as "date.created",
+        // Too bad there's no place to put "last modified" in the DC.
+        java.util.Calendar calValue = docinfo.getCreationDate();
+        if (calValue == null) {
+            calValue = docinfo.getModificationDate();
+        }
+
+        if (calValue != null) {
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "date", "created", null,
+                                    new DCDate(
+                                        ZonedDateTime.ofInstant(calValue.toInstant(), ZoneOffset.UTC)
+                                    ).toString());
+        }
+        itemService.update(context, item);
     }
 
 
