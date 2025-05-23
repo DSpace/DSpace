@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
+import org.dspace.statistics.Dataset;
 
 /**
  * This class serves as a REST representation of a Usage Report from the DSpace statistics
@@ -121,5 +122,29 @@ public class UsageReportRest extends BaseObjectRest<String> {
      */
     public void setPoints(List<UsageReportPointRest> points) {
         this.points = points;
+    }
+
+    /**
+     * Append or Update Total point {@link UsageReportPointRest} object on this {@link UsageReportRest} object
+     * Assumes the last item in the provided dataset represents the total.
+     * Sometimes the point representing the total has already been added, sometime it hasn't.
+     * If it hasn't, then a new point will be created for it.
+     * In both cases, the capitalization in the Label will be normalized.
+     * @param dataset {@link Dataset} upon which this {@link UsageReportRest} object is based
+     */
+    public void appendTotal(Dataset dataset) {
+        if (this.points == null) {
+            return;
+        }
+        UsageReportPointDsoTotalVisitsRest totalPoint = new UsageReportPointDsoTotalVisitsRest();
+        totalPoint.setId("total");
+        totalPoint.setLabel("Total");
+        totalPoint.setType("total");
+        totalPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][dataset.getColLabels().size() - 1]));
+        if (this.points.get(this.points.size() - 1).getLabel().toLowerCase().equals("total")) {
+            this.points.set(this.points.size() - 1, totalPoint);
+        } else {
+            this.addPoint(totalPoint);
+        }
     }
 }
