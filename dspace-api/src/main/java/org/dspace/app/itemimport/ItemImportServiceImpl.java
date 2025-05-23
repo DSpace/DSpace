@@ -1426,11 +1426,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         if (bundleName == null) {
             // is it license.txt?
-            if ("license.txt".equals(fileName)) {
-                newBundleName = "LICENSE";
+            if (Constants.LICENSE_BITSTREAM_NAME.equals(fileName)) {
+                newBundleName = Constants.LICENSE_BUNDLE_NAME;
             } else {
                 // call it ORIGINAL
-                newBundleName = "ORIGINAL";
+                newBundleName = Constants.CONTENT_BUNDLE_NAME;
             }
         }
 
@@ -1494,11 +1494,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         if (StringUtils.isBlank(bundleName)) {
             // is it license.txt?
-            if (bitstreamPath.endsWith("license.txt")) {
-                newBundleName = "LICENSE";
+            if (bitstreamPath.endsWith(Constants.LICENSE_BITSTREAM_NAME)) {
+                newBundleName = Constants.LICENSE_BUNDLE_NAME;
             } else {
                 // call it ORIGINAL
-                newBundleName = "ORIGINAL";
+                newBundleName = Constants.CONTENT_BUNDLE_NAME;
             }
         }
 

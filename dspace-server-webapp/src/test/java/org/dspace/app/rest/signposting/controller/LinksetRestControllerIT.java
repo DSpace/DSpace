@@ -358,7 +358,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         }
 
         try (InputStream is = IOUtils.toInputStream("test", CharEncoding.UTF_8)) {
-            Bitstream bitstream4 = BitstreamBuilder.createBitstream(context, item, is, "LICENSE")
+            Bitstream bitstream4 = BitstreamBuilder.createBitstream(context, item, is, Constants.LICENSE_BUNDLE_NAME)
                     .withName("Bitstream 4")
                     .withDescription("description")
                     .withMimeType("application/pdf")
