@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -142,6 +143,12 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
         return id;
     }
 
+    /**
+     * Get the display name of the object.
+     *
+     * @return a name, or {@code null} if the object has no name.
+     */
+    @Nullable
     public abstract String getName();
 
     /**
