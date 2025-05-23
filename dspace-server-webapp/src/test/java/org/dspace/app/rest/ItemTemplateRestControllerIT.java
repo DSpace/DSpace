@@ -37,8 +37,8 @@ import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Collection;
 import org.dspace.core.Constants;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -55,7 +55,7 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
     private TemplateItemRest testTemplateItem;
     private String patchBody;
 
-    @Before
+    @BeforeEach
     public void createStructure() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)

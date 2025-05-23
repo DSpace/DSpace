@@ -7,8 +7,8 @@
  */
 package org.dspace.content;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
@@ -23,8 +23,8 @@ import org.dspace.content.dao.RelationshipDAO;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTestWithDatabase {
 
@@ -42,7 +42,7 @@ public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTest
     protected Item person1;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
 

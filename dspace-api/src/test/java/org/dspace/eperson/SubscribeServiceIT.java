@@ -16,7 +16,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -36,8 +37,8 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.eperson.service.SubscribeService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
 
@@ -46,7 +47,7 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
     private Collection firstCollection;
     private Collection secondCollection;
 
-    @Before
+    @BeforeEach
     public void init() throws Exception {
         context.turnOffAuthorisationSystem();
         Community parentCommunity = CommunityBuilder.createCommunity(context).build();
@@ -111,17 +112,20 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
         return createSubscriptionParameter("frequency", "D");
     }
 
-    @Test(expected = Exception.class)
-    public void findAllWithInvalidResource() throws Exception {
+    @Test
+    public void findAllWithInvalidResource() {
+        assertThrows(Exception.class, () -> {
 
-        String resourceType = "INVALID";
-        Integer limit = 10;
-        Integer offset = 0;
+            String resourceType = "INVALID";
+            Integer limit = 10;
+            Integer offset = 0;
 
-        createSubscription("content", firstCollection, context.getCurrentUser(),
-                           weekly());
+            createSubscription("content", firstCollection, context.getCurrentUser(),
+                weekly());
 
-        subscribeService.findAll(context, resourceType, limit, offset);
+            subscribeService.findAll(context, resourceType, limit, offset);
+
+        });
 
     }
 
@@ -160,20 +164,23 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
         SubscribeBuilder.deleteSubscription(subscription.getID());
     }
 
-    @Test(expected = AuthorizeException.class)
-    public void nonAdminDifferentUserTriesToSubscribe() throws Exception {
-        context.turnOffAuthorisationSystem();
-        EPerson notAdmin = EPersonBuilder.createEPerson(context).withEmail("not-admin@example.com").build();
-        context.restoreAuthSystemState();
-        EPerson currentUser = context.getCurrentUser();
-        context.setCurrentUser(notAdmin);
-        try {
-            subscribeService.subscribe(context, admin, firstCollection,
-                                       singletonList(
-                                           daily()), "content");
-        } finally {
-            context.setCurrentUser(currentUser);
-        }
+    @Test
+    public void nonAdminDifferentUserTriesToSubscribe() {
+        assertThrows(AuthorizeException.class, () -> {
+            context.turnOffAuthorisationSystem();
+            EPerson notAdmin = EPersonBuilder.createEPerson(context).withEmail("not-admin@example.com").build();
+            context.restoreAuthSystemState();
+            EPerson currentUser = context.getCurrentUser();
+            context.setCurrentUser(notAdmin);
+            try {
+                subscribeService.subscribe(context, admin, firstCollection,
+                    singletonList(
+                        daily()), "content");
+            } finally {
+                context.setCurrentUser(currentUser);
+            }
+
+        });
 
     }
 
@@ -226,24 +233,27 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
         assertThat(subscribeService.isSubscribed(context, subscribingUser, secondCollection), is(false));
     }
 
-    @Test(expected = AuthorizeException.class)
-    public void nonAdminDifferentUserTriesToUnSubscribeAnotherUser() throws Exception {
-        EPerson subscribingUser = context.getCurrentUser();
-        Subscription subscription = createSubscription("content", secondCollection, subscribingUser,
-                                                       weekly());
+    @Test
+    public void nonAdminDifferentUserTriesToUnSubscribeAnotherUser() {
+        assertThrows(AuthorizeException.class, () -> {
+            EPerson subscribingUser = context.getCurrentUser();
+            Subscription subscription = createSubscription("content", secondCollection, subscribingUser,
+                weekly());
 
-        context.turnOffAuthorisationSystem();
-        EPerson nonAdmin = EPersonBuilder.createEPerson(context).build();
-        context.restoreAuthSystemState();
+            context.turnOffAuthorisationSystem();
+            EPerson nonAdmin = EPersonBuilder.createEPerson(context).build();
+            context.restoreAuthSystemState();
 
 
-        try {
-            context.setCurrentUser(nonAdmin);
-            subscribeService.unsubscribe(context, subscribingUser, secondCollection);
-        } finally {
-            context.setCurrentUser(subscribingUser);
-            SubscribeBuilder.deleteSubscription(subscription.getID());
-        }
+            try {
+                context.setCurrentUser(nonAdmin);
+                subscribeService.unsubscribe(context, subscribingUser, secondCollection);
+            } finally {
+                context.setCurrentUser(subscribingUser);
+                SubscribeBuilder.deleteSubscription(subscription.getID());
+            }
+
+        });
 
     }
 

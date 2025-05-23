@@ -58,9 +58,9 @@ import org.dspace.orcid.service.impl.OrcidHistoryServiceImpl;
 import org.dspace.profile.OrcidSynchronizationMode;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link OrcidBulkPush}.
@@ -84,7 +84,7 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
     private OrcidClient orcidClientMock;
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         orcidHistoryService = (OrcidHistoryServiceImpl) OrcidServiceFactory.getInstance().getOrcidHistoryService();
@@ -115,7 +115,7 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
     }
 
-    @After
+    @AfterEach
     public void after() throws SQLException {
         List<OrcidHistory> records = orcidHistoryService.findAll(context);
         for (OrcidHistory record : records) {

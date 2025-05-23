@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.security;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -21,12 +21,14 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.services.RequestService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -34,7 +36,8 @@ import org.springframework.test.util.ReflectionTestUtils;
  * This class verifies that {@link EPersonRestPermissionEvaluatorPlugin} properly
  * evaluates Patch requests.
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class EPersonRestPermissionEvaluatorPluginTest {
 
     @InjectMocks
@@ -45,13 +48,13 @@ public class EPersonRestPermissionEvaluatorPluginTest {
     @Mock
     private RequestService requestService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ePersonRestPermissionEvaluatorPlugin = spy(EPersonRestPermissionEvaluatorPlugin.class);
         authentication = mock(Authentication.class);
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert("WRITE");
         when(ePersonRestPermissionEvaluatorPlugin
-                 .hasDSpacePermission(authentication, null, null, restPermission)).thenReturn(true);
+            .hasDSpacePermission(authentication, null, null, restPermission)).thenReturn(true);
         ReflectionTestUtils.setField(ePersonRestPermissionEvaluatorPlugin, "requestService", requestService);
         when(requestService.getCurrentRequest()).thenReturn(null);
     }
@@ -66,7 +69,7 @@ public class EPersonRestPermissionEvaluatorPluginTest {
         ops.add(canLoginOperation);
         Patch patch = new Patch(ops);
         assertFalse(ePersonRestPermissionEvaluatorPlugin
-                        .hasPatchPermission(authentication, null, null, patch));
+            .hasPatchPermission(authentication, null, null, patch));
 
     }
 
@@ -78,7 +81,7 @@ public class EPersonRestPermissionEvaluatorPluginTest {
         ops.add(addOperation);
         Patch patch = new Patch(ops);
         assertTrue(ePersonRestPermissionEvaluatorPlugin
-                       .hasPatchPermission(authentication, null, null, patch));
+            .hasPatchPermission(authentication, null, null, patch));
 
     }
 

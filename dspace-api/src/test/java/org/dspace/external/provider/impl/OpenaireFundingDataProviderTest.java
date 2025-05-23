@@ -7,9 +7,9 @@
  */
 package org.dspace.external.provider.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,8 +19,8 @@ import org.dspace.external.factory.ExternalServiceFactory;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.service.ExternalDataService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for OpenaireFundingDataProvider
@@ -40,7 +40,7 @@ public class OpenaireFundingDataProviderTest extends AbstractDSpaceTest {
      * Other methods can be annotated with @Before here or in subclasses but no
      * execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     public void init() {
         // Set up External Service Factory and set data providers
         externalDataService = ExternalServiceFactory.getInstance().getExternalDataService();
@@ -49,33 +49,35 @@ public class OpenaireFundingDataProviderTest extends AbstractDSpaceTest {
 
     @Test
     public void testNumberOfResultsWSingleKeyword() {
-        assertNotNull("openaireFundingDataProvider is not null", openaireFundingDataProvider);
-        assertEquals("openaireFunding.numberOfResults.query:mock", 77,
-                openaireFundingDataProvider.getNumberOfResults("mock"));
+        assertNotNull(openaireFundingDataProvider, "openaireFundingDataProvider is not null");
+        assertEquals(77,
+                openaireFundingDataProvider.getNumberOfResults("mock"),
+                "openaireFunding.numberOfResults.query:mock");
     }
 
     @Test
     public void testNumberOfResultsWKeywords() {
-        assertNotNull("openaireFundingDataProvider is not null", openaireFundingDataProvider);
-        assertEquals("openaireFunding.numberOfResults.query:mock+test", 77,
-                openaireFundingDataProvider.getNumberOfResults("mock+test"));
+        assertNotNull(openaireFundingDataProvider, "openaireFundingDataProvider is not null");
+        assertEquals(77,
+                openaireFundingDataProvider.getNumberOfResults("mock+test"),
+                "openaireFunding.numberOfResults.query:mock+test");
     }
 
     @Test
     public void testQueryResultsWSingleKeyword() {
-        assertNotNull("openaireFundingDataProvider is not null", openaireFundingDataProvider);
+        assertNotNull(openaireFundingDataProvider, "openaireFundingDataProvider is not null");
         List<ExternalDataObject> results = openaireFundingDataProvider.searchExternalDataObjects("mock", 0, 10);
-        assertEquals("openaireFunding.searchExternalDataObjects.size", 10, results.size());
+        assertEquals(10, results.size(), "openaireFunding.searchExternalDataObjects.size");
     }
 
     @Test
     public void testQueryResultsWKeywords() {
         String value = "Mushroom Robo-Pic - Development of an autonomous robotic mushroom picking system";
 
-        assertNotNull("openaireFundingDataProvider is not null", openaireFundingDataProvider);
+        assertNotNull(openaireFundingDataProvider, "openaireFundingDataProvider is not null");
         List<ExternalDataObject> results = openaireFundingDataProvider.searchExternalDataObjects("mock+test", 0, 10);
-        assertEquals("openaireFunding.searchExternalDataObjects.size", 10, results.size());
-        assertTrue("openaireFunding.searchExternalDataObjects.first.value", value.equals(results.get(0).getValue()));
+        assertEquals(10, results.size(), "openaireFunding.searchExternalDataObjects.size");
+        assertTrue(value.equals(results.get(0).getValue()), "openaireFunding.searchExternalDataObjects.first.value");
     }
 
     @Test
@@ -84,22 +86,22 @@ public class OpenaireFundingDataProviderTest extends AbstractDSpaceTest {
         String value = "Portuguese Wild Mushrooms: Chemical characterization and functional study"
                 + " of antiproliferative and proapoptotic properties in cancer cell lines";
 
-        assertNotNull("openaireFundingDataProvider is not null", openaireFundingDataProvider);
+        assertNotNull(openaireFundingDataProvider, "openaireFundingDataProvider is not null");
 
         Optional<ExternalDataObject> result = openaireFundingDataProvider.getExternalDataObject(id);
 
-        assertTrue("openaireFunding.getExternalDataObject.exists", result.isPresent());
-        assertTrue("openaireFunding.getExternalDataObject.value", value.equals(result.get().getValue()));
+        assertTrue(result.isPresent(), "openaireFunding.getExternalDataObject.exists");
+        assertTrue(value.equals(result.get().getValue()), "openaireFunding.getExternalDataObject.value");
     }
 
     @Test
     public void testGetDataObjectWInvalidId() {
         String id = "WRONGID";
 
-        assertNotNull("openaireFundingDataProvider is not null", openaireFundingDataProvider);
+        assertNotNull(openaireFundingDataProvider, "openaireFundingDataProvider is not null");
 
         Optional<ExternalDataObject> result = openaireFundingDataProvider.getExternalDataObject(id);
 
-        assertTrue("openaireFunding.getExternalDataObject.notExists:WRONGID", result.isEmpty());
+        assertTrue(result.isEmpty(), "openaireFunding.getExternalDataObject.notExists:WRONGID");
     }
 }
