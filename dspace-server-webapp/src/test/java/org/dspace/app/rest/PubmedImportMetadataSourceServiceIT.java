@@ -101,35 +101,34 @@ public class PubmedImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         //define first record
         MetadatumDTO title = createMetadatumDTO("dc","title", null,
                 "Teaching strategies of clinical reasoning in advanced nursing clinical practice: A scoping review.");
-        MetadatumDTO description1 = createMetadatumDTO("dc", "description", "abstract", "To report and synthesize"
-                + " the main strategies for teaching clinical reasoning described in the literature in the context of"
-                + " advanced clinical practice and promote new areas of research to improve the pedagogical approach"
-                + " to clinical reasoning in Advanced Practice Nursing.");
-        MetadatumDTO description2 = createMetadatumDTO("dc", "description", "abstract", "Clinical reasoning and"
-                + " clinical thinking are essential elements in the advanced nursing clinical practice decision-making"
-                + " process. The quality improvement of care is related to the development of those skills."
-                + " Therefore, it is crucial to optimize teaching strategies that can enhance the role of clinical"
-                + " reasoning in advanced clinical practice.");
-        MetadatumDTO description3 = createMetadatumDTO("dc", "description", "abstract", "A scoping review was"
-                + " conducted using the framework developed by Arksey and O'Malley as a research strategy."
-                + " Consistent with the nature of scoping reviews, a study protocol has been established.");
-        MetadatumDTO description4 = createMetadatumDTO("dc", "description", "abstract", "The studies included and"
-                + " analyzed in this scoping review cover from January 2016 to June 2022. Primary studies and secondary"
-                + " revision studies, published in biomedical databases, were selected, including qualitative ones."
-                + " Electronic databases used were: CINAHL, PubMed, Cochrane Library, Scopus, and OVID."
-                + " Three authors independently evaluated the articles for titles, abstracts, and full text.");
-        MetadatumDTO description5 = createMetadatumDTO("dc", "description", "abstract", "1433 articles were examined,"
-                + " applying the eligibility and exclusion criteria 73 studies were assessed for eligibility,"
-                + " and 27 were included in the scoping review. The results that emerged from the review were"
-                + " interpreted and grouped into three macro strategies (simulations-based education, art and visual"
-                + " thinking, and other learning approaches) and nineteen educational interventions.");
-        MetadatumDTO description6 = createMetadatumDTO("dc", "description", "abstract", "Among the different"
-                + " strategies, the simulations are the most used. Despite this, our scoping review reveals that is"
-                + " necessary to use different teaching strategies to stimulate critical thinking, improve diagnostic"
-                + " reasoning, refine clinical judgment, and strengthen decision-making. However, it is not possible to"
-                + " demonstrate which methodology is more effective in obtaining the learning outcomes necessary to"
-                + " acquire an adequate level of judgment and critical thinking. Therefore, it will be"
-                + " necessary to relate teaching methodologies with the skills developed.");
+        MetadatumDTO description1 = createMetadatumDTO("dc", "description", "abstract",
+                "AIM/OBJECTIVE: To report and synthesize the main strategies for teaching clinical reasoning " +
+                        "described in the literature in the context of advanced clinical practice and promote new " +
+                        "areas of research to improve the pedagogical approach to clinical reasoning in Advanced " +
+                        "Practice Nursing.\n\nBACKGROUND: Clinical reasoning and clinical thinking are essential " +
+                        "elements in the advanced nursing clinical practice decision-making process. The quality " +
+                        "improvement of care is related to the development of those skills. Therefore, it is crucial " +
+                        "to optimize teaching strategies that can enhance the role of clinical reasoning in advanced " +
+                        "clinical practice.\n\nDESIGN: A scoping review was conducted using the framework developed " +
+                        "by Arksey and O'Malley as a research strategy. Consistent with the nature of scoping reviews" +
+                        ", a study protocol has been established.\n\nMETHODS: The studies included and analyzed in " +
+                        "this scoping review cover from January 2016 to June 2022. Primary studies and secondary " +
+                        "revision studies, published in biomedical databases, were selected, including qualitative " +
+                        "ones. Electronic databases used were: CINAHL, PubMed, Cochrane Library, Scopus, and OVID. " +
+                        "Three authors independently evaluated the articles for titles, abstracts, and full text.\n\n" +
+                        "RESULTS: 1433 articles were examined, applying the eligibility and exclusion criteria 73 " +
+                        "studies were assessed for eligibility, and 27 were included in the scoping review. The " +
+                        "results that emerged from the review were interpreted and grouped into three macro " +
+                        "strategies (simulations-based education, art and visual thinking, and other learning " +
+                        "approaches) and nineteen educational interventions.\n\nCONCLUSIONS: Among the different " +
+                        "strategies, the simulations are the most used. Despite this, our scoping review reveals " +
+                        "that is necessary to use different teaching strategies to stimulate critical thinking, " +
+                        "improve diagnostic reasoning, refine clinical judgment, and strengthen decision-making. " +
+                        "However, it is not possible to demonstrate which methodology is more effective in obtaining " +
+                        "the learning outcomes necessary to acquire an adequate level of judgment and critical " +
+                        "thinking. Therefore, it will be necessary to relate teaching methodologies with the skills " +
+                        "developed.\n\nAn unlabeled section of an abstract.\n\nAn abstract section with no attributes" +
+                        " at all, concerning.");
         MetadatumDTO identifierOther = createMetadatumDTO("dc", "identifier", "other", "36708638");
         MetadatumDTO author1 = createMetadatumDTO("dc", "contributor", "author", "Giuffrida, Silvia");
         MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "Silano, Verdiana");
@@ -148,11 +147,6 @@ public class PubmedImportMetadataSourceServiceIT extends AbstractLiveImportInteg
 
         metadatums.add(title);
         metadatums.add(description1);
-        metadatums.add(description2);
-        metadatums.add(description3);
-        metadatums.add(description4);
-        metadatums.add(description5);
-        metadatums.add(description6);
         metadatums.add(identifierOther);
         metadatums.add(author1);
         metadatums.add(author2);
