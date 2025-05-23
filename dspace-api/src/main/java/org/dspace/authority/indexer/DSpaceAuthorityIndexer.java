@@ -148,12 +148,12 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                 !metadataAuthorityKey.startsWith(AuthorityValueService.GENERATE)) {
             // !uid.startsWith(AuthorityValueGenerator.GENERATE) is not strictly
             // necessary here but it prevents exceptions in solr
-            AuthorityValue value = authorityValueService.findByUID(context, metadataAuthorityKey);
+            AuthorityValue value = authorityValueService.findByUID(metadataAuthorityKey);
             if (value != null) {
                 return value;
             }
         }
-        return authorityValueService.generate(context, metadataAuthorityKey,
+        return authorityValueService.generate(metadataAuthorityKey,
                 metadataContent, metadataField.replaceAll("\\.", "_"));
     }
 
