@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import com.ibm.icu.impl.Pair;
 import jakarta.annotation.Nullable;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.ArrayUtils;
@@ -406,9 +407,16 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                         // Remove authority unless the md is not authority controlled
                         if (!isAuthorityControlledField(md)) {
                             for (int i = 0; i < fromCSV.length; i++) {
-                                int pos = fromCSV[i].indexOf(csv.getAuthoritySeparator());
-                                if (pos > -1) {
-                                    fromCSV[i] = fromCSV[i].substring(0, pos);
+
+                                Pair<String, String> authorityAndConfidence = getAuthorityAndConfidence(fromCSV[i]);
+
+                                if (authorityAndConfidence != null) {
+                                    // Calculate the length of the authority + confidence part of the value
+                                    int authLength = authorityAndConfidence.first.length()
+                                        + authorityAndConfidence.second.length()
+                                        + csv.getAuthoritySeparator().length() * 2;
+
+                                    fromCSV[i] = fromCSV[i].substring(0, fromCSV[i].length() - authLength);
                                 }
                             }
                         }
@@ -1171,21 +1179,42 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         dcv.setConfidence(Choices.CF_UNSET);
     }
 
-    private void resolveValueAndAuthority(String value, BulkEditMetadataValue dcv) {
+
+
+    private Pair<String, String> getAuthorityAndConfidence(String value) {
         // Cells with valid authority are composed of three parts ~ <value>, <authority>, <confidence>
         // The value itself may also include the authority separator though
-        String[] parts = value.split(csv.getEscapedAuthoritySeparator());
+        String[] parts = value.split(csv.getAuthoritySeparator());
 
-        // If we don't have enough parts, assume the whole string is the value
         if (parts.length < 3) {
+            return null;
+        }
+
+        // Check that confidence is an integer
+        try {
+            Integer.parseInt(parts[parts.length - 1]);
+        } catch (NumberFormatException e) {
+            return null; // confidence isn't an integer
+        }
+
+        return Pair.of(parts[parts.length - 2], parts[parts.length - 1]);
+    }
+
+    private void resolveValueAndAuthority(String value, BulkEditMetadataValue dcv) {
+        Pair<String, String> authorityAndConfidence = getAuthorityAndConfidence(value);
+
+        // If no authority & confidence is found, assume the whole string is the value
+        if (authorityAndConfidence == null) {
             simplyCopyValue(value, dcv);
             return;
         }
 
         try {
             // The last part of the cell must be a confidence value (integer)
-            int confidence = Integer.parseInt(parts[parts.length - 1]);
-            String authority = parts[parts.length - 2];
+            int confidence = Integer.parseInt(authorityAndConfidence.second);
+            String authority = authorityAndConfidence.first;
+
+            String[] parts = value.split(csv.getEscapedAuthoritySeparator());
             String plainValue = String.join(
                 csv.getAuthoritySeparator(),
                 ArrayUtils.subarray(parts, 0, parts.length - 2)
