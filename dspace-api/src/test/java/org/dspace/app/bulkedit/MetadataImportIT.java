@@ -43,6 +43,8 @@ import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -54,6 +56,9 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             = EPersonServiceFactory.getInstance().getEPersonService();
     private final RelationshipService relationshipService
             = ContentServiceFactory.getInstance().getRelationshipService();
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+
 
     private Collection collection;
     private Collection publicationCollection;
@@ -260,6 +265,31 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         performImportScript(csv);
         item = findItemByName(itemTitle);
         assertEquals(0, itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size());
+    }
+
+
+    @Test
+    public void metadataImportWithAuthoritySeperatorTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        String itemTitle = "Testing publication 1";
+        Item item = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle(itemTitle)
+            .build();
+        context.restoreAuthSystemState();
+
+        final String testAbstract = "To test our hypothesis, we created mutant strains" +
+            " R20291::licB and R20291:: cd2781 using ClosTron mutagenesis system.";
+
+        String[] csv = {"id,dc.description.abstract",
+            item.getID().toString() + ",\"" + testAbstract + "\""};
+        performImportScript(csv);
+        item = findItemByName(itemTitle);
+
+        assertEquals(1, itemService.getMetadata(item,
+            "dc", "description", "abstract", Item.ANY).size());
+        assertEquals(testAbstract, itemService.getMetadata(item,
+            "dc", "description", "abstract", Item.ANY).get(0).getValue());
     }
 
     private Item findItemByName(String name) throws Exception {
