@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +21,8 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -32,6 +35,8 @@ import org.hibernate.type.SqlTypes;
  * The cardinality properties describe how many of each relations this relationshipType can support
  */
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Table(name = "relationship_type")
 public class RelationshipType implements ReloadableEntity<Integer> {
 

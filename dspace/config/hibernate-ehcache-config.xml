@@ -145,4 +145,24 @@
       </resources>
     </cache>
 
+    <cache alias="org.dspace.content.RelationshipType"
+           uses-template="default">
+        <expiry>
+            <none/>
+        </expiry>
+        <resources>
+            <heap unit='entries'>500</heap>
+        </resources>
+    </cache>
+
+    <cache alias="org.dspace.content.EntityType"
+           uses-template="default">
+        <expiry>
+            <none/>
+        </expiry>
+        <resources>
+            <heap unit='entries'>100</heap>
+        </resources>
+    </cache>
+
 </config>
