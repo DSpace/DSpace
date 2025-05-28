@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Logging configuration for "load-etd" script -->
+<Configuration strict='true'
+               xmlns='http://logging.apache.org/log4j/2.0/config'>
+    <Properties>
+        <!-- Default log file directory if "log.dir" property is not specified -->
+        <Property name='log.dir'>${log4j:configParentLocation}/../log</Property>
+    </Properties>
+
+    <Appenders>
+        <Appender name='Console'
+          type='Console'>
+            <Layout type='PatternLayout'
+                    pattern="%m%n"/>
+        </Appender>
+
+        <Appender name='File'
+            filePattern="${log.dir}/etdloader.log-%d{yyyy-MM-dd}"
+            type='RollingFile'
+            fileName='${log.dir}/etdloader.log'
+        >
+
+            <Layout type='PatternLayout'
+                    pattern='%d [%-5p]: (%c{2})%n%m%n%n'/>
+            <policies>
+                <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
+            </policies>
+        </Appender>
+    </Appenders>
+
+    <Loggers>
+        <Root level="WARN">
+            <AppenderRef ref="Console" level="INFO"/>
+            <AppenderRef ref="File"/>
+        </Root>
+
+        <Logger name="edu.umd.lib.dspace.app.EtdLoader" level="DEBUG"/>
+    </Loggers>
+</Configuration>

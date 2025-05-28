@@ -56,7 +56,17 @@ if [ "$JAVA_OPTS" = "" ]; then
   JAVA_OPTS="-Xmx256m -Dfile.encoding=UTF-8"
 fi
 
-export JAVA_OPTS="$JAVA_OPTS -Dlog4j2.configurationFile=$DSPACEDIR/config/log4j2-cli.xml"
+# UMD Customization
+# Enable the dspace-cli log file to be overridden by a "UMD_DSPACE_CLI_LOG_CONFIG"
+# environment variable. This allows scripts such as "load-etd" to specify their
+# own log files.
+if [ "$UMD_DSPACE_CLI_LOG_CONFIG" = "" ]; then
+  # Default to using log4j2-cli.xml
+  UMD_DSPACE_CLI_LOG_CONFIG="-Dlog4j2.configurationFile=$DSPACEDIR/config/log4j2-cli.xml"
+fi
+
+export JAVA_OPTS="$JAVA_OPTS $UMD_DSPACE_CLI_LOG_CONFIG"
+# End UMD Customization
 
 # Now invoke Java
 java $JAVA_OPTS \

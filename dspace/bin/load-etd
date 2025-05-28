@@ -2,11 +2,11 @@
 
 #####################################################################
 # Copyright 2006, The University of Maryland.  All rights reserved.
-# 
+#
 # Program:   load-etd
-# 
+#
 # Author:    Ben Wallberg
-# 
+#
 # Purpose:   Load ProQuest ETD into DSpace.
 #
 # Usage:     See PrintUsageAndExit()
@@ -25,7 +25,8 @@ GetCmdLine();
 # Get directories
 chomp($bindir = `dirname $0`);
 
-$ENV{JAVA_OPTS} .= " -Dlog4j.configuration=log4j-etdloader.properties";
+# Use UMD_DSPACE_CLI_LOG_CONFIG to override the dspace-cli log configuration
+$ENV{UMD_DSPACE_CLI_LOG_CONFIG} = "-Dlog4j2.configurationFile=log4j2-etdloader.xml";
 $ENV{JAVA_OPTS} .= " -Ddspace.log.init.disable=true";
 $ENV{JAVA_OPTS} .= " -Detdloader.zipfile=$zipfile";
 $ENV{JAVA_OPTS} .= " -Detdloader.marcfile=$marcfile" if (defined $marcfile);
@@ -98,7 +99,7 @@ sub PrintUsageAndExit {
         }
         print "\n";
     }
-        
+
     print <<'EOS';
 Usage: load-etd -i <zipfile> [-o <marcfile>] [-r <item>] [-c <csvfile>]
     <zipfile>:  zip file containing items to load
