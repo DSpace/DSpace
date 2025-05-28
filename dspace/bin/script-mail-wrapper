@@ -67,7 +67,8 @@ echo SCRIPT_ARGUMENTS=\'$@\'
 # Call the script being wrapped
 $SCRIPT "$@" 2>&1 | tee "$LOG_FILE_PATH" || true
 
-# Mail the log
-$MAIL_SCRIPT_DIR/mail -s "$SCRIPT_BASENAME: $SERVER_TYPE" "$EMAIL_ADDRESS" < $LOG_FILE_PATH
+# Mail the log, passing all non-JSON unchanged, and filtering out DEBUG messages
+jq -R -r '. as $line | try (fromjson | select(."log.level" != "DEBUG") | .message) catch $line' $LOG_FILE_PATH | \
+$MAIL_SCRIPT_DIR/mail -s "$SCRIPT_BASENAME: $SERVER_TYPE" "$EMAIL_ADDRESS"
 
 echo Done running `basename $0` script
