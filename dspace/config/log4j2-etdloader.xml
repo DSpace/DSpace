@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!-- Logging configuration for "load-etd" script -->
+<!--
+    This logging configuration is for the local development environment,
+    and behaves differently than the ETD logging in Kubernetes, specifically:
+
+    * The Kubernetes logger outputs entries in a JSON format
+    * This logging configuration only outputs INFO and higher to the
+      console while Kubernetes sends DEBUG messages to the console (and then
+      strips them out before sending the email from the "script-mail-wrapper"
+      script).
+
+    The intent is to provide an identical email to what is sent by Kubernetes,
+    while preserving a text-based log, which is easier to read when developing.
+-->
 <Configuration strict='true'
                xmlns='http://logging.apache.org/log4j/2.0/config'>
     <Properties>
