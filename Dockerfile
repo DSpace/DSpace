@@ -90,7 +90,7 @@ RUN apt-get update && \
         libgetopt-complete-perl \
         libconfig-properties-perl \
         vim \
-        python3-lxml
+        python3-lxml \
         jq && \
     mkfifo /var/spool/postfix/public/pickup && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
