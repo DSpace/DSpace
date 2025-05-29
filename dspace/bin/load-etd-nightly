@@ -1,7 +1,7 @@
 #!/bin/csh
 
 # load-etd-nightly
-# 
+#
 # Check for new upload files in the incoming directory and load
 # them into dspace.
 #
@@ -21,7 +21,6 @@ set marcdir = $datadir/marc
 set marcfile = `date '+%Y%m%d'`.dat
 set csvdir = $datadir/csv
 set csvfile = `date '+%Y%m%d'`.csv
-set transfermarc = `$bindir/dspace dsprop -property etdloader.transfermarc`;
 
 # Check for incoming files
 ls $incomingdir/etdadmin_upload_*.zip >& /dev/null
@@ -43,10 +42,10 @@ if ($status == 0) then
   foreach upload ($incomingdir/etdadmin_upload_*.zip)
     set zipfile = `basename $upload`
 
-    # Load the files from this archive  
-    echo 
+    # Load the files from this archive
+    echo
     echo ======================================================================
-    echo Loading archive file: $incomingdir/$zipfile  
+    echo Loading archive file: $incomingdir/$zipfile
     $bindir/load-etd -i $incomingdir/$zipfile -o $marcdir/$marcfile -c $csvdir/$csvfile
 
     # Move archive to the processed directory
@@ -59,23 +58,6 @@ if ($status == 0) then
 
     @ count = $count + 1
   end
-
-  # Marc processing
-  if ($count > 0) then
-    if ($transfermarc == "true") then
-      echo 
-      echo ======================================================================
-      echo Transfering marc file
-      cd $marcdir
-      $bindir/etd2marc-transfer $marcfile
-      
-      echo
-      echo Sending email notification
-      $bindir/etd2marc-mail $count $marcfile
-    else
-      echo Upload of the marc file is not enabled
-    endif
-  endif
 endif
 
 
