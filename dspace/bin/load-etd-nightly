@@ -17,25 +17,11 @@ set datadir = `cd $argv[1]; pwd`
 set bindir  = `dirname $0`
 set incomingdir = $datadir/incoming
 set processeddir = $datadir/processed
-set marcdir = $datadir/marc
-set marcfile = `date '+%Y%m%d'`.dat
-set csvdir = $datadir/csv
-set csvfile = `date '+%Y%m%d'`.csv
 
 # Check for incoming files
 ls $incomingdir/etdadmin_upload_*.zip >& /dev/null
 if ($status == 0) then
   echo Files found in $incomingdir
-
-  if (! -d $marcdir ) then
-    mkdir -p $marcdir
-  endif
-  if (! -d $csvdir ) then
-    mkdir -p $csvdir
-  endif
-
-  touch $marcdir/$marcfile
-  touch $csvdir/$csvfile
 
   @ count = 0
 
@@ -46,7 +32,7 @@ if ($status == 0) then
     echo
     echo ======================================================================
     echo Loading archive file: $incomingdir/$zipfile
-    $bindir/load-etd -i $incomingdir/$zipfile -o $marcdir/$marcfile -c $csvdir/$csvfile
+    $bindir/load-etd -i $incomingdir/$zipfile
 
     # Move archive to the processed directory
     if (! -d $processeddir ) then

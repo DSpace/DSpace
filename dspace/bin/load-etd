@@ -29,9 +29,7 @@ chomp($bindir = `dirname $0`);
 $ENV{UMD_DSPACE_CLI_LOG_CONFIG} = "-Dlog4j2.configurationFile=log4j2-etdloader.xml";
 $ENV{JAVA_OPTS} .= " -Ddspace.log.init.disable=true";
 $ENV{JAVA_OPTS} .= " -Detdloader.zipfile=$zipfile";
-$ENV{JAVA_OPTS} .= " -Detdloader.marcfile=$marcfile" if (defined $marcfile);
 $ENV{JAVA_OPTS} .= " -Detdloader.singleitem=$item" if (defined $item);
-$ENV{JAVA_OPTS} .= " -Detdloader.csvfile=$csvfile" if (defined $csvfile);
 
 # Add additions jar to front of classpath to ensure the overlay files
 # has precedence over stock implementation
@@ -62,7 +60,7 @@ sub GetCmdLine {
         PrintUsageAndExit();
     }
 
-    if ( ! getopts('i:o:r:c:')) {
+    if ( ! getopts('i:r:')) {
         print "Error in option processing\n\n";
         PrintUsageAndExit();
     }
@@ -72,16 +70,8 @@ sub GetCmdLine {
     }
     $zipfile = $opt_i;
 
-    if (defined $opt_o) {
-	$marcfile = $opt_o;
-    }
-
     if (defined $opt_r) {
 	$item = $opt_r;
-    }
-
-    if (defined $opt_c) {
-	$csvfile = $opt_c;
     }
 
 }
@@ -101,11 +91,9 @@ sub PrintUsageAndExit {
     }
 
     print <<'EOS';
-Usage: load-etd -i <zipfile> [-o <marcfile>] [-r <item>] [-c <csvfile>]
+Usage: load-etd -i <zipfile> [-r <item>]
     <zipfile>:  zip file containing items to load
-    <marcfile>: output marc file
     <item>:     process a single item, not the entire zip file
-    <csvfile>:  CSV output file with author,title,handle of each item
 EOS
 
     exit 1;
