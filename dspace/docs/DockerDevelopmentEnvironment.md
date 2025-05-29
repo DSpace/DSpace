@@ -287,12 +287,14 @@ Docker container, with email being captured by the "MailHog" application.
 
 ### Dockerfile.dev-additions
 
-Add the following lines to the "Dockerfile.dev-additions" file, just after the
-`FROM eclipse-temurin:${JDK_VERSION}` line, to include the packages needed for the
-script and email functionality:
+Replace the "RUN apt-get update" in the section "Dockerfile.dev-additions" file,
+just after the `FROM docker.io/eclipse-temurin:${JDK_VERSION}` line, to include
+the packages needed for the script and email functionality:
 
 ```text
-FROM eclipse-temurin:${JDK_VERSION}
+FROM docker.io/eclipse-temurin:${JDK_VERSION}
+
+...
 
 # Dependencies for email functionality
 RUN apt-get update && \
@@ -302,6 +304,7 @@ RUN apt-get update && \
       s-nail \
       libgetopt-complete-perl \
       libconfig-properties-perl \
+      jq \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/* \
     && mkfifo /var/spool/postfix/public/pickup

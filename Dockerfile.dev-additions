@@ -72,7 +72,8 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
         csh \
         libgetopt-complete-perl \
-        libconfig-properties-perl
+        libconfig-properties-perl \
+        jq
 
 # Create the directories needed for Proquest ETD loading
 RUN mkdir -p $DSPACE_INSTALL/proquest/incoming $DSPACE_INSTALL/proquest/processed \
