@@ -148,7 +148,7 @@
     <cache alias="org.dspace.content.RelationshipType"
            uses-template="default">
         <expiry>
-            <none/>
+            <ttl unit="hours">1</ttl>
         </expiry>
         <resources>
             <heap unit='entries'>500</heap>
@@ -158,7 +158,7 @@
     <cache alias="org.dspace.content.EntityType"
            uses-template="default">
         <expiry>
-            <none/>
+            <ttl unit="hours">1</ttl>
         </expiry>
         <resources>
             <heap unit='entries'>100</heap>
