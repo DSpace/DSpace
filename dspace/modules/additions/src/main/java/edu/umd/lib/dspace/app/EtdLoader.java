@@ -6,12 +6,8 @@
 package edu.umd.lib.dspace.app;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -88,9 +84,6 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.sort.OrderFormat;
 import org.dspace.util.UUIDUtils;
-import org.marc4j.MarcStreamWriter;
-import org.marc4j.MarcXmlReader;
-import org.marc4j.marc.Record;
 import org.xml.sax.InputSource;
 // SQL
 // IO
@@ -144,8 +137,6 @@ public class EtdLoader {
 
     static Transformer tDC = null;
 
-    static Transformer tMeta2Marc = null;
-
     static Map namespace = new HashMap();
 
     static Map mXPath = new HashMap();
@@ -157,10 +148,6 @@ public class EtdLoader {
     static EPerson etdeperson = null;
 
     static SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
-
-    static MarcStreamWriter marcwriter = null;
-
-    static PrintWriter csvwriter = null;
 
     static Pattern pZipEntry = Pattern
             .compile(".*_umd_0117._(\\d+)(.pdf|_DATA.xml)");
@@ -216,8 +203,6 @@ public class EtdLoader {
             String strZipFile = props.getProperty("etdloader.zipfile", null);
             String strSingleItem = props.getProperty("etdloader.singleitem",
                     null);
-            String strMarcFile = props.getProperty("etdloader.marcfile", null);
-            String strCsvFile = props.getProperty("etdloader.csvfile", null);
 
             // dspace dir
             String strDspace = configurationService.getProperty("dspace.dir");
@@ -226,34 +211,14 @@ public class EtdLoader {
             String strCollection = configurationService
                     .getProperty("drum.etdloader.collection");
 
-            String transferMarc = configurationService
-                    .getProperty("drum.etdloader.transfermarc");
-
             log.info("DSpace directory : " + strDspace);
             log.info("ETD Loaeder Eperson : " + strEPerson);
             log.info("ETD Loader Collection: " + strCollection);
-            log.info("ETD Loader Transfer Marc: " + transferMarc);
 
             // the transformers
             TransformerFactory tFactory = TransformerFactory.newInstance();
             tDC = tFactory.newTransformer(new StreamSource(new File(strDspace
                     + "/config/load/etd2dc.xsl")));
-            tMeta2Marc = tFactory.newTransformer(new StreamSource(new File(
-                    strDspace + "/config/load/etd2marc.xsl")));
-
-            // open the marc output file
-            if (strMarcFile != null) {
-                FileOutputStream fos = new FileOutputStream(new File(
-                        strMarcFile), true);
-                marcwriter = new MarcStreamWriter(fos, "UTF-8");
-            }
-
-            // open the csv output file
-            if (strCsvFile != null) {
-                FileOutputStream fos = new FileOutputStream(strCsvFile, true);
-                OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
-                csvwriter = new PrintWriter(osw);
-            }
 
             // Get DSpace values
             Context context = new Context();
@@ -299,22 +264,6 @@ public class EtdLoader {
         } catch (Exception e) {
             log.error("Uncaught exception: " + e.getMessage(), e);
         } finally {
-            if (marcwriter != null) {
-                try {
-                    marcwriter.close();
-                } catch (Exception e) {
-                    log.error("Error closing marcwriter", e);
-                }
-            }
-
-            if (csvwriter != null) {
-                try {
-                    csvwriter.close();
-                } catch (Exception e) {
-                    log.error("Error closing csvwriter", e);
-                }
-            }
-
             log.info("=====================================\n"
                     + "Records read:    " + lRead + "\n" + "Records written: "
                     + lWritten + "\n" + "Embargoes:       " + lEmbargo);
@@ -601,92 +550,6 @@ public class EtdLoader {
         }
     }
 
-    /*********************************************************** createMarc */
-    /**
-     * Create a marc record from the etd metadata.
-     */
-
-    public static void createMarc(Document meta, String strHandle, List files)
-            throws Exception {
-
-        if (marcwriter != null) {
-            log.debug("Creating marc");
-
-            // Convert etd metadata to marc xml
-            DocumentSource source = new DocumentSource(meta);
-            DocumentResult result = new DocumentResult();
-
-            tMeta2Marc.setParameter("files", getFileTypes(files));
-            tMeta2Marc.setParameter("handle", strHandle);
-            tMeta2Marc.transform(source, result);
-
-            // Convert marc xml to marc
-            StringWriter sw = new StringWriter();
-            XMLWriter writer = new XMLWriter(sw);
-            writer.write(result.getDocument());
-            writer.flush();
-            InputSource is = new InputSource(new StringReader(sw.toString()));
-            MarcXmlReader convert = new MarcXmlReader(is);
-            Record record = convert.next();
-
-            // Write out the marc record
-            marcwriter.write(record);
-        }
-    }
-
-    /************************************************************ createCsv */
-    /**
-     * Add an entry in the CSV files for this item: title, author, handle
-     */
-
-    public static void createCsv(Item item, String strHandle) throws Exception {
-
-        if (csvwriter != null) {
-            log.debug("Creating CSV");
-
-            // Build the line
-            StringBuffer sb = new StringBuffer();
-
-            sb.append('"');
-
-            // Get the title(s)
-            List<MetadataValue> titles = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null,
-                    Item.ANY);
-
-            for (int i = 0; i < titles.size(); i++) {
-                if (i > 0) {
-                    sb.append("; ");
-                }
-
-                sb.append(titles.get(i).getValue().replaceAll("\"", "\"\""));
-            }
-
-            sb.append("\",\"");
-
-            // Get the author(s)
-            List<MetadataValue> authors = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "contributor",
-                    "author", Item.ANY);
-
-            for (int i = 0; i < authors.size(); i++) {
-                if (i > 0) {
-                    sb.append("; ");
-                }
-
-                sb.append(authors.get(i).getValue().replaceAll("\"", "\"\""));
-            }
-
-            sb.append("\",\"");
-
-            // Add the handle
-            sb.append(strHandle);
-
-            sb.append('"');
-
-            // Write out the csv line
-            csvwriter.println(sb.toString());
-        }
-    }
-
     /******************************************************* getCollections */
     /**
      * Get additional mapped collections.
@@ -871,12 +734,6 @@ public class EtdLoader {
             if (sCollections.size() == 0) {
                 reportCollections(context, item);
             }
-
-            // Create marc record for upload to TSD
-            createMarc(meta, strHandle, files);
-
-            // Create csv entry for this item
-            createCsv(item, strHandle);
         } catch (Exception e) {
             log.error("Error loading item " + strItem + ": "
                     + e.getMessage());

@@ -402,7 +402,6 @@ drum.mail.duplicate_title = mohideen@umd.edu
 drum.eperson.subscription.limiteperson =
 
 # Used by etd loader cron job
-drum.etdloader.transfermarc = false
 drum.etdloader.eperson = load_diss@drum.umd.edu
 # UUID of "UMD Theses and Dissertations" collection
 drum.etdloader.collection = ba3ddc3f-7a58-4fd3-bde5-304938050ea2
