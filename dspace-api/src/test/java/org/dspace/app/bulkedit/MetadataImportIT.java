@@ -8,6 +8,7 @@
 package org.dspace.app.bulkedit;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
@@ -34,6 +35,8 @@ import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
@@ -59,6 +62,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     private final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    private final MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance()
+        .getMetadataAuthorityService();
 
     private Collection collection;
     private Collection publicationCollection;
@@ -290,6 +295,109 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             "dc", "description", "abstract", Item.ANY).size());
         assertEquals(testAbstract, itemService.getMetadata(item,
             "dc", "description", "abstract", Item.ANY).get(0).getValue());
+    }
+
+
+    @Test
+    public void metadataImportWithAuthoritySeperatorTestAndAuthority() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        String itemTitle = "Testing publication 1";
+        Item item = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle(itemTitle)
+            .build();
+        context.restoreAuthSystemState();
+
+        final String testAbstract = "The double colon '::' has many purposes, like: ...";
+        final String authority = "::authority::123";
+        String[] csv = {"id,dc.description.abstract",
+            item.getID().toString() + ",\"" + testAbstract + authority + "\""};
+        performImportScript(csv);
+        item = findItemByName(itemTitle);
+
+        assertEquals(1, itemService.getMetadata(item,
+            "dc", "description", "abstract", Item.ANY).size());
+        assertEquals(testAbstract, itemService.getMetadata(item,
+            "dc", "description", "abstract", Item.ANY).get(0).getValue());
+
+    }
+
+
+    @Test
+    public void metadataImportWithAuthoritySeperatorTestAndAuthorityWithAuthorityControll() throws Exception {
+
+        try {
+            // enable authority controll
+            configurationService.setProperty("authority.controlled.dc.description.abstract", "true");
+            metadataAuthorityService.clearCache();
+
+            context.turnOffAuthorisationSystem();
+            String itemTitle = "Testing publication 1";
+            Item item = ItemBuilder.createItem(context, publicationCollection)
+                .withTitle(itemTitle)
+                .build();
+            context.restoreAuthSystemState();
+
+            final String testAbstract = "The double colon '::' has many purposes, like: ...";
+            final String authority = "::authority::123";
+
+            String[] csv = {"id,dc.description.abstract",
+                item.getID().toString() + ",\"" + testAbstract + authority + "\""};
+            performImportScript(csv);
+            item = findItemByName(itemTitle);
+
+            assertEquals(1, itemService.getMetadata(item,
+                "dc", "description", "abstract", Item.ANY).size());
+            assertEquals(testAbstract, itemService.getMetadata(item,
+                "dc", "description", "abstract", Item.ANY).get(0).getValue());
+
+            // Make sure the authority is present
+            assertEquals("authority", itemService.getMetadata(item,
+                "dc", "description", "abstract", Item.ANY).get(0).getAuthority());
+            assertEquals(123, itemService.getMetadata(item,
+                "dc", "description", "abstract", Item.ANY).get(0).getConfidence());
+        } finally {
+            configurationService.setProperty("authority.controlled.dc.description.abstract", null);
+        }
+    }
+
+    @Test
+    public void metadataImportWithInvalidConfidenceTestAndAuthorityWithAuthorityControll() throws Exception {
+
+        try {
+            // enable authority controll
+            configurationService.setProperty("authority.controlled.dc.description.abstract", "true");
+            metadataAuthorityService.clearCache();
+
+
+            context.turnOffAuthorisationSystem();
+            String itemTitle = "Testing publication 1";
+            Item item = ItemBuilder.createItem(context, publicationCollection)
+                .withTitle(itemTitle)
+                .build();
+            context.restoreAuthSystemState();
+
+            final String testAbstract = "The double colon '::' has many purposes, like: ...";
+            final String authority = "::authority::123";
+
+            String[] csv = {"id,dc.description.abstract",
+                item.getID().toString() + ",\"" + testAbstract + authority + "\""};
+            performImportScript(csv);
+            item = findItemByName(itemTitle);
+
+            assertEquals(1, itemService.getMetadata(item,
+                "dc", "description", "abstract", Item.ANY).size());
+            assertEquals(testAbstract, itemService.getMetadata(item,
+                "dc", "description", "abstract", Item.ANY).get(0).getValue());
+
+            // Make sure the authority is NOT present
+            assertNull(itemService.getMetadata(item,
+                "dc", "description", "abstract", Item.ANY).get(0).getAuthority());
+            assertEquals(-1, itemService.getMetadata(item,
+                "dc", "description", "abstract", Item.ANY).get(0).getConfidence());
+        } finally {
+            configurationService.setProperty("authority.controlled.dc.description.abstract", null);
+        }
     }
 
     private Item findItemByName(String name) throws Exception {
