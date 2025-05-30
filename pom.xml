@@ -20,11 +20,11 @@
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>17</java.version>
         <spring.version>6.2.7</spring.version>
-        <spring-boot.version>3.4.5</spring-boot.version>
-        <spring-security.version>6.4.5</spring-security.version> <!-- sync with version used by spring-boot-->
+        <spring-boot.version>3.5.0</spring-boot.version>
+        <spring-security.version>6.5.0</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>6.4.8.Final</hibernate.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
-        <postgresql.driver.version>42.7.5</postgresql.driver.version>
+        <postgresql.driver.version>42.7.6</postgresql.driver.version>
         <flyway.version>10.22.0</flyway.version>
         <solr.client.version>8.11.4</solr.client.version>
 
@@ -299,7 +299,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.23.1</version>
+                            <version>10.24.0</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -1501,7 +1501,7 @@
             <dependency>
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
-                <version>1.10.1</version>
+                <version>1.11.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-cli</groupId>

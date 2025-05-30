@@ -44,9 +44,11 @@ updates:
         - "com.h2database:*"
         - "io.findify:s3mock*"
         - "io.netty:*"
+        - "org.apache.httpcomponents.client5:*"
         - "org.hamcrest:*"
         - "org.mock-server:*"
         - "org.mockito:*"
+        - "org.xmlunit:*"
         update-types:
         - "minor"
         - "patch"
@@ -112,13 +114,14 @@ updates:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
   ######################
-  ## dspace-8_x branch
+  ## dspace-9_x branch
   ######################
   - package-ecosystem: "maven"
     directory: "/"
-    target-branch: dspace-8_x
+    target-branch: dspace-9_x
     schedule:
       interval: "weekly"
+      time: "02:00"
     # Allow up to 10 open PRs for dependencies
     open-pull-requests-limit: 10
     # Group together some upgrades in a single PR
@@ -149,9 +152,119 @@ updates:
           - "com.h2database:*"
           - "io.findify:s3mock*"
           - "io.netty:*"
+          - "org.apache.httpcomponents.client5:*"
           - "org.hamcrest:*"
           - "org.mock-server:*"
           - "org.mockito:*"
+          - "org.xmlunit:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Apache Commons deps in a single PR
+      apache-commons:
+        applies-to: version-updates
+        patterns:
+          - "org.apache.commons:*"
+          - "commons-*:commons-*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all fasterxml deps in a single PR
+      fasterxml:
+        applies-to: version-updates
+        patterns:
+          - "com.fasterxml:*"
+          - "com.fasterxml.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+        # Group together all Hibernate deps in a single PR
+      hibernate:
+        applies-to: version-updates
+        patterns:
+          - "org.hibernate.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Jakarta deps in a single PR
+      jakarta:
+        applies-to: version-updates
+        patterns:
+          - "jakarta.*:*"
+          - "org.eclipse.angus:jakarta.mail"
+          - "org.glassfish.jaxb:jaxb-runtime"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Spring deps in a single PR
+      spring:
+        applies-to: version-updates
+        patterns:
+          - "org.springframework:*"
+          - "org.springframework.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all WebJARs deps in a single PR
+      webjars:
+        applies-to: version-updates
+        patterns:
+          - "org.webjars:*"
+          - "org.webjars.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # Don't try to auto-update any DSpace dependencies
+      - dependency-name: "org.dspace:*"
+      - dependency-name: "org.dspace.*:*"
+      # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-major" ]
+  ######################
+  ## dspace-8_x branch
+  ######################
+  - package-ecosystem: "maven"
+    directory: "/"
+    target-branch: dspace-8_x
+    schedule:
+      interval: "weekly"
+      time: "02:00"
+    # Allow up to 10 open PRs for dependencies
+    open-pull-requests-limit: 10
+    # Group together some upgrades in a single PR
+    groups:
+      # Group together all Build Tools in a single PR
+      build-tools:
+        applies-to: version-updates
+        patterns:
+          - "org.apache.maven.plugins:*"
+          - "*:*-maven-plugin"
+          - "*:maven-*-plugin"
+          - "com.github.spotbugs:spotbugs"
+          - "com.google.code.findbugs:*"
+          - "com.google.errorprone:*"
+          - "com.puppycrawl.tools:checkstyle"
+          - "org.sonatype.plugins:*"
+        exclude-patterns:
+          # Exclude anything from Spring, as that is in a separate group
+          - "org.springframework.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      test-tools:
+        applies-to: version-updates
+        patterns:
+          - "junit:*"
+          - "com.github.stefanbirker:system-rules"
+          - "com.h2database:*"
+          - "io.findify:s3mock*"
+          - "io.netty:*"
+          - "org.apache.httpcomponents.client5:*"
+          - "org.hamcrest:*"
+          - "org.mock-server:*"
+          - "org.mockito:*"
+          - "org.xmlunit:*"
         update-types:
           - "minor"
           - "patch"
@@ -224,6 +337,7 @@ updates:
     target-branch: dspace-7_x
     schedule:
       interval: "weekly"
+      time: "02:00"
     # Allow up to 10 open PRs for dependencies
     open-pull-requests-limit: 10
     # Group together some upgrades in a single PR
@@ -257,6 +371,7 @@ updates:
           - "org.hamcrest:*"
           - "org.mock-server:*"
           - "org.mockito:*"
+          - "org.xmlunit:*"
         update-types:
           - "minor"
           - "patch"
@@ -286,12 +401,13 @@ updates:
         update-types:
           - "minor"
           - "patch"
-      # Group together all Jakarta deps in a single PR
+      # Group together all Javax deps in a single PR
+      # NOTE: Javax is only used in 7.x and has been replaced by Jakarta in 8.x and later
       jakarta:
         applies-to: version-updates
         patterns:
-          - "jakarta.*:*"
-          - "org.eclipse.angus:jakarta.mail"
+          - "javax.*:*"
+          - "*:javax.mail"
           - "org.glassfish.jaxb:jaxb-runtime"
         update-types:
           - "minor"
