@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,11 +22,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import com.ibm.icu.impl.Pair;
 import jakarta.annotation.Nullable;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.RelationshipUtils;
 import org.dspace.authority.AuthorityValue;
@@ -408,15 +408,11 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                         if (!isAuthorityControlledField(md)) {
                             for (int i = 0; i < fromCSV.length; i++) {
 
-                                Pair<String, String> authorityAndConfidence = getAuthorityAndConfidence(fromCSV[i]);
+                                Triple<String, String, String> valueAndauthorityAndConfidence =
+                                    getValueAndAuthorityAndConfidence(fromCSV[i]);
 
-                                if (authorityAndConfidence != null) {
-                                    // Calculate the length of the authority + confidence part of the value
-                                    int authLength = authorityAndConfidence.first.length()
-                                        + authorityAndConfidence.second.length()
-                                        + csv.getAuthoritySeparator().length() * 2;
-
-                                    fromCSV[i] = fromCSV[i].substring(0, fromCSV[i].length() - authLength);
+                                if (valueAndauthorityAndConfidence.getMiddle() != null) {
+                                    fromCSV[i] = valueAndauthorityAndConfidence.getLeft();
                                 }
                             }
                         }
@@ -489,9 +485,11 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                         // Remove authority unless the md is not authority controlled
                         if (!isAuthorityControlledField(md)) {
                             for (int i = 0; i < fromCSV.length; i++) {
-                                int pos = fromCSV[i].indexOf(csv.getAuthoritySeparator());
-                                if (pos > -1) {
-                                    fromCSV[i] = fromCSV[i].substring(0, pos);
+                                Triple<String, String, String> valueAndauthorityAndConfidence =
+                                    getValueAndAuthorityAndConfidence(fromCSV[i]);
+
+                                if (valueAndauthorityAndConfidence.getMiddle() != null) {
+                                    fromCSV[i] = valueAndauthorityAndConfidence.getLeft();
                                 }
                             }
                         }
@@ -1181,44 +1179,45 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
 
 
-    private Pair<String, String> getAuthorityAndConfidence(String value) {
+    private Triple<String, String, String> getValueAndAuthorityAndConfidence(String value) {
         // Cells with valid authority are composed of three parts ~ <value>, <authority>, <confidence>
         // The value itself may also include the authority separator though
         String[] parts = value.split(csv.getAuthoritySeparator());
 
         if (parts.length < 3) {
-            return null;
+            return Triple.of(String.join(csv.getAuthoritySeparator(),
+                Arrays.copyOfRange(parts, 0, parts.length)), null, null);
         }
 
         // Check that confidence is an integer
         try {
             Integer.parseInt(parts[parts.length - 1]);
         } catch (NumberFormatException e) {
-            return null; // confidence isn't an integer
+            return Triple.of(String.join(csv.getAuthoritySeparator(),
+                Arrays.copyOfRange(parts, 0, parts.length)), null, null);
+
         }
 
-        return Pair.of(parts[parts.length - 2], parts[parts.length - 1]);
+        return Triple.of(String.join(csv.getAuthoritySeparator(),
+            Arrays.copyOfRange(parts, 0, parts.length - 2)),
+            parts[parts.length - 2], parts[parts.length - 1]);
     }
 
     private void resolveValueAndAuthority(String value, BulkEditMetadataValue dcv) {
-        Pair<String, String> authorityAndConfidence = getAuthorityAndConfidence(value);
+        Triple<String, String, String> valueAndauthorityAndConfidence = getValueAndAuthorityAndConfidence(value);
 
         // If no authority & confidence is found, assume the whole string is the value
-        if (authorityAndConfidence == null) {
+        if (valueAndauthorityAndConfidence == null) {
             simplyCopyValue(value, dcv);
             return;
         }
 
         try {
             // The last part of the cell must be a confidence value (integer)
-            int confidence = Integer.parseInt(authorityAndConfidence.second);
-            String authority = authorityAndConfidence.first;
+            int confidence = Integer.parseInt(valueAndauthorityAndConfidence.getRight());
+            String authority = valueAndauthorityAndConfidence.getMiddle();
 
-            String[] parts = value.split(csv.getEscapedAuthoritySeparator());
-            String plainValue = String.join(
-                csv.getAuthoritySeparator(),
-                ArrayUtils.subarray(parts, 0, parts.length - 2)
-            );
+            String plainValue = valueAndauthorityAndConfidence.getLeft();
 
             dcv.setValue(plainValue);
             dcv.setAuthority(authority);
