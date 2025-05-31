@@ -38,7 +38,6 @@ import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
 import org.dspace.discovery.DiscoverResult;
-import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableCollection;
@@ -792,18 +791,13 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      * @throws SearchServiceException
      */
     @Override
-    public List<Community> findAdminAuthorizedCommunity(Context context, String query, int offset, int limit)
+    public DiscoverResult findAdminAuthorizedCommunity(Context context, String query, int offset, int limit)
         throws SearchServiceException, SQLException {
-        List<Community> communities = new ArrayList<>();
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
                                                               IndexableCommunity.TYPE,
             offset, limit, null, null);
-        for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
-            Community community = ((IndexableCommunity) solrCollections).getIndexedObject();
-            communities.add(community);
-        }
-        return communities;
+        return discoverResult;
     }
 
     /**
@@ -835,22 +829,17 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      * @throws SearchServiceException
      */
     @Override
-    public List<Collection> findAdminAuthorizedCollection(Context context, String query, int offset, int limit)
+    public DiscoverResult findAdminAuthorizedCollection(Context context, String query, int offset, int limit)
         throws SearchServiceException, SQLException {
-        List<Collection> collections = new ArrayList<>();
         if (context.getCurrentUser() == null) {
-            return collections;
+            return null;
         }
 
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
                                                               IndexableCollection.TYPE,
             offset, limit, CollectionService.SOLR_SORT_FIELD, SORT_ORDER.asc);
-        for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
-            Collection collection = ((IndexableCollection) solrCollections).getIndexedObject();
-            collections.add(collection);
-        }
-        return collections;
+        return discoverResult;
     }
 
     /**
