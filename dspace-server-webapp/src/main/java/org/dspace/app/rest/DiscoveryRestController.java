@@ -33,6 +33,7 @@ import org.dspace.app.rest.model.hateoas.SearchSupportResource;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.repository.DiscoveryRestRepository;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -202,18 +203,16 @@ public class DiscoveryRestController implements InitializingBean {
         dsoTypes = emptyIfNull(dsoTypes);
 
         if (log.isTraceEnabled()) {
-            log.trace("Facetting on facet " + facetName + " with scope: " + StringUtils.trimToEmpty(dsoScope)
-                          + ", dsoTypes: " + String.join(", ", dsoTypes)
-                          + ", prefix: " + StringUtils.trimToEmpty(prefix)
-                          + ", query: " + StringUtils.trimToEmpty(query)
-                          + ", filters: " + Objects.toString(searchFilters)
-                          + ", page: " + Objects.toString(page));
+            log.info("Facetting on facet {} with scope: {}, dsoTypes: {}, prefix: {}, query: {}, filters: {}, page: {}", facetName, StringUtils.trimToEmpty(dsoScope), String.join(", ", dsoTypes), StringUtils.trimToEmpty(prefix), StringUtils.trimToEmpty(query), Objects.toString(searchFilters), Objects.toString(page));
         }
 
+        log.info("Facetting on facet {} with scope: {}, dsoTypes: {}, prefix: {}, query: {}, filters: {}, page: {}", facetName, StringUtils.trimToEmpty(dsoScope), String.join(", ", dsoTypes), StringUtils.trimToEmpty(prefix), StringUtils.trimToEmpty(query), Objects.toString(searchFilters), Objects.toString(page));
         try {
             FacetResultsRest facetResultsRest = discoveryRestRepository
                 .getFacetObjects(facetName, prefix, query, dsoTypes, dsoScope, configuration, searchFilters, page);
-
+            String[] canDisplayLabel = DSpaceServicesFactory.getInstance().getConfigurationService()
+                    .getArrayProperty("discovery.facet.hasLabels");
+            log.info("canDisplayLabel: " + Arrays.toString(canDisplayLabel));
             FacetResultsResource facetResultsResource = converter.toResource(facetResultsRest);
 
             halLinkService.addLinks(facetResultsResource, page);
