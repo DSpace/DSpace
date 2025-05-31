@@ -35,8 +35,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -385,7 +385,7 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
     // TODO This test doesn't work either as it seems that only the first file is ever transferred into the request
     // Thus we cannot check for this and we have no way of knowing how many files we gave to the request
     @Test
-    @Ignore
+    @Disabled
     public void uploadBitstreamMultipleFiles() throws Exception {
         context.turnOffAuthorisationSystem();
 

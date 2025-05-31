@@ -46,8 +46,8 @@ import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.SimpleMapConverter;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
@@ -74,7 +74,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
     @Autowired
     private SimpleMapConverter mapConverterDSpaceToSchemaOrgUri;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

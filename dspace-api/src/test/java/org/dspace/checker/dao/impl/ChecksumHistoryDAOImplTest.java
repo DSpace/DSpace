@@ -7,7 +7,7 @@
  */
 package org.dspace.checker.dao.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -23,11 +23,11 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.CoreHelpers;
 import org.dspace.core.HibernateDBConnection;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mwood
@@ -37,20 +37,20 @@ public class ChecksumHistoryDAOImplTest
     public ChecksumHistoryDAOImplTest() {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass()
         throws SQLException, ClassNotFoundException {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown()
         throws SQLException {
     }
@@ -119,17 +119,17 @@ public class ChecksumHistoryDAOImplTest
 
         qry.setParameter("id", matchId);
         count = (Long) qry.getSingleResult();
-        assertEquals("Should find no row at matchDate", 0, count);
+        assertEquals(0, count, "Should find no row at matchDate");
 
         // See if nonmatching old row is still present.
         qry.setParameter("id", noMatchId);
         count = (Long) qry.getSingleResult();
-        assertEquals("Should find one row at noMatchDate", 1, count);
+        assertEquals(1, count, "Should find one row at noMatchDate");
 
         // See if future date row is still present.
         qry.setParameter("id", futureMatchId);
         count = (Long) qry.getSingleResult();
-        assertEquals("Should find one row at futureDate", 1, count);
+        assertEquals(1, count, "Should find one row at futureDate");
     }
 
     /**

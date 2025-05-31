@@ -10,14 +10,14 @@ package org.dspace.app.sword;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.dspace.app.rest.test.AbstractWebClientIntegrationTest;
 import org.dspace.services.ConfigurationService;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +45,7 @@ public class Swordv1IT extends AbstractWebClientIntegrationTest {
     private final String DEPOSIT_PATH = "/sword/deposit";
     private final String MEDIA_LINK_PATH = "/sword/media-link";
 
-    @Before
+    @BeforeEach
     public void onlyRunIfConfigExists() {
         // These integration tests REQUIRE that SWORDWebConfig is found/available (as this class deploys SWORD)
         // If this class is not available, the below "Assume" will cause all tests to be SKIPPED
@@ -53,7 +53,7 @@ public class Swordv1IT extends AbstractWebClientIntegrationTest {
         try {
             Class.forName("org.dspace.app.configuration.SWORDWebConfig");
         } catch (ClassNotFoundException ce) {
-            Assume.assumeNoException(ce);
+            Assumptions.assumeNoException(ce);
         }
 
         // Ensure SWORD URL configurations are set correctly (based on our integration test server's paths)
@@ -93,7 +93,7 @@ public class Swordv1IT extends AbstractWebClientIntegrationTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void depositTest() throws Exception {
         // TODO: Actually test a full deposit via SWORD.
         // Currently, we are just ensuring the /deposit endpoint exists (see above) and isn't throwing a 404
@@ -108,7 +108,7 @@ public class Swordv1IT extends AbstractWebClientIntegrationTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void mediaLinkTest() throws Exception {
         // TODO: Actually test a /media-link request.
         // Currently, we are just ensuring the /media-link endpoint exists (see above) and isn't throwing a 404

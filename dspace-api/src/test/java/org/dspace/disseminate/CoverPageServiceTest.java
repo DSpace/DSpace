@@ -21,14 +21,17 @@ import org.dspace.AbstractDSpaceTest;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class CoverPageServiceTest extends AbstractDSpaceTest {
 
     @Mock
@@ -39,7 +42,7 @@ public class CoverPageServiceTest extends AbstractDSpaceTest {
 
     CoverPageService sut;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         Mockito.doReturn(itemMetaData).when(item).getMetadata();
 
@@ -79,13 +82,13 @@ public class CoverPageServiceTest extends AbstractDSpaceTest {
     public void multipleAuthors() throws Exception {
 
         givenMetadataValues("dc_title",
-                "My title",
-                "dc_contributor_author",
-                "My author 1",
-                "dc_contributor_author",
-                "My author 2",
-                "dc_creator",
-                "My author 3");
+            "My title",
+            "dc_contributor_author",
+            "My author 1",
+            "dc_contributor_author",
+            "My author 2",
+            "dc_creator",
+            "My author 3");
 
         try (var coverPage = sut.renderCoverDocument(item)) {
             assertThat(coverPage.getNumberOfPages(), equalTo(1));
@@ -100,13 +103,13 @@ public class CoverPageServiceTest extends AbstractDSpaceTest {
     public void multipleEditors() throws Exception {
 
         givenMetadataValues("dc_title",
-                "My title",
-                "dc_contributor_author",
-                "My author 1",
-                "dc_contributor_editor",
-                "My editor 1",
-                "dc_contributor_editor",
-                "My editor 2");
+            "My title",
+            "dc_contributor_author",
+            "My author 1",
+            "dc_contributor_editor",
+            "My editor 1",
+            "dc_contributor_editor",
+            "My editor 2");
 
         try (var coverPage = sut.renderCoverDocument(item)) {
             assertThat(coverPage.getNumberOfPages(), equalTo(1));

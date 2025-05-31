@@ -30,9 +30,9 @@ import org.dspace.content.Item;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class CommunityCollectionItemParentIT extends AbstractControllerIntegrationTest {
@@ -60,7 +60,7 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
     Item itemAA2;
 
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException, AuthorizeException {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
@@ -212,7 +212,7 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
     }
 
     //Enable this test when this security level has been supported
-    @Ignore
+    @Disabled
     @Test
     public void parentCommunityPrivateParentCommunityUnAuthorizedTest() throws Exception {
 
@@ -237,7 +237,7 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
     }
 
     //Enable this test when this security level has been supported
-    @Ignore
+    @Disabled
     @Test
     public void parentCommunityPrivateParentCommunityForbiddenTest() throws Exception {
 
@@ -272,7 +272,7 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
     }
 
     //Enable this test when this security level has been supported
-    @Ignore
+    @Disabled
     @Test
     public void parentCommunityForCollectionPrivateParentCommunityUnAuthorizedTest() throws Exception {
 
@@ -297,7 +297,7 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
     }
 
     //Enable this test when this security level has been supported
-    @Ignore
+    @Disabled
     @Test
     public void parentCommunityForCollectionPrivateParentCommunityForbiddenTest() throws Exception {
 
@@ -334,7 +334,7 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
 
 
     //Enable this test when this security level has been supported
-    @Ignore
+    @Disabled
     @Test
     public void owningCollectionForItemPrivateOwningCollectionUnAuthorizedTest() throws Exception {
 
@@ -347,7 +347,7 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
     }
 
     //Enable this test when this security level has been supported
-    @Ignore
+    @Disabled
     @Test
     public void owningCollectionForItemPrivateOwningCollectionForbiddenTest() throws Exception {
 

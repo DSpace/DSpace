@@ -7,8 +7,8 @@
  */
 package org.dspace.util;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.text.ParseException;
 import java.util.Arrays;
@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.importer.external.service.DoiCheck;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class for the DoiCheck
@@ -28,14 +28,14 @@ public class DoiCheckTest {
     @Test
     public void checkDOIsTest() throws ParseException {
         for (String doi : DOIsToTest()) {
-            assertTrue("The: " + doi + "  is a doi!", DoiCheck.isDoi(doi));
+            assertTrue(DoiCheck.isDoi(doi), "The: " + doi + "  is a doi!");
         }
     }
 
     @Test
     public void checkWrongDOIsTest() throws ParseException {
         for (String key : wrongDOIsToTest()) {
-            assertFalse("This : " + key + "  isn't a doi!", DoiCheck.isDoi(key));
+            assertFalse(DoiCheck.isDoi(key), "This : " + key + "  isn't a doi!");
         }
     }
 
