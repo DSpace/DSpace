@@ -50,7 +50,11 @@ public class LiveImportClientImpl implements LiveImportClient {
     @Override
     public String executeHttpGetRequest(int timeout, String URL, Map<String, Map<String, String>> params) {
         HttpGet method = null;
-        RequestConfig config = RequestConfig.custom().setConnectionRequestTimeout(timeout).build();
+        RequestConfig config = RequestConfig.custom()
+            .setConnectionRequestTimeout(timeout)
+            .setConnectTimeout(timeout)
+            .setSocketTimeout(timeout)
+            .build();
         try (CloseableHttpClient httpClient = Optional.ofNullable(this.httpClient)
                                         .orElse(DSpaceHttpClientFactory.getInstance().buildWithRequestConfig(config))) {
             String uri = buildUrl(URL, params.get(URI_PARAMETERS));
