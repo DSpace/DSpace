@@ -112,13 +112,9 @@ public class VersioningServiceImpl implements VersioningService {
                 provider.deleteVersionedItem(c, version, history);
             }
 
-            // to keep version number stables, we do not delete versions,
-            // we set all fields null except versionnumber and versionhistory
-            version.setItem(null);
-            version.setSummary(null);
-            version.setVersionDate(null);
-            version.setePerson(null);
-            versionDAO.save(c, version);
+            // previously Setting all fields to null may cause issues with version number persistence.
+            // To resolve this, remove the Version if it discard from UI persist correct version number.
+            versionDAO.delete(c, version);
 
             // if all versions of a version history were deleted,
             // we delete the version history.
