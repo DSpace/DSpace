@@ -149,6 +149,10 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
             .orElse(null);
     }
 
+    /**
+     * Returns a list of external work IDs constructed in the org.orcid.jaxb
+     * ExternalIDs object
+     */
     private ExternalIDs getWorkExternalIds(Context context, Item item, Work work) {
         ExternalIDs externalIDs = new ExternalIDs();
         externalIDs.getExternalIdentifier().addAll(getWorkExternalIdList(context, item, work));
@@ -157,7 +161,7 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
 
     /**
      * Creates a list of ExternalID, one for orcid.mapping.funding.external-ids
-     * value, taking the values from the given item.
+     * value, taking the values from the given item and work type.
      */
     private List<ExternalID> getWorkExternalIdList(Context context, Item item, Work work) {
 
