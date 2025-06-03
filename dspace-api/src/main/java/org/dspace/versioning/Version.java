@@ -46,7 +46,7 @@ public class Version implements ReloadableEntity<Integer> {
     private Item item;
 
     @Column(name = "version_number")
-    private int versionNumber;
+    private Integer versionNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "eperson_id")
