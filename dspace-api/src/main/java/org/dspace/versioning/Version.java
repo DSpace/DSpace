@@ -88,12 +88,12 @@ public class Version implements ReloadableEntity<Integer> {
         this.item = item;
     }
 
-    public int getVersionNumber() {
+    public Integer getVersionNumber() {
         return versionNumber;
     }
 
-    public void setVersionNumber(int version_number) {
-        this.versionNumber = version_number;
+    public void setVersionNumber(Integer versionNumber) {
+        this.versionNumber = versionNumber;
     }
 
     public EPerson getEPerson() {
