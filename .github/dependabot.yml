@@ -76,7 +76,6 @@ updates:
         patterns:
         - "org.hibernate.*:*"
         update-types:
-        - "minor"
         - "patch"
       # Group together all Jakarta deps in a single PR
       jakarta:
@@ -184,7 +183,6 @@ updates:
         patterns:
           - "org.hibernate.*:*"
         update-types:
-          - "minor"
           - "patch"
       # Group together all Jakarta deps in a single PR
       jakarta:
@@ -292,7 +290,6 @@ updates:
         patterns:
           - "org.hibernate.*:*"
         update-types:
-          - "minor"
           - "patch"
       # Group together all Jakarta deps in a single PR
       jakarta:
@@ -399,7 +396,6 @@ updates:
         patterns:
           - "org.hibernate.*:*"
         update-types:
-          - "minor"
           - "patch"
       # Group together all Javax deps in a single PR
       # NOTE: Javax is only used in 7.x and has been replaced by Jakarta in 8.x and later
