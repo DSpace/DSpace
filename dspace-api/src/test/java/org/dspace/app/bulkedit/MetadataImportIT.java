@@ -377,11 +377,10 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
                 .build();
             context.restoreAuthSystemState();
 
-            final String testAbstract = "The double colon '::' has many purposes, like: ...";
-            final String authority = "::authority::nonint";
+            final String testAbstract = "The double colon '::' has many purposes, like: ...::authority::nonint";
 
             String[] csv = {"id,dc.description.abstract",
-                item.getID().toString() + ",\"" + testAbstract + authority + "\""};
+                item.getID().toString() + ",\"" + testAbstract + "\""};
             performImportScript(csv);
             item = findItemByName(itemTitle);
 
