@@ -72,17 +72,41 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         return new UUIDIterator<Item>(context, uuids, Item.class, this);
     }
 
-
+    /**
+     * calling findAllFiltered method can be changed based on user logic in future .
+     */
     @Override
     public Iterator<Item> findAll(Context context, boolean archived, boolean withdrawn) throws SQLException {
-        Query query = createQuery(context,
-                "SELECT i.id FROM Item i WHERE inArchive=:in_archive or withdrawn=:withdrawn ORDER BY id");
+        return findAllFiltered(context,archived,withdrawn);
+    }
+
+    private Iterator<Item> findAllFiltered(Context context, boolean archived, boolean withdrawn) throws SQLException {
+        String queryString = "SELECT i.id FROM Item i WHERE i.inArchive = :in_archive" +
+                " OR i.withdrawn = :withdrawn ORDER BY i.id";
+        return executeItemQuery(context, queryString, archived, withdrawn);
+    }
+    /**
+     * Returns items where BOTH archived AND withdrawn must match.
+     * This excludes workspace/workflow items (strict match) .
+     */
+    private Iterator<Item> findAllUnfiltered(Context context, boolean archived, boolean withdrawn) throws SQLException {
+        String queryString = "SELECT i.id FROM Item i WHERE i.inArchive = :in_archive " +
+                "AND i.withdrawn = :withdrawn ORDER BY i.id";
+        return executeItemQuery(context, queryString, archived, withdrawn);
+    }
+    /**
+     * Common query executor for both filtered/unfiltered findAll methods.
+     */
+    private Iterator<Item> executeItemQuery(Context context, String queryString, boolean archived, boolean withdrawn)
+            throws SQLException {
+        Query query = createQuery(context, queryString);
         query.setParameter("in_archive", archived);
         query.setParameter("withdrawn", withdrawn);
         @SuppressWarnings("unchecked")
         List<UUID> uuids = query.getResultList();
         return new UUIDIterator<Item>(context, uuids, Item.class, this);
     }
+
 
     @Override
     public Iterator<Item> findAllRegularItems(Context context) throws SQLException {
@@ -455,14 +479,34 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     @Override
     public int countItems(Context context, boolean includeArchived, boolean includeWithdrawn,
                           boolean discoverable) throws SQLException {
+        return countItemsUnfiltered(context, includeArchived, includeWithdrawn, discoverable);
+    }
+
+    private int countItemsFiltered(Context context, boolean includeArchived, boolean includeWithdrawn,
+                                   boolean discoverable) throws SQLException {
         Query query = createQuery(context,
                 "SELECT count(*) FROM Item i " +
-                "WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND discoverable=:discoverable");
+                        "WHERE i.inArchive = :in_archive OR i.withdrawn = :withdrawn " +
+                        "AND i.discoverable = :discoverable");
+        query.setParameter("in_archive", includeArchived);
+        query.setParameter("withdrawn", includeWithdrawn);
+        query.setParameter("discoverable", discoverable);
+
+        return count(query);
+    }
+
+    private int countItemsUnfiltered(Context context, boolean includeArchived, boolean includeWithdrawn,
+                                     boolean discoverable) throws SQLException {
+        Query query = createQuery(context,
+                "SELECT count(*) FROM Item i WHERE i.inArchive = :in_archive " +
+                        "AND i.withdrawn = :withdrawn AND i.discoverable = :discoverable");
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
         query.setParameter("discoverable", discoverable);
         return count(query);
     }
+
+
 
     @Override
     public int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn,
