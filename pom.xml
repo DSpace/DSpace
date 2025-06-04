@@ -299,7 +299,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.24.0</version>
+                            <version>10.25.0</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -332,7 +332,7 @@
                 <!-- This additional configuration also cleans sub-modules -->
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.5.0</version>
                     <configuration>
                         <filesets>
                             <fileset>
