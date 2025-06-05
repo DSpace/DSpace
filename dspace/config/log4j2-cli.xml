@@ -92,6 +92,8 @@
                 level='ERROR'/>
         <Logger name='org.dspace.utils'
                 level='ERROR'/>
+        <Logger name='org.dspace.discovery'
+                level='DEBUG'/>
 
         <!-- Block passwords from being exposed in Axis logs. (DEBUG exposes passwords in Basic Auth) -->
         <Logger name='org.apache.axis.handlers.http.HTTPAuthHandler'

@@ -39,6 +39,10 @@ public class ControlledVocabulary {
     private String value;
     private List<ControlledVocabulary> childNodes;
 
+    public static final String AUTHORITY = "authority";
+    public static final String XML = "xml";
+    public static final String SUGGEST = "suggest";
+
     public ControlledVocabulary(String id, String label, String value, List<ControlledVocabulary> childNodes) {
         this.id = id;
         this.label = label;

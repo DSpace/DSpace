@@ -11,6 +11,7 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +34,8 @@ import org.dspace.app.rest.model.hateoas.SearchSupportResource;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.repository.DiscoveryRestRepository;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.discovery.SolrSuggestService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -233,4 +236,19 @@ public class DiscoveryRestController implements InitializingBean {
         }
     }
 
+    /**
+     * Return serialized map of Solr search suggest handler results
+     * for use in autocomplete and term suggestion lookups
+     * @param dictionary dictionary as configured in search/solrconfig.xml
+     * @param query term query
+     * @return Map (to be serialized to JSON)
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/suggest", produces = "application/json")
+    public Map<String, Object> suggest(
+        @RequestParam(name = "dict") String dictionary,
+        @RequestParam(name = "q") String query) {
+        SolrSuggestService solrSuggestService = DSpaceServicesFactory.getInstance().getServiceManager()
+            .getServicesByType(SolrSuggestService.class).get(0);
+        return solrSuggestService.getSuggestions(query, dictionary);
+    }
 }
