@@ -366,7 +366,6 @@
 
     <dynamicField name="random_*" type="random" />
     <dynamicField name="*_suggest" type="suggestAutoComplete" indexed="true" stored="true" multiValued="true"/>
-    <dynamicField name="*_display" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="suggest_value" type="textgen" indexed="true" stored="true" multiValued="true"/>
     <field name="suggest_context" type="string" indexed="true" stored="true" multiValued="false"/>
  </fields>
@@ -379,7 +378,5 @@
 
  <copyField source="*" dest="search_text"/>
  <copyField source="dspace.entity.type" dest="search.entitytype"/>
- <copyField source="dc.subject.thesoz" dest="thesoz_suggest"/>
- <copyField source="dc.contributor.author" dest="author_suggest"/>
 
 </schema>
