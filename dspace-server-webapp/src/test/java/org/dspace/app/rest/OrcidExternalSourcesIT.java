@@ -50,9 +50,10 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
     private OrcidV3AuthorDataProvider orcidV3AuthorDataProvider;
 
     public void onlyRunIfConfigExists() {
-        if (StringUtils.isBlank(configurationService.getProperty("orcid.application-client-id"))) {
-            Assumptions.assumeNoException(new IllegalStateException("Missing ORCID credentials"));
-        }
+        Assumptions.assumeTrue(
+            StringUtils.isNotBlank(configurationService.getProperty("orcid.application-client-id")),
+            "Missing ORCID credentials - skipping ORCID tests"
+        );
     }
 
     @Test

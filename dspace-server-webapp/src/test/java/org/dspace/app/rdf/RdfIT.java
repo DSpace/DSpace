@@ -76,11 +76,14 @@ public class RdfIT extends AbstractWebClientIntegrationTest {
         // These integration tests REQUIRE that RDFWebConfig is found/available (as this class deploys RDF)
         // If this class is not available, the below "Assume" will cause all tests to be SKIPPED
         // NOTE: RDFWebConfig is provided by the 'dspace-rdf' module
-        try {
-            Class.forName("org.dspace.app.configuration.RDFWebConfig");
-        } catch (ClassNotFoundException ce) {
-            Assumptions.assumeNoException(ce);
-        }
+        Assumptions.assumeTrue(() -> {
+            try {
+                Class.forName("org.dspace.app.configuration.RDFWebConfig");
+                return true;
+            } catch (ClassNotFoundException e) {
+                return false;
+            }
+        }, "RDFWebConfig class not found - skipping RDF tests");
 
         // Change the running RDFFactory to use our spy-able, default instance of RDFStorage
         // Again, this lets us fake a triplestore backend in individual tests below.
