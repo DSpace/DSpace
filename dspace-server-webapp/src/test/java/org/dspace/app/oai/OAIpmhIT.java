@@ -10,9 +10,7 @@ package org.dspace.app.oai;
 
 import static org.hamcrest.Matchers.startsWith;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -94,15 +92,14 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
         // These integration tests REQUIRE that OAIWebConfig is found/available (as this class deploys OAI)
         // If this class is not available, the below "Assume" will cause all tests to be SKIPPED
         // NOTE: OAIWebConfig is provided by the 'dspace-oai' module
-        try {
-            Class.forName("org.dspace.app.configuration.OAIWebConfig");
-        } catch (ClassNotFoundException ce) {
-            Assumptions.assumeNoException(ce);
-        }
-
-        // Disable XOAI Caching for ALL tests
-        when(xoaiCacheService.isActive()).thenReturn(false);
-        when(xoaiCacheService.hasCache(anyString())).thenReturn(false);
+        Assumptions.assumeTrue(() -> {
+            try {
+                Class.forName("org.dspace.app.configuration.OAIWebConfig");
+                return true;
+            } catch (ClassNotFoundException e) {
+                return false;
+            }
+        }, "OAIWebConfig class not found - skipping OAI tests");
     }
 
     @Test
