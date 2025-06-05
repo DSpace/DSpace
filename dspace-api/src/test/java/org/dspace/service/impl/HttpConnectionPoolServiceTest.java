@@ -25,11 +25,12 @@ import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.Rule;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
-import org.mockserver.junit.MockServerRule;
+import org.mockserver.integration.ClientAndServer;
 
 /**
  *
@@ -39,15 +40,26 @@ public class HttpConnectionPoolServiceTest
         extends AbstractDSpaceTest {
     private static ConfigurationService configurationService;
 
-    @Rule
-    public MockServerRule mockServerRule = new MockServerRule(this);
-
+    private ClientAndServer mockServer;
     private MockServerClient mockServerClient;
 
     @BeforeAll
     public static void initClass() {
         configurationService = DSpaceServicesFactory.getInstance()
                 .getConfigurationService();
+    }
+
+    @BeforeEach
+    public void setUp() {
+        mockServer = ClientAndServer.startClientAndServer();
+        mockServerClient = new MockServerClient("localhost", mockServer.getPort());
+    }
+
+    @AfterEach
+    public void tearDown() {
+        if (mockServer != null) {
+            mockServer.stop();
+        }
     }
 
     /**
@@ -81,7 +93,7 @@ public class HttpConnectionPoolServiceTest
             URI uri = new URIBuilder()
                     .setScheme("http")
                     .setHost("localhost")
-                    .setPort(mockServerClient.getPort())
+                    .setPort(mockServer.getPort())
                     .setPath(testPath)
                     .build();
             System.out.println(uri.toString());
