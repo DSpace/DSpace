@@ -7,43 +7,37 @@
  */
 package org.dspace.eperson;
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErr;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
+import com.ginsberg.junit.exit.SystemExitExtension;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.util.FakeConsoleServiceImpl;
-import org.junit.Rule;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
+@ExtendWith(SystemExitExtension.class)
 public class EPersonCLIToolIT
         extends AbstractIntegrationTest {
     private static final String NEW_PASSWORD = "secret";
     private static final String BAD_PASSWORD = "not secret";
-
-    // Handle System.exit() from unit under test.
-    @Rule
-    public final ExpectedSystemExit exit = ExpectedSystemExit.none();
-
-    // Capture System.err() output.
-    @Rule
-    public final SystemErrRule sysErr = new SystemErrRule().enableLog();
 
     /**
      * Test --modify --newPassword
      * @throws Exception passed through.
      */
     @Test
+    @ExpectSystemExitWithStatus(0)
     @SuppressWarnings("static-access")
     public void testSetPassword()
             throws Exception {
-        exit.expectSystemExitWithStatus(0);
         System.out.println("main");
 
         // Create a source of "console" input.
@@ -75,10 +69,10 @@ public class EPersonCLIToolIT
      * @throws Exception passed through.
      */
     @Test
+    @ExpectSystemExitWithStatus(0)
     @SuppressWarnings("static-access")
     public void testSetEmptyPassword()
             throws Exception {
-        exit.expectSystemExitWithStatus(0);
         System.out.println("main");
 
         // Create a source of "console" input.
@@ -99,12 +93,11 @@ public class EPersonCLIToolIT
             "--email", email,
             "--newPassword"
         };
-        instance.main(argv);
-
+        String stderr = tapSystemErr(() -> {
+            instance.main(argv);
+        });
         String newPasswordHash = eperson.getPassword();
         assertEquals(oldPasswordHash, newPasswordHash, "Password hash changed");
-
-        String stderr = sysErr.getLog();
         assertTrue(stderr.contains(EPersonCLITool.ERR_PASSWORD_EMPTY),
                 "Standard error did not mention 'empty'");
     }
@@ -116,10 +109,10 @@ public class EPersonCLIToolIT
      * @throws Exception passed through.
      */
     @Test
+    @ExpectSystemExitWithStatus(0)
     @SuppressWarnings("static-access")
     public void testSetMismatchedPassword()
             throws Exception {
-        exit.expectSystemExitWithStatus(0);
         System.out.println("main");
 
         // Create a source of "console" input.
@@ -141,12 +134,13 @@ public class EPersonCLIToolIT
             "--email", email,
             "--newPassword"
         };
-        instance.main(argv);
+        String stderr = tapSystemErr(() -> {
+            instance.main(argv);
+        });
 
         String newPasswordHash = eperson.getPassword();
         assertEquals(oldPasswordHash, newPasswordHash, "Password hash changed");
 
-        String stderr = sysErr.getLog();
         assertTrue(stderr.contains(EPersonCLITool.ERR_PASSWORD_NOMATCH),
                 "Standard error did not indicate password mismatch");
     }
