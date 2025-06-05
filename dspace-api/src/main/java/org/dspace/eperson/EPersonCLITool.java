@@ -80,13 +80,37 @@ public class EPersonCLITool {
     /**
      * Tool for manipulating user accounts.
      *
+     * This small method simply wraps the execute method so that
+     * it can be called directly from the Java API or Unit Tests without
+     * calling System.exit().
+     *
      * @param argv the command line arguments given
      * @throws ParseException     Base for Exceptions thrown during parsing of a command-line.
      * @throws SQLException       An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      */
-    public static void main(String argv[])
+    public static void main(String[] argv) {
+        try {
+            int exitCode = execute(argv);
+            System.exit(exitCode);
+        } catch (ParseException|SQLException|AuthorizeException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    /**
+     * Tool for manipulating user accounts.
+     *
+     * @param argv the command line arguments given
+     * @return 0 if the command was successful, 1 otherwise
+     * @throws ParseException     Base for Exceptions thrown during parsing of a command-line.
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
+     */
+    public static int execute(String argv[])
         throws ParseException, SQLException, AuthorizeException {
         final OptionGroup VERBS = new OptionGroup();
         VERBS.addOption(VERB_ADD);
@@ -132,7 +156,7 @@ public class EPersonCLITool {
             }
         }
 
-        System.exit(status);
+        return status;
     }
 
     /**

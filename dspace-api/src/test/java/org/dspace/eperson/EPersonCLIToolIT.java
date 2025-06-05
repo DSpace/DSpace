@@ -12,18 +12,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
-import com.ginsberg.junit.exit.SystemExitExtension;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.util.FakeConsoleServiceImpl;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
-@ExtendWith(SystemExitExtension.class)
 public class EPersonCLIToolIT
         extends AbstractIntegrationTest {
     private static final String NEW_PASSWORD = "secret";
@@ -34,7 +30,6 @@ public class EPersonCLIToolIT
      * @throws Exception passed through.
      */
     @Test
-    @ExpectSystemExitWithStatus(0)
     @SuppressWarnings("static-access")
     public void testSetPassword()
             throws Exception {
@@ -58,7 +53,8 @@ public class EPersonCLIToolIT
             "--email", email,
             "--newPassword"
         };
-        instance.main(argv);
+        int exitCode = instance.execute(argv);
+        assertEquals(0, exitCode, "Exit code should be 0");
 
         String newPasswordHash = eperson.getPassword();
         assertNotEquals(oldPasswordHash, newPasswordHash, "Password hash did not change");
@@ -69,7 +65,6 @@ public class EPersonCLIToolIT
      * @throws Exception passed through.
      */
     @Test
-    @ExpectSystemExitWithStatus(0)
     @SuppressWarnings("static-access")
     public void testSetEmptyPassword()
             throws Exception {
@@ -94,7 +89,8 @@ public class EPersonCLIToolIT
             "--newPassword"
         };
         String stderr = tapSystemErr(() -> {
-            instance.main(argv);
+            int exitCode = instance.execute(argv);
+            assertEquals(0, exitCode, "Exit code should be 0");
         });
         String newPasswordHash = eperson.getPassword();
         assertEquals(oldPasswordHash, newPasswordHash, "Password hash changed");
@@ -109,7 +105,6 @@ public class EPersonCLIToolIT
      * @throws Exception passed through.
      */
     @Test
-    @ExpectSystemExitWithStatus(0)
     @SuppressWarnings("static-access")
     public void testSetMismatchedPassword()
             throws Exception {
@@ -135,7 +130,8 @@ public class EPersonCLIToolIT
             "--newPassword"
         };
         String stderr = tapSystemErr(() -> {
-            instance.main(argv);
+            int exitCode = instance.execute(argv);
+            assertEquals(0, exitCode, "Exit code should be 0");
         });
 
         String newPasswordHash = eperson.getPassword();
