@@ -165,4 +165,36 @@
             <str>spellcheck</str>
         </arr>
     </requestHandler>
+
+    <searchComponent name="suggest" class="solr.SuggestComponent">
+        <lst name="suggester">
+            <str name="name">subject</str>
+            <str name="lookupImpl">AnalyzingInfixLookupFactory</str>
+            <str name="dictionaryImpl">HighFrequencyDictionaryFactory</str>
+            <str name="field">dc.subject_suggest</str>
+            <str name="suggestAnalyzerFieldType">textgen</str>
+            <str name="buildOnCommit">true</str>
+            <str name="buildOnOptimize">true</str>
+        </lst>
+        <lst name="suggester">
+            <str name="name">authors</str>
+            <str name="lookupImpl">AnalyzingInfixLookupFactory</str>
+            <str name="dictionaryImpl">HighFrequencyDictionaryFactory</str>
+            <str name="field">dc.contributor.author_suggest</str>
+            <str name="suggestAnalyzerFieldType">textgen</str>
+            <str name="buildOnCommit">true</str>
+            <str name="buildOnOptimize">true</str>
+        </lst>
+    </searchComponent>
+
+    <requestHandler name="/suggest" class="solr.SearchHandler" startup="lazy">
+        <lst name="defaults">
+            <str name="suggest">true</str>
+            <str name="suggest.count">10</str>
+        </lst>
+        <arr name="components">
+            <str>suggest</str>
+        </arr>
+    </requestHandler>
+
 </config>

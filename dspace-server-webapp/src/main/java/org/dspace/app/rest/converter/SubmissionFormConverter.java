@@ -14,6 +14,8 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ScopeEnum;
 import org.dspace.app.rest.model.SubmissionFormFieldRest;
 import org.dspace.app.rest.model.SubmissionFormInputTypeRest;
@@ -29,6 +31,7 @@ import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.submit.model.LanguageFormField;
+import org.dspace.vocabulary.ControlledVocabulary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,6 +48,8 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     private static final String INPUT_TYPE_NAME = "name";
     private static final String INPUT_TYPE_LOOKUP = "lookup";
     private static final String INPUT_TYPE_LOOKUP_NAME = "lookup-name";
+
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private AuthorityUtils authorityUtils;
@@ -72,6 +77,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
             rowRest.setFields(fields);
             rows.add(rowRest);
             for (DCInput dcinput : row) {
+                log.warn(dcinput.getFieldName() + ": " + dcinput.getVocabularyType());
                 fields.add(getField(dcinput, formName));
             }
         }
@@ -89,8 +95,8 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
         inputField.setMandatory(dcinput.isRequired());
         inputField.setScope(ScopeEnum.fromString(dcinput.getScope()));
         inputField.setVisibility(new SubmissionVisibilityRest(
-            VisibilityEnum.fromString(dcinput.isReadOnly("submission") ? "read-only" : null),
-            VisibilityEnum.fromString(dcinput.isReadOnly("workflow") ? "read-only" : null)));
+                VisibilityEnum.fromString(dcinput.isReadOnly("submission") ? "read-only" : null),
+                VisibilityEnum.fromString(dcinput.isReadOnly("workflow") ? "read-only" : null)));
         inputField.setRepeatable(dcinput.isRepeatable());
         if (dcinput.getLanguage()) {
             int idx = 1;
@@ -117,21 +123,27 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                 String inputType = dcinput.getInputType();
 
                 SelectableMetadata selMd = new SelectableMetadata();
-                if (isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
+                if (ControlledVocabulary.SUGGEST.equals(dcinput.getVocabularyType())) {
+                    inputRest.setType(INPUT_TYPE_ONEBOX);
+                    selMd.setControlledVocabulary(dcinput.getVocabulary());
+                    selMd.setClosed(dcinput.isClosedVocabulary());
+                    selMd.setVocabularyType(dcinput.getVocabularyType());
+                } else if (isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
                         dcinput.getPairsType(), dcinput.getVocabulary())) {
                     inputRest.setType(getPresentation(dcinput.getSchema(), dcinput.getElement(),
-                                                      dcinput.getQualifier(), inputType));
+                            dcinput.getQualifier(), inputType));
                     selMd.setControlledVocabulary(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
-                                                        dcinput.getQualifier(), dcinput.getPairsType(),
-                                                        dcinput.getVocabulary()));
+                            dcinput.getQualifier(), dcinput.getPairsType(),
+                            dcinput.getVocabulary()));
                     selMd.setClosed(
                             isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
                                     dcinput.getPairsType(), dcinput.getVocabulary(), dcinput.isClosedVocabulary()));
+                    selMd.setVocabularyType(dcinput.getVocabularyType());
                 } else {
                     inputRest.setType(inputType);
                 }
                 selMd.setMetadata(org.dspace.core.Utils
-                    .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "."));
+                        .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "."));
                 selectableMetadata.add(selMd);
             } else {
                 // if the field is a qualdrop_value
@@ -142,17 +154,23 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                     selMd.setLabel((String) pairs.get(idx));
                     selMd.setMetadata(org.dspace.core.Utils
                             .standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
-                    if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
+                    if (ControlledVocabulary.SUGGEST.equals(dcinput.getVocabularyType())) {
+                        selMd.setControlledVocabulary(dcinput.getVocabulary());
+                        selMd.setClosed(dcinput.isClosedVocabulary());
+                        selMd.setVocabularyType(dcinput.getVocabularyType());
+                    } else if (authorityUtils.isChoice(
+                            dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
                         selMd.setControlledVocabulary(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
                                 pairs.get(idx + 1), dcinput.getPairsType(), dcinput.getVocabulary()));
                         selMd.setClosed(isClosed(dcinput.getSchema(), dcinput.getElement(),
-                                dcinput.getQualifier(), null, dcinput.getVocabulary(), dcinput.isClosedVocabulary()));
+                                dcinput.getQualifier(), null, dcinput.getVocabulary(),
+                                dcinput.isClosedVocabulary()));
+                        selMd.setVocabularyType(dcinput.getVocabularyType());
                     }
                     selectableMetadata.add(selMd);
                 }
             }
         }
-
         inputField.setInput(inputRest);
         if (dcinput.isMetadataField()) {
             inputField.setSelectableMetadata(selectableMetadata);
@@ -169,7 +187,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
      * This method will create a SelectableRelationship object
      * The DCInput will be used to define all the properties of the SelectableRelationship object
      * @param dcinput                   The parsed input from submission-forms.xml
-     * @return                          The SelectableRelationship object based on the dcinput
+     * @return The SelectableRelationship object based on the dcinput
      */
     private SelectableRelationship getSelectableRelationships(DCInput dcinput) {
         SelectableRelationship selectableRelationship = new SelectableRelationship();
@@ -213,7 +231,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     }
 
     private boolean isClosed(String schema, String element, String qualifier, String valuePairsName,
-            String vocabularyName, boolean isClosedVocabulary) {
+                             String vocabularyName, boolean isClosedVocabulary) {
         if (StringUtils.isNotBlank(valuePairsName)) {
             return true;
         } else if (StringUtils.isNotBlank(vocabularyName)) {
@@ -223,7 +241,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     }
 
     private boolean isChoice(String schema, String element, String qualifier, String valuePairsName,
-            String vocabularyName) {
+                             String vocabularyName) {
         if (StringUtils.isNotBlank(valuePairsName) || StringUtils.isNotBlank(vocabularyName)) {
             return true;
         }

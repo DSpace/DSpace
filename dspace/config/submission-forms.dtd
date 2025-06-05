@@ -8,7 +8,7 @@
  <!ELEMENT row (field|relation-field)+ >
  <!ATTLIST form name NMTOKEN #REQUIRED>
 
- <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, style?, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?, readonly?) >
+ <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, style?, type-bind?, input-type, hint, required?, regex?, vocabulary?, validation-dictionary?, visibility?, readonly?) >
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
  <!ELEMENT dc-qualifier (#PCDATA) >
@@ -47,19 +47,23 @@
 
  <!ATTLIST input-type value-pairs-name CDATA  #IMPLIED>
 
- <!ELEMENT vocabulary (#PCDATA) >
+ <!ELEMENT vocabulary (#PCDATA)>
 
- <!ATTLIST vocabulary closed (true|false) "false">
+ <!ATTLIST vocabulary
+     closed (true|false) "false"
+     type (xml|authority|suggest) "xml">
 
- <!ELEMENT visibility (#PCDATA) >
+ <!ELEMENT validation-dictionary (#PCDATA)>
 
- <!ATTLIST language value-pairs-name CDATA  #IMPLIED>
+ <!ELEMENT visibility (#PCDATA)>
 
- <!ELEMENT readonly (#PCDATA) >
+ <!ATTLIST language value-pairs-name CDATA #IMPLIED>
 
-<!ELEMENT relationship-type (#PCDATA) >
-<!ELEMENT search-configuration (#PCDATA) >
-<!ELEMENT filter (#PCDATA) >
-<!ELEMENT externalsources (#PCDATA) >
+ <!ELEMENT readonly (#PCDATA)>
+
+<!ELEMENT relationship-type (#PCDATA)>
+<!ELEMENT search-configuration (#PCDATA)>
+<!ELEMENT filter (#PCDATA)>
+<!ELEMENT externalsources (#PCDATA)>
 <!ELEMENT relation-field (relationship-type, search-configuration, filter?, repeatable?, name-variants?, label, type-bind?, hint, linked-metadata-field?, externalsources?, required?, regex?, visibility?)>
 <!ELEMENT linked-metadata-field (dc-schema, dc-element, dc-qualifier?, input-type)>
