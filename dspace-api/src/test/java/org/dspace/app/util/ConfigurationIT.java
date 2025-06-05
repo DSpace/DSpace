@@ -16,11 +16,13 @@ import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainin
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
+import com.ginsberg.junit.exit.SystemExitExtension;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Tests for configuration utilities.
@@ -31,6 +33,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author mhwood
  */
+@ExtendWith(SystemExitExtension.class)
 public class ConfigurationIT
         extends AbstractDSpaceTest {
 
