@@ -198,7 +198,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
         assertEquals(((Integer) 0), relationshipType.getLeftMinCardinality());
         assertEquals(((Integer) 0), relationshipType.getRightMinCardinality());
         assertNull(relationshipType.getLeftMaxCardinality());
-        assertNull(null, relationshipType.getRightMaxCardinality());
+        assertNull(relationshipType.getRightMaxCardinality());
 
         getClient().perform(get("/api/core/relationshiptypes/" + relationshipType.getID()))
                    .andExpect(jsonPath("$.leftMinCardinality", is(0)))
