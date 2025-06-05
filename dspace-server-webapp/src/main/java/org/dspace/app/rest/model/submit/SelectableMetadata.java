@@ -31,6 +31,8 @@ public class SelectableMetadata {
     private String controlledVocabulary;
     @JsonInclude(Include.NON_NULL)
     private Boolean closed = false;
+    @JsonInclude(Include.NON_NULL)
+    private String vocabularyType = "xml";
 
     public String getMetadata() {
         return metadata;
@@ -62,5 +64,13 @@ public class SelectableMetadata {
 
     public void setClosed(Boolean closed) {
         this.closed = closed;
+    }
+
+    public String getVocabularyType() {
+        return vocabularyType;
+    }
+
+    public void setVocabularyType(String vocabularyType) {
+        this.vocabularyType = vocabularyType;
     }
 }
