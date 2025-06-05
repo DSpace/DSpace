@@ -343,8 +343,9 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                                 authorityName = dcinput.getVocabulary();
                             }
 
-                            // do we have an authority?
-                            if (StringUtils.isNotBlank(authorityName)) {
+                            // do we have an authority that is not configured for solr 'suggest' type?
+                            if (StringUtils.isNotBlank(authorityName)
+                                    && !"suggest".equals(dcinput.getVocabularyType())) {
                                 String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
                                                                dcinput.getQualifier());
                                 ChoiceAuthority ca = controller.get(authorityName);
