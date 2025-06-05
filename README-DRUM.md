@@ -68,12 +68,12 @@ Confluence for information about setting up a MacBook to use the Kubernetes
     $ kubectl config use-context build
     ```
 
-6) Create the "docker.lib.umd.edu/drum-dependencies-7_x" Docker image. This
+6) Create the "docker.lib.umd.edu/drum-dependencies-8_x" Docker image. This
    image is used to pre-cache Maven downloads that will be used in subsequent
    DSpace docker builds:
 
     ```bash
-    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -t docker.lib.umd.edu/drum-dependencies-7_x:latest -f Dockerfile.dependencies .
+    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -t docker.lib.umd.edu/drum-dependencies-8_x:latest -f Dockerfile.dependencies .
     ```
 
 7) Create the "docker.lib.umd.edu/drum" Docker image:

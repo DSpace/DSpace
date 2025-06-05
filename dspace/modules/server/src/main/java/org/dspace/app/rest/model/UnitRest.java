@@ -9,10 +9,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @LinksRest(links = {
-        @LinkRest(
-                name = UnitRest.GROUPS,
-                method = "getGroups"
-        )
+    @LinkRest(name = UnitRest.GROUPS, method = "getGroups")
 })
 public class UnitRest extends DSpaceObjectRest {
     public static final String NAME = "unit";

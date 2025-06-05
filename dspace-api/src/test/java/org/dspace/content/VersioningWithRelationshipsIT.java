@@ -49,6 +49,7 @@ import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
+import org.dspace.builder.VersionBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
@@ -58,12 +59,10 @@ import org.dspace.content.virtual.Collected;
 import org.dspace.content.virtual.VirtualMetadataConfiguration;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
-import org.dspace.discovery.SolrSearchCore;
+import org.dspace.discovery.MockSolrSearchCore;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
-import org.dspace.versioning.factory.VersionServiceFactory;
-import org.dspace.versioning.service.VersioningService;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
@@ -74,16 +73,14 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
 
     private final RelationshipService relationshipService =
         ContentServiceFactory.getInstance().getRelationshipService();
-    private final VersioningService versioningService =
-        VersionServiceFactory.getInstance().getVersionService();
     private final WorkspaceItemService workspaceItemService =
         ContentServiceFactory.getInstance().getWorkspaceItemService();
     private final InstallItemService installItemService =
         ContentServiceFactory.getInstance().getInstallItemService();
     private final ItemService itemService =
         ContentServiceFactory.getInstance().getItemService();
-    private final SolrSearchCore solrSearchCore =
-        DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrSearchCore.class).get(0);
+    private final MockSolrSearchCore solrSearchCore =
+        DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(null, MockSolrSearchCore.class);
 
     protected Community community;
     protected Collection collection;
@@ -291,7 +288,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         // create a new version of the publication //
         /////////////////////////////////////////////
 
-        Version newVersion = versioningService.createNewVersion(context, originalPublication);
+        Version newVersion = VersionBuilder.createVersion(context, originalPublication, "test").build();
         Item newPublication = newVersion.getItem();
         assertNotSame(originalPublication, newPublication);
 
@@ -567,7 +564,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         // create a new version of the publication //
         /////////////////////////////////////////////
 
-        Version newVersion = versioningService.createNewVersion(context, originalPublication);
+        Version newVersion = VersionBuilder.createVersion(context, originalPublication, "test").build();
         Item newPublication = newVersion.getItem();
         assertNotSame(originalPublication, newPublication);
 
@@ -927,7 +924,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         // create a new version of the person //
         ////////////////////////////////////////
 
-        Version newVersion = versioningService.createNewVersion(context, originalPerson);
+        Version newVersion = VersionBuilder.createVersion(context, originalPerson, "test").build();
         Item newPerson = newVersion.getItem();
         assertNotSame(originalPerson, newPerson);
 
@@ -1300,7 +1297,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         // create new version of publication //
         ///////////////////////////////////////
 
-        Version newVersion = versioningService.createNewVersion(context, originalPublication);
+        Version newVersion = VersionBuilder.createVersion(context, originalPublication, "test").build();
         Item newPublication = newVersion.getItem();
         assertNotSame(originalPublication, newPublication);
 
@@ -1463,7 +1460,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         // create a new version of the publication //
         /////////////////////////////////////////////
 
-        Version newVersion = versioningService.createNewVersion(context, originalPublication);
+        Version newVersion = VersionBuilder.createVersion(context, originalPublication, "test").build();
         Item newPublication = newVersion.getItem();
         assertNotSame(originalPublication, newPublication);
 
@@ -1782,7 +1779,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         // create new version - volume 1.2 //
         /////////////////////////////////////
 
-        Item v1_2 = versioningService.createNewVersion(context, v1_1).getItem();
+        Item v1_2 = VersionBuilder.createVersion(context, v1_1, "test").build().getItem();
         installItemService.installItem(context, workspaceItemService.findByItem(context, v1_2));
         context.commit();
 
@@ -1790,7 +1787,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         // create new version - issue 3.2 //
         ////////////////////////////////////
 
-        Item i3_2 = versioningService.createNewVersion(context, i3_1).getItem();
+        Item i3_2 = VersionBuilder.createVersion(context, i3_1, "test").build().getItem();
         installItemService.installItem(context, workspaceItemService.findByItem(context, i3_2));
         context.commit();
 
@@ -2316,7 +2313,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 // create new version - person 3.2 //
                 /////////////////////////////////////
 
-                Item pe3_2 = versioningService.createNewVersion(context, pe3_1).getItem();
+                Item pe3_2 = VersionBuilder.createVersion(context, pe3_1, "test").build().getItem();
                 installItemService.installItem(context, workspaceItemService.findByItem(context, pe3_2));
                 context.commit();
 
@@ -2324,7 +2321,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 // create new version - project 3.2 //
                 //////////////////////////////////////
 
-                Item pr3_2 = versioningService.createNewVersion(context, pr3_1).getItem();
+                Item pr3_2 = VersionBuilder.createVersion(context, pr3_1, "test").build().getItem();
                 installItemService.installItem(context, workspaceItemService.findByItem(context, pr3_2));
                 context.commit();
 
@@ -3056,7 +3053,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         // create new version - volume 1.2 //
         /////////////////////////////////////
 
-        Item v1_2 = versioningService.createNewVersion(context, v1_1).getItem();
+        Item v1_2 = VersionBuilder.createVersion(context, v1_1, "test").build().getItem();
         installItemService.installItem(context, workspaceItemService.findByItem(context, v1_2));
         context.commit();
 
@@ -3064,7 +3061,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         // create new version - issue 3.2 //
         ////////////////////////////////////
 
-        Item i3_2 = versioningService.createNewVersion(context, i3_1).getItem();
+        Item i3_2 = VersionBuilder.createVersion(context, i3_1, "test").build().getItem();
         installItemService.installItem(context, workspaceItemService.findByItem(context, i3_2));
         context.commit();
 
@@ -3509,7 +3506,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         // create a new version of publication 1 and archive //
         ///////////////////////////////////////////////////////
 
-        Item publication1V2 = versioningService.createNewVersion(context, publication1V1).getItem();
+        Item publication1V2 = VersionBuilder.createVersion(context, publication1V1, "test").build().getItem();
         installItemService.installItem(context, workspaceItemService.findByItem(context, publication1V2));
         context.dispatchEvents();
 
@@ -3517,7 +3514,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         // create new version of person 1 //
         ////////////////////////////////////
 
-        Item person1V2 = versioningService.createNewVersion(context, person1V1).getItem();
+        Item person1V2 = VersionBuilder.createVersion(context, person1V1, "test").build().getItem();
         // update "Smith, Donald" to "Smith, D."
         itemService.replaceMetadata(
             context, person1V2, "person", "givenName", null, null, "D.",
@@ -3853,7 +3850,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         // create new version of person 2 //
         ////////////////////////////////////
 
-        Item person2V2 = versioningService.createNewVersion(context, person2V1).getItem();
+        Item person2V2 = VersionBuilder.createVersion(context, person2V1, "test").build().getItem();
         Relationship rel1 = getRelationship(publication1V2, isAuthorOfPublication, person2V2);
         assertNotNull(rel1);
         rel1.setRightwardValue("Doe, Jane Jr");

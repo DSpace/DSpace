@@ -229,7 +229,7 @@ public class Collection extends CacheableDSpaceObject implements DSpaceObjectLeg
      * @throws SQLException if database error
      */
     public void setLicense(Context context, String license) throws SQLException {
-        getCollectionService().setMetadataSingleValue(context, this, MD_LICENSE, Item.ANY, license);
+        getCollectionService().setMetadataSingleValue(context, this, MD_LICENSE, null, license);
     }
 
     /**

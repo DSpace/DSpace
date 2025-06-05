@@ -9,7 +9,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @LinksRest(links = {
-        @LinkRest(name = EtdUnitRest.COLLECTIONS, method = "getCollections")
+    @LinkRest(name = EtdUnitRest.COLLECTIONS, method = "getCollections")
 })
 public class EtdUnitRest extends DSpaceObjectRest {
     public static final String NAME = "etdunit";

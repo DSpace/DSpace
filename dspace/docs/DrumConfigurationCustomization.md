@@ -41,21 +41,24 @@ running "Dockerfile.dev".
 Finally, the "Dockerfile.ci" file supports generating a Docker image for use
 by Jenkins for continuous integration setup and testing.
 
----
+In DSpace 8.1, the stock DSpace files started using the "dspace-8_x" tag instead
+of "latest" as the default Docker image tag.
 
-**Note:** Starting in DSpace 8, the stock files use Spring Boot and an
-"embedded Tomcat" server to run the back-end server. This turned out to be
-incompatible with the DSpace customization mechanism, when customizations are
-added to the "dspace/modules/server" directory (see DSpace Issue 9987 -
-<https://github.com/DSpace/DSpace/issues/9987)>).
+This turned out to be an issue when building Docker images in Kubernetes,
+because the "Dockerfile.dependencies" Docker image needs to be pushed to the
+Nexus in order for it to be available for subsequent builds (the Kubernetes
+"build" context does not seem to have a Docker cache store that persists between
+invocations).
 
-A fix to restore the the "dspace/modules/server" customizations was provided
-to DSpace in DSpace Pull 10043 (<https://github.com/DSpace/DSpace/pull/10043>).
+The Nexus is set up to reject the push of any image with a tag that already
+exists -- except for the "latest" tag. If we used the "dspace-8_x" tag, this
+means that the "drum-dependencies" image could only be created once.
 
-These customizations can be removed when upgrading to a DSpace version that
-contains the changes.
-
----
+The "Dockerfile.dependencies" Docker image uses the "pom.xml" files of the
+current DRUM checkout, so clearly it must be able to be updated as DRUM changes.
+Therefore, the name of the "Dockerfile.dependencies" Docker image name was kept
+as "drum-dependencies-8_x" (as it was in DRUM DSpace 8.0), and the
+"latest" tag remains as the default tag.
 
 ## .github/workflows/build.yml
 

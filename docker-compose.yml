@@ -43,6 +43,8 @@ services:
       # End UMD Customization
       # solr.server: Ensure we are using the 'dspacesolr' image for Solr
       solr__P__server: http://dspacesolr:8983/solr
+      # matomo.tracker.url: Ensure we are using the 'matomo' image for Matomo
+      matomo__P__tracker__P__url: http://matomo
       # proxies.trusted.ipranges: This setting is required for a REST API running in Docker to trust requests
       # from the host machine. This IP range MUST correspond to the 'dspacenet' subnet defined above.
       proxies__P__trusted__P__ipranges: '172.23.0'
@@ -85,7 +87,9 @@ services:
     - |
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
+      # UMD Customization
       java $${JPDA_OPTS} -jar /dspace/webapps/server-boot.jar --dspace.dir=/dspace
+      # End UMD Customization
   # DSpace PostgreSQL database container
   dspacedb:
     container_name: dspacedb
@@ -119,7 +123,7 @@ services:
   # DSpace Solr container
   dspacesolr:
     container_name: dspacesolr
-    image: "${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-latest}"
+    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-dspace-8_x}"
     build:
       context: ./dspace/src/main/docker/dspace-solr/
       # Provide path to Solr configs necessary to build Docker image

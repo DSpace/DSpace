@@ -1,16 +1,24 @@
 # This image will be published as dspace/dspace
 # See https://github.com/DSpace/DSpace/tree/main/dspace/src/main/docker for usage details
 #
-# - note: default tag for branch: dspace/dspace: dspace/dspace:latest
+# - note: default tag for branch: dspace/dspace: dspace/dspace:dspace-8_x
 
 # This Dockerfile uses JDK17 by default.
 # To build with other versions, use "--build-arg JDK_VERSION=[value]"
 ARG JDK_VERSION=17
+# The Docker version tag to build from
+# UMD Customization
+# Continuing to use "latest" because this allows a new image to be easily
+# created and pushed to the Nexus
 ARG DSPACE_VERSION=latest
+# End UMD Customization
+# The Docker registry to use for DSpace images. Defaults to "docker.io"
+# NOTE: non-DSpace images are hardcoded to use "docker.io" and are not impacted by this build argument
+ARG DOCKER_REGISTRY=docker.io
 
 # Step 1 - Run Maven Build
 # UMD Customization
-FROM docker.lib.umd.edu/drum-dependencies-8_x:${DSPACE_VERSION} as build
+FROM docker.lib.umd.edu/drum-dependencies-8_x:${DSPACE_VERSION} AS build
 # End UMD Customization
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
@@ -33,35 +41,38 @@ RUN mvn --no-transfer-progress package ${MAVEN_FLAGS} && \
 RUN rm -rf /install/webapps/server/
 
 # Step 2 - Run Ant Deploy
-FROM eclipse-temurin:${JDK_VERSION} as ant_build
+FROM docker.io/eclipse-temurin:${JDK_VERSION} AS ant_build
 ARG TARGET_DIR=dspace-installer
 # COPY the /install directory from 'build' container to /dspace-src in this container
 COPY --from=build /install /dspace-src
 WORKDIR /dspace-src
 # Create the initial install deployment using ANT
-ENV ANT_VERSION 1.10.13
-ENV ANT_HOME /tmp/ant-$ANT_VERSION
-ENV PATH $ANT_HOME/bin:$PATH
-# Need wget to install ant
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends wget \
-    && apt-get purge -y --auto-remove \
-    && rm -rf /var/lib/apt/lists/*
+ENV ANT_VERSION=1.10.13
+ENV ANT_HOME=/tmp/ant-$ANT_VERSION
+ENV PATH=$ANT_HOME/bin:$PATH
 # Download and install 'ant'
 RUN mkdir $ANT_HOME && \
-    wget -qO- "https://archive.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz" | tar -zx --strip-components=1 -C $ANT_HOME
+    curl --silent --show-error --location --fail --retry 5 --output /tmp/apache-ant.tar.gz \
+      https://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz && \
+    tar -zx --strip-components=1 -f /tmp/apache-ant.tar.gz -C $ANT_HOME && \
+    rm /tmp/apache-ant.tar.gz
 # Run necessary 'ant' deploy scripts
 RUN ant init_installation update_configs update_code update_webapps
 
 # Step 3 - Start up DSpace via Runnable JAR
-FROM eclipse-temurin:${JDK_VERSION}
+FROM docker.io/eclipse-temurin:${JDK_VERSION}
 # NOTE: DSPACE_INSTALL must align with the "dspace.dir" default configuration.
 ENV DSPACE_INSTALL=/dspace
 # Copy the /dspace directory from 'ant_build' container to /dspace in this container
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 WORKDIR $DSPACE_INSTALL
-# Expose Tomcat port
-EXPOSE 8080
+# Need host command for "[dspace]/bin/make-handle-config"
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends host \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
+# Expose Tomcat port (8080) & Handle Server HTTP port (8000)
+EXPOSE 8080 8000
 # Give java extra memory (2GB)
 ENV JAVA_OPTS=-Xmx2000m
 
@@ -79,7 +90,8 @@ RUN apt-get update && \
         libgetopt-complete-perl \
         libconfig-properties-perl \
         vim \
-        python3-lxml && \
+        python3-lxml \
+        jq && \
     mkfifo /var/spool/postfix/public/pickup && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # End UMD Customization
