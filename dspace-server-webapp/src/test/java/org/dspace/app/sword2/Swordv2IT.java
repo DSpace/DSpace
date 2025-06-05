@@ -86,11 +86,14 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
         // These integration tests REQUIRE that SWORDv2WebConfig is found/available (as this class deploys SWORDv2)
         // If this class is not available, the below "Assume" will cause all tests to be SKIPPED
         // NOTE: SWORDv2WebConfig is provided by the 'dspace-swordv2' module
-        try {
-            Class.forName("org.dspace.app.configuration.SWORDv2WebConfig");
-        } catch (ClassNotFoundException ce) {
-            Assumptions.assumeNoException(ce);
-        }
+        Assumptions.assumeTrue(() -> {
+            try {
+                Class.forName("org.dspace.app.configuration.SWORDv2WebConfig");
+                return true;
+            } catch (ClassNotFoundException e) {
+                return false;
+            }
+        }, "SWORDv2WebConfig class not found - skipping SWORD v2 tests");
 
         // Ensure SWORDv2 URL configurations are set correctly (based on our integration test server's paths)
         // SWORDv2 validates requests against these configs, and throws a 404 if they don't match the request path
