@@ -73,7 +73,7 @@ public class AbstractDSpaceIntegrationTest {
     public static void initTestEnvironment() {
         try {
             //Stops System.exit(0) throws exception instead of exiting
-            System.setSecurityManager(new NoExitSecurityManager());
+            //System.setSecurityManager(new NoExitSecurityManager());
 
             // All tests should assume UTC timezone by default (unless overridden in the test itself)
             // This ensures that Spring doesn't attempt to change the timezone of dates that are read from the
@@ -129,7 +129,7 @@ public class AbstractDSpaceIntegrationTest {
      */
     @AfterAll
     public static void destroyTestEnvironment() throws SQLException {
-        System.setSecurityManager(null);
+        //System.setSecurityManager(null);
 
         // Clear our test properties
         testProps.clear();
