@@ -34,12 +34,14 @@ import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.dspace.services.ConfigurationService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 /**
  * Unit tests for {@link DSpaceHttpClientFactory}.
@@ -47,7 +49,8 @@ import org.mockito.junit.MockitoJUnitRunner;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class DSpaceHttpClientFactoryTest {
 
     @InjectMocks
@@ -60,7 +63,7 @@ public class DSpaceHttpClientFactoryTest {
 
     private MockWebServer mockServer;
 
-    @Before
+    @BeforeEach
     public void init() {
         this.httpClientFactory.setProxyRoutePlanner(new DSpaceProxyRoutePlanner(configurationService));
         this.mockProxy = new MockWebServer();
@@ -227,8 +230,8 @@ public class DSpaceHttpClientFactoryTest {
     public void testBuildWithRequestConfig() throws Exception {
         setHttpProxyOnConfigurationService();
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(2500)
-                .build();
+            .setConnectTimeout(2500)
+            .build();
         AtomicReference<HttpContext> contextReference = new AtomicReference<HttpContext>();
         HttpRequestInterceptor interceptor = (request, context) -> contextReference.set(context);
         httpClientFactory.setRequestInterceptors(List.of(interceptor));

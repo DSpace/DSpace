@@ -38,8 +38,8 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -73,7 +73,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void unknownFormatRequiredByDefault() throws Exception {
         getClient().perform(get("/api/core/bitstreamformats"))
                    .andExpect(status().isOk())
@@ -88,7 +88,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void findAllMimeTypeCheck() throws Exception {
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)

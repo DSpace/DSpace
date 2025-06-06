@@ -21,8 +21,8 @@ import org.dspace.builder.EPersonBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.eperson.EPerson;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -39,7 +39,7 @@ public class CollectionLogoControllerIT extends AbstractControllerIntegrationTes
     private MockMultipartFile bitstreamFile;
     private Collection childCollection;
 
-    @Before
+    @BeforeEach
     public void createStructure() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)

@@ -7,8 +7,9 @@
  */
 package org.dspace.app.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
@@ -30,7 +31,7 @@ import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,23 +117,25 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         }
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void adsImportMetadataFindMatchingRecordsTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+    @Test
+    public void adsImportMetadataFindMatchingRecordsTest() {
+        assertThrows(UnsupportedOperationException.class, () -> {
+            context.turnOffAuthorisationSystem();
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
 
-        org.dspace.content.Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                                              .withName("Collection 1")
-                                                              .build();
+            org.dspace.content.Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .build();
 
-        Item testItem = ItemBuilder.createItem(context, col1)
-                                   .withTitle("test item")
-                                   .withIssueDate("2021")
-                                   .build();
-        context.restoreAuthSystemState();
-        adsServiceImpl.findMatchingRecords(testItem);
+            Item testItem = ItemBuilder.createItem(context, col1)
+                .withTitle("test item")
+                .withIssueDate("2021")
+                .build();
+            context.restoreAuthSystemState();
+            adsServiceImpl.findMatchingRecords(testItem);
+        });
     }
 
     @Test
