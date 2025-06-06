@@ -124,9 +124,11 @@ public class EntityTypeServiceImpl implements EntityTypeService {
     public List<String> getSubmitAuthorizedTypes(Context context)
             throws SQLException, SolrServerException, IOException {
         List<String> types = new ArrayList<>();
-        StringBuilder query = new StringBuilder();
-        org.dspace.eperson.EPerson currentUser = context.getCurrentUser();
+
+        SolrQuery sQuery = new SolrQuery("*:*");
         if (!authorizeService.isAdmin(context)) {
+            StringBuilder query = new StringBuilder();
+            org.dspace.eperson.EPerson currentUser = context.getCurrentUser();
             String userId = "";
             if (currentUser != null) {
                 userId = currentUser.getID().toString();
@@ -137,11 +139,8 @@ public class EntityTypeServiceImpl implements EntityTypeService {
                 query.append(" OR g").append(group.getID());
             }
             query.append(")");
-        } else {
-            query.append("*:*");
+            sQuery.addFilterQuery(query.toString());
         }
-
-        SolrQuery sQuery = new SolrQuery(query.toString());
         sQuery.addFilterQuery("search.resourcetype:" + IndexableCollection.TYPE);
         sQuery.setRows(0);
         sQuery.addFacetField("search.entitytype");
