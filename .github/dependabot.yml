@@ -109,6 +109,9 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Don't try to auto-update bouncycastle or asm since they should be synced with tika
+      - dependency-name: "org.bouncycastle:*:*"
+      - dependency-name: "org.ow2.asm:*:*"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -216,6 +219,9 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Don't try to auto-update bouncycastle or asm since they should be synced with tika
+      - dependency-name: "org.bouncycastle:*:*"
+      - dependency-name: "org.ow2.asm:*:*"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
@@ -323,6 +329,9 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Don't try to auto-update bouncycastle or asm since they should be synced with tika
+      - dependency-name: "org.bouncycastle:*:*"
+      - dependency-name: "org.ow2.asm:*:*"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
@@ -449,6 +458,9 @@ updates:
       # See https://github.com/DSpace/DSpace/pull/9888#issuecomment-2408165545
       - dependency-name: "org.springframework.security:*"
         versions: [">=5.8.0"]
+      # Don't try to auto-update bouncycastle or asm since they should be synced with tika
+      - dependency-name: "org.bouncycastle:*:*"
+      - dependency-name: "org.ow2.asm:*:*"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
