@@ -247,9 +247,16 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         }
 
         // If authorization was given before and cached
-        Boolean cachedResult = c.getCachedAuthorizationResult(o, action, e);
-        if (cachedResult != null) {
-            return cachedResult;
+        if (useInheritance) {
+            Boolean cachedResult = c.getCachedAuthorizationResultWithInheritance(o, action, e);
+            if (cachedResult != null) {
+                return cachedResult;
+            }
+        } else {
+            Boolean cachedResult = c.getCachedAuthorizationResult(o, action, e);
+            if (cachedResult != null) {
+                return cachedResult;
+            }
         }
 
         // is eperson set? if not, userToCheck = null (anonymous)
@@ -306,7 +313,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             // check policies for date validity
             if (resourcePolicyService.isDateValid(rp)) {
                 if (rp.getEPerson() != null && rp.getEPerson().equals(userToCheck)) {
-                    c.cacheAuthorizedAction(o, action, e, true, rp);
+                    c.cacheAuthorizedAction(o, action, e, true, false, rp);
                     return true; // match
                 }
 
@@ -314,7 +321,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                     && groupService.isMember(c, e, rp.getGroup())) {
                     // group was set, and eperson is a member
                     // of that group
-                    c.cacheAuthorizedAction(o, action, e, true, rp);
+                    c.cacheAuthorizedAction(o, action, e, true, false, rp);
                     return true;
                 }
             }
@@ -332,12 +339,12 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                                                                       .getAdminObject(c, o, action) : null;
 
             if (isAdmin(c, e, adminObject)) {
-                c.cacheAuthorizedAction(o, action, e, true, null);
+                c.cacheAuthorizedAction(o, action, e, true, useInheritance, null);
                 return true;
             }
         }
         // default authorization is denial
-        c.cacheAuthorizedAction(o, action, e, false, null);
+        c.cacheAuthorizedAction(o, action, e, false, useInheritance, null);
         return false;
     }
 
@@ -377,7 +384,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             return false;
         }
 
-        Boolean cachedResult = c.getCachedAuthorizationResult(o, Constants.ADMIN, e);
+        Boolean cachedResult = c.getCachedAuthorizationResultWithInheritance(o, Constants.ADMIN, e);
         if (cachedResult != null) {
             return cachedResult;
         }
@@ -391,7 +398,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             // check policies for date validity
             if (resourcePolicyService.isDateValid(rp)) {
                 if (rp.getEPerson() != null && rp.getEPerson().equals(e)) {
-                    c.cacheAuthorizedAction(o, Constants.ADMIN, e, true, rp);
+                    c.cacheAuthorizedAction(o, Constants.ADMIN, e, true, false, rp);
                     return true; // match
                 }
 
@@ -399,7 +406,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                     && groupService.isMember(c, e, rp.getGroup())) {
                     // group was set, and eperson is a member
                     // of that group
-                    c.cacheAuthorizedAction(o, Constants.ADMIN, e, true, rp);
+                    c.cacheAuthorizedAction(o, Constants.ADMIN, e, true, false, rp);
                     return true;
                 }
             }
@@ -411,6 +418,9 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             }
         }
 
+        // Without inheritance, there are no admin permissions on this object
+        c.cacheAuthorizedAction(o, Constants.ADMIN, e, false, false, null);
+
         // If user doesn't have specific Admin permissions on this object,
         // check the *parent* objects of this object.  This allows Admin
         // permissions to be inherited automatically (e.g. Admin on Community
@@ -418,11 +428,11 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         DSpaceObject parent = serviceFactory.getDSpaceObjectService(o).getParentObject(c, o);
         if (parent != null) {
             boolean admin = isAdmin(c, e, parent);
-            c.cacheAuthorizedAction(o, Constants.ADMIN, e, admin, null);
+            c.cacheAuthorizedAction(o, Constants.ADMIN, e, admin, true, null);
             return admin;
         }
 
-        c.cacheAuthorizedAction(o, Constants.ADMIN, e, false, null);
+        c.cacheAuthorizedAction(o, Constants.ADMIN, e, false, true, null);
         return false;
     }
 
