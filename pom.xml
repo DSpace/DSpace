@@ -1430,7 +1430,7 @@
             <dependency>
                 <groupId>net.handle</groupId>
                 <artifactId>handle</artifactId>
-                <version>9.3.1</version>
+                <version>9.3.2</version>
             </dependency>
             <!-- Only necessary to run Handle Server from commandline. Therefore, a runtime dependency. -->
             <dependency>
