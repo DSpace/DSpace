@@ -27,7 +27,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.discovery.indexobject.IndexableMetadataField;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.event.EventDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -202,7 +204,8 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
      * @param mdFieldId ID of the metadata field that needs to be (re)indexed
      */
     private void triggerEventToUpdateIndex(Context context, int mdFieldId) {
-        context.addEvent(new Event(Event.MODIFY, Constants.SITE, null, IndexableMetadataField.TYPE, new ArrayList<>(
+        context.addEvent(new Event(Event.MODIFY, Constants.SITE, null,
+            new EventDetail(DetailType.DSO_TYPE, IndexableMetadataField.TYPE), new ArrayList<>(
             Arrays.asList(Integer.toString(mdFieldId)))));
     }
 
