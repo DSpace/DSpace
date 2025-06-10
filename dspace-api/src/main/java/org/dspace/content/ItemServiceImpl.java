@@ -594,7 +594,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public void removeDSpaceLicense(Context context, Item item) throws SQLException, AuthorizeException, IOException {
         // get all bundles with name "LICENSE" (these are the DSpace license
         // bundles)
-        List<Bundle> bunds = getBundles(item, "LICENSE");
+        List<Bundle> bunds = getBundles(item, Constants.LICENSE_BUNDLE_NAME);
 
         for (Bundle bund : bunds) {
             // FIXME: probably serious troubles with Authorizations
