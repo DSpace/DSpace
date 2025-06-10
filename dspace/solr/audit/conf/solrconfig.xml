@@ -450,16 +450,16 @@
     </processor>    
     <processor class="solr.RunUpdateProcessorFactory" />
   </updateRequestProcessorChain>
-   
-<!--  <queryResponseWriter name="json" class="solr.scripting.xslt.XSLTResponseWriter">-->
-<!--    <str name="content-type">text/plain; charset=UTF-8</str>-->
-<!--  </queryResponseWriter>-->
-<!--  -->
-<!--  <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" startup="lazy"/>-->
-<!--  -->
-<!--  <queryResponseWriter name="xslt" class="solr.scripting.xslt.XSLTResponseWriter">-->
-<!--    <int name="xsltCacheLifetimeSeconds">5</int>-->
-<!--  </queryResponseWriter>-->
+
+  <queryResponseWriter name="json" class="solr.JSONResponseWriter">
+    <str name="content-type">text/plain; charset=UTF-8</str>
+  </queryResponseWriter>
+
+  <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" startup="lazy"/>
+
+  <queryResponseWriter name="xslt" class="solr.scripting.xslt.XSLTResponseWriter">
+    <int name="xsltCacheLifetimeSeconds">5</int>
+  </queryResponseWriter>
 
   <admin>
     <defaultQuery>*:*</defaultQuery>

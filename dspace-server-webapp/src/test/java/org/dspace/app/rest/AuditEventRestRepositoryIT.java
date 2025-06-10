@@ -10,6 +10,8 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.AuditEventMatcher.matchAuditEvent;
 import static org.dspace.app.rest.matcher.AuditEventMatcher.matchAuditEventFullProjection;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -18,18 +20,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.dspace.app.audit.AuditEvent;
 import org.dspace.app.audit.AuditService;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.AuditEventBuilder;
+import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -50,10 +57,15 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
     @Autowired
     private AuditService auditService;
 
+    @Autowired
+    private BitstreamService bitstreamService;
+
     private void loadSomeObjects(boolean enabled) throws Exception {
-        if (enabled) {
+        auditService.deleteEvents(context, null, null);
+
+        if (!enabled) {
             // enable the audit system for this test
-            configurationService.setProperty("audit.enabled", true);
+            configurationService.setProperty("audit.enabled", false);
         }
         // We turn off the authorization system in order to create the structure as
         // defined below
@@ -401,6 +413,59 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
             .andExpect(jsonPath("$._links.next.href").doesNotExist())
             .andExpect(jsonPath("$.page.size", is(1)))
             .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void findByObjectBitstreamTest() throws Exception {
+        loadSomeObjects(true);
+        context.turnOffAuthorisationSystem();
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, InputStream.nullInputStream())
+                                              .withName("test image")
+                                              .withFormat("test format type")
+                                              .build();
+
+        bitstreamService.delete(context, bitstream);
+        context.commit();
+        context.restoreAuthSystemState();
+
+        List<AuditEvent> events = auditService.findEvents(context, bitstream.getID(), null, null, Integer.MAX_VALUE, 0,
+            false);
+        assertTrue(events.size() > 4);
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/system/auditevents/search/findByObject")
+                                 .param("size", "100")
+                                 .param("object", bitstream.getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(contentType))
+                             .andExpect(jsonPath("$._embedded.auditevents",
+                                 Matchers.hasSize(Math.min(events.size(), 100))))
+                             // all the audit events must have received a uuid when stored
+                             .andExpect(jsonPath("$._embedded.auditevents.*.id", Matchers.not(Matchers.empty())))
+                             // all the audit events must be related to the bitstream
+                             .andExpect(jsonPath("$._embedded.auditevents",
+                                 Matchers.everyItem(Matchers.anyOf(
+                                     hasJsonPath("$.subjectUUID", is(bitstream.getID().toString())),
+                                     hasJsonPath("$.objectUUID", is(bitstream.getID().toString()))
+                                 ))))
+                             .andExpect(jsonPath("$._embedded.auditevents",
+                                 Matchers.containsInAnyOrder(
+                                     events.stream()
+                                           .map(event ->
+                                               matchAuditEvent(event)).collect(
+                                               Collectors.toList())
+                                 )))
+                             .andExpect(jsonPath("$._embedded.auditevents",
+                                 hasItems(
+                                     allOf(
+                                         hasJsonPath("$.checksum", is(bitstream.getChecksum())),
+                                         hasJsonPath("$.eventType", is("CREATE"))
+                                     ),
+                                     allOf(
+                                         hasJsonPath("$.checksum", is(bitstream.getChecksum())),
+                                         hasJsonPath("$.eventType", is("DELETE"))
+                                     ))))
+                             .andExpect(jsonPath("$.page.size", is(100)))
+                             .andExpect(jsonPath("$.page.totalElements", is(events.size())));
     }
 
 }

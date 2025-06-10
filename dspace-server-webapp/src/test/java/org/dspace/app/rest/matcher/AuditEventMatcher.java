@@ -48,6 +48,13 @@ public class AuditEventMatcher {
             hasJsonPath("$.subjectType", is(audit.getSubjectType())),
             hasJsonPath("$.objectUUID", is(uuidStr(audit.getObjectUUID()))),
             hasJsonPath("$.objectType", is(audit.getObjectType())),
+            hasJsonPath("$.metadataField", is(audit.getMetadataField())),
+            hasJsonPath("$.value", is(audit.getValue())),
+            hasJsonPath("$.authority", is(audit.getAuthority())),
+            hasJsonPath("$.confidence", is(audit.getConfidence())),
+            hasJsonPath("$.place", is(audit.getPlace())),
+            hasJsonPath("$.action", is(audit.getAction())),
+            hasJsonPath("$.checksum", is(audit.getChecksum())),
             //we should apply the date formatter to make the check
             //hasJsonPath("$.timeStamp", is(audit.getDatetime())),
             hasJsonPath("$.type", is("auditevent")),

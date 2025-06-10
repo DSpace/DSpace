@@ -115,7 +115,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         // if we ever use the identifier service for bundles, we should
         // create the bundle before we create the Event and should add all
         // identifiers to it.
-        context.addEvent(new Event(Event.CREATE, Constants.BUNDLE, bundle.getID(), null));
+        context.addEvent(new Event(Event.CREATE, Constants.BUNDLE,
+            bundle.getID(), Constants.ITEM, item.getID(),
+            new EventDetail(DetailType.DSO_SUMMARY, bundle.getDetails()),
+            getIdentifiers(context, bundle)));
 
         return bundle;
     }
@@ -159,6 +162,11 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         if (owningItem != null) {
             itemService.updateLastModified(context, owningItem);
             itemService.update(context, owningItem);
+            context.addEvent(new Event(Event.ADD, Constants.BUNDLE, bundle.getID(),
+                Constants.ITEM, owningItem.getID(),
+                new EventDetail(DetailType.BITSTREAM_SEQUENCE_ID, String.valueOf(bitstream.getSequenceID())),
+                getIdentifiers(context, bundle)));
+
         }
 
         bundle.addBitstream(bitstream);
@@ -233,6 +241,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         if (owningItem != null) {
             itemService.updateLastModified(context, owningItem);
             itemService.update(context, owningItem);
+            context.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, bundle.getID(),
+                Constants.ITEM, owningItem.getID(),
+                new EventDetail(DetailType.BITSTREAM_SEQUENCE_ID, String.valueOf(bitstream.getSequenceID())),
+                getIdentifiers(context, bundle)));
         }
 
         // In the event that the bitstream to remove is actually

@@ -36,6 +36,13 @@ public class AuditEventConverter
             auditRest.setSubjectType(audit.getSubjectType());
             auditRest.setSubjectUUID(audit.getSubjectUUID());
             auditRest.setTimeStamp(audit.getDatetime());
+            auditRest.setMetadataField(audit.getMetadataField());
+            auditRest.setValue(audit.getValue());
+            auditRest.setAuthority(audit.getAuthority());
+            auditRest.setConfidence(audit.getConfidence());
+            auditRest.setPlace(audit.getPlace());
+            auditRest.setAction(audit.getAction());
+            auditRest.setChecksum(audit.getChecksum());
         }
         return auditRest;
     }

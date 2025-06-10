@@ -7,6 +7,9 @@
  */
 package org.dspace.app.audit;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
@@ -25,11 +28,14 @@ public class AuditConsumer implements Consumer {
 
     private AuditService auditService;
     private ConfigurationService configurationService;
+    private List<Integer> meaningfulEvents;
 
     public void initialize() throws Exception {
         DSpace dSpace = new DSpace();
         auditService = dSpace.getSingletonService(AuditService.class);
         configurationService = dSpace.getConfigurationService();
+        meaningfulEvents = List.of(Event.MODIFY_METADATA, Event.CREATE, Event.DELETE,
+            Event.REMOVE);
     }
 
     /**
@@ -39,9 +45,23 @@ public class AuditConsumer implements Consumer {
      * @param event Content event
      */
     public void consume(Context ctx, Event event) throws Exception {
-        if (configurationService.getBooleanProperty("audit.enabled", false)) {
+        if (configurationService.getBooleanProperty("audit.enabled", false)
+            && isEventMeaningful(ctx, event)) {
             auditService.store(ctx, event);
+            auditService.commit();
+
         }
+    }
+
+    private boolean isEventMeaningful(Context ctx, Event event) {
+        if (meaningfulEvents.contains(event.getEventType())) {
+            return true;
+        }
+        UUID relatedObjectId = event.getObjectID();
+        if (relatedObjectId != null) {
+            return true;
+        }
+        return false;
     }
 
     public void end(Context ctx) throws Exception {

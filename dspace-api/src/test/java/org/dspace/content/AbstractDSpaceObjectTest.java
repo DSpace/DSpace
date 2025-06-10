@@ -16,6 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -92,11 +93,11 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
             dspaceObject.addDetails(s);
         }
 
-        String details = dspaceObject.getDetails();
+        List<Object> details = dspaceObject.getDetails();
         dspaceObject.clearDetails();
 
         assertThat("testClearDetails 0", dspaceObject.getDetails(), nullValue());
-        assertThat("testClearDetails 1", dspaceObject.getDetails(), not(equalTo(details)));
+        assertThat("testClearDetails 1", dspaceObject.getDetails(), not(equalTo(details.get(0))));
     }
 
     /**

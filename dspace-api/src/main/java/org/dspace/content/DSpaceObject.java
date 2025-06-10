@@ -25,6 +25,7 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import org.apache.commons.collections4.CollectionUtils;
+import org.dspace.app.audit.MetadataEvent;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.handle.Handle;
@@ -46,7 +47,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     // accumulate information to add to "detail" element of content Event,
     // e.g. to document metadata fields touched, etc.
     @Transient
-    private StringBuffer eventDetails = null;
+    private List<Object> eventDetails = null;
 
     /**
      * The same order should be applied inside this comparator
@@ -108,21 +109,20 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
      * Subclass can just start calling addDetails, since it creates
      * the cache if it needs to.
      *
-     * @param d detail string to add.
+     * @param d detail object to add.
      */
-    protected void addDetails(String d) {
+    public void addDetails(Object d) {
         if (eventDetails == null) {
-            eventDetails = new StringBuffer(d);
-        } else {
-            eventDetails.append(", ").append(d);
+            eventDetails = new ArrayList();
         }
+        eventDetails.add(d);
     }
 
     /**
      * @return summary of event details, or null if there are none.
      */
-    public String getDetails() {
-        return eventDetails == null ? null : eventDetails.toString();
+    public List<Object> getDetails() {
+        return eventDetails == null ? List.of() : eventDetails;
     }
 
     /**
@@ -192,7 +192,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     protected void addMetadata(MetadataValue metadataValue) {
         setMetadataModified();
         getMetadata().add(metadataValue);
-        addDetails(metadataValue.getMetadataField().toString());
+        addDetails(new MetadataEvent(metadataValue, MetadataEvent.INITIAL_ADD));
     }
 
     public List<ResourcePolicy> getResourcePolicies() {

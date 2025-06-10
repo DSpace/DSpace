@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -133,7 +134,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         setFormat(context, bitstream, null);
 
         context.addEvent(
-            new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, null, getIdentifiers(context, bitstream)));
+            new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID,
+                new EventDetail(DetailType.BITSTREAM_CHECKSUM, bitstream.getChecksum()),
+                getIdentifiers(context, bitstream)));
 
         return bitstream;
     }
@@ -146,6 +149,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         Bitstream b = create(context, is);
         bundleService.addBitstream(context, bundle, b);
+        UUID itemUUID = getItem(b).stream().findFirst().map(Item::getID).orElse(null);
+        context.addEvent(
+            new Event(Event.CREATE, Constants.BITSTREAM, b.getID(), Constants.ITEM, itemUUID,
+                new EventDetail(DetailType.BITSTREAM_CHECKSUM, b.getChecksum()), getIdentifiers(context, b)));
         return b;
     }
 
@@ -194,7 +201,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM,
                                    bitstream.getID(), new EventDetail(
-            DetailType.INFO, "REGISTER"), getIdentifiers(context, bitstream)));
+            DetailType.BITSTREAM_CHECKSUM, bitstream.getChecksum()),
+            getIdentifiers(context, bitstream)));
 
         return bitstream;
     }
@@ -252,8 +260,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             bitstream.setModified();
         }
         if (bitstream.isMetadataModified()) {
+            UUID itemUUID = getItem(bitstream).stream().findFirst().map(Item::getID).orElse(null);
             context.addEvent(
                 new Event(Event.MODIFY_METADATA, Constants.BITSTREAM, bitstream.getID(),
+                    Constants.ITEM, itemUUID,
                     new EventDetail(DetailType.DSO_SUMMARY, bitstream.getDetails()),
                           getIdentifiers(context, bitstream)));
             bitstream.clearModified();
@@ -274,6 +284,11 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(),
             new EventDetail(DetailType.BITSTREAM_SEQUENCE_ID, String.valueOf(bitstream.getSequenceID())),
+            getIdentifiers(context, bitstream)));
+        // add anew event details will be checksum value of the deleted bitstream
+        UUID itemUUID = getItem(bitstream).stream().findFirst().map(Item::getID).orElse(null);
+        context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(), Constants.ITEM, itemUUID,
+            new EventDetail(DetailType.BITSTREAM_CHECKSUM, bitstream.getChecksum()),
             getIdentifiers(context, bitstream)));
 
         // Remove bitstream itself
@@ -512,5 +527,11 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
                      .map(Bundle::getName)
                      .collect(Collectors.toSet());
         return bundleNames.stream().anyMatch(bundles::contains);
+    }
+
+    private Optional<Item> getItem(Bitstream bitstream) throws SQLException {
+        return bitstream.getBundles().stream()
+            .flatMap(bundle -> bundle.getItems().stream())
+            .findFirst();
     }
 }

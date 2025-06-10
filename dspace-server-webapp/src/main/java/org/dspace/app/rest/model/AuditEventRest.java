@@ -41,6 +41,13 @@ public class AuditEventRest extends BaseObjectRest<UUID> {
     private String eventType;
     private Date timeStamp;
     private String detail;
+    private String metadataField;
+    private String value;
+    private String authority;
+    private Integer confidence;
+    private Integer place;
+    private String action;
+    private String checksum;
 
     @Override
     @JsonProperty(access = Access.READ_ONLY)
@@ -127,4 +134,59 @@ public class AuditEventRest extends BaseObjectRest<UUID> {
         this.detail = detail;
     }
 
+    public String getMetadataField() {
+        return metadataField;
+    }
+
+    public void setMetadataField(String metadataField) {
+        this.metadataField = metadataField;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(String authority) {
+        this.authority = authority;
+    }
+
+    public Integer getConfidence() {
+        return confidence;
+    }
+
+    public void setConfidence(Integer confidence) {
+        this.confidence = confidence;
+    }
+
+    public Integer getPlace() {
+        return place;
+    }
+
+    public void setPlace(Integer place) {
+        this.place = place;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public String getChecksum() {
+        return checksum;
+    }
+
+    public void setChecksum(String checksum) {
+        this.checksum = checksum;
+    }
 }
