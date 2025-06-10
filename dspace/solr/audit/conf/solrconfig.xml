@@ -457,10 +457,6 @@
 
   <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" startup="lazy"/>
 
-  <queryResponseWriter name="xslt" class="solr.scripting.xslt.XSLTResponseWriter">
-    <int name="xsltCacheLifetimeSeconds">5</int>
-  </queryResponseWriter>
-
   <admin>
     <defaultQuery>*:*</defaultQuery>
   </admin>
