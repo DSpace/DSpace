@@ -581,7 +581,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                             .collect(Collectors.toList()));
                 }
                 DiscoverySearchFilterFacet matchingFacet = null;
-                for (DiscoverySearchFilterFacet facetConfig : searchConfigurationService.getAllFacetsConfig()) {
+                for (DiscoverySearchFilterFacet facetConfig : searchConfigurationService.getAllUniqueFacetsConfig()) {
                     boolean coversAllFieldsFromVocab = true;
                     for (String fieldFromVocab: metadataFields) {
                         boolean coversFieldFromVocab = false;

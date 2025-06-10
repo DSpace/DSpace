@@ -71,6 +71,7 @@ import org.dspace.discovery.indexobject.IndexableCommunity;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
+import org.dspace.discovery.indexobject.factory.ItemIndexFactory;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
@@ -340,6 +341,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         try {
             final List<IndexFactory> indexableObjectServices = indexObjectServiceFactory.
                 getIndexFactories();
+            int indexObject = 0;
             for (IndexFactory indexableObjectService : indexableObjectServices) {
                 if (type == null || StringUtils.equals(indexableObjectService.getType(), type)) {
                     final Iterator<IndexableObject> indexableObjects = indexableObjectService.findAll(context);
@@ -347,6 +349,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         final IndexableObject indexableObject = indexableObjects.next();
                         indexContent(context, indexableObject, force);
                         context.uncacheEntity(indexableObject.getIndexedObject());
+                        indexObject++;
+                        if ((indexObject % 100) == 0 && indexableObjectService instanceof ItemIndexFactory) {
+                            context.uncacheEntities();
+                        }
                     }
                 }
             }
@@ -786,16 +792,20 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         solrQuery.setQuery(query);
 
-        // Add any search fields to our query. This is the limited list
-        // of fields that will be returned in the solr result
-        for (String fieldName : discoveryQuery.getSearchFields()) {
-            solrQuery.addField(fieldName);
+        if (discoveryQuery.getMaxResults() != 0) {
+            // set search fields in Solr query only if we are interested in the actual search results
+
+            // Add any search fields to our query. This is the limited list
+            // of fields that will be returned in the solr result
+            for (String fieldName : discoveryQuery.getSearchFields()) {
+                solrQuery.addField(fieldName);
+            }
+            // Also ensure a few key obj identifier fields are returned with every query
+            solrQuery.addField(SearchUtils.RESOURCE_TYPE_FIELD);
+            solrQuery.addField(SearchUtils.RESOURCE_ID_FIELD);
+            solrQuery.addField(SearchUtils.RESOURCE_UNIQUE_ID);
+            solrQuery.addField(STATUS_FIELD);
         }
-        // Also ensure a few key obj identifier fields are returned with every query
-        solrQuery.addField(SearchUtils.RESOURCE_TYPE_FIELD);
-        solrQuery.addField(SearchUtils.RESOURCE_ID_FIELD);
-        solrQuery.addField(SearchUtils.RESOURCE_UNIQUE_ID);
-        solrQuery.addField(STATUS_FIELD);
 
         if (discoveryQuery.isSpellCheck()) {
             solrQuery.setParam(SpellingParams.SPELLCHECK_Q, query);

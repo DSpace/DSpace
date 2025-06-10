@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>9.0-SNAPSHOT</version>
+        <version>10.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -102,7 +102,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.1</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -501,10 +501,6 @@
             <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>jakarta.el</groupId>
-            <artifactId>jakarta.el-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
         </dependency>
@@ -738,7 +734,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.12.782</version>
+            <version>1.12.785</version>
         </dependency>
 
         <!-- TODO: This may need to be replaced with the "orcid-model" artifact once this ticket is resolved:
@@ -774,11 +770,12 @@
             <version>1.19.0</version>
             <scope>test</scope>
         </dependency>
+
         <!-- Used for Solr core export/import -->
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>5.10</version>
+            <version>5.11.1</version>
         </dependency>
 
         <!-- Email templating -->
@@ -791,7 +788,7 @@
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
-            <version>2.10.0</version>
+            <version>2.10.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -873,7 +870,7 @@
             <artifactId>jclouds-core</artifactId>
             <version>${jclouds.version}</version>
             <exclusions>
-               <exclusion>
+                <exclusion>
                     <groupId>com.google.code.gson</groupId>
                     <artifactId>gson</artifactId>
                 </exclusion>
@@ -942,5 +939,10 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

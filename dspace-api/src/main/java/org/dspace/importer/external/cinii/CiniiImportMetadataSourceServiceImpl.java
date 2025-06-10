@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
-import jakarta.el.MethodNotFoundException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpException;
@@ -113,7 +112,7 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for Cinii");
+        throw new UnsupportedOperationException("This method is not implemented for Cinii");
     }
 
     public String getUrl() {

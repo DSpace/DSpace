@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.json.JSONObject;
 
 /**
@@ -97,7 +97,7 @@ public final class OrcidFactoryUtils {
             httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
             HttpResponse response;
-            try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+            try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
                 response = httpClient.execute(httpPost);
             }
             JSONObject responseObject = null;

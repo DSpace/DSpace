@@ -426,6 +426,68 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void findOneWithdrawnAsCollectionAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create collection admin account
+        EPerson collectionAdmin = EPersonBuilder.createEPerson(context)
+            .withEmail("collection-admin@dspace.com")
+            .withPassword("test")
+            .withCanLogin(true)
+            .build();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+
+        // Create collection
+        Collection adminCollection = CollectionBuilder.createCollection(context, child1)
+            .withName("Collection Admin col")
+            .withAdminGroup(collectionAdmin)
+            .build();
+        Collection noAdminCollection =
+            CollectionBuilder.createCollection(context, child1).withName("Collection non Admin")
+                .build();
+
+        // both items are withdrawn
+        Item administeredItem = ItemBuilder.createItem(context, adminCollection)
+            .withTitle("Public item 1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald").withAuthor("Doe, John")
+            .withSubject("ExtraEntry")
+            .withdrawn()
+            .build();
+
+        Item nonAdministeredItem = ItemBuilder.createItem(context, noAdminCollection)
+            .withTitle("Public item 2")
+            .withIssueDate("2016-02-13")
+            .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+            .withSubject("TestingForMore").withSubject("ExtraEntry")
+            .withdrawn()
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String collectionAdmintoken = getAuthToken(collectionAdmin.getEmail(), "test");
+
+        // Metadata are retrieved since user is administering the item's collection
+        getClient(collectionAdmintoken).perform(get("/api/core/items/" + administeredItem.getID())
+                .param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata").isNotEmpty());
+
+        // No metadata is retrieved since user is not administering the item's collection
+        getClient().perform(get("/api/core/items/" + nonAdministeredItem.getID())
+            .param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata").isEmpty());
+
+
+    }
+
+    @Test
     public void findOneFullProjectionTest() throws Exception {
         context.turnOffAuthorisationSystem();
 

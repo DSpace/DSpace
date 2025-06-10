@@ -169,13 +169,7 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
         }
         initializeAccessToken();
         InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"), accessToken);
-        Person person = converter.convertSinglePerson(bioDocument);
-        try {
-            bioDocument.close();
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
-        return person;
+        return converter.convertSinglePerson(bioDocument);
     }
 
     /**
@@ -219,11 +213,6 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
                     bios.add(bio);
                 }
             }
-        }
-        try {
-            bioDocument.close();
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
         }
         return bios.stream().map(bio -> convertToExternalDataObject(bio)).collect(Collectors.toList());
     }
