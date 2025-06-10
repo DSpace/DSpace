@@ -7,6 +7,8 @@
  */
 package org.dspace.matomo.client;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -18,8 +20,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.dspace.AbstractUnitTest;
 import org.dspace.matomo.exception.MatomoClientException;
 import org.dspace.matomo.model.MatomoRequestDetails;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -44,7 +46,7 @@ public class MatomoClientImplTest extends AbstractUnitTest {
 
     MatomoClientImpl matomoClient;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         matomoClient = new MatomoClientImpl("testURL", "custom-token", builder, reader, httpClient);
     }
@@ -101,43 +103,47 @@ public class MatomoClientImplTest extends AbstractUnitTest {
         Mockito.verify(this.httpClient, Mockito.times(2)).execute(Mockito.any(HttpPost.class));
     }
 
-    @Test(expected = MatomoClientException.class)
-    public void testFailSingleRequest() throws IOException {
+    @Test
+    public void testFailSingleRequest() {
+        assertThrows(MatomoClientException.class, () -> {
 
-        MatomoRequestDetails details =
-            new MatomoRequestDetails()
-                .addParameter("test1", "value1")
-                .addParameter("test2", "value2")
-                .addParameter("test3", "value3");
+            MatomoRequestDetails details =
+                new MatomoRequestDetails()
+                    .addParameter("test1", "value1")
+                    .addParameter("test2", "value2")
+                    .addParameter("test3", "value3");
 
-        String json =
-            "{'auth_token': 'custom-token', 'requests': ['?test1=value1&test2=value2&test3=value3']}";
-        StatusLine statusLine = Mockito.mock(StatusLine.class);
-        Mockito.when(builder.buildJSON(Mockito.any())).thenReturn(json);
-        Mockito.when(statusLine.getStatusCode()).thenReturn(500);
-        Mockito.when(response.getStatusLine()).thenReturn(statusLine);
-        Mockito.when(this.httpClient.execute(Mockito.any(HttpPost.class))).thenReturn(response);
+            String json =
+                "{'auth_token': 'custom-token', 'requests': ['?test1=value1&test2=value2&test3=value3']}";
+            StatusLine statusLine = Mockito.mock(StatusLine.class);
+            Mockito.when(builder.buildJSON(Mockito.any())).thenReturn(json);
+            Mockito.when(statusLine.getStatusCode()).thenReturn(500);
+            Mockito.when(response.getStatusLine()).thenReturn(statusLine);
+            Mockito.when(this.httpClient.execute(Mockito.any(HttpPost.class))).thenReturn(response);
 
-        this.matomoClient.sendDetails(List.of(details));
+            this.matomoClient.sendDetails(List.of(details));
+        });
     }
 
 
-    @Test(expected = MatomoClientException.class)
-    public void testExceptionRequest() throws IOException {
+    @Test
+    public void testExceptionRequest() {
+        assertThrows(MatomoClientException.class, () -> {
 
-        MatomoRequestDetails details =
-            new MatomoRequestDetails()
-                .addParameter("test1", "value1")
-                .addParameter("test2", "value2")
-                .addParameter("test3", "value3");
+            MatomoRequestDetails details =
+                new MatomoRequestDetails()
+                    .addParameter("test1", "value1")
+                    .addParameter("test2", "value2")
+                    .addParameter("test3", "value3");
 
-        String json =
-            "{'auth_token': 'custom-token', 'requests': ['?test1=value1&test2=value2&test3=value3']}";
-        Mockito.when(builder.buildJSON(Mockito.any())).thenReturn(json);
-        Mockito.doThrow(IOException.class)
-               .when(this.httpClient)
-               .execute(Mockito.any(HttpPost.class));
-        this.matomoClient.sendDetails(List.of(details));
+            String json =
+                "{'auth_token': 'custom-token', 'requests': ['?test1=value1&test2=value2&test3=value3']}";
+            Mockito.when(builder.buildJSON(Mockito.any())).thenReturn(json);
+            Mockito.doThrow(IOException.class)
+                .when(this.httpClient)
+                .execute(Mockito.any(HttpPost.class));
+            this.matomoClient.sendDetails(List.of(details));
+        });
     }
 
 
