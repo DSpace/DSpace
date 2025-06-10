@@ -120,6 +120,9 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
+      - dependency-name: "org.hibernate.*:*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -238,6 +241,9 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
+      - dependency-name: "org.hibernate.*:*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
@@ -356,6 +362,9 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
+      - dependency-name: "org.hibernate.*:*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
@@ -493,6 +502,9 @@ updates:
       # See https://github.com/DSpace/DSpace/pull/9888#issuecomment-2408165545
       - dependency-name: "org.springframework.security:*"
         versions: [">=5.8.0"]
+      # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
+      - dependency-name: "org.hibernate.*:*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
