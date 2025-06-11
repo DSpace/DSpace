@@ -69,8 +69,8 @@ database is not previously initialized. If you would like to reinitialize the
 database, stop the dspacedb container and delete the volume.
 
 ```zsh
-$ docker-compose -p d7 down
-$ docker volume rm d7_pgdata
+$ docker-compose -p d8 down
+$ docker volume rm d8_pgdata
 ```
 
 ---
