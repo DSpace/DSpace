@@ -54,11 +54,6 @@
             </exclusions>
         </dependency>
 
-        <!-- additional dependencies for the sword-common code -->
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
