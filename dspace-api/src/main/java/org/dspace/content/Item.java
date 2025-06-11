@@ -113,7 +113,13 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     private boolean modifiedMetadataCache = true;
 
     @Transient
+    private boolean modifiedRelationshipMetadataCache = true;
+
+    @Transient
     private List<MetadataValue> cachedMetadata = new ArrayList<>();
+
+    @Transient
+    private List<RelationshipMetadataValue> cachedRelationshipMetadata = new ArrayList<>();
 
     /**
      * Protected constructor, create object using:
@@ -401,5 +407,23 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     protected void setCachedMetadata(List<MetadataValue> cachedMetadata) {
         this.cachedMetadata = cachedMetadata;
         modifiedMetadataCache = false;
+    }
+
+    public boolean isModifiedRelationshipMetadataCache() {
+        return modifiedRelationshipMetadataCache;
+    }
+
+    protected void setRelationshipMetadataModified() {
+        super.setMetadataModified();
+        modifiedRelationshipMetadataCache = true;
+    }
+
+    protected List<RelationshipMetadataValue> getCachedRelationshipMetadata() {
+        return cachedRelationshipMetadata;
+    }
+
+    protected void setCachedRelationshipMetadata(List<RelationshipMetadataValue> cachedRelationshipMetadata) {
+        this.cachedRelationshipMetadata = cachedRelationshipMetadata;
+        modifiedRelationshipMetadataCache = false;
     }
 }

@@ -1650,29 +1650,31 @@ prevent the generation of resource policy entry values with null dspace_object a
             log.debug("Called getMetadata for " + item.getID() + " without enableVirtualMetadata");
             return super.getMetadata(item, schema, element, qualifier, lang);
         }
-        if (item.isModifiedMetadataCache()) {
-            log.debug("Called getMetadata for " + item.getID() + " with invalid cache");
-            //rebuild cache
-            List<MetadataValue> dbMetadataValues = item.getMetadata();
 
-            List<MetadataValue> fullMetadataValueList = new LinkedList<>();
-            fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
-            fullMetadataValueList.addAll(dbMetadataValues);
+        List<MetadataValue> fullMetadataValueList = new LinkedList<>();
+        boolean metadataModified = item.isModifiedMetadataCache();
+        boolean relationshipMetadataModified = item.isModifiedRelationshipMetadataCache();
 
-            item.setCachedMetadata(MetadataValueComparators.sort(fullMetadataValueList));
+        if (metadataModified) {
+            log.debug("Called getMetadata for " + item.getID() + " with invalid metadata cache");
+            List<MetadataValue> metadata = item.getMetadata();
+            item.setCachedMetadata(MetadataValueComparators.sort(metadata));
+            fullMetadataValueList.addAll(metadata);
+        } else {
+            fullMetadataValueList.addAll(item.getCachedMetadata());
         }
 
-        log.debug("Called getMetadata for " + item.getID() + " based on cache");
-        // Build up list of matching values based on the cache
-        List<MetadataValue> values = new ArrayList<>();
-        for (MetadataValue dcv : item.getCachedMetadata()) {
-            if (match(schema, element, qualifier, lang, dcv)) {
-                values.add(dcv);
-            }
+        if (relationshipMetadataModified) {
+            log.debug("Called getMetadata for " + item.getID() + " with invalid relationship metadata cache");
+            List<RelationshipMetadataValue> relationshipMetadata =
+                    relationshipMetadataService.getRelationshipMetadata(item, true);
+            item.setCachedRelationshipMetadata(MetadataValueComparators.sort(relationshipMetadata));
+            fullMetadataValueList.addAll(relationshipMetadata);
+        } else {
+            fullMetadataValueList.addAll(item.getCachedRelationshipMetadata());
         }
 
-        // Create an array of matching values
-        return values;
+        return fullMetadataValueList;
     }
 
     /**

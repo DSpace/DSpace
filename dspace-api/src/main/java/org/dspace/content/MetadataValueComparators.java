@@ -41,10 +41,10 @@ public final class MetadataValueComparators {
      * @param metadataValues
      * @return {@code List<MetadataValue>} ordered copy list using stream.
      */
-    public static final List<MetadataValue> sort(List<MetadataValue> metadataValues) {
+    public static final <T extends MetadataValue> List<T> sort(List<T> metadataValues) {
         return metadataValues
                 .stream()
-                .sorted(MetadataValueComparators.defaultComparator)
+                .sorted(defaultComparator)
                 .collect(Collectors.toList());
     }
 
