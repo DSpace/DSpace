@@ -30,6 +30,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.SolrSearchCore;
 import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,24 +125,33 @@ public class EntityTypeServiceImpl implements EntityTypeService {
     public List<String> getSubmitAuthorizedTypes(Context context)
             throws SQLException, SolrServerException, IOException {
         List<String> types = new ArrayList<>();
-        StringBuilder query = new StringBuilder();
-        org.dspace.eperson.EPerson currentUser = context.getCurrentUser();
+        StringBuilder query = null;
+        EPerson currentUser = context.getCurrentUser();
         if (!authorizeService.isAdmin(context)) {
             String userId = "";
             if (currentUser != null) {
                 userId = currentUser.getID().toString();
+                query = new StringBuilder();
+                query.append("submit:(e").append(userId);
             }
-            query.append("submit:(e").append(userId);
+
             Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
             for (Group group : groups) {
-                query.append(" OR g").append(group.getID());
+                if (query == null) {
+                    query = new StringBuilder();
+                    query.append("submit:(g");
+                } else {
+                    query.append(" OR g");
+                }
+                query.append(group.getID());
             }
             query.append(")");
-        } else {
-            query.append("*:*");
         }
 
-        SolrQuery sQuery = new SolrQuery(query.toString());
+        SolrQuery sQuery = new SolrQuery("*:*");
+        if (query != null) {
+            sQuery.addFilterQuery(query.toString());
+        }
         sQuery.addFilterQuery("search.resourcetype:" + IndexableCollection.TYPE);
         sQuery.setRows(0);
         sQuery.addFacetField("search.entitytype");
