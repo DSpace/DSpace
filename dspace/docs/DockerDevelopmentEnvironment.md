@@ -192,13 +192,13 @@ To start debugging,
 
 ```zsh
 # To stop all the containers
-$ docker compose -p d7 stop
+$ docker compose -p d8 stop
 
 # To stop just the dspace container
-$ docker compose -p d7 stop dspace
+$ docker compose -p d8 stop dspace
 
 # To restart just the dspace container
-$ docker compose -p d7 restart dspace
+$ docker compose -p d8 restart dspace
 
 # To attach to the dspace container
 $ docker exec -it dspace bash
@@ -207,9 +207,9 @@ $ docker exec -it dspace bash
 ## Create an administrator user
 
 ```zsh
-$ docker compose -p d7 -f docker-compose-cli.yml run dspace-cli create-administrator
+$ docker compose -p d8 -f docker-compose-cli.yml run dspace-cli create-administrator
 $ docker exec -it dspace /dspace/bin/dspace create-administrator
-Creating d7_dspace-cli_run ... done
+Creating d8_dspace-cli_run ... done
 Creating an initial administrator account
 E-mail address: <EMAIL_ADDRESS>
 First name: <FIRST_NAME>

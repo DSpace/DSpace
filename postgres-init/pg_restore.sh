@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# Retreive the directory where the script resides
+# Retrieve the directory where the script resides
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Switch to the script directory

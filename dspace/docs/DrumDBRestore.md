@@ -1,7 +1,7 @@
 # DRUM Database Restore
 
 **Note:** The following steps describe retrieving a DRUM DSpace database
-snapshot from Kubernetes with use with DRUM for local development.
+snapshot from Kubernetes for use with DRUM for local development.
 
 1) Switch the appropriate Kubernetes namespace from which the database snapshot
    should be retrieved (the following example uses the Kubernetes "test"
@@ -28,7 +28,7 @@ snapshot from Kubernetes with use with DRUM for local development.
    Start the "dspacedb" container and wait for the restore to complete.
 
     ```bash
-    $ docker compose -p d7 up -d dspacedb
+    $ docker compose -p d8 up -d dspacedb
     ```
 
     To determine if the restore is complete, run the following command, and wait

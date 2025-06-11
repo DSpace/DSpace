@@ -32,9 +32,6 @@ services:
     # Mount local [src]/dspace/config/ to container. This syncs your local configs with container
     # NOTE: Environment variables specified above will OVERRIDE any configs in local.cfg or dspace.cfg
     - ./dspace/config:/dspace/config
-    # UMD Customization
-    - ./dspace/src/main/docker-compose/local.cfg:/dspace/config/local.cfg
-    # End UMD Customization
     entrypoint: /dspace/bin/dspace
     command: help
     tty: true
