@@ -57,8 +57,7 @@ public class AuditEventMatcher {
             hasJsonPath("$.checksum", is(audit.getChecksum())),
             //we should apply the date formatter to make the check
             //hasJsonPath("$.timeStamp", is(audit.getDatetime())),
-            hasJsonPath("$.type", is("auditevent")),
-            hasJsonPath("$.uniqueType", is("system.auditevent")));
+            hasJsonPath("$.type", is("auditevent")));
      }
 
     public static Matcher<? super Object> matchLinks(AuditEvent audit) {

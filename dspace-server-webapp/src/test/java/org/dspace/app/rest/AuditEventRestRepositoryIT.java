@@ -60,10 +60,10 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
     @Autowired
     private BitstreamService bitstreamService;
 
-    private void loadSomeObjects(boolean enabled) throws Exception {
+    private void loadSomeObjects(boolean setDisabled) throws Exception {
         auditService.deleteEvents(context, null, null);
 
-        if (!enabled) {
+        if (configurationService.getBooleanProperty("audit.enabled", true) && setDisabled) {
             // enable the audit system for this test
             configurationService.setProperty("audit.enabled", false);
         }
@@ -74,6 +74,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
         collection = CollectionBuilder.createCollection(context, parentCommunity).withName("My Collection").build();
         item = ItemBuilder.createItem(context, collection).withTitle("My Item").withAuthor("Test, Author")
                 .withIssueDate("2020-10-31").build();
+        context.commit();
         auditService.commit();
         context.restoreAuthSystemState();
     }
