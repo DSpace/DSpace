@@ -103,8 +103,8 @@ public class AuditService {
     }
 
     private boolean isProcessableEvent(Event event) {
-        return DetailType.BITSTREAM_CHECKSUM.equals(event.getDetail().getDetailKey())
-            || DetailType.DSO_SUMMARY.equals(event.getDetail().getDetailKey());
+        return event.getDetail() != null && (DetailType.BITSTREAM_CHECKSUM.equals(event.getDetail().getDetailKey())
+            || DetailType.DSO_SUMMARY.equals(event.getDetail().getDetailKey()));
     }
 
     /**
@@ -205,12 +205,7 @@ public class AuditService {
             !detail.getDetailKey().equals(DetailType.BITSTREAM_CHECKSUM)) {
             return "";
         }
-        List<Object> checksum = (List<Object>)detail.getDetailObject();
-        return checksum
-            .stream()
-            .map(String.class::cast)
-            .findFirst()
-            .orElse("");
+        return (String)detail.getDetailObject();
     }
 
     private AuditEvent getAuditEvent(Context context, Event event, MetadataEvent metadataEvent) {

@@ -60,13 +60,9 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
     @Autowired
     private BitstreamService bitstreamService;
 
-    private void loadSomeObjects(boolean setDisabled) throws Exception {
+    private void loadSomeObjects() throws Exception {
         auditService.deleteEvents(context, null, null);
 
-        if (configurationService.getBooleanProperty("audit.enabled", true) && setDisabled) {
-            // enable the audit system for this test
-            configurationService.setProperty("audit.enabled", false);
-        }
         // We turn off the authorization system in order to create the structure as
         // defined below
         context.turnOffAuthorisationSystem();
@@ -89,7 +85,8 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void findAllTest() throws Exception {
-        loadSomeObjects(true);
+        configurationService.setProperty("audit.enabled", true);
+        loadSomeObjects();
         List<AuditEvent> events = auditService.findAllEvents(context, Integer.MAX_VALUE, 0, false);
         assertTrue(events.size() > 0);
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -104,7 +101,8 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void findAllNotAdminTest() throws Exception {
-        loadSomeObjects(true);
+        configurationService.setProperty("audit.enabled", true);
+        loadSomeObjects();
         // anonymous cannot access the auditevents endpoint
         getClient().perform(get("/api/system/auditevents")).andExpect(status().isUnauthorized());
         // nor normal user
@@ -114,7 +112,8 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void findAllDisabledTest() throws Exception {
-        loadSomeObjects(false);
+        configurationService.setProperty("audit.enabled", false);
+        loadSomeObjects();
         List<AuditEvent> events = auditService.findAllEvents(context, Integer.MAX_VALUE, 0, false);
         assertEquals(0, events.size());
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -123,10 +122,10 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void findAllPaginationTest() throws Exception {
-        loadSomeObjects(false);
+        configurationService.setProperty("audit.enabled", true);
+        loadSomeObjects();
         // enable now the audit system to have a predictable number of events
         context.turnOffAuthorisationSystem();
-        configurationService.setProperty("audit.enabled", true);
         AuditEvent audit = AuditEventBuilder.createAuditEvent(context).withEpersonUUID(eperson.getID())
                 .withDetail("some information").withEventType("ADD").withSubject(collection).withObject(item).build();
         AuditEvent auditWithMissingEperson = AuditEventBuilder.createAuditEvent(context)
@@ -206,10 +205,10 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void findOneTest() throws Exception {
-        loadSomeObjects(false);
+        configurationService.setProperty("audit.enabled", true);
+        loadSomeObjects();
         // enable now the audit system to have a predictable number of events
         context.turnOffAuthorisationSystem();
-        configurationService.setProperty("audit.enabled", true);
         AuditEvent audit = AuditEventBuilder.createAuditEvent(context).withEpersonUUID(eperson.getID())
                 .withDetail("some information").withEventType("ADD").withSubject(collection).withObject(item).build();
         AuditEvent auditWithMissingEperson = AuditEventBuilder.createAuditEvent(context)
@@ -270,10 +269,10 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void findOneNotAdminTest() throws Exception {
-        loadSomeObjects(false);
+        configurationService.setProperty("audit.enabled", true);
+        loadSomeObjects();
         // enable now the audit system to have a predictable number of events
         context.turnOffAuthorisationSystem();
-        configurationService.setProperty("audit.enabled", true);
         AuditEvent audit = AuditEventBuilder.createAuditEvent(context).withEpersonUUID(eperson.getID())
                 .withDetail("some information").withEventType("ADD").withSubject(collection).withObject(item).build();
         auditService.commit();
@@ -294,7 +293,8 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void findByObjectTest() throws Exception {
-        loadSomeObjects(true);
+        configurationService.setProperty("audit.enabled", true);
+        loadSomeObjects();
         List<AuditEvent> events = auditService.findEvents(context, item.getID(), null, null, Integer.MAX_VALUE, 0,
                 false);
         assertTrue(events.size() > 0);
@@ -319,7 +319,8 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void findByObjectNotAdminTest() throws Exception {
-        loadSomeObjects(true);
+        configurationService.setProperty("audit.enabled", true);
+        loadSomeObjects();
         // anonymous cannot access the auditevents endpoint
         getClient().perform(get("/api/system/auditevents/search/findByObject")
                         .param("object", item.getID().toString()))
@@ -333,7 +334,8 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void findByObjectDisabledTest() throws Exception {
-        loadSomeObjects(false);
+        configurationService.setProperty("audit.enabled", false);
+        loadSomeObjects();
         List<AuditEvent> events = auditService.findAllEvents(context, Integer.MAX_VALUE, 0, false);
         assertEquals(0, events.size());
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -344,10 +346,10 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void findByObjectPaginationTest() throws Exception {
-        loadSomeObjects(false);
+        configurationService.setProperty("audit.enabled", true);
+        loadSomeObjects();
         // enable now the audit system to have a predictable number of events
         context.turnOffAuthorisationSystem();
-        configurationService.setProperty("audit.enabled", true);
         AuditEvent audit = AuditEventBuilder.createAuditEvent(context).withEpersonUUID(eperson.getID())
                 .withDetail("some information").withEventType("ADD").withSubject(collection).withObject(item).build();
         AuditEvent auditWithMissingEperson = AuditEventBuilder.createAuditEvent(context)
@@ -418,7 +420,8 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void findByObjectBitstreamTest() throws Exception {
-        loadSomeObjects(true);
+        configurationService.setProperty("audit.enabled", true);
+        loadSomeObjects();
         context.turnOffAuthorisationSystem();
         Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, InputStream.nullInputStream())
                                               .withName("test image")

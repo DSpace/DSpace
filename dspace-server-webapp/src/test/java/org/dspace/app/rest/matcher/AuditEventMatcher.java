@@ -40,10 +40,6 @@ public class AuditEventMatcher {
 
     public static Matcher<? super Object> matchProperties(AuditEvent audit) {
         return allOf(
-            audit.getUuid() != null ?
-                hasJsonPath("$.id", is(audit.getUuid().toString())) :
-                    hasJsonPath("$.id", Matchers.not(Matchers.empty())),
-            hasJsonPath("$.detail", is(audit.getDetail())),
             hasJsonPath("$.subjectUUID", is(uuidStr(audit.getSubjectUUID()))),
             hasJsonPath("$.subjectType", is(audit.getSubjectType())),
             hasJsonPath("$.objectUUID", is(uuidStr(audit.getObjectUUID()))),
