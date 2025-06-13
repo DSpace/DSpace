@@ -22,7 +22,7 @@
         <spring.version>6.2.7</spring.version>
         <spring-boot.version>3.5.0</spring-boot.version>
         <spring-security.version>6.5.0</spring-security.version> <!-- sync with version used by spring-boot-->
-        <hibernate.version>6.4.8.Final</hibernate.version>
+        <hibernate.version>6.4.10.Final</hibernate.version>
         <hibernate-validator.version>8.0.2.Final</hibernate-validator.version>
         <postgresql.driver.version>42.7.6</postgresql.driver.version>
         <flyway.version>10.22.0</flyway.version>
