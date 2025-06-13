@@ -1674,7 +1674,15 @@ prevent the generation of resource policy entry values with null dspace_object a
             fullMetadataValueList.addAll(item.getCachedRelationshipMetadata());
         }
 
-        return fullMetadataValueList;
+        // Build up list of matching values based on the cache
+        List<MetadataValue> values = new ArrayList<>();
+        for (MetadataValue dcv : fullMetadataValueList) {
+            if (match(schema, element, qualifier, lang, dcv)) {
+                values.add(dcv);
+            }
+        }
+
+        return values;
     }
 
     /**
