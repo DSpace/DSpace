@@ -183,13 +183,13 @@ public class RelationshipServiceImpl implements RelationshipService {
             // metadata on the next update.
             // Set the Relationship's Items to the new ones, appending to the end
             if (newLeftItem != null) {
-                relationship.getLeftItem().setMetadataModified();
+                relationship.getLeftItem().setRelationshipMetadataModified();
                 relationship.setLeftItem(newLeftItem);
                 relationship.setLeftPlace(-1);
                 insertLeft = true;
             }
             if (newRightItem != null) {
-                relationship.getRightItem().setMetadataModified();
+                relationship.getRightItem().setRelationshipMetadataModified();
                 relationship.setRightItem(newRightItem);
                 relationship.setRightPlace(-1);
                 insertRight = true;
@@ -523,7 +523,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Override
     public void updateItem(Context context, Item relatedItem)
         throws SQLException, AuthorizeException {
-        relatedItem.setMetadataModified();
+        relatedItem.setRelationshipMetadataModified();
         itemService.update(context, relatedItem);
     }
 
