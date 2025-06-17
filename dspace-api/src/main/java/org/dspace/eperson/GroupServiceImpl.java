@@ -44,7 +44,9 @@ import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.event.EventDetail;
 import org.dspace.util.UUIDUtils;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -140,8 +142,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         group.addMember(e);
         e.getGroups().add(group);
         context.addEvent(
-            new Event(Event.ADD, Constants.GROUP, group.getID(), Constants.EPERSON, e.getID(), e.getEmail(),
-                      getIdentifiers(context, group)));
+            new Event(Event.ADD, Constants.GROUP, group.getID(), Constants.EPERSON, e.getID(),
+                new EventDetail(DetailType.EPERSON_EMAIL, e.getEmail()),
+                getIdentifiers(context, group)));
     }
 
     @Override
@@ -156,7 +159,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         groupChild.addParentGroup(groupParent);
 
         context.addEvent(new Event(Event.ADD, Constants.GROUP, groupParent.getID(), Constants.GROUP, groupChild.getID(),
-                                   groupChild.getName(), getIdentifiers(context, groupParent)));
+            new EventDetail(DetailType.DSO_NAME, groupChild.getName()), getIdentifiers(context, groupParent)));
     }
 
     /**
@@ -213,7 +216,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         }
         if (group.remove(ePerson)) {
             context.addEvent(new Event(Event.REMOVE, Constants.GROUP, group.getID(), Constants.EPERSON, ePerson.getID(),
-                                       ePerson.getEmail(), getIdentifiers(context, group)));
+                new EventDetail(DetailType.EPERSON_EMAIL, ePerson.getEmail()), getIdentifiers(context, group)));
         }
     }
 
@@ -241,7 +244,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             childGroup.removeParentGroup(groupParent);
             context.addEvent(
                 new Event(Event.REMOVE, Constants.GROUP, groupParent.getID(), Constants.GROUP, childGroup.getID(),
-                          childGroup.getName(), getIdentifiers(context, groupParent)));
+                    new EventDetail(DetailType.DSO_NAME, childGroup.getName()), getIdentifiers(context, groupParent)));
         }
     }
 
@@ -547,7 +550,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         }
 
         context.addEvent(new Event(Event.DELETE, Constants.GROUP, group.getID(),
-                                   group.getName(), getIdentifiers(context, group)));
+            new EventDetail(DetailType.DSO_NAME, group.getName()), getIdentifiers(context, group)));
 
         // Remove any ResourcePolicies that reference this group
         authorizeService.removeGroupPolicies(context, group);
@@ -652,8 +655,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         groupDAO.save(context, group);
 
         if (group.isMetadataModified()) {
-            context.addEvent(new Event(Event.MODIFY_METADATA, Constants.GROUP, group.getID(), group.getDetails(),
-                                       getIdentifiers(context, group)));
+            context.addEvent(new Event(Event.MODIFY_METADATA, Constants.GROUP, group.getID(),
+                new EventDetail(DetailType.DSO_SUMMARY, group.getDetails()),
+                getIdentifiers(context, group)));
             group.clearDetails();
         }
 
