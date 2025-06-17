@@ -30,6 +30,7 @@
         <name-map collection-entity-type="CustomEntityType" submission-name="entitytypetest"/>
         <name-map collection-handle="123456789/test-duplicate-detection" submission-name="test-duplicate-detection"/>
         <name-map collection-handle="123456789/collection-test-patch" submission-name="publicationTestPatch"/>
+        <name-map collection-handle="123456789/enforced-relation" submission-name="enforcedRelation"/>
     </submission-map>
 
 
@@ -200,6 +201,13 @@
             <processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
             <type>upload</type>
         </step-definition>
+
+        <step-definition id="publicationStep" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -303,6 +311,10 @@
             <step id="collection"/>
             <step id="duplicates"/>
             <step id="traditionalpageone"/>
+        </submission-process>
+
+        <submission-process name="enforcedRelation">
+            <step id="publicationStep"></step>
         </submission-process>
 
         <submission-process name="publicationTestPatch">
