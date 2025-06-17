@@ -425,7 +425,7 @@ public abstract class JWTTokenHandler {
     /**
      * Generate a random 32 bytes key
      */
-    private String generateRandomKey() {
+    String generateRandomKey() {
         //24 bytes because BASE64 encoding makes this 32 bytes
         //Base64 takes 4 characters for every 3 bytes
 
