@@ -150,10 +150,6 @@
     </util:map>
 
 
-    <bean class="java.lang.Integer" id="maxRetry">
-        <constructor-arg value="2"/>
-    </bean>
-
     <bean class="org.dspace.importer.external.pubmed.metadatamapping.transform.GeneratePubmedQueryService" id="pubmedService">
         <description>Defines how an org.dspace.content.Item is mapped to a query in scopus. Please note that exactly one of
             these must be present. If multiple are present the result is undefined.
