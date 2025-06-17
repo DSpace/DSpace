@@ -82,6 +82,10 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
 
     private Map<String, String> disambiguatedOrganizationIdentifierFields = new HashMap<>();
 
+    private int maxContributorValueLength;
+
+    private int maxDescriptionValueLength;
+
     @Override
     public Optional<FuzzyDate> createFuzzyDate(MetadataValue metadataValue) {
 
@@ -119,7 +123,7 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
         }
 
         Contributor contributor = new Contributor();
-        contributor.setCreditName(new CreditName(metadataValue.getValue()));
+        contributor.setCreditName(new CreditName(shortenContributorName(metadataValue.getValue())));
         contributor.setContributorAttributes(getContributorAttributes(metadataValue, role));
 
         return of(contributor);
@@ -134,7 +138,7 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
         }
 
         FundingContributor contributor = new FundingContributor();
-        contributor.setCreditName(new CreditName(metadataValue.getValue()));
+        contributor.setCreditName(new CreditName(shortenContributorName(metadataValue.getValue())));
         contributor.setContributorAttributes(getFundingContributorAttributes(metadataValue, role));
 
         return of(contributor);
@@ -164,6 +168,28 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
         }
 
         return country.map(isoCountry -> new Country(isoCountry));
+    }
+
+    @Override
+    public String shortenDescription(String metadataValue) {
+        if (getMaxContributorValueLength() > 4 && StringUtils.isNotBlank(metadataValue)
+            && metadataValue.length() > getMaxDescriptionValueLength()) {
+            return metadataValue.substring(0, getMaxDescriptionValueLength() - 4) + "...";
+        }
+        return metadataValue;
+    }
+
+    /**
+     * Shorten the value aligned to orcid string-150 data type and add some ellipses value
+     * @param metadataValue
+     * @return shortened value when to long or the original value
+     */
+    private String shortenContributorName(String metadataValue) {
+        if (getMaxContributorValueLength() > 4 && StringUtils.isNotBlank(metadataValue)
+            && metadataValue.length() > getMaxContributorValueLength()) {
+            return metadataValue.substring(0, getMaxContributorValueLength() - 4) + "...";
+        }
+        return metadataValue;
     }
 
     private ContributorAttributes getContributorAttributes(MetadataValue metadataValue, ContributorRole role) {
@@ -297,4 +323,19 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
         this.organizationTitleField = organizationTitleField;
     }
 
+    public int getMaxContributorValueLength() {
+        return maxContributorValueLength;
+    }
+
+    public void setMaxContributorValueLength(int maxContributorValueLength) {
+        this.maxContributorValueLength = maxContributorValueLength;
+    }
+
+    public int getMaxDescriptionValueLength() {
+        return maxDescriptionValueLength;
+    }
+
+    public void setMaxDescriptionValueLength(int maxDescriptionValueLength) {
+        this.maxDescriptionValueLength = maxDescriptionValueLength;
+    }
 }
