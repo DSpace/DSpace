@@ -22,6 +22,7 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authority.AuthorityValueServiceImpl;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
+import org.dspace.authority.orcid.MockOrcid;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
@@ -29,11 +30,13 @@ import org.dspace.content.authority.DCInputAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 /**
  * This class handles all Authority related IT. It alters some config to run the tests, but it gets cleared again
@@ -56,6 +59,17 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     @Before
     public void setup() throws Exception {
         super.setUp();
+
+        // Explicitly set stubbing for the MockOrcid class. We don't do it in the init() or constructor
+        // of the MockOrcid class itself or Mockito will complain of unnecessary stubbing in certain other
+        // AbstractIntegrationTest implementations (depending on how config is (re)loaded)
+        ApplicationContext applicationContext = DSpaceServicesFactory.getInstance()
+                .getServiceManager().getApplicationContext();
+        MockOrcid mockOrcid = applicationContext.getBean(MockOrcid.class);
+        mockOrcid.setupNoResultsSearch();
+        mockOrcid.setupSingleSearch();
+        mockOrcid.setupSearchWithResults();
+
         configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
                 new String[] {
                         "org.dspace.content.authority.SolrAuthority = SolrAuthorAuthority",

@@ -20,6 +20,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpResponseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.action.LDNAction;
 import org.dspace.app.ldn.action.LDNActionStatus;
 import org.dspace.app.ldn.model.Notification;
@@ -59,6 +60,8 @@ public class LDNMetadataProcessor implements LDNProcessor {
         "Announce",
         "TentativeReject",
         "Accept",
+        "TentativeAccept",
+        "Reject",
         "coar-notify:ReviewAction",
         "coar-notify:IngestAction",
         "coar-notify:EndorsementAction");
@@ -152,7 +155,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
     }
 
     /**
-     * Lookup associated item to the notification context. If UUID in URL, lookup bu
+     * Lookup associated item to the notification context. If UUID in URL, lookup by
      * UUID, else lookup by handle.
      *
      * @param context      current context
@@ -168,7 +171,22 @@ public class LDNMetadataProcessor implements LDNProcessor {
         String url = null;
 
         if (CONTEXT_ID_ITEM_TYPES.containsAll(notification.getType())) {
-            url = notification.getContext().getId();
+            if (notification.getContext() != null) {
+                url = notification.getContext().getId();
+            } else if (notification.getInReplyTo() != null) {
+                // Find context information (the item this notification relates to) via the inReplyTo notification ID
+                LDNMessageEntity inReplyToldnMessageEntity =
+                        ldnMessageService.find(context, notification.getInReplyTo());
+                if (inReplyToldnMessageEntity != null) {
+                    String dspaceUrl = configurationService.getProperty("dspace.ui.url")
+                            + "/handle/";
+                    url = dspaceUrl + inReplyToldnMessageEntity.getObject().getHandle();
+                    // Set context based on the inReplyTo and update in DB
+                    LDNMessageEntity ldnMessageEntity = ldnMessageService.find(context, notification.getId());
+                    ldnMessageEntity.setContext(inReplyToldnMessageEntity.getObject());
+                    ldnMessageService.update(context, ldnMessageEntity);
+                }
+            }
         } else if (OBJECT_ID_ITEM_TYPES.containsAll(notification.getType())) {
             url = notification.getObject().getId();
         } else if (OBJECT_SUBJECT_ITEM_TYPES.containsAll(notification.getType())) {

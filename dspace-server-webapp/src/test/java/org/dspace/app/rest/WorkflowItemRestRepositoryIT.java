@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -684,6 +685,71 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/submission/workspaceitems")))
                 .andExpect(jsonPath("$.page.size", is(20)))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    /**
+     * A delete request over a workflowitem with expunge param should result in delete item over detabase
+     * workspace
+     *
+     * @throws Exception
+     */
+    public void deleteOneWithExpungeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withWorkflowGroup(1, admin).build();
+
+        //2. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword("dspace")
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. a workflow item
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .build();
+
+        Item item = witem.getItem();
+
+        //Add a bitstream to the item
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, Charset.defaultCharset())) {
+            bitstream = BitstreamBuilder
+                    .createBitstream(context, item, is)
+                    .withName("Bitstream1")
+                    .withMimeType("text/plain").build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete the workflowitem
+        getClient(token).perform(delete("/api/workflow/workflowitems/" + witem.getID() + "?expunge=true"))
+                    .andExpect(status().is(204));
+
+        // Trying to get deleted workflowitem should fail with 404
+        getClient(token).perform(get("/api/workflow/workflowitems/" + witem.getID()))
+                   .andExpect(status().is(404));
+
+        // the workflowitem's item should fail with 404
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                   .andExpect(status().is(404));
+
+        // the workflowitem's bitstream should fail with 404
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                   .andExpect(status().is(404));
     }
 
     @Test
@@ -2151,6 +2217,51 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.sections.test-never-hidden").exists())
             .andExpect(jsonPath("$.sections.test-always-hidden").doesNotExist());
 
+    }
+
+    @Test
+    public void deleteBitstreamTest()
+        throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword(password)
+            .build();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection1 = CollectionBuilder.createCollection(context, parentCommunity,
+                "123456789/collection-test-patch")
+            .withName("Collection 1")
+            .build();
+        Bitstream bitstream = null;
+        WorkspaceItem witem = null;
+        String bitstreamContent = "0123456789";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, Charset.defaultCharset())) {
+            context.setCurrentUser(submitter);
+            witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
+                .withTitle("Test WorkspaceItem")
+                .withIssueDate("2019-10-01")
+                .grantLicense()
+                .build();
+            bitstream = BitstreamBuilder.createBitstream(context, witem.getItem(), is)
+                .withName("Test bitstream")
+                .withDescription("This is a bitstream to test range requests")
+                .withMimeType("text/plain")
+                .build();
+        }
+        context.restoreAuthSystemState();
+        String tokenSubmitter = getAuthToken(submitter.getEmail(), password);
+        List<Operation> deleteFile = new ArrayList<>();
+        deleteFile.add(new RemoveOperation("/sections/upload-no-required-metadata/files/0/"));
+        getClient(tokenSubmitter).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(getPatchContent(deleteFile))
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk());
+        // verify that the patch removed bitstream
+        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.sections.upload-no-required-metadata.files",hasSize(0)));
     }
 
 }

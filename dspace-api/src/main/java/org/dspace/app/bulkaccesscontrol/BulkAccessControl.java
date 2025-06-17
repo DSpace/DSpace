@@ -416,7 +416,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         discoverQuery.setQuery(query);
         discoverQuery.setStart(start);
         discoverQuery.setMaxResults(limit);
-
+        discoverQuery.setSortField("search.resourceid", DiscoverQuery.SORT_ORDER.asc);
         return discoverQuery;
     }
 
