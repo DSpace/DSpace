@@ -322,6 +322,8 @@
             <!-- Publications use a custom first step, but share page 2 with "traditional" Item form -->
             <step id="publicationStep"/>
             <step id="traditionalpagetwo"/>
+            <!--Step for COAR Notify services requests -->
+            <!-- <step id="coarnotify"/> -->
             <step id="upload"/>
             <step id="license"/>
         </submission-process>
@@ -406,6 +408,10 @@
 
             <!--Step will be to Sign off on the License -->
             <step id="license"/>
+
+            <!-- Step allows the user to select a Creative Commons License -->
+            <!-- Required for OpenAIREv4 support -->
+            <step id="cclicense"/>
         </submission-process>
         <submission-process name="openairePersonSubmission">
             <step id="collection"/>

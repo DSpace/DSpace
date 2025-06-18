@@ -101,6 +101,14 @@ public class OpenSearchServiceImpl implements OpenSearchService {
             configurationService.getProperty("websvc.opensearch.uicontext");
     }
 
+    /**
+     * Get base search UI URL (websvc.opensearch.max_num_of_items_per_request)
+     */
+    public int getMaxNumOfItemsPerRequest() {
+        return configurationService.getIntProperty(
+                "websvc.opensearch.max_num_of_items_per_request", 100);
+    }
+
     @Override
     public String getContentType(String format) {
         return "html".equals(format) ? "text/html" :

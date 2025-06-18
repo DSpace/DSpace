@@ -110,7 +110,7 @@ public class XOAI {
         try {
             for (Bundle b : itemService.getBundles(item, "ORIGINAL")) {
                 for (Bitstream bs : b.getBitstreams()) {
-                    if (!formats.contains(bs.getFormat(context).getMIMEType())) {
+                    if (bs != null && !formats.contains(bs.getFormat(context).getMIMEType())) {
                         formats.add(bs.getFormat(context).getMIMEType());
                     }
                 }
@@ -334,6 +334,11 @@ public class XOAI {
                     server.add(list);
                     server.commit();
                     list.clear();
+                    try {
+                        context.uncacheEntities();
+                    } catch (SQLException ex) {
+                        log.error("Error uncaching entities", ex);
+                    }
                 }
             }
             System.out.println("Total: " + i + " items");

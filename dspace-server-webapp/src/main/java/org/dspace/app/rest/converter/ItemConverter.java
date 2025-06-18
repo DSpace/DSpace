@@ -8,7 +8,6 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -64,6 +63,9 @@ public class ItemConverter
     /**
      * Retrieves the metadata list filtered according to the hidden metadata configuration
      * When the context is null, it will return the metadatalist as for an anonymous user
+     * When the context is not null, it will return the full metadata list if the user
+     * is allowed to edit the item or if the user is an admin. Otherwise, it will
+     * return the metadata list filtered according to the hidden metadata configuration
      * Overrides the parent method to include virtual metadata
      * @param context The context
      * @param obj     The object of which the filtered metadata will be retrieved
@@ -76,8 +78,9 @@ public class ItemConverter
         List<MetadataValue> returnList = new LinkedList<>();
         try {
             if (obj.isWithdrawn() && (Objects.isNull(context) ||
-                                      Objects.isNull(context.getCurrentUser()) || !authorizeService.isAdmin(context))) {
-                return new MetadataValueList(new ArrayList<MetadataValue>());
+                                      Objects.isNull(context.getCurrentUser()) ||
+                !authorizeService.isAdmin(context, obj))) {
+                return new MetadataValueList(List.of());
             }
             if (context != null && (authorizeService.isAdmin(context) || itemService.canEdit(context, obj))) {
                 return new MetadataValueList(fullList);
