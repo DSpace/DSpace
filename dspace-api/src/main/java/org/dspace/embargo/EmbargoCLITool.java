@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -25,6 +27,8 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.embargo.factory.EmbargoServiceFactory;
@@ -44,6 +48,7 @@ public class EmbargoCLITool {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(EmbargoServiceImpl.class);
 
     private static final EmbargoService embargoService = EmbargoServiceFactory.getInstance().getEmbargoService();
+    private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     /**
      * Default constructor
@@ -145,13 +150,20 @@ public class EmbargoCLITool {
                 }
             } else {
                 Iterator<Item> ii = embargoService.findItemsByLiftMetadata(context);
+                List<UUID> uuidsToProcess = new ArrayList<UUID>();
                 while (ii.hasNext()) {
                     Item item = ii.next();
+                    uuidsToProcess.add(item.getID());
+                    context.uncacheEntity(item);
+                }
+                for (UUID uuid: uuidsToProcess){
+                    Item item = itemService.find(context,uuid);
                     if (processOneItem(context, item, line, now)) {
                         status = 1;
                     }
-                    context.uncacheEntity(item);
+                    context.commit();
                 }
+
             }
             context.complete();
             context = null;
