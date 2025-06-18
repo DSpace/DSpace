@@ -29,6 +29,18 @@ import org.dspace.discovery.SolrSearchCore;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
+
+/**
+ * This class provides a mechanism to retrieve metadata values
+ * using Solr for auto-completion.
+ * It implements the {@link ChoiceAuthority} interface to offer choices
+ * for metadata values based on a prefix text.
+ *
+ * <p>The implementation leverages Solr facets to find matching metadata
+ * values and supports configuration through the {@link ConfigurationService}.
+ * It can be used as a plugin to enable dynamic metadata lookups
+ * for specific fields.</p>
+ */
 public class LocalMetadataLookup implements ChoiceAuthority {
 
     private static final Logger log = LogManager.getLogger(LocalMetadataLookup.class);
@@ -44,18 +56,36 @@ public class LocalMetadataLookup implements ChoiceAuthority {
     protected final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    /**
+     * Retrieves matching metadata values from Solr based on the given prefix text.
+     *
+     * @param text   The prefix text to match.
+     * @param start  The starting index for the results.
+     * @param limit  The maximum number of results to retrieve.
+     * @param locale The locale for the metadata lookup.
+     * @return A {@link Choices} object containing the matching values.
+     */
     @Override
     public Choices getMatches(String text, int start, int limit, String locale) {
         SolrQuery solrQuery = new SolrQuery();
 
+        // Retrieve all documents with "*:*" query as we are only interested in facet values.
         solrQuery.setQuery("*:*");
+        // Add a facet field for the specified field to group and count its distinct values.
         solrQuery.addFacetField(field);
+        // Limit the number of facet values returned to (limit + 1) to check if there are more results.
         solrQuery.add("f." + field + "." + FacetParams.FACET_LIMIT, String.valueOf(limit + 1));
+        // Apply a facet prefix to filter values that start with the given text (case-insensitive).
         solrQuery.setFacetPrefix(field, text.toLowerCase());
+        // Start facet value retrieval from index 0 (first result).
         solrQuery.set(CommonParams.START, 0);
+        // Set rows to 0, as we only need facet data, not actual documents.
         solrQuery.set(CommonParams.ROWS, 0);
+        // Sort facet values based on the configured "order" (e.g., "index" for alphabetical or "count").
         solrQuery.add("f." + field + "." + FacetParams.FACET_SORT, order);
+        // Include only facet values with at least one occurrence (minimum count = 1).
         solrQuery.add("f." + field + "." + FacetParams.FACET_MINCOUNT, String.valueOf(1));
+        // Apply a filter query to restrict results to latest version items.
         solrQuery.set(CommonParams.FQ, "search.resourcetype:Item AND latestVersion:true");
 
         Choices result;
@@ -103,6 +133,13 @@ public class LocalMetadataLookup implements ChoiceAuthority {
         return result;
     }
 
+    /**
+     * Retrieves the best match from Solr for a given input text.
+     *
+     * @param text   The input text to match.
+     * @param locale The locale for the metadata lookup.
+     * @return A {@link Choices} object containing the best match.
+     */
     @Override
     public Choices getBestMatch(String text, String locale) {
         Choices matches = getMatches(text, 0, 1, locale);
@@ -112,17 +149,35 @@ public class LocalMetadataLookup implements ChoiceAuthority {
         return matches;
     }
 
+    /**
+     * Retrieves the label for a given metadata key.
+     *
+     * @param key    The metadata key for which the label is required.
+     * @param locale The locale for the metadata lookup.
+     * @return The label corresponding to the metadata key.
+     */
     @Override
     public String getLabel(String key, String locale) {
         Choice match = getMatches(key, 0, 1, locale).values[0];
         return match.label;
     }
 
+    /**
+     * Gets the name of the plugin instance.
+     *
+     * @return The plugin instance name.
+     */
     @Override
     public String getPluginInstanceName() {
         return pluginInstanceName;
     }
 
+    /**
+     * Sets the name of the plugin instance and initializes
+     * related configuration properties.
+     *
+     * @param name The name of the plugin instance.
+     */
     @Override
     public void setPluginInstanceName(String name) {
         this.pluginInstanceName = name;
