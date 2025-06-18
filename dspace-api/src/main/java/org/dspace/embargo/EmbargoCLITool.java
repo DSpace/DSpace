@@ -89,9 +89,12 @@ public class EmbargoCLITool {
         int status = 0;
 
         Options options = new Options();
-        options.addOption("v", "verbose", false, "Print a line describing action taken for each embargoed Item found.");
-        options.addOption("q", "quiet", false, "Do not print anything except for errors.");
-        options.addOption("n", "dryrun", false, "Do not change anything in the data model, print message instead.");
+        options.addOption("v", "verbose", false,
+                          "Print a line describing action taken for each embargoed Item found.");
+        options.addOption("q", "quiet", false,
+                          "Do not print anything except for errors.");
+        options.addOption("n", "dryrun", false,
+                          "Do not change anything in the data model, print message instead.");
         options.addOption("i", "identifier", true,
                           "Process ONLY this Handle identifier(s), which must be an Item.  Can be repeated.");
         options.addOption("c", "check", false,
@@ -215,8 +218,8 @@ public class EmbargoCLITool {
                     } else if (!line.hasOption('l')) {
                         if (line.hasOption('v')) {
                             System.err.println(
-                                    "Checking current embargo on Item handle=" + item.getHandle() + ", lift date=" + lift.get(
-                                            0).getValue());
+                                "Checking current embargo on Item handle=" + item.getHandle() + ", lift date=" + lift
+                                    .get(0).getValue());
                         }
                         embargoService.checkEmbargo(context, item);
                     }
