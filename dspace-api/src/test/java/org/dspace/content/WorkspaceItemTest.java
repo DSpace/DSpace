@@ -45,6 +45,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.internal.util.MockUtil;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -105,7 +106,11 @@ public class WorkspaceItemTest extends AbstractUnitTest {
 
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
-            authorizeServiceSpy = spy(authorizeService);
+            if (!MockUtil.isMock(authorizeService)) {
+                authorizeServiceSpy = spy(authorizeService);
+            } else {
+                authorizeServiceSpy = authorizeService;
+            }
             // "Wire" our spy to be used by the current loaded object services
             // (To ensure these services use the spy instead of the real service)
             ReflectionTestUtils.setField(workspaceItemService, "authorizeService", authorizeServiceSpy);

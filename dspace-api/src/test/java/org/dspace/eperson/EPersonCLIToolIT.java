@@ -7,14 +7,14 @@
  */
 package org.dspace.eperson;
 
-import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErr;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
+import com.ginsberg.junit.exit.SystemExitPreventedException;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.util.FakeConsoleServiceImpl;
 import org.junit.jupiter.api.Test;
+
+import static com.github.stefanbirkner.systemlambda.SystemLambda.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *
@@ -25,16 +25,17 @@ public class EPersonCLIToolIT
     private static final String NEW_PASSWORD = "secret";
     private static final String BAD_PASSWORD = "not secret";
 
+
+
     /**
      * Test --modify --newPassword
      * @throws Exception passed through.
      */
     @Test
+    @ExpectSystemExitWithStatus(0)
     @SuppressWarnings("static-access")
     public void testSetPassword()
             throws Exception {
-        System.out.println("main");
-
         // Create a source of "console" input.
         FakeConsoleServiceImpl consoleService = new FakeConsoleServiceImpl();
         consoleService.setPassword(NEW_PASSWORD.toCharArray());
@@ -49,13 +50,17 @@ public class EPersonCLIToolIT
 
         // Test!
         String[] argv = {
-            "--modify",
-            "--email", email,
-            "--newPassword"
+                "--modify",
+                "--email", email,
+                "--newPassword"
         };
-        int exitCode = instance.execute(argv);
-        assertEquals(0, exitCode, "Exit code should be 0");
-
+        tapSystemOut(() -> {
+            try {
+                instance.main(argv);
+            } catch (SystemExitPreventedException ignored) {
+                // Ignore the exception raised by the agent
+            }
+        });
         String newPasswordHash = eperson.getPassword();
         assertNotEquals(oldPasswordHash, newPasswordHash, "Password hash did not change");
     }
@@ -65,11 +70,10 @@ public class EPersonCLIToolIT
      * @throws Exception passed through.
      */
     @Test
+    @ExpectSystemExitWithStatus(0)
     @SuppressWarnings("static-access")
     public void testSetEmptyPassword()
             throws Exception {
-        System.out.println("main");
-
         // Create a source of "console" input.
         FakeConsoleServiceImpl consoleService = new FakeConsoleServiceImpl();
         consoleService.setPassword(new char[0]);
@@ -84,18 +88,22 @@ public class EPersonCLIToolIT
 
         // Test!
         String[] argv = {
-            "--modify",
-            "--email", email,
-            "--newPassword"
+                "--modify",
+                "--email", email,
+                "--newPassword"
         };
-        String stderr = tapSystemErr(() -> {
-            int exitCode = instance.execute(argv);
-            assertEquals(0, exitCode, "Exit code should be 0");
+        String sysErr = tapSystemErr(() -> {
+            try {
+                instance.main(argv);
+            } catch (SystemExitPreventedException ignored) {
+                // Ignore the exception raised by the agent
+            }
         });
+
         String newPasswordHash = eperson.getPassword();
+
         assertEquals(oldPasswordHash, newPasswordHash, "Password hash changed");
-        assertTrue(stderr.contains(EPersonCLITool.ERR_PASSWORD_EMPTY),
-                "Standard error did not mention 'empty'");
+        assertTrue(sysErr.contains(EPersonCLITool.ERR_PASSWORD_EMPTY), "Standard error did not mention 'empty'");
     }
 
     /**
@@ -105,11 +113,10 @@ public class EPersonCLIToolIT
      * @throws Exception passed through.
      */
     @Test
+    @ExpectSystemExitWithStatus(0)
     @SuppressWarnings("static-access")
     public void testSetMismatchedPassword()
             throws Exception {
-        System.out.println("main");
-
         // Create a source of "console" input.
         FakeConsoleServiceImpl consoleService = new FakeConsoleServiceImpl();
         consoleService.setPassword1(NEW_PASSWORD.toCharArray());
@@ -125,19 +132,22 @@ public class EPersonCLIToolIT
 
         // Test!
         String[] argv = {
-            "--modify",
-            "--email", email,
-            "--newPassword"
+                "--modify",
+                "--email", email,
+                "--newPassword"
         };
-        String stderr = tapSystemErr(() -> {
-            int exitCode = instance.execute(argv);
-            assertEquals(0, exitCode, "Exit code should be 0");
+        String sysErr = tapSystemErr(() -> {
+            try {
+                instance.main(argv);
+            } catch (SystemExitPreventedException ignored) {
+                // Ignore the exception raised by the agent
+            }
         });
 
         String newPasswordHash = eperson.getPassword();
         assertEquals(oldPasswordHash, newPasswordHash, "Password hash changed");
-
-        assertTrue(stderr.contains(EPersonCLITool.ERR_PASSWORD_NOMATCH),
+        assertTrue(sysErr.contains(EPersonCLITool.ERR_PASSWORD_NOMATCH),
                 "Standard error did not indicate password mismatch");
+
     }
 }

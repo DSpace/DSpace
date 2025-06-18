@@ -118,25 +118,8 @@
             <artifactId>jakarta.mail</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
-            <scope>test</scope>
-        </dependency>
-  <dependency>
-   <groupId>org.hamcrest</groupId>
-   <artifactId>hamcrest-junit</artifactId>
-   <version>2.0.0.0</version>
-   <scope>test</scope>
-  </dependency>
-  <dependency>
-   <groupId>org.junit.jupiter</groupId>
-   <artifactId>junit-jupiter</artifactId>
-   <scope>test</scope>
-  </dependency>
-        <dependency>
-            <groupId>com.ginsberg</groupId>
-            <artifactId>junit5-system-exit</artifactId>
-            <version>2.0.2</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
