@@ -7,17 +7,17 @@
  */
 package org.dspace.services.session;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.dspace.services.sessions.StatelessRequestServiceImpl;
 import org.dspace.test.DSpaceAbstractKernelTest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Testing the request and session services
@@ -28,12 +28,12 @@ public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
 
     private StatelessRequestServiceImpl statelessRequestService;
 
-    @Before
+    @BeforeEach
     public void before() {
         statelessRequestService = getService(StatelessRequestServiceImpl.class);
     }
 
-    @After
+    @AfterEach
     public void after() {
         statelessRequestService.clear();
         statelessRequestService = null;

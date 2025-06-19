@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.security.jwt;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 
 import java.util.ArrayList;
@@ -18,20 +18,23 @@ import java.util.UUID;
 import com.nimbusds.jwt.JWTClaimsSet;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.core.Context;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 /**
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class SpecialGroupClaimProviderTest {
 
     @InjectMocks
@@ -50,7 +53,7 @@ public class SpecialGroupClaimProviderTest {
 
     private JWTClaimsSet jwtClaimsSet;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         context = Mockito.mock(Context.class);
         //Stub the specialgroups list that is normally kept in the context class
@@ -70,7 +73,7 @@ public class SpecialGroupClaimProviderTest {
             .build();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         specialGroups.clear();
     }

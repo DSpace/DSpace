@@ -40,8 +40,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -237,7 +237,7 @@ public class LDNMessageRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Override
-    @After
+    @AfterEach
     public void destroy() throws Exception {
         List<LDNMessageEntity> ldnMessageEntities = ldnMessageService.findAll(context);
         if (CollectionUtils.isNotEmpty(ldnMessageEntities)) {
