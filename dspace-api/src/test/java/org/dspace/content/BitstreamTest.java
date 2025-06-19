@@ -39,6 +39,7 @@ import org.dspace.core.Context;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.util.MockUtil;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -88,7 +89,11 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
 
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
-            authorizeServiceSpy = spy(authorizeService);
+            if (!MockUtil.isMock(authorizeService)) {
+                authorizeServiceSpy = spy(authorizeService);
+            } else {
+                authorizeServiceSpy = authorizeService;
+            }
             // "Wire" our spy to be used by the current loaded bitstreamService
             // (To ensure it uses the spy instead of the real service)
             ReflectionTestUtils.setField(bitstreamService, "authorizeService", authorizeServiceSpy);

@@ -7,6 +7,7 @@
  */
 package org.dspace.example;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -23,6 +24,6 @@ public class ExampleIT extends AbstractIntegrationTest {
 
     @Test
     public void testExampleImpl() {
-        assertTrue(new DSpace().getSingletonService(Example.class) instanceof ExampleImpl);
+        assertInstanceOf(ExampleImpl.class, new DSpace().getSingletonService(Example.class));
     }
 }

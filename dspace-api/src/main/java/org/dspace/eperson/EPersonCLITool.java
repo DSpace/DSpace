@@ -44,19 +44,19 @@ public class EPersonCLITool {
     private static final Option VERB_MODIFY = new Option("M", "modify", false, "modify an EPerson");
 
     private static final Option OPT_GIVENNAME = new Option("g", "givenname", true,
-                                                           "the person's actual first or personal name");
+            "the person's actual first or personal name");
     private static final Option OPT_SURNAME = new Option("s", "surname", true,
-                                                         "the person's actual last or family name");
+            "the person's actual last or family name");
     private static final Option OPT_PHONE = new Option("t", "telephone", true, "telephone number, empty for none");
     private static final Option OPT_LANGUAGE = new Option("l", "language", true, "the person's preferred language");
     private static final Option OPT_REQUIRE_CERTIFICATE = new Option("c", "requireCertificate", true,
-                                                                     "if 'true', an X.509 certificate will be " +
-                                                                         "required for login");
+            "if 'true', an X.509 certificate will be " +
+                    "required for login");
     private static final Option OPT_CAN_LOGIN = new Option("C", "canLogIn", true, "'true' if the user can log in");
 
     private static final Option OPT_EMAIL = new Option("m", "email", true, "the user's email address, empty for none");
     private static final Option OPT_NETID = new Option("n", "netid", true,
-                                                       "network ID associated with the person, empty for none");
+            "network ID associated with the person, empty for none");
 
     private static final Option OPT_NEW_EMAIL = new Option("i", "newEmail", true, "new email address");
     private static final Option OPT_NEW_NETID = new Option("I", "newNetid", true, "new network ID");
@@ -80,38 +80,14 @@ public class EPersonCLITool {
     /**
      * Tool for manipulating user accounts.
      *
-     * This small method simply wraps the execute method so that
-     * it can be called directly from the Java API or Unit Tests without
-     * calling System.exit().
-     *
      * @param argv the command line arguments given
      * @throws ParseException     Base for Exceptions thrown during parsing of a command-line.
      * @throws SQLException       An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      */
-    public static void main(String[] argv) {
-        try {
-            int exitCode = execute(argv);
-            System.exit(exitCode);
-        } catch (ParseException|SQLException|AuthorizeException e) {
-            System.err.println(e.getMessage());
-            System.exit(1);
-        }
-    }
-
-    /**
-     * Tool for manipulating user accounts.
-     *
-     * @param argv the command line arguments given
-     * @return 0 if the command was successful, 1 otherwise
-     * @throws ParseException     Base for Exceptions thrown during parsing of a command-line.
-     * @throws SQLException       An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
-     */
-    public static int execute(String argv[])
-        throws ParseException, SQLException, AuthorizeException {
+    public static void main(String argv[])
+            throws ParseException, SQLException, AuthorizeException {
         final OptionGroup VERBS = new OptionGroup();
         VERBS.addOption(VERB_ADD);
         VERBS.addOption(VERB_DELETE);
@@ -156,7 +132,7 @@ public class EPersonCLITool {
             }
         }
 
-        return status;
+        System.exit(status);
     }
 
     /**
@@ -226,14 +202,14 @@ public class EPersonCLITool {
         eperson.setFirstName(context, command.getOptionValue(OPT_GIVENNAME.getOpt()));
         eperson.setLastName(context, command.getOptionValue(OPT_SURNAME.getOpt()));
         eperson.setLanguage(context, command.getOptionValue(OPT_LANGUAGE.getOpt(),
-                                                            Locale.getDefault().getLanguage()));
+                Locale.getDefault().getLanguage()));
         ePersonService.setMetadataSingleValue(context, eperson, MD_PHONE,
                 command.getOptionValue(OPT_PHONE.getOpt()), null);
         eperson.setNetid(command.getOptionValue(OPT_NETID.getOpt()));
         ePersonService.setPassword(eperson, command.getOptionValue('p'));
         if (command.hasOption(OPT_REQUIRE_CERTIFICATE.getOpt())) {
             eperson.setRequireCertificate(Boolean.valueOf(command.getOptionValue(
-                OPT_REQUIRE_CERTIFICATE.getOpt())));
+                    OPT_REQUIRE_CERTIFICATE.getOpt())));
         } else {
             eperson.setRequireCertificate(false);
         }
@@ -440,7 +416,7 @@ public class EPersonCLITool {
             }
             if (command.hasOption(OPT_REQUIRE_CERTIFICATE.getOpt())) {
                 eperson.setRequireCertificate(Boolean.valueOf(command.getOptionValue(
-                    OPT_REQUIRE_CERTIFICATE.getOpt())));
+                        OPT_REQUIRE_CERTIFICATE.getOpt())));
                 modified = true;
             }
             if (command.hasOption(OPT_CAN_LOGIN.getOpt())) {
@@ -477,10 +453,10 @@ public class EPersonCLITool {
         try {
             for (EPerson person : ePersonService.findAll(context, EPerson.EMAIL)) {
                 System.out.printf("%s\t%s/%s\t%s, %s\n",
-                                  person.getID().toString(),
-                                  person.getEmail(),
-                                  person.getNetid(),
-                                  person.getLastName(), person.getFirstName()); // TODO more user details
+                        person.getID().toString(),
+                        person.getEmail(),
+                        person.getNetid(),
+                        person.getLastName(), person.getFirstName()); // TODO more user details
             }
         } catch (SQLException ex) {
             System.err.println(ex.getMessage());

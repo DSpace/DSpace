@@ -81,14 +81,6 @@
                      as it is used to reference the LICENSE.header and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
     </properties>
- <dependencies>
-  <dependency>
-   <groupId>org.hamcrest</groupId>
-   <artifactId>hamcrest-junit</artifactId>
-   <version>2.0.0.0</version>
-   <scope>test</scope>
-  </dependency>
- </dependencies>
 
     <build>
         <!-- Define Maven Plugin Settings that should be inherited to ALL submodule POMs.
@@ -225,6 +217,9 @@
                              maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
                         <argLine>${test.argLine} ${surefireJacoco}</argLine>
                         <!-- tests whose name starts by Abstract will be ignored -->
+                        <includes>
+                            <include>**/*Test.java</include>
+                        </includes>
                         <excludes>
                             <exclude>**/Abstract*</exclude>
                         </excludes>
@@ -250,7 +245,10 @@
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-failsafe-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
-                        <argLine>${test.argLine} ${failsafeJacoco}</argLine>
+                        <argLine>${test.argLine} ${failsafeJacoco} -javaagent:${settings.localRepository}/com/ginsberg/junit5-system-exit/2.0.2/junit5-system-exit-2.0.2.jar</argLine>
+                        <includes>
+                            <include>**/*IT.java</include>
+                        </includes>
                         <excludes>
                             <exclude>**/Abstract*</exclude>
                         </excludes>
@@ -360,13 +358,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>3.8.1</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>properties</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -424,43 +415,6 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>0.8.13</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.openrewrite.maven</groupId>
-                    <artifactId>rewrite-maven-plugin</artifactId>
-                    <version>6.9.0</version>
-                    <configuration>
-                        <exportDatatables>true</exportDatatables>
-                        <activeRecipes>
-                            <!--<recipe>org.dspace.refactor.JUnit4to5AssertArguments</recipe>-->
-                            <!--<recipe>org.openrewrite.java.testing.junit5.JUnit4to5Migration</recipe>-->
-                            <recipe>org.openrewrite.java.spring.boot2.SpringBoot2JUnit4to5Migration</recipe>
-                        </activeRecipes>
-                        <exclusions>
-                            <!--
-                            <exclusion>dspace-services</exclusion>
-                            <exclusion>**/dspace-services/**</exclusion>
-                            <exclusion>**/dspace-services/*.java</exclusion>
-                            -->
-                        </exclusions>
-                    </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.openrewrite.recipe</groupId>
-                            <artifactId>rewrite-spring</artifactId>
-                            <version>6.7.0</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.dspace.refactor</groupId>
-                            <artifactId>dspace-junit-4-to-5</artifactId>
-                            <version>0.0.1-SNAPSHOT</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.openrewrite.recipe</groupId>
-                            <artifactId>rewrite-testing-frameworks</artifactId>
-                            <version>3.9.0</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -678,25 +632,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- Set up junit5-system-exit javaagent property -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>prepare-junit5-system-exit-agent</id>
-                                <phase>process-test-classes</phase>
-                                <goals>
-                                    <goal>build-classpath</goal>
-                                </goals>
-                                <configuration>
-                                    <includeGroupIds>com.ginsberg</includeGroupIds>
-                                    <includeArtifactIds>junit5-system-exit</includeArtifactIds>
-                                    <outputProperty>junit5SystemExitAgent</outputProperty>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -736,25 +671,6 @@
                                         for JaCoCo runtime agent.
                                     -->
                                     <propertyName>failsafeJacoco</propertyName>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- Set up junit5-system-exit javaagent property -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>prepare-junit5-system-exit-agent</id>
-                                <phase>process-test-classes</phase>
-                                <goals>
-                                    <goal>build-classpath</goal>
-                                </goals>
-                                <configuration>
-                                    <includeGroupIds>com.ginsberg</includeGroupIds>
-                                    <includeArtifactIds>junit5-system-exit</includeArtifactIds>
-                                    <outputProperty>junit5SystemExitAgentIT</outputProperty>
                                 </configuration>
                             </execution>
                         </executions>
@@ -1201,11 +1117,6 @@
                 <version>[9.0.0,10.0.0)</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.dspace.refactor</groupId>
-                <artifactId>dspace-junit-4-to-5</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
-            </dependency>
             <!-- DSpace third Party Dependencies -->
 
             <dependency>
@@ -1349,39 +1260,23 @@
                 <artifactId>spring-expression</artifactId>
                 <version>${spring.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-test</artifactId>
-                <version>${spring.version}</version>
-                <scope>test</scope>
-            </dependency>
-
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring-boot.version}</version>
                 <scope>test</scope>
-                <exclusions>
-                    <!-- We are still using JUnit 4, while Spring Boot defaults to JUnit 5 -->
-                    <exclusion>
-                        <groupId>org.junit.jupiter</groupId>
-                        <artifactId>junit-jupiter</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.junit.vintage</groupId>
-                        <artifactId>junit-vintage-engine</artifactId>
-                    </exclusion>
-                    <!-- We use a later version of Mockito -->
-                    <exclusion>
-                        <groupId>org.mockito</groupId>
-                        <artifactId>mockito-junit-jupiter</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.mockito</groupId>
-                        <artifactId>mockito-core</artifactId>
-                    </exclusion>
-                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.ginsberg</groupId>
+                <artifactId>junit5-system-exit</artifactId>
+                <version>2.0.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.github.stefanbirkner</groupId>
+                <artifactId>system-lambda</artifactId>
+                <version>1.2.1</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
@@ -1803,51 +1698,6 @@
                 <artifactId>error_prone_annotations</artifactId>
                 <version>${errorprone.version}</version>
                 <scope>compile</scope>
-            </dependency>
-            <!-- JUnit, Mockito and Hamcrest are used for Unit/Integration tests -->
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest</artifactId>
-                <version>2.2</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-core</artifactId>
-                <version>2.2</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.13.2</version>
-                <scope>test</scope>
-            </dependency>
-            <!-- JUnit 5 dependencies - all aligned to same version -->
-            <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>5.12.2</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.ginsberg</groupId>
-                <artifactId>junit5-system-exit</artifactId>
-                <version>2.0.2</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.github.stefanbirkner</groupId>
-                <artifactId>system-lambda</artifactId>
-                <version>1.2.1</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-inline</artifactId>
-                <version>4.11.0</version>
-                <scope>test</scope>
             </dependency>
             <!-- H2 is an in-memory database used for Unit/Integration tests -->
             <dependency>

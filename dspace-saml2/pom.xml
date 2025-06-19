@@ -109,16 +109,6 @@
                     </plugin>
                 </plugins>
             </build>
-            <dependencies>
-                <!-- When running tests, also include test classes from dspace-api
-                     (this test-jar is only built when tests are enabled). -->
-                <dependency>
-                    <groupId>org.dspace</groupId>
-                    <artifactId>dspace-api</artifactId>
-                    <type>test-jar</type>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
         </profile>
 
         <!-- Setup the Integration Test Environment (when -DskipIntegrationTests=false) -->
@@ -177,16 +167,6 @@
                     </plugin>
                 </plugins>
             </build>
-           <dependencies>
-                <!-- When running tests, also include test classes from dspace-api
-                     (this test-jar is only built when tests are enabled). -->
-                <dependency>
-                    <groupId>org.dspace</groupId>
-                    <artifactId>dspace-api</artifactId>
-                    <type>test-jar</type>
-                    <scope>test</scope>
-                </dependency>
-           </dependencies>
         </profile>
      </profiles>
 
@@ -236,28 +216,15 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- Test dependencies -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-  <dependency>
-   <groupId>org.hamcrest</groupId>
-   <artifactId>hamcrest-junit</artifactId>
-   <version>2.0.0.0</version>
-   <scope>test</scope>
-  </dependency>
-  <dependency>
-   <groupId>org.junit.jupiter</groupId>
-   <artifactId>junit-jupiter</artifactId>
-   <scope>test</scope>
-  </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

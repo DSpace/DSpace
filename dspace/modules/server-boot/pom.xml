@@ -49,12 +49,6 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-  <dependency>
-   <groupId>org.hamcrest</groupId>
-   <artifactId>hamcrest-junit</artifactId>
-   <version>2.0.0.0</version>
-   <scope>test</scope>
-  </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -75,11 +69,6 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- Solr Core is only needed for Integration Tests (to run a MockSolrServer) -->

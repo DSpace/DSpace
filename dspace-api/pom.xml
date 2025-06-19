@@ -526,67 +526,24 @@
             <artifactId>dspace-services</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest</artifactId>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.stefanbirkner</groupId>
-            <artifactId>system-lambda</artifactId>
-            <version>1.0.0</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-  <dependency>
-   <groupId>org.hamcrest</groupId>
-   <artifactId>hamcrest-junit</artifactId>
-   <version>2.0.0.0</version>
-   <scope>test</scope>
-  </dependency>
-  <dependency>
-   <groupId>org.junit.jupiter</groupId>
-   <artifactId>junit-jupiter-params</artifactId>
-   <scope>test</scope>
-  </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-    <dependency>
-        <groupId>org.junit.platform</groupId>
-        <artifactId>junit-platform-engine</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.junit.platform</groupId>
-        <artifactId>junit-platform-launcher</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-inline</artifactId>
-        <scope>test</scope>
-    </dependency>
-  <dependency>
-   <groupId>org.mockito</groupId>
-   <artifactId>mockito-junit-jupiter</artifactId>
-   <version>4.11.0</version>
-   <scope>test</scope>
-  </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <scope>test</scope>
+            <exclusions>
+                <!--
+                 Exclude the outdated android-json library, which is pulled in transitively via jsonassert.
+                 This prevents conflicts with the newer org.json:json version that provides the JSONArray.toList() method.
+                -->
+                <exclusion>
+                    <groupId>com.vaadin.external.google</groupId>
+                    <artifactId>android-json</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Used for RSS / ATOM syndication feeds -->
         <dependency>
@@ -801,19 +758,32 @@
             <version>20231013</version>
         </dependency>
 
-        <!-- Useful for testing command-line tools -->
-        <dependency>
-            <groupId>com.github.stefanbirkner</groupId>
-            <artifactId>system-rules</artifactId>
-            <version>1.19.0</version>
-            <scope>test</scope>
-        </dependency>
-
         <!-- Used for Solr core export/import -->
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
             <version>5.11.1</version>
+            <exclusions>
+                <!-- The opencsv library was transitively pulling in junit-vintage-engine (which includes JUnit 4),
+                 causing a conflict with JUnit 5 (the version used by Spring Boot 3.x).
+                 The <exclusions> block is added to prevent junit-vintage-engine from being included,
+                 ensuring that only JUnit 5 is used for testing, thereby resolving the OutputDirectoryProvider error. -->
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ginsberg</groupId>
+            <artifactId>junit5-system-exit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-lambda</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <!-- Email templating -->
@@ -852,35 +822,24 @@
         </dependency>
         
         <dependency>
-          <groupId>eu.openaire</groupId>
-          <artifactId>broker-client</artifactId>
-          <version>1.1.2</version>
+            <groupId>eu.openaire</groupId>
+            <artifactId>broker-client</artifactId>
+            <version>1.1.2</version>
         </dependency>
 
         <dependency>
             <groupId>org.mock-server</groupId>
-            <artifactId>mockserver-junit-rule</artifactId>
+            <artifactId>mockserver-junit-jupiter</artifactId>
             <version>5.15.0</version>
             <scope>test</scope>
             <exclusions>
-                <!-- Exclude snakeyaml to avoid conflicts with: spring-boot-starter-cache -->
-            	<exclusion>
-            		<groupId>org.yaml</groupId>
-            		<artifactId>snakeyaml</artifactId>
-            	</exclusion>
                 <exclusion>
-                    <groupId>com.fasterxml.jackson.datatype</groupId>
-                    <artifactId>jackson-datatype-jsr310</artifactId>
+                    <groupId>org.junit.jupiter</groupId>
+                    <artifactId>junit-jupiter-api</artifactId>
                 </exclusion>
-                <!-- Resolve dependency conflicts with Hibernate -->
                 <exclusion>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                </exclusion>
-                <!-- Resolve dependency conflicts with Solr -->
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>org.junit.jupiter</groupId>
+                    <artifactId>junit-jupiter-engine</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
