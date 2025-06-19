@@ -116,24 +116,22 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
         Mockito.when(bitstream.getType()).thenReturn(Constants.BITSTREAM);
         Mockito.when(this.usageEvent.getObject()).thenReturn(bitstream);
 
-        try (MockedStatic<ContentServiceFactory> mock = Mockito.mockStatic(ContentServiceFactory.class)) {
-            ContentServiceFactory serviceFactory = Mockito.mock(ContentServiceFactory.class);
-            try (MockedStatic<ContentServiceFactory> mockContentServiceFactory1 = mockStatic(ContentServiceFactory.class)) {
-                mockContentServiceFactory1.when(() -> ContentServiceFactory.getInstance()).thenReturn(serviceFactory);
-                DSpaceObjectService<Bitstream> bitstreamService = Mockito.mock(BitstreamService.class);
-                Mockito.when(serviceFactory.getDSpaceObjectService(bitstream))
-                    .thenReturn(bitstreamService);
-                Mockito.when(bitstreamService.getParentObject(context, bitstream))
-                    .thenReturn(item);
-                requestDetails = builder.build(usageEvent);
-                assertThat(
+        ContentServiceFactory serviceFactory = Mockito.mock(ContentServiceFactory.class);
+        try (MockedStatic<ContentServiceFactory> mockContentServiceFactory1 = mockStatic(ContentServiceFactory.class)) {
+            mockContentServiceFactory1.when(() -> ContentServiceFactory.getInstance()).thenReturn(serviceFactory);
+            DSpaceObjectService<Bitstream> bitstreamService = Mockito.mock(BitstreamService.class);
+            Mockito.when(serviceFactory.getDSpaceObjectService(bitstream))
+                .thenReturn(bitstreamService);
+            Mockito.when(bitstreamService.getParentObject(context, bitstream))
+                .thenReturn(item);
+            requestDetails = builder.build(usageEvent);
+            assertThat(
                     requestDetails.parameters,
                     Matchers.hasEntry(
                         Matchers.is("action_name"),
                         Matchers.is("item-name")
-                    )
-                );
-            }
+                        )
+                    );
         }
 
     }
