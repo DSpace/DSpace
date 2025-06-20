@@ -15,7 +15,6 @@ import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.VersionRest;
 import org.dspace.app.rest.projection.DefaultProjection;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
@@ -34,8 +33,6 @@ import org.springframework.stereotype.Component;
     description = "It can be used to verify if the user can delete a version of an Item")
 public class CanDeleteVersionFeature extends DeleteFeature {
 
-    @Autowired
-    private ItemService itemService;
     @Autowired
     private ItemConverter itemConverter;
     @Autowired

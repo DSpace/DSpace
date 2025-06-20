@@ -41,6 +41,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                             .andExpect(jsonPath("$._embedded.externalsources", Matchers.hasItems(
                                 ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
                                 ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false),
+                                ExternalSourceMatcher.matchExternalSource("suggestion", "suggestion", false),
                                 ExternalSourceMatcher.matchExternalSource("scopus", "scopus", false),
                                 ExternalSourceMatcher.matchExternalSource(
                                     "sherpaJournalIssn", "sherpaJournalIssn", false),
@@ -51,9 +52,25 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource(
                                         "pubmed", "pubmed", false),
                                 ExternalSourceMatcher.matchExternalSource(
-                                        "openAIREFunding", "openAIREFunding", false)
+                                    "openaireFunding", "openaireFunding", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPublication", "openalexPublication", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPublicationByAuthorId", "openalexPublicationByAuthorId", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPublicationByDOI", "openalexPublicationByDOI", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPerson", "openalexPerson", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexInstitution", "openalexInstitution", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPublisher", "openalexPublisher", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexFunder", "openalexFunder", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexJournal", "openalexJournal", false)
                             )))
-                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(10)));
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(20)));
     }
 
     @Test

@@ -20,19 +20,14 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-    @LinkRest(
-            name = BrowseIndexRest.LINK_ITEMS,
-            method = "listBrowseItems"
-    ),
-    @LinkRest(
-            name = BrowseIndexRest.LINK_ENTRIES,
-            method = "listBrowseEntries"
-    )
+    @LinkRest(name = BrowseIndexRest.LINK_ITEMS, method = "listBrowseItems"),
+    @LinkRest(name = BrowseIndexRest.LINK_ENTRIES, method = "listBrowseEntries")
 })
 public class BrowseIndexRest extends BaseObjectRest<String> {
     private static final long serialVersionUID = -4870333170249999559L;
 
     public static final String NAME = "browse";
+    public static final String PLURAL_NAME = "browses";
 
     public static final String CATEGORY = RestAddressableModel.DISCOVER;
 
@@ -77,6 +72,11 @@ public class BrowseIndexRest extends BaseObjectRest<String> {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public List<String> getMetadataList() {

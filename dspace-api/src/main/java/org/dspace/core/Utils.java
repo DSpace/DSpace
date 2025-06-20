@@ -23,12 +23,14 @@ import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -75,31 +77,27 @@ public final class Utils {
     private static final VMID vmid = new VMID();
 
     // for parseISO8601Date
-    private static final SimpleDateFormat[] parseFmt = {
-        // first try at parsing, has milliseconds (note General time zone)
-        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSz"),
+    private static final DateTimeFormatter[] parseFmt = {
+        // First try a standard Instant format
+        DateTimeFormatter.ISO_INSTANT,
 
-        // second try at parsing, no milliseconds (note General time zone)
-        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ssz"),
+        // then try at parsing, has milliseconds (note General time zone)
+        DateTimeFormatter.ofPattern("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSz"),
+
+        // then try at parsing, no milliseconds (note General time zone)
+        DateTimeFormatter.ofPattern("yyyy'-'MM'-'dd'T'HH':'mm':'ssz"),
 
         // finally, try without any timezone (defaults to current TZ)
-        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS"),
+        DateTimeFormatter.ofPattern("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS"),
 
-        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss"),
+        DateTimeFormatter.ofPattern("yyyy'-'MM'-'dd'T'HH':'mm':'ss"),
 
-        new SimpleDateFormat("yyyy'-'MM'-'dd")
+        DateTimeFormatter.ofPattern("yyyy'-'MM'-'dd")
     };
 
     // for formatISO8601Date
-    // output canonical format (note RFC22 time zone, easier to hack)
-    private static final SimpleDateFormat outFmtSecond
-            = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ssZ");
-
-    // output format with millsecond precision
-    private static final SimpleDateFormat outFmtMillisec
-            = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ");
-
-    private static final Calendar outCal = GregorianCalendar.getInstance();
+    // output canonical format
+    private static final DateTimeFormatter outFmt = DateTimeFormatter.ISO_INSTANT;
 
     /**
      * Private constructor
@@ -199,7 +197,7 @@ public final class Utils {
         byte[] junk = new byte[16];
 
         random.nextBytes(junk);
-        String input = String.valueOf(vmid) + new Date() + Arrays.toString(junk) + counter++;
+        String input = String.valueOf(vmid) + Instant.now().toEpochMilli() + Arrays.toString(junk) + counter++;
 
         return getMD5Bytes(input.getBytes(StandardCharsets.UTF_8));
     }
@@ -316,29 +314,16 @@ public final class Utils {
     /**
      * Translates timestamp from an ISO 8601-standard format, which
      * is commonly used in XML and RDF documents.
-     * This method is synchronized because it depends on a non-reentrant
-     * static DateFormat (more efficient than creating a new one each call).
      *
      * @param s the input string
-     * @return Date object, or null if there is a problem translating.
+     * @return Instant object, or null if there is a problem translating.
      */
-    public static synchronized Date parseISO8601Date(String s) {
-        // attempt to normalize the timezone to something we can parse;
-        // SimpleDateFormat can't handle "Z"
-        char tzSign = s.charAt(s.length() - 6);
-        if (s.endsWith("Z")) {
-            s = s.substring(0, s.length() - 1) + "GMT+00:00";
-        } else if ((tzSign == '-' || tzSign == '+') && s.length() > 10) {
-            // check for trailing timezone
-            s = s.substring(0, s.length() - 6) + "GMT" + s.substring(s.length() - 6);
-        }
-
-        // try to parse without milliseconds
-        ParseException lastError = null;
-        for (SimpleDateFormat simpleDateFormat : parseFmt) {
+    public static Instant parseISO8601Date(String s) {
+        DateTimeParseException lastError = null;
+        for (DateTimeFormatter formatter : parseFmt) {
             try {
-                return simpleDateFormat.parse(s);
-            } catch (ParseException e) {
+                return formatter.parse(s, Instant::from);
+            } catch (DateTimeParseException e) {
                 lastError = e;
             }
         }
@@ -349,24 +334,13 @@ public final class Utils {
     }
 
     /**
-     * Convert a Date to String in the ISO 8601 standard format.
-     * The RFC822 timezone is almost right, still need to insert ":".
-     * This method is synchronized because it depends on a non-reentrant
-     * static DateFormat (more efficient than creating a new one each call).
+     * Convert a date to String in the ISO 8601 standard format.
      *
-     * @param d the input Date
+     * @param date the input TemporalAccessor (e.g. LocalDate, LocalDateTime, Instant)
      * @return String containing formatted date.
      */
-    public static synchronized String formatISO8601Date(Date d) {
-        String result;
-        outCal.setTime(d);
-        if (outCal.get(Calendar.MILLISECOND) == 0) {
-            result = outFmtSecond.format(d);
-        } else {
-            result = outFmtMillisec.format(d);
-        }
-        int rl = result.length();
-        return result.substring(0, rl - 2) + ":" + result.substring(rl - 2);
+    public static String formatISO8601Date(TemporalAccessor date) {
+        return outFmt.format(date);
     }
 
     public static <E> java.util.Collection<E> emptyIfNull(java.util.Collection<E> collection) {
@@ -506,4 +480,25 @@ public final class Utils {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         return StringSubstitutor.replace(string, config.getProperties());
     }
+
+    /**
+     * Get the maximum timestamp that can be stored in a PostgreSQL database with hibernate,
+     * for our "distant future" access expiry date.
+     * @return the maximum timestamp that can be stored with Postgres + Hibernate
+     */
+    public static Instant getMaxTimestamp() {
+        return LocalDateTime.of(294276, 12, 31, 23, 59, 59)
+                .toInstant(ZoneOffset.UTC);
+    }
+
+    /**
+     * Get the minimum timestamp that can be stored in a PostgreSQL database, for date validation or any other
+     * purpose to ensure we don't try to store a date before the epoch.
+     * @return the minimum timestamp that can be stored with Postgres + Hibernate
+     */
+    public static Instant getMinTimestamp() {
+        return LocalDateTime.of(-4713, 11, 12, 0, 0, 0)
+                .toInstant(ZoneOffset.UTC);
+    }
+
 }

@@ -8,22 +8,22 @@
 package org.dspace.service.impl;
 
 import java.util.concurrent.TimeUnit;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.apache.http.HeaderElement;
 import org.apache.http.HeaderElementIterator;
 import org.apache.http.HttpResponse;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeaderElementIterator;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.services.ConfigurationService;
 
 /**
@@ -112,7 +112,7 @@ public class HttpConnectionPoolService {
      * @return the client.
      */
     public CloseableHttpClient getClient() {
-        CloseableHttpClient httpClient = HttpClientBuilder.create()
+        CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().builder(true).create()
                 .setKeepAliveStrategy(keepAliveStrategy)
                 .setConnectionManager(connManager)
                 .build();

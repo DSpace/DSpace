@@ -15,8 +15,8 @@ import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -347,7 +347,7 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
          * being no other members in step 3
          * - approve it by user B
          * - delete user B
-         * - verify the delete suceeds
+         * - verify the delete succeeds
          * - verify that the item is archived
          */
         context.turnOffAuthorisationSystem();
@@ -543,7 +543,7 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
      * task if they are the only member. This test also verifies the user can be removed from a step with no tasks
      * even if they are the only member. This test also verifies that after the task has been passed and the user has
      *  been removed from the workflow, the EPerson can be removed. This test also verifies that an item is correctly
-     *  arhived if the last step has no members left.
+     *  archived if the last step has no members left.
      *
      * @throws Exception
      */

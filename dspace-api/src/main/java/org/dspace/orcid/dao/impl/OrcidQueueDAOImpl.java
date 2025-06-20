@@ -10,8 +10,8 @@ package org.dspace.orcid.dao.impl;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.Query;
 
+import jakarta.persistence.Query;
 import org.dspace.content.Item;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -59,6 +59,13 @@ public class OrcidQueueDAOImpl extends AbstractHibernateDAO<OrcidQueue> implemen
     @Override
     public List<OrcidQueue> findByProfileItemOrEntity(Context context, Item item) throws SQLException {
         Query query = createQuery(context, "FROM OrcidQueue WHERE profileItem.id= :itemId OR entity.id = :itemId");
+        query.setParameter("itemId", item.getID());
+        return query.getResultList();
+    }
+
+    @Override
+    public List<OrcidQueue> findByEntity(Context context, Item item) throws SQLException {
+        Query query = createQuery(context, "FROM OrcidQueue WHERE entity.id = :itemId");
         query.setParameter("itemId", item.getID());
         return query.getResultList();
     }

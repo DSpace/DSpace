@@ -7,8 +7,8 @@
  */
 package org.dspace.authority;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -67,7 +67,7 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
 
             nextValue.setId(authorityKey);
             nextValue.updateLastModifiedDate();
-            nextValue.setCreationDate(new Date());
+            nextValue.setCreationDate(Instant.now());
             nextValue.setField(field);
         }
 

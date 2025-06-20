@@ -40,6 +40,11 @@ dspace.dir=/dspace
 # It corresponds to the URL that you would type into your browser to access the REST API.
 dspace.server.url = http://localhost:8080/server
 
+# Additional URL of DSpace backend which could be used by DSpace frontend during SSR execution.
+# May require a port number if not using standard ports (80 or 443)
+# DO NOT end it with '/'.
+dspace.server.ssr.url = ${dspace.server.url}
+
 # Public URL of DSpace frontend (Angular UI). May require a port number if not using standard ports (80 or 443)
 # DO NOT end it with '/'.
 # This is used by the backend to provide links in emails, RSS feeds, Sitemaps, etc.
@@ -76,19 +81,9 @@ dspace.name = DSpace at My University
 # URL for connecting to database
 db.url = jdbc:postgresql://localhost:5432/dspace
 
-# JDBC Driver for PostgreSQL
-db.driver = org.postgresql.Driver
-
-# PostgreSQL Database Dialect (for Hibernate)
-db.dialect = org.hibernate.dialect.PostgreSQL94Dialect
-
 # Database username and password
 db.username = dspace
 db.password = dspace
-
-# Database Schema name
-# For PostgreSQL, this is often "public" (default schema)
-db.schema = public
 
 ## Connection pool parameters
 
@@ -208,6 +203,9 @@ db.schema = public
 # X.509 certificate authentication. See authentication-x509.cfg for default configuration.
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.X509Authentication
 
+# SAML authentication/authorization. See authenication-saml.cfg for default configuration.
+#plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.SamlAuthentication
+
 # Authentication by Password (encrypted in DSpace's database). See authentication-password.cfg for default configuration.
 # Enabled by default in authentication.cfg
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
@@ -241,3 +239,8 @@ db.schema = public
 
 # Maximum size of a multipart request (i.e. max total size of all files in one request)
 #spring.servlet.multipart.max-request-size = 512MB
+
+########################
+#  LDN INBOX SETTINGS  #
+########################
+ldn.enabled = true

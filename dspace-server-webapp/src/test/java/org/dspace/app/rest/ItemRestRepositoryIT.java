@@ -14,6 +14,7 @@ import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.builder.OrcidHistoryBuilder.createOrcidHistory;
 import static org.dspace.builder.OrcidQueueBuilder.createOrcidQueue;
+import static org.dspace.core.Constants.READ;
 import static org.dspace.core.Constants.WRITE;
 import static org.dspace.orcid.OrcidOperation.DELETE;
 import static org.dspace.profile.OrcidEntitySyncPreference.ALL;
@@ -36,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -43,9 +45,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
@@ -119,6 +121,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     private Item publication1;
     private Item author1;
@@ -313,7 +318,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$.page.totalPages", is(2)))
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(jsonPath("$.page.totalElements", is(3)));
-        ;
 
         getClient(token).perform(get("/api/core/items")
                    .param("size", "2")
@@ -419,6 +423,68 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         "owningCollection"
                 )))
                 .andExpect(jsonPath("$", publicItem1Matcher));
+    }
+
+    @Test
+    public void findOneWithdrawnAsCollectionAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create collection admin account
+        EPerson collectionAdmin = EPersonBuilder.createEPerson(context)
+            .withEmail("collection-admin@dspace.com")
+            .withPassword("test")
+            .withCanLogin(true)
+            .build();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+
+        // Create collection
+        Collection adminCollection = CollectionBuilder.createCollection(context, child1)
+            .withName("Collection Admin col")
+            .withAdminGroup(collectionAdmin)
+            .build();
+        Collection noAdminCollection =
+            CollectionBuilder.createCollection(context, child1).withName("Collection non Admin")
+                .build();
+
+        // both items are withdrawn
+        Item administeredItem = ItemBuilder.createItem(context, adminCollection)
+            .withTitle("Public item 1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald").withAuthor("Doe, John")
+            .withSubject("ExtraEntry")
+            .withdrawn()
+            .build();
+
+        Item nonAdministeredItem = ItemBuilder.createItem(context, noAdminCollection)
+            .withTitle("Public item 2")
+            .withIssueDate("2016-02-13")
+            .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+            .withSubject("TestingForMore").withSubject("ExtraEntry")
+            .withdrawn()
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String collectionAdmintoken = getAuthToken(collectionAdmin.getEmail(), "test");
+
+        // Metadata are retrieved since user is administering the item's collection
+        getClient(collectionAdmintoken).perform(get("/api/core/items/" + administeredItem.getID())
+                .param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata").isNotEmpty());
+
+        // No metadata is retrieved since user is not administering the item's collection
+        getClient().perform(get("/api/core/items/" + nonAdministeredItem.getID())
+            .param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata").isEmpty());
+
+
     }
 
     @Test
@@ -596,7 +662,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         // is used in the provenance note.
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -651,7 +717,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .build();
 
         context.restoreAuthSystemState();
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -700,7 +766,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         // try to use an unauthorized user
         String token = getAuthToken(eperson.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -760,7 +826,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", null);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -822,7 +888,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         // is used in the provenance note.
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -882,7 +948,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -932,7 +998,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(eperson.getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -977,7 +1043,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1031,7 +1097,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1076,7 +1142,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(eperson.getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1119,7 +1185,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1165,7 +1231,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         // String value should work.
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", "false");
         ops.add(replaceOperation);
@@ -1212,7 +1278,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1257,7 +1323,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(eperson.getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1311,7 +1377,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", null);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1381,7 +1447,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + publicItem.getID()))
                    .andExpect(status().isOk());
 
-        // Check publicItem bitstream creation (shuold be stored in bundle)
+        // Check publicItem bitstream creation (should be stored in bundle)
         getClient().perform(get("/api/core/items/" + publicItem.getID() + "/bundles"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -1452,7 +1518,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + publicItem.getID()))
             .andExpect(status().isOk());
 
-        // Check publicItem bitstream creation (shuold be stored in bundle)
+        // Check publicItem bitstream creation (should be stored in bundle)
         getClient().perform(get("/api/core/items/" + publicItem.getID() + "/bundles"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
@@ -1638,7 +1704,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .withIssueDate("2017-12-18")
                                          .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                          .withSubject("ExtraEntry")
-                                         .withEmbargoPeriod("6 months")
+                                         .withEmbargoPeriod(Period.ofMonths(6))
                                          .build();
 
         //3. a public item
@@ -1729,7 +1795,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withIssueDate("2015-10-21")
                 .withAuthor("Smith, Donald")
                 .withSubject("ExtraEntry")
-                .withEmbargoPeriod("1 week")
+                .withEmbargoPeriod(Period.ofWeeks(1))
                 .build();
 
         context.restoreAuthSystemState();
@@ -1778,7 +1844,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withTitle("embargoed item 1")
                 .withIssueDate("2017-11-18")
                 .withAuthor("Smith, Donald")
-                .withEmbargoPeriod("-2 week")
+                .withEmbargoPeriod(Period.ofWeeks(-2))
                 .build();
 
         context.restoreAuthSystemState();
@@ -1830,7 +1896,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 )));
 
 
-        //Admin users are allowed to acceess undiscoverable items
+        //Admin users are allowed to access undiscoverable items
         String token1 = getAuthToken(admin.getEmail(), password);
         getClient(token1).perform(get("/api/core/items/" + unDiscoverableYetAccessibleItem1.getID()))
                 .andExpect(status().isOk())
@@ -2069,9 +2135,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         UUID idRef = null;
-        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
         try {
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         ItemRest itemRestFull = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
@@ -2168,7 +2233,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String itemUuidString = null;
         try {
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
@@ -2251,7 +2315,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String itemUuidString = null;
         try {
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
@@ -2330,7 +2393,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String itemUuidString = null;
         try {
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
@@ -2438,7 +2500,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        new MetadataPatchSuite().runWith(getClient(token), "/api/core/items/" + item.getID(), expectedStatus);
+        new MetadataPatchSuite(mapper).runWith(getClient(token), "/api/core/items/" + item.getID(), expectedStatus);
     }
 
     /**
@@ -2463,7 +2525,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         context.restoreAuthSystemState();
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
@@ -2501,7 +2562,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         context.restoreAuthSystemState();
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
@@ -2541,7 +2601,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String itemUuidString = null;
         try {
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
@@ -2602,7 +2661,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String itemUuidString = null;
         try {
-        ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection="
                                                                 + col1.getID().toString())
@@ -2935,7 +2993,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                        BitstreamMatcher.matchBitstreamEntryWithoutEmbed(bitstream2.getID(), bitstream2.getSizeBytes())
                    )))
                    .andExpect(jsonPath("$._embedded.owningCollection._embedded.mappedItems." +
-                                           "_embedded.mappedItems[0]_embedded.relationships").doesNotExist())
+                                           "_embedded.mappedItems[0]._embedded.relationships").doesNotExist())
                    .andExpect(jsonPath("$._embedded.owningCollection._embedded.mappedItems" +
                                            "._embedded.mappedItems[0]._embedded.bundles._embedded.bundles[0]." +
                                            "_embedded.primaryBitstream").doesNotExist())
@@ -3012,8 +3070,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
 
-        ResourcePolicyBuilder.createResourcePolicy(context)
-                             .withUser(eperson)
+        ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
                              .withAction(WRITE)
                              .withDspaceObject(item)
                              .build();
@@ -3021,10 +3078,42 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/core/items/" + item.getID()))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
-                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
-                        .andExpect(jsonPath("$.metadata", matchMetadataDoesNotExist("dc.description.provenance")));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
+            .andExpect(jsonPath("$.metadata", matchMetadata("dc.description.provenance", "Provenance data")));
+
+    }
+
+    @Test
+    public void testHiddenMetadataForUserWithReadRights() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+            .withTitle("Public item 1")
+            .withProvenanceData("Provenance data")
+            .build();
+
+        context.restoreAuthSystemState();
+
+
+        ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
+            .withAction(READ)
+            .withDspaceObject(item)
+            .build();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
+            .andExpect(jsonPath("$.metadata", matchMetadataDoesNotExist("dc.description.provenance")));
 
     }
 
@@ -3895,7 +3984,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         createOrcidQueue(context, firstProfile, publication).build();
         createOrcidQueue(context, secondProfile, publication).build();
 
-        List<OrcidHistory> historyRecords = new ArrayList<OrcidHistory>();
+        List<OrcidHistory> historyRecords = new ArrayList<>();
         historyRecords.add(createOrcidHistory(context, firstProfile, publication).build());
         historyRecords.add(createOrcidHistory(context, firstProfile, publication).withPutCode("12345").build());
         historyRecords.add(createOrcidHistory(context, secondProfile, publication).build());
@@ -3982,7 +4071,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         createOrcidQueue(context, firstProfile, funding).build();
         createOrcidQueue(context, secondProfile, funding).build();
 
-        List<OrcidHistory> historyRecords = new ArrayList<OrcidHistory>();
+        List<OrcidHistory> historyRecords = new ArrayList<>();
         historyRecords.add(createOrcidHistory(context, firstProfile, funding).build());
         historyRecords.add(createOrcidHistory(context, firstProfile, funding).withPutCode("12345").build());
         historyRecords.add(createOrcidHistory(context, secondProfile, funding).build());
@@ -4081,7 +4170,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -4131,9 +4220,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .param("projection", "full"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntryFullProjection(
-                                        col1.getName(), col1.getID(), col1.getHandle())));;
+                                        col1.getName(), col1.getID(), col1.getHandle())));
 
-        // try to spoof information as a logged in eperson using embedding, verify that no embedds are included
+        // try to spoof information as a logged in eperson using embedding, verify that no embeds are included
         getClient(tokenEperson).perform(get("/api/core/items/" + item.getID())
                  .param("projection", "full"))
                  .andExpect(status().isOk())
@@ -4166,7 +4255,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(tokenEperson).perform(get("/api/core/items/" + item.getID() + "/owningCollection"))
                                .andExpect(status().isForbidden());
 
-        // try to spoof information as anonymous user using embedding, verify that no embedds are included
+        // try to spoof information as anonymous user using embedding, verify that no embeds are included
         getClient().perform(get("/api/core/items/" + item.getID())
                    .param("projection", "full"))
                    .andExpect(status().isOk())
@@ -4661,7 +4750,156 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         getClient().perform(get("/api/core/items/{uuid}/accessStatus", item.getID()))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.status", notNullValue()));
+                   .andExpect(jsonPath("$.status", notNullValue()))
+                   .andExpect(jsonPath("$.embargoDate", nullValue()));
+    }
+
+    @Test
+    public void findAccessStatusWithEmbargoDateForItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection owningCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                       .withName("Owning Collection")
+                                                       .build();
+        Item item = ItemBuilder.createItem(context, owningCollection)
+                               .withTitle("Test item")
+                               .build();
+        Bundle originalBundle = BundleBuilder.createBundle(context, item)
+                                             .withName(Constants.DEFAULT_BUNDLE_NAME)
+                                             .build();
+        InputStream is = IOUtils.toInputStream("dummy", "utf-8");
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, originalBundle, is)
+                                              .withName("test.pdf")
+                                              .withMimeType("application/pdf")
+                                              .withEmbargoPeriod(Period.ofMonths(6))
+                                              .build();
+        context.restoreAuthSystemState();
+        getClient().perform(get("/api/core/items/{uuid}/accessStatus", item.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.status", notNullValue()))
+                   .andExpect(jsonPath("$.embargoDate", notNullValue()));
+    }
+
+    @Test
+    public void findSubmitterByAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("testone@mail.com")
+                .withPassword(password)
+                .withCanLogin(true)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + publicItem.getID())
+                        .param("projection", "full"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()));
+
+        getClient(token).perform(get("/api/core/items/" + publicItem.getID() + "/submitter"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(submitter.getID().toString())))
+                .andExpect(jsonPath("$.email", is(submitter.getEmail())));
+    }
+
+    @Test
+    public void findSubmitterWithoutReadAccessTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("testone@mail.com")
+                .withPassword(password)
+                .withCanLogin(true)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + publicItem.getID())
+                        .param("projection", "full"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()));
+
+//      find submitter by user has no read access
+        getClient(token).perform(get("/api/core/items/" + publicItem.getID() + "/submitter"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void findSubmitterByAnonymousTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("testone@mail.com")
+                .withPassword(password)
+                .withCanLogin(true)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/items/" + publicItem.getID())
+                        .param("projection", "full"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()));
+
+        getClient().perform(get("/api/core/items/" + publicItem.getID() + "/submitter"))
+                .andExpect(status().isNoContent());
     }
 
 }

@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -55,7 +55,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Component(MetadataFieldRest.CATEGORY + "." + MetadataFieldRest.NAME)
+@Component(MetadataFieldRest.CATEGORY + "." + MetadataFieldRest.PLURAL_NAME)
 public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFieldRest, Integer> {
     /**
      * log4j logger
@@ -70,6 +70,9 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
     @Autowired
     private SearchService searchService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Override
     @PreAuthorize("permitAll()")
@@ -239,7 +242,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         // parse request body
         MetadataFieldRest metadataFieldRest;
         try {
-            metadataFieldRest = new ObjectMapper().readValue(
+            metadataFieldRest = mapper.readValue(
                 getRequestService().getCurrentRequest().getHttpServletRequest().getInputStream(),
                 MetadataFieldRest.class
                                                             );
@@ -319,7 +322,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
         MetadataFieldRest metadataFieldRest;
         try {
-            metadataFieldRest = new ObjectMapper().readValue(jsonNode.toString(), MetadataFieldRest.class);
+            metadataFieldRest = mapper.readValue(jsonNode.toString(), MetadataFieldRest.class);
         } catch (JsonProcessingException e) {
             throw new DSpaceBadRequestException("Cannot parse JSON in request body", e);
         }

@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.util.IOUtils;
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -72,21 +73,23 @@ public class TikaTextExtractionFilter
         // Not using temporary file. We'll use Tika's default in-memory parsing.
         // Get maximum characters to extract. Default is 100,000 chars, which is also Tika's default setting.
         String extractedText;
-        int maxChars = configurationService.getIntProperty("textextractor.max-chars", 100000);
+        int maxChars = configurationService.getIntProperty("textextractor.max-chars", 100_000);
         try {
             // Use Tika to extract text from input. Tika will automatically detect the file type.
             Tika tika = new Tika();
             tika.setMaxStringLength(maxChars); // Tell Tika the maximum number of characters to extract
+            IOUtils.setByteArrayMaxOverride(
+                    configurationService.getIntProperty("textextractor.max-array", 100_000_000));
             extractedText = tika.parseToString(source);
         } catch (IOException e) {
             System.err.format("Unable to extract text from bitstream in Item %s%n", currentItem.getID().toString());
-            e.printStackTrace();
+            e.printStackTrace(System.err);
             log.error("Unable to extract text from bitstream in Item {}", currentItem.getID().toString(), e);
             throw e;
         } catch (OutOfMemoryError oe) {
             System.err.format("OutOfMemoryError occurred when extracting text from bitstream in Item %s. " +
                 "You may wish to enable 'textextractor.use-temp-file'.%n", currentItem.getID().toString());
-            oe.printStackTrace();
+            oe.printStackTrace(System.err);
             log.error("OutOfMemoryError occurred when extracting text from bitstream in Item {}. " +
                           "You may wish to enable 'textextractor.use-temp-file'.", currentItem.getID().toString(), oe);
             throw oe;
@@ -138,7 +141,7 @@ public class TikaTextExtractionFilter
                 @Override
                 public void characters(char[] ch, int start, int length) throws SAXException {
                     try {
-                        writer.append(new String(ch), start, length);
+                        writer.append(new String(ch, start, length));
                     } catch (IOException e) {
                         String errorMsg = String.format("Could not append to temporary file at %s " +
                                                             "when performing text extraction",
@@ -156,7 +159,7 @@ public class TikaTextExtractionFilter
                 @Override
                 public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
                     try {
-                        writer.append(new String(ch), start, length);
+                        writer.append(new String(ch, start, length));
                     } catch (IOException e) {
                         String errorMsg = String.format("Could not append to temporary file at %s " +
                                                             "when performing text extraction",
