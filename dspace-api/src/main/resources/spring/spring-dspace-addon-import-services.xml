@@ -317,4 +317,8 @@
           class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexFunderFieldMapping">
     </bean>
 
+    <bean class="java.lang.Integer" id="maxRetry">
+        <constructor-arg value="3"/>
+    </bean>
+
 </beans>
