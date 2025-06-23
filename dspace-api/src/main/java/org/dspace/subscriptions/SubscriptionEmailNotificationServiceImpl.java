@@ -37,12 +37,14 @@ import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.subscriptions.service.DSpaceObjectUpdates;
 import org.dspace.subscriptions.service.SubscriptionGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of {@link DSpaceRunnable} to find subscribed objects and send notification mails about them
  *
  * @author alba aliu
  */
+@Service
 public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEmailNotificationService {
 
     private static final Logger log = LogManager.getLogger(SubscriptionEmailNotificationServiceImpl.class);
@@ -65,13 +67,13 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void perform(Context context, DSpaceRunnableHandler handler, String subscriptionType, String frequency) {
-        List<IndexableObject> communityItems = new ArrayList<>();
-        List<IndexableObject> collectionsItems = new ArrayList<>();
+        Map<DSpaceObject, List<IndexableObject>> communityItemsMap = new HashMap<>();
+        Map<DSpaceObject, List<IndexableObject>> collectionsItemsMap = new HashMap<>();
         try {
             List<Subscription> subscriptions =
                                findAllSubscriptionsBySubscriptionTypeAndFrequency(context, subscriptionType, frequency);
             // Here is verified if SubscriptionType is "content" Or "statistics" as them are configured
-            if (subscriptionType2generators.keySet().contains(subscriptionType)) {
+            if (subscriptionType2generators.containsKey(subscriptionType)) {
                 // the list of the person who has subscribed
                 int iterator = 0;
                 for (Subscription subscription : subscriptions) {
@@ -87,12 +89,18 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
                         List<IndexableObject> indexableCommunityItems = contentUpdates
                                 .get(Community.class.getSimpleName().toLowerCase())
                                 .findUpdates(context, dSpaceObject, frequency);
-                        communityItems.addAll(getItems(context, ePerson, indexableCommunityItems));
+                        List<IndexableObject> filteredItems = getItems(context, ePerson, indexableCommunityItems);
+                        if (!filteredItems.isEmpty()) {
+                            communityItemsMap.put(dSpaceObject, filteredItems);
+                        }
                     } else if (dSpaceObject.getType() == COLLECTION) {
                         List<IndexableObject> indexableCollectionItems = contentUpdates
                                 .get(Collection.class.getSimpleName().toLowerCase())
                                 .findUpdates(context, dSpaceObject, frequency);
-                        collectionsItems.addAll(getItems(context, ePerson, indexableCollectionItems));
+                        List<IndexableObject> filteredItems = getItems(context, ePerson, indexableCollectionItems);
+                        if (!filteredItems.isEmpty()) {
+                            collectionsItemsMap.put(dSpaceObject, filteredItems);
+                        }
                     } else {
                         log.warn("found an invalid DSpace Object type ({}) among subscriptions to send",
                                  dSpaceObject.getType());
@@ -106,14 +114,14 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
                             continue;
                         } else {
                             subscriptionType2generators.get(subscriptionType)
-                                      .notifyForSubscriptions(context, ePerson, communityItems, collectionsItems);
-                            communityItems.clear();
-                            collectionsItems.clear();
+                                .notifyForSubscriptions(context, ePerson, communityItemsMap, collectionsItemsMap);
+                            communityItemsMap.clear();
+                            collectionsItemsMap.clear();
                         }
                     } else {
                         //in the end of the iteration
                         subscriptionType2generators.get(subscriptionType)
-                                        .notifyForSubscriptions(context, ePerson, communityItems, collectionsItems);
+                            .notifyForSubscriptions(context, ePerson, communityItemsMap, collectionsItemsMap);
                     }
                     iterator++;
                 }
