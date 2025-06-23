@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -27,10 +26,11 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class VersionedHandleIdentifierProviderWithCanonicalHandlesIT extends AbstractIntegrationTestWithDatabase {
+public class VersionedHandleIdentifierProviderWithCanonicalHandlesIT extends AbstractIdentifierProviderIT {
     private ServiceManager serviceManager;
     private IdentifierServiceImpl identifierService;
 
@@ -62,34 +62,34 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandlesIT extends Abs
                                       .withName("Collection")
                                       .build();
 
-
+        registerProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
     }
 
-    private void registerProvider(Class type) {
-        // Register our new provider
-        List servicesByType = serviceManager.getServicesByType(type);
-        if (servicesByType.isEmpty()) {
-            serviceManager.registerServiceClass(type.getName(), type);
-        }
-        IdentifierProvider identifierProvider =
-            (IdentifierProvider) serviceManager.getServiceByName(type.getName(), type);
-
-        // Overwrite the identifier-service's providers with the new one to ensure only this provider is used
-        identifierService.setProviders(List.of(identifierProvider));
+    @After
+    @Override
+    public void destroy() throws Exception {
+        super.destroy();
+        // Unregister this non-default provider
+        unregisterProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
+        // Re-register the default provider (for later tests)
+        registerProvider(VersionedHandleIdentifierProvider.class);
     }
 
     private void createVersions() throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+
         itemV1 = ItemBuilder.createItem(context, collection)
                             .withTitle("First version")
                             .build();
         firstHandle = itemV1.getHandle();
         itemV2 = VersionBuilder.createVersion(context, itemV1, "Second version").build().getItem();
         itemV3 = VersionBuilder.createVersion(context, itemV1, "Third version").build().getItem();
+
+        context.restoreAuthSystemState();
     }
 
     @Test
     public void testCanonicalVersionedHandleProvider() throws Exception {
-        registerProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
         createVersions();
 
         // Confirm the original item only has a version handle
@@ -106,8 +106,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandlesIT extends Abs
 
     @Test
     public void testCollectionHandleMetadata() {
-        registerProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
-
+        context.turnOffAuthorisationSystem();
         Community testCommunity = CommunityBuilder.createCommunity(context)
                                                   .withName("Test community")
                                                   .build();
@@ -115,6 +114,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandlesIT extends Abs
         Collection testCollection = CollectionBuilder.createCollection(context, testCommunity)
                                                      .withName("Test Collection")
                                                      .build();
+        context.restoreAuthSystemState();
 
         List<MetadataValue> metadata = ContentServiceFactory.getInstance().getDSpaceObjectService(testCollection)
                                                             .getMetadata(testCollection, "dc", "identifier", "uri",
@@ -126,11 +126,11 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandlesIT extends Abs
 
     @Test
     public void testCommunityHandleMetadata() {
-        registerProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
-
+        context.turnOffAuthorisationSystem();
         Community testCommunity = CommunityBuilder.createCommunity(context)
                                                   .withName("Test community")
                                                   .build();
+        context.restoreAuthSystemState();
 
         List<MetadataValue> metadata = ContentServiceFactory.getInstance().getDSpaceObjectService(testCommunity)
                                                             .getMetadata(testCommunity, "dc", "identifier", "uri",
