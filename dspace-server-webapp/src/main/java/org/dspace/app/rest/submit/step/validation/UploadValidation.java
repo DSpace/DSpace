@@ -15,12 +15,15 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
 import org.dspace.app.rest.submit.SubmissionService;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.content.Bitstream;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.service.ItemService;
 import org.dspace.submit.model.UploadConfiguration;
 import org.dspace.submit.model.UploadConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Execute file required check validation
@@ -37,16 +40,25 @@ public class UploadValidation extends AbstractValidation {
 
     private UploadConfigurationService uploadConfigurationService;
 
+    @Autowired
+    private MetadataValidation metadataValidation;
+
     @Override
     public List<ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
                                     SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
-        //TODO MANAGE METADATA
         List<ErrorRest> errors = new ArrayList<>();
         UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(config.getId());
         if (uploadConfig.isRequired() && !itemService.hasUploadedFiles(obj.getItem())) {
             addError(errors, ERROR_VALIDATION_FILEREQUIRED,
                      "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/"
                          + config.getId());
+        }
+        if (itemService.hasUploadedFiles(obj.getItem())) {
+            List<Bitstream> bitstreams =
+                    itemService.getNonInternalBitstreams(ContextUtil.obtainCurrentRequestContext(), obj.getItem());
+            for (Bitstream bitstream : bitstreams) {
+                errors.addAll(metadataValidation.validate(submissionService, bitstream, config));
+            }
         }
         return errors;
     }
