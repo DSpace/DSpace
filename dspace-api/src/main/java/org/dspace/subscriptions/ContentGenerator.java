@@ -70,7 +70,7 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
     private static final String MODIFIED_ITEMS_LABEL = "Modified Items";
     private static final int MAX_METADATA_VALUES = 3;
     private static final String COMMUNITY_NOTE_PREFIX = " (via community subscription to \"";
-    private static final String COMMUNITY_NOTE_SUFFIX = " \")";
+    private static final String COMMUNITY_NOTE_SUFFIX = "\")";
     private static final String LINE_SEPARATOR = System.lineSeparator();
 
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
@@ -99,21 +99,15 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
                     collMap.values().forEach(allItems::addAll);
                 }
 
-                Map<Collection, List<IndexableObject>> allByCollection =
-                        allItems.stream()
-                                .filter(distinctByKey(IndexableObject::getID))
-                                .collect(groupingBy(obj -> ((Item) obj.getIndexedObject()).getOwningCollection()));
+                Map<Boolean, List<IndexableObject>> partitionedItems = allItems.stream()
+                        .filter(distinctByKey(IndexableObject::getID))
+                        .collect(partitioningBy(obj -> isNewItem((Item) obj.getIndexedObject())));
 
-                // Split into new and modified sections
-                Map<Collection, List<IndexableObject>> newItemsByCollection = new HashMap<>();
-                Map<Collection, List<IndexableObject>> modifiedItemsByCollection = new HashMap<>();
-                allByCollection.forEach((collection, items) -> {
-                    Map<Boolean, List<IndexableObject>> partitionedItems =
-                            items.stream().collect(partitioningBy(obj -> isNewItem((Item) obj.getIndexedObject())));
+                Map<Collection, List<IndexableObject>> newItemsByCollection = partitionedItems.get(true).stream()
+                        .collect(groupingBy(obj -> ((Item) obj.getIndexedObject()).getOwningCollection()));
 
-                    newItemsByCollection.put(collection,  partitionedItems.get(true));
-                    modifiedItemsByCollection.put(collection, partitionedItems.get(false));
-                });
+                Map<Collection, List<IndexableObject>> modifiedItemsByCollection = partitionedItems.get(false).stream()
+                        .collect(groupingBy(obj -> ((Item) obj.getIndexedObject()).getOwningCollection()));
 
                 String intro = buildIntro(newItemsByCollection, modifiedItemsByCollection);
                 String combinedSection = buildCombinedSection(newItemsByCollection, modifiedItemsByCollection,
