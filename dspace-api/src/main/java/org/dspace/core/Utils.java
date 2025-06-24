@@ -25,7 +25,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.LocalDateTime
 import java.time.Instant;
-import java.time.ZoneOffset
+import java.time.ZoneOffset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
