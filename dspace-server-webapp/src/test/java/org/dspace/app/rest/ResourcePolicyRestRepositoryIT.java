@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,6 +33,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.commons.codec.CharEncoding;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.matcher.ResourcePolicyMatcher;
 import org.dspace.app.rest.model.ResourcePolicyRest;
@@ -43,12 +46,14 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -183,7 +188,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void findOneNotFoundTest() throws Exception {
 
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + UUID.randomUUID().toString()))
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + UUID.randomUUID()))
             .andExpect(status().isNotFound());
     }
 
@@ -1216,6 +1221,376 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
+    public void createPolicyByCollectionAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson colAdmin = EPersonBuilder.createEPerson(context)
+                                         .withEmail("colAdmin@mail.test")
+                                         .withPassword(password)
+                                         .build();
+
+        EPerson colAdmin2 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("colAdmin2@mail.test")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("colSubmitter@mail.test")
+                                          .withPassword(password)
+                                          .build();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("My top commynity")
+                                              .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                 .withName("My collection")
+                                                 .withAdminGroup(colAdmin)
+                                                 .withSubmitterGroup(submitter)
+                                                 .withEntityType("Publication")
+                                                 .build();
+
+        CollectionBuilder.createCollection(context, community)
+                         .withName("My Second Collection")
+                         .withAdminGroup(colAdmin2)
+                         .withSubmitterGroup(submitter)
+                         .withEntityType("Publication")
+                         .build();
+
+        Item publication = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item")
+                                      .build();
+
+        //Add a bitstream to a publication
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream("ThisIsSomeDummyText", CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.createBitstream(context, publication, is)
+                                        .withName("Bitstream")
+                                        .withDescription("description")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+        context.restoreAuthSystemState();
+
+        ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
+        resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_CUSTOM);
+        resourcePolicyRest.setAction(Constants.actionText[Constants.WRITE]);
+        resourcePolicyRest.setName("Test for collection admin");
+
+        String authcolAdminToken = getAuthToken(colAdmin.getEmail(), password);
+        String authcolAdmin2Token = getAuthToken(colAdmin2.getEmail(), password);
+        String authSubmitterToken = getAuthToken(submitter.getEmail(), password);
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        try {
+            // submitter can't create policy
+            getClient(authSubmitterToken).perform(post("/api/authz/resourcepolicies")
+                                         .content(new ObjectMapper().writeValueAsBytes(resourcePolicyRest))
+                                         .param("resource", bitstream.getID().toString())
+                                         .param("eperson", submitter.getID().toString())
+                                         .param("projections", "full")
+                                         .contentType(contentType))
+                                         .andExpect(status().isForbidden());
+
+            // other collection admin can't create policy for other collection
+            getClient(authcolAdmin2Token).perform(post("/api/authz/resourcepolicies")
+                                         .content(new ObjectMapper().writeValueAsBytes(resourcePolicyRest))
+                                         .param("resource", bitstream.getID().toString())
+                                         .param("eperson", submitter.getID().toString())
+                                         .param("projections", "full")
+                                         .contentType(contentType))
+                                         .andExpect(status().isForbidden());
+
+            // create policy for submitter by collection admin
+            getClient(authcolAdminToken).perform(post("/api/authz/resourcepolicies")
+                                        .content(new ObjectMapper().writeValueAsBytes(resourcePolicyRest))
+                                        .param("resource", bitstream.getID().toString())
+                                        .param("eperson", submitter.getID().toString())
+                                        .param("projections", "full")
+                                        .contentType(contentType))
+                    .andExpect(status().isCreated())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$", ResourcePolicyMatcher.matchFullEmbeds()))
+                    .andExpect(jsonPath("$", Matchers.allOf(
+                            hasJsonPath("$.name", is(resourcePolicyRest.getName())),
+                            hasJsonPath("$.description", is(resourcePolicyRest.getDescription())),
+                            hasJsonPath("$.policyType", is(resourcePolicyRest.getPolicyType())),
+                            hasJsonPath("$.action", is(resourcePolicyRest.getAction())),
+                            hasJsonPath("$.startDate", is(resourcePolicyRest.getStartDate())),
+                            hasJsonPath("$.endDate", is(resourcePolicyRest.getEndDate())),
+                            hasJsonPath("$.type", is(resourcePolicyRest.getType())))))
+                    .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            // submitter can see own policy
+            getClient(authSubmitterToken).perform(get("/api/authz/resourcepolicies/" + idRef.get()))
+                                         .andExpect(status().isOk())
+                                         .andExpect(content().contentType(contentType))
+                                         .andExpect(jsonPath("$._links.self.href",
+                                             Matchers.containsString("/api/authz/resourcepolicies/" + idRef.get())));
+
+            // collection admin can see that policy
+            getClient(authcolAdminToken).perform(get("/api/authz/resourcepolicies/" + idRef.get()))
+                                        .andExpect(status().isOk())
+                                        .andExpect(content().contentType(contentType))
+                                        .andExpect(jsonPath("$._links.self.href",
+                                            Matchers.containsString("/api/authz/resourcepolicies/" + idRef.get())));
+        } finally {
+            ResourcePolicyBuilder.delete(idRef.get());
+        }
+    }
+
+    @Test
+    public void createPolicyBySubCommunityAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson comAdmin = EPersonBuilder.createEPerson(context)
+                                         .withEmail("comAdmin@mail.test")
+                                         .withPassword(password)
+                                         .build();
+
+        EPerson comAdmin2 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("comAdmin2@mail.test")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("colSubmitter@mail.test")
+                                          .withPassword(password)
+                                          .build();
+
+        Community community = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                              .withName("My First Commynity")
+                                              .withAdminGroup(comAdmin)
+                                              .build();
+
+        Community community2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                               .withName("My Second Commynity")
+                                               .withAdminGroup(comAdmin2)
+                                               .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                 .withName("My collection")
+                                                 .withSubmitterGroup(submitter)
+                                                 .withEntityType("Publication")
+                                                 .build();
+
+        CollectionBuilder.createCollection(context, community2)
+                         .withName("My Second Collection")
+                         .withSubmitterGroup(submitter)
+                         .withEntityType("Publication")
+                         .build();
+
+        Item publication = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
+        resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_CUSTOM);
+        resourcePolicyRest.setAction(Constants.actionText[Constants.WRITE]);
+        resourcePolicyRest.setName("Test for collection admin");
+
+        String authcomAdminToken = getAuthToken(comAdmin.getEmail(), password);
+        String authcomAdmin2Token = getAuthToken(comAdmin2.getEmail(), password);
+        String authSubmitterToken = getAuthToken(submitter.getEmail(), password);
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        try {
+            // submitter can't create policy
+            getClient(authSubmitterToken).perform(post("/api/authz/resourcepolicies")
+                                         .content(new ObjectMapper().writeValueAsBytes(resourcePolicyRest))
+                                         .param("resource", publication.getID().toString())
+                                         .param("eperson", submitter.getID().toString())
+                                         .param("projections", "full")
+                                         .contentType(contentType))
+                                         .andExpect(status().isForbidden());
+
+            // other Community admin can't create policy for collections into other Community
+            getClient(authcomAdmin2Token).perform(post("/api/authz/resourcepolicies")
+                                         .content(new ObjectMapper().writeValueAsBytes(resourcePolicyRest))
+                                         .param("resource", publication.getID().toString())
+                                         .param("eperson", submitter.getID().toString())
+                                         .param("projections", "full")
+                                         .contentType(contentType))
+                                         .andExpect(status().isForbidden());
+
+            // create policy for submitter by Community admin
+            getClient(authcomAdminToken).perform(post("/api/authz/resourcepolicies")
+                                        .content(new ObjectMapper().writeValueAsBytes(resourcePolicyRest))
+                                        .param("resource", publication.getID().toString())
+                                        .param("eperson", submitter.getID().toString())
+                                        .param("projections", "full")
+                                        .contentType(contentType))
+                    .andExpect(status().isCreated())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$", ResourcePolicyMatcher.matchFullEmbeds()))
+                    .andExpect(jsonPath("$", Matchers.allOf(
+                            hasJsonPath("$.name", is(resourcePolicyRest.getName())),
+                            hasJsonPath("$.description", is(resourcePolicyRest.getDescription())),
+                            hasJsonPath("$.policyType", is(resourcePolicyRest.getPolicyType())),
+                            hasJsonPath("$.action", is(resourcePolicyRest.getAction())),
+                            hasJsonPath("$.startDate", is(resourcePolicyRest.getStartDate())),
+                            hasJsonPath("$.endDate", is(resourcePolicyRest.getEndDate())),
+                            hasJsonPath("$.type", is(resourcePolicyRest.getType())))))
+                    .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            // submitter can see own policy
+            getClient(authSubmitterToken).perform(get("/api/authz/resourcepolicies/" + idRef.get()))
+                                         .andExpect(status().isOk())
+                                         .andExpect(content().contentType(contentType))
+                                         .andExpect(jsonPath("$._links.self.href",
+                                             Matchers.containsString("/api/authz/resourcepolicies/" + idRef.get())));
+
+            // community admin can see policies of own collections/items
+            getClient(authcomAdminToken).perform(get("/api/authz/resourcepolicies/" + idRef.get()))
+                                        .andExpect(status().isOk())
+                                        .andExpect(content().contentType(contentType))
+                                        .andExpect(jsonPath("$._links.self.href",
+                                            Matchers.containsString("/api/authz/resourcepolicies/" + idRef.get())));
+
+            // Other community admin can't see policies of other community's collections/items
+            getClient(authcomAdmin2Token).perform(get("/api/authz/resourcepolicies/" + idRef.get()))
+                                         .andExpect(status().isForbidden());
+        } finally {
+            ResourcePolicyBuilder.delete(idRef.get());
+        }
+    }
+
+    @Test
+    public void createPolicyByCommunityAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson rootComAdmin = EPersonBuilder.createEPerson(context)
+                                             .withEmail("rootComAdmin@mail.test")
+                                             .withPassword(password)
+                                             .build();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("colSubmitter@mail.test")
+                                          .withPassword(password)
+                                          .build();
+
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Root Community")
+                                                  .withAdminGroup(rootComAdmin)
+                                                  .build();
+
+        Community community = CommunityBuilder.createSubCommunity(context, rootCommunity)
+                                              .withName("My First Commynity")
+                                              .build();
+
+        Community community2 = CommunityBuilder.createSubCommunity(context, rootCommunity)
+                                               .withName("My Second Commynity")
+                                               .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                 .withName("My collection")
+                                                 .withSubmitterGroup(submitter)
+                                                 .withEntityType("Publication")
+                                                 .build();
+
+        CollectionBuilder.createCollection(context, community2)
+                         .withName("My Second Collection")
+                         .withSubmitterGroup(submitter)
+                         .withEntityType("Publication")
+                         .build();
+
+        Item publication = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item")
+                                      .build();
+
+        Collection collection2 = CollectionBuilder.createCollection(context, community)
+                                                  .withName("My Second Collection")
+                                                  .withSubmitterGroup(submitter)
+                                                  .withEntityType("Publication")
+                                                  .build();
+
+        Item publication2 = ItemBuilder.createItem(context, collection2)
+                                       .withTitle("Item of second collection")
+                                       .build();
+
+        //Add a bitstream to a publication
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream("ThisIsSomeDummyText", CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.createBitstream(context, publication2, is)
+                    .withName("Bitstream")
+                    .withDescription("description")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
+        resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_CUSTOM);
+        resourcePolicyRest.setAction(Constants.actionText[Constants.WRITE]);
+        resourcePolicyRest.setName("Test for collection admin");
+
+        ResourcePolicyRest resourcePolicyRest2 = new ResourcePolicyRest();
+        resourcePolicyRest2.setPolicyType(ResourcePolicy.TYPE_CUSTOM);
+        resourcePolicyRest2.setAction(Constants.actionText[Constants.WRITE]);
+        resourcePolicyRest2.setName("Test for root community admin");
+
+        String authSubmitterToken = getAuthToken(submitter.getEmail(), password);
+        String authRootAdminToken = getAuthToken(rootComAdmin.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef2 = new AtomicReference<Integer>();
+        try {
+            // create policy for submitter by root Community admin
+            getClient(authRootAdminToken).perform(post("/api/authz/resourcepolicies")
+                                         .content(new ObjectMapper().writeValueAsBytes(resourcePolicyRest))
+                                         .param("resource", publication.getID().toString())
+                                         .param("eperson", submitter.getID().toString())
+                                         .contentType(contentType))
+                    .andExpect(status().isCreated())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$", ResourcePolicyMatcher.matchFullEmbeds()))
+                    .andExpect(jsonPath("$", Matchers.allOf(
+                            hasJsonPath("$.name", is(resourcePolicyRest.getName())),
+                            hasJsonPath("$.description", is(resourcePolicyRest.getDescription())),
+                            hasJsonPath("$.policyType", is(resourcePolicyRest.getPolicyType())),
+                            hasJsonPath("$.action", is(resourcePolicyRest.getAction())),
+                            hasJsonPath("$.startDate", is(resourcePolicyRest.getStartDate())),
+                            hasJsonPath("$.endDate", is(resourcePolicyRest.getEndDate())),
+                            hasJsonPath("$.type", is(resourcePolicyRest.getType())))))
+                    .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            // create policy for submitter by root Community admin
+            getClient(authRootAdminToken).perform(post("/api/authz/resourcepolicies")
+                                         .content(new ObjectMapper().writeValueAsBytes(resourcePolicyRest))
+                                         .param("resource", bitstream.getID().toString())
+                                         .param("eperson", submitter.getID().toString())
+                                         .contentType(contentType))
+                    .andExpect(status().isCreated())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$", ResourcePolicyMatcher.matchFullEmbeds()))
+                    .andExpect(jsonPath("$", Matchers.allOf(
+                            hasJsonPath("$.name", is(resourcePolicyRest.getName())),
+                            hasJsonPath("$.description", is(resourcePolicyRest.getDescription())),
+                            hasJsonPath("$.policyType", is(resourcePolicyRest.getPolicyType())),
+                            hasJsonPath("$.action", is(resourcePolicyRest.getAction())),
+                            hasJsonPath("$.startDate", is(resourcePolicyRest.getStartDate())),
+                            hasJsonPath("$.endDate", is(resourcePolicyRest.getEndDate())),
+                            hasJsonPath("$.type", is(resourcePolicyRest.getType())))))
+                    .andDo(result -> idRef2.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient(authSubmitterToken).perform(get("/api/authz/resourcepolicies/" + idRef.get()))
+                                         .andExpect(status().isOk())
+                                         .andExpect(content().contentType(contentType))
+                                         .andExpect(jsonPath("$._links.self.href",
+                                             Matchers.containsString("/api/authz/resourcepolicies/" + idRef.get())));
+
+            getClient(authSubmitterToken).perform(get("/api/authz/resourcepolicies/" + idRef2.get()))
+                                         .andExpect(status().isOk())
+                                         .andExpect(content().contentType(contentType))
+                                         .andExpect(jsonPath("$._links.self.href",
+                                             Matchers.containsString("/api/authz/resourcepolicies/" + idRef2.get())));
+        } finally {
+            ResourcePolicyBuilder.delete(idRef.get());
+            ResourcePolicyBuilder.delete(idRef2.get());
+        }
+    }
+
+    @Test
     public void deleteOne() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -1306,6 +1681,174 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(delete("/api/authz/resourcepolicies/" + Integer.MAX_VALUE))
             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deletePolicyByCollectionAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson colAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("colAdmin@mail.test")
+                .withPassword(password)
+                .build();
+
+        EPerson colAdmin2 = EPersonBuilder.createEPerson(context)
+                .withEmail("colAdmin2@mail.test")
+                .withPassword(password)
+                .build();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("colSubmitter@mail.test")
+                .withPassword(password)
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("My top commynity")
+                .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withName("My collection")
+                .withAdminGroup(colAdmin)
+                .withSubmitterGroup(submitter)
+                .withEntityType("Publication")
+                .build();
+
+        CollectionBuilder.createCollection(context, community)
+                .withName("My Second Collection")
+                .withAdminGroup(colAdmin2)
+                .withSubmitterGroup(submitter)
+                .withEntityType("Publication")
+                .build();
+
+        Item publication = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item")
+                .build();
+
+        //Add a bitstream to a publication
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream("ThisIsSomeDummyText", CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.createBitstream(context, publication, is)
+                    .withName("Bitstream")
+                    .withDescription("description")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String authcolAdminToken = getAuthToken(colAdmin.getEmail(), password);
+        String authcolAdmin2Token = getAuthToken(colAdmin2.getEmail(), password);
+        String authSubmitterToken = getAuthToken(submitter.getEmail(), password);
+
+        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context, submitter, null)
+                                                 .withDspaceObject(bitstream)
+                                                 .withAction(Constants.READ)
+                                                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                                                 .build();
+
+        // submitter can't delete own policy
+        getClient(authSubmitterToken).perform(delete("/api/authz/resourcepolicies/" + rp.getID()))
+                                     .andExpect(status().isForbidden());
+
+        // check that policy wasn't deleted
+        getClient(adminToken).perform(get("/api/authz/resourcepolicies/" + rp.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(contentType))
+                             .andExpect(jsonPath("$._links.self.href",
+                                 Matchers.containsString("/api/authz/resourcepolicies/" + rp.getID())));
+
+        // other collection admin can't delete policy that belong to items of other collections
+        getClient(authcolAdmin2Token).perform(delete("/api/authz/resourcepolicies/" + rp.getID()))
+                                     .andExpect(status().isForbidden());
+
+        // check that policy wasn't deleted
+        getClient(adminToken).perform(get("/api/authz/resourcepolicies/" + rp.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(contentType))
+                             .andExpect(jsonPath("$._links.self.href",
+                                 Matchers.containsString("/api/authz/resourcepolicies/" + rp.getID())));
+
+        // delete policy for submitter by collection admin
+        getClient(authcolAdminToken).perform(delete("/api/authz/resourcepolicies/" + rp.getID()))
+                                    .andExpect(status().isNoContent());
+
+        getClient(adminToken).perform(get("/api/authz/resourcepolicies/" + rp.getID()))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deletePolicyBySubCommunityAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson comAdmin = EPersonBuilder.createEPerson(context)
+                                         .withEmail("comAdmin@mail.test")
+                                         .withPassword(password)
+                                         .build();
+
+        EPerson comAdmin2 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("comAdmin2@mail.test")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("colSubmitter@mail.test")
+                                          .withPassword(password)
+                                          .build();
+
+        Community community = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                              .withName("My First Commynity")
+                                              .withAdminGroup(comAdmin)
+                                              .build();
+
+        Community community2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                               .withName("My Second Commynity")
+                                               .withAdminGroup(comAdmin2)
+                                               .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                 .withName("My collection")
+                                                 .withSubmitterGroup(submitter)
+                                                 .withEntityType("Publication")
+                                                 .build();
+
+        CollectionBuilder.createCollection(context, community2)
+                         .withName("My Second Collection")
+                         .withSubmitterGroup(submitter)
+                         .withEntityType("Publication")
+                         .build();
+
+        Item publication = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context, submitter, null)
+                                                 .withDspaceObject(publication)
+                                                 .withAction(Constants.WRITE)
+                                                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                                                 .build();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String authcomAdminToken = getAuthToken(comAdmin.getEmail(), password);
+        String authcomAdmin2Token = getAuthToken(comAdmin2.getEmail(), password);
+
+        // other Community admin can't delete policy of other Community
+        getClient(authcomAdmin2Token).perform(delete("/api/authz/resourcepolicies/" + rp.getID()))
+                                     .andExpect(status().isForbidden());
+
+        getClient(adminToken).perform(get("/api/authz/resourcepolicies/" + rp.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(contentType))
+                             .andExpect(jsonPath("$._links.self.href",
+                                 Matchers.containsString("/api/authz/resourcepolicies/" + rp.getID())));
+
+        // Community admin can delete policy
+        getClient(authcomAdminToken).perform(delete("/api/authz/resourcepolicies/" + rp.getID()))
+                                    .andExpect(status().isNoContent());
+
+        // submitter can see own policy
+        getClient(adminToken).perform(get("/api/authz/resourcepolicies/" + rp.getID()))
+                             .andExpect(status().isNotFound());
     }
 
     @Test

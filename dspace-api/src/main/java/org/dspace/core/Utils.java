@@ -506,4 +506,5 @@ public final class Utils {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         return StringSubstitutor.replace(string, config.getProperties());
     }
+
 }
