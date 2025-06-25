@@ -288,6 +288,57 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     }
 
     @Override
+    public List<EPerson> searchMembers(Context context, String query, Group includeGroup, int offset, int limit)
+            throws SQLException {
+        List<EPerson> ePersons = new ArrayList<>();
+        UUID uuid = UUIDUtils.fromString(query);
+        if (uuid == null) {
+            // Search by firstname & lastname (NOTE: email will also be included automatically)
+            MetadataField firstNameField = metadataFieldService.findByElement(context, "eperson", "firstname", null);
+            MetadataField lastNameField = metadataFieldService.findByElement(context, "eperson", "lastname", null);
+            if (StringUtils.isBlank(query)) {
+                query = null;
+            }
+            ePersons = ePersonDAO.searchMember(context, query, Arrays.asList(firstNameField, lastNameField),
+                    includeGroup, Arrays.asList(firstNameField, lastNameField),
+                    offset, limit);
+        } else {
+            // Search by UUID
+            EPerson person = find(context, uuid);
+            // Verify EPerson is a member of the given group before adding
+            if (person != null && groupService.isDirectMember(includeGroup, person)) {
+                ePersons.add(person);
+            }
+        }
+
+        return ePersons;
+    }
+
+    @Override
+    public int searchMembersCount(Context context, String query, Group includeGroup) throws SQLException {
+        int result = 0;
+        UUID uuid = UUIDUtils.fromString(query);
+        if (uuid == null) {
+            // Count results found by firstname & lastname (email is also included automatically)
+            MetadataField firstNameField = metadataFieldService.findByElement(context, "eperson", "firstname", null);
+            MetadataField lastNameField = metadataFieldService.findByElement(context, "eperson", "lastname", null);
+            if (StringUtils.isBlank(query)) {
+                query = null;
+            }
+            result = ePersonDAO.searchMemberCount(context, query, Arrays.asList(firstNameField, lastNameField),
+                    includeGroup);
+        } else {
+            // Search by UUID
+            EPerson person = find(context, uuid);
+            // Verify EPerson is a member of the given group before counting
+            if (person != null && groupService.isDirectMember(includeGroup, person)) {
+                result = 1;
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<EPerson> findAll(Context context, int sortField) throws SQLException {
         return findAll(context, sortField, -1, -1);
     }
