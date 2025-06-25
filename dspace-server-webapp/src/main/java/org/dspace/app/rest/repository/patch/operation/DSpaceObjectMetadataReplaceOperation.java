@@ -80,8 +80,7 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
                          MetadataValueRest metadataValue, String index, String propertyOfMd, String valueMdProperty) {
         // replace entire set of metadata
         if (metadataField == null) {
-            this.replaceAllMetadata(context, dso, dsoService);
-            return;
+            throw new UnprocessableEntityException("Metadata field does not exist");
         }
 
         // replace all metadata for existing key
