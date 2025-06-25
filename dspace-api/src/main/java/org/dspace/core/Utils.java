@@ -24,9 +24,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -508,49 +505,6 @@ public final class Utils {
     public static String interpolateConfigsInString(String string) {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         return StringSubstitutor.replace(string, config.getProperties());
-    }
-
-    /**
-     * Get the maximum timestamp that can be stored in a PostgreSQL database with hibernate,
-     * for our "distant future" access expiry date.
-     * @return the maximum timestamp that can be stored with Postgres + Hibernate
-     */
-    public static Instant getMaxTimestamp() {
-        return LocalDateTime.of(294276, 12, 31, 23, 59, 59)
-                .toInstant(ZoneOffset.UTC);
-    }
-
-    /**
-     * Get the minimum timestamp that can be stored in a PostgreSQL database, for date validation or any other
-     * purpose to ensure we don't try to store a date before the epoch.
-     * @return the minimum timestamp that can be stored with Postgres + Hibernate
-     */
-    public static Instant getMinTimestamp() {
-        return LocalDateTime.of(-4713, 11, 12, 0, 0, 0)
-                .toInstant(ZoneOffset.UTC);
-    }
-
-    /**
-     * Checks whether a given string can be converted to a valid {@code int} value.
-     * <p>
-     * This method returns {@code false} if the input string is {@code null}, empty,
-     * or contains only whitespace. Otherwise, it attempts to parse the string as an
-     * integer using {@link Integer#parseInt(String)}.
-     *
-     * @param str the string to check for integer convertibility
-     * @return {@code true} if the string is non-blank and can be parsed as an integer;
-     *         {@code false} otherwise
-     */
-    public static boolean isConvertibleToInt(String str) {
-        if (StringUtils.isBlank(str)) {
-            return false;
-        }
-        try {
-            Integer.parseInt(str);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
     }
 
 }
