@@ -33,7 +33,7 @@
         <!-- NOTE: when updating jackson.version, also sync jackson-databind.version below -->
         <jackson.version>2.19.1</jackson.version>
         <jackson-databind.version>2.19.1</jackson-databind.version>
-        <jackson-dataformat.version>2.16.0</jackson-dataformat.version>
+        <jackson-dataformat.version>2.19.1</jackson-dataformat.version>
         <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
         <jaxb-api.version>4.0.2</jaxb-api.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
@@ -1352,6 +1352,16 @@
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-xml</artifactId>
                 <version>${jackson-dataformat.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.fasterxml.woodstox</groupId>
+                        <artifactId>woodstox-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.codehaus.woodstox</groupId>
+                        <artifactId>stax2-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Solr-core and Postgres disagree on versions of Checker Qual -->
