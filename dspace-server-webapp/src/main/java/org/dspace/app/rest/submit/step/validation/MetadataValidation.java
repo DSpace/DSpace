@@ -182,6 +182,8 @@ public class MetadataValidation extends AbstractValidation {
                 }
             }
 
+            // If a validation dictionary is set, search the Solr suggest dictionary for the
+            // metadatavalue and return an error if it is not present
             if (input.getValidationDictionary() != null && !StringUtils.isEmpty(md.getValue())) {
                 try {
                 String json = solrSuggestService.getSuggestions(md.getValue(),
