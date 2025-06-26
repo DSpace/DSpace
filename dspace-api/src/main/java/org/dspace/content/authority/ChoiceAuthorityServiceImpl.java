@@ -36,6 +36,7 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.services.ConfigurationService;
 import org.dspace.submit.factory.SubmissionServiceFactory;
 import org.dspace.submit.service.SubmissionConfigService;
+import org.dspace.vocabulary.ControlledVocabulary;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -343,9 +344,9 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                                 authorityName = dcinput.getVocabulary();
                             }
 
-                            // do we have an authority that is not configured for solr 'suggest' type?
+                            // do we have a vocabulary that is NOT configured for solr 'suggest' type?
                             if (StringUtils.isNotBlank(authorityName)
-                                    && !"suggest".equals(dcinput.getVocabularyType())) {
+                                    && !ControlledVocabulary.SUGGEST.equals(dcinput.getVocabularyType())) {
                                 String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
                                                                dcinput.getQualifier());
                                 ChoiceAuthority ca = controller.get(authorityName);

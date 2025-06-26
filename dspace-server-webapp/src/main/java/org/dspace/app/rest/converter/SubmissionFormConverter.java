@@ -30,6 +30,7 @@ import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.submit.model.LanguageFormField;
+import org.dspace.vocabulary.ControlledVocabulary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -121,7 +122,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                 String inputType = dcinput.getInputType();
 
                 SelectableMetadata selMd = new SelectableMetadata();
-                if ("suggest".equals(dcinput.getVocabularyType())) {
+                if (ControlledVocabulary.SUGGEST.equals(dcinput.getVocabularyType())) {
                     inputRest.setType(INPUT_TYPE_ONEBOX);
                     selMd.setControlledVocabulary(dcinput.getVocabulary());
                     selMd.setClosed(dcinput.isClosedVocabulary());
@@ -152,7 +153,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                     selMd.setLabel((String) pairs.get(idx));
                     selMd.setMetadata(org.dspace.core.Utils
                             .standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
-                    if ("suggest".equals(dcinput.getVocabularyType())) {
+                    if (ControlledVocabulary.SUGGEST.equals(dcinput.getVocabularyType())) {
                         selMd.setControlledVocabulary(dcinput.getVocabulary());
                         selMd.setClosed(dcinput.isClosedVocabulary());
                         selMd.setVocabularyType(dcinput.getVocabularyType());
