@@ -7,6 +7,8 @@
  */
 package org.dspace.app.sitemap;
 
+import static org.dspace.discovery.SearchUtils.RESOURCE_TYPE_FIELD;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -189,7 +191,8 @@ public class GenerateSitemaps {
         try {
             DiscoverQuery discoveryQuery = new DiscoverQuery();
             discoveryQuery.setMaxResults(PAGE_SIZE);
-            discoveryQuery.setQuery("search.resourcetype:Community");
+            discoveryQuery.setQuery("*:*");
+            discoveryQuery.addFilterQueries(RESOURCE_TYPE_FIELD + ":Community");
             do {
                 discoveryQuery.setStart(offset);
                 DiscoverResult discoverResult = searchService.search(c, discoveryQuery);
@@ -213,7 +216,8 @@ public class GenerateSitemaps {
             offset = 0;
             discoveryQuery = new DiscoverQuery();
             discoveryQuery.setMaxResults(PAGE_SIZE);
-            discoveryQuery.setQuery("search.resourcetype:Collection");
+            discoveryQuery.setQuery("*:*");
+            discoveryQuery.addFilterQueries(RESOURCE_TYPE_FIELD + ":Collection");
             do {
                 discoveryQuery.setStart(offset);
                 DiscoverResult discoverResult = searchService.search(c, discoveryQuery);
@@ -237,7 +241,8 @@ public class GenerateSitemaps {
             offset = 0;
             discoveryQuery = new DiscoverQuery();
             discoveryQuery.setMaxResults(PAGE_SIZE);
-            discoveryQuery.setQuery("search.resourcetype:Item");
+            discoveryQuery.setQuery("*:*");
+            discoveryQuery.addFilterQueries(RESOURCE_TYPE_FIELD + ":Item");
             discoveryQuery.addSearchField("search.entitytype");
             do {
 

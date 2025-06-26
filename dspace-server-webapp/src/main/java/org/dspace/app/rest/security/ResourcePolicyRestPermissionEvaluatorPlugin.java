@@ -55,7 +55,6 @@ public class ResourcePolicyRestPermissionEvaluatorPlugin extends RestObjectPermi
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
 
         if (!DSpaceRestPermission.READ.equals(restPermission)
-                && !DSpaceRestPermission.WRITE.equals(restPermission)
                 && !DSpaceRestPermission.DELETE.equals(restPermission)
                 || !StringUtils.equalsIgnoreCase(targetType, ResourcePolicyRest.NAME)) {
             return false;
