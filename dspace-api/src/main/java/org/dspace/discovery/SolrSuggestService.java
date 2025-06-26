@@ -42,6 +42,13 @@ public class SolrSuggestService {
 
     }
 
+    /**
+     * Get a list of suggested terms from the Solr suggest request handler
+     *
+     * @param query the current text input
+     * @param dictionary the name of the Solr suggest dictionary to search
+     * @return simple serialised JSON containing Solr suggest results
+     */
     public String getSuggestions(String query, String dictionary) {
         String json = "";
         ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
