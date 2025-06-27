@@ -71,7 +71,7 @@ import org.junit.rules.TemporaryFolder;
 
 /**
  * Basic integration testing for the AIP Backup and Restore feature
- * https://wiki.duraspace.org/display/DSDOC5x/AIP+Backup+and+Restore
+ * https://wiki.lyrasis.org/display/DSDOC5x/AIP+Backup+and+Restore
  *
  * @author Tim Donohue
  */
