@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -216,9 +217,14 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         Pageable pageable, @Parameter(value = "query") String query) {
         try {
             Context context = obtainContext();
-            List<Collection> collections = authorizeService.findAdminAuthorizedCollection(context, query,
+            List<Collection> collections = new ArrayList<Collection>();
+            DiscoverResult discoverResult = authorizeService.findAdminAuthorizedCollection(context, query,
                 Math.toIntExact(pageable.getOffset()),
                 Math.toIntExact(pageable.getPageSize()));
+            for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
+                Collection collection = ((IndexableCollection) solrCollections).getIndexedObject();
+                collections.add(collection);
+            }
             long tot = authorizeService.countAdminAuthorizedCollection(context, query);
             return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
         } catch (SearchServiceException | SQLException e) {
