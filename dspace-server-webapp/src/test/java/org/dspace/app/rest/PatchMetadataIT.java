@@ -1429,7 +1429,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     @Test
     public void replaceInvalidMetadataShouldFailTest() throws Exception {
         initSimplePublicationItem();
-        assertEquals(11, publicationItem.getMetadata().size());
+        assertEquals(12, publicationItem.getMetadata().size());
 
         String patchBody = getPatchContent(List.of(
             new ReplaceOperation("/metadata/dc.contributor.invalid/0", "some value")
@@ -1442,7 +1442,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
         publicationItem = context.reloadEntity(publicationItem);
 
-        assertEquals(11, publicationItem.getMetadata().size());
+        assertEquals(12, publicationItem.getMetadata().size());
         assertEquals(0,
             itemService.getMetadata(publicationItem, "dc", "contributor", "invalid", Item.ANY, false).size());
     }
