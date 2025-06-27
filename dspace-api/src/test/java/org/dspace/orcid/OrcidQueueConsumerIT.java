@@ -54,9 +54,9 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.service.VersioningService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link OrcidQueueConsumer}.
@@ -81,7 +81,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
     private Collection profileCollection;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -97,7 +97,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         List<OrcidQueue> records = orcidQueueService.findAll(context);

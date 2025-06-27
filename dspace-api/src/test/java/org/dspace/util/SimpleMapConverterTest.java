@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -22,13 +22,14 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.FileUtils;
 import org.dspace.services.ConfigurationService;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 /**
  * Unit tests for {@link SimpleMapConverter}.
@@ -36,11 +37,12 @@ import org.mockito.junit.MockitoJUnitRunner;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class SimpleMapConverterTest {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public File folder;
 
     @Mock
     private ConfigurationService configurationService;
@@ -49,10 +51,10 @@ public class SimpleMapConverterTest {
 
     private File crosswalksDir;
 
-    @Before
+    @BeforeEach
     public void before() throws IOException {
-        dspaceDir = folder.getRoot();
-        crosswalksDir = folder.newFolder("config", "crosswalks");
+        dspaceDir = folder;
+        crosswalksDir = newFolder(folder, "config", "crosswalks");
     }
 
     @Test
@@ -117,7 +119,7 @@ public class SimpleMapConverterTest {
 
         assertThat(exception.getMessage(),
             is("An error occurs parsing " + dspaceDir.getAbsolutePath() + separator + "config" + separator
-                    + "crosswalks" + separator + "test.properties"));
+                + "crosswalks" + separator + "test.properties"));
 
         Throwable cause = exception.getCause();
         assertThat(cause, notNullValue());
@@ -166,6 +168,15 @@ public class SimpleMapConverterTest {
     private void createFileInFolder(File folder, String name, String content) throws IOException {
         File file = new File(folder, name);
         FileUtils.write(file, content, StandardCharsets.UTF_8);
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
     }
 
 }

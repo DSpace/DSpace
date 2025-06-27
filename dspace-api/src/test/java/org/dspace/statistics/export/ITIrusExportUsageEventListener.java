@@ -7,8 +7,8 @@
  */
 package org.dspace.statistics.export;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -56,9 +56,9 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactory;
 import org.dspace.statistics.export.service.FailedOpenURLTrackerService;
 import org.dspace.usage.UsageEvent;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class for the IrusExportUsageEventListener
@@ -108,7 +108,7 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
      * Initializes the test by setting up all objects needed to create a test item.
      * @throws java.lang.Exception passed through.
      */
-    @Before()
+    @BeforeEach()
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -158,7 +158,7 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
      * Empty the testProcessedUrls used to store succeeded URLs.
      * Empty the database table where the failed URLs are logged.
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         try {

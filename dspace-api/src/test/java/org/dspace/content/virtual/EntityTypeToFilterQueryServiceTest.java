@@ -7,18 +7,21 @@
  */
 package org.dspace.content.virtual;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class EntityTypeToFilterQueryServiceTest {
 
     @InjectMocks
@@ -32,7 +35,7 @@ public class EntityTypeToFilterQueryServiceTest {
         entityTypeToFilterQueryService.setMap(map);
 
         // The reported map should match our defined map
-        assertEquals("TestSetMap 0", map, entityTypeToFilterQueryService.getMap());
+        assertEquals(map, entityTypeToFilterQueryService.getMap(), "TestSetMap 0");
     }
 
     @Test
@@ -42,7 +45,7 @@ public class EntityTypeToFilterQueryServiceTest {
         entityTypeToFilterQueryService.setMap(map);
 
         // The reported map should match our defined map
-        assertEquals("TestGetFields 0", map, entityTypeToFilterQueryService.getMap());
+        assertEquals(map, entityTypeToFilterQueryService.getMap(), "TestGetFields 0");
     }
 
     @Test
@@ -53,7 +56,7 @@ public class EntityTypeToFilterQueryServiceTest {
         entityTypeToFilterQueryService.setMap(map);
 
         // The mocked entityTypeToFilterQueryService should report true for hasKey("key")
-        assertEquals("TestHasKey 0", true, entityTypeToFilterQueryService.hasKey("key"));
+        assertEquals(true, entityTypeToFilterQueryService.hasKey("key"), "TestHasKey 0");
     }
 
     @Test
@@ -64,7 +67,8 @@ public class EntityTypeToFilterQueryServiceTest {
         entityTypeToFilterQueryService.setMap(map);
 
         // The reported value for our defined key should match our defined value
-        assertEquals("TestGetFilterQueryForKey 0", "value",
-                entityTypeToFilterQueryService.getFilterQueryForKey("key"));
+        assertEquals("value",
+            entityTypeToFilterQueryService.getFilterQueryForKey("key"),
+            "TestGetFilterQueryForKey 0");
     }
 }

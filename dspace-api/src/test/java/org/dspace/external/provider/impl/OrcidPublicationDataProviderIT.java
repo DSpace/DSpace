@@ -13,7 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -45,9 +45,9 @@ import org.dspace.orcid.client.OrcidClient;
 import org.dspace.orcid.client.OrcidConfiguration;
 import org.dspace.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.utils.DSpace;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.WorkBulk;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
@@ -78,7 +78,7 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
 
     private Collection persons;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -126,7 +126,7 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
 
     }
 
-    @After
+    @AfterEach
     public void after() {
         dataProvider.setOrcidClient(orcidClient);
         orcidConfiguration.setClientId(originalClientId);

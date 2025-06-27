@@ -14,8 +14,8 @@ import org.dspace.matomo.client.MatomoClient;
 import org.dspace.matomo.model.MatomoRequestDetails;
 import org.dspace.matomo.model.MatomoRequestDetailsBuilder;
 import org.dspace.usage.UsageEvent;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -28,7 +28,7 @@ public class MatomoAsyncBulkRequestHandlerTest extends AbstractUnitTest {
 
     MatomoAsyncBulkRequestHandler matomoAsyncDequeHandler;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         matomoAsyncDequeHandler =
             new MatomoAsyncBulkRequestHandler(builder, matomoClient, 5);

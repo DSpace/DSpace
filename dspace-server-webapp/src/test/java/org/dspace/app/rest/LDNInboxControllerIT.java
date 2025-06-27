@@ -10,9 +10,9 @@ package org.dspace.app.rest;
 import static org.dspace.content.QAEvent.COAR_NOTIFY_SOURCE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,8 +52,8 @@ import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
@@ -527,7 +527,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Override
-    @After
+    @AfterEach
     public void destroy() throws Exception {
         List<LDNMessageEntity> ldnMessageEntities = ldnMessageService.findAll(context);
         if (CollectionUtils.isNotEmpty(ldnMessageEntities)) {

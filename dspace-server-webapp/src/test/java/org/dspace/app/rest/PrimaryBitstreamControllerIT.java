@@ -34,9 +34,9 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -55,7 +55,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     Community community;
     Collection collection;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -113,7 +113,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                                                            bundle.getHandle(), bundle.getType())));
         // verify primaryBitstream was actually added
         bundle = context.reloadEntity(bundle);
-        Assert.assertEquals(bitstream, bundle.getPrimaryBitstream());
+        Assertions.assertEquals(bitstream, bundle.getPrimaryBitstream());
     }
 
     @Test
@@ -125,7 +125,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                         .andExpect(status().isNotFound());
         // verify primaryBitstream is still null
         bundle = context.reloadEntity(bundle);
-        Assert.assertNull(bundle.getPrimaryBitstream());
+        Assertions.assertNull(bundle.getPrimaryBitstream());
     }
 
     @Test
@@ -137,7 +137,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                         .andExpect(status().isUnprocessableEntity());
         // verify primaryBitstream is still null
         bundle = context.reloadEntity(bundle);
-        Assert.assertNull(bundle.getPrimaryBitstream());
+        Assertions.assertNull(bundle.getPrimaryBitstream());
     }
 
     @Test
@@ -154,7 +154,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                         .andExpect(status().isBadRequest());
         // verify primaryBitstream is still the original one
         bundle = context.reloadEntity(bundle);
-        Assert.assertEquals(bitstream, bundle.getPrimaryBitstream());
+        Assertions.assertEquals(bitstream, bundle.getPrimaryBitstream());
     }
 
     @Test
@@ -171,7 +171,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                         .andExpect(status().isUnprocessableEntity());
         // verify primaryBitstream is still null
         bundle = context.reloadEntity(bundle);
-        Assert.assertNull(bundle.getPrimaryBitstream());
+        Assertions.assertNull(bundle.getPrimaryBitstream());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                                                            bundle2.getHandle(), bundle2.getType())));
         // verify primaryBitstream was actually added
         bundle2 = context.reloadEntity(bundle2);
-        Assert.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
+        Assertions.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
 
         // verify Community Admin can't set a primaryBitstream outside their own Community
         getClient(token).perform(post(getBundlePrimaryBitstreamUrl(bundle.getID()))
@@ -222,7 +222,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                                                            bundle2.getHandle(), bundle2.getType())));
         // verify primaryBitstream was actually added
         bundle2 = context.reloadEntity(bundle2);
-        Assert.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
+        Assertions.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
 
         // verify Collection Admin can't set a primaryBitstream outside their own Collection
         getClient(token).perform(post(getBundlePrimaryBitstreamUrl(bundle.getID()))
@@ -249,7 +249,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                                                            bundle2.getHandle(), bundle2.getType())));
         // verify primaryBitstream was actually added
         bundle2 = context.reloadEntity(bundle2);
-        Assert.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
+        Assertions.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
 
         // verify Item Admin can't set a primaryBitstream outside their own Item
         getClient(token).perform(post(getBundlePrimaryBitstreamUrl(bundle.getID()))
@@ -292,7 +292,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                                                                bundle.getHandle(), bundle.getType())));
         // verify primaryBitstream was actually updated
         bundle = context.reloadEntity(bundle);
-        Assert.assertEquals(bitstream2, bundle.getPrimaryBitstream());
+        Assertions.assertEquals(bitstream2, bundle.getPrimaryBitstream());
     }
 
     @Test
@@ -315,7 +315,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                         .andExpect(status().isUnprocessableEntity());
         // verify primaryBitstream is still the original one
         bundle = context.reloadEntity(bundle);
-        Assert.assertEquals(bitstream, bundle.getPrimaryBitstream());
+        Assertions.assertEquals(bitstream, bundle.getPrimaryBitstream());
     }
 
     @Test
@@ -327,7 +327,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                         .andExpect(status().isBadRequest());
         // verify primaryBitstream is still null
         bundle = context.reloadEntity(bundle);
-        Assert.assertNull(bundle.getPrimaryBitstream());
+        Assertions.assertNull(bundle.getPrimaryBitstream());
     }
 
     @Test
@@ -345,7 +345,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                         .andExpect(status().isUnprocessableEntity());
         // verify primaryBitstream is still the original one
         bundle = context.reloadEntity(bundle);
-        Assert.assertEquals(bitstream, bundle.getPrimaryBitstream());
+        Assertions.assertEquals(bitstream, bundle.getPrimaryBitstream());
     }
 
     @Test
@@ -370,7 +370,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                                                            bundle2.getHandle(), bundle2.getType())));
         // verify primaryBitstream was actually updated
         bundle2 = context.reloadEntity(bundle2);
-        Assert.assertEquals(bitstream3, bundle2.getPrimaryBitstream());
+        Assertions.assertEquals(bitstream3, bundle2.getPrimaryBitstream());
 
         bundle.setPrimaryBitstreamID(bitstream);
         // verify Community Admin can't update a primaryBitstream outside their own Community
@@ -401,7 +401,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                                                            bundle2.getHandle(), bundle2.getType())));
         // verify primaryBitstream was actually updated
         bundle2 = context.reloadEntity(bundle2);
-        Assert.assertEquals(bitstream3, bundle2.getPrimaryBitstream());
+        Assertions.assertEquals(bitstream3, bundle2.getPrimaryBitstream());
 
         bundle.setPrimaryBitstreamID(bitstream);
         // verify Collection Admin can't update a primaryBitstream outside their own Collection
@@ -431,7 +431,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                                                            bundle2.getHandle(), bundle2.getType())));
         // verify primaryBitstream was actually updated
         bundle2 = context.reloadEntity(bundle2);
-        Assert.assertEquals(bitstream3, bundle2.getPrimaryBitstream());
+        Assertions.assertEquals(bitstream3, bundle2.getPrimaryBitstream());
 
         bundle.setPrimaryBitstreamID(bitstream);
         // verify Item Admin can't update a primaryBitstream outside their own Item
@@ -477,10 +477,10 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                         .andExpect(status().isNoContent());
         // verify primaryBitstream was actually deleted
         bundle = context.reloadEntity(bundle);
-        Assert.assertNull(bundle.getPrimaryBitstream());
+        Assertions.assertNull(bundle.getPrimaryBitstream());
         // verify bitstream itself still exists
-        Assert.assertEquals(1, bundle.getBitstreams().size());
-        Assert.assertEquals(bitstream, bundle.getBitstreams().get(0));
+        Assertions.assertEquals(1, bundle.getBitstreams().size());
+        Assertions.assertEquals(bitstream, bundle.getBitstreams().get(0));
     }
 
     @Test
@@ -497,7 +497,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                         .andExpect(status().isBadRequest());
         // verify primaryBitstream is still null
         bundle = context.reloadEntity(bundle);
-        Assert.assertNull(bundle.getPrimaryBitstream());
+        Assertions.assertNull(bundle.getPrimaryBitstream());
     }
 
     @Test
@@ -517,10 +517,10 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                         .andExpect(status().isNoContent());
         // verify primaryBitstream was actually deleted
         bundle2 = context.reloadEntity(bundle2);
-        Assert.assertNull(bundle2.getPrimaryBitstream());
+        Assertions.assertNull(bundle2.getPrimaryBitstream());
         // verify bitstream itself still exists
-        Assert.assertEquals(1, bundle2.getBitstreams().size());
-        Assert.assertEquals(bitstream2, bundle2.getBitstreams().get(0));
+        Assertions.assertEquals(1, bundle2.getBitstreams().size());
+        Assertions.assertEquals(bitstream2, bundle2.getBitstreams().get(0));
 
         bundle.setPrimaryBitstreamID(bitstream);
         // verify Community Admin can't delete a primaryBitstream outside their own Community
@@ -546,10 +546,10 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                         .andExpect(status().isNoContent());
         // verify primaryBitstream was actually deleted
         bundle2 = context.reloadEntity(bundle2);
-        Assert.assertNull(bundle2.getPrimaryBitstream());
+        Assertions.assertNull(bundle2.getPrimaryBitstream());
         // verify bitstream itself still exists
-        Assert.assertEquals(1, bundle2.getBitstreams().size());
-        Assert.assertEquals(bitstream2, bundle2.getBitstreams().get(0));
+        Assertions.assertEquals(1, bundle2.getBitstreams().size());
+        Assertions.assertEquals(bitstream2, bundle2.getBitstreams().get(0));
 
         bundle.setPrimaryBitstreamID(bitstream);
         // verify Collection Admin can't delete a primaryBitstream outside their own Collection
@@ -574,10 +574,10 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                         .andExpect(status().isNoContent());
         // verify primaryBitstream was actually deleted
         bundle2 = context.reloadEntity(bundle2);
-        Assert.assertNull(bundle2.getPrimaryBitstream());
+        Assertions.assertNull(bundle2.getPrimaryBitstream());
         // verify bitstream itself still exists
-        Assert.assertEquals(1, bundle2.getBitstreams().size());
-        Assert.assertEquals(bitstream2, bundle2.getBitstreams().get(0));
+        Assertions.assertEquals(1, bundle2.getBitstreams().size());
+        Assertions.assertEquals(bitstream2, bundle2.getBitstreams().get(0));
 
         bundle.setPrimaryBitstreamID(bitstream);
         // verify Item Admin can't delete a primaryBitstream outside their own Item

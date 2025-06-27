@@ -7,9 +7,9 @@
  */
 package org.dspace.alerts;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
@@ -23,14 +23,17 @@ import org.dspace.alerts.service.SystemWideAlertService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class SystemWideAlertServiceTest {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SystemWideAlertService.class);
@@ -71,10 +74,10 @@ public class SystemWideAlertServiceTest {
 
         // The newly created SystemWideAlert's message should match our mocked SystemWideAlert's message
         SystemWideAlert result = systemWideAlertService.create(context, "Test message",
-                                                               AllowSessionsEnum.ALLOW_ALL_SESSIONS, null, true);
-        assertEquals("TestCreate 0", systemWideAlert.getMessage(), result.getMessage());
+            AllowSessionsEnum.ALLOW_ALL_SESSIONS, null, true);
+        assertEquals(systemWideAlert.getMessage(), result.getMessage(), "TestCreate 0");
         // The newly created SystemWideAlert should match our mocked SystemWideAlert
-        assertEquals("TestCreate 1", systemWideAlert, result);
+        assertEquals(systemWideAlert, result, "TestCreate 1");
     }
 
 
@@ -84,7 +87,7 @@ public class SystemWideAlertServiceTest {
         List<SystemWideAlert> systemWideAlertList = new ArrayList<>();
 
         // The SystemWideAlert(s) reported from our mocked state should match our systemWideAlertList
-        assertEquals("TestFindAll 0", systemWideAlertList, systemWideAlertService.findAll(context));
+        assertEquals(systemWideAlertList, systemWideAlertService.findAll(context), "TestFindAll 0");
     }
 
     @Test
@@ -93,7 +96,7 @@ public class SystemWideAlertServiceTest {
         when(systemWideAlertService.find(context, 0)).thenReturn(systemWideAlert);
 
         // The SystemWideAlert reported from our ID should match our mocked SystemWideAlert
-        assertEquals("TestFind 0", systemWideAlert, systemWideAlertService.find(context, 0));
+        assertEquals(systemWideAlert, systemWideAlertService.find(context, 0), "TestFind 0");
     }
 
     @Test
@@ -102,7 +105,7 @@ public class SystemWideAlertServiceTest {
         List<SystemWideAlert> systemWideAlertList = new ArrayList<>();
 
         // The SystemWideAlert(s) reported from our mocked state should match our systemWideAlertList
-        assertEquals("TestFindAllActive 0", systemWideAlertList, systemWideAlertService.findAllActive(context, 10, 0));
+        assertEquals(systemWideAlertList, systemWideAlertService.findAllActive(context, 10, 0), "TestFindAllActive 0");
     }
 
 
@@ -141,7 +144,7 @@ public class SystemWideAlertServiceTest {
         when(systemWideAlertDAO.findAllActive(context, 1, 0)).thenReturn(systemWideAlertList);
 
         // Assert the non admin users can log in
-        assertTrue("CanNonAdminUserLogin 0", systemWideAlertService.canNonAdminUserLogin(context));
+        assertTrue(systemWideAlertService.canNonAdminUserLogin(context), "CanNonAdminUserLogin 0");
     }
 
     @Test
@@ -155,14 +158,15 @@ public class SystemWideAlertServiceTest {
         when(systemWideAlertDAO.findAllActive(context, 1, 0)).thenReturn(systemWideAlertList);
 
         // Assert the non admin users can log in
-        assertFalse("CanNonAdminUserLogin 1", systemWideAlertService.canNonAdminUserLogin(context));
+        assertFalse(systemWideAlertService.canNonAdminUserLogin(context), "CanNonAdminUserLogin 1");
     }
 
     @Test
     public void canUserMaintainSessionAdminTest() throws Exception {
         // Assert the admin user can log in
-        assertTrue("CanUserMaintainSession 0", systemWideAlertService.canNonAdminUserLogin(context));
+        assertTrue(systemWideAlertService.canNonAdminUserLogin(context), "CanUserMaintainSession 0");
     }
+
     @Test
     public void canUserMaintainSessionTrueTest() throws Exception {
         // Mock admin state
@@ -177,7 +181,7 @@ public class SystemWideAlertServiceTest {
         when(systemWideAlertDAO.findAllActive(context, 1, 0)).thenReturn(systemWideAlertList);
 
         // Assert the non admin users can main session
-        assertTrue("CanUserMaintainSession 1", systemWideAlertService.canUserMaintainSession(context, eperson));
+        assertTrue(systemWideAlertService.canUserMaintainSession(context, eperson), "CanUserMaintainSession 1");
     }
 
     @Test
@@ -194,9 +198,8 @@ public class SystemWideAlertServiceTest {
         when(systemWideAlertDAO.findAllActive(context, 1, 0)).thenReturn(systemWideAlertList);
 
         // Assert the non admin users cannot main session
-        assertFalse("CanUserMaintainSession 2", systemWideAlertService.canUserMaintainSession(context, eperson));
+        assertFalse(systemWideAlertService.canUserMaintainSession(context, eperson), "CanUserMaintainSession 2");
     }
-
 
 
 }

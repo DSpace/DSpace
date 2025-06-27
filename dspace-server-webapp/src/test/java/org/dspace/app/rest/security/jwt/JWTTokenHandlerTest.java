@@ -7,7 +7,8 @@
  */
 package org.dspace.app.rest.security.jwt;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -26,15 +27,17 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
@@ -43,7 +46,8 @@ import org.springframework.security.crypto.keygen.StringKeyGenerator;
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class JWTTokenHandlerTest {
 
     @InjectMocks
@@ -74,7 +78,7 @@ public class JWTTokenHandlerTest {
     @Spy
     protected List<JWTClaimProvider> jwtClaimProviders = new ArrayList<>();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(ePerson.getSessionSalt()).thenReturn("01234567890123456789012345678901");
         when(ePerson.getLastActive()).thenReturn(Instant.now());
@@ -85,7 +89,7 @@ public class JWTTokenHandlerTest {
         jwtClaimProviders.add(ePersonClaimProvider);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
     }
 
@@ -99,15 +103,17 @@ public class JWTTokenHandlerTest {
         assertEquals("epersonID", personId);
     }
 
-    @Test(expected = ParseException.class)
-    public void testJWTEncrypted() throws Exception {
-        when(loginJWTTokenHandler.isEncryptionEnabled()).thenReturn(true);
-        Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
-        StringKeyGenerator keyGenerator = KeyGenerators.string();
-        when(configurationService.getProperty("jwt.login.encryption.secret")).thenReturn(keyGenerator.generateKey());
-        String token = loginJWTTokenHandler
-            .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
-        SignedJWT signedJWT = SignedJWT.parse(token);
+    @Test
+    public void testJWTEncrypted() {
+        assertThrows(ParseException.class, () -> {
+            when(loginJWTTokenHandler.isEncryptionEnabled()).thenReturn(true);
+            Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
+            StringKeyGenerator keyGenerator = KeyGenerators.string();
+            when(configurationService.getProperty("jwt.login.encryption.secret")).thenReturn(keyGenerator.generateKey());
+            String token = loginJWTTokenHandler
+                .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
+            SignedJWT signedJWT = SignedJWT.parse(token);
+        });
     }
 
     //temporary set a negative expiration time so the token is invalid immediately
