@@ -33,7 +33,7 @@ Prior versions of DSpace (v6.x and below) used two different UIs (XMLUI and JSPU
 Documentation for each release may be viewed online or downloaded via our [Documentation Wiki](https://wiki.lyrasis.org/display/DSDOC/).
 
 The latest DSpace Installation instructions are available at:
-https://wiki.lyrasis.org/display/DSDOC8x/Installing+DSpace
+https://wiki.lyrasis.org/display/DSDOC9x/Installing+DSpace
 
 Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL)
 and a servlet container (usually Tomcat) in order to function.
