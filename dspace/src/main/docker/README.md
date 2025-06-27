@@ -122,7 +122,7 @@ docker push dspace/dspace-postgres-pgcrypto:latest-loadsql
 
 This is a test / demo image which provides an Apache HTTPD proxy (in front of Tomcat)
 with `mod_shib` & Shibboleth installed based on the
-[DSpace Shibboleth configuration instructions](https://wiki.lyrasis.org/display/DSDOC7x/Authentication+Plugins#AuthenticationPlugins-ShibbolethAuthentication).
+[DSpace Shibboleth configuration instructions](https://wiki.lyrasis.org/display/DSDOC9x/Authentication+Plugins#AuthenticationPlugins-ShibbolethAuthentication).
 It is primarily for usage for testing DSpace's Shibboleth integration.
 It uses https://samltest.id/ as the Shibboleth IDP
 
