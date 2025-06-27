@@ -39,12 +39,12 @@ Please be aware that, as a Java web application, DSpace requires a database (Pos
 and a servlet container (usually Tomcat) in order to function.
 More information about these and all other prerequisites can be found in the Installation instructions above.
 
-## Running DSpace 8 in Docker
+## Running DSpace 9 in Docker
 
 NOTE: At this time, we do not have production-ready Docker images for DSpace.
 That said, we do have quick-start Docker Compose scripts for development or testing purposes.
 
-See [Running DSpace 8 with Docker Compose](dspace/src/main/docker-compose/README.md)
+See [Running DSpace 9 with Docker Compose](dspace/src/main/docker-compose/README.md)
 
 ## Contributing
 
