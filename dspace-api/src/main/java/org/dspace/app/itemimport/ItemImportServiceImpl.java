@@ -1891,6 +1891,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         ParserConfigurationException, SAXException {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance()
                                                         .newDocumentBuilder();
+        builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        builder.setExpandEntityReferences(false);
+        
 
         return builder.parse(new File(filename));
     }
