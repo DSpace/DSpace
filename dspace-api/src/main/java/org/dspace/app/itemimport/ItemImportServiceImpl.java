@@ -1889,10 +1889,14 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      */
     protected Document loadXML(String filename) throws IOException,
         ParserConfigurationException, SAXException {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-                                                        .newDocumentBuilder();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            dbf.setXIncludeAware(false);
+            dbf.setExpandEntityReferences(false);
+            DocumentBuilder builder = dbf.newDocumentBuilder();
+            Document document = builder.parse(new File(filename));
 
-        return builder.parse(new File(filename));
+        return document;
     }
 
     /**
