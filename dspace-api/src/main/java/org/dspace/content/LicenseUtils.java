@@ -22,6 +22,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -139,10 +140,10 @@ public class LicenseUtils {
         // Store text as a bitstream
         byte[] licenseBytes = licenseText.getBytes("UTF-8");
         ByteArrayInputStream bais = new ByteArrayInputStream(licenseBytes);
-        Bitstream b = itemService.createSingleBitstream(context, bais, item, "LICENSE");
+        Bitstream b = itemService.createSingleBitstream(context, bais, item, Constants.LICENSE_BUNDLE_NAME);
 
         // Now set the format and name of the bitstream
-        b.setName(context, "license.txt");
+        b.setName(context, Constants.LICENSE_BITSTREAM_NAME);
         b.setSource(context, "Written by org.dspace.content.LicenseUtils");
 
         DCDate acceptanceDCDate = DCDate.getCurrent();

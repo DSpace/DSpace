@@ -2172,7 +2172,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .build();
 
         Bundle license = BundleBuilder.createBundle(context, publicItem1)
-            .withName("LICENSE")
+            .withName(Constants.LICENSE_BUNDLE_NAME)
             .build();
 
         String bitstreamContent = "This is an archived bitstream";
@@ -2226,7 +2226,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .build();
 
         Bundle license = BundleBuilder.createBundle(context, publicItem1)
-            .withName("LICENSE")
+            .withName(Constants.LICENSE_BUNDLE_NAME)
             .build();
 
         String bitstreamContent = "This is an archived bitstream";
@@ -2272,7 +2272,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .build();
 
         Bundle license = BundleBuilder.createBundle(context, publicItem1)
-            .withName("LICENSE")
+            .withName(Constants.LICENSE_BUNDLE_NAME)
             .build();
 
         String bitstreamContent = "This is an archived bitstream";
@@ -2337,7 +2337,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .build();
 
         Bundle license = BundleBuilder.createBundle(context, publicItem1)
-            .withName("LICENSE")
+            .withName(Constants.LICENSE_BUNDLE_NAME)
             .build();
 
         String bitstreamContent = "This is an archived bitstream";
@@ -2377,7 +2377,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .build();
 
         Bundle license = BundleBuilder.createBundle(context, publicItem1)
-            .withName("LICENSE")
+            .withName(Constants.LICENSE_BUNDLE_NAME)
             .build();
 
         String bitstreamContent = "This is an archived bitstream";
