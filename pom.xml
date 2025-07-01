@@ -366,9 +366,9 @@
                 </plugin>
                 <!-- Used to generate a new release via Sonatype (see release profile). -->
                 <plugin>
-                    <groupId>org.sonatype.plugins</groupId>
-                    <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>1.7.0</version>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>0.8.0</version>
                 </plugin>
                 <!-- Used to generate JavaDocs for new releases (see release profile). -->
                 <plugin>
@@ -941,7 +941,7 @@
 
         <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
-         to actually perform a DSpace software release to Maven central.
+         to actually perform a DSpace software release to Maven Central.
          This profile contains settings which are ONLY enabled when performing
          a DSpace release. See also https://wiki.duraspace.org/display/DSPACE/Release+Procedure
          NOTE: You MUST trigger this profile by running "-Drelease"
@@ -958,26 +958,24 @@
             </activation>
             <build>
                 <plugins>
-                    <!-- Configure Nexus plugin for new releases via Sonatype.
-                         See: http://central.sonatype.org/pages/apache-maven.html -->
+                    <!--
+                      Configure Central Publishing Plugin for new releases via Sonatype.
+                      See: https://central.sonatype.org/publish/publish-portal-maven/
+                      A few notes on how this plugin works:
+                      1. In your settings.xml, your user/password tokens MUST be specified for a <server> tag
+                         with <id>central</id>. Otherwise, you will see a 401 Unauthorized error.
+                      2. The <distributionManagement> POM section is no longer needed. This plugin defaults to
+                         uploading releases to Central Portal (https://central.sonatype.com/publishing)
+                         and -SNAPSHOT releases to https://central.sonatype.com/repository/maven-snapshots/
+                      3. Sonatype has publishing *requirements* which must be met. Our POM is already configured to
+                         meet those requirements: https://central.sonatype.org/publish/requirements/
+                    -->
                     <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
                         <extensions>true</extensions>
-                        <configuration>
-                            <!-- In your settings.xml, your username/password
-                                 MUST be specified for server 'ossrh' -->
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <!-- Disable autoclose of repository after upload, as this sometimes times out -->
-                            <skipStagingRepositoryClose>true</skipStagingRepositoryClose>
-                            <!-- Require manual verification / release to Maven Central -->
-                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                            <!-- Increase Staging timeout to 10mins -->
-                            <stagingProgressTimeoutMinutes>10</stagingProgressTimeoutMinutes>
-                        </configuration>
                     </plugin>
-                    <!-- For new releases, generate Source JAR files -->
+                    <!-- Per Sonatype publishing requirements, generate Source JAR files -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
@@ -990,7 +988,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- For new releases, generate JavaDocs for each module -->
+                    <!-- Per Sonatype publishing requirements, generate JavaDocs for each module -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
@@ -1003,8 +1001,8 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- Sign any new releases via GPG.
-                         NOTE: you may optionall specify the "gpg.passphrase" in your settings.xml -->
+                    <!-- Per Sonatype publishing requirements, sign any new releases via GPG.
+                         NOTE: you may optionally specify the "gpg.passphrase" in your settings.xml -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
@@ -1942,23 +1940,9 @@
     <scm>
         <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
         <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
-        <url>git@github.com:DSpace/DSpace.git</url>
+        <url>https://github.com/DSpace/DSpace</url>
         <tag>dspace-9_x</tag>
     </scm>
-
-
-    <!-- Configure our release repositories to use Sonatype.
-         See: http://central.sonatype.org/pages/apache-maven.html -->
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
     <repositories>
         <!-- Check Maven Central first (before other repos below) -->
@@ -1969,11 +1953,10 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <!-- Enable access to artifacts in Sonatype's snapshot repo for Snapshots ONLY -->
+        <!-- Enable access to artifacts in Sonatype's Central Portal snapshot repo for Snapshots ONLY -->
         <repository>
-            <id>maven-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <layout>default</layout>
+            <id>central-portal-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
