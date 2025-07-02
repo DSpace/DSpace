@@ -18,6 +18,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -297,7 +298,7 @@ public class XSLTIngestionCrosswalk
                 "Failed to initialize transformer, probably error loading stylesheet.");
         }
 
-        SAXBuilder builder = new SAXBuilder();
+        SAXBuilder builder = XMLUtils.getSAXBuilder();
         Document inDoc = builder.build(new FileInputStream(argv[i + 1]));
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         List dimList;

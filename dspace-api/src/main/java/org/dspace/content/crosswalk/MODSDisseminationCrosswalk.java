@@ -22,6 +22,7 @@ import java.util.Properties;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -144,7 +145,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         MODS_NS.getURI() + " " + MODS_XSD;
 
     private static final XMLOutputter outputUgly = new XMLOutputter();
-    private static final SAXBuilder builder = new SAXBuilder();
+    private static final SAXBuilder builder = XMLUtils.getSAXBuilder();
 
     private Map<String, modsTriple> modsMap = null;
 

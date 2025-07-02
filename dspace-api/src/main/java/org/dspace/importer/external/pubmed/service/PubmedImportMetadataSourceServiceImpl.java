@@ -24,6 +24,7 @@ import java.util.concurrent.Callable;
 import com.google.common.io.CharStreams;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -233,11 +234,13 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         String value = null;
 
         try {
-            SAXBuilder saxBuilder = new SAXBuilder();
-            // Disallow external entities & entity expansion to protect against XXE attacks
-            // (NOTE: We receive errors if we disable all DTDs for PubMed, so this is the best we can do)
-            saxBuilder.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            saxBuilder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
+            // To properly parse PubMed responses, we must allow DOCTYPE/DTDs overall but
+            // we can still take advantage of entities themselves being disabled, and not
+            // expanded.
+            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false);
+            saxBuilder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",
+                    true);
             Document document = saxBuilder.build(new StringReader(src));
             Element root = document.getRootElement();
 
@@ -354,12 +357,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private List<Element> splitToRecords(String recordsSrc) {
         try {
-            SAXBuilder saxBuilder = new SAXBuilder();
-            // Disallow external entities & entity expansion to protect against XXE attacks
-            // (NOTE: We receive errors if we disable all DTDs for PubMed, so this is the best we can do)
-            saxBuilder.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            saxBuilder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            saxBuilder.setExpandEntities(false);
+            SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
             Document document = saxBuilder.build(new StringReader(recordsSrc));
             Element root = document.getRootElement();
 
