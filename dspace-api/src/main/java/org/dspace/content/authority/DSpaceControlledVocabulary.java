@@ -178,13 +178,13 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     public Choices getMatches(String text, int start, int limit, String locale) {
         init(locale);
         log.debug("Getting matches for '" + text + "'");
-        String xpathExpression = "";
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
-        for (int i = 0; i < textHierarchy.length; i++) {
-            xpathExpression +=
-                String.format(xpathTemplate, textHierarchy[i].replaceAll("'", "&apos;").toLowerCase());
-        }
+        String xpathExpression = xpathTemplate.repeat(textHierarchy.length);
         XPath xpath = XPathFactory.newInstance().newXPath();
+        xpath.setXPathVariableResolver(variableName -> {
+            int index = Integer.parseInt(variableName.getLocalPart().substring(4)); // Extract index from "paramX"
+            return textHierarchy[index].toLowerCase();
+        });
         int total = 0;
         List<Choice> choices = new ArrayList<Choice>();
         try {
@@ -203,13 +203,13 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     public Choices getBestMatch(String text, String locale) {
         init(locale);
         log.debug("Getting best matches for '" + text + "'");
-        String xpathExpression = "";
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
-        for (int i = 0; i < textHierarchy.length; i++) {
-            xpathExpression +=
-                String.format(valueTemplate, textHierarchy[i].replaceAll("'", "&apos;"));
-        }
+        String xpathExpression = valueTemplate.repeat(textHierarchy.length);
         XPath xpath = XPathFactory.newInstance().newXPath();
+        xpath.setXPathVariableResolver(variableName -> {
+            int index = Integer.parseInt(variableName.getLocalPart().substring(4)); // Extract index from "paramX"
+            return textHierarchy[index];
+        });
         List<Choice> choices = new ArrayList<Choice>();
         try {
             NodeList results = (NodeList) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODESET);
