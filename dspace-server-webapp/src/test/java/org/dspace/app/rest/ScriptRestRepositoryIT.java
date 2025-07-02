@@ -9,14 +9,14 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -64,8 +64,8 @@ import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -757,7 +757,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         }
     }
 
-    @After
+    @AfterEach
     public void destroy() throws Exception {
         context.turnOffAuthorisationSystem();
         CollectionUtils.emptyIfNull(processService.findAll(context)).stream().forEach(process -> {

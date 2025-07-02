@@ -7,10 +7,11 @@
  */
 package org.dspace.app.packager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.ginsberg.junit.exit.ExpectSystemExit;
 import com.google.common.collect.Iterators;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
@@ -40,9 +42,10 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom2.Element;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 
 /**
  * Basic integration testing for the Packager restore feature
@@ -63,7 +66,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     protected Item article;
     File tempFile;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -73,7 +76,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
                 .withName("Sub Community")
                 .build();
         col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
-                                .withEntityType("Publication").build();
+                .withEntityType("Publication").build();
 
         // Create a new Publication (which is an Article)
         article = ItemBuilder.createItem(context, col1)
@@ -85,7 +88,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         tempFile.delete();
@@ -93,6 +96,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    @ExpectSystemExit
     public void packagerExportUUIDTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -103,19 +107,25 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    @ExpectSystemExit
     public void packagerImportUUIDTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //Item
+        System.out.println("packagerImportUUIDTest");
         performExportScript(article.getHandle(), tempFile);
+        System.out.println("packagerImportUUIDTest2");
         String idStr = getID();
         itemService.delete(context, article);
         performImportScript(tempFile);
+        System.out.println("packagerImportUUIDTest3");
         Item item = itemService.find(context, UUID.fromString(idStr));
         assertNotNull(item);
+        System.out.println("packagerImportUUIDTest4");
     }
 
     @Test
+    @ExpectSystemExit
     public void packagerImportColUUIDTest() throws Exception {
         context.turnOffAuthorisationSystem();
         configService.setProperty("upload.temp.dir",tempFile.getParent());
@@ -129,6 +139,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    @ExpectSystemExit
     public void packagerImportComUUIDTest() throws Exception {
         context.turnOffAuthorisationSystem();
         configService.setProperty("upload.temp.dir",tempFile.getParent());
@@ -143,6 +154,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    @ExpectSystemExit
     public void packagerUUIDAlreadyExistTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -154,6 +166,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    @ExpectSystemExit
     public void packagerUUIDAlreadyExistWithoutForceTest() throws Exception {
         context.turnOffAuthorisationSystem();
         //should fail to restore the item because the uuid already exists.

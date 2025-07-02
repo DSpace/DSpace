@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.security;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -17,18 +17,21 @@ import java.util.stream.Collectors;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class EPersonRestAuthenticationProviderTest {
 
     @InjectMocks

@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matcher;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

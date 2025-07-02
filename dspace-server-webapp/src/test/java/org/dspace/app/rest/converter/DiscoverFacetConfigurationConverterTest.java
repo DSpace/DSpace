@@ -7,9 +7,9 @@
  */
 package org.dspace.app.rest.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.LinkedList;
@@ -17,16 +17,19 @@ import java.util.LinkedList;
 import org.dspace.app.rest.model.FacetConfigurationRest;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 /**
  * This class has the purpose to test the DiscoverFacetConfigurationConverter
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class DiscoverFacetConfigurationConverterTest {
 
     FacetConfigurationRest facetConfigurationRest;
@@ -77,9 +80,9 @@ public class DiscoverFacetConfigurationConverterTest {
         assertNotNull(facetConfigurationRest);
         assertTrue(!facetConfigurationRest.getSidebarFacets().isEmpty());
         assertEquals(discoverySearchFilterFacet.getIndexFieldName(),
-                     facetConfigurationRest.getSidebarFacets().get(0).getName());
+            facetConfigurationRest.getSidebarFacets().get(0).getName());
         assertEquals(discoverySearchFilterFacet.getType(),
-                     facetConfigurationRest.getSidebarFacets().get(0).getFacetType());
+            facetConfigurationRest.getSidebarFacets().get(0).getFacetType());
     }
 
     @Test

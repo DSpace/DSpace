@@ -7,11 +7,11 @@
  */
 package org.dspace.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.SQLException;
 
@@ -19,8 +19,8 @@ import org.dspace.AbstractUnitTest;
 import org.dspace.eperson.EPerson;
 import org.dspace.utils.DSpace;
 import org.hibernate.Session;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Perform some basic unit tests for HibernateDBConnection
@@ -38,7 +38,7 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -52,26 +52,27 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
      */
     @Test
     public void testGetSession() throws SQLException {
-        assertNotNull("DB connection should not be null", connection);
+        assertNotNull(connection, "DB connection should not be null");
         // Connection should begin with an active transaction
-        assertTrue("A transaction should be open by default", connection.getTransaction().isActive());
+        assertTrue(connection.getTransaction().isActive(), "A transaction should be open by default");
 
         // Rollback current transaction
         connection.getTransaction().rollback();
 
         // Transaction should be closed
-        assertFalse("Transaction should be closed after rollback", connection.getTransaction().isActive());
+        assertFalse(connection.getTransaction().isActive(), "Transaction should be closed after rollback");
 
         //Now call getSession(), saving a reference to the session
         Session currentSession = connection.getSession();
 
         // New transaction should be initialized
-        assertTrue("New transaction should be open after getSession() call",
-                   connection.getTransaction().isActive());
+        assertTrue(connection.getTransaction().isActive(),
+                   "New transaction should be open after getSession() call");
 
         // Call getSession again. The same Session should still be returned
-        assertEquals("Multiple calls to getSession should return same Session", currentSession,
-                     connection.getSession());
+        assertEquals(currentSession,
+                     connection.getSession(),
+                     "Multiple calls to getSession should return same Session");
     }
 
     /**
@@ -79,16 +80,16 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
      */
     @Test
     public void testIsTransactionAlive() {
-        assertNotNull("DB connection should not be null", connection);
-        assertNotNull("Transaction should not be null", connection.getTransaction());
+        assertNotNull(connection, "DB connection should not be null");
+        assertNotNull(connection.getTransaction(), "Transaction should not be null");
         // Connection should begin with a transaction
-        assertTrue("A transaction should be open by default", connection.isTransActionAlive());
+        assertTrue(connection.isTransActionAlive(), "A transaction should be open by default");
 
         // Rollback current transaction
         connection.getTransaction().rollback();
 
         // Transaction should be closed
-        assertFalse("Transaction should be closed after rollback", connection.isTransActionAlive());
+        assertFalse(connection.isTransActionAlive(), "Transaction should be closed after rollback");
     }
 
     /**
@@ -96,15 +97,15 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
      */
     @Test
     public void testIsSessionAlive() throws SQLException {
-        assertNotNull("DB connection should not be null", connection);
-        assertNotNull("Session should not be null", connection.getSession());
-        assertTrue("A Session should be alive by default", connection.isSessionAlive());
+        assertNotNull(connection, "DB connection should not be null");
+        assertNotNull(connection.getSession(), "Session should not be null");
+        assertTrue(connection.isSessionAlive(), "A Session should be alive by default");
 
         // Rollback current transaction, closing it
         connection.getTransaction().rollback();
 
         // Session should still be alive even after transaction closes
-        assertTrue("A Session should still be alive if transaction closes", connection.isSessionAlive());
+        assertTrue(connection.isSessionAlive(), "A Session should still be alive if transaction closes");
 
         // NOTE: Because we configure Hibernate Session objects to be bound to a thread
         // (see 'hibernate.current_session_context_class' in hibernate.cfg.xml), a Session is ALWAYS ALIVE until
@@ -128,7 +129,7 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
         connection.closeDBConnection();
 
         Session newSession = connection.getSession();
-        assertNotEquals("New Session expected",initialSession, newSession);
+        assertNotEquals(initialSession, newSession, "New Session expected");
     }
 
     /**
@@ -138,10 +139,10 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
     public void testCommit() throws SQLException {
         // Ensure a transaction exists
         connection.getSession();
-        assertTrue("Transaction should be active", connection.getTransaction().isActive());
+        assertTrue(connection.getTransaction().isActive(), "Transaction should be active");
 
         connection.commit();
-        assertFalse("Commit should close transaction", connection.getTransaction().isActive());
+        assertFalse(connection.getTransaction().isActive(), "Commit should close transaction");
 
         // A second commit should be a no-op (no error thrown)
         connection.commit();
@@ -154,10 +155,10 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
     public void testRollback() throws SQLException {
         // Ensure a transaction exists
         connection.getSession();
-        assertTrue("Transaction should be active", connection.getTransaction().isActive());
+        assertTrue(connection.getTransaction().isActive(), "Transaction should be active");
 
         connection.rollback();
-        assertFalse("Rollback should close transaction", connection.getTransaction().isActive());
+        assertFalse(connection.getTransaction().isActive(), "Rollback should close transaction");
 
         // A second rollback should be a no-op (no error thrown)
         connection.rollback();
@@ -172,16 +173,16 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
         HibernateDBConnection dbConnection = (HibernateDBConnection) context.getDBConnection();
         EPerson person = context.getCurrentUser();
 
-        assertTrue("Current user should be cached in session", dbConnection.getSession()
-                                                                           .contains(person));
+        assertTrue(dbConnection.getSession()
+                                                                           .contains(person), "Current user should be cached in session");
 
         dbConnection.rollback();
-        assertFalse("Current user should be gone from cache", dbConnection.getSession()
-                                                                           .contains(person));
+        assertFalse(dbConnection.getSession()
+                                                                           .contains(person), "Current user should be gone from cache");
 
         person = dbConnection.reloadEntity(person);
-        assertTrue("Current user should be cached back in session", dbConnection.getSession()
-                                                                           .contains(person));
+        assertTrue(dbConnection.getSession()
+                                                                           .contains(person), "Current user should be cached back in session");
     }
 
     /**
@@ -193,16 +194,16 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
         HibernateDBConnection dbConnection = (HibernateDBConnection) context.getDBConnection();
         EPerson person = context.getCurrentUser();
 
-        assertTrue("Current user should be cached in session", dbConnection.getSession()
-                                                                           .contains(person));
+        assertTrue(dbConnection.getSession()
+                                                                           .contains(person), "Current user should be cached in session");
 
         dbConnection.commit();
-        assertFalse("Current user should be gone from cache", dbConnection.getSession()
-                                                                          .contains(person));
+        assertFalse(dbConnection.getSession()
+                                                                          .contains(person), "Current user should be gone from cache");
 
         person = dbConnection.reloadEntity(person);
-        assertTrue("Current user should be cached back in session", dbConnection.getSession()
-                                                                                .contains(person));
+        assertTrue(dbConnection.getSession()
+                                                                                .contains(person), "Current user should be cached back in session");
     }
 
     /**
@@ -214,17 +215,17 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
         HibernateDBConnection dbConnection = (HibernateDBConnection) context.getDBConnection();
         EPerson person = context.getCurrentUser();
 
-        assertTrue("Current user should be cached in session", dbConnection.getSession()
-                .contains(person));
+        assertTrue(dbConnection.getSession()
+                .contains(person), "Current user should be cached in session");
 
         dbConnection.uncacheEntities();
-        assertFalse("Current user should be gone from cache", dbConnection.getSession()
-                .contains(person));
+        assertFalse(dbConnection.getSession()
+                .contains(person), "Current user should be gone from cache");
 
         // Test ability to reload an uncached entity
         person = dbConnection.reloadEntity(person);
-        assertTrue("Current user should be cached back in session", dbConnection.getSession()
-                .contains(person));
+        assertTrue(dbConnection.getSession()
+                .contains(person), "Current user should be cached back in session");
     }
 
     /**
@@ -236,16 +237,16 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
         HibernateDBConnection dbConnection = (HibernateDBConnection) context.getDBConnection();
         EPerson person = context.getCurrentUser();
 
-        assertTrue("Current user should be cached in session", dbConnection.getSession()
-                                                                           .contains(person));
+        assertTrue(dbConnection.getSession()
+                                                                           .contains(person), "Current user should be cached in session");
 
         dbConnection.uncacheEntity(person);
-        assertFalse("Current user should be gone from cache", dbConnection.getSession()
-                                                                          .contains(person));
+        assertFalse(dbConnection.getSession()
+                                                                          .contains(person), "Current user should be gone from cache");
 
         // Test ability to reload an uncached entity
         person = dbConnection.reloadEntity(person);
-        assertTrue("Current user should be cached back in session", dbConnection.getSession()
-                                                                                .contains(person));
+        assertTrue(dbConnection.getSession()
+                                                                                .contains(person), "Current user should be cached back in session");
     }
 }

@@ -8,8 +8,8 @@
 
 package org.dspace.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -18,12 +18,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Drive the MultiFormatDateParser from a table of test formats and sample data
@@ -31,18 +30,17 @@ import org.junit.runners.Parameterized;
  *
  * @author mhwood
  */
-@RunWith(Parameterized.class)
 public class MultiFormatDateParserTest {
     private static Locale vmLocale;
-    private final String toParseDate;
-    private final String expectedFormat;
-    private final String expectedResult;
+    private String toParseDate;
+    private String expectedFormat;
+    private String expectedResult;
 
     /**
      * Test a single date format.
      * JUnit will instantiate this class repeatedly with data from {@link #dateFormatsToTest}.
      */
-    public MultiFormatDateParserTest(String toParseDate,
+    public void initMultiFormatDateParserTest(String toParseDate,
                                      String expectedFormat, String expectedResult) {
         this.toParseDate = toParseDate;
         this.expectedFormat = expectedFormat;
@@ -52,7 +50,6 @@ public class MultiFormatDateParserTest {
     /**
      * Date formats and samples to drive the parameterized test.
      */
-    @Parameterized.Parameters
     public static Collection dateFormatsToTest() {
         // Format: "String to parse", "format of string", "expected result in UTC"
         return Arrays.asList(new Object[][] {
@@ -83,7 +80,7 @@ public class MultiFormatDateParserTest {
         });
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         Map<String, String> formats = new HashMap<>(32);
         formats.put("\\d{8}", "yyyyMMdd");
@@ -119,25 +116,27 @@ public class MultiFormatDateParserTest {
         new MultiFormatDateParser().setPatterns(formats);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
     /**
      * Test of parse method, of class MultiFormatDateParser.
      */
-    @Test
-    public void testParse() {
+    @MethodSource("dateFormatsToTest")
+    @ParameterizedTest
+    public void testParse(String toParseDate, String expectedFormat, String expectedResult) {
+        initMultiFormatDateParserTest(toParseDate, expectedFormat, expectedResult);
         ZonedDateTime result = MultiFormatDateParser.parse(toParseDate);
         // Verify that the parsed ZonedDateTime is equal to the expected String result (or null if result is empty)
         if (!expectedResult.isEmpty()) {
-            assertEquals("Should parse: " + expectedFormat, expectedResult, result.toString());
+            assertEquals(expectedResult, result.toString(), "Should parse: " + expectedFormat);
         } else {
-            assertNull("Should not parse: " + expectedFormat, result);
+            assertNull(result, "Should not parse: " + expectedFormat);
         }
     }
 }
