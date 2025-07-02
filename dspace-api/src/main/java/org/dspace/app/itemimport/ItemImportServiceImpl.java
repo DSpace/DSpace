@@ -48,7 +48,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.mail.MessagingException;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
@@ -67,6 +66,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.app.util.LocalSchemaFilenameFilter;
 import org.dspace.app.util.RelationshipUtils;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -178,6 +178,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected RelationshipTypeService relationshipTypeService;
     @Autowired(required = true)
     protected MetadataValueService metadataValueService;
+
+    protected DocumentBuilder builder;
 
     protected String tempWorkDir;
 
@@ -1888,9 +1890,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      */
     protected Document loadXML(String filename) throws IOException,
         ParserConfigurationException, SAXException {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-                                                        .newDocumentBuilder();
-
+        DocumentBuilder builder = XMLUtils.getDocumentBuilder();
         return builder.parse(new File(filename));
     }
 

@@ -386,7 +386,7 @@ public class RoleIngester implements PackageIngester {
         Document document;
 
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory dbf = XMLUtils.getDocumentBuilderFactory();
             dbf.setIgnoringComments(true);
             dbf.setCoalescing(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -420,7 +420,7 @@ public class RoleIngester implements PackageIngester {
         Document document;
 
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory dbf = XMLUtils.getDocumentBuilderFactory();
             dbf.setIgnoringComments(true);
             dbf.setCoalescing(true);
             DocumentBuilder db = dbf.newDocumentBuilder();

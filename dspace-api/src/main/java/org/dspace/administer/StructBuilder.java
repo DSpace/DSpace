@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
@@ -43,6 +42,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -613,8 +613,8 @@ public class StructBuilder {
      */
     private static org.w3c.dom.Document loadXML(InputStream input)
         throws IOException, ParserConfigurationException, SAXException {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-                                                        .newDocumentBuilder();
+        // This builder factory does not disable external DTD, entities, etc.
+        DocumentBuilder builder = XMLUtils.getTrustedDocumentBuilder();
 
         org.w3c.dom.Document document = builder.parse(input);
 

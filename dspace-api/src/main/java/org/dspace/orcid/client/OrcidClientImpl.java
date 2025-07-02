@@ -43,6 +43,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.dspace.app.client.DSpaceHttpClientFactory;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.exception.OrcidClientException;
 import org.dspace.orcid.model.OrcidEntityType;
@@ -351,8 +352,7 @@ public class OrcidClientImpl implements OrcidClient {
     @SuppressWarnings("unchecked")
     private <T> T unmarshall(HttpEntity entity, Class<T> clazz) throws Exception {
         JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        XMLInputFactory xmlInputFactory = XMLUtils.getXMLInputFactory();
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(entity.getContent());
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         return (T) unmarshaller.unmarshal(xmlStreamReader);

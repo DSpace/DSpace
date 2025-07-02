@@ -31,9 +31,7 @@ public abstract class Converter<T> {
 
     protected Object unmarshall(InputStream input, Class<?> type) throws SAXException, URISyntaxException {
         try {
-            XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-            // disallow DTD parsing to ensure no XXE attacks can occur
-            xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            XMLInputFactory xmlInputFactory = XMLUtils.getXMLInputFactory();
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(input);
 
             JAXBContext context = JAXBContext.newInstance(type);
