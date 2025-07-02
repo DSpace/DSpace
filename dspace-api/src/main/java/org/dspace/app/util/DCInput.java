@@ -132,6 +132,12 @@ public class DCInput {
     private boolean closedVocabulary = false;
 
     /**
+     * The type of vocabulary (source)
+     * xml, authority, suggest
+     */
+    private String vocabularyType = "xml";
+
+    /**
      * the regex in ECMAScript standard format, usable also by rests.
      */
     private String regex = null;
@@ -152,6 +158,11 @@ public class DCInput {
     private String searchConfiguration = null;
     private final String filter;
     private final List<String> externalSources;
+
+    /**
+     * validation dictionary
+     */
+    private String validationDictionary = null;
 
     /**
      * The scope of the input sets, this restricts hidden metadata fields from
@@ -217,6 +228,9 @@ public class DCInput {
         String closedVocabularyStr = fieldMap.get("closedVocabulary");
         closedVocabulary = "true".equalsIgnoreCase(closedVocabularyStr)
             || "yes".equalsIgnoreCase(closedVocabularyStr);
+
+        vocabularyType = fieldMap.get("vocabularyType");
+        validationDictionary = fieldMap.get("validation-dictionary");
 
         // parsing of the <type-bind> element (using the colon as split separator)
         typeBind = new ArrayList<>();
@@ -459,6 +473,20 @@ public class DCInput {
     }
 
     /**
+     * @return type of vocabulary source (xml, authority, suggest)
+     */
+    public String getVocabularyType() {
+        return vocabularyType;
+    }
+
+    /**
+     * @param vocabularyType type of vocabulary source (xml, authority, suggest)
+     */
+    public void setVocabularyType(String vocabularyType) {
+        this.vocabularyType = vocabularyType;
+    }
+
+    /**
      * Gets the display string that corresponds to the passed storage string in
      * a particular display-storage pair set.
      *
@@ -567,6 +595,10 @@ public class DCInput {
             return true;
         }
         return false;
+    }
+
+    public String getValidationDictionary() {
+        return validationDictionary;
     }
 
     public boolean validate(String value) {

@@ -33,6 +33,8 @@ import org.dspace.app.rest.model.hateoas.SearchSupportResource;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.repository.DiscoveryRestRepository;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.discovery.SolrSuggestService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -233,4 +235,11 @@ public class DiscoveryRestController implements InitializingBean {
         }
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/suggest/{dictionary}/{query}",
+                    produces = "application/json" )
+    public String suggest(@PathVariable(name = "dictionary") String dictionary,
+                          @PathVariable(name = "query") String query) {
+        SolrSuggestService solrSuggestService = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrSuggestService.class).get(0);
+        return solrSuggestService.getSuggestions(query, dictionary);
+    }
 }
