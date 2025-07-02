@@ -29,7 +29,7 @@ updates:
         - "com.google.code.findbugs:*"
         - "com.google.errorprone:*"
         - "com.puppycrawl.tools:checkstyle"
-        - "org.sonatype.plugins:*"
+        - "org.sonatype.*:*"
         exclude-patterns:
         # Exclude anything from Spring, as that is in a separate group
         - "org.springframework.*:*"
@@ -150,7 +150,7 @@ updates:
           - "com.google.code.findbugs:*"
           - "com.google.errorprone:*"
           - "com.puppycrawl.tools:checkstyle"
-          - "org.sonatype.plugins:*"
+          - "org.sonatype.*:*"
         exclude-patterns:
           # Exclude anything from Spring, as that is in a separate group
           - "org.springframework.*:*"
@@ -271,7 +271,7 @@ updates:
           - "com.google.code.findbugs:*"
           - "com.google.errorprone:*"
           - "com.puppycrawl.tools:checkstyle"
-          - "org.sonatype.plugins:*"
+          - "org.sonatype.*:*"
         exclude-patterns:
           # Exclude anything from Spring, as that is in a separate group
           - "org.springframework.*:*"
@@ -392,7 +392,7 @@ updates:
           - "com.google.code.findbugs:*"
           - "com.google.errorprone:*"
           - "com.puppycrawl.tools:checkstyle"
-          - "org.sonatype.plugins:*"
+          - "org.sonatype.*:*"
         exclude-patterns:
           # Exclude anything from Spring, as that is in a separate group
           - "org.springframework.*:*"
