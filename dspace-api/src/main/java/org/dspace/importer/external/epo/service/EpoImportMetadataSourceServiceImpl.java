@@ -399,6 +399,10 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
 
             SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
+            // To properly parse EPO responses, we must allow DOCTYPEs overall. But, we can still apply all the
+            // other default XXE protections, including disabling external entities and entity expansion.
+            // NOTE: we only need to allow DOCTYPEs for this initial API call. All other calls have them disabled.
+            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false);
             Document document = saxBuilder.build(new StringReader(response));
             Element root = document.getRootElement();
 

@@ -235,12 +235,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
         try {
             SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
-            // To properly parse PubMed responses, we must allow DOCTYPE/DTDs overall but
-            // we can still take advantage of entities themselves being disabled, and not
-            // expanded.
+            // To properly parse PubMed responses, we must allow DOCTYPEs overall. But, we can still apply all the
+            // other default XXE protections, including disabling external entities and entity expansion.
             saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false);
-            saxBuilder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",
-                    true);
             Document document = saxBuilder.build(new StringReader(src));
             Element root = document.getRootElement();
 
@@ -358,6 +355,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
     private List<Element> splitToRecords(String recordsSrc) {
         try {
             SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
+            // To properly parse PubMed responses, we must allow DOCTYPEs overall. But, we can still apply all the
+            // other default XXE protections, including disabling external entities and entity expansion.
+            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false);
             Document document = saxBuilder.build(new StringReader(recordsSrc));
             Element root = document.getRootElement();
 
