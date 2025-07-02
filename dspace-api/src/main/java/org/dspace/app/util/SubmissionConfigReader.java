@@ -170,8 +170,11 @@ public class SubmissionConfigReader {
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory
-                .newInstance();
+            // This document builder factory will *not* disable external
+            // entities as they can be useful in managing large forms, but
+            // it is up to site administrators to validate the XML they are
+            // storing
+            DocumentBuilderFactory factory = XMLUtils.getTrustedDocumentBuilderFactory();
             factory.setValidating(false);
             factory.setIgnoringComments(true);
             factory.setIgnoringElementContentWhitespace(true);

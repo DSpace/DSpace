@@ -9,8 +9,13 @@ package org.dspace.app.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jdom2.input.SAXBuilder;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -161,4 +166,122 @@ public class XMLUtils {
         }
         return result;
     }
+
+    /**
+     * Initialize and return a javax DocumentBuilderFactory with NO security
+     * applied. This is intended only for internal, administrative/configuration
+     * use where external entities and other dangerous features are actually
+     * purposefully included.
+     * The method here is tiny, but may be expanded with other features like
+     * whitespace handling, and calling this method name helps to document
+     * the fact that the caller knows it is trusting the XML source / factory.
+     *
+     * @return document builder factory to generate new builders
+     * @throws ParserConfigurationException
+     */
+    public static DocumentBuilderFactory getTrustedDocumentBuilderFactory()
+            throws ParserConfigurationException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        return factory;
+    }
+
+    /**
+     * Initialize and return the javax DocumentBuilderFactory with some basic security
+     * applied to avoid XXE attacks and other unwanted content inclusion
+     * @return document builder factory to generate new builders
+     * @throws ParserConfigurationException
+     */
+    public static DocumentBuilderFactory getDocumentBuilderFactory()
+            throws ParserConfigurationException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        // No DOCTYPE / DTDs
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        // No external general entities
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        // No external parameter entities
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        // No external DTDs
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        // Even if entities somehow get defined, they will not be expanded
+        factory.setExpandEntityReferences(false);
+        // Disable "XInclude" markup processing
+        factory.setXIncludeAware(false);
+
+        return factory;
+    }
+
+    /**
+     * Initialize and return a javax DocumentBuilder with NO security
+     * applied. This is intended only for internal, administrative/configuration
+     * use where external entities and other dangerous features are actually
+     * purposefully included.
+     * The method here is tiny, but may be expanded with other features like
+     * whitespace handling, and calling this method name helps to document
+     * the fact that the caller knows it is trusting the XML source / builder
+     *
+     * @return document builder with no security features set
+     * @throws ParserConfigurationException
+     */
+    public static DocumentBuilder getTrustedDocumentBuilder()
+            throws ParserConfigurationException {
+        return getTrustedDocumentBuilderFactory().newDocumentBuilder();
+    }
+
+    /**
+     * Initialize and return the javax DocumentBuilder with some basic security applied
+     * to avoid XXE attacks and other unwanted content inclusion
+     * @return document builder for use in XML parsing
+     * @throws ParserConfigurationException
+     */
+    public static DocumentBuilder getDocumentBuilder()
+            throws ParserConfigurationException {
+        return getDocumentBuilderFactory().newDocumentBuilder();
+    }
+
+    /**
+     * Initialize and return the SAX document builder with some basic security applied
+     * to avoid XXE attacks and other unwanted content inclusion
+     * @return SAX document builder for use in XML parsing
+     */
+    public static SAXBuilder getSAXBuilder() {
+        return getSAXBuilder(false);
+    }
+
+    /**
+     * Initialize and return the SAX document builder with some basic security applied
+     * to avoid XXE attacks and other unwanted content inclusion
+     * @param validate whether to use JDOM XSD validation
+     * @return SAX document builder for use in XML parsing
+     */
+    public static SAXBuilder getSAXBuilder(boolean validate) {
+        SAXBuilder saxBuilder = new SAXBuilder();
+        if (validate) {
+            saxBuilder.setValidation(true);
+        }
+        // No DOCTYPE / DTDs
+        saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        // No external general entities
+        saxBuilder.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        // No external parameter entities
+        saxBuilder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        // No external DTDs
+        saxBuilder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        // Don't expand entities
+        saxBuilder.setExpandEntities(false);
+
+        return saxBuilder;
+    }
+
+    /**
+     * Initialize and return the Java XML Input Factory with some basic security applied
+     * to avoid XXE attacks and other unwanted content inclusion
+     * @return XML input factory for use in XML parsing
+     */
+    public static XMLInputFactory getXMLInputFactory() {
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+
+        return xmlInputFactory;
+    }
+
 }

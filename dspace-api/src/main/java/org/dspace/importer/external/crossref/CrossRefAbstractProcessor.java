@@ -12,7 +12,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.importer.external.metadatamapping.contributor.JsonPathMetadataProcessor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -64,10 +64,9 @@ public class CrossRefAbstractProcessor implements JsonPathMetadataProcessor {
         }
 
         String xmlString = "<root>" + abstractValue + "</root>";
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document xmlDoc;
         try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = XMLUtils.getDocumentBuilder();
             InputSource is = new InputSource(new StringReader(xmlString));
             xmlDoc = builder.parse(is);
         } catch (SAXException | IOException | ParserConfigurationException e) {
