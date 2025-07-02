@@ -463,9 +463,14 @@ public class DCInputsReader {
         throws SAXException {
         if (value.equals("dropdown")
             || value.equals("qualdrop_value")
-            || value.equals("list")) {
+            || value.equals("list")
+            || value.equals("tag")) {
             String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
             if (pairTypeName == null) {
+                if (value.equals("tag")) {
+                    // Optional value pair key for tag inputs
+                    return;
+                }
                 throw new SAXException("Form " + formName + ", field " +
                                            field.get("dc-element") +
                                            "." + field.get("dc-qualifier") +
