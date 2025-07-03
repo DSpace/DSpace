@@ -1,4 +1,4 @@
-name: Deploy Backend (DSpace) - Branch tst - up
+name: Deploy Backend (DSpace) - Branch tst
 
 on:
   push:
