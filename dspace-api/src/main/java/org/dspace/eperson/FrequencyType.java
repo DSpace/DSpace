@@ -12,12 +12,10 @@ import static java.time.temporal.TemporalAdjusters.previousOrSame;
 
 import java.time.DayOfWeek;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
 import org.apache.commons.codec.binary.StringUtils;
@@ -48,13 +46,13 @@ public enum FrequencyType {
                 // startDate is beginning of day yesterday
                 Instant startOfYesterday = ZonedDateTime.now(ZoneOffset.UTC)
                                                         .minus(1, ChronoUnit.DAYS)
-                                                        .with(LocalDateTime.MIN)
+                                                        .with(LocalTime.MIN)
                                                         .toInstant();
                 startDate = startOfYesterday.toString();
                 // endDate is end of day yesterday
                 Instant endOfYesterday = ZonedDateTime.now(ZoneOffset.UTC)
                                                       .minus(1, ChronoUnit.DAYS)
-                                                      .with(LocalDateTime.MAX)
+                                                      .with(LocalTime.MAX)
                                                       .toInstant();
                 endDate = endOfYesterday.toString();
                 break;
@@ -80,14 +78,14 @@ public enum FrequencyType {
                 Instant startOfLastWeek = ZonedDateTime.now(ZoneOffset.UTC)
                                                        .minus(1, ChronoUnit.WEEKS)
                                                        .with(previousOrSame(DayOfWeek.SUNDAY))
-                                                       .with(LocalDateTime.MIN)
+                                                       .with(LocalTime.MIN)
                                                        .toInstant();
                 startDate = startOfLastWeek.toString();
                 // End date is end of last week (Saturday, end of day)
                 Instant endOfLastWeek = ZonedDateTime.now(ZoneOffset.UTC)
                                                      .minus(1, ChronoUnit.WEEKS)
                                                      .with(nextOrSame(DayOfWeek.SATURDAY))
-                                                     .with(LocalDateTime.MAX)
+                                                     .with(LocalTime.MAX)
                                                      .toInstant();
                 endDate = endOfLastWeek.toString();
                 break;
