@@ -44,14 +44,12 @@ public enum FrequencyType {
             case "D":
                 // Frequency is anything updated yesterday.
                 // startDate is beginning of day yesterday
-                Instant startOfYesterday = ZonedDateTime.now(ZoneOffset.UTC)
-                                                        .minus(1, ChronoUnit.DAYS)
+                Instant startOfYesterday = ZonedDateTime.now(ZoneOffset.UTC).minusDays(1)
                                                         .with(LocalTime.MIN)
                                                         .toInstant();
                 startDate = startOfYesterday.toString();
                 // endDate is end of day yesterday
-                Instant endOfYesterday = ZonedDateTime.now(ZoneOffset.UTC)
-                                                      .minus(1, ChronoUnit.DAYS)
+                Instant endOfYesterday = ZonedDateTime.now(ZoneOffset.UTC).minusDays(1)
                                                       .with(LocalTime.MAX)
                                                       .toInstant();
                 endDate = endOfYesterday.toString();
@@ -75,15 +73,13 @@ public enum FrequencyType {
             case "W":
                 // Frequency is anything updated last week
                 // startDate is beginning of last week (Sunday, beginning of the day)
-                Instant startOfLastWeek = ZonedDateTime.now(ZoneOffset.UTC)
-                                                       .minus(1, ChronoUnit.WEEKS)
+                Instant startOfLastWeek = ZonedDateTime.now(ZoneOffset.UTC).minusWeeks(1)
                                                        .with(previousOrSame(DayOfWeek.SUNDAY))
                                                        .with(LocalTime.MIN)
                                                        .toInstant();
                 startDate = startOfLastWeek.toString();
                 // End date is end of last week (Saturday, end of day)
-                Instant endOfLastWeek = ZonedDateTime.now(ZoneOffset.UTC)
-                                                     .minus(1, ChronoUnit.WEEKS)
+                Instant endOfLastWeek = ZonedDateTime.now(ZoneOffset.UTC).minusWeeks(1)
                                                      .with(nextOrSame(DayOfWeek.SATURDAY))
                                                      .with(LocalTime.MAX)
                                                      .toInstant();
