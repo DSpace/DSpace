@@ -8,7 +8,9 @@
 package org.dspace.app.mediafilter;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,7 +45,7 @@ import org.dspace.utils.DSpace;
  * bitstreams to be processed, even if they have been before; -n noindex does not
  * recreate index after processing bitstreams; -i [identifier] limits processing
  * scope to a community, collection or item; -m [max] limits processing to a
- * maximum number of items; -fd [fromdate] takes only items starting from this date,
+ * maximum number of items; -d [fromdate] takes only items starting from this date,
  * filtering by last_modified in the item table.
  */
 public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfiguration> {
@@ -66,7 +68,7 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
     private String[] filterNames;
     private String[] skipIds = null;
     private Map<String, List<String>> filterFormats = new HashMap<>();
-    private LocalDate fromDate = null;
+    private Instant fromDate = null;
 
     private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
 
@@ -123,7 +125,8 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
 
         // isForce overrides fromDate
         if (!isForce && commandLine.hasOption('d')) {
-            fromDate = LocalDate.parse(commandLine.getOptionValue('d'));
+            fromDate = LocalDate.parse(commandLine.getOptionValue('d')).atStartOfDay(ZoneId.systemDefault())
+                                                                           .toInstant();
         }
 
 

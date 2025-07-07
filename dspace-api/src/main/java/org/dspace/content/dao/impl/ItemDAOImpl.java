@@ -450,6 +450,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         Query query = createQuery(context, criteriaQuery);
         @SuppressWarnings("unchecked")
         List<UUID> uuids = query.getResultList();
+        log.info("Retrieved " + uuids.size() + " items modified since " + since);
         return new UUIDIterator<Item>(context, uuids, Item.class, this);
     }
 
@@ -469,6 +470,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         Query query = createQuery(context, criteriaQuery);
         @SuppressWarnings("unchecked")
         List<UUID> uuids = query.getResultList();
+        log.info("Retrieved " + uuids.size() + " items from collection " + collection.getID() + " modified since " + last);
         return new UUIDIterator<Item>(context, uuids, Item.class, this);
     }
 
