@@ -462,15 +462,17 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         CriteriaQuery<UUID> criteriaQuery = criteriaBuilder.createQuery(UUID.class);
         Root<Item> itemRoot = criteriaQuery.from(Item.class);
         criteriaQuery.select(itemRoot.get(Item_.id));
-        criteriaQuery.where(criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)));
-        criteriaQuery.where(criteriaBuilder.greaterThan(itemRoot.get(Item_.lastModified), last));
+        criteriaQuery.where(criteriaBuilder.and(
+            criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)),
+            criteriaBuilder.greaterThan(itemRoot.get(Item_.lastModified), last)));
         criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get((Item_.id))));
 
         // Transform into a query object to execute
         Query query = createQuery(context, criteriaQuery);
         @SuppressWarnings("unchecked")
         List<UUID> uuids = query.getResultList();
-        log.info("Retrieved " + uuids.size() + " items from collection " + collection.getID() + " modified since " + last);
+        log.info("Retrieved " + uuids.size() + " items from collection " + collection.getID() +
+                 " modified since " + last);
         return new UUIDIterator<Item>(context, uuids, Item.class, this);
     }
 
