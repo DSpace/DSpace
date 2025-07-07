@@ -45,7 +45,7 @@ import org.dspace.utils.DSpace;
  * bitstreams to be processed, even if they have been before; -n noindex does not
  * recreate index after processing bitstreams; -i [identifier] limits processing
  * scope to a community, collection or item; -m [max] limits processing to a
- * maximum number of items; -fd [fromdate] takes only items starting from this date,
+ * maximum number of items; -d [fromdate] takes only items starting from this date,
  * filtering by last_modified in the item table.
  */
 public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfiguration> {
@@ -70,7 +70,7 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
     private Map<String, List<String>> filterFormats = new HashMap<>();
     private LocalDate fromDate = null;
 
-    private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();;
+    private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
 
     public MediaFilterScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager()

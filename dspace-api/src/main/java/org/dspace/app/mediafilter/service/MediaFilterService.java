@@ -151,5 +151,9 @@ public interface MediaFilterService {
      */
     public void setLogHandler(DSpaceRunnableHandler handler);
 
+    /** 
+     * Used to set start date (or time, if no specific date of force parameter is given) for filtering items
+     * @param fromDate the datetime from which to filter items
+    */
     public void setFromDate(Date fromDate);
 }

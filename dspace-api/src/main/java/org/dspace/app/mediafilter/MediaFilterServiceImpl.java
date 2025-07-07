@@ -118,9 +118,15 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     @Override
     public void applyFiltersAllItems(Context context) throws Exception {
         boolean storeLastDate = false;
+        String timeToStore = null;
         if (fromDate == null) {
             storeLastDate = true;
+            // dspace.filtermedia.lastdate is saved as datetime. If new items are added while running
+            // the script, storing time at the start of script to ensure that these items are processed
+            // in the next run.
+            timeToStore = DCDate.getCurrent().toString();
             String lastDate = siteService.getMetadata(siteService.findSite(context), "dspace.filtermedia.lastdate");
+            logInfo("Last date retrieved from db for media filter processing: " + lastDate);
             if ((lastDate != null) && (isForce == false)) {
                 fromDate = new DCDate(lastDate).toDate();
             }
@@ -134,6 +140,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 applyFiltersCommunity(context, topLevelCommunity);
             }
         } else if (fromDate != null) {
+            logInfo("Using fromDate " + fromDate);
             Iterator<Item> itemIterator =
                     itemService.findByLastModifiedSince(
                             context,
@@ -150,11 +157,12 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             }
         }
         if (storeLastDate) {
+            logInfo("Setting new last date to db for media filter processing: " + timeToStore);
             siteService.clearMetadata(context, siteService.findSite(context),
                 "dspace", "filtermedia", "lastdate", Item.ANY);
             siteService.addMetadata(context, siteService.findSite(context),
                 "dspace", "filtermedia", "lastdate", null,
-                new DCDate(new Date()).toString());
+                timeToStore);
             siteService.update(context, siteService.findSite(context));
         }
     }
