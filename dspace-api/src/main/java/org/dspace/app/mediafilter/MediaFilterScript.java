@@ -7,6 +7,7 @@
  */
 package org.dspace.app.mediafilter;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +24,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
@@ -63,6 +67,8 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
     private String[] skipIds = null;
     private Map<String, List<String>> filterFormats = new HashMap<>();
     private LocalDate fromDate = null;
+
+    private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
 
     public MediaFilterScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager()
@@ -231,6 +237,14 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
 
         try {
             c = new Context();
+
+            MetadataField field = metadataFieldService.findByElement(c, "dspace", "filtermedia", "lastdate");
+            if (field == null) {
+                throw new SQLException("Cannot find field dspace.filtermedia.lastdate from the Metadata "
+                                          + "Registry. Please update the registry by running\n"
+                                          + "./dspace registry-loader -metadata ../config/registries/dspace-types.xml\n"
+                                          + "in the [dspace]/bin/ directory.");
+            }
 
             // have to be super-user to do the filtering
             c.turnOffAuthorisationSystem();
