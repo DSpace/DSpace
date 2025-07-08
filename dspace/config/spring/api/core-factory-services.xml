@@ -34,6 +34,7 @@
 
     <bean id="eventServiceFactory" class="org.dspace.event.factory.EventServiceFactoryImpl"/>
 
+    <bean id="handleRedirectServiceFactory" class="org.dspace.handleredirect.factory.HandleRedirectServiceFactoryImpl"/>
     <bean id="handleServiceFactory" class="org.dspace.handle.factory.HandleServiceFactoryImpl"/>
     <bean id="harvestServiceFactory" class="org.dspace.harvest.factory.HarvestServiceFactoryImpl"/>
     <bean id="identifierServiceFactory" class="org.dspace.identifier.factory.IdentifierServiceFactoryImpl"/>
