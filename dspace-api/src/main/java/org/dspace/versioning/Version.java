@@ -46,7 +46,7 @@ public class Version implements ReloadableEntity<Integer> {
     private Item item;
 
     @Column(name = "version_number")
-    private int versionNumber;
+    private Integer versionNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "eperson_id")
@@ -88,12 +88,12 @@ public class Version implements ReloadableEntity<Integer> {
         this.item = item;
     }
 
-    public int getVersionNumber() {
+    public Integer getVersionNumber() {
         return versionNumber;
     }
 
-    public void setVersionNumber(int version_number) {
-        this.versionNumber = version_number;
+    public void setVersionNumber(Integer versionNumber) {
+        this.versionNumber = versionNumber;
     }
 
     public EPerson getEPerson() {
