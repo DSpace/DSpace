@@ -14,10 +14,13 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -771,6 +774,33 @@ public class METSManifest {
         return (Element) result;
     }
 
+    public Element getRelObjStructDiv()
+            throws MetadataValidationException {
+        //get first <structMap>
+        List sms = mets.getChildren("structMap", metsNS);
+        if (sms == null) {
+            throw new MetadataValidationException("METS document is missing the required structMap element.");
+        }
+
+        Element sm = null;
+        for (int s = 0; s < sms.size(); s++) {
+            if ("rels".equals(((Element) sms.get(s)).getAttributeValue("ID"))) {
+                sm = (Element) sms.get(s);
+                break;
+            }
+        }
+
+        if (sm == null) {
+            return null;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Got getObjStructDiv result=" + sm.toString());
+        }
+
+        return (Element) sm;
+    }
+
     /**
      * Get an array of child object {@code <div>}s from the METS Manifest {@code <structMap>}.
      * These {@code <div>}s reference the location of any child objects METS manifests.
@@ -782,6 +812,18 @@ public class METSManifest {
         throws MetadataValidationException {
         //get the <div> in <structMap> which describes the current object's contents
         Element objDiv = getObjStructDiv();
+
+        //get the child <div>s -- these should reference the child METS manifest
+        return objDiv.getChildren("div", metsNS);
+    }
+
+    public List getRelObjDivs()
+            throws MetadataValidationException {
+        //get the <div> in <structMap> which describes the current object's contents
+        Element objDiv = getRelObjStructDiv();
+        if (objDiv == null) {
+            return new ArrayList();
+        }
 
         //get the child <div>s -- these should reference the child METS manifest
         return objDiv.getChildren("div", metsNS);
@@ -830,6 +872,97 @@ public class METSManifest {
         String[] childPaths = new String[childPathList.size()];
         childPaths = (String[]) childPathList.toArray(childPaths);
         return childPaths;
+    }
+
+    public Map<String, List<String>> getRelMetsFilePaths(PackageParameters params)
+            throws MetadataValidationException {
+        Map<String, Boolean> scope = parseScope(params.getProperty("scope"));
+        //get our child object <div>s
+        List relObjDivs = getRelObjDivs();
+
+        Map<String, List<String>> relPathMap = new HashMap<>();
+
+        if (relObjDivs != null && !relObjDivs.isEmpty()) {
+            Iterator relIterator = relObjDivs.iterator();
+            //For each Div, we want to find the underlying <mptr> with @LOCTYPE=URL
+            while (relIterator.hasNext()) {
+                Element relDiv = (Element) relIterator.next();
+                String relType = relDiv.getAttributeValue("ID").replace("rels_", "");
+                if (scope.containsKey(relType) || scope.containsKey("*")) {
+                    List relItems = relDiv.getChildren("div", metsNS);
+                    if (relItems != null && !relItems.isEmpty()) {
+                        Iterator relItemIterator = relItems.iterator();
+                        while (relItemIterator.hasNext()) {
+                            Element relItemDiv = (Element) relItemIterator.next();
+
+                            //get all child <mptr>'s
+                            List relMptrs = relItemDiv.getChildren("mptr", metsNS);
+                            if (relMptrs != null && !relMptrs.isEmpty()) {
+                                Iterator mptrIterator = relMptrs.iterator();
+                                //For each mptr, we want to find the one with @LOCTYPE=URL
+                                while (mptrIterator.hasNext()) {
+                                    Element mptr = (Element) mptrIterator.next();
+                                    String locType = mptr.getAttributeValue("LOCTYPE");
+                                    //if @LOCTYPE=URL, then capture @xlink:href as the METS Manifest file path
+                                    if (locType != null && locType.equals("URL")) {
+                                        String filePath = mptr.getAttributeValue("href", xlinkNS);
+                                        if (filePath != null && filePath.length() > 0) {
+                                            List<String> relPathList;
+                                            if (relPathMap.containsKey(relType)) {
+                                                relPathList = relPathMap.get(relType);
+                                            } else {
+                                                relPathList = new ArrayList<>();
+                                            }
+                                            relPathList.add(filePath);
+                                            relPathMap.put(relType, relPathList);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Update scope to remove now processed non-recursive options
+        if (scope.containsKey("*") && !scope.get("*")) {
+            scope.remove("*");
+        }
+        for (String relType : relPathMap.keySet()) {
+            if (scope.containsKey(relType) && !scope.get(relType)) {
+                scope.remove(relType);
+            }
+        }
+        params.setProperty("scope", resolveScope(scope));
+
+        return relPathMap;
+    }
+
+    public Map<String, Boolean> parseScope(String scopeString) {
+        Map<String, Boolean> scope = new HashMap<>();
+        if (scopeString == null) {
+            return scope;
+        }
+        for (String part : scopeString.split(",")) {
+            String[] pair = part.split(":");
+            String relName = pair[0];
+            boolean recursive = pair.length == 2 && pair[1].toLowerCase().startsWith("r");
+            scope.put(relName, recursive);
+        }
+        return scope;
+    }
+
+    public String resolveScope(Map<String, Boolean> scope) {
+        List<String> scopeString = new ArrayList<>();
+        for (String relType : scope.keySet()) {
+            if (scope.get(relType)) {
+                scopeString.add(relType + ":recursive");
+            } else {
+                scopeString.add(relType);
+            }
+        }
+        return StringUtils.join(scopeString, ",");
     }
 
     /**
