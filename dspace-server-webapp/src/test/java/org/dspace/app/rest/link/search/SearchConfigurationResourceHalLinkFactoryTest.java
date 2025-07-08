@@ -7,13 +7,14 @@
  */
 package org.dspace.app.rest.link.search;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 import org.dspace.app.rest.DiscoveryRestController;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.hateoas.SearchConfigurationResource;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -32,7 +33,7 @@ public class SearchConfigurationResourceHalLinkFactoryTest {
     @InjectMocks
     private SearchConfigurationResourceHalLinkFactory searchConfigurationResourceHalLinkFactory;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         searchConfigurationResourceHalLinkFactory = new SearchConfigurationResourceHalLinkFactory();
     }

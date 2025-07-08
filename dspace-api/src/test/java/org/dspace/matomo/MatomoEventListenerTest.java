@@ -18,8 +18,8 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.services.ConfigurationService;
 import org.dspace.usage.UsageEvent;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -36,7 +36,7 @@ public class MatomoEventListenerTest extends AbstractUnitTest {
 
     MatomoEventListener matomoEventListener;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         matomoEventListener =
             new MatomoEventListener(List.of(matomoHandler1, matomoHandler2), configurationService, bitstreamService);

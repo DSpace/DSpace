@@ -62,9 +62,9 @@ import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -80,7 +80,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     @Autowired
     private XmlWorkflowFactory xmlWorkflowFactory;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
 
@@ -1032,7 +1032,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    @Ignore(value = "This demonstrate the bug logged in DS-4179")
+    @Disabled(value = "This demonstrate the bug logged in DS-4179")
     /**
      * Verify that update of metadata is forbidden in step 1.
      *

@@ -12,7 +12,7 @@ import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.RelationshipTypeService;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class AbstractEntityIntegrationTest extends AbstractControllerIntegrationTest {
@@ -39,7 +39,7 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
      * After the EntityTypes are created, RelationshipTypes are set up between the different EntityTypes as indicated
      * in relationship-types.xml
      */
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
