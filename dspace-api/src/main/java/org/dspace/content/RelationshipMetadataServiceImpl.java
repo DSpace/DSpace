@@ -285,7 +285,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
             Context context, Item item, Item otherItem, Relationship relationship, int place,
             String key, VirtualMetadataConfiguration virtualBean) throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
-        for (String value : virtualBean.getValues(context, otherItem)) {
+        for (String value : virtualBean.getValues(context, otherItem, relationship)) {
             RelationshipMetadataValue relationshipMetadataValue = constructRelationshipMetadataValue(context, item,
                                                                                                      relationship
                                                                                                          .getID(),
