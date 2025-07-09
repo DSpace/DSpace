@@ -256,7 +256,7 @@ public class DSBitStoreService extends BaseBitStoreService {
             log.error("Bitstream path outside of assetstore root requested: bitstream={}, path={}, assetstore={}", bitstream.getID(), normalizedPath, baseDir.getAbsolutePath());
             throw new IOException("Illegal bitstream path constructed");
         }
-        return new File(bufFilename.toString());
+        return bitstreamFile;
     }
 
     public boolean isRegisteredBitstream(String internalId) {
