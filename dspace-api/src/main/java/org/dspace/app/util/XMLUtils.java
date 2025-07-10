@@ -7,7 +7,13 @@
  */
 package org.dspace.app.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,6 +24,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.jdom2.input.SAXBuilder;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Simple class to read information from small XML using DOM manipulation
@@ -211,27 +220,36 @@ public class XMLUtils {
     }
 
     /**
-     * Initialize and return a javax DocumentBuilder with NO security
+     * Initialize and return a javax DocumentBuilder with less security
      * applied. This is intended only for internal, administrative/configuration
      * use where external entities and other dangerous features are actually
-     * purposefully included.
+     * purposefully included, but are only allowed from specified paths, e.g.
+     * dspace.dir or some other path specified by the java caller.
      * The method here is tiny, but may be expanded with other features like
      * whitespace handling, and calling this method name helps to document
      * the fact that the caller knows it is trusting the XML source / builder
+     * <p>
+     * If no allowedPaths are passed, then all external entities are rejected
      *
      * @return document builder with no security features set
-     * @throws ParserConfigurationException
+     * @throws ParserConfigurationException if the builder can not be configured
      */
-    public static DocumentBuilder getTrustedDocumentBuilder()
+    public static DocumentBuilder getTrustedDocumentBuilder(String... allowedPaths)
             throws ParserConfigurationException {
-        return getTrustedDocumentBuilderFactory().newDocumentBuilder();
+        DocumentBuilderFactory factory = getTrustedDocumentBuilderFactory();
+        factory.setValidating(false);
+        factory.setIgnoringComments(true);
+        factory.setIgnoringElementContentWhitespace(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        builder.setEntityResolver(new PathRestrictedEntityResolver(allowedPaths));
+        return factory.newDocumentBuilder();
     }
 
     /**
      * Initialize and return the javax DocumentBuilder with some basic security applied
      * to avoid XXE attacks and other unwanted content inclusion
      * @return document builder for use in XML parsing
-     * @throws ParserConfigurationException
+     * @throws ParserConfigurationException if the builder can not be configured
      */
     public static DocumentBuilder getDocumentBuilder()
             throws ParserConfigurationException {
@@ -283,5 +301,69 @@ public class XMLUtils {
 
         return xmlInputFactory;
     }
+
+    /**
+     * This entity resolver accepts one or more path strings in its
+     * constructor and throws a SAXException if the entity systemID
+     * is not within the allowed path (or a subdirectory).
+     * If no parameters are passed, then this effectively disallows
+     * any external entity resolution.
+     */
+    public static class PathRestrictedEntityResolver implements EntityResolver {
+        private final List<String> allowedBasePaths;
+
+        public PathRestrictedEntityResolver(String... allowedBasePaths) {
+            this.allowedBasePaths = Arrays.asList(allowedBasePaths);
+        }
+
+        @Override
+        public InputSource resolveEntity(String publicId, String systemId)
+                throws SAXException, IOException {
+
+            if (systemId == null) {
+                return null;
+            }
+
+            String filePath;
+            if (systemId.startsWith("file://")) {
+                filePath = systemId.substring(7);
+            } else if (systemId.startsWith("file:")) {
+                filePath = systemId.substring(5);
+            } else if (!systemId.contains("://")) {
+                filePath = systemId;
+            } else {
+                throw new SAXException("External resources not allowed: " + systemId +
+                        ". Only local file paths are permitted.");
+            }
+
+            Path resolvedPath;
+            try {
+                resolvedPath = Paths.get(filePath).toAbsolutePath().normalize();
+            } catch (Exception e) {
+                throw new SAXException("Invalid path: " + systemId, e);
+            }
+
+            boolean isAllowed = false;
+            for (String basePath : allowedBasePaths) {
+                Path allowedPath = Paths.get(basePath).toAbsolutePath().normalize();
+                if (resolvedPath.startsWith(allowedPath)) {
+                    isAllowed = true;
+                    break;
+                }
+            }
+
+            if (!isAllowed) {
+                throw new SAXException("Access denied to path: " + resolvedPath);
+            }
+
+            File file = resolvedPath.toFile();
+            if (!file.exists() || !file.canRead()) {
+                throw new SAXException("File not found or not readable: " + resolvedPath);
+            }
+
+            return new InputSource(new FileInputStream(file));
+        }
+    }
+
 
 }
