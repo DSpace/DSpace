@@ -7,7 +7,7 @@
 # To build with other versions, use "--build-arg JDK_VERSION=[value]"
 ARG JDK_VERSION=17
 # The Docker version tag to build from
-ARG DSPACE_VERSION=latest
+ARG DSPACE_VERSION=dspace-9_x
 # The Docker registry to use for DSpace images. Defaults to "docker.io"
 # NOTE: non-DSpace images are hardcoded to use "docker.io" and are not impacted by this build argument
 ARG DOCKER_REGISTRY=docker.io
