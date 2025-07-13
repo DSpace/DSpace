@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -744,15 +745,20 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             myitem = wi.getItem();
         }
 
+        // normalize and validate path to make sure itemname doesn't contain path traversal
+        Path itemPath = new File(path + File.separatorChar + itemname + File.separatorChar)
+            .toPath().normalize();
+        if (!itemPath.startsWith(path)) {
+            throw new IOException("Illegal item metadata path: '" + itemPath);
+        }
+
         // now fill out dublin core for item
-        loadMetadata(c, myitem, path + File.separatorChar + itemname
-            + File.separatorChar);
+        loadMetadata(c, myitem, itemPath.toString());
 
         // and the bitstreams from the contents file
         // process contents file, add bistreams and bundles, return any
         // non-standard permissions
-        List<String> options = processContentsFile(c, myitem, path
-            + File.separatorChar + itemname, "contents");
+        List<String> options = processContentsFile(c, myitem, itemPath.toString(), "contents");
 
         if (useWorkflow) {
             // don't process handle file
@@ -770,8 +776,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             }
         } else {
             // only process handle file if not using workflow system
-            String myhandle = processHandleFile(c, myitem, path
-                + File.separatorChar + itemname, "handle");
+            String myhandle = processHandleFile(c, myitem, itemPath.toString(), "handle");
 
             // put item in system
             if (!isTest) {
