@@ -751,14 +751,16 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         if (!itemPath.startsWith(path)) {
             throw new IOException("Illegal item metadata path: '" + itemPath);
         }
+        // Normalization chops off the last separator, and we need to put it back
+        String itemPathDir = itemPath.toString() + File.separatorChar;
 
         // now fill out dublin core for item
-        loadMetadata(c, myitem, itemPath.toString());
+        loadMetadata(c, myitem, itemPathDir);
 
         // and the bitstreams from the contents file
         // process contents file, add bistreams and bundles, return any
         // non-standard permissions
-        List<String> options = processContentsFile(c, myitem, itemPath.toString(), "contents");
+        List<String> options = processContentsFile(c, myitem, itemPathDir, "contents");
 
         if (useWorkflow) {
             // don't process handle file
@@ -776,7 +778,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             }
         } else {
             // only process handle file if not using workflow system
-            String myhandle = processHandleFile(c, myitem, itemPath.toString(), "handle");
+            String myhandle = processHandleFile(c, myitem, itemPathDir, "handle");
 
             // put item in system
             if (!isTest) {
