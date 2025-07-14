@@ -26,8 +26,17 @@
 
     <bean id="rorTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="ror.title"/>
-        <property name="query" value="/name"/>
+<!--        <property name="query" value="/name"/>-->
+        <property name="metadataProcessor" ref="rorNamesProcessor"/>
     </bean>
+
+    <bean name="rorNamesProcessor" class="org.dspace.importer.external.metadatamapping.contributor.ConditionalArrayElementAttributeProcessor">
+        <property name="pathToArray" value="/names" />
+        <property name="elementAttribute" value="/value" />
+        <property name="filterAttribute" value="/types" />
+        <property name="requiredValueInFilter" value="ror_display" />
+    </bean>
+
     <bean id="ror.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="organization.legalName"/>
     </bean>
@@ -42,15 +51,31 @@
 
     <bean id="rorAcronymContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="ror.acronym"/>
-        <property name="query" value="/acronyms"/>
+<!--        <property name="query" value="/acronyms"/>-->
+        <property name="metadataProcessor" ref="rorAcronymProcessor"/>
     </bean>
+
+    <bean name="rorAcronymProcessor" class="org.dspace.importer.external.metadatamapping.contributor.ConditionalArrayElementAttributeProcessor">
+        <property name="pathToArray" value="/names" />
+        <property name="elementAttribute" value="/value" />
+        <property name="filterAttribute" value="/types" />
+        <property name="requiredValueInFilter" value="acronym" />
+    </bean>
+
     <bean id="ror.acronym" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="organization.alternateName"/>
     </bean>
 
     <bean id="rorLinksContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="ror.links"/>
-        <property name="query" value="/links"/>
+<!--        <property name="query" value="/links"/>-->
+        <property name="metadataProcessor" ref="rorLinksProcessor"/>
+    </bean>
+    <bean name="rorLinksProcessor" class="org.dspace.importer.external.metadatamapping.contributor.ConditionalArrayElementAttributeProcessor">
+        <property name="pathToArray" value="/links" />
+        <property name="elementAttribute" value="/value" />
+        <property name="filterAttribute" value="/type" />
+        <property name="requiredValueInFilter" value="website" />
     </bean>
     <bean id="ror.links" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="organization.url"/>
@@ -66,7 +91,12 @@
 
     <bean id="rorCountryContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="ror.country"/>
-        <property name="query" value="/country/country_code"/>
+<!--        <property name="query" value="/country/country_code"/>-->
+        <property name="metadataProcessor" ref="rorCountryProcessor"/>
+    </bean>
+    <bean name="rorCountryProcessor" class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+        <property name="pathToArray" value="/locations"/>
+        <property name="elementAttribute" value="/geonames_details/country_code"/>
     </bean>
     <bean id="ror.country" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="organization.address.addressCountry"/>
@@ -82,7 +112,14 @@
 
     <bean id="rorFundRefContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="ror.fundref"/>
-        <property name="query" value="/external_ids/FundRef/all"/>
+<!--        <property name="query" value="/external_ids/FundRef/all"/>-->
+        <property name="metadataProcessor" ref="rorFundRefProcessor"/>
+    </bean>
+    <bean name="rorFundRefProcessor" class="org.dspace.importer.external.metadatamapping.contributor.ConditionalArrayElementAttributeProcessor">
+        <property name="pathToArray" value="/external_ids" />
+        <property name="elementAttribute" value="/all" />
+        <property name="filterAttribute" value="/type" />
+        <property name="requiredValueInFilter" value="fundref" />
     </bean>
     <bean id="ror.fundref" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="organization.identifier.crossrefid"/>
@@ -90,7 +127,14 @@
 
     <bean id="rorISNIContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="ror.isni"/>
-        <property name="query" value="/external_ids/ISNI/all"/>
+<!--        <property name="query" value="/external_ids/ISNI/all"/>-->
+        <property name="metadataProcessor" ref="rorISNIProcessor"/>
+    </bean>
+    <bean name="rorISNIProcessor" class="org.dspace.importer.external.metadatamapping.contributor.ConditionalArrayElementAttributeProcessor">
+        <property name="pathToArray" value="/external_ids" />
+        <property name="elementAttribute" value="/all" />
+        <property name="filterAttribute" value="/type" />
+        <property name="requiredValueInFilter" value="isni" />
     </bean>
     <bean id="ror.isni" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="organization.identifier.isni"/>
