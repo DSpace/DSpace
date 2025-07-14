@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -48,7 +49,6 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
@@ -68,6 +68,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.app.util.LocalSchemaFilenameFilter;
 import org.dspace.app.util.RelationshipUtils;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -179,6 +180,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected RelationshipTypeService relationshipTypeService;
     @Autowired(required = true)
     protected MetadataValueService metadataValueService;
+
+    protected DocumentBuilder builder;
 
     protected String tempWorkDir;
 
@@ -743,15 +746,22 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             myitem = wi.getItem();
         }
 
+        // normalize and validate path to make sure itemname doesn't contain path traversal
+        Path itemPath = new File(path + File.separatorChar + itemname + File.separatorChar)
+            .toPath().normalize();
+        if (!itemPath.startsWith(path)) {
+            throw new IOException("Illegal item metadata path: '" + itemPath);
+        }
+        // Normalization chops off the last separator, and we need to put it back
+        String itemPathDir = itemPath.toString() + File.separatorChar;
+
         // now fill out dublin core for item
-        loadMetadata(c, myitem, path + File.separatorChar + itemname
-            + File.separatorChar);
+        loadMetadata(c, myitem, itemPathDir);
 
         // and the bitstreams from the contents file
         // process contents file, add bistreams and bundles, return any
         // non-standard permissions
-        List<String> options = processContentsFile(c, myitem, path
-            + File.separatorChar + itemname, "contents");
+        List<String> options = processContentsFile(c, myitem, itemPathDir, "contents");
 
         if (useWorkflow) {
             // don't process handle file
@@ -769,8 +779,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             }
         } else {
             // only process handle file if not using workflow system
-            String myhandle = processHandleFile(c, myitem, path
-                + File.separatorChar + itemname, "handle");
+            String myhandle = processHandleFile(c, myitem, itemPathDir, "handle");
 
             // put item in system
             if (!isTest) {
@@ -1889,9 +1898,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      */
     protected Document loadXML(String filename) throws IOException,
         ParserConfigurationException, SAXException {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-                                                        .newDocumentBuilder();
-
+        DocumentBuilder builder = XMLUtils.getDocumentBuilder();
         return builder.parse(new File(filename));
     }
 
