@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -33,6 +31,7 @@ import javax.xml.transform.TransformerFactory;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.LocalSchemaFilenameFilter;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -52,7 +51,6 @@ public class ItemArchive {
 
     public static final String DUBLIN_CORE_XML = "dublin_core.xml";
 
-    protected static DocumentBuilder builder = null;
     protected Transformer transformer = null;
 
     protected List<DtoMetadata> dtomList = null;
@@ -95,14 +93,14 @@ public class ItemArchive {
         InputStream is = null;
         try {
             is = new FileInputStream(new File(dir, DUBLIN_CORE_XML));
-            itarch.dtomList = MetadataUtilities.loadDublinCore(getDocumentBuilder(), is);
+            itarch.dtomList = MetadataUtilities.loadDublinCore(XMLUtils.getDocumentBuilder(), is);
 
             //The code to search for local schema files was copied from org.dspace.app.itemimport
             // .ItemImportServiceImpl.java
             File file[] = dir.listFiles(new LocalSchemaFilenameFilter());
             for (int i = 0; i < file.length; i++) {
                 is = new FileInputStream(file[i]);
-                itarch.dtomList.addAll(MetadataUtilities.loadDublinCore(getDocumentBuilder(), is));
+                itarch.dtomList.addAll(MetadataUtilities.loadDublinCore(XMLUtils.getDocumentBuilder(), is));
             }
         } finally {
             if (is != null) {
@@ -124,14 +122,6 @@ public class ItemArchive {
         ItemUpdate.prv("item instantiated: " + itarch.item.getHandle());
 
         return itarch;
-    }
-
-    protected static DocumentBuilder getDocumentBuilder()
-        throws ParserConfigurationException {
-        if (builder == null) {
-            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        }
-        return builder;
     }
 
     /**
@@ -318,7 +308,7 @@ public class ItemArchive {
 
         try {
             out = new FileOutputStream(new File(dir, "dublin_core.xml"));
-            Document doc = MetadataUtilities.writeDublinCore(getDocumentBuilder(), undoDtomList);
+            Document doc = MetadataUtilities.writeDublinCore(XMLUtils.getDocumentBuilder(), undoDtomList);
             MetadataUtilities.writeDocument(doc, getTransformer(), out);
 
             // if undo has delete bitstream

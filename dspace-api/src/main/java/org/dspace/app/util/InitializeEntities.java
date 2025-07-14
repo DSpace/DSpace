@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.cli.CommandLine;
@@ -139,8 +138,9 @@ public class InitializeEntities {
     private void parseXMLToRelations(Context context, String fileLocation) throws AuthorizeException {
         try {
             File fXmlFile = new File(fileLocation);
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            // This XML builder will allow external entities, so the relationship types XML should
+            // be considered trusted by administrators
+            DocumentBuilder dBuilder = XMLUtils.getTrustedDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
 
             doc.getDocumentElement().normalize();
