@@ -1011,6 +1011,34 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     }
 
     /**
+     * Ensures a file path does not attempt to access files outside the designated parent directory.
+     *
+     * @param parentDir          The absolute path to the parent directory that should contain the file
+     * @param fileName           The name or path of the file to validate
+     * @throws IOException       If an error occurs while resolving canonical paths, or the file path attempts
+     *                           to access a location outside the parent directory
+     */
+    private void validateFilePath(String parentDir, String fileName) throws IOException {
+        File parent = new File(parentDir);
+        File file = new File(fileName);
+
+        // If the fileName is not an absolute path, we resolve it against the parentDir
+        if (!file.isAbsolute()) {
+            file = new File(parent, fileName);
+        }
+
+        String parentCanonicalPath = parent.getCanonicalPath();
+        String fileCanonicalPath = file.getCanonicalPath();
+
+        if (!fileCanonicalPath.startsWith(parentCanonicalPath)) {
+            log.error("File path outside of canonical root requested: fileCanonicalPath={} does not begin " +
+                "with parentCanonicalPath={}", fileCanonicalPath, parentCanonicalPath);
+            throw new IOException("Illegal file path '" + fileName + "' encountered. This references a path " +
+                "outside of the import package. Please see the system logs for more details.");
+        }
+    }
+
+    /**
      * Read the collections file inside the item directory. If there
      * is one and it is not empty return a list of collections in
      * which the item should be inserted. If it does not exist or it
@@ -1210,6 +1238,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                             sDescription = sDescription.replaceFirst("description:", "");
                         }
 
+                        validateFilePath(path, sFilePath);
                         registerBitstream(c, i, iAssetstore, sFilePath, sBundle, sDescription);
                         logInfo("\tRegistering Bitstream: " + sFilePath
                             + "\tAssetstore: " + iAssetstore
@@ -1423,6 +1452,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             return;
         }
 
+        validateFilePath(path, fileName);
         String fullpath = path + File.separatorChar + fileName;
 
         // get an input stream
