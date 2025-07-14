@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>9.1-SNAPSHOT</version>
+    <version>9.1</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -1034,73 +1034,73 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>9.1-SNAPSHOT</version>
+                <version>9.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>9.1-SNAPSHOT</version>
+                <version>9.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>9.1-SNAPSHOT</version>
+                <version>9.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>server</artifactId>
                 <classifier>classes</classifier>
-                <version>9.1-SNAPSHOT</version>
+                <version>9.1</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>9.1-SNAPSHOT</version>
+                <version>9.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>9.1-SNAPSHOT</version>
+                <version>9.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>9.1-SNAPSHOT</version>
+                <version>9.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>9.1-SNAPSHOT</version>
+                <version>9.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>9.1-SNAPSHOT</version>
+                <version>9.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>9.1-SNAPSHOT</version>
+                <version>9.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-saml2</artifactId>
-                <version>9.1-SNAPSHOT</version>
+                <version>9.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-iiif</artifactId>
-                <version>9.1-SNAPSHOT</version>
+                <version>9.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>9.1-SNAPSHOT</version>
+                <version>9.1</version>
             </dependency>
             <!-- DSpace API Localization Packages -->
             <dependency>
@@ -1941,7 +1941,7 @@
         <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
         <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
         <url>https://github.com/DSpace/DSpace</url>
-        <tag>dspace-9_x</tag>
+        <tag>dspace-9.1</tag>
     </scm>
 
     <repositories>
