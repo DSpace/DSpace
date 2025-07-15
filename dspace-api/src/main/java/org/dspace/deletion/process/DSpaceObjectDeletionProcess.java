@@ -7,17 +7,12 @@
  */
 package org.dspace.deletion.process;
 
-import static org.dspace.core.Constants.COLLECTION;
-import static org.dspace.core.Constants.COMMUNITY;
-import static org.dspace.core.Constants.ITEM;
-
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
 
 import org.apache.commons.cli.ParseException;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -27,6 +22,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.deletion.process.strategies.DSpaceObjectDeletionStrategy;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -37,8 +33,8 @@ import org.dspace.utils.DSpace;
 
 /**
  * Batch process for deleting DSpace objects (Item, Collection, Community).
- * This class implements a worker that, given an identifier (UUID or handle),
- * resolves the corresponding DSpace object and manages its deletion using the appropriate services.
+ * This class orchestrates the deletion process, delegating the actual deletion logic
+ * to a strategy registry that selects the appropriate strategy for each DSpaceObject type.
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
@@ -52,6 +48,7 @@ public class DSpaceObjectDeletionProcess
 
     private String id;
     private Context context;
+    private List<DSpaceObjectDeletionStrategy> deletionStrategies;
 
     @Override
     public void setup() throws ParseException {
@@ -59,6 +56,8 @@ public class DSpaceObjectDeletionProcess
         handleService = HandleServiceFactory.getInstance().getHandleService();
         communityService = ContentServiceFactory.getInstance().getCommunityService();
         collectionService = ContentServiceFactory.getInstance().getCollectionService();
+
+        deletionStrategies.add(null);
 
         parseCommandLineOptions();
     }
@@ -74,36 +73,21 @@ public class DSpaceObjectDeletionProcess
     public void internalRun() throws Exception {
         assignCurrentUserInContext();
         Optional<DSpaceObject> dSpaceObjectOptional = resolveDSpaceObject(this.id);
-
         if (dSpaceObjectOptional.isEmpty()) {
             var error = String.format("DSpaceObject for provided identifier:%s doesn't exist!", this.id);
             throw new IllegalArgumentException(error);
         }
 
         DSpaceObject dso = dSpaceObjectOptional.get();
-        var dsoType = dso.getType();
-        if (dsoType != COLLECTION || dsoType != COMMUNITY || dsoType != ITEM) {
-            var error = String.format("Provided identifier:%s does not belong to" +
-                                      " objects of type 'Community', 'Collection' or 'Item' ", this.id);
-            throw new IllegalArgumentException(error);
-        }
-
-        deleteDSpaceObject(dso);
+        getStrategy(dso).delete(context, dso);
     }
 
-    private void deleteDSpaceObject(DSpaceObject dso) throws SQLException, AuthorizeException, IOException {
-        switch (dso.getType()) {
-            case ITEM:
-                this.itemService.delete(this.context, (Item) dso);
-            case COLLECTION:
-                this.collectionService.delete(this.context, (Collection) dso);
-            case COMMUNITY:
-                this.communityService.delete(this.context, (Community) dso);
-            default:
-                var error = String.format("Provided identifier:%s does not belong to" +
-                                          " objects of type 'Community', 'Collection' or 'Item' ", this.id);
-                throw new IllegalArgumentException(error);
-        }
+    private DSpaceObjectDeletionStrategy getStrategy(DSpaceObject dso) {
+        return deletionStrategies.stream()
+                                 .filter(s -> s.supports(dso))
+                                 .findFirst()
+                                 .orElseThrow(() ->
+                                                new IllegalArgumentException("No strategy for type: " + dso.getType()));
     }
 
     private void assignCurrentUserInContext() throws SQLException {
@@ -119,7 +103,7 @@ public class DSpaceObjectDeletionProcess
      * Resolves the identifier (Item, Collection, or Community).
      *
      * @param identifier   The UUID or handle of the DSpace object.
-     * @return An Optional containing the IndexableObject if found.
+     * @return An Optional containing the DSpaceObject if found.
      * @throws SQLException If database error occurs.
      */
     private Optional<DSpaceObject> resolveDSpaceObject(String identifier) throws SQLException {
@@ -144,7 +128,6 @@ public class DSpaceObjectDeletionProcess
                 return Optional.of(collection);
             }
         }
-
         DSpaceObject dso = handleService.resolveToObject(context, identifier);
         return dso != null ? Optional.of(dso) : Optional.empty();
     }

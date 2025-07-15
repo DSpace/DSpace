@@ -1,0 +1,40 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.deletion.process.strategies;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
+import org.dspace.authorize.AuthorizeException;
+import org.springframework.beans.factory.annotation.Autowired;
+
+/**
+ * Deletion strategy for DSpace Item objects.
+ *
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+ */
+public class ItemDeletionStrategy implements DSpaceObjectDeletionStrategy {
+
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
+    @Override
+    public void delete(Context context, DSpaceObject dso) throws SQLException, AuthorizeException, IOException {
+        itemService.delete(context, (Item) dso);
+    }
+
+    @Override
+    public boolean supports(DSpaceObject dso) {
+        return dso instanceof Item;
+    }
+
+}
