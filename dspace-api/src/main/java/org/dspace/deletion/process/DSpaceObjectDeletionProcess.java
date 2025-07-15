@@ -8,9 +8,9 @@
 package org.dspace.deletion.process;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.List;
 
 import org.apache.commons.cli.ParseException;
 import org.dspace.content.Collection;
@@ -22,7 +22,10 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.deletion.process.strategies.CollectionDeletionStrategy;
+import org.dspace.deletion.process.strategies.CommunityDeletionStrategy;
 import org.dspace.deletion.process.strategies.DSpaceObjectDeletionStrategy;
+import org.dspace.deletion.process.strategies.ItemDeletionStrategy;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -52,12 +55,15 @@ public class DSpaceObjectDeletionProcess
 
     @Override
     public void setup() throws ParseException {
+        ServiceManager sm = new DSpace().getServiceManager();
         itemService = ContentServiceFactory.getInstance().getItemService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
         communityService = ContentServiceFactory.getInstance().getCommunityService();
         collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
-        deletionStrategies.add(null);
+        deletionStrategies.add(sm.getServiceByName("itemDeletionStrategy", ItemDeletionStrategy.class));
+        deletionStrategies.add(sm.getServiceByName("communityDeletionStrategy", CommunityDeletionStrategy.class));
+        deletionStrategies.add(sm.getServiceByName("collectionDeletionStrategy", CollectionDeletionStrategy.class));
 
         parseCommandLineOptions();
     }

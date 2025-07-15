@@ -113,4 +113,8 @@
         <property name="dspaceRunnableClass" value="org.dspace.deletion.process.DSpaceObjectDeletionProcess"/>
     </bean>
 
+    <bean id="itemDeletionStrategy" class="org.dspace.deletion.process.strategies.ItemDeletionStrategy" />
+    <bean id="communityDeletionStrategy" class="org.dspace.deletion.process.strategies.CommunityDeletionStrategy" />
+    <bean id="collectionDeletionStrategy" class="org.dspace.deletion.process.strategies.CollectionDeletionStrategy" />
+
 </beans>
