@@ -10,12 +10,12 @@ package org.dspace.deletion.process.strategies;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.dspace.content.DSpaceObject;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
-import org.dspace.authorize.AuthorizeException;
 
 /**
  * Deletion strategy for DSpace Collection objects.
@@ -36,4 +36,4 @@ public class CollectionDeletionStrategy implements DSpaceObjectDeletionStrategy 
         return dso instanceof Collection;
     }
 
-} 
+}

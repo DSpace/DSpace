@@ -10,13 +10,12 @@ package org.dspace.deletion.process.strategies;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.authorize.AuthorizeException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Deletion strategy for DSpace Item objects.

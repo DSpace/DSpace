@@ -7,11 +7,12 @@
  */
 package org.dspace.deletion.process.strategies;
 
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
-import org.dspace.authorize.AuthorizeException;
 import java.io.IOException;
 import java.sql.SQLException;
+
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 
 /**
  * Strategy interface for deleting DSpace objects.
@@ -33,4 +34,4 @@ public interface DSpaceObjectDeletionStrategy {
      */
     void delete(Context context, DSpaceObject dso) throws SQLException, AuthorizeException, IOException;
 
-} 
+}
