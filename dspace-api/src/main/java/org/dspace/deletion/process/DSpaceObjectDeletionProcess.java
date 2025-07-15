@@ -8,6 +8,7 @@
 package org.dspace.deletion.process;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -51,7 +52,7 @@ public class DSpaceObjectDeletionProcess
 
     private String id;
     private Context context;
-    private List<DSpaceObjectDeletionStrategy> deletionStrategies;
+    private List<DSpaceObjectDeletionStrategy> deletionStrategies = new ArrayList<>();
 
     @Override
     public void setup() throws ParseException {
