@@ -178,13 +178,21 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     public Choices getMatches(String text, int start, int limit, String locale) {
         init(locale);
         log.debug("Getting matches for '" + text + "'");
-        String xpathExpression = "";
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
+        StringBuilder xpathExpressionBuilder = new StringBuilder();
         for (int i = 0; i < textHierarchy.length; i++) {
-            xpathExpression +=
-                String.format(xpathTemplate, textHierarchy[i].replaceAll("'", "&apos;").toLowerCase());
+            xpathExpressionBuilder.append(String.format(xpathTemplate, "$var" + i));
         }
+        String xpathExpression = xpathExpressionBuilder.toString();
         XPath xpath = XPathFactory.newInstance().newXPath();
+        xpath.setXPathVariableResolver(variableName -> {
+            String varName = variableName.getLocalPart();
+            if (varName.startsWith("var")) {
+                int index = Integer.parseInt(varName.substring(3));
+                return textHierarchy[index].toLowerCase();
+            }
+            throw new IllegalArgumentException("Unexpected variable: " + varName);
+        });
         int total = 0;
         List<Choice> choices = new ArrayList<Choice>();
         try {
@@ -203,13 +211,21 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     public Choices getBestMatch(String text, String locale) {
         init(locale);
         log.debug("Getting best matches for '" + text + "'");
-        String xpathExpression = "";
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
+        StringBuilder xpathExpressionBuilder = new StringBuilder();
         for (int i = 0; i < textHierarchy.length; i++) {
-            xpathExpression +=
-                String.format(valueTemplate, textHierarchy[i].replaceAll("'", "&apos;"));
+            xpathExpressionBuilder.append(String.format(valueTemplate, "$var" + i));
         }
+        String xpathExpression = xpathExpressionBuilder.toString();
         XPath xpath = XPathFactory.newInstance().newXPath();
+        xpath.setXPathVariableResolver(variableName -> {
+            String varName = variableName.getLocalPart();
+            if (varName.startsWith("var")) {
+                int index = Integer.parseInt(varName.substring(3));
+                return textHierarchy[index];
+            }
+            throw new IllegalArgumentException("Unexpected variable: " + varName);
+        });
         List<Choice> choices = new ArrayList<Choice>();
         try {
             NodeList results = (NodeList) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODESET);
