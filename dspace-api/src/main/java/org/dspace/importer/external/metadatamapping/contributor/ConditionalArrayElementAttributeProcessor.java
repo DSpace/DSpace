@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
  * /names/value where /names/types contains "ror_display".
  *
  * Configurable via:
- *   pathToArray: e.g., /items/0/names
+ *   pathToArray: e.g., /names
  *   elementAttribute: e.g., /value
  *   filterAttribute: e.g., /types
  *   requiredValueInFilter: e.g., ror_display
@@ -35,12 +35,12 @@ import org.apache.logging.log4j.Logger;
  * {
  *   "items": [{
  *     "names": [
- *       { "types": ["label", "ror_display"], "value": "Universidade Federal do Piauí" },
- *       { "types": ["label"], "value": "UFPI" }
+ *       { "types": ["label", "ror_display"], "value": "Instituto Federal do Piauí" },
+ *       { "types": ["acronym"], "value": "IFPI" }
  *     ]
  *   }]
  * }
- * This processor can extract "Universidade Federal do Piauí" using proper configuration.
+ * This processor can extract "Instituto Federal do Piauí" using proper configuration.
  *
  * Author: Jesiel (based on Mykhaylo Boychuk’s original processor)
  */
@@ -55,10 +55,6 @@ public class ConditionalArrayElementAttributeProcessor implements JsonPathMetada
 
     @Override
     public Collection<String> processMetadata(String json) {
-        System.out.println("pathToArray: " + pathToArray);
-        System.out.println("elementAttribute: " + elementAttribute);
-        System.out.println("filterAttribute: " + filterAttribute);
-        System.out.println("requiredValueInFilter: " + requiredValueInFilter);
         JsonNode rootNode = convertStringJsonToJsonNode(json);
         Collection<String> results = new ArrayList<>();
 
@@ -67,7 +63,6 @@ public class ConditionalArrayElementAttributeProcessor implements JsonPathMetada
         }
 
         Iterator<JsonNode> array = rootNode.at(pathToArray).iterator();
-        System.out.println("array: " + array.toString());
         while (array.hasNext()) {
             JsonNode element = array.next();
             JsonNode filterNode = element.at(filterAttribute);
