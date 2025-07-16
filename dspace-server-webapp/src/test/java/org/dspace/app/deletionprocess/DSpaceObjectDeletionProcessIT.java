@@ -7,11 +7,14 @@
  */
 package org.dspace.app.deletionprocess;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
@@ -73,8 +76,8 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
                            .build();
 
         Bundle bundleOfItem1 = BundleBuilder.createBundle(context, item1)
-                                     .withName("ORIGINAL")
-                                     .build();
+                                            .withName("ORIGINAL")
+                                            .build();
 
         try (InputStream is = IOUtils.toInputStream("Dummy content 1", CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.createBitstream(context, bundleOfItem1, is)
@@ -121,6 +124,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
 
     @Test
     public void asyncDetetionOfItemTest() throws Exception {
+        // verify that item with bitstreams exist
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
                              .andExpect(status().isOk())
@@ -147,12 +151,13 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream4.getID().toString())))
                              .andExpect(jsonPath("$.name", Matchers.is(bitstream4.getName())));
 
-        String[] args = new String[]{ "dspace-object-deletion", "-i", item1.getID().toString() };
+        String[] args = new String[]{"dspace-object-deletion", "-i", item1.getID().toString()};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
 
+        // // verify that item with bitstreams was deleted
         getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
                              .andExpect(status().isNotFound());
 
@@ -167,34 +172,294 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream4.getID()))
                              .andExpect(status().isNotFound());
+
+        // check item2
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item2.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(item2.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(item2.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream5.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream5.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream5.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream6.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream6.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream6.getName())));
     }
 
     @Test
     public void asyncDetetionOfCollectionTest() throws Exception {
 
+        // verify that collection with items/bitstreams exists
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/core/collections/" + collection.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(collection.getID().toString())))
                              .andExpect(jsonPath("$.name", Matchers.is(collection.getName())));
 
-        String[] args = new String[]{ "dspace-object-deletion", "-i", collection.getID().toString() };
+        // check item1
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(item1.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(item1.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream1.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream1.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream2.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream2.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream3.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream3.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream3.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream4.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream4.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream4.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/collections/" + collection.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(collection.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(collection.getName())));
+
+        // check item2
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item2.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(item2.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(item2.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream5.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream5.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream5.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream6.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream6.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream6.getName())));
+
+        String[] args = new String[]{"dspace-object-deletion", "-i", collection.getID().toString()};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
 
+        // // verify that collection with items/bitstreams was deleted
+        getClient(tokenAdmin).perform(get("/api/core/collections/" + collection.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item2.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream3.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream4.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream5.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream6.getID()))
+                             .andExpect(status().isNotFound());
     }
 
     @Test
     public void asyncDetetionOfCommunityTest() throws Exception {
 
-        String[] args = new String[]{ "dspace-object-deletion", "-i", community.getID().toString() };
+        // verify that community with collections/items/bitstreams exists
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/communities/" + community.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(community.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(community.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/collections/" + collection.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(collection.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(collection.getName())));
+
+        // check item1
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(item1.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(item1.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream1.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream1.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream2.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream2.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream3.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream3.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream3.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream4.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream4.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream4.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/collections/" + collection.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(collection.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(collection.getName())));
+
+        // check item2
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item2.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(item2.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(item2.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream5.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream5.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream5.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream6.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream6.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream6.getName())));
+
+        String[] args = new String[]{"dspace-object-deletion", "-i", community.getID().toString()};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
 
+        // // verify that collection with items/bitstreams was deleted
+        getClient(tokenAdmin).perform(get("/api/core/communities/" + community.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/collections/" + collection.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item2.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream3.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream4.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream5.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream6.getID()))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void asyncDetetionOfUnsupportedObjectTest() throws Exception {
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream1.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream1.getName())));
+
+        String[] args = new String[]{ "dspace-object-deletion", "-i", bitstream1.getID().toString() };
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
+        deletionProcess.initialize(args, handler, admin);
+        deletionProcess.run();
+
+        var message = String.format("DSpaceObject for provided identifier:%s doesn't exist!", bitstream1.getID());
+        assertTrue(handler.getException().getMessage().contains(message));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream1.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream1.getName())));
+    }
+
+    @Test
+    public void asyncDetetionOfItemByHandleTest() throws Exception {
+        // verify that item with bitstreams exist
+        AtomicReference<String> idRef = new AtomicReference<>();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(item1.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(item1.getName())))
+                             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                            "$.handle")));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream1.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream1.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream2.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream2.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream3.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream3.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream3.getName())));
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream4.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", Matchers.is(bitstream4.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstream4.getName())));
+
+        String[] args = new String[]{"dspace-object-deletion", "-i", idRef.get() };
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
+        deletionProcess.initialize(args, handler, admin);
+        deletionProcess.run();
+
+        // verify that item with bitstreams was deleted
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream3.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream4.getID()))
+                             .andExpect(status().isNotFound());
     }
 
 }
