@@ -8,10 +8,10 @@
 package org.dspace.app.deletionprocess;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicReference;
