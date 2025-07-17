@@ -27,6 +27,7 @@ import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.submit.factory.SubmissionServiceFactory;
 import org.dspace.submit.service.SubmissionConfigService;
+import org.dspace.workflow.WorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
@@ -70,6 +71,14 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         submitter = obj.getSubmitter();
 
         witem.setId(obj.getID());
+
+        // Return early if this is a workflow item
+        // TODO - WIP - this is just an experimental change and I expect it
+        // breaks the "Edit Metadata" workflow action for a claimed task since
+        // that requires the form models, errors etc to be loaded
+        if (witem instanceof WorkflowItem) {
+            return;
+        }
 
         // 1. retrieve the submission definition
         // 2. iterate over the submission section to allow to plugin additional
