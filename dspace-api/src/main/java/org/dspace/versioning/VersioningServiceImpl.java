@@ -117,6 +117,7 @@ public class VersioningServiceImpl implements VersioningService {
             version.setItem(null);
             version.setSummary(null);
             version.setVersionDate(null);
+            version.setVersionNumber(null);
             version.setePerson(null);
             versionDAO.save(c, version);
 
