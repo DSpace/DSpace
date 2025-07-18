@@ -34,7 +34,7 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
 
     private final Logger log = org.apache.logging.log4j.LogManager.getLogger(AuthorityValueServiceImpl.class);
 
-    @Autowired()
+    @Autowired
     protected AuthorityTypes authorityTypes;
 
     protected AuthorityValueServiceImpl() {
