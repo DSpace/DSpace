@@ -7,9 +7,9 @@
  */
 package org.dspace.access.status;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -37,9 +37,9 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit Tests for access status service
@@ -78,7 +78,7 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -112,7 +112,7 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         context.turnOffAuthorisationSystem();
@@ -159,8 +159,8 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
         AccessStatus accessStatus = accessStatusService.getAccessStatus(context, item);
         String status = accessStatus.getStatus();
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
-        assertNotEquals("testGetAccessStatusItem 0", status, DefaultAccessStatusHelper.UNKNOWN);
-        assertNull("testGetAccessStatusItem 1", availabilityDate);
+        assertNotEquals(status, DefaultAccessStatusHelper.UNKNOWN, "testGetAccessStatusItem 0");
+        assertNull(availabilityDate, "testGetAccessStatusItem 1");
     }
 
     @Test
@@ -168,8 +168,8 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
         AccessStatus accessStatus = accessStatusService.getAnonymousAccessStatus(context, item);
         String status = accessStatus.getStatus();
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
-        assertNotEquals("testGetAnonymousAccessStatusItem 0", status, DefaultAccessStatusHelper.UNKNOWN);
-        assertNull("testGetAnonymousAccessStatusItem 1", availabilityDate);
+        assertNotEquals(status, DefaultAccessStatusHelper.UNKNOWN, "testGetAnonymousAccessStatusItem 0");
+        assertNull(availabilityDate, "testGetAnonymousAccessStatusItem 1");
     }
 
     @Test
@@ -177,7 +177,7 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
         AccessStatus accessStatus = accessStatusService.getAccessStatus(context, bitstream);
         String status = accessStatus.getStatus();
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
-        assertNotEquals("testGetAccessStatusBitstream 0", status, DefaultAccessStatusHelper.UNKNOWN);
-        assertNull("testGetAccessStatusBitstream 1", availabilityDate);
+        assertNotEquals(status, DefaultAccessStatusHelper.UNKNOWN, "testGetAccessStatusBitstream 0");
+        assertNull(availabilityDate, "testGetAccessStatusBitstream 1");
     }
 }

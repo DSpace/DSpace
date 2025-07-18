@@ -15,13 +15,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.RelationshipType;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class RightTiltedRelationshipRestRepositoryIT extends RelationshipRestRepositoryIT {
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
 

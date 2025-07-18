@@ -7,25 +7,28 @@
  */
 package org.dspace.app.rest.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import org.dspace.app.rest.model.RootRest;
 import org.dspace.app.util.Util;
 import org.dspace.services.ConfigurationService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * This class' purpose is to test the RootConvertor class.
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class RootConverterTest {
 
     @InjectMocks
@@ -39,7 +42,7 @@ public class RootConverterTest {
     private String serverURL = "https://dspace-rest/server";
     private String serverSSRURL = "http://internal-rest:8080/server";
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(configurationService.getProperty("dspace.ui.url")).thenReturn("dspaceurl");
         when(configurationService.getProperty("dspace.name")).thenReturn("dspacename");

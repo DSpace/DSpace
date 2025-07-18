@@ -7,7 +7,8 @@
  */
 package org.dspace.app.rest.security.jwt;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -21,13 +22,15 @@ import com.nimbusds.jwt.SignedJWT;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
@@ -35,13 +38,14 @@ import org.springframework.security.crypto.keygen.StringKeyGenerator;
 /**
  * Test suite for the short lived authentication token
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
     @InjectMocks
     @Spy
     private ShortLivedJWTTokenHandler shortLivedJWTTokenHandler;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         when(ePerson.getSessionSalt()).thenReturn("01234567890123456789012345678901");
@@ -62,16 +66,18 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
         assertEquals("epersonID", personId);
     }
 
-    @Test(expected = ParseException.class)
-    public void testJWTEncrypted() throws Exception {
-        when(shortLivedJWTTokenHandler.isEncryptionEnabled()).thenReturn(true);
-        Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
-        StringKeyGenerator keyGenerator = KeyGenerators.string();
-        when(configurationService.getProperty("jwt.shortLived.encryption.secret"))
-            .thenReturn(keyGenerator.generateKey());
-        String token = shortLivedJWTTokenHandler
-            .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
-        SignedJWT signedJWT = SignedJWT.parse(token);
+    @Test
+    public void testJWTEncrypted() {
+        assertThrows(ParseException.class, () -> {
+            when(shortLivedJWTTokenHandler.isEncryptionEnabled()).thenReturn(true);
+            Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
+            StringKeyGenerator keyGenerator = KeyGenerators.string();
+            when(configurationService.getProperty("jwt.shortLived.encryption.secret"))
+                .thenReturn(keyGenerator.generateKey());
+            String token = shortLivedJWTTokenHandler
+                .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
+            SignedJWT signedJWT = SignedJWT.parse(token);
+        });
     }
 
     //temporary set a negative expiration time so the token is invalid immediately

@@ -7,7 +7,7 @@
  */
 package org.dspace.content.virtual;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -17,14 +17,17 @@ import java.util.UUID;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class UUIDValueTest {
 
     @InjectMocks
@@ -43,7 +46,7 @@ public class UUIDValueTest {
         list.add(String.valueOf(uuid));
 
         // The reported value(s) should match our defined list
-        assertEquals("TestGetValues 0", list, uuidValue.getValues(context, item));
+        assertEquals(list, uuidValue.getValues(context, item), "TestGetValues 0");
     }
 
     @Test
@@ -52,7 +55,7 @@ public class UUIDValueTest {
         uuidValue.setUseForPlace(true);
 
         // The reported boolean should return true
-        assertEquals("TestSetUseForPlace 0", true, uuidValue.getUseForPlace());
+        assertEquals(true, uuidValue.getUseForPlace(), "TestSetUseForPlace 0");
 
     }
 
@@ -62,6 +65,6 @@ public class UUIDValueTest {
         uuidValue.setUseForPlace(true);
 
         // The reported boolean should return true
-        assertEquals("TestGetUseForPlace 0", true, uuidValue.getUseForPlace());
+        assertEquals(true, uuidValue.getUseForPlace(), "TestGetUseForPlace 0");
     }
 }
