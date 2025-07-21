@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -1116,4 +1117,84 @@ public class RelationshipServiceImpl implements RelationshipService {
         return relationshipDAO
                .countByItemAndRelationshipTypeAndList(context, focusUUID, relationshipType, items, isLeft);
     }
+
+    @Override
+    public void deleteMultipleRelationshipsCopyVirtualMetadata(Context context, String[] copyVirtual, Item item)
+            throws SQLException, AuthorizeException, BadVirtualMetadataType {
+
+        if (copyVirtual == null || copyVirtual.length == 0) {
+            // Don't delete nor copy any metadata here if the "copyVirtualMetadata" parameter wasn't passed. The
+            // relationships not deleted in this method will be deleted implicitly by the this.delete() method
+            // without copying the metadata anyway.
+            return;
+        }
+
+        if (Objects.deepEquals(copyVirtual, COPYVIRTUAL_ALL)) {
+            // Option 1: Copy all virtual metadata of this item to its related items. Iterate over all of the item's
+            //           relationships and copy their data.
+            for (Relationship relationship : findByItem(context, item)) {
+                deleteRelationshipCopyVirtualMetadata(context, item, relationship);
+            }
+        } else if (Objects.deepEquals(copyVirtual, COPYVIRTUAL_CONFIGURED)) {
+            // Option 2: Use a configuration value to determine if virtual metadata needs to be copied. Iterate over all
+            //           of the item's relationships and copy their data depending on the
+            //           configuration.
+            for (Relationship relationship : findByItem(context, item)) {
+                boolean copyToLeft = relationship.getRelationshipType().isCopyToLeft();
+                boolean copyToRight = relationship.getRelationshipType().isCopyToRight();
+                if (relationship.getLeftItem().getID().equals(item.getID())) {
+                    copyToLeft = false;
+                } else {
+                    copyToRight = false;
+                }
+                forceDelete(context, relationship, copyToLeft, copyToRight);
+            }
+        } else {
+            // Option 3: Copy the virtual metadata of selected types of this item to its related items. The copyVirtual
+            //           array should only contain numeric values at this point. These values are used to select the
+            //           types. Iterate over all selected types and copy the corresponding values to this item's
+            //           relatives.
+            List<Integer> relationshipIds = parseVirtualMetadataTypes(copyVirtual);
+            for (Integer relationshipId : relationshipIds) {
+                RelationshipType relationshipType = relationshipTypeService.find(context, relationshipId);
+                for (Relationship relationship : findByItemAndRelationshipType(context, item, relationshipType)) {
+                    deleteRelationshipCopyVirtualMetadata(context, item, relationship);
+                }
+            }
+        }
+    }
+
+    private List<Integer> parseVirtualMetadataTypes(String[] copyVirtual) throws BadVirtualMetadataType {
+        List<Integer> types = new ArrayList<>();
+        for (String typeString : copyVirtual) {
+            if (!StringUtils.isNumeric(typeString)) {
+                var message = String.format("parameter %s should only contain a single value '%s', '%s' or a list of " +
+                       "numbers.", REQUESTPARAMETER_COPYVIRTUALMETADATA, COPYVIRTUAL_ALL[0], COPYVIRTUAL_CONFIGURED[0]);
+                throw new BadVirtualMetadataType(message);
+            }
+            types.add(Integer.parseInt(typeString));
+        }
+        return types;
+    }
+
+    /**
+     * Deletes the relationship while copying the virtual metadata to the item which is **NOT** deleted
+     *
+     * @param itemToDelete         The item to be deleted
+     * @param relationshipToDelete The relationship to be deleted
+     */
+    private void deleteRelationshipCopyVirtualMetadata(Context context, Item itemToDelete,
+             Relationship relationshipToDelete) throws SQLException, AuthorizeException {
+
+        boolean copyToLeft = relationshipToDelete.getRightItem().equals(itemToDelete);
+        boolean copyToRight = relationshipToDelete.getLeftItem().equals(itemToDelete);
+
+        if (copyToLeft && copyToRight) {
+            //The item has a relationship with itself. Copying metadata is useless since the item will be deleted
+            copyToLeft = false;
+            copyToRight = false;
+        }
+        forceDelete(context, relationshipToDelete, copyToLeft, copyToRight);
+    }
+
 }

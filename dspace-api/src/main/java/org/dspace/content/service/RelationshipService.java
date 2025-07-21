@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.BadVirtualMetadataType;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.Relationship.LatestVersionStatus;
@@ -24,6 +25,10 @@ import org.dspace.service.DSpaceCRUDService;
  * This Service will use the DAO classes to access the information about Relationships from the database
  */
 public interface RelationshipService extends DSpaceCRUDService<Relationship> {
+
+    public static final String[] COPYVIRTUAL_ALL = {"all"};
+    public static final String[] COPYVIRTUAL_CONFIGURED = {"configured"};
+    public static final String REQUESTPARAMETER_COPYVIRTUALMETADATA = "copyVirtualMetadata";
 
     /**
      * Retrieves the list of Relationships currently in the system for which the given Item is either
@@ -524,5 +529,16 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      */
     public int countByItemRelationshipTypeAndRelatedList(Context context, UUID focusUUID,
            RelationshipType relationshipType, List<UUID> items, boolean isLeft) throws SQLException;
+
+    /**
+     * Deletes relationships of an item which need virtual metadata to be copied to actual metadata
+     * This ensures a delete call is used which can copy the metadata prior to deleting the item
+     *
+     * @param context     The relevant DSpace context
+     * @param copyVirtual The value(s) of the copyVirtualMetadata parameter
+     * @param item        The item to be deleted
+     */
+    public void deleteMultipleRelationshipsCopyVirtualMetadata(Context context, String[] copyVirtual, Item item)
+            throws SQLException, AuthorizeException, BadVirtualMetadataType;
 
 }

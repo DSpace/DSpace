@@ -14,6 +14,9 @@ import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.builder.OrcidHistoryBuilder.createOrcidHistory;
 import static org.dspace.builder.OrcidQueueBuilder.createOrcidQueue;
+import static org.dspace.content.service.RelationshipService.COPYVIRTUAL_ALL;
+import static org.dspace.content.service.RelationshipService.COPYVIRTUAL_CONFIGURED;
+import static org.dspace.content.service.RelationshipService.REQUESTPARAMETER_COPYVIRTUALMETADATA;
 import static org.dspace.core.Constants.READ;
 import static org.dspace.core.Constants.WRITE;
 import static org.dspace.orcid.OrcidOperation.DELETE;
@@ -61,7 +64,6 @@ import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
-import org.dspace.app.rest.repository.ItemRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.builder.BitstreamBuilder;
@@ -3712,8 +3714,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // Delete public item with copyVirtualMetadata isAuthorOfPublication relationship id
         getClient(token).perform(delete("/api/core/items/" + publication1.getID())
-            .param(ItemRestRepository.REQUESTPARAMETER_COPYVIRTUALMETADATA,
-                String.valueOf(isAuthorOfPublication.getID())))
+                        .param(REQUESTPARAMETER_COPYVIRTUALMETADATA, String.valueOf(isAuthorOfPublication.getID())))
                         .andExpect(status().is(204));
         // The non-deleted item of the relationships the delete item had (other sides) still has the
         // relationship Metadata
@@ -3745,8 +3746,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // Delete public item with copyVirtualMetadata id of relationship neither item has
         getClient(token).perform(delete("/api/core/items/" + publication1.getID())
-            .param(ItemRestRepository.REQUESTPARAMETER_COPYVIRTUALMETADATA,
-                String.valueOf(isJournalVolumeOfIssueRelationshipType.getID())))
+           .param(REQUESTPARAMETER_COPYVIRTUALMETADATA, String.valueOf(isJournalVolumeOfIssueRelationshipType.getID())))
                         .andExpect(status().is(204));
         // The non-deleted item of the relationships the delete item had (other sides) doesn't still have the
         // relationship Metadata
@@ -3765,7 +3765,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         //Delete public item with copyVirtualMetadata = all
         getClient(token).perform(delete("/api/core/items/" + publication1.getID())
-            .param(ItemRestRepository.REQUESTPARAMETER_COPYVIRTUALMETADATA, ItemRestRepository.COPYVIRTUAL_ALL))
+                        .param(REQUESTPARAMETER_COPYVIRTUALMETADATA, COPYVIRTUAL_ALL))
                         .andExpect(status().is(204));
         // The non-deleted item of the relationships the delete item had (other sides) now still has the
         // relationship Metadata
@@ -3787,7 +3787,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         //Delete public item with copyVirtualMetadata = configured
         getClient(token).perform(delete("/api/core/items/" + publication1.getID())
-            .param(ItemRestRepository.REQUESTPARAMETER_COPYVIRTUALMETADATA, ItemRestRepository.COPYVIRTUAL_CONFIGURED))
+                        .param(REQUESTPARAMETER_COPYVIRTUALMETADATA, COPYVIRTUAL_CONFIGURED))
                         .andExpect(status().is(204));
         // The non-deleted item of the relationships the delete item had (other sides) now still has the
         // relationship Metadata
@@ -3854,7 +3854,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         //Delete public item with copyVirtualMetadata = configured
         getClient(token).perform(delete("/api/core/items/" + publication1.getID())
-            .param(ItemRestRepository.REQUESTPARAMETER_COPYVIRTUALMETADATA, ItemRestRepository.COPYVIRTUAL_CONFIGURED))
+                        .param(REQUESTPARAMETER_COPYVIRTUALMETADATA, COPYVIRTUAL_CONFIGURED))
                         .andExpect(status().is(204));
         // The non-deleted item of the relationships the delete item had (other sides) now still has the
         // relationship Metadata
