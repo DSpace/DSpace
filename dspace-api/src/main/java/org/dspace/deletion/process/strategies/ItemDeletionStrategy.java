@@ -7,8 +7,6 @@
  */
 package org.dspace.deletion.process.strategies;
 
-import static org.dspace.content.service.RelationshipService.REQUESTPARAMETER_COPYVIRTUALMETADATA;
-
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -35,7 +33,8 @@ public class ItemDeletionStrategy implements DSpaceObjectDeletionStrategy {
     private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
 
     @Override
-    public void delete(Context context, DSpaceObject dso, String[] copyVirtual) throws SQLException, AuthorizeException, IOException {
+    public void delete(Context context, DSpaceObject dso, String[] copyVirtual)
+            throws SQLException, AuthorizeException, IOException {
         Item item = (Item) dso;
         try {
             if (itemService.isInProgressSubmission(context, item)) {
