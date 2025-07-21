@@ -7,15 +7,21 @@
  */
 package org.dspace.deletion.process.strategies;
 
+import static org.dspace.content.service.RelationshipService.REQUESTPARAMETER_COPYVIRTUALMETADATA;
+
 import java.io.IOException;
 import java.sql.SQLException;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.BadVirtualMetadataType;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Context;
+import org.dspace.services.RequestService;
+import org.dspace.utils.DSpace;
 
 /**
  * Deletion strategy for DSpace Item objects.
@@ -24,11 +30,29 @@ import org.dspace.core.Context;
  */
 public class ItemDeletionStrategy implements DSpaceObjectDeletionStrategy {
 
+    private RequestService requestService = new DSpace().getRequestService();
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
 
     @Override
-    public void delete(Context context, DSpaceObject dso) throws SQLException, AuthorizeException, IOException {
-        itemService.delete(context, (Item) dso);
+    public void delete(Context context, DSpaceObject dso, String[] copyVirtual) throws SQLException, AuthorizeException, IOException {
+        Item item = (Item) dso;
+        try {
+            if (itemService.isInProgressSubmission(context, item)) {
+                throw new RuntimeException("The item cannot be deleted. It's part of a in-progress submission.");
+            }
+            if (item.getTemplateItemOf() != null) {
+                throw new RuntimeException("The item cannot be deleted. It's a template for a collection");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        try {
+            relationshipService.deleteMultipleRelationshipsCopyVirtualMetadata(context, copyVirtual, item);
+            itemService.delete(context, item);
+        } catch (SQLException | BadVirtualMetadataType | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Override

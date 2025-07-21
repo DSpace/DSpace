@@ -27,7 +27,8 @@ public class CommunityDeletionStrategy implements DSpaceObjectDeletionStrategy {
     private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
 
     @Override
-    public void delete(Context context, DSpaceObject dso) throws SQLException, AuthorizeException, IOException {
+    public void delete(Context context, DSpaceObject dso, String[] extraParams)
+            throws SQLException, AuthorizeException, IOException {
         communityService.delete(context, (Community) dso);
     }
 

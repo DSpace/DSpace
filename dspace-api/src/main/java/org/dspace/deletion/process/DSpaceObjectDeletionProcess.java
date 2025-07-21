@@ -14,6 +14,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -48,10 +51,12 @@ public class DSpaceObjectDeletionProcess
     private ItemService itemService;
     private HandleService handleService;
     private CommunityService communityService;
+    private AuthorizeService authorizeService;
     private CollectionService collectionService;
 
     private String id;
     private Context context;
+    private String[] copyVirtualMetadata;
     private List<DSpaceObjectDeletionStrategy> deletionStrategies = new ArrayList<>();
 
     @Override
@@ -61,6 +66,7 @@ public class DSpaceObjectDeletionProcess
         handleService = HandleServiceFactory.getInstance().getHandleService();
         communityService = ContentServiceFactory.getInstance().getCommunityService();
         collectionService = ContentServiceFactory.getInstance().getCollectionService();
+        authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
         deletionStrategies.add(sm.getServiceByName("itemDeletionStrategy", ItemDeletionStrategy.class));
         deletionStrategies.add(sm.getServiceByName("communityDeletionStrategy", CommunityDeletionStrategy.class));
@@ -74,27 +80,33 @@ public class DSpaceObjectDeletionProcess
      */
     private void parseCommandLineOptions() {
         this.id = commandLine.getOptionValue('i');
+        this.copyVirtualMetadata = commandLine.hasOption('c') ? commandLine.getOptionValues('c') : new String[0];
     }
 
     @Override
     public void internalRun() throws Exception {
         assignCurrentUserInContext();
         Optional<DSpaceObject> dSpaceObjectOptional = resolveDSpaceObject(this.id);
+
         if (dSpaceObjectOptional.isEmpty()) {
             var error = String.format("DSpaceObject for provided identifier:%s doesn't exist!", this.id);
             throw new IllegalArgumentException(error);
         }
 
         DSpaceObject dso = dSpaceObjectOptional.get();
-        getStrategy(dso).delete(context, dso);
+
+        if (!authorizeService.isAdmin(context, dso)) {
+            throw new AuthorizeException("Current user is not eligible to execute script 'dspace-object-deletion'");
+        }
+
+        getStrategy(dso).delete(this.context, dso, this.copyVirtualMetadata);
     }
 
     private DSpaceObjectDeletionStrategy getStrategy(DSpaceObject dso) {
         return deletionStrategies.stream()
-                                 .filter(s -> s.supports(dso))
-                                 .findFirst()
-                                 .orElseThrow(() ->
-                                                new IllegalArgumentException("No strategy for type: " + dso.getType()));
+                              .filter(s -> s.supports(dso))
+                              .findFirst()
+                              .orElseThrow(() -> new IllegalArgumentException("No strategy for type:" + dso.getType()));
     }
 
     private void assignCurrentUserInContext() throws SQLException {

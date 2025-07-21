@@ -27,7 +27,8 @@ public class CollectionDeletionStrategy implements DSpaceObjectDeletionStrategy 
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     @Override
-    public void delete(Context context, DSpaceObject dso) throws SQLException, AuthorizeException, IOException {
+    public void delete(Context context, DSpaceObject dso, String[] extraParams)
+            throws SQLException, AuthorizeException, IOException {
         collectionService.delete(context, (Collection) dso);
     }
 

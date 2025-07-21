@@ -29,9 +29,11 @@ public interface DSpaceObjectDeletionStrategy {
 
     /**
      * Deletes the given DSpaceObject from the system.
+     *
      * @param context the DSpace context
-     * @param dso the object to delete
+     * @param dso     the object to delete
+     * @param params  list of extra parameters
      */
-    void delete(Context context, DSpaceObject dso) throws SQLException, AuthorizeException, IOException;
+    void delete(Context context, DSpaceObject dso, String[] params) throws SQLException, AuthorizeException,IOException;
 
 }

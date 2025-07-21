@@ -31,6 +31,11 @@ public class DSpaceObjectDeletionProcessScriptConfiguration<T extends DSpaceObje
             options.addOption("i", "identifier", true,"UUID or handle of Community, Collection or Item");
             options.getOption("i").setType(String.class);
             options.getOption("i").setRequired(true);
+
+            options.addOption("c", "copyVirtualMetadata", true,"Optionaly, only for Item");
+            options.getOption("c").setType(String.class);
+            options.getOption("c").setRequired(false);
+
             super.options = options;
         }
         return options;
