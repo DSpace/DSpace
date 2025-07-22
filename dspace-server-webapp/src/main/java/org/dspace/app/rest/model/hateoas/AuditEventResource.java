@@ -19,7 +19,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(AuditEventRest.NAME)
 public class AuditEventResource extends DSpaceResource<AuditEventRest> {
-    public AuditEventResource(AuditEventRest authz, Utils utils) {
-        super(authz, utils);
+    public AuditEventResource(AuditEventRest auditEvent, Utils utils) {
+        super(auditEvent, utils);
     }
 }

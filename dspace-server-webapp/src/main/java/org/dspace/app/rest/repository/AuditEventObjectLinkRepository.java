@@ -46,22 +46,29 @@ public class AuditEventObjectLinkRepository extends AbstractDSpaceRestRepository
                                                Projection projection) {
         try {
             Context context = obtainContext();
-            AuditEvent audit = auditService.findEvent(context, auditId);
-            if (audit == null) {
-                throw new ResourceNotFoundException("No such audit event: " + auditId.toString());
-            }
+            AuditEvent audit = getAuditEvent(context, auditId);
             UUID objUUID = audit.getObjectUUID();
-            DSpaceObject dso = null;
-            if (objUUID != null) {
-                dso = dspaceObjectUtil.findDSpaceObject(context, objUUID);
-            }
+            DSpaceObject dso = getDSpaceObject(context, objUUID);
+
             if (dso != null) {
                 return (DSpaceObjectRest) converter.toRest(dso, utils.obtainProjection());
             } else {
                 return null;
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("Failed to retrieve audit event object for audit ID: " + auditId.toString(), e);
         }
+    }
+
+    private AuditEvent getAuditEvent(Context context, UUID auditId) {
+        AuditEvent audit = auditService.findEvent(context, auditId);
+        if (audit == null) {
+            throw new ResourceNotFoundException("No such audit event: " + auditId.toString());
+        }
+        return audit;
+    }
+
+    private DSpaceObject getDSpaceObject(Context context, UUID objUUID) throws SQLException {
+        return objUUID != null ? dspaceObjectUtil.findDSpaceObject(context, objUUID) : null;
     }
 }
