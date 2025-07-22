@@ -18,7 +18,6 @@ import java.util.UUID;
 
 import org.dspace.app.audit.AuditEvent;
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 
 public class AuditEventMatcher {
 
