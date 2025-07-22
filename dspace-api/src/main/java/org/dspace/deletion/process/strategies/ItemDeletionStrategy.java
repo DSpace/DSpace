@@ -18,8 +18,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Context;
-import org.dspace.services.RequestService;
-import org.dspace.utils.DSpace;
 
 /**
  * Deletion strategy for DSpace Item objects.
@@ -28,7 +26,6 @@ import org.dspace.utils.DSpace;
  */
 public class ItemDeletionStrategy implements DSpaceObjectDeletionStrategy {
 
-    private RequestService requestService = new DSpace().getRequestService();
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
 
