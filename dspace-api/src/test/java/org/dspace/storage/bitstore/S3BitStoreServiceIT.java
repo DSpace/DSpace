@@ -26,9 +26,11 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +43,6 @@ import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import io.findify.s3mock.S3Mock;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -80,8 +81,6 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
 
     private Collection collection;
 
-    private File s3Directory;
-
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
 
@@ -89,9 +88,8 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
     public void setup() throws Exception {
 
         configurationService.setProperty("assetstore.s3.enabled", "true");
-        s3Directory = new File(System.getProperty("java.io.tmpdir"), "s3");
 
-        s3Mock = S3Mock.create(8001, s3Directory.getAbsolutePath());
+        s3Mock = new S3Mock.Builder().withPort(8001).withInMemoryBackend().build();
         s3Mock.start();
 
         amazonS3Client = createAmazonS3Client();
@@ -112,8 +110,7 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @After
-    public void cleanUp() throws IOException {
-        FileUtils.deleteDirectory(s3Directory);
+    public void cleanUp() {
         s3Mock.shutdown();
     }
 
@@ -337,7 +334,7 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
         String computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         int slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
-        assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
+        assertThat(countPathElements(computedPath), Matchers.equalTo(slashes));
 
         path.append("2");
         computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
@@ -362,31 +359,31 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
         String computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         int slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
-        assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
+        assertThat(countPathElements(computedPath), Matchers.equalTo(slashes));
 
         path.append("2");
         computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
-        assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
+        assertThat(countPathElements(computedPath), Matchers.equalTo(slashes));
 
         path.append("3");
         computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
-        assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
+        assertThat(countPathElements(computedPath), Matchers.equalTo(slashes));
 
         path.append("4");
         computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
-        assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
+        assertThat(countPathElements(computedPath), Matchers.equalTo(slashes));
 
         path.append("56789");
         computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
-        assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
+        assertThat(countPathElements(computedPath), Matchers.equalTo(slashes));
     }
 
     @Test
@@ -463,6 +460,14 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
         int odd = Math.min(1, minimum % S3BitStoreService.digitsPerLevel);
         int slashes = slashesPerLevel + odd;
         return Math.min(slashes, S3BitStoreService.directoryLevels);
+    }
+
+    // Count the number of elements in a Unix or Windows path.
+    // We use 'Paths' instead of splitting on slashes because these OSes use different path separators.
+    private int countPathElements(String stringPath) {
+        List<String> pathElements = new ArrayList<>();
+        Paths.get(stringPath).forEach(p -> pathElements.add(p.toString()));
+        return pathElements.size();
     }
 
 }

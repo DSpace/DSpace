@@ -16,12 +16,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.tools.ant.filters.StringInputStream;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
@@ -43,7 +43,8 @@ public class AbstractLiveImportIntegrationTest extends AbstractControllerIntegra
     private void checkMetadataValue(List<MetadatumDTO> list, List<MetadatumDTO> list2) {
         assertEquals(list.size(), list2.size());
         for (int i = 0; i < list.size(); i++) {
-            assertTrue(sameMetadatum(list.get(i), list2.get(i)));
+            assertTrue("'" + list.get(i).toString() + "' should be equal to '" + list2.get(i).toString() + "'",
+                       sameMetadatum(list.get(i), list2.get(i)));
         }
     }
 
@@ -70,7 +71,7 @@ public class AbstractLiveImportIntegrationTest extends AbstractControllerIntegra
             throws UnsupportedEncodingException {
         BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
         basicHttpEntity.setChunked(true);
-        basicHttpEntity.setContent(new StringInputStream(xmlExample));
+        basicHttpEntity.setContent(IOUtils.toInputStream(xmlExample));
 
         CloseableHttpResponse response = mock(CloseableHttpResponse.class);
         when(response.getStatusLine()).thenReturn(statusLine(statusCode, reason));
