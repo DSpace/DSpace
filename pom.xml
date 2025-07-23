@@ -39,7 +39,7 @@
         <jcache-version>1.1.1</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
         <jetty.version>9.4.57.v20241219</jetty.version>
-        <log4j.version>2.24.3</log4j.version>
+        <log4j.version>2.25.1</log4j.version>
         <pdfbox-version>2.0.34</pdfbox-version>
         <rome.version>1.19.0</rome.version>
         <!-- SLF4J is not used, but specified for dependency convergence issues between many dependencies -->
@@ -531,10 +531,10 @@
     </build>
 
     <profiles>
-        <!-- Allow for passing extra memory to Unit/Integration tests.
-             By default this gives unit tests 1GB of memory max (when tests are enabled),
-             unless tweaked on commandline (e.g. "-Dtest.argLine=-Xmx512m"). Since
-             m-surefire-p and m-failsafe-p both fork a new JVM for testing, they ignores MAVEN_OPTS. -->
+        <!-- Profile which sets our default system properties for all Unit/Integration tests.
+             By default, this sets UTF-8 encoding for all tests and gives tests 1GB of memory max.
+             Both m-surefire-p and m-failsafe-p are unable to use MAVEN_OPTS because they fork a new JVM for testing.
+             These default settings may be overridden via the commandline (e.g. "-Dtest.argLine=-Xmx512m"). -->
         <profile>
             <id>test-argLine</id>
             <activation>
@@ -543,7 +543,7 @@
                 </property>
             </activation>
             <properties>
-                <test.argLine>-Xmx1024m</test.argLine>
+                <test.argLine>-Xmx1024m -Dfile.encoding=UTF-8</test.argLine>
             </properties>
         </profile>
 
