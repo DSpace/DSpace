@@ -141,9 +141,10 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
     }
 
     /**
-     * Test of getMatches method of class
-     * DSpaceControlledVocabulary using a localized controlled vocabulary with valid locale parameter (localized
-     * label returned)
+     * Test of getMatches method of class DSpaceControlledVocabulary
+     * using a localized controlled vocabulary with valid locale parameter
+     * (localized label returned).
+     * @throws java.lang.ClassNotFoundException if class under test cannot be found.
      */
     @Test
     public void testGetMatchesGermanLocale() throws ClassNotFoundException {
@@ -167,9 +168,10 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
     }
 
     /**
-     * Test of getBestMatch method of class
-     * DSpaceControlledVocabulary using a localized controlled vocabulary with valid locale parameter (localized
-     * label returned)
+     * Test of getBestMatch method of class DSpaceControlledVocabulary
+     * using a localized controlled vocabulary with valid locale parameter
+     * (localized label returned).
+     * @throws java.lang.ClassNotFoundException if class under test cannot be found.
      */
     @Test
     public void testGetBestMatchIdValueGermanLocale() throws ClassNotFoundException {
