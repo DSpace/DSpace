@@ -170,7 +170,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
                 script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
             }
             if (script != null) {
-                if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
+                if (DSpaceRunnable.StepResult.Continue.equals(
+                        script.initialize(args, testDSpaceRunnableHandler, null))) {
                     script.run();
                 }
             }

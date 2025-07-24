@@ -58,7 +58,8 @@ public class TikaTextExtractionFilterTest extends AbstractUnitTest {
         String inMemoryExtractedText = readAll(result);
 
         // Verify the two results are equal
-        assertEquals(inMemoryExtractedText, tempFileExtractedText, "Extracted text via temp file is the same as in-memory.");
+        assertEquals(inMemoryExtractedText, tempFileExtractedText,
+                "Extracted text via temp file is the same as in-memory.");
     }
 
     /**

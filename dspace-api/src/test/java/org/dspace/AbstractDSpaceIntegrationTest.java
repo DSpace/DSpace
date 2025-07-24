@@ -55,7 +55,7 @@ public class AbstractDSpaceIntegrationTest {
     /**
      * Obtain the TestName from JUnit, so that we can print it out in the test logs (see below)
      */
-    
+
     public String testName;
 
     /**

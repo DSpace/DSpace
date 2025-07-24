@@ -57,14 +57,16 @@ public class GoogleAnalytics4ClientRequestBuilderTest {
     @Test
     public void testGetEndpointUrlWithNotSupportedKey() {
 
-        assertThrows(IllegalArgumentException.class, () -> requestBuilder.getEndpointUrl("UA-12345"), "Only keys with G- prefix are supported");
+        assertThrows(IllegalArgumentException.class, () -> requestBuilder.getEndpointUrl("UA-12345"),
+                "Only keys with G- prefix are supported");
 
     }
 
     @Test
     public void testGetEndpointUrlWithoutApiSecretConfigured() {
 
-        assertThrows(GoogleAnalyticsClientException.class, () -> requestBuilder.getEndpointUrl("G-12345"), "The API secret must be configured to sent GA4 events");
+        assertThrows(GoogleAnalyticsClientException.class, () -> requestBuilder.getEndpointUrl("G-12345"),
+                "The API secret must be configured to sent GA4 events");
 
     }
 

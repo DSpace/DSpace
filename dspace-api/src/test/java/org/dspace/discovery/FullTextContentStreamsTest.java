@@ -166,13 +166,15 @@ public class FullTextContentStreamsTest {
 
         assertEquals(HANDLE, streams.getSourceInfo(), "Source info should give you the handle");
         assertEquals(CONTENT_TYPE, streams.getContentType(), "Content type should be plain text");
-        assertEquals("Full Text 1;Full Text 2;Full Text 3", streams.getName(), "The name should match the concatenation of the names of the bitstreams");
+        assertEquals("Full Text 1;Full Text 2;Full Text 3", streams.getName(),
+                "The name should match the concatenation of the names of the bitstreams");
         assertEquals((Long) 6L, streams.getSize(), "The size of the streams should be the sum of the bitstream sizes");
         assertFalse(streams.isEmpty(), "Content stream should not be empty");
         InputStream inputStream = streams.getStream();
         assertNotNull(inputStream);
         assertEquals("\nThis is text 1" +
-            "\nThis is text 2\nThis is text 3", IOUtils.toString(inputStream, StandardCharsets.UTF_8), "The data in the input stream should match 'This is text 1'");
+            "\nThis is text 2\nThis is text 3", IOUtils.toString(inputStream, StandardCharsets.UTF_8),
+                "The data in the input stream should match 'This is text 1'");
     }
 
     @Test
@@ -185,7 +187,8 @@ public class FullTextContentStreamsTest {
 
         assertEquals(HANDLE, streams.getSourceInfo(), "Source info should give you the handle");
         assertEquals(CONTENT_TYPE, streams.getContentType(), "Content type should be plain text");
-        assertEquals("Full Text 1;Full Text 2;Full Text 3", streams.getName(), "The name should match the concatenation of the names of the bitstreams");
+        assertEquals("Full Text 1;Full Text 2;Full Text 3", streams.getName(),
+                "The name should match the concatenation of the names of the bitstreams");
         assertEquals((Long) 6L, streams.getSize(), "The size of the streams should be the sum of the bitstream sizes");
         assertFalse(streams.isEmpty(), "Content stream should not be empty");
         InputStream inputStream = streams.getStream();

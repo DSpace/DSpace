@@ -144,7 +144,8 @@ public class RelationshipTypeDAOImplIT extends AbstractIntegrationTest {
     @Test
     public void testFindByLeftOrRightLabel() throws Exception {
         assertEquals(relationshipTypeList, relationshipTypeService.
-                findByLeftwardOrRightwardTypeName(context, "isAuthorOfPublication", -1, -1), "TestFindByLeftOrRightLabel 0");
+                findByLeftwardOrRightwardTypeName(context, "isAuthorOfPublication", -1, -1),
+                "TestFindByLeftOrRightLabel 0");
     }
 
     /**

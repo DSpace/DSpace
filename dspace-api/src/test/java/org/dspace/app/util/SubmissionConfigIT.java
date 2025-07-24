@@ -9,7 +9,6 @@ package org.dspace.app.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;

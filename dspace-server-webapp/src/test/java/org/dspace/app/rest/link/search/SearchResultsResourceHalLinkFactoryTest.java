@@ -9,7 +9,6 @@ package org.dspace.app.rest.link.search;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 import org.dspace.app.rest.DiscoveryRestController;
 import org.dspace.app.rest.model.hateoas.SearchResultsResource;
 import org.junit.jupiter.api.BeforeEach;
