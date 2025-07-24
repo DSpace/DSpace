@@ -10,6 +10,7 @@ package org.dspace.app.bulkedit;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -155,7 +156,8 @@ public class DSpaceCSVLine implements Serializable {
      */
     public Set<String> metadataKeys() {
         // Return the keys
-        return items.keySet().stream().filter((key) -> key.contains(".")).collect(Collectors.toSet());
+        return items.keySet().stream().filter((key) -> key.contains("."))
+            .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**

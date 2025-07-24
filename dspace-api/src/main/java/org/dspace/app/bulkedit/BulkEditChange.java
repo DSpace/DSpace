@@ -8,7 +8,9 @@
 package org.dspace.app.bulkedit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.dspace.content.Collection;
@@ -20,12 +22,20 @@ import org.dspace.content.Item;
  * @author Stuart Lewis
  */
 public class BulkEditChange {
+    /**
+     * UUID referring to an existing item or a temporary UUID representing the item to be created
+     */
     private UUID uuid;
 
     /**
      * The item these changes relate to
      */
     private Item item;
+
+    /**
+     * Optional extra identifiers
+     */
+    private Map<String, String> identifiers;
 
     /**
      * The List of hashtables with the new elements
@@ -107,6 +117,7 @@ public class BulkEditChange {
         newOwningCollection = null;
 
         // Initialise the arrays
+        identifiers = new HashMap<>();
         adds = new ArrayList<>();
         removes = new ArrayList<>();
         constant = new ArrayList<>();
@@ -127,6 +138,7 @@ public class BulkEditChange {
         empty = true;
 
         // Initialise the arrays
+        identifiers = new HashMap<>();
         adds = new ArrayList<>();
         removes = new ArrayList<>();
         constant = new ArrayList<>();
@@ -251,6 +263,27 @@ public class BulkEditChange {
     public Item getItem() {
         // Return the item
         return item;
+    }
+
+    /**
+     * Set an optional identifier
+     */
+    public void setIdentifier(String key, String value) {
+        identifiers.put(key, value);
+    }
+
+    /**
+     * Get an optional identifier
+     */
+    public String getIdentifier(String key) {
+        return identifiers.get(key);
+    }
+
+    /**
+     * Get all optional identifiers
+     */
+    public Map<String, String> getIdentifiers() {
+        return identifiers;
     }
 
     /**

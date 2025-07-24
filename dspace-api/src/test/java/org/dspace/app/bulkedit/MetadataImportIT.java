@@ -31,6 +31,7 @@ import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -38,6 +39,7 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
@@ -75,6 +77,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     private Collection publicationCollection;
     private Collection personCollection;
 
+    private RelationshipType isAuthorOfPublicationRelType;
+
     @Before
     @Override
     public void setUp() throws Exception {
@@ -91,8 +95,9 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
         EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
-        RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
-            "isPublicationOfAuthor", 0, 10, 0, 10);
+        isAuthorOfPublicationRelType = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+            "isPublicationOfAuthor", 0, 10, 0, 10).build();
         context.commit();
 
         context.restoreAuthSystemState();
@@ -175,6 +180,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, publicationCollection)
                                .withTitle("Publication1").build();
+        context.commit();
         context.restoreAuthSystemState();
 
         String[] csv = {"id,collection,dc.title,relation.isPublicationOfAuthor,dspace.entity.type",
@@ -197,6 +203,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             .build();
         Item publicationItem = ItemBuilder.createItem(context, publicationCollection)
                                           .withTitle("Publication1").build();
+        context.commit();
         context.restoreAuthSystemState();
 
         String[] csv = {"id,collection,relation.isPublicationOfAuthor",
@@ -218,6 +225,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             .build();
         Item publicationItem = ItemBuilder.createItem(context, publicationCollection)
             .withTitle("Publication1").build();
+        context.commit();
         context.restoreAuthSystemState();
 
         String[] csv = {"id,collection,relation.isAuthorOfPublication",
@@ -264,6 +272,58 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void metadataImportExistingItemRelationshipReplaceTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item personItem = ItemBuilder.createItem(context, personCollection)
+            .withPersonIdentifierFirstName("John")
+            .withPersonIdentifierLastName("Doe")
+            .build();
+        Item publicationItem1 = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("Publication1").build();
+        Item publicationItem2 = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("Publication2").build();
+        Relationship existingRelationship =
+            RelationshipBuilder
+                .createRelationshipBuilder(context, publicationItem1, personItem, isAuthorOfPublicationRelType)
+                .withRightwardValue("Last, First").build();
+        context.commit();
+        context.restoreAuthSystemState();
+
+        String[] csv = {"id,collection,relation.isPublicationOfAuthor",
+            personItem.getID() + "," + personCollection.getHandle() + "," + publicationItem2.getID()};
+        performImportScript(csv);
+
+        List<Relationship> relationshipList = relationshipService.findByItem(context, personItem);
+        assertEquals(1, relationshipList.size());
+        assertEquals(publicationItem2.getID(), relationshipList.get(0).getLeftItem().getID());
+        assertEquals(personItem.getID(), relationshipList.get(0).getRightItem().getID());
+    }
+
+    @Test
+    public void metadataImportExistingItemRelationshipRemoveTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item personItem = ItemBuilder.createItem(context, personCollection)
+            .withPersonIdentifierFirstName("John")
+            .withPersonIdentifierLastName("Doe")
+            .build();
+        Item publicationItem = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("Publication1").build();
+        Relationship existingRelationship =
+            RelationshipBuilder
+                .createRelationshipBuilder(context, publicationItem, personItem, isAuthorOfPublicationRelType)
+                .withRightwardValue("Last, First").build();
+        context.commit();
+        context.restoreAuthSystemState();
+
+        String[] csv = {"id,collection,relation.isPublicationOfAuthor",
+            personItem.getID() + "," + personCollection.getHandle() + ","};
+        performImportScript(csv);
+
+        List<Relationship> relationshipList = relationshipService.findByItem(context, personItem);
+        assertEquals(0, relationshipList.size());
+    }
+
+    @Test
     public void personMetadataImportTest() throws Exception {
 
         String[] csv = {"id,collection,dc.title,person.birthDate",
@@ -284,6 +344,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context,publicationCollection).withAuthor("TestAuthorToRemove")
             .withTitle("title").build();
+        context.commit();
         context.restoreAuthSystemState();
 
         assertTrue(itemHasMetadata(item, "dc", "contributor", "author", Item.ANY,
@@ -302,6 +363,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     public void metadataImportDeleteItemNotAllowedTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context,publicationCollection).withTitle("title").build();
+        context.commit();
         context.restoreAuthSystemState();
 
         configurationService.setProperty("bulkedit.allowexpunge", false);
@@ -316,6 +378,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     public void metadataImportDeleteItemAllowedTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context,publicationCollection).withTitle("title").build();
+        context.commit();
         context.restoreAuthSystemState();
 
         configurationService.setProperty("bulkedit.allowexpunge", true);
@@ -372,8 +435,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
 
         String[] csv = {"id,dc.title,dc.contributor.author", item.getID().toString() +
-            ",title,\"author 1::authorityKeyChanged||author 2 edited::authorityKeyToStay||" +
-            "author 3::authorityKeyUnchanged||author 4::newAuthorityKey\""};
+            ",title,\"author 1::authorityKeyChanged::600||author 2 edited::authorityKeyToStay::600||" +
+            "author 3::authorityKeyUnchanged::600||author 4::newAuthorityKey::600||author 5::noConfidence\""};
         performImportScript(csv);
 
         item = findItemByName("title");
@@ -385,7 +448,9 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             "author 3", "authorityKeyUnchanged"));
         assertTrue(itemHasMetadata(item, "dc", "contributor", "author", Item.ANY,
             "author 4", "newAuthorityKey"));
-        assertEquals(4, itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size());
+        assertTrue(itemHasMetadata(item, "dc", "contributor", "author", Item.ANY,
+            "author 5::noConfidence", null));
+        assertEquals(5, itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size());
     }
 
     private boolean itemHasMetadata(Item item, String schema, String element, String qualifier, String language,

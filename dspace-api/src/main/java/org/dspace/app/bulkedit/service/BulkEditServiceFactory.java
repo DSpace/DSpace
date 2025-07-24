@@ -10,10 +10,26 @@ package org.dspace.app.bulkedit.service;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
+/**
+ * Factory for services related to bulk-edit
+ * These services cannot and should not be Autowired and always retrieved through this factory because they are stateful
+ * This means every call to retrieve a service will create a new instance of that service, ensuring any variable
+ * within these services remains within the context of where the service was retrieved (e.g. within the same bulk-edit)
+ */
 public abstract class BulkEditServiceFactory {
-    public abstract BulkEditRegisterService<DSpaceCSV> getCSVBulkEditRegisterService();
-    public abstract BulkEditImportService getBulkEditImportService();
+    /**
+     * Get the service for parsing a {@link DSpaceCSV} to a list of {@link org.dspace.app.bulkedit.BulkEditChange}
+     */
+    public abstract BulkEditParsingService<DSpaceCSV> getCSVBulkEditParsingService();
 
+    /**
+     * Get the service for applying {@link org.dspace.app.bulkedit.BulkEditChange}s
+     */
+    public abstract BulkEditService getBulkEditService();
+
+    /**
+     * Get the instance of this factory to retrieve service instances from
+     */
     public static BulkEditServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
             .getServiceByName("bulkEditServiceFactory", BulkEditServiceFactory.class);

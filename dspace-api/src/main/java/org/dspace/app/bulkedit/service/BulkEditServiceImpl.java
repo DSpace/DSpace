@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -39,12 +38,24 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class BulkEditImportServiceImpl implements BulkEditImportService {
+/**
+ * Implementation of the service for processing and applying changes found in {@link BulkEditChange}
+ * More documentation on the methods in {@link BulkEditService}
+ *
+ * Warning: This service is stateful, in that a new instance will be created every time it is requested.
+ *          This is by design because the service will keep information about multiple related changes until
+ *          it is done applying them all and this ensures none of the information leaks between other calls/processes.
+ *          This means the service should never be Autowired and should instead be requested through the
+ *          {@link BulkEditServiceFactory} wherever the call is made to parse and/or apply the changes.
+ */
+public class BulkEditServiceImpl implements BulkEditService {
     @Autowired
     protected CollectionService collectionService;
 
@@ -66,18 +77,56 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
     @Autowired
     protected InstallItemService installItemService;
 
+    @Autowired
+    protected ConfigurationService configurationService;
+
+    protected DSpaceRunnableHandler handler;
+    protected boolean useCollectionTemplate;
+    protected boolean useWorkflow;
+    protected boolean workflowNotify;
+    protected boolean archive;
+
     /**
-     * Map to store temporary UUIDs of newly imported items, mapped to the UUID of their actual imported item
-     * Used to resolve relationship references between two items in the same import
+     * A map containing previously imported/updated item UUIDs, mapped to their fake UUID found in their respective
+     * {@link BulkEditChange}, this way, real relationships between newly imported items can be made
      */
-    protected Map<UUID, UUID> fakeToRealUUIDMap = new ConcurrentHashMap<>();
+    protected final Map<UUID, UUID> fakeToRealUUIDMap = new HashMap<>();
 
     @Override
-    public void importBulkEditChange(Context c, BulkEditChange bechange, boolean useCollectionTemplate,
-                                     boolean useWorkflow, boolean workflowNotify)
+    public void applyBulkEditChanges(Context c, List<BulkEditChange> bulkEditChanges)
+        throws SQLException, AuthorizeException, IOException, MetadataImportException, WorkflowException {
+        c.setMode(Context.Mode.BATCH_EDIT);
+        int i = 1;
+        int batchSize = configurationService.getIntProperty("bulkedit.change.commit.count", 100);
+        int changeCount = bulkEditChanges.size();
+        int commitCount = 0;
+        for (BulkEditChange bechange : bulkEditChanges) {
+            applyBulkEditChange(c, bechange);
+
+            if (i % batchSize == 0) {
+                c.commit();
+                commitCount++;
+                if (handler != null) {
+                    handler.logInfo(String.format(
+                        "Commit %d/%d: The changes in rows %s-%s have been persisted to the database",
+                        commitCount,
+                        (int) Math.ceil((double) changeCount / batchSize),
+                        i - batchSize + 1,
+                        i
+                    ));
+                }
+            }
+
+            i++;
+        }
+        c.commit();
+    }
+
+    @Override
+    public void applyBulkEditChange(Context c, BulkEditChange bechange)
         throws SQLException, AuthorizeException, IOException, MetadataImportException, WorkflowException {
         if (bechange.isNewItem()) {
-            createNewItem(c, bechange, useCollectionTemplate, useWorkflow, workflowNotify);
+            createNewItem(c, bechange);
         } else {
             boolean deleted = performActions(c, bechange);
             if (deleted) {
@@ -88,8 +137,7 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
         }
     }
 
-    protected void createNewItem(Context c, BulkEditChange bechange, boolean useCollectionTemplate,
-                                 boolean useWorkflow, boolean workflowNotify)
+    protected void createNewItem(Context c, BulkEditChange bechange)
         throws SQLException, AuthorizeException, MetadataImportException, WorkflowException, IOException {
         // Create the item
         Collection collection = bechange.getNewOwningCollection();
@@ -97,21 +145,15 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
         Item item = wsItem.getItem();
 
         // Add the metadata to the item
-        for (BulkEditMetadataValue dcv : bechange.getAdds()) {
-            if (!StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
-                itemService.addMetadata(c, item, dcv.getSchema(),
-                    dcv.getElement(),
-                    dcv.getQualifier(),
-                    dcv.getLanguage(),
-                    dcv.getValue(),
-                    dcv.getAuthority(),
-                    dcv.getConfidence());
+        for (BulkEditMetadataValue dcv : getBulkEditMetadataValueSorted(bechange.getAdds())) {
+            if (!isRelationship(dcv)) {
+                addMetadata(c, item, dcv);
             }
         }
         //Add relations after all metadata has been processed
         for (BulkEditMetadataValue dcv : bechange.getAdds()) {
-            if (StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
-                addRelationship(c, item, dcv.getElement(), dcv.getValue());
+            if (isRelationship(dcv)) {
+                addRelationship(c, item, dcv);
             }
         }
 
@@ -124,7 +166,7 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
             } else {
                 workflowService.startWithoutNotify(c, wsItem);
             }
-        } else {
+        } else if (archive) {
             // Install the item
             installItemService.installItem(c, wsItem);
         }
@@ -210,7 +252,7 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
         if ((!bechange.getAdds().isEmpty()) || (!bechange.getRemoves().isEmpty())) {
             // Get the complete list of what values should now be in that element
             Map<String, List<BulkEditMetadataValue>> metadataValuesToAddOrKeep =
-                getMetadataByField(bechange.getComplete());
+                getMetadataByField(getBulkEditMetadataValueSorted(bechange.getComplete()));
             Map<String, List<BulkEditMetadataValue>> metadataValuesToRemove =
                 getMetadataByField(bechange.getRemoves());
 
@@ -221,28 +263,14 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
                     String element = list.get(0).getElement();
                     String qualifier = list.get(0).getQualifier();
                     String language = list.get(0).getLanguage();
-                    List<String> values = list.stream()
-                        .map(BulkEditMetadataValue::getValue).collect(Collectors.toList());
-                    List<String> authorities = list.stream()
-                        .map(BulkEditMetadataValue::getAuthority).collect(Collectors.toList());
-                    List<Integer> confidences = list.stream()
-                        .map(BulkEditMetadataValue::getConfidence).collect(Collectors.toList());
 
-                    if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
-                        List<RelationshipType> relationshipTypeList = relationshipTypeService
-                            .findByLeftwardOrRightwardTypeName(c, element);
-                        for (RelationshipType relationshipType : relationshipTypeList) {
-                            for (Relationship relationship : relationshipService
-                                .findByItemAndRelationshipType(c, item, relationshipType)) {
-                                relationshipService.delete(c, relationship);
-                                relationshipService.update(c, relationship);
-                            }
+                    clearMetadataAndRelationships(c, item, schema, element, qualifier, language);
+                    for (BulkEditMetadataValue dcv : list) {
+                        if (isRelationship(dcv)) {
+                            addRelationship(c, item, dcv);
+                        } else {
+                            addMetadata(c, item, dcv);
                         }
-                        addRelationships(c, item, element, values);
-                    } else {
-                        itemService.clearMetadata(c, item, schema, element, qualifier, language);
-                        itemService.addMetadata(c, item, schema, element, qualifier,
-                            language, values, authorities, confidences);
                     }
                 }
             }
@@ -255,7 +283,7 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
                         String qualifier = list.get(0).getQualifier();
                         String language = list.get(0).getLanguage();
 
-                        itemService.clearMetadata(c, item, schema, element, qualifier, language);
+                        clearMetadataAndRelationships(c, item, schema, element, qualifier, language);
                     }
                 }
             }
@@ -264,7 +292,38 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
         }
     }
 
-    private Map<String, List<BulkEditMetadataValue>> getMetadataByField(List<BulkEditMetadataValue> allMetadata) {
+    protected void clearMetadataAndRelationships(Context c, Item item, String schema, String element, String qualifier,
+                                                 String language) throws SQLException, AuthorizeException {
+        itemService.clearMetadata(c, item, schema, element, qualifier, language);
+        if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
+            List<RelationshipType> relationshipTypeList = relationshipTypeService
+                .findByLeftwardOrRightwardTypeName(c, element);
+            for (RelationshipType relationshipType : relationshipTypeList) {
+                for (Relationship relationship : relationshipService
+                    .findByItemAndRelationshipType(c, item, relationshipType)) {
+                    relationshipService.delete(c, relationship);
+                    relationshipService.update(c, relationship);
+                }
+            }
+        }
+    }
+
+    protected void addMetadata(Context c, Item item, BulkEditMetadataValue dcv)
+        throws SQLException, AuthorizeException, MetadataImportException {
+        itemService.addMetadata(c, item, dcv.getSchema(),
+            dcv.getElement(),
+            dcv.getQualifier(),
+            dcv.getLanguage(),
+            dcv.getValue(),
+            dcv.getAuthority(),
+            dcv.getConfidence());
+    }
+
+    protected boolean isRelationship(BulkEditMetadataValue dcv) {
+        return StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName());
+    }
+
+    protected Map<String, List<BulkEditMetadataValue>> getMetadataByField(List<BulkEditMetadataValue> allMetadata) {
         Map<String, List<BulkEditMetadataValue>> map = new HashMap<>();
         for (BulkEditMetadataValue value : allMetadata) {
             String mdField = value.getSchema() + "." + value.getElement() + "." + value.getQualifier() + "." +
@@ -279,21 +338,17 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
 
     /**
      *
-     * Adds multiple relationships with a matching typeName to an item.
+     * Creates a relationship for the given item
      *
-     * @param c             The relevant DSpace context
-     * @param item          The item to which this metadatavalue belongs to
-     * @param typeName       The element for the metadatavalue
-     * @param values to iterate over
+     * @param c         The relevant DSpace context
+     * @param item      The item that the relationships will be made for
+     * @param dcv       Metadata value changes to create the relationship from
      * @throws SQLException If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    private void addRelationships(Context c, Item item, String typeName, List<String> values)
-        throws SQLException, AuthorizeException,
-        MetadataImportException {
-        for (String value : values) {
-            addRelationship(c, item, typeName, value);
-        }
+    protected void addRelationship(Context c, Item item, BulkEditMetadataValue dcv)
+        throws SQLException, AuthorizeException, MetadataImportException {
+        addRelationship(c, item, dcv.getElement(), dcv.getValue());
     }
 
     /**
@@ -307,7 +362,7 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
      * @throws SQLException If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    private void addRelationship(Context c, Item item, String typeName, String value)
+    protected void addRelationship(Context c, Item item, String typeName, String value)
         throws SQLException, AuthorizeException, MetadataImportException {
         if (value.isEmpty()) {
             return;
@@ -360,6 +415,35 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
     }
 
     /**
+     * Sort a list of {@link BulkEditMetadataValue} to put essential values first
+     * dspace.entity.type is essential because it might influence how other imported values should behave
+     */
+    protected List<BulkEditMetadataValue> getBulkEditMetadataValueSorted(
+        List<BulkEditMetadataValue> bulkEditMetadataValues
+    ) {
+        return bulkEditMetadataValues.stream().sorted((o1, o2) -> {
+            boolean isO1EntityType = isEntityTypeMetadata(o1);
+            boolean isO2EntityType = isEntityTypeMetadata(o2);
+
+            if (isO1EntityType && !isO2EntityType) {
+                return -1;
+            }
+            if (!isO1EntityType && isO2EntityType) {
+                return 1;
+            }
+            return 0;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * Check if a {@link BulkEditMetadataValue} is an entity type value
+     */
+    protected boolean isEntityTypeMetadata(BulkEditMetadataValue dcv) {
+        return dcv.getSchema().equals("dspace") && dcv.getElement().equals("entity") && dcv.getQualifier() != null &&
+            dcv.getQualifier().equals("type");
+    }
+
+    /**
      * Gets an existing entity from a target reference.
      *
      * @param context the context to use.
@@ -367,7 +451,7 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
      * @return the entity, which is guaranteed to exist.
      * @throws MetadataImportException if the target reference is badly formed or refers to a non-existing item.
      */
-    private Entity getEntity(Context context, String value) throws MetadataImportException {
+    protected Entity getEntity(Context context, String value) throws MetadataImportException {
         Entity entity;
         UUID uuid;
         try {
@@ -390,5 +474,25 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
         } catch (SQLException sqle) {
             throw new MetadataImportException("Unable to find entity using reference: " + value, sqle);
         }
+    }
+
+    public void setHandler(DSpaceRunnableHandler handler) {
+        this.handler = handler;
+    }
+
+    public void setUseCollectionTemplate(boolean useCollectionTemplate) {
+        this.useCollectionTemplate = useCollectionTemplate;
+    }
+
+    public void setUseWorkflow(boolean useWorkflow) {
+        this.useWorkflow = useWorkflow;
+    }
+
+    public void setWorkflowNotify(boolean workflowNotify) {
+        this.workflowNotify = workflowNotify;
+    }
+
+    public void setArchive(boolean archive) {
+        this.archive = archive;
     }
 }

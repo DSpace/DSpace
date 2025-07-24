@@ -4,10 +4,8 @@
        default-lazy-init="true">
     <bean name="bulkEditServiceFactory" class="org.dspace.app.bulkedit.service.BulkEditServiceFactoryImpl"/>
 
-    <bean class="org.dspace.app.bulkedit.service.BulkEditImportServiceImpl"/>
-
-    <bean name="bulkEditUtil" class="org.dspace.app.bulkedit.util.BulkEditUtil"/>
+    <bean name="bulkEditService" class="org.dspace.app.bulkedit.service.BulkEditServiceImpl" scope="prototype" autowire-candidate="false"/>
 
     <!-- CSV import -->
-    <bean class="org.dspace.app.bulkedit.service.CSVBulkEditRegisterServiceImpl"/>
+    <bean name="csvBulkEditParsingService" class="org.dspace.app.bulkedit.service.CSVBulkEditParsingServiceImpl" scope="prototype" autowire-candidate="false"/>
 </beans>
