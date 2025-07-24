@@ -639,13 +639,13 @@ public class CSVBulkEditParsingServiceImpl implements BulkEditParsingService<DSp
             }
 
             // look up the value and authority in solr
-            List<AuthorityValue> byValue = authorityValueService.findByValue(c, metadataField.getSchema(),
+            List<AuthorityValue> byValue = authorityValueService.findByValue(metadataField.getSchema(),
                 metadataField.getElement(), metadataField.getQualifier(), value);
             AuthorityValue authorityValue = null;
             if (byValue.isEmpty()) {
                 String toGenerate = fromAuthority.generateString() + value;
                 String field = metadataField.getMetadataField("_");
-                authorityValue = authorityValueService.generate(c, toGenerate, value, field);
+                authorityValue = authorityValueService.generate(toGenerate, value, field);
                 dcv.setAuthority(toGenerate);
             } else {
                 authorityValue = byValue.get(0);
@@ -951,7 +951,7 @@ public class CSVBulkEditParsingServiceImpl implements BulkEditParsingService<DSp
                         .getLabel();
                 } else {
                     // Target item may be archived; check there.
-                    // Add to errors if Realtionship.type cannot be derived
+                    // Add to errors if Relationship.type cannot be derived
                     Item targetItem = null;
                     if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
                         targetItem = itemService.find(c, UUID.fromString(targetUUID));
@@ -996,7 +996,7 @@ public class CSVBulkEditParsingServiceImpl implements BulkEditParsingService<DSp
                             validateTypesByTypeByTypeName(c, targetType, originType, typeName, originRow);
                         } else {
                             // Origin item may be archived; check there.
-                            // Add to errors if Realtionship.type cannot be derived.
+                            // Add to errors if Relationship.type cannot be derived.
                             Item originItem = null;
                             if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
                                 DSpaceCSVLine dSpaceCSVLine = csv.getCSVLines()

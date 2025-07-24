@@ -104,6 +104,31 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void metadataImportTestWithDuplicateHeader() {
+        String[] csv = {"id,collection,dc.title,dc.title,dc.contributor.author",
+            "+," + collection.getHandle() + ",\"Test Import 1\",\"Test Import 2\"," + "\"Donald, SmithImported\"," +
+                "+," + collection.getHandle() + ",\"Test Import 3\",\"Test Import 4\"," + "\"Donald, SmithImported\""};
+        // Should throw an exception because of duplicate header
+        try {
+            performImportScript(csv);
+        } catch (Exception e) {
+            assertTrue(e instanceof MetadataImportInvalidHeadingException);
+        }
+    }
+
+    @Test
+    public void metadataImportTestWithAnyLanguage() {
+        String[] csv = {"id,collection,dc.title[*],dc.contributor.author",
+            "+," + collection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
+        // Should throw an exception because of invalid ANY language (*) in metadata field
+        try {
+            performImportScript(csv);
+        } catch (Exception e) {
+            assertTrue(e instanceof MetadataImportInvalidHeadingException);
+        }
+    }
+
+    @Test
     public void metadataImportTest() throws Exception {
         String[] csv = {"id,collection,dc.title,dc.contributor.author",
             "+," + collection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
@@ -170,8 +195,9 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
         }
         if (script != null) {
-            script.initialize(args, testDSpaceRunnableHandler, null);
-            script.run();
+            if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
+                script.run();
+            }
         }
     }
 
@@ -342,8 +368,9 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void metadataImportRemovingValueTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context,publicationCollection).withAuthor("TestAuthorToRemove")
-            .withTitle("title").build();
+        String itemTitle = "Testing removing author";
+        Item item = ItemBuilder.createItem(context,personCollection).withAuthor("TestAuthorToRemove")
+            .withTitle(itemTitle).build();
         context.commit();
         context.restoreAuthSystemState();
 
@@ -352,10 +379,10 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
         context.commit();
 
-        String[] csv = {"id,collection,dc.title,dc.contributor.author[*]",
-            item.getID().toString() + "," + publicationCollection.getHandle() + "," + item.getName() + ","};
+        String[] csv = {"id,collection,dc.title,dc.contributor.author",
+            item.getID().toString() + "," + personCollection.getHandle() + "," + item.getName() + ","};
         performImportScript(csv);
-        item = findItemByName("title");
+        item = findItemByName(itemTitle);
         assertEquals(0, itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size());
     }
 
@@ -513,7 +540,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         }
     }
 
-    private void enableAuthorAuthorityControl() {
+    private void enableAuthorAuthorityControl() throws Exception {
         configurationService.setProperty("choices.plugin.dc.contributor.author", "SolrAuthorAuthority");
         configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
 
