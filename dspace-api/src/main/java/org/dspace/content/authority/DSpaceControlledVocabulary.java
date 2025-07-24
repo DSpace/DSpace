@@ -67,7 +67,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     protected static String idTemplate = "//node[@id = %s]";
     protected static String idTemplateQuoted = "//node[@id = '%s']";
     protected static String labelTemplate = "//node[@label = %s]";
-    protected static String idParentTemplate = "//node[@id = %s]/parent::isComposedBy/parent::node";
+    protected static String idParentTemplate = "//node[@id = '%s']/parent::isComposedBy/parent::node";
     protected static String rootTemplate = "/node";
     protected static String idAttribute = "id";
     protected static String labelAttribute = "label";
@@ -277,7 +277,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     @Override
     public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale) {
         init(locale);
-        String xpathExpression = String.format(idTemplate, parentId);
+        String xpathExpression = String.format(idTemplateQuoted, parentId);
         return getChoicesByXpath(xpathExpression, start, limit);
     }
 
