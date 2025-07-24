@@ -58,7 +58,8 @@ public class UniversalAnalyticsClientRequestBuilderTest {
         GoogleAnalyticsEvent event = buildEvent("123", "192.168.1.25", "Chrome", "REF",
             "/api/documents/123", "Test publication");
 
-        assertThrows(IllegalArgumentException.class, () -> requestBuilder.composeRequestsBody("G-12345", List.of(event)), "Only keys with G- prefix are supported");
+        assertThrows(IllegalArgumentException.class, () -> requestBuilder.composeRequestsBody("G-12345",
+                List.of(event)), "Only keys with G- prefix are supported");
 
     }
 

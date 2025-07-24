@@ -9,7 +9,6 @@ package org.dspace.curate;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
 import org.apache.commons.cli.ParseException;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
@@ -47,7 +46,8 @@ public class CurationIT extends AbstractIntegrationTestWithDatabase {
                 script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
             }
             if (script != null) {
-                if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
+                if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(
+                        args, testDSpaceRunnableHandler, null))) {
                     script.run();
                 }
             }

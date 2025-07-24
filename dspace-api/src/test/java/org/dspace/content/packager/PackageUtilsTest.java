@@ -215,7 +215,8 @@ public class PackageUtilsTest extends AbstractUnitTest {
         assertThat("Exported group name should contain '_hdl:' substring", exportName, containsString("_hdl:"));
 
         String importName = PackageUtils.translateGroupNameForImport(context, exportName);
-        assertEquals(group.getName(), importName, "Exported Group name with dso unchanged by roundtrip translation for export/import");
+        assertEquals(group.getName(), importName,
+                "Exported Group name with dso unchanged by roundtrip translation for export/import");
 
         testCollection.setWorkflowGroup(context, 1, originalFirstStepWorkflowGroup);
     }

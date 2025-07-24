@@ -400,7 +400,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     @Test
     public void testNonUniqueRowName() {
         assertThrows(MetadataImportException.class, () -> {
-            String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other,rowName",
+            String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication," +
+                    "collection,dc.identifier.other,rowName",
                 "+,Person,," + col1.getHandle() + ",1,value",
                 "+,Person,," + col1.getHandle() + ",1,value",
                 "+,Publication,rowName:value," + col1.getHandle() + ",2"};
@@ -495,7 +496,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     @Test
     public void testCSVImportWrongOrderRowName() {
         assertThrows(Exception.class, () -> {
-            String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other,rowName",
+            String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication," +
+                    "collection,dc.identifier.other,rowName",
                 "+,Publication,rowName:row2," + col1.getHandle() + ",2,row1",
                 "+,Person,," + col1.getHandle() + ",8675309,row2",};
             performImportScript(csv, false);

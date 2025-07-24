@@ -126,8 +126,10 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         // We should have title, uuid, owning collection name set and metadata value list instantiated to empty
         assertEquals(item1.getID(), potentialDuplicate.getUuid(), "UUID should match item1 uuid");
         assertEquals(item1Title, potentialDuplicate.getTitle(), "Title should match item1 title");
-        assertEquals(item1.getOwningCollection().getName(), potentialDuplicate.getOwningCollectionName(), "Owning collection should match item1 owning collection");
-        assertEquals(0, potentialDuplicate.getMetadataValueList().size(), "Metadata value list size should be 0");
+        assertEquals(item1.getOwningCollection().getName(), potentialDuplicate.getOwningCollectionName(),
+                "Owning collection should match item1 owning collection");
+        assertEquals(0, potentialDuplicate.getMetadataValueList().size(),
+                "Metadata value list size should be 0");
     }
 
     /**
@@ -146,10 +148,12 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
 
         // Make sure result list is size 1
         int size = 1;
-        assertEquals(size, potentialDuplicates.size(), "Potential duplicates of item1 should have size " + size);
+        assertEquals(size, potentialDuplicates.size(),
+                "Potential duplicates of item1 should have size " + size);
 
         // The only member should be Public item II (one distance from public item I)
-        assertEquals(item2.getID(), potentialDuplicates.get(0).getUuid(), "Item II should be be the detected duplicate");
+        assertEquals(item2.getID(), potentialDuplicates.get(0).getUuid(),
+                "Item II should be be the detected duplicate");
 
         // Get potential duplicates of item2:
         // Expected: BOTH other items should appear as they are both 1 distance away from "Public item II"
@@ -160,11 +164,14 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
 
         // Make sure result list is size 1
         size = 2;
-        assertEquals(size, potentialDuplicates.size(), "Potential duplicates of item2 should have size " + size);
+        assertEquals(size, potentialDuplicates.size(),
+                "Potential duplicates of item2 should have size " + size);
 
         // The result list should contain both item1 and item3 in the expected order
-        assertEquals(item1.getID(), potentialDuplicates.get(0).getUuid(), "item1 should be the first detected duplicate");
-        assertEquals(item3.getID(), potentialDuplicates.get(1).getUuid(), "item3 should be be the second detected duplicate");
+        assertEquals(item1.getID(), potentialDuplicates.get(0).getUuid(),
+                "item1 should be the first detected duplicate");
+        assertEquals(item3.getID(), potentialDuplicates.get(1).getUuid(),
+                "item3 should be be the second detected duplicate");
 
         // Check metadata is populated as per configuration, using item1 (first in results)
         // Check for date
@@ -173,13 +180,16 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
                         .equals("dc.date.issued"))
                 .map(MetadataValue::getValue).findFirst();
         assertThat("There should be an issue date found", foundDate.isPresent());
-        assertEquals(item1IssueDate, foundDate.get(), "item1 issue date should match the duplicate obj metadata issue date");
+        assertEquals(item1IssueDate, foundDate.get(),
+                "item1 issue date should match the duplicate obj metadata issue date");
         // Check for subject
         Optional<String> foundSubject = potentialDuplicates.get(0).getMetadataValueList().stream()
-                .filter(metadataValue -> metadataValue.getMetadataField().toString('.').equals("dc.subject"))
+                .filter(metadataValue -> metadataValue.getMetadataField()
+                        .toString('.').equals("dc.subject"))
                 .map(MetadataValue::getValue).findFirst();
         assertThat("There should be a subject found", foundSubject.isPresent());
-        assertEquals(item1Subject, foundSubject.get(), "item1 subject should match the duplicate obj metadata subject");
+        assertEquals(item1Subject, foundSubject.get(),
+                "item1 subject should match the duplicate obj metadata subject");
 
         // Check for author, which was NOT configured to be copied
         Optional<String> foundAuthor = potentialDuplicates.get(0).getMetadataValueList().stream()
@@ -225,10 +235,12 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
 
         // Make sure result list is size 1
         int size = 1;
-        assertEquals(size, potentialDuplicates.size(), "Potential duplicates of item4 (special characters) should have size " + size);
+        assertEquals(size, potentialDuplicates.size(),
+                "Potential duplicates of item4 (special characters) should have size " + size);
 
         // The only member should be item 5
-        assertEquals(item5.getID(), potentialDuplicates.get(0).getUuid(), "Item 5 should be be the detected duplicate");
+        assertEquals(item5.getID(), potentialDuplicates.get(0).getUuid(),
+                "Item 5 should be be the detected duplicate");
 
     }
 
@@ -271,10 +283,12 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
 
         // Make sure result list is size 1
         int size = 1;
-        assertEquals(size, potentialDuplicates.size(), "Potential duplicates of item6 (long title) should have size " + size);
+        assertEquals(size, potentialDuplicates.size(),
+                "Potential duplicates of item6 (long title) should have size " + size);
 
         // The only member should be item 5
-        assertEquals(item7.getID(), potentialDuplicates.get(0).getUuid(), "Item 7's long title should match Item 6 as a potential duplicate");
+        assertEquals(item7.getID(), potentialDuplicates.get(0).getUuid(),
+                "Item 7's long title should match Item 6 as a potential duplicate");
 
     }
 
@@ -324,7 +338,8 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         assertEquals(size, potentialDuplicates.size(), "ONLY one exact match should be found (item 9) " + size);
 
         // The only member should be item 9
-        assertEquals(item9.getID(), potentialDuplicates.get(0).getUuid(), "Item 9 should match Item 8 as a potential duplicate");
+        assertEquals(item9.getID(), potentialDuplicates.get(0).getUuid(),
+                "Item 9 should match Item 8 as a potential duplicate");
 
     }
 
@@ -351,10 +366,12 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
 
         // Make sure result list is size 1
         int size = 1;
-        assertEquals(size, potentialDuplicates.size(), "Potential duplicates of item1 should have size " + size);
+        assertEquals(size, potentialDuplicates.size(),
+                "Potential duplicates of item1 should have size " + size);
 
         // The only member should be workflow item 2
-        assertEquals(workflowItem2.getItem().getID(), potentialDuplicates.get(0).getUuid(), "Workflow item 2 should be be the detected duplicate");
+        assertEquals(workflowItem2.getItem().getID(), potentialDuplicates.get(0).getUuid(),
+                "Workflow item 2 should be be the detected duplicate");
     }
 
     /**
@@ -400,10 +417,12 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
 
         // Make sure result list is size 1
         int size = 1;
-        assertEquals(size, potentialDuplicates.size(), "Potential duplicates of item10 (title + author) should have size " + size);
+        assertEquals(size, potentialDuplicates.size(),
+                "Potential duplicates of item10 (title + author) should have size " + size);
 
         // The only member should be item 11 since item 12 has a different author (but the same title
-        assertEquals(item11.getID(), potentialDuplicates.get(0).getUuid(), "Item 11 should be be the detected duplicate");
+        assertEquals(item11.getID(), potentialDuplicates.get(0).getUuid(),
+                "Item 11 should be be the detected duplicate");
 
     }
 

@@ -109,7 +109,8 @@ public class JWTTokenHandlerTest {
             when(loginJWTTokenHandler.isEncryptionEnabled()).thenReturn(true);
             Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
             StringKeyGenerator keyGenerator = KeyGenerators.string();
-            when(configurationService.getProperty("jwt.login.encryption.secret")).thenReturn(keyGenerator.generateKey());
+            when(configurationService.getProperty("jwt.login.encryption.secret"))
+                    .thenReturn(keyGenerator.generateKey());
             String token = loginJWTTokenHandler
                 .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
             SignedJWT signedJWT = SignedJWT.parse(token);

@@ -9,7 +9,6 @@ package org.dspace.xmlworkflow;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 import org.dspace.AbstractUnitTest;
 import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.state.Workflow;

@@ -201,7 +201,8 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
                 "The item " + item.getName() + " has NOT exactly 1 bitstream in the TEXT bundle");
         assertTrue(StringUtils.equals(bitstreams.get(0).getName(), expectedFileName),
                 "The text bitstream in the " + item.getName() + " is NOT named properly [" + expectedFileName + "]");
-        assertTrue(StringUtils.contains(getContent(bitstreams.get(0)), expectedContent), "The text bitstream in the " + item.getName() + " doesn't contain the proper content ["
+        assertTrue(StringUtils.contains(getContent(bitstreams.get(0)), expectedContent),
+                "The text bitstream in the " + item.getName() + " doesn't contain the proper content ["
                 + expectedContent + "]");
     }
 

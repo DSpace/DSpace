@@ -48,7 +48,8 @@ public class MetadataFieldPerformanceTest extends AbstractUnitTest {
         double maxDuration = maxDurationPerCall * amount;
         //Duration is 0.05798 without performance improvements
         //Duration is 0.0022 with performance improvements
-        Assertions.assertTrue(duration < maxDuration, "Duration (" + duration + ") should be smaller than " + maxDuration +
+        Assertions.assertTrue(duration < maxDuration, "Duration (" + duration + ") " +
+                "should be smaller than " + maxDuration +
                 " for " + amount + " tests." +
                 " Max of " + maxDurationPerCall + " ms per operation exceeded: " +
                 (((double) duration) / amount) + " ms.");
@@ -79,7 +80,8 @@ public class MetadataFieldPerformanceTest extends AbstractUnitTest {
         double maxDuration = maxDurationPerCall * amount;
         //Duration is 1.542 without performance improvements
         //Duration is 0.0538 with performance improvements
-        Assertions.assertTrue(duration < maxDuration, "Duration (" + duration + ") should be smaller than " + maxDuration +
+        Assertions.assertTrue(duration < maxDuration, "Duration (" + duration + ") " +
+                "should be smaller than " + maxDuration +
                 " for " + amount + " tests." +
                 " Max of " + maxDurationPerCall + " ms per operation exceeded: " +
                 (((double) duration) / amount) + " ms.");

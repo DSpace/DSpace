@@ -727,7 +727,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testAddItemNoAuth() {
         assertThrows(AuthorizeException.class, () -> {
             // Disallow Collection ADD perms
-            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy)
+                    .authorizeAction(context, collection, Constants.ADD);
 
             // create item first
             context.turnOffAuthorisationSystem();

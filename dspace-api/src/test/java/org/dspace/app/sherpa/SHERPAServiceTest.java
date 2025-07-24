@@ -105,7 +105,8 @@ public class SHERPAServiceTest extends AbstractDSpaceTest {
         String invalidISSN = "{TEST}";
 
         // Characters like { and } that conflict with JSON should be stripped from the filter query
-        assertEquals("TEST", SHERPAUtils.sanitiseQuery(invalidISSN), "JSON filter query sanitisation not stripping special characters");
+        assertEquals("TEST", SHERPAUtils.sanitiseQuery(invalidISSN),
+                "JSON filter query sanitisation not stripping special characters");
 
         // The valid string should look like this (assuming default configuration)
         // https://v2.sherpa.ac.uk/cgi/retrieve?item-type=publication&filter=[["issn","equals","0140-6736"]]&format=Json
@@ -162,7 +163,8 @@ public class SHERPAServiceTest extends AbstractDSpaceTest {
 
         // Assert response has expected publication (metadata) URI
         String expectedSystemMetadataUri = "http://v2.sherpa.ac.uk/id/publication/23803";
-        assertTrue(expectedSystemMetadataUri.equals(response.getMetadata().getUri()), "Response metadata URI did not match expected '" + expectedSystemMetadataUri
+        assertTrue(expectedSystemMetadataUri.equals(response.getMetadata().getUri()),
+                "Response metadata URI did not match expected '" + expectedSystemMetadataUri
             + "' value");
 
         // Assert response has at least one policy
@@ -170,7 +172,8 @@ public class SHERPAServiceTest extends AbstractDSpaceTest {
             "Response did not contain at least one archiving policy");
 
         // Assert response has at least one permitted version
-        assertTrue(CollectionUtils.isNotEmpty(response.getJournals().get(0).getPolicies().get(0).getPermittedVersions()),
+        assertTrue(CollectionUtils.isNotEmpty(response.getJournals().get(0)
+                        .getPolicies().get(0).getPermittedVersions()),
             "Response did not contain at least one permitted version");
 
         // Assert journal has at least one publisher
@@ -202,16 +205,19 @@ public class SHERPAServiceTest extends AbstractDSpaceTest {
 
         // Assert response has a publisher with name "Public Library of Science", or fail with message
         String expectedName = "Public Library of Science";
-        assertEquals(expectedName, response.getPublishers().get(0).getName(), "Publisher name did not match expected '" + expectedName + "' value");
+        assertEquals(expectedName, response.getPublishers().get(0).getName(),
+                "Publisher name did not match expected '" + expectedName + "' value");
 
         // Assert response has expected publisher URL
         String expectedUrl = "http://www.plos.org/";
-        assertEquals(expectedUrl, response.getPublishers().get(0).getUri(), "Response metadata URI did not match expected '" + expectedUrl
+        assertEquals(expectedUrl, response.getPublishers().get(0).getUri(),
+                "Response metadata URI did not match expected '" + expectedUrl
             + "' value");
 
         // Assert response has at expected publisher ID
         String expectedId = "112";
-        assertEquals(expectedId, response.getPublishers().get(0).getIdentifier(), "Response publisher ID did not match expected ID " + expectedId);
+        assertEquals(expectedId, response.getPublishers().get(0).getIdentifier(),
+                "Response publisher ID did not match expected ID " + expectedId);
     }
 
     /**

@@ -173,16 +173,13 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
         HibernateDBConnection dbConnection = (HibernateDBConnection) context.getDBConnection();
         EPerson person = context.getCurrentUser();
 
-        assertTrue(dbConnection.getSession()
-                                                                           .contains(person), "Current user should be cached in session");
+        assertTrue(dbConnection.getSession().contains(person), "Current user should be cached in session");
 
         dbConnection.rollback();
-        assertFalse(dbConnection.getSession()
-                                                                           .contains(person), "Current user should be gone from cache");
+        assertFalse(dbConnection.getSession().contains(person), "Current user should be gone from cache");
 
         person = dbConnection.reloadEntity(person);
-        assertTrue(dbConnection.getSession()
-                                                                           .contains(person), "Current user should be cached back in session");
+        assertTrue(dbConnection.getSession().contains(person), "Current user should be cached back in session");
     }
 
     /**
@@ -194,16 +191,13 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
         HibernateDBConnection dbConnection = (HibernateDBConnection) context.getDBConnection();
         EPerson person = context.getCurrentUser();
 
-        assertTrue(dbConnection.getSession()
-                                                                           .contains(person), "Current user should be cached in session");
+        assertTrue(dbConnection.getSession().contains(person), "Current user should be cached in session");
 
         dbConnection.commit();
-        assertFalse(dbConnection.getSession()
-                                                                          .contains(person), "Current user should be gone from cache");
+        assertFalse(dbConnection.getSession().contains(person), "Current user should be gone from cache");
 
         person = dbConnection.reloadEntity(person);
-        assertTrue(dbConnection.getSession()
-                                                                                .contains(person), "Current user should be cached back in session");
+        assertTrue(dbConnection.getSession().contains(person), "Current user should be cached back in session");
     }
 
     /**
@@ -237,16 +231,13 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
         HibernateDBConnection dbConnection = (HibernateDBConnection) context.getDBConnection();
         EPerson person = context.getCurrentUser();
 
-        assertTrue(dbConnection.getSession()
-                                                                           .contains(person), "Current user should be cached in session");
+        assertTrue(dbConnection.getSession().contains(person), "Current user should be cached in session");
 
         dbConnection.uncacheEntity(person);
-        assertFalse(dbConnection.getSession()
-                                                                          .contains(person), "Current user should be gone from cache");
+        assertFalse(dbConnection.getSession().contains(person), "Current user should be gone from cache");
 
         // Test ability to reload an uncached entity
         person = dbConnection.reloadEntity(person);
-        assertTrue(dbConnection.getSession()
-                                                                                .contains(person), "Current user should be cached back in session");
+        assertTrue(dbConnection.getSession().contains(person), "Current user should be cached back in session");
     }
 }

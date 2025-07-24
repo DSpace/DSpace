@@ -94,7 +94,7 @@ public class EPersonCLITool {
         try {
             int exitCode = execute(argv);
             System.exit(exitCode);
-        } catch (ParseException|SQLException|AuthorizeException e) {
+        } catch (ParseException | SQLException | AuthorizeException e) {
             System.err.println(e.getMessage());
             System.exit(1);
         }

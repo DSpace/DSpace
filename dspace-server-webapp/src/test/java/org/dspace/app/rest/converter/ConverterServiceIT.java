@@ -278,7 +278,8 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
             } else if (value == null) {
                 fail("got null value, but expected a " + expectedClass + " for embed: " + rel);
             } else {
-                assertTrue(expectedClass.isAssignableFrom(value.getClass()), "got a " + value.getClass() + " value, but expected a "
+                assertTrue(expectedClass.isAssignableFrom(value.getClass()), "got a "
+                        + value.getClass() + " value, but expected a "
                         + expectedClass + " for embed: " + rel);
             }
         }
