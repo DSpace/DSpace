@@ -30,7 +30,7 @@ import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.BadVirtualMetadataType;
+import org.dspace.content.BadVirtualMetadataTypeException;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -160,7 +160,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             }
             relationshipService.deleteMultipleRelationshipsCopyVirtualMetadata(context, copyVirtual, item);
             itemService.delete(context, item);
-        } catch (BadVirtualMetadataType e) {
+        } catch (BadVirtualMetadataTypeException e) {
             throw new DSpaceBadRequestException(e.getMessage(), e);
         } catch (SQLException | IOException ex) {
             throw new RuntimeException(ex.getMessage(), ex);

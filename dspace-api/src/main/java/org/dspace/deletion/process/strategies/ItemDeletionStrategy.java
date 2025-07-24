@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.BadVirtualMetadataType;
+import org.dspace.content.BadVirtualMetadataTypeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -46,7 +46,7 @@ public class ItemDeletionStrategy implements DSpaceObjectDeletionStrategy {
         try {
             relationshipService.deleteMultipleRelationshipsCopyVirtualMetadata(context, copyVirtual, item);
             itemService.delete(context, item);
-        } catch (SQLException | BadVirtualMetadataType | IOException e) {
+        } catch (SQLException | BadVirtualMetadataTypeException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

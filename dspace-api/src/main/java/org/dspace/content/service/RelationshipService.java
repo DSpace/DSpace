@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.BadVirtualMetadataType;
+import org.dspace.content.BadVirtualMetadataTypeException;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.Relationship.LatestVersionStatus;
@@ -539,6 +539,6 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @param item        The item to be deleted
      */
     public void deleteMultipleRelationshipsCopyVirtualMetadata(Context context, String[] copyVirtual, Item item)
-            throws SQLException, AuthorizeException, BadVirtualMetadataType;
+            throws SQLException, AuthorizeException, BadVirtualMetadataTypeException;
 
 }

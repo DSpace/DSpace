@@ -12,21 +12,21 @@ package org.dspace.content;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
-public class BadVirtualMetadataType extends Exception {
+public class BadVirtualMetadataTypeException extends Exception {
 
-    public BadVirtualMetadataType() {
+    public BadVirtualMetadataTypeException() {
         super();
     }
 
-    public BadVirtualMetadataType(String s, Throwable t) {
+    public BadVirtualMetadataTypeException(String s, Throwable t) {
         super(s, t);
     }
 
-    public BadVirtualMetadataType(String s) {
+    public BadVirtualMetadataTypeException(String s) {
         super(s);
     }
 
-    public BadVirtualMetadataType(Throwable t) {
+    public BadVirtualMetadataTypeException(Throwable t) {
         super(t);
     }
 

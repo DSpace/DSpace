@@ -1120,7 +1120,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public void deleteMultipleRelationshipsCopyVirtualMetadata(Context context, String[] copyVirtual, Item item)
-            throws SQLException, AuthorizeException, BadVirtualMetadataType {
+            throws SQLException, AuthorizeException, BadVirtualMetadataTypeException {
 
         if (copyVirtual == null || copyVirtual.length == 0) {
             // Don't delete nor copy any metadata here if the "copyVirtualMetadata" parameter wasn't passed. The
@@ -1164,13 +1164,13 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
     }
 
-    private List<Integer> parseVirtualMetadataTypes(String[] copyVirtual) throws BadVirtualMetadataType {
+    private List<Integer> parseVirtualMetadataTypes(String[] copyVirtual) throws BadVirtualMetadataTypeException {
         List<Integer> types = new ArrayList<>();
         for (String typeString : copyVirtual) {
             if (!StringUtils.isNumeric(typeString)) {
                 var message = String.format("parameter %s should only contain a single value '%s', '%s' or a list of " +
                        "numbers.", REQUESTPARAMETER_COPYVIRTUALMETADATA, COPYVIRTUAL_ALL[0], COPYVIRTUAL_CONFIGURED[0]);
-                throw new BadVirtualMetadataType(message);
+                throw new BadVirtualMetadataTypeException(message);
             }
             types.add(Integer.parseInt(typeString));
         }
