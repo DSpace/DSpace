@@ -56,7 +56,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Basic integration testing for the SAF Export feature via UI {@link ItemExport}.
- * https://wiki.lyrasis.org/display/DSDOC7x/Importing+and+Exporting+Items+via+Simple+Archive+Format
+ * https://wiki.lyrasis.org/display/DSDOC9x/Importing+and+Exporting+Items+via+Simple+Archive+Format
  *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
@@ -76,6 +76,8 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
     private ProcessService processService;
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
+    @Autowired
+    private ObjectMapper mapper;
     private Collection collection;
     private Path workDir;
 
@@ -327,7 +329,7 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
 
             getClient(token)
                 .perform(multipart("/api/system/scripts/export/processes")
-                        .param("properties", new ObjectMapper().writeValueAsString(list)))
+                        .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                         ProcessMatcher.matchProcess("export",

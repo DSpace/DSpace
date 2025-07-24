@@ -13,11 +13,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataSchemaRest;
@@ -38,11 +38,14 @@ import org.springframework.stereotype.Component;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Component(MetadataSchemaRest.CATEGORY + "." + MetadataSchemaRest.NAME)
+@Component(MetadataSchemaRest.CATEGORY + "." + MetadataSchemaRest.PLURAL_NAME)
 public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataSchemaRest, Integer> {
 
     @Autowired
     MetadataSchemaService metadataSchemaService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Override
     @PreAuthorize("permitAll()")
@@ -82,7 +85,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         // parse request body
         MetadataSchemaRest metadataSchemaRest;
         try {
-            metadataSchemaRest = new ObjectMapper().readValue(
+            metadataSchemaRest = mapper.readValue(
                     getRequestService().getCurrentRequest().getHttpServletRequest().getInputStream(),
                     MetadataSchemaRest.class
             );
@@ -144,7 +147,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
 
         MetadataSchemaRest metadataSchemaRest;
         try {
-            metadataSchemaRest = new ObjectMapper().readValue(jsonNode.toString(), MetadataSchemaRest.class);
+            metadataSchemaRest = mapper.readValue(jsonNode.toString(), MetadataSchemaRest.class);
         } catch (JsonProcessingException e) {
             throw new DSpaceBadRequestException("Cannot parse JSON in request body", e);
         }

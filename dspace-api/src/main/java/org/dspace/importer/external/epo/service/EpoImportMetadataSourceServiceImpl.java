@@ -32,6 +32,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.xerces.impl.dv.util.Base64;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -106,7 +107,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     }
 
     /**
-     * Set the costumer epo secret
+     * Set the customer epo secret
      * @param consumerSecret the customer epo secret
      */
     public void setConsumerSecret(String consumerSecret) {
@@ -397,9 +398,11 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
             String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
 
-            SAXBuilder saxBuilder = new SAXBuilder();
-            // disallow DTD parsing to ensure no XXE attacks can occur
-            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
+            SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
+            // To properly parse EPO responses, we must allow DOCTYPEs overall. But, we can still apply all the
+            // other default XXE protections, including disabling external entities and entity expansion.
+            // NOTE: we only need to allow DOCTYPEs for this initial API call. All other calls have them disabled.
+            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false);
             Document document = saxBuilder.build(new StringReader(response));
             Element root = document.getRootElement();
 
@@ -436,9 +439,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
             String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
 
-            SAXBuilder saxBuilder = new SAXBuilder();
-            // disallow DTD parsing to ensure no XXE attacks can occur
-            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
+            SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
             Document document = saxBuilder.build(new StringReader(response));
             Element root = document.getRootElement();
 
@@ -489,9 +490,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     private List<Element> splitToRecords(String recordsSrc) {
         try {
-            SAXBuilder saxBuilder = new SAXBuilder();
-            // disallow DTD parsing to ensure no XXE attacks can occur
-            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
+            SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
             Document document = saxBuilder.build(new StringReader(recordsSrc));
             Element root = document.getRootElement();
             List<Namespace> namespaces = Arrays.asList(Namespace.getNamespace("ns", "http://www.epo.org/exchange"));

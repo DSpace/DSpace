@@ -30,6 +30,7 @@
     	<property name="tokenEndpointUrl" value="${orcid.token-url}" />
     	<property name="authorizeEndpointUrl" value="${orcid.authorize-url}" />
     	<property name="scopes" value="${orcid.scope}" />
+		<property name="revokeUrl" value="${orcid.revoke-url}" />
     </bean>
     
     <bean class="org.dspace.orcid.client.OrcidClientImpl" />
@@ -38,17 +39,17 @@
     <bean class="org.dspace.orcid.model.validator.impl.OrcidValidatorImpl" />
     
     <bean class="org.dspace.orcid.service.impl.OrcidEntityFactoryServiceImpl">
-    	<constructor-arg name="itemService" ref="org.dspace.content.ItemServiceImpl" />
-    	<constructor-arg name="entityFactories">
-    		<list>
-    			<bean class="org.dspace.orcid.model.factory.impl.OrcidWorkFactory">
-    				<property name="fieldMapping" ref="orcidWorkFactoryFieldMapping" />
-    			</bean>
-    			<bean class="org.dspace.orcid.model.factory.impl.OrcidFundingFactory">
-    				<property name="fieldMapping" ref="orcidFundingFactoryFieldMapping" />
-    			</bean>
-    		</list>
-   		</constructor-arg>
+        <constructor-arg name="entityFactories">
+            <list>
+                <bean class="org.dspace.orcid.model.factory.impl.OrcidWorkFactory">
+                    <property name="fieldMapping" ref="orcidWorkFactoryFieldMapping" />
+                </bean>
+                <bean class="org.dspace.orcid.model.factory.impl.OrcidFundingFactory">
+                    <property name="fieldMapping" ref="orcidFundingFactoryFieldMapping" />
+                </bean>
+            </list>
+        </constructor-arg>
+        <constructor-arg name="itemService" ref="org.dspace.content.ItemServiceImpl" />
 	</bean>
 	
 	<bean id="orcidWorkFactoryFieldMapping" class="org.dspace.orcid.model.OrcidWorkFieldMapping" >

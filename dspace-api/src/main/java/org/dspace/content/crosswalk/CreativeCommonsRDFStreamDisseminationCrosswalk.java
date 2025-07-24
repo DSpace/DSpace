@@ -59,7 +59,6 @@ public class CreativeCommonsRDFStreamDisseminationCrosswalk
             Bitstream cc = creativeCommonsService.getLicenseRdfBitstream((Item) dso);
             if (cc != null) {
                 Utils.copy(bitstreamService.retrieve(context, cc), out);
-                out.close();
             }
         }
     }

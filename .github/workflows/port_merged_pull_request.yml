@@ -1,0 +1,46 @@
+# This workflow will attempt to port a merged pull request to
+# the branch specified in a "port to" label (if exists)
+name: Port merged Pull Request
+
+# Only run for merged PRs against the "main" or maintenance branches
+# We allow this to run for `pull_request_target` so that github secrets are available
+# (This is required when the PR comes from a forked repo)
+on:
+  pull_request_target:
+    types: [ closed ]
+    branches:
+      - main
+      - 'dspace-**'
+
+permissions:
+  contents: write      # so action can add comments
+  pull-requests: write # so action can create pull requests
+
+jobs:
+  port_pr:
+    runs-on: ubuntu-latest
+    # Don't run on closed *unmerged* pull requests
+    if: github.event.pull_request.merged
+    steps:
+      # Checkout code
+      - uses: actions/checkout@v4
+      # Port PR to other branch (ONLY if labeled with "port to")
+      # See https://github.com/korthout/backport-action
+      - name: Create backport pull requests
+        uses: korthout/backport-action@v2
+        with:
+          # Trigger based on a "port to [branch]" label on PR
+          # (This label must specify the branch name to port to)
+          label_pattern: '^port to ([^ ]+)$'
+          # Title to add to the (newly created) port PR
+          pull_title: '[Port ${target_branch}] ${pull_title}'
+          # Description to add to the (newly created) port PR
+          pull_description: 'Port of #${pull_number} by @${pull_author} to `${target_branch}`.'
+          # Copy all labels from original PR to (newly created) port PR
+          # NOTE: The labels matching 'label_pattern' are automatically excluded
+          copy_labels_pattern: '.*'
+          # Skip any merge commits in the ported PR. This means only non-merge commits are cherry-picked to the new PR
+          merge_commits: 'skip'
+          # Use a personal access token (PAT) to create PR as 'dspace-bot' user.
+          # A PAT is required in order for the new PR to trigger its own actions (for CI checks)
+          github_token: ${{ secrets.PR_PORT_TOKEN }}

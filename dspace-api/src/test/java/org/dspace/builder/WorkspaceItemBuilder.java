@@ -10,7 +10,10 @@ package org.dspace.builder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.UUID;
 
+import org.dspace.app.ldn.NotifyPatternToTrigger;
+import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -41,14 +44,31 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
 
     public static WorkspaceItemBuilder createWorkspaceItem(final Context context, final Collection col) {
         WorkspaceItemBuilder builder = new WorkspaceItemBuilder(context);
-        return builder.create(context, col);
+        return builder.create(context, col, null);
     }
 
-    private WorkspaceItemBuilder create(final Context context, final Collection col) {
+    public static WorkspaceItemBuilder createWorkspaceItem(final Context context, final Collection col, UUID uuid) {
+        WorkspaceItemBuilder builder = new WorkspaceItemBuilder(context);
+        return builder.create(context, col, uuid);
+    }
+
+    /**
+     * Create with a specific UUID (e.g. restoring items with Packager import)
+     *
+     * @param context DSpace context
+     * @param col Parent collection
+     * @param uuid Item UUID
+     * @return WorkspaceItemBuilder
+     */
+    private WorkspaceItemBuilder create(final Context context, final Collection col, UUID uuid) {
         this.context = context;
 
         try {
-            workspaceItem = workspaceItemService.create(context, col, false);
+            if (uuid == null) {
+                workspaceItem = workspaceItemService.create(context, col, false);
+            } else {
+                workspaceItem = workspaceItemService.create(context, col, uuid, false, false);
+            }
             item = workspaceItem.getItem();
         } catch (Exception e) {
             return handleException(e);
@@ -114,10 +134,12 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
                 delete(c, workspaceItem);
             } else {
                 item = c.reloadEntity(item);
-                // check if the wsi has been pushed to the workflow
-                XmlWorkflowItem wfi = workflowItemService.findByItem(c, item);
-                if (wfi != null) {
-                    workflowItemService.delete(c, wfi);
+                if (item != null) {
+                    // check if the wsi has been pushed to the workflow
+                    XmlWorkflowItem wfi = workflowItemService.findByItem(c, item);
+                    if (wfi != null) {
+                        workflowItemService.delete(c, wfi);
+                    }
                 }
             }
             item = c.reloadEntity(item);
@@ -219,4 +241,20 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         }
         return this;
     }
+
+    public WorkspaceItemBuilder withCOARNotifyService(NotifyServiceEntity notifyService, String pattern) {
+        Item item = workspaceItem.getItem();
+
+        try {
+            NotifyPatternToTrigger notifyPatternToTrigger = notifyPatternToTriggerService.create(context);
+            notifyPatternToTrigger.setItem(item);
+            notifyPatternToTrigger.setNotifyService(notifyService);
+            notifyPatternToTrigger.setPattern(pattern);
+            notifyPatternToTriggerService.update(context, notifyPatternToTrigger);
+        } catch (Exception e) {
+            handleException(e);
+        }
+        return this;
+    }
+
 }

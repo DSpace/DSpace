@@ -35,6 +35,7 @@
         <entry key-ref="wos.fullName" value-ref="wosFullNameContrib"/>
         <entry key-ref="wos.subject" value-ref="wosSubjectContrib"/>
         <entry key-ref="wos.orcid" value-ref="wosOrcidContrib"/>
+        <entry key-ref="wos.publisher" value-ref="wosPublisherContrib"/>
         <entry key-ref="wos.contributorEditor" value-ref="wosContributorEditorContrib"/>
         <entry key-ref="wos.wosId" value-ref="wosIdContrib"/>
         <entry key-ref="wos.rid" value-ref="wosRidContrib"/>

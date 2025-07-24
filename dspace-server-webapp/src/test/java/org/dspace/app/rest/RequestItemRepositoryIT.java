@@ -8,14 +8,12 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
-import static org.exparity.hamcrest.date.DateMatchers.within;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,16 +28,19 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import jakarta.servlet.http.Cookie;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.converter.RequestItemConverter;
@@ -56,10 +57,14 @@ import org.dspace.builder.RequestItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.services.ConfigurationService;
+import org.exparity.hamcrest.date.LocalDateTimeMatchers;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 /**
  *
@@ -82,11 +87,27 @@ public class RequestItemRepositoryIT
     @Autowired(required = true)
     RequestItemService requestItemService;
 
+    @Autowired
+    ApplicationContext applicationContext;
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private ObjectMapper mapper;
+
     private Collection collection;
 
     private Item item;
 
     private Bitstream bitstream;
+
+    private Map<String, Object> altchaPayload;
+
+    @After
+    public void tearDown() {
+        configurationService.setProperty("captcha.provider", "google");
+    }
 
     @Before
     public void init()
@@ -116,6 +137,18 @@ public class RequestItemRepositoryIT
                 .withName("Bitstream")
                 .build();
 
+        altchaPayload = new HashMap<>();
+        altchaPayload.put("challenge", "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3");
+        altchaPayload.put("salt", "salt123");
+        altchaPayload.put("number", 1);
+        altchaPayload.put("signature", "f5cd3ed4161f5f3c914c5778e716d6b446fa277086bbb8fd3e2b0c4b89f18833");
+        altchaPayload.put("algorithm", "SHA-256");
+
+        // Set up altcha configuration
+        configurationService.setProperty("captcha.provider", "altcha");
+        configurationService.setProperty("altcha.algorithm", "SHA-256");
+        configurationService.setProperty("altcha.hmac.key", "onetwothreesecret");
+
         context.restoreAuthSystemState();
     }
 
@@ -127,8 +160,6 @@ public class RequestItemRepositoryIT
     @Test
     public void testFindAll()
             throws Exception {
-        System.out.println("findAll");
-
         getClient().perform(get(URI_ROOT))
                 .andExpect(status().isMethodNotAllowed());
     }
@@ -141,8 +172,6 @@ public class RequestItemRepositoryIT
     @Test
     public void testFindOneAuthenticated()
             throws Exception {
-        System.out.println("findOne (authenticated)");
-
         // Create a request.
         RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
@@ -166,8 +195,6 @@ public class RequestItemRepositoryIT
     @Test
     public void testFindOneNotAuthenticated()
             throws Exception {
-        System.out.println("findOne (not authenticated)");
-
         // Create a request.
         RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
@@ -190,8 +217,6 @@ public class RequestItemRepositoryIT
     @Test
     public void testFindOneNonexistent()
             throws Exception {
-        System.out.println("findOne (nonexistent request)");
-
         String uri = URI_ROOT + "/impossible";
         getClient().perform(get(uri))
                 .andExpect(status().isNotFound());
@@ -207,8 +232,6 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateAndReturnAuthenticated()
             throws SQLException, AuthorizeException, IOException, Exception {
-        System.out.println("createAndReturn (authenticated)");
-
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
         rir.setAllfiles(true);
@@ -218,7 +241,6 @@ public class RequestItemRepositoryIT
         rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
 
         // Create it and see if it was created correctly.
-        ObjectMapper mapper = new ObjectMapper();
         String authToken = getAuthToken(eperson.getEmail(), password);
         try {
                 getClient(authToken)
@@ -260,8 +282,6 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateAndReturnNotAuthenticated()
             throws SQLException, AuthorizeException, IOException, Exception {
-        System.out.println("createAndReturn (not authenticated)");
-
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
         rir.setAllfiles(false);
@@ -270,11 +290,16 @@ public class RequestItemRepositoryIT
         rir.setRequestEmail(RequestItemBuilder.REQ_EMAIL);
         rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
         rir.setRequestName(RequestItemBuilder.REQ_NAME);
+        String base64Payload =
+                "eyJjaGFsbGVuZ2UiOiJhNjY1YTQ1OTIwNDIyZjlkNDE3ZTQ4NjdlZmRjNGZiOGEwNGExZ" +
+                "jNmZmYxZmEwN2U5OThlODZmN2Y3YTI3YWUzIiwic2FsdCI6InNhbHQxMjMiLCJudW1iZX" +
+                "IiOjEsInNpZ25hdHVyZSI6ImY1Y2QzZWQ0MTYxZjVmM2M5MTRjNTc3OGU3MTZkNmI0NDZ" +
+                "mYTI3NzA4NmJiYjhmZDNlMmIwYzRiODlmMTg4MzMiLCJhbGdvcml0aG0iOiJTSEEtMjU2In0=";
 
         // Create it and see if it was created correctly.
-        ObjectMapper mapper = new ObjectMapper();
         try {
                 getClient().perform(post(URI_ROOT)
+                                .header("x-captcha-payload", base64Payload)
                                 .content(mapper.writeValueAsBytes(rir))
                                 .contentType(contentType))
                         .andExpect(status().isCreated())
@@ -312,8 +337,6 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateAndReturnBadRequest()
             throws SQLException, AuthorizeException, IOException, Exception {
-        System.out.println("createAndReturn (bad requests)");
-
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
         rir.setBitstreamId(bitstream.getID().toString());
@@ -324,7 +347,6 @@ public class RequestItemRepositoryIT
         rir.setAllfiles(false);
 
         // Try to create it, with various malformations.
-        ObjectMapper mapper = new ObjectMapper();
         String authToken = getAuthToken(eperson.getEmail(), password);
 
         // Test missing bitstream ID
@@ -390,8 +412,6 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateWithInvalidCSRF()
             throws Exception {
-        System.out.println("testCreateWithInvalidCSRF");
-
         // Login via password to retrieve a valid token
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -411,11 +431,10 @@ public class RequestItemRepositoryIT
         rir.setRequestName(RequestItemBuilder.REQ_NAME);
         rir.setAllfiles(false);
 
-        ObjectMapper mapper = new ObjectMapper();
         getClient().perform(post(URI_ROOT)
                 .content(mapper.writeValueAsBytes(rir))
                 .contentType(contentType)
-                .with(csrf().useInvalidToken().asHeader())
+                .with(invalidCsrfToken())
                 .secure(true)
                 .cookie(cookies))
                 // Should return a 403 Forbidden, for an invalid CSRF token
@@ -495,9 +514,10 @@ public class RequestItemRepositoryIT
         Map<String, String> parameters = Map.of(
                 "acceptRequest", "true",
                 "subject", "subject",
+                "accessPeriod", "+1DAY",
                 "responseMessage", "Request accepted",
                 "suggestOpenAccess", "true");
-        String content = new ObjectMapper()
+        String content = mapper
                 .writer()
                 .writeValueAsString(parameters);
 
@@ -515,8 +535,8 @@ public class RequestItemRepositoryIT
                 = requestItemService.findByToken(context, requestTokenRef.get());
         assertTrue("acceptRequest should be true", foundRequest.isAccept_request());
         assertThat("decision_date must be within a minute of now",
-                foundRequest.getDecision_date(),
-                within(1, ChronoUnit.MINUTES, new Date()));
+                   foundRequest.getDecision_date().atZone(ZoneOffset.UTC).toLocalDateTime(),
+                   LocalDateTimeMatchers.within(1, ChronoUnit.MINUTES, LocalDateTime.now()));
     }
 
     @Test
@@ -530,7 +550,7 @@ public class RequestItemRepositoryIT
         Map<String, String> parameters;
         String content;
 
-        ObjectWriter mapperWriter = new ObjectMapper().writer();
+        ObjectWriter mapperWriter = mapper.writer();
 
         // Unauthenticated user should be allowed.
         parameters = Map.of(
@@ -549,8 +569,6 @@ public class RequestItemRepositoryIT
     @Test
     public void testPutBadRequest()
             throws Exception {
-        System.out.println("put bad requests");
-
         // Create an item request to approve.
         RequestItem itemRequest = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
@@ -560,7 +578,7 @@ public class RequestItemRepositoryIT
         Map<String, String> parameters;
         String content;
 
-        ObjectWriter mapperWriter = new ObjectMapper().writer();
+        ObjectWriter mapperWriter = mapper.writer();
 
         // Missing acceptRequest
         parameters = Map.of(
@@ -577,13 +595,11 @@ public class RequestItemRepositoryIT
     @Test
     public void testPutCompletedRequest()
             throws Exception {
-        System.out.println("put completed request");
-
         // Create an item request that is already denied.
         RequestItem itemRequest = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .withAcceptRequest(false)
-                .withDecisionDate(new Date())
+                .withDecisionDate(Instant.now())
                 .build();
 
         // Try to accept it again.
@@ -591,7 +607,7 @@ public class RequestItemRepositoryIT
                 "acceptRequest", "true",
                 "subject", "subject",
                 "responseMessage", "Request accepted");
-        ObjectWriter mapperWriter = new ObjectMapper().writer();
+        ObjectWriter mapperWriter = mapper.writer();
         String content = mapperWriter.writeValueAsString(parameters);
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(put(URI_ROOT + '/' + itemRequest.getToken())
@@ -605,9 +621,10 @@ public class RequestItemRepositoryIT
      */
     @Test
     public void testGetDomainClass() {
-        System.out.println("getDomainClass");
         RequestItemRepository instance = new RequestItemRepository();
         Class instanceClass = instance.getDomainClass();
         assertEquals("Wrong domain class", RequestItemRest.class, instanceClass);
     }
+
+
 }

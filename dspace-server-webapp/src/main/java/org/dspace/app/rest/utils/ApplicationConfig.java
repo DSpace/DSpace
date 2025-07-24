@@ -32,9 +32,13 @@ import org.springframework.context.annotation.Configuration;
     "org.dspace.app.rest.converter",
     "org.dspace.app.rest.repository",
     "org.dspace.app.rest.utils",
+    "org.dspace.app.rest.link",
+    "org.dspace.app.rest.converter.factory",
     "org.dspace.app.configuration",
     "org.dspace.iiif",
-    "org.dspace.app.iiif"
+    "org.dspace.app.iiif",
+    "org.dspace.app.ldn",
+    "org.dspace.app.scheduler"
 })
 public class ApplicationConfig {
     // Allowed CORS origins ("Access-Control-Allow-Origin" header)
@@ -70,6 +74,10 @@ public class ApplicationConfig {
     // Configured User Interface URL (default: http://localhost:4000)
     @Value("${dspace.ui.url:http://localhost:4000}")
     private String uiURL;
+
+    // LDN enable status
+    @Value("${ldn.enabled}")
+    private boolean ldnEnabled;
 
     /**
      * Return the array of allowed origins (client URLs) for the CORS "Access-Control-Allow-Origin" header
@@ -127,6 +135,14 @@ public class ApplicationConfig {
      */
     public boolean getCorsAllowCredentials() {
         return corsAllowCredentials;
+    }
+
+    /**
+     * Return the ldn.enabled value
+     * @return true or false
+     */
+    public boolean getLdnEnabled() {
+        return this.ldnEnabled;
     }
 
     /**

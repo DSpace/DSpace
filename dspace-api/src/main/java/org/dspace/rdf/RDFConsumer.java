@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -241,9 +241,9 @@ public class RDFConsumer implements Consumer {
             }
 
             DSOIdentifier id = new DSOIdentifier(dso, ctx);
-            // If an item gets withdrawn, a MODIFIY event is fired. We have to
+            // If an item gets withdrawn, a MODIFY event is fired. We have to
             // delete the item from the triple store instead of converting it.
-            // we don't have to take care for reinstantions of items as they can
+            // we don't have to take care for reinstate events on items as they can
             // be processed as normal modify events.
             if (dso instanceof Item
                 && event.getDetail() != null

@@ -18,6 +18,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class PropertyRest extends BaseObjectRest<String> {
     public static final String NAME = "property";
+    public static final String PLURAL_NAME = "properties";
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
     public String getName() {
@@ -58,5 +59,10 @@ public class PropertyRest extends BaseObjectRest<String> {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 }

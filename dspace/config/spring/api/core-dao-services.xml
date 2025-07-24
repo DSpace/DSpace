@@ -40,6 +40,7 @@
     <bean class="org.dspace.eperson.dao.impl.Group2GroupCacheDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.GroupDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.RegistrationDataDAOImpl"/>
+    <bean class="org.dspace.eperson.dao.impl.RegistrationDataMetadataDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.SubscriptionDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.SubscriptionParameterDAOImpl"/>
 
@@ -68,6 +69,11 @@
     <bean class="org.dspace.orcid.dao.impl.OrcidHistoryDAOImpl" />
 
     <bean class="org.dspace.supervision.dao.impl.SupervisionOrderDaoImpl"/>
+
+    <bean class="org.dspace.app.ldn.dao.impl.NotifyServiceDaoImpl"/>
+    <bean class="org.dspace.app.ldn.dao.impl.NotifyServiceInboundPatternDaoImpl"/>
+    <bean class="org.dspace.app.ldn.dao.impl.LDNMessageDaoImpl"/>
+    <bean class="org.dspace.app.ldn.dao.impl.NotifyPatternToTriggerDaoImpl"/>
 
 
 </beans>

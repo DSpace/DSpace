@@ -19,6 +19,7 @@ import org.dspace.app.rest.RestResourceController;
 public class ViewEventRest extends BaseObjectRest<UUID> {
 
     public static final String NAME = "viewevent";
+    public static final String PLURAL_NAME = "viewevents";
     public static final String CATEGORY = RestAddressableModel.STATISTICS;
 
     private UUID targetId;
@@ -66,5 +67,10 @@ public class ViewEventRest extends BaseObjectRest<UUID> {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 }

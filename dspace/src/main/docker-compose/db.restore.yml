@@ -6,15 +6,13 @@
 # http://www.dspace.org/license/
 #
 
-version: "3.7"
-
 #
 # Overrides the default "dspacedb" container behavior to load a local SQL file into PostgreSQL.
 #
 # This can be used to restore a "dspacedb" container from a pg_dump, or during upgrade to a new version of PostgreSQL.
 services:
   dspacedb:
-    image: dspace/dspace-postgres-pgcrypto:dspace-7_x-loadsql
+    image: dspace/dspace-postgres-pgcrypto:${DSPACE_VER:-latest}-loadsql
     environment:
       # Location where the dump SQL file will be available on the running container
       - LOCALSQL=/tmp/pgdump.sql

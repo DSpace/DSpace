@@ -12,11 +12,11 @@ import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFI
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.BadRequestException;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
@@ -63,6 +63,9 @@ public class CollectionItemTemplateController {
 
     @Autowired
     private ConverterService converter;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     /**
      * This method will create an Item and add it as a template to a Collection.
@@ -114,7 +117,6 @@ public class CollectionItemTemplateController {
 
         TemplateItemRest inputTemplateItemRest;
         try {
-            ObjectMapper mapper = new ObjectMapper();
             inputTemplateItemRest = mapper.readValue(itemBody.toString(), TemplateItemRest.class);
         } catch (IOException e1) {
             throw new UnprocessableEntityException("Error parsing request body", e1);

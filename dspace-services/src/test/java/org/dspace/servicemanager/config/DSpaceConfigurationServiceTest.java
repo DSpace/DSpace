@@ -18,13 +18,17 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
+import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -56,7 +60,7 @@ public class DSpaceConfigurationServiceTest {
         configurationService.clear();
 
         // Start fresh with out own set of configs
-        Map<String, Object> l = new HashMap<String, Object>();
+        Map<String, Object> l = new HashMap<>();
         l.put("service.name", "DSpace");
         l.put("sample.array", "itemA,itemB,itemC");
         l.put("sample.number", "123");
@@ -67,9 +71,14 @@ public class DSpaceConfigurationServiceTest {
         l.put("current.user", "${aaronz}");
         l.put("test.key1", "This is a value");
         l.put("test.key2", "This is key1=${test.key1}");
+        // Hierarchical properties
+        l.put("hier.key1.foo", "key1_foo");
+        l.put("hier.key1.bar", "key1_bar");
+        l.put("hier.key2.foo", "key2_foo");
+        l.put("hier.key2.bar", "key2_bar");
 
         // Record how many properties we initialized with (for below unit tests)
-        numPropsLoaded = 9;
+        numPropsLoaded = 13;
 
         configurationService.loadConfiguration(l);
         l = null;
@@ -86,7 +95,7 @@ public class DSpaceConfigurationServiceTest {
     @Test
     public void testVariableReplacement() {
 
-        Map<String, Object> l = new HashMap<String, Object>();
+        Map<String, Object> l = new HashMap<>();
         l.put("service.name", "DSpace");
         l.put("aaronz", "Aaron Zeckoski");
         l.put("current.user", "${aaronz}");
@@ -295,7 +304,7 @@ public class DSpaceConfigurationServiceTest {
         assertEquals("itemC", array[2]);
         Integer number = configurationService.getPropertyAsType("sample.number", Integer.class);
         assertNotNull(number);
-        assertEquals(new Integer(123), number);
+        assertEquals(Integer.valueOf(123), number);
 
         Boolean bool = configurationService.getPropertyAsType("sample.boolean", Boolean.class);
         assertNotNull(bool);
@@ -306,7 +315,6 @@ public class DSpaceConfigurationServiceTest {
         assertEquals(Boolean.FALSE, bool2);
 
         boolean bool3 = configurationService.getPropertyAsType("INVALID.PROPERTY", boolean.class);
-        assertNotNull(bool3);
         assertEquals(false, bool3);
 
         assertEquals(123, (int) configurationService.getPropertyAsType("sample.number", int.class));
@@ -333,9 +341,9 @@ public class DSpaceConfigurationServiceTest {
         assertEquals("itemB", array[1]);
         assertEquals("itemC", array[2]);
 
-        Integer number = configurationService.getPropertyAsType("sample.number", new Integer(12345));
+        Integer number = configurationService.getPropertyAsType("sample.number", 12345);
         assertNotNull(number);
-        assertEquals(new Integer(123), number);
+        assertEquals(Integer.valueOf(123), number);
 
         Boolean bool = configurationService.getPropertyAsType("sample.boolean", Boolean.FALSE);
         assertNotNull(bool);
@@ -441,6 +449,67 @@ public class DSpaceConfigurationServiceTest {
     }
 
     /**
+     * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getHierarchicalConfiguration()}.
+     */
+    @Test
+    public void testGetHierarchicalConfiguration() {
+        HierarchicalConfiguration<ImmutableNode> config = configurationService.getHierarchicalConfiguration();
+
+        assertNotNull(config);
+        assertEquals(2, config.childConfigurationsAt("hier").size());
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getChildren()}.
+     */
+    @Test
+    public void testGetChildren() {
+        List<HierarchicalConfiguration<ImmutableNode>> children = configurationService.getChildren("hier");
+
+        assertNotNull(children);
+        assertEquals(2, children.size());
+
+        List<String> childPropertyNames = children.stream()
+            .map(node -> node.getRootElementName())
+            .collect(Collectors.toList());
+
+        assertEquals(2, childPropertyNames.size());
+        assertEquals("key1", childPropertyNames.get(0));
+        assertEquals("key2", childPropertyNames.get(1));
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getChildren()}.
+     */
+    @Test
+    public void testGetChildrenNonExistentKey() {
+        List<HierarchicalConfiguration<ImmutableNode>> children =
+            configurationService.getChildren("thisKeyDoesNotExist");
+
+        assertNotNull(children);
+        assertEquals(0, children.size());
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getChildren()}.
+     */
+    @Test
+    public void testGetChildrenDeepKey() {
+        List<HierarchicalConfiguration<ImmutableNode>> children = configurationService.getChildren("hier.key1");
+
+        assertNotNull(children);
+        assertEquals(2, children.size());
+
+        List<String> childPropertyNames = children.stream()
+            .map(node -> node.getRootElementName())
+            .collect(Collectors.toList());
+
+        assertEquals(2, childPropertyNames.size());
+        assertEquals("foo", childPropertyNames.get(0));
+        assertEquals("bar", childPropertyNames.get(1));
+    }
+
+    /**
      * Test method for
      * {@link org.dspace.servicemanager.config.DSpaceConfigurationService#loadConfig(java.lang.String, java.lang.Object)}.
      */
@@ -482,7 +551,7 @@ public class DSpaceConfigurationServiceTest {
         DSpaceConfigurationService dscs = new DSpaceConfigurationService();
         int size = dscs.getProperties().size();
 
-        // Add two new Sytem properties
+        // Add two new System properties
         System.setProperty("Hello", "World");
         System.setProperty("Tim", "Donohue");
 
@@ -522,8 +591,11 @@ public class DSpaceConfigurationServiceTest {
     }
 
     /**
-     * Tests the ability of our ConfigurationService to automatically reload properties after a set period
-     * of time.
+     * Tests the ability of our ConfigurationService to automatically reload
+     * properties after a set period of time.
+     * @throws ConfigurationException passed through.
+     * @throws IOException if test properties file cannot be created or copied.
+     * @throws InterruptedException if sleep is interrupted.
      */
     @Test
     public void testAutomaticReload() throws ConfigurationException, IOException, InterruptedException {

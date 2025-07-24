@@ -11,21 +11,21 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.hibernate.proxy.HibernateProxyHelper;
+import org.dspace.core.HibernateProxyHelper;
 
 /**
  * Class representing bitstreams stored in the DSpace system.
@@ -307,8 +307,16 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
         return collection;
     }
 
+    public void setCollection(Collection collection) {
+        this.collection = collection;
+    }
+
     public Community getCommunity() {
         return community;
+    }
+
+    public void setCommunity(Community community) {
+        this.community = community;
     }
 
     /**

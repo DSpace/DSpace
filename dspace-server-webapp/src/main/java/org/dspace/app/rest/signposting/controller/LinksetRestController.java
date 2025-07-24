@@ -16,9 +16,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.signposting.converter.LinksetRestMessageConverter;
 import org.dspace.app.rest.signposting.model.Linkset;
@@ -144,7 +144,7 @@ public class LinksetRestController {
         DSpaceObject dso = findObject(context, uuid);
         List<LinksetNode> linksetNodes = linksetService.createLinksetNodesForSingleLinkset(request, context, dso);
         return linksetNodes.stream()
-                .map(node -> new TypedLinkRest(node.getLink(), node.getRelation(), node.getType()))
+                .map(node -> new TypedLinkRest(node.getLink(), node.getRelation(), node.getType(), node.getProfile()))
                 .collect(Collectors.toList());
     }
 
@@ -163,7 +163,8 @@ public class LinksetRestController {
         DSpaceObject object = findObject(context, uuid);
         DisseminationCrosswalk xwalk = (DisseminationCrosswalk)
                 pluginService.getNamedPlugin(DisseminationCrosswalk.class, xwalkName);
-        List<Element> elements = xwalk.disseminateList(context, object);
+        // Output valid XML: disseminate using root element as opposed to list
+        Element elements = xwalk.disseminateElement(context, object);
         XMLOutputter outputter = new XMLOutputter(Format.getCompactFormat());
         return outputter.outputString(elements);
     }
