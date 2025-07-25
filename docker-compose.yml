@@ -86,8 +86,6 @@ services:
   # DSpace Solr container
   dspacesolr:
     container_name: dspacesolr
-    environment:
-      SOLR_OPTS: -XX:-UseLargePages
     image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-latest}"
     build:
       context: ./dspace/src/main/docker/dspace-solr/
