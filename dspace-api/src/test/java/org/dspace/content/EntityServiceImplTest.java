@@ -7,7 +7,7 @@
  */
 package org.dspace.content;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -21,14 +21,17 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-@RunWith(MockitoJUnitRunner.class)
-public class EntityServiceImplTest  {
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
+public class EntityServiceImplTest {
 
     @InjectMocks
     private EntityServiceImpl entityService;
@@ -66,8 +69,9 @@ public class EntityServiceImplTest  {
         when(item.getName()).thenReturn("ItemName");
 
         // The returned Entity's item should match the mocked item's name
-        assertEquals("TestFindByItem 0", "ItemName",
-                entityService.findByItemId(context, item.getID()).getItem().getName());
+        assertEquals("ItemName",
+            entityService.findByItemId(context, item.getID()).getItem().getName(),
+            "TestFindByItem 0");
     }
 
     @Test
@@ -78,7 +82,7 @@ public class EntityServiceImplTest  {
         EntityType entityType = entityTypeService.findByEntityType(context, "testType");
 
         // The returned EntityType should equal our defined entityType case
-        assertEquals("TestGetType 0", entityType, entityService.getType(context, entity));
+        assertEquals(entityType, entityService.getType(context, entity), "TestGetType 0");
     }
 
     @Test
@@ -98,7 +102,7 @@ public class EntityServiceImplTest  {
         when(entity.getRelationships()).thenReturn(relationshipList);
 
         // The left relation(s) reported from our mocked Entity should match our relationshipList
-        assertEquals("TestGetLeftRelations 0", relationshipList, entityService.getLeftRelations(context, entity));
+        assertEquals(relationshipList, entityService.getLeftRelations(context, entity), "TestGetLeftRelations 0");
     }
 
     @Test
@@ -118,7 +122,7 @@ public class EntityServiceImplTest  {
         when(entity.getRelationships()).thenReturn(relationshipList);
 
         // The right relation(s) reported from our mocked Entity should match our relationshipList
-        assertEquals("TestGetLeftRelations 0", relationshipList, entityService.getRightRelations(context, entity));
+        assertEquals(relationshipList, entityService.getRightRelations(context, entity), "TestGetLeftRelations 0");
     }
 
     @Test
@@ -136,8 +140,9 @@ public class EntityServiceImplTest  {
         when(relationshipService.findByTypeName(context, "leftwardType", -1, -1)).thenReturn(relationshipList);
 
         // The relation(s) reported from our defined type should match our relationshipList
-        assertEquals("TestGetRelationsByLabel 0", relationshipList,
-                entityService.getRelationsByTypeName(context, "leftwardType"));
+        assertEquals(relationshipList,
+            entityService.getRelationsByTypeName(context, "leftwardType"),
+            "TestGetRelationsByLabel 0");
     }
 
     @Test
@@ -159,11 +164,12 @@ public class EntityServiceImplTest  {
         when(entity.getItem()).thenReturn(item);
         when(entityService.getType(context, entity)).thenReturn(entityType);
         when(relationshipTypeService.findByEntityType(context, entityType, -1, -1))
-                .thenReturn(relationshipTypeList);
+            .thenReturn(relationshipTypeList);
 
         // The relation(s) reported from our mocked Entity should match our relationshipList
-        assertEquals("TestGetAllRelationshipTypes 0", relationshipTypeList,
-                entityService.getAllRelationshipTypes(context, entity));
+        assertEquals(relationshipTypeList,
+            entityService.getAllRelationshipTypes(context, entity),
+            "TestGetAllRelationshipTypes 0");
     }
 
     @Test
@@ -186,11 +192,12 @@ public class EntityServiceImplTest  {
         when(entity.getItem()).thenReturn(item);
         when(entityService.getType(context, entity)).thenReturn(entityType);
         when(relationshipTypeService.findByEntityType(context, entityType, true, -1, -1))
-                .thenReturn(relationshipTypeList);
+            .thenReturn(relationshipTypeList);
 
         // The left relationshipType(s) reported from our mocked Entity should match our relationshipList
-        assertEquals("TestGetLeftRelationshipTypes 0", relationshipTypeList,
-                entityService.getLeftRelationshipTypes(context, entity));
+        assertEquals(relationshipTypeList,
+            entityService.getLeftRelationshipTypes(context, entity),
+            "TestGetLeftRelationshipTypes 0");
     }
 
     @Test
@@ -213,11 +220,12 @@ public class EntityServiceImplTest  {
         when(entity.getItem()).thenReturn(item);
         when(entityService.getType(context, entity)).thenReturn(entityType);
         when(relationshipTypeService.findByEntityType(context, entityType, false, -1, -1))
-                .thenReturn(relationshipTypeList);
+            .thenReturn(relationshipTypeList);
 
         // The right relationshipType(s) reported from our mocked Entity should match our relationshipList
-        assertEquals("TestGetRightRelationshipTypes 0", relationshipTypeList,
-                entityService.getRightRelationshipTypes(context, entity));
+        assertEquals(relationshipTypeList,
+            entityService.getRightRelationshipTypes(context, entity),
+            "TestGetRightRelationshipTypes 0");
     }
 
 
@@ -231,14 +239,13 @@ public class EntityServiceImplTest  {
         // Mock the state of objects utilized in getRelationshipTypesByTypeName()
         // to meet the success criteria of the invocation
         when(relationshipTypeService.findByLeftwardOrRightwardTypeName(context, "leftwardType", -1, -1))
-                .thenReturn(list);
+            .thenReturn(list);
 
         // The RelationshipType(s) reported from our mocked Entity should match our list
-        assertEquals("TestGetRelationshipTypesByLabel 0", list,
-                entityService.getRelationshipTypesByTypeName(context, "leftwardType"));
+        assertEquals(list,
+            entityService.getRelationshipTypesByTypeName(context, "leftwardType"),
+            "TestGetRelationshipTypesByLabel 0");
     }
-
-
 
 
 }

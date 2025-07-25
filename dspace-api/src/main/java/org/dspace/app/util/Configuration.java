@@ -30,8 +30,12 @@ public class Configuration {
     private Configuration() { }
 
     /**
-     * Command-line interface for running configuration tasks. Possible
-     * arguments:
+     * Command-line interface for running configuration tasks.
+     * This small method simply wraps the execute method so that
+     * it can be called directly from the Java API or Unit Tests without
+     * calling System.exit().
+     *
+     * Possible arguments:
      * <ul>
      * <li>{@code --module name} the name of the configuration "module" for this property.</li>
      * <li>{@code --property name} prints the value of the DSpace configuration
@@ -45,6 +49,14 @@ public class Configuration {
      * @param argv the command line arguments given
      */
     public static void main(String[] argv) {
+        int exitCode = execute(argv);
+        System.exit(exitCode);
+    }
+
+    /**
+     * Actual execute method for the Configuration CLI task
+     */
+    public static int execute(String[] argv) {
         // Build a description of the command line
         Options options = new Options();
         options.addOption("p", "property", true, "name of the desired property");
@@ -64,7 +76,7 @@ public class Configuration {
             cmd = parser.parse(options, argv);
         } catch (ParseException ex) {
             System.err.println(ex.getMessage());
-            System.exit(1);
+            return 1;
         }
 
         // Give help if asked
@@ -75,13 +87,13 @@ public class Configuration {
                                           "If --module is omitted, then --property gives the entire" +
                                               " name of the property.  Otherwise the name is" +
                                               " composed of module.property.");
-            System.exit(0);
+            return 0;
         }
 
         // Check for missing required values
         if (!cmd.hasOption('p')) {
             System.err.println("Error:  -p is required");
-            System.exit(1);
+            return 1;
         }
 
         // Figure out the property's full name
@@ -123,6 +135,6 @@ public class Configuration {
             }
         }
 
-        System.exit(0);
+        return 0;
     }
 }

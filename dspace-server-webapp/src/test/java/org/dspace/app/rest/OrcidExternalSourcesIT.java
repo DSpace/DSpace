@@ -22,8 +22,8 @@ import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.provider.impl.OrcidV3AuthorDataProvider;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Assume;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -50,9 +50,10 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
     private OrcidV3AuthorDataProvider orcidV3AuthorDataProvider;
 
     public void onlyRunIfConfigExists() {
-        if (StringUtils.isBlank(configurationService.getProperty("orcid.application-client-id"))) {
-            Assume.assumeNoException(new IllegalStateException("Missing ORCID credentials"));
-        }
+        Assumptions.assumeTrue(
+            StringUtils.isNotBlank(configurationService.getProperty("orcid.application-client-id")),
+            "Missing ORCID credentials - skipping ORCID tests"
+        );
     }
 
     @Test

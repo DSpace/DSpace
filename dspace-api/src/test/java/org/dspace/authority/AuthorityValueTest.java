@@ -7,15 +7,15 @@
  */
 package org.dspace.authority;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -32,21 +32,20 @@ public class AuthorityValueTest {
 
         // Test an invalid date.
         actual = AuthorityValue.stringToDate("not a date");
-        assertNull("Unparsable date should return null", actual);
+        assertNull(actual, "Unparsable date should return null");
 
         // Test a date-time without zone or offset.
         expected = LocalDateTime.of(1957, 01, 27, 01, 23, 45)
                                 .atZone(ZoneId.systemDefault())
                                 .toInstant();
         actual = AuthorityValue.stringToDate("1957-01-27T01:23:45");
-        assertEquals("Local date-time should convert", expected, actual);
+        assertEquals(expected, actual, "Local date-time should convert");
 
         // Test a date-time with milliseconds and offset from UTC.
         expected = LocalDateTime.of(1957, 01, 27, 01, 23, 45, 678_000_000)
                                 .atZone(ZoneOffset.of("-05"))
                                 .toInstant();
         actual = AuthorityValue.stringToDate("1957-01-27T01:23:45.678-05");
-        assertEquals("Zoned date-time with milliseconds should convert",
-                expected, actual);
+        assertEquals(expected, actual, "Zoned date-time with milliseconds should convert");
     }
 }

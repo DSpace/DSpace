@@ -13,8 +13,9 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -38,9 +39,9 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -75,7 +76,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -112,7 +113,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
 //        try {
@@ -181,8 +182,8 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         Bundle created = bundleService.create(context, item, "testCreateBundle");
         //the item created by default has no name nor type set
         assertThat("testCreate 0", created, notNullValue());
-        assertTrue("testCreate 1", created.getID() != null);
-        assertTrue("testCreate 2", created.getBitstreams().size() == 0);
+        assertTrue(created.getID() != null, "testCreate 1");
+        assertTrue(created.getBitstreams().size() == 0, "testCreate 2");
         assertThat("testCreate 3", created.getName(), equalTo("testCreateBundle"));
     }
 
@@ -192,12 +193,12 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     @Override
     @Test
     public void testGetID() {
-        assertTrue("testGetID 0", b.getID() != null);
+        assertTrue(b.getID() != null, "testGetID 0");
     }
 
     @Test
     public void testLegacyID() {
-        assertTrue("testGetLegacyID 0", b.getLegacyId() == null);
+        assertTrue(b.getLegacyId() == null, "testGetLegacyID 0");
     }
 
     /**
@@ -356,15 +357,16 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     /**
      * Test of createBitstream method, of class Bundle.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testCreateBitstreamNoAuth()
-        throws FileNotFoundException, AuthorizeException, SQLException, IOException {
-        // Disallow Bundle ADD permissions
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+    @Test
+    public void testCreateBitstreamNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow Bundle ADD permissions
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
 
-        File f = new File(testProps.get("test.bitstream").toString());
-        bitstreamService.create(context, b, new FileInputStream(f));
-        fail("Exception should be thrown");
+            File f = new File(testProps.get("test.bitstream").toString());
+            bitstreamService.create(context, b, new FileInputStream(f));
+            fail("Exception should be thrown");
+        });
     }
 
     /**
@@ -392,15 +394,17 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     /**
      * Test of registerBitstream method, of class Bundle.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testRegisterBitstreamNoAuth() throws AuthorizeException, IOException, SQLException {
-        // Disallow Bundle ADD permissions
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+    @Test
+    public void testRegisterBitstreamNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow Bundle ADD permissions
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
 
-        int assetstore = 0; //default assetstore
-        File f = new File(testProps.get("test.bitstream").toString());
-        bitstreamService.register(context, b, assetstore, f.getAbsolutePath());
-        fail("Exception should be thrown");
+            int assetstore = 0; //default assetstore
+            File f = new File(testProps.get("test.bitstream").toString());
+            bitstreamService.register(context, b, assetstore, f.getAbsolutePath());
+            fail("Exception should be thrown");
+        });
     }
 
     /**
@@ -429,17 +433,19 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     /**
      * Test of addBitstream method, of class Bundle.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testAddBitstreamNoAuth() throws SQLException, AuthorizeException, IOException {
-        // Disallow Bundle ADD permissions
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+    @Test
+    public void testAddBitstreamNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow Bundle ADD permissions
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
 
-        // create a new Bitstream to add to Bundle
-        File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
-        bs.setName(context, "name");
-        bundleService.addBitstream(context, b, bs);
-        fail("Exception should have been thrown");
+            // create a new Bitstream to add to Bundle
+            File f = new File(testProps.get("test.bitstream").toString());
+            Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
+            bs.setName(context, "name");
+            bundleService.addBitstream(context, b, bs);
+            fail("Exception should have been thrown");
+        });
     }
 
     /**
@@ -468,19 +474,21 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     /**
      * Test of removeBitstream method, of class Bundle.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testRemoveBitstreamNoAuth() throws SQLException, AuthorizeException, IOException {
-        // Disallow Bundle ADD permissions
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, b, Constants.REMOVE);
+    @Test
+    public void testRemoveBitstreamNoAuth() {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow Bundle ADD permissions
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, b, Constants.REMOVE);
 
-        File f = new File(testProps.get("test.bitstream").toString());
-        context.turnOffAuthorisationSystem();
-        Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
-        bs.setName(context, "name");
-        context.restoreAuthSystemState();
+            File f = new File(testProps.get("test.bitstream").toString());
+            context.turnOffAuthorisationSystem();
+            Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
+            bs.setName(context, "name");
+            context.restoreAuthSystemState();
 
-        bundleService.removeBitstream(context, b, bs);
-        fail("Exception should have been thrown");
+            bundleService.removeBitstream(context, b, bs);
+            fail("Exception should have been thrown");
+        });
     }
 
     /**
@@ -600,7 +608,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         }
 
         List<ResourcePolicy> bspolicies = bundleService.getBundlePolicies(context, b);
-        assertTrue("testInheritCollectionDefaultPolicies 0", defaultCollectionPolicies.size() == bspolicies.size());
+        assertTrue(defaultCollectionPolicies.size() == bspolicies.size(), "testInheritCollectionDefaultPolicies 0");
 
         boolean equals = false;
         for (int i = 0; i < defaultCollectionPolicies.size(); i++) {
@@ -611,7 +619,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
                 equals = true;
             }
         }
-        assertTrue("testInheritCollectionDefaultPolicies 1", equals);
+        assertTrue(equals, "testInheritCollectionDefaultPolicies 1");
 
         bspolicies = bundleService.getBitstreamPolicies(context, b);
         boolean exists = true;
@@ -623,7 +631,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
                 exists = true;
             }
         }
-        assertTrue("testInheritCollectionDefaultPolicies 2", exists);
+        assertTrue(exists, "testInheritCollectionDefaultPolicies 2");
 
     }
 
@@ -639,7 +647,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         bundleService.replaceAllBitstreamPolicies(context, b, newpolicies);
 
         List<ResourcePolicy> bspolicies = bundleService.getBundlePolicies(context, b);
-        assertTrue("testReplaceAllBitstreamPolicies 0", newpolicies.size() == bspolicies.size());
+        assertTrue(newpolicies.size() == bspolicies.size(), "testReplaceAllBitstreamPolicies 0");
 
         boolean equals = true;
         for (int i = 0; i < newpolicies.size() && equals; i++) {
@@ -647,7 +655,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
                 equals = false;
             }
         }
-        assertTrue("testReplaceAllBitstreamPolicies 1", equals);
+        assertTrue(equals, "testReplaceAllBitstreamPolicies 1");
 
         bspolicies = bundleService.getBitstreamPolicies(context, b);
         boolean exists = true;
@@ -656,7 +664,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
                 exists = false;
             }
         }
-        assertTrue("testReplaceAllBitstreamPolicies 2", exists);
+        assertTrue(exists, "testReplaceAllBitstreamPolicies 2");
     }
 
     /**
@@ -666,7 +674,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     public void testGetBundlePolicies() throws SQLException {
         //empty by default
         List<ResourcePolicy> bspolicies = bundleService.getBundlePolicies(context, b);
-        assertTrue("testGetBundlePolicies 0", CollectionUtils.isNotEmpty(bspolicies));
+        assertTrue(CollectionUtils.isNotEmpty(bspolicies), "testGetBundlePolicies 0");
     }
 
     /**
@@ -676,7 +684,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     public void testGetBitstreamPolicies() throws SQLException {
         //empty by default
         List<ResourcePolicy> bspolicies = bundleService.getBitstreamPolicies(context, b);
-        assertTrue("testGetBitstreamPolicies 0", bspolicies.isEmpty());
+        assertTrue(bspolicies.isEmpty(), "testGetBitstreamPolicies 0");
     }
 
     @Test
@@ -707,7 +715,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
 
         // Assert Bitstreams are in the order added
         Bitstream[] bitstreams = b.getBitstreams().toArray(new Bitstream[b.getBitstreams().size()]);
-        assertTrue("testSetOrder: starting count correct", bitstreams.length == 3);
+        assertTrue(bitstreams.length == 3, "testSetOrder: starting count correct");
         assertThat("testSetOrder: Bitstream 1 is first", bitstreams[0].getName(), equalTo(bs.getName()));
         assertThat("testSetOrder: Bitstream 2 is second", bitstreams[1].getName(), equalTo(bs2.getName()));
         assertThat("testSetOrder: Bitstream 3 is third", bitstreams[2].getName(), equalTo(bs3.getName()));
@@ -722,7 +730,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
 
         // Assert Bitstreams are in the new order
         bitstreams = b.getBitstreams().toArray(new Bitstream[b.getBitstreams().size()]);
-        assertTrue("testSetOrder: new count correct", bitstreams.length == 3);
+        assertTrue(bitstreams.length == 3, "testSetOrder: new count correct");
         assertThat("testSetOrder: Bitstream 3 is now first", bitstreams[0].getName(), equalTo(bs3.getName()));
         assertThat("testSetOrder: Bitstream 1 is now second", bitstreams[1].getName(), equalTo(bs.getName()));
         assertThat("testSetOrder: Bitstream 2 is now third", bitstreams[2].getName(), equalTo(bs2.getName()));

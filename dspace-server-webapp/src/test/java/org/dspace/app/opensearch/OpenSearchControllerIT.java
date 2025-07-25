@@ -21,9 +21,9 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration test to test the /opensearch endpoint
@@ -35,7 +35,7 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
 
     private ConfigurationService configurationService;
 
-    @Before
+    @BeforeEach
     public void init() throws Exception {
         //enable OpenSearch by configuration
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -174,7 +174,7 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
     }
 
     // Ignore this test as it is throwing an exception
-    @Ignore
+    @Disabled
     @Test
     public void invalidQueryTest() throws Exception {
         //When we call the root endpoint
