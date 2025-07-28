@@ -6,8 +6,8 @@
 # http://www.dspace.org/license/
 #
 
-# To build for example use:
-# docker build --build-arg POSTGRES_VERSION=17 --build-arg POSTGRES_PASSWORD=mypass ./dspace/src/main/docker/dspace-postgres-curl/
+# Example build:
+# docker build --build-arg POSTGRES_VERSION=17 --build-arg POSTGRES_PASSWORD=mypass ./dspace/src/main/docker/dspace-postgres-loadsql/
 # This will be published as dspace/dspace-postgres-loadsql:$DSPACE_VERSION
 
 ARG POSTGRES_VERSION=15
