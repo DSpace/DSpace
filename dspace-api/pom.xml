@@ -929,7 +929,7 @@
         <dependency>
             <groupId>org.xhtmlrenderer</groupId>
             <artifactId>flying-saucer-pdf</artifactId>
-            <version>9.12.0</version>
+            <version>9.13.1</version>
             <exclusions>
                 <!-- Conflicts with Hibernate. Use version that is brought in via Hibernate -->
                 <exclusion>
