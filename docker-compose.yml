@@ -66,7 +66,7 @@ services:
   dspacedb:
     container_name: dspacedb
     # Uses the base PostgreSQL image
-    image: "${DOCKER_REGISTRY:-docker.io}/postgres:${POSTGRES_VERSION:-15}"
+    image: "docker.io/postgres:${POSTGRES_VERSION:-15}"
     environment:
       PGDATA: /pgdata
       POSTGRES_DB: dspace
