@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.submit.step.validation.UploadValidation.ERROR_VALIDATION_METADATA_PENDING;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -2323,7 +2324,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         // check that the errors returned mentions that the dc.title is missing from upload section
         getClient(epersonToken).perform(get("/api/workflow/workflowitems/" + workflowItem.getID()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
+                .andExpect(jsonPath("$.errors[?(@.message=='" + ERROR_VALIDATION_METADATA_PENDING + "')]",
                         Matchers.contains(
                                 hasJsonPath("$.paths", Matchers.contains(
                                         hasJsonPath("$", Matchers.is("/sections/upload/dc.title"))
