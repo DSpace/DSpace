@@ -220,6 +220,19 @@ jobs:
           result=$(wget -O- -q http://127.0.0.1:8080/server/api/core/collections)
           echo "$result"
           echo "$result" |  grep -oE "\"Dog in Yard\","
+      # Verify basic backend logging is working.
+      # 1. Access the top communities list. Verify that the "Before request" INFO statement is logged
+      # 2. Access an invalid endpoint (and ignore 404 response). Verify that a "status:404" WARN statement is logged
+      - name: Verify backend is logging properly
+        run: |
+          wget -O/dev/null -q http://127.0.0.1:8080/server/api/core/communities/search/top
+          logs=$(docker compose -f docker-compose.yml logs -n 5 dspace)
+          echo "$logs"
+          echo "$logs" | grep -o "Before request \[GET /server/api/core/communities/search/top\]"
+          wget -O/dev/null -q http://127.0.0.1:8080/server/api/does/not/exist || true
+          logs=$(docker compose -f docker-compose.yml logs -n 5 dspace)
+          echo "$logs"
+          echo "$logs" | grep -o "status:404 exception: The repository type does.not was not found"
       # Verify Handle Server can be stared and is working properly
       # 1. First generate the "[dspace]/handle-server" folder with the sitebndl.zip
       # 2. Start the Handle Server (and wait 20 seconds to let it start up)
