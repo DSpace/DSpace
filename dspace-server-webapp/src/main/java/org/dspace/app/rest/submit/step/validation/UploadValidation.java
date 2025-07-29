@@ -9,7 +9,6 @@ package org.dspace.app.rest.submit.step.validation;
 
 import static org.dspace.app.rest.submit.step.validation.MetadataValidation.ERROR_VALIDATION_AUTHORITY_REQUIRED;
 import static org.dspace.app.rest.submit.step.validation.MetadataValidation.ERROR_VALIDATION_REGEX;
-import static org.dspace.app.rest.submit.step.validation.MetadataValidation.ERROR_VALIDATION_REQUIRED;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -43,6 +42,8 @@ import org.dspace.submit.model.UploadConfigurationService;
 public class UploadValidation extends AbstractValidation {
 
     private static final String ERROR_VALIDATION_FILEREQUIRED = "error.validation.filerequired";
+
+    public static final String ERROR_VALIDATION_METADATA_PENDING = "error.validation.metadata.pending";
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UploadValidation.class);
 
@@ -110,7 +111,7 @@ public class UploadValidation extends AbstractValidation {
                     }
                     if (input.isRequired() && !foundResult) {
                         // for this required qualdrop no value was found, add to the list of error fields
-                        addError(errors, ERROR_VALIDATION_REQUIRED,
+                        addError(errors, ERROR_VALIDATION_METADATA_PENDING,
                                 "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
                                         input.getFieldName());
                     }
@@ -132,7 +133,7 @@ public class UploadValidation extends AbstractValidation {
                         if (input.isAllowedFor(documentTypeValue)) {
                             // since this field is missing add to list of error
                             // fields
-                            addError(errors, ERROR_VALIDATION_REQUIRED, "/"
+                            addError(errors, ERROR_VALIDATION_METADATA_PENDING, "/"
                                     + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
                                     input.getFieldName());
                         }
