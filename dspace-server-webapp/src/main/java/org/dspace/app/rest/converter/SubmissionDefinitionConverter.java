@@ -75,21 +75,6 @@ public class SubmissionDefinitionConverter implements DSpaceConverter<Submission
                         e);
             }
         }
-
-        HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        Context context = null;
-        try {
-            context = ContextUtil.obtainContext(request);
-            List<Collection> collections = panelConverter.getSubmissionConfigService()
-                                                         .getCollectionsBySubmissionConfig(context,
-                                                                                           obj.getSubmissionName());
-            DSpaceConverter<Collection, CollectionRest> cc = converter.getConverter(Collection.class);
-            List<CollectionRest> collectionsRest = collections.stream().map((collection) ->
-                    cc.convert(collection, projection)).collect(Collectors.toList());
-            sd.setCollections(collectionsRest);
-        } catch (SQLException | IllegalStateException | SubmissionConfigReaderException e) {
-            log.error(e.getMessage(), e);
-        }
         sd.setPanels(panels);
         return sd;
     }
