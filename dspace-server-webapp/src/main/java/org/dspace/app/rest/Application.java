@@ -9,7 +9,10 @@ package org.dspace.app.rest;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.ZoneOffset;
 import java.util.List;
+import java.util.TimeZone;
+import javax.annotation.PostConstruct;
 import javax.servlet.Filter;
 
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
@@ -261,5 +264,13 @@ public class Application extends SpringBootServletInitializer {
                 argumentResolvers.add(new SearchFilterResolver());
             }
         };
+    }
+
+    @PostConstruct
+    public void setDefaultTimezone() {
+        // Set the default timezone in Spring Boot to UTC.
+        // This ensures that Spring Boot doesn't attempt to change the timezone of dates that are read from the
+        // database (via Hibernate). We store all dates in the database as UTC.
+        TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC));
     }
 }
