@@ -7,7 +7,6 @@
  */
 package org.dspace.statistics;
 
-import static org.dspace.statistics.SolrLoggerServiceImpl.DATE_FORMAT_8601;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -19,9 +18,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Date;
+import java.time.Instant;
 
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -161,25 +159,25 @@ public class SolrLoggerServiceImplIT
         doc.setField(F_IP, NOT_BOT_IP);
         doc.setField(F_DNS, NOT_BOT_DNS);
         doc.setField(F_AGENT, NOT_BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         client.add(doc);
 
         doc.setField(F_IP, BOT_IP);
         doc.setField(F_DNS, BOT_DNS);
         doc.setField(F_AGENT, NOT_BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         client.add(doc);
 
         doc.setField(F_IP, NOT_BOT_IP);
         doc.setField(F_DNS, NOT_BOT_DNS);
         doc.setField(F_AGENT, BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         client.add(doc);
 
         doc.setField(F_IP, BOT_IP);
         doc.setField(F_DNS, BOT_DNS);
         doc.setField(F_AGENT, BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         client.add(doc);
 
         client.commit(true, true);
@@ -259,28 +257,28 @@ public class SolrLoggerServiceImplIT
         doc.setField(F_IP, NOT_BOT_IP);
         doc.setField(F_DNS, NOT_BOT_DNS);
         doc.setField(F_AGENT, NOT_BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         doc.setField(F_IS_BOT, Boolean.FALSE.toString());
         client.add(doc);
 
         doc.setField(F_IP, BOT_IP);
         doc.setField(F_DNS, BOT_DNS);
         doc.setField(F_AGENT, NOT_BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         doc.setField(F_IS_BOT, Boolean.TRUE.toString());
         client.add(doc);
 
         doc.setField(F_IP, NOT_BOT_IP);
         doc.setField(F_DNS, NOT_BOT_DNS);
         doc.setField(F_AGENT, BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         doc.setField(F_IS_BOT, Boolean.TRUE.toString());
         client.add(doc);
 
         doc.setField(F_IP, BOT_IP);
         doc.setField(F_DNS, BOT_DNS);
         doc.setField(F_AGENT, BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         doc.setField(F_IS_BOT, Boolean.TRUE.toString());
         client.add(doc);
 

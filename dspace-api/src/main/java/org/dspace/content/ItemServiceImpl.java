@@ -10,9 +10,9 @@ package org.dspace.content;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -415,20 +415,20 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
+    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Instant since)
         throws SQLException {
         return itemDAO.findAll(context, true, true, true, since);
     }
 
     @Override
-    public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
+    public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Instant since)
         throws SQLException {
         return itemDAO.findAll(context, true, true, false, since);
     }
 
     @Override
     public void updateLastModified(Context context, Item item) throws SQLException, AuthorizeException {
-        item.setLastModified(new Date());
+        item.setLastModified(Instant.now());
         update(context, item);
         //Also fire a modified event since the item HAS been modified
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(), null, getIdentifiers(context, item)));
@@ -594,7 +594,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public void removeDSpaceLicense(Context context, Item item) throws SQLException, AuthorizeException, IOException {
         // get all bundles with name "LICENSE" (these are the DSpace license
         // bundles)
-        List<Bundle> bunds = getBundles(item, "LICENSE");
+        List<Bundle> bunds = getBundles(item, Constants.LICENSE_BUNDLE_NAME);
 
         for (Bundle bund : bunds) {
             // FIXME: probably serious troubles with Authorizations
@@ -681,7 +681,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         if (item.isMetadataModified() || item.isModified()) {
             // Set the last modified date
-            item.setLastModified(new Date());
+            item.setLastModified(Instant.now());
 
             itemDAO.save(context, item);
 
@@ -1694,7 +1694,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public Iterator<Item> findByLastModifiedSince(Context context, Date last)
+    public Iterator<Item> findByLastModifiedSince(Context context, Instant last)
         throws SQLException {
         return itemDAO.findByLastModifiedSince(context, last);
     }

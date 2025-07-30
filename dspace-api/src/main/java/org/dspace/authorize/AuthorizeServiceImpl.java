@@ -9,11 +9,12 @@ package org.dspace.authorize;
 
 import static org.dspace.app.util.AuthorizeUtil.canCollectionAdminManageAccounts;
 import static org.dspace.app.util.AuthorizeUtil.canCommunityAdminManageAccounts;
+import static org.dspace.discovery.SearchUtils.RESOURCE_TYPE_FIELD;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -662,7 +663,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson,
                                                int type, String rpType, String rpName, String rpDescription,
-                                               Date startDate, Date endDate) throws SQLException, AuthorizeException {
+                                               LocalDate startDate, LocalDate endDate)
+        throws SQLException, AuthorizeException {
         if (group == null && eperson == null) {
             throw new IllegalArgumentException(
                 "We need at least an eperson or a group in order to create a resource policy.");
@@ -684,7 +686,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public ResourcePolicy createOrModifyPolicy(ResourcePolicy policy, Context context, String name, Group group,
                                                EPerson ePerson,
-                                               Date embargoDate, int action, String reason, DSpaceObject dso)
+                                               LocalDate embargoDate, int action, String reason, DSpaceObject dso)
         throws AuthorizeException, SQLException {
         ResourcePolicy policyTemp = null;
         if (policy != null) {
@@ -736,7 +738,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      */
     @Override
     public boolean isCommunityAdmin(Context context) throws SQLException {
-        return performCheck(context, "search.resourcetype:" + IndexableCommunity.TYPE);
+        return performCheck(context, RESOURCE_TYPE_FIELD + ":" + IndexableCommunity.TYPE);
     }
 
     /**
@@ -749,7 +751,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      */
     @Override
     public boolean isCollectionAdmin(Context context) throws SQLException {
-        return performCheck(context, "search.resourcetype:" + IndexableCollection.TYPE);
+        return performCheck(context, RESOURCE_TYPE_FIELD + ":" + IndexableCollection.TYPE);
     }
 
     /**
@@ -762,7 +764,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      */
     @Override
     public boolean isItemAdmin(Context context) throws SQLException {
-        return performCheck(context, "search.resourcetype:" + IndexableItem.TYPE);
+        return performCheck(context, RESOURCE_TYPE_FIELD + ":" + IndexableItem.TYPE);
     }
 
     /**
@@ -776,8 +778,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public boolean isComColAdmin(Context context) throws SQLException {
         return performCheck(context,
-            "(search.resourcetype:" + IndexableCommunity.TYPE + " OR search.resourcetype:" +
-                IndexableCollection.TYPE + ")");
+            "(" + RESOURCE_TYPE_FIELD + ":" + IndexableCommunity.TYPE + " OR " +
+            RESOURCE_TYPE_FIELD + ":" + IndexableCollection.TYPE + ")");
     }
 
     /**
@@ -795,7 +797,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         throws SearchServiceException, SQLException {
         List<Community> communities = new ArrayList<>();
         query = formatCustomQuery(query);
-        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
+        DiscoverResult discoverResult = getDiscoverResult(context, query + RESOURCE_TYPE_FIELD + ":" +
                                                               IndexableCommunity.TYPE,
             offset, limit, null, null);
         for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
@@ -817,9 +819,9 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     public long countAdminAuthorizedCommunity(Context context, String query)
         throws SearchServiceException, SQLException {
         query = formatCustomQuery(query);
-        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
+        DiscoverResult discoverResult = getDiscoverResult(context, query + RESOURCE_TYPE_FIELD + ":" +
                                                               IndexableCommunity.TYPE,
-            null, null, null, null);
+            null, 0, null, null);
         return discoverResult.getTotalSearchResults();
     }
 
@@ -842,7 +844,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         }
 
         query = formatCustomQuery(query);
-        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
+        DiscoverResult discoverResult = getDiscoverResult(context, query + RESOURCE_TYPE_FIELD + ":" +
                                                               IndexableCollection.TYPE,
             offset, limit, CollectionService.SOLR_SORT_FIELD, SORT_ORDER.asc);
         for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
@@ -864,9 +866,9 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     public long countAdminAuthorizedCollection(Context context, String query)
         throws SearchServiceException, SQLException {
         query = formatCustomQuery(query);
-        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
+        DiscoverResult discoverResult = getDiscoverResult(context, query + RESOURCE_TYPE_FIELD + ":" +
                                                               IndexableCollection.TYPE,
-            null, null, null, null);
+            null, 0, null, null);
         return discoverResult.getTotalSearchResults();
     }
 

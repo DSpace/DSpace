@@ -21,7 +21,6 @@ import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jakarta.el.MethodNotFoundException;
 import jakarta.ws.rs.BadRequestException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -99,17 +98,17 @@ public class ScieloImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for Scielo");
+        throw new UnsupportedOperationException("This method is not implemented for Scielo");
     }
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for Scielo");
+        throw new UnsupportedOperationException("This method is not implemented for Scielo");
     }
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for Scielo");
+        throw new UnsupportedOperationException("This method is not implemented for Scielo");
     }
 
     /**

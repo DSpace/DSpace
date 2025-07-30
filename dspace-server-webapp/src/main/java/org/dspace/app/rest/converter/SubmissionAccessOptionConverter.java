@@ -8,7 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import java.text.ParseException;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.AccessConditionOptionRest;
@@ -43,8 +43,8 @@ public class SubmissionAccessOptionConverter
             optionRest.setHasEndDate(option.getHasEndDate());
             if (StringUtils.isNotBlank(option.getStartDateLimit())) {
                 try {
-                    Date requested = dateMathParser.parseMath(option.getStartDateLimit());
-                    optionRest.setMaxStartDate(TimeHelpers.toMidnightUTC(requested));
+                    LocalDateTime requested = dateMathParser.parseMath(option.getStartDateLimit());
+                    optionRest.setMaxStartDate(TimeHelpers.toMidnightUTC(requested).toLocalDate());
                 } catch (ParseException e) {
                     throw new IllegalStateException("Wrong start date limit configuration for the access condition "
                             + "option named  " + option.getName());
@@ -52,8 +52,8 @@ public class SubmissionAccessOptionConverter
             }
             if (StringUtils.isNotBlank(option.getEndDateLimit())) {
                 try {
-                    Date requested = dateMathParser.parseMath(option.getEndDateLimit());
-                    optionRest.setMaxEndDate(TimeHelpers.toMidnightUTC(requested));
+                    LocalDateTime requested = dateMathParser.parseMath(option.getEndDateLimit());
+                    optionRest.setMaxEndDate(TimeHelpers.toMidnightUTC(requested).toLocalDate());
                 } catch (ParseException e) {
                     throw new IllegalStateException("Wrong end date limit configuration for the access condition "
                             + "option named  " + option.getName());

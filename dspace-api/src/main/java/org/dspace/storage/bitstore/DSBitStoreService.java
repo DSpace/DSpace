@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -249,7 +250,15 @@ public class DSBitStoreService extends BaseBitStoreService {
             log.debug("Local filename for " + sInternalId + " is "
                           + bufFilename.toString());
         }
-        return new File(bufFilename.toString());
+        File bitstreamFile = new File(bufFilename.toString());
+        Path normalizedPath = bitstreamFile.toPath().normalize();
+        if (!normalizedPath.startsWith(baseDir.getAbsolutePath())) {
+            log.error("Bitstream path outside of assetstore root requested:" +
+                    "bitstream={}, path={}, assetstore={}",
+                    bitstream.getID(), normalizedPath, baseDir.getAbsolutePath());
+            throw new IOException("Illegal bitstream path constructed");
+        }
+        return bitstreamFile;
     }
 
     public boolean isRegisteredBitstream(String internalId) {
