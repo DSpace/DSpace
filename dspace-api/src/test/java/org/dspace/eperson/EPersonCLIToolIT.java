@@ -7,14 +7,17 @@
  */
 package org.dspace.eperson;
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErr;
+import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
 import com.ginsberg.junit.exit.SystemExitPreventedException;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.util.FakeConsoleServiceImpl;
 import org.junit.jupiter.api.Test;
-
-import static com.github.stefanbirkner.systemlambda.SystemLambda.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *

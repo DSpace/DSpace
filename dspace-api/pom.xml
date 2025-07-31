@@ -762,7 +762,7 @@
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>5.12.1</version>
+            <version>5.12.0</version>
             <exclusions>
                 <!-- The opencsv library was transitively pulling in junit-vintage-engine (which includes JUnit 4),
                  causing a conflict with JUnit 5 (the version used by Spring Boot 3.x).

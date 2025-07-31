@@ -8,7 +8,6 @@
 package org.dspace.example;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.example.impl.ExampleImpl;

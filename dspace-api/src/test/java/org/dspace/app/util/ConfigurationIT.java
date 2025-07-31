@@ -8,10 +8,14 @@
 
 package org.dspace.app.util;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Arrays;
 
 import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
 import com.ginsberg.junit.exit.SystemExitPreventedException;
@@ -20,8 +24,6 @@ import org.dspace.services.ConfigurationService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
 
 /**
  * Tests for configuration utilities.
