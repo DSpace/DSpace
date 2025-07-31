@@ -80,7 +80,15 @@ public class DSpaceObjectDeletionProcess
      */
     private void parseCommandLineOptions() {
         this.id = commandLine.getOptionValue('i');
-        this.copyVirtualMetadata = commandLine.hasOption('c') ? commandLine.getOptionValues('c') : new String[0];
+        this.copyVirtualMetadata = commandLine.hasOption('c') ? parseCopyVirtualMetadataOption() : new String[0];
+    }
+
+    private String[] parseCopyVirtualMetadataOption() {
+        String value = commandLine.getOptionValue('c');
+        if (value.contains(",")) {
+            return value.split(",");
+        }
+        return new String[] { value };
     }
 
     @Override
