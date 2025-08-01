@@ -20,13 +20,13 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
 import org.dspace.app.rest.submit.SubmissionService;
-import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.MetadataAuthorityService;
@@ -67,10 +67,11 @@ public class UploadValidation extends AbstractValidation {
                          + config.getId());
         }
         if (itemService.hasUploadedFiles(obj.getItem())) {
-            List<Bitstream> bitstreams =
-                    itemService.getNonInternalBitstreams(ContextUtil.obtainCurrentRequestContext(), obj.getItem());
-            for (Bitstream bitstream : bitstreams) {
-                errors.addAll(metadataValidate(bitstream, config, uploadConfig));
+            List<Bundle> bundles = itemService.getBundles(obj.getItem(), "ORIGINAL");
+            for (Bundle bundle : bundles) {
+                for (Bitstream bitstream : bundle.getBitstreams()) {
+                    errors.addAll(metadataValidate(bitstream, config, uploadConfig));
+                }
             }
         }
         return errors;
