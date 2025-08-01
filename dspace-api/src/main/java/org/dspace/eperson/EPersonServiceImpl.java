@@ -46,7 +46,9 @@ import org.dspace.eperson.dao.EPersonDAO;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.event.EventDetail;
 import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.qaevent.dao.QAEventsDAO;
 import org.dspace.services.ConfigurationService;
@@ -477,7 +479,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                 throw new EPersonDeletionException(constraintList);
             }
         }
-        context.addEvent(new Event(Event.DELETE, Constants.EPERSON, ePerson.getID(), ePerson.getEmail(),
+        context.addEvent(new Event(Event.DELETE, Constants.EPERSON, ePerson.getID(),
+            new EventDetail(DetailType.EPERSON_EMAIL, ePerson.getEmail()),
                 getIdentifiers(context, ePerson)));
 
         // XXX FIXME: This sidesteps the object model code so it won't
