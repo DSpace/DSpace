@@ -178,7 +178,7 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
     @Override
     public int countWithNoPolicy(Context context) throws SQLException {
         Query query = createQuery(context,
-                                  "SELECT count(bit.id) from Bitstream bit where bit.deleted<>true and bit.id not in" +
+                                  "SELECT count(bit.id) from Bitstream bit where bit.deleted<>true and bit not in" +
                                       " (select res.dSpaceObject from ResourcePolicy res where res.resourceTypeId = " +
                                       ":typeId )");
         query.setParameter("typeId", Constants.BITSTREAM);
