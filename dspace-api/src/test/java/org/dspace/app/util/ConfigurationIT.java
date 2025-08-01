@@ -8,22 +8,22 @@
 
 package org.dspace.app.util;
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Arrays;
+
+import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
+import com.ginsberg.junit.exit.SystemExitPreventedException;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.Assertion;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for configuration utilities.
@@ -43,7 +43,7 @@ public class ConfigurationIT
     private static final String SINGLE_VALUE = "value";
 
     private static final String ARRAY_PROPERTY = "test.array";
-    private static final String[] ARRAY_VALUE = { "one", "two" };
+    private static final String[] ARRAY_VALUE = {"one", "two"};
 
     private static final String PLACEHOLDER_PROPERTY = "test.substituted";
     private static final String PLACEHOLDER_VALUE = "insert ${test.single} here"; // Keep aligned with SINGLE_NAME
@@ -51,22 +51,11 @@ public class ConfigurationIT
 
     private static final String MISSING_PROPERTY = "test.missing";
 
-    /** Capture standard output. */
-    @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule();
-
-    /** Capture standard error. */
-    @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule();
-
-    /** Capture System.exit() value. */
-    @Rule
-    public final ExpectedSystemExit expectedSystemExit = ExpectedSystemExit.none();
 
     /**
      * Create some expected properties before all tests.
      */
-    @BeforeClass
+    @BeforeAll
     public static void setupSuite() {
         cfg = kernelImpl.getConfigurationService();
 
@@ -79,7 +68,7 @@ public class ConfigurationIT
     /**
      * After all tests, remove the properties that were created at entry.
      */
-    @AfterClass
+    @AfterAll
     public static void teardownSuite() {
         if (null != cfg) {
             cfg.setProperty(SINGLE_PROPERTY, null);
@@ -92,56 +81,44 @@ public class ConfigurationIT
      * Test fetching all values of a single-valued property.
      */
     @Test
-    public void testMainAllSingle() {
+    @ExpectSystemExitWithStatus(0)
+    public void testMainAllSingle() throws Exception {
         String[] argv;
-        argv = new String[] {
-            "--property", SINGLE_PROPERTY
+        argv = new String[]{
+                "--property", SINGLE_PROPERTY
         };
-        expectedSystemExit.expectSystemExitWithStatus(0);
-        expectedSystemExit.checkAssertionAfterwards(new Assertion() {
-            @Override public void checkAssertion() {
-                String[] output = systemOutRule.getLogWithNormalizedLineSeparator()
-                        .split("\n");
-                assertThat(output, arrayWithSize(1));
+
+        String output = tapSystemOut(() -> {
+            try {
+                Configuration.main(argv);
+            } catch (SystemExitPreventedException ignored) {
+                // Ignore the exception raised by the agent
             }
         });
-        expectedSystemExit.checkAssertionAfterwards(new Assertion() {
-            @Override public void checkAssertion() {
-                String[] output = systemOutRule.getLogWithNormalizedLineSeparator()
-                        .split("\n");
-                assertThat(output[0], equalTo(SINGLE_VALUE));
-            }
-        });
-        systemOutRule.enableLog();
-        Configuration.main(argv);
+        System.out.println("### output2");
+        String[] outputLines = parseOutputLines(output);
+        assertThat(outputLines, arrayWithSize(1));
+        assertEquals(SINGLE_VALUE, outputLines[0], "--first should return only value");
+        System.out.println("### output: " + Arrays.toString(outputLines));
+
     }
 
-    /**
-     * Test fetching all values of an array property.
-     */
     @Test
-    public void testMainAllArray() {
-        String[] argv;
-        argv = new String[] {
-            "--property", ARRAY_PROPERTY
+    @ExpectSystemExitWithStatus(0)
+    public void testMainAllArray() throws Exception {
+        String[] argv = new String[] {
+                "--property", ARRAY_PROPERTY
         };
-        expectedSystemExit.expectSystemExitWithStatus(0);
-        expectedSystemExit.checkAssertionAfterwards(new Assertion() {
-            @Override public void checkAssertion() {
-                String[] output = systemOutRule.getLogWithNormalizedLineSeparator()
-                        .split("\n");
-                assertThat(output, arrayWithSize(ARRAY_VALUE.length));
+        String output = tapSystemOut(() -> {
+            try {
+                Configuration.main(argv);
+            } catch (SystemExitPreventedException ignored) {
+                // Ignore the exception raised by the agent
             }
         });
-        expectedSystemExit.checkAssertionAfterwards(new Assertion() {
-            @Override public void checkAssertion() {
-                String[] output = systemOutRule.getLogWithNormalizedLineSeparator()
-                        .split("\n");
-                assertThat(output, arrayContainingInAnyOrder(ARRAY_VALUE));
-            }
-        });
-        systemOutRule.enableLog();
-        Configuration.main(argv);
+        String[] outputLines = parseOutputLines(output);
+        assertThat(outputLines, arrayWithSize(ARRAY_VALUE.length));
+        assertThat(outputLines, arrayContainingInAnyOrder(ARRAY_VALUE));
     }
 
     /**
@@ -149,28 +126,21 @@ public class ConfigurationIT
      * placeholders.
      */
     @Test
-    public void testMainAllSubstitution() {
-        String[] argv;
-        argv = new String[] {
-            "--property", PLACEHOLDER_PROPERTY
+    @ExpectSystemExitWithStatus(0)
+    public void testMainAllSubstitution() throws Exception {
+        String[] argv = new String[] {
+                "--property", PLACEHOLDER_PROPERTY
         };
-        expectedSystemExit.expectSystemExitWithStatus(0);
-        expectedSystemExit.checkAssertionAfterwards(new Assertion() {
-            @Override public void checkAssertion() {
-                String[] output = systemOutRule.getLogWithNormalizedLineSeparator()
-                        .split("\n");
-                assertThat(output, arrayWithSize(1));
+        String output = tapSystemOut(() -> {
+            try {
+                Configuration.main(argv);
+            } catch (SystemExitPreventedException ignored) {
+                // Ignore the exception raised by the agent
             }
         });
-        expectedSystemExit.checkAssertionAfterwards(new Assertion() {
-            @Override public void checkAssertion() {
-                String[] output = systemOutRule.getLogWithNormalizedLineSeparator()
-                        .split("\n");
-                assertThat(output[0], equalTo(SUBSTITUTED_VALUE));
-            }
-        });
-        systemOutRule.enableLog();
-        Configuration.main(argv);
+        String[] outputLines = parseOutputLines(output);
+        assertThat(outputLines, arrayWithSize(1));
+        assertThat(outputLines[0], equalTo(SUBSTITUTED_VALUE));
     }
 
     /**
@@ -178,91 +148,94 @@ public class ConfigurationIT
      * placeholders, suppressing property substitution.
      */
     @Test
-    public void testMainAllRaw() {
-        // Can it handle a raw property (with substitution placeholders)?
-        String[] argv;
-        argv = new String[] {
-            "--property", PLACEHOLDER_PROPERTY,
-            "--raw"
+    @ExpectSystemExitWithStatus(0)
+    public void testMainAllRaw() throws Exception {
+        String[] argv = new String[] {
+                "--property", PLACEHOLDER_PROPERTY,
+                "--raw"
         };
-        expectedSystemExit.expectSystemExitWithStatus(0);
-        expectedSystemExit.checkAssertionAfterwards(new Assertion() {
-            @Override public void checkAssertion() {
-                String[] output = systemOutRule.getLogWithNormalizedLineSeparator()
-                        .split("\n");
-                assertThat(output, arrayWithSize(1));
+        String output = tapSystemOut(() -> {
+            try {
+                Configuration.main(argv);
+            } catch (SystemExitPreventedException ignored) {
+                // Ignore the exception raised by the agent
             }
         });
-        expectedSystemExit.checkAssertionAfterwards(new Assertion() {
-            @Override public void checkAssertion() {
-                String[] output = systemOutRule.getLogWithNormalizedLineSeparator()
-                        .split("\n");
-                assertThat(output[0], equalTo(PLACEHOLDER_VALUE));
-            }
-        });
-        systemOutRule.enableLog();
-        Configuration.main(argv);
+        String[] outputLines = parseOutputLines(output);
+        assertThat(outputLines, arrayWithSize(1));
+        assertThat(outputLines[0], equalTo(PLACEHOLDER_VALUE));
     }
 
     /**
      * Test fetching all values of an undefined property.
      */
     @Test
-    public void testMainAllUndefined() {
-        // Can it handle an undefined property?
-        String[] argv;
-        argv = new String[] {
-            "--property", MISSING_PROPERTY
+    @ExpectSystemExitWithStatus(0)
+    public void testMainAllUndefined() throws Exception {
+        String[] argv = new String[] {
+                "--property", MISSING_PROPERTY
         };
-        expectedSystemExit.expectSystemExitWithStatus(0);
-        expectedSystemExit.checkAssertionAfterwards(new Assertion() {
-            @Override public void checkAssertion() {
-                String outputs = systemOutRule.getLogWithNormalizedLineSeparator();
-                String[] output = outputs.split("\n");
-                assertThat(output, arrayWithSize(0)); // Huh?  Shouldn't split() return { "" } ?
+        String output = tapSystemOut(() -> {
+            try {
+                Configuration.main(argv);
+            } catch (SystemExitPreventedException ignored) {
+                // Ignore the exception raised by the agent
             }
         });
-        systemOutRule.enableLog();
-        Configuration.main(argv);
+        String[] outputLines = parseOutputLines(output);
+        assertThat(outputLines, arrayWithSize(0));
     }
 
     /**
      * Test fetching only the first value of an array property.
      */
     @Test
-    public void testMainFirstArray() {
+    @ExpectSystemExitWithStatus(0)
+    public void testMainFirstArray() throws Exception {
         String[] argv = new String[] {
-            "--property", ARRAY_PROPERTY,
-            "--first"
+                "--property", ARRAY_PROPERTY,
+                "--first"
         };
-        expectedSystemExit.expectSystemExitWithStatus(0);
-        expectedSystemExit.checkAssertionAfterwards(() -> {
-            String outputs = systemOutRule.getLogWithNormalizedLineSeparator();
-            String[] output = outputs.split("\n");
-            assertThat(output, arrayWithSize(1));
-            assertEquals("--first should return first value", output[0], ARRAY_VALUE[0]);
+        String output = tapSystemOut(() -> {
+            try {
+                Configuration.main(argv);
+            } catch (SystemExitPreventedException ignored) {
+                // Ignore the exception raised by the agent
+            }
         });
-        systemOutRule.enableLog();
-        Configuration.main(argv);
+        String[] outputLines = parseOutputLines(output);
+        assertThat(outputLines, arrayWithSize(1));
+        assertThat(outputLines[0], equalTo(ARRAY_VALUE[0]));
     }
 
     /**
      * Test fetching a single-valued property using {@code --first}
      */
     @Test
-    public void testMainFirstSingle() {
+    @ExpectSystemExitWithStatus(0)
+    public void testMainFirstSingle() throws Exception {
         String[] argv = new String[] {
-            "--property", SINGLE_PROPERTY,
-            "--first"
+                "--property", SINGLE_PROPERTY,
+                "--first"
         };
-        expectedSystemExit.expectSystemExitWithStatus(0);
-        expectedSystemExit.checkAssertionAfterwards(() -> {
-            String outputs = systemOutRule.getLogWithNormalizedLineSeparator();
-            String[] output = outputs.split("\n");
-            assertThat(output, arrayWithSize(1));
-            assertEquals("--first should return only value", output[0], SINGLE_VALUE);
+        String output = tapSystemOut(() -> {
+            try {
+                Configuration.main(argv);
+            } catch (SystemExitPreventedException ignored) {
+                // Ignore the exception raised by the agent
+            }
         });
-        systemOutRule.enableLog();
-        Configuration.main(argv);
+        String[] outputLines = parseOutputLines(output);
+        assertThat(outputLines, arrayWithSize(1));
+        assertEquals(SINGLE_VALUE, outputLines[0], "--first should return only value");
+    }
+
+
+    private String[] parseOutputLines(String output) {
+        String trimmedOutput = output.trim();
+        if (trimmedOutput.isEmpty()) {
+            return new String[0];
+        }
+        return trimmedOutput.split("\n");
     }
 }

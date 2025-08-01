@@ -7,7 +7,7 @@
  */
 package org.dspace.app.requestitem;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -27,11 +27,11 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -48,7 +48,7 @@ public class RequestItemHelpdeskStrategyTest
 
     private Item item;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass()
             throws SQLException {
         AbstractBuilder.init(); // AbstractUnitTest doesn't do this for us.
@@ -66,14 +66,14 @@ public class RequestItemHelpdeskStrategyTest
         ctx.complete();
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
         // AbstractUnitTest doesn't do this for us.
         AbstractBuilder.cleanupObjects();
         AbstractBuilder.destroy();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         context = new Context();
         context.setCurrentUser(johnDoe);
@@ -101,19 +101,19 @@ public class RequestItemHelpdeskStrategyTest
         configurationService.setProperty(RequestItemHelpdeskStrategy.P_HELPDESK_OVERRIDE, "true");
         configurationService.setProperty(RequestItemHelpdeskStrategy.P_MAIL_HELPDESK, HELPDESK_ADDRESS);
         List<RequestItemAuthor> authors = instance.getRequestItemAuthor(context, item);
-        assertEquals("Wrong author address", HELPDESK_ADDRESS, authors.get(0).getEmail());
+        assertEquals(HELPDESK_ADDRESS, authors.get(0).getEmail(), "Wrong author address");
 
         // Check with help desk disabled.
         configurationService.setProperty(RequestItemHelpdeskStrategy.P_HELPDESK_OVERRIDE, "false");
         authors = instance.getRequestItemAuthor(context, item);
-        assertEquals("Wrong author address", AUTHOR_ADDRESS, authors.get(0).getEmail());
+        assertEquals(AUTHOR_ADDRESS, authors.get(0).getEmail(), "Wrong author address");
     }
 
     /**
      * Test of getHelpDeskPerson method, of class RequestItemHelpdeskStrategy.
      * @throws java.lang.Exception passed through.
      */
-    @Ignore
+    @Disabled
     @Test
     public void testGetHelpDeskPerson() throws Exception {
     }

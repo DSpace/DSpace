@@ -32,8 +32,8 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.WorkflowItem;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -59,7 +59,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
     private AuthorizationFeature reinstateFeature;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         reinstateFeature = authorizationFeatureService.find(ReinstateFeature.NAME);

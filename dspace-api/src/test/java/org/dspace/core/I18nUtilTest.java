@@ -8,38 +8,38 @@
 
 package org.dspace.core;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Locale;
 
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mwood
  */
 public class I18nUtilTest extends AbstractDSpaceTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -138,19 +138,18 @@ public class I18nUtilTest extends AbstractDSpaceTest {
         configService.setProperty("default.locale", "en_US.UTF-8");
 
         // Assert our overridden default.locale is set in I18nUtil
-        assertEquals("Default locale", new Locale("en", "US", "UTF-8"), I18nUtil.getDefaultLocale());
+        assertEquals(new Locale("en", "US", "UTF-8"), I18nUtil.getDefaultLocale(), "Default locale");
 
         // Test for a stock key (in Messages.properties)
         String key = "metadata.dc.title";
         String expResult = "Title";
         String result = I18nUtil.getMessage(key);
-        assertEquals("Returns the translation of the key if it is defined",
-                     expResult, result);
+        assertEquals(expResult, result, "Returns the translation of the key if it is defined");
 
         // Test for a missing key
         key = expResult = "bogus key";
         result = I18nUtil.getMessage(key);
-        assertEquals("Returns the key if it is not defined", expResult, result);
+        assertEquals(expResult, result, "Returns the key if it is not defined");
     }
 
     /**
@@ -165,13 +164,12 @@ public class I18nUtilTest extends AbstractDSpaceTest {
         String key = "metadata.dc.title";
         String expResult = "Title";
         String result = I18nUtil.getMessage(key, locale);
-        assertEquals("Returns the translation of the key if it is defined",
-                     expResult, result);
+        assertEquals(expResult, result, "Returns the translation of the key if it is defined");
 
         // Test for a missing key
         key = expResult = "bogus key";
         result = I18nUtil.getMessage(key, locale);
-        assertEquals("Returns the key if it is not defined", expResult, result);
+        assertEquals(expResult, result, "Returns the key if it is not defined");
     }
 
     /**

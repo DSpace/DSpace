@@ -7,20 +7,20 @@
  */
 package org.dspace.content.crosswalk;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom2.Namespace;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -50,7 +50,7 @@ public class QDCCrosswalkTest
 
     private static PluginService pluginService;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         DSpaceServicesFactory dsf = DSpaceServicesFactory.getInstance();
 
@@ -70,17 +70,17 @@ public class QDCCrosswalkTest
         cfg.setProperty(PROPERTIES_KEY, PROPERTIES);
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // make sure that the config properties set in @BeforeClass are picked up
         QDCCrosswalk.initStatic();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -90,8 +90,8 @@ public class QDCCrosswalkTest
     @Test
     public void testGetPluginNames() {
         String[] names = QDCCrosswalk.getPluginNames();
-        assertEquals("Wrong number of plugin names.", 1, names.length);
-        assertEquals("Plugin should be named '" + PLUGIN_NAME + "'.", PLUGIN_NAME, names[0]);
+        assertEquals(1, names.length, "Wrong number of plugin names.");
+        assertEquals(PLUGIN_NAME, names[0], "Plugin should be named '" + PLUGIN_NAME + "'.");
     }
 
     /**
@@ -106,7 +106,7 @@ public class QDCCrosswalkTest
         for (Namespace namespace : namespaces) {
             found_prefix |= namespace.getPrefix().equals(NAMESPACE_PREFIX);
         }
-        assertTrue("Should know namespace " + NAMESPACE_PREFIX + '.', found_prefix);
+        assertTrue(found_prefix, "Should know namespace " + NAMESPACE_PREFIX + '.');
     }
 
     /**
@@ -118,14 +118,14 @@ public class QDCCrosswalkTest
                 IngestionCrosswalk.class, PLUGIN_NAME);
         String schemaLocation = instance.getSchemaLocation();
         System.out.println(schemaLocation);
-        assertEquals("SchemaLocation did not match.", SCHEMALOCATION, schemaLocation);
+        assertEquals(SCHEMALOCATION, schemaLocation, "SchemaLocation did not match.");
     }
 
     /**
      * Test of disseminateList method, of class QDCCrosswalk.
      * @throws java.lang.Exception passed through.
      */
-    @Ignore
+    @Disabled
     @Test
     public void testDisseminateList() throws Exception {
     }
@@ -134,7 +134,7 @@ public class QDCCrosswalkTest
      * Test of disseminateElement method, of class QDCCrosswalk.
      * @throws java.lang.Exception passed through.
      */
-    @Ignore
+    @Disabled
     @Test
     public void testDisseminateElement() throws Exception {
     }
@@ -142,7 +142,7 @@ public class QDCCrosswalkTest
     /**
      * Test of canDisseminate method, of class QDCCrosswalk.
      */
-    @Ignore
+    @Disabled
     @Test
     public void testCanDisseminate() {
     }
@@ -151,7 +151,7 @@ public class QDCCrosswalkTest
      * Test of ingest method, of class QDCCrosswalk.
      * @throws java.lang.Exception passed through.
      */
-    @Ignore
+    @Disabled
     @Test
     public void testIngest_4args_1() throws Exception {
     }
@@ -160,7 +160,7 @@ public class QDCCrosswalkTest
      * Test of ingest method, of class QDCCrosswalk.
      * @throws java.lang.Exception passed through.
      */
-    @Ignore
+    @Disabled
     @Test
     public void testIngest_4args_2() throws Exception {
     }
@@ -172,6 +172,6 @@ public class QDCCrosswalkTest
     public void testPreferList() {
         QDCCrosswalk instance = (QDCCrosswalk) pluginService.getNamedPlugin(
                 IngestionCrosswalk.class, PLUGIN_NAME);
-        assertTrue("QDC crosswalk should prefer list.", instance.preferList());
+        assertTrue(instance.preferList(), "QDC crosswalk should prefer list.");
     }
 }

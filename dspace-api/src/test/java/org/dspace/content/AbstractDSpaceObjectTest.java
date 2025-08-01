@@ -13,7 +13,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.SQLException;
 
@@ -35,8 +36,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -75,7 +76,7 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         dspaceObject = null;
@@ -215,22 +216,24 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
     /**
      * Test of getAdminObject method, of class DSpaceObject.
      */
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetAdminObjectwithException() throws SQLException {
+    @Test
+    public void testGetAdminObjectwithException() {
+        assertThrows(IllegalArgumentException.class, () -> {
 
-        if (this.dspaceObject instanceof Bundle
-            || this.dspaceObject instanceof Community
-            || this.dspaceObject instanceof Collection
-            || this.dspaceObject instanceof Item) {
-            //the previous classes overwrite the method, we add this to pass
-            //this test
-            throw new IllegalArgumentException();
-        } else {
-            DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(
-                dspaceObject.getType());
-            dSpaceObjectService.getAdminObject(context, dspaceObject, Constants.ADMIN);
-            fail("Exception should have been thrown");
-        }
+            if (this.dspaceObject instanceof Bundle
+                || this.dspaceObject instanceof Community
+                || this.dspaceObject instanceof Collection
+                || this.dspaceObject instanceof Item) {
+                //the previous classes overwrite the method, we add this to pass
+                //this test
+                throw new IllegalArgumentException();
+            } else {
+                DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(
+                    dspaceObject.getType());
+                dSpaceObjectService.getAdminObject(context, dspaceObject, Constants.ADMIN);
+                fail("Exception should have been thrown");
+            }
+        });
     }
 
     /**

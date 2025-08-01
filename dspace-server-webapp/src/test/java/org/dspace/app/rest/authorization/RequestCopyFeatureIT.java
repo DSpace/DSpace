@@ -43,10 +43,9 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
 
 
 public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
@@ -88,7 +87,7 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
 
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
 

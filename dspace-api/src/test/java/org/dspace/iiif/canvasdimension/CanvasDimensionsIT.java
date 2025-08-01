@@ -7,7 +7,7 @@
  */
 package org.dspace.iiif.canvasdimension;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,9 +25,9 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
 
@@ -48,7 +48,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
 
         System.setOut(new PrintStream(outContent));
@@ -71,7 +71,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
         context.restoreAuthSystemState();
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         System.setOut(originalOut);

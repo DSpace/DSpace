@@ -68,9 +68,9 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.http.MediaType;
@@ -107,7 +107,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Autowired
     private ItemService itemService;
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException, AuthorizeException {
         //disable file upload mandatory
         configurationService.setProperty("webui.submit.upload.required", false);
@@ -1687,7 +1687,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         Item newItem = VersionBuilder.createVersion(context, oldItem, "create: " + newTitle).build().getItem();
-        Assert.assertNotEquals(oldItem, newItem);
+        Assertions.assertNotEquals(oldItem, newItem);
 
         // modify the new version
         itemService.replaceMetadata(

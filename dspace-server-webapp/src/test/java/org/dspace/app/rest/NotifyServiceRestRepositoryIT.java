@@ -49,9 +49,9 @@ import org.dspace.app.rest.repository.NotifyServiceRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.NotifyServiceBuilder;
 import org.dspace.builder.NotifyServiceInboundPatternBuilder;
-import org.junit.After;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -557,7 +557,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     // TODO: Test is currently ignored as the code in this test is IDENTICAL to the code in
     // "notifyServiceNameReplaceOperationTest". It's unclear WHY this should throw a 400 exception?
     @Test
-    @Ignore
+    @Disabled
     public void notifyServiceNameReplaceOperationBadRequestTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -697,7 +697,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    @Ignore
+    @Disabled
     /*
      * frabacche senseless because it's a mandatory+unique
      * entity field and also table column!
@@ -2251,7 +2251,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Override
-    @After
+    @AfterEach
     public void destroy() throws Exception {
         List<NotifyServiceEntity> notifyServiceEntities = notifyService.findAll(context);
         if (CollectionUtils.isNotEmpty(notifyServiceEntities)) {

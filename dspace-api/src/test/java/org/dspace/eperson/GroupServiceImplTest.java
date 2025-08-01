@@ -7,14 +7,16 @@
  */
 package org.dspace.eperson;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.sql.SQLException;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test integration of GroupServiceImpl.
@@ -41,13 +43,13 @@ public class GroupServiceImplTest
     }
 */
 
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         super.destroy();
@@ -94,14 +96,15 @@ public class GroupServiceImplTest
     /**
      * Test of setName method applied to a 'permanent' Group.
      */
-    @Test(expected = SQLException.class)
-    public void testSetName_permanent()
-        throws Exception {
-        System.out.println("setName on a 'permanent' Group");
-        String name = "NOTANONYMOUS";
-        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        Group group = groupService.findByName(context, Group.ANONYMOUS);
-        groupService.setName(group, name);
+    @Test
+    public void testSetName_permanent() {
+        assertThrows(SQLException.class, () -> {
+            System.out.println("setName on a 'permanent' Group");
+            String name = "NOTANONYMOUS";
+            GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+            Group group = groupService.findByName(context, Group.ANONYMOUS);
+            groupService.setName(group, name);
+        });
     }
 
     /**
@@ -401,13 +404,14 @@ public class GroupServiceImplTest
     /**
      * Test of delete method applied to a 'permanent' Group.
      */
-    @Test(expected = SQLException.class)
-    public void testDelete_permanent()
-        throws Exception {
-        System.out.println("delete on a 'permanent' Group");
-        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        Group group = groupService.findByName(context, Group.ANONYMOUS);
-        groupService.delete(context, group);
+    @Test
+    public void testDelete_permanent() {
+        assertThrows(SQLException.class, () -> {
+            System.out.println("delete on a 'permanent' Group");
+            GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+            Group group = groupService.findByName(context, Group.ANONYMOUS);
+            groupService.delete(context, group);
+        });
     }
 
     /**

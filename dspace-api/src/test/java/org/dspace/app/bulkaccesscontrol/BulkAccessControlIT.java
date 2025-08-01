@@ -74,9 +74,9 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Basic integration testing for the Bulk Access conditions Feature{@link BulkAccessControl}.
@@ -101,7 +101,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
     private SearchService searchService = SearchUtils.getSearchService();
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
 
@@ -111,7 +111,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
         tempFilePath = tempDir + "/bulk-access.json";
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         PathUtils.deleteDirectory(tempDir);

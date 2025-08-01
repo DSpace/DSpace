@@ -49,11 +49,11 @@ public class Configuration {
         Options options = new Options();
         options.addOption("p", "property", true, "name of the desired property");
         options.addOption("m", "module", true,
-                          "optional name of the module in which 'property' exists");
+                "optional name of the module in which 'property' exists");
         options.addOption("r", "raw", false,
-                          "do not do property substitution on the value");
+                "do not do property substitution on the value");
         options.addOption("f", "first", false,
-                          "display only the first value of an array property");
+                "display only the first value of an array property");
         options.addOption("?", "Get help");
         options.addOption("h", "help", false, "Get help");
 
@@ -70,11 +70,11 @@ public class Configuration {
         // Give help if asked
         if (cmd.hasOption('?') || cmd.hasOption('h')) {
             new HelpFormatter().printHelp("dsprop [options]",
-                                          "Display the value of a DSpace configuration property",
-                                          options,
-                                          "If --module is omitted, then --property gives the entire" +
-                                              " name of the property.  Otherwise the name is" +
-                                              " composed of module.property.");
+                    "Display the value of a DSpace configuration property",
+                    options,
+                    "If --module is omitted, then --property gives the entire" +
+                            " name of the property.  Otherwise the name is" +
+                            " composed of module.property.");
             System.exit(0);
         }
 
@@ -88,7 +88,7 @@ public class Configuration {
         StringBuilder propNameBuilder = new StringBuilder(1024);
         if (cmd.hasOption('m')) {
             propNameBuilder.append(cmd.getOptionValue('m'))
-                           .append('.');
+                    .append('.');
         }
         propNameBuilder.append(cmd.getOptionValue('p'));
         String propName = propNameBuilder.toString();

@@ -7,7 +7,7 @@
  */
 package org.dspace.statistics.export;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
@@ -18,17 +18,20 @@ import java.util.List;
 
 import org.dspace.core.Context;
 import org.dspace.statistics.export.dao.OpenURLTrackerDAO;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 /**
  * Class to test the FailedOpenURLTrackerServiceImpl
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class FailedOpenURLTrackerServiceImplTest {
 
     @InjectMocks
@@ -65,7 +68,7 @@ public class FailedOpenURLTrackerServiceImplTest {
 
         when(openURLTrackerDAO.findAll(context, OpenURLTracker.class)).thenReturn(trackers);
 
-        assertEquals("TestFindAll 0", trackers, openURLTrackerLoggerService.findAll(context));
+        assertEquals(trackers, openURLTrackerLoggerService.findAll(context), "TestFindAll 0");
     }
 
     /**
@@ -78,7 +81,7 @@ public class FailedOpenURLTrackerServiceImplTest {
 
         when(openURLTrackerDAO.create(any(), any())).thenReturn(tracker);
 
-        assertEquals("TestCreate 0", tracker, openURLTrackerLoggerService.create(context));
+        assertEquals(tracker, openURLTrackerLoggerService.create(context), "TestCreate 0");
     }
 
 

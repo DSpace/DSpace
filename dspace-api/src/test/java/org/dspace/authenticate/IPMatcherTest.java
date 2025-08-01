@@ -10,14 +10,15 @@
  */
 package org.dspace.authenticate;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Mark Wood
@@ -40,7 +41,7 @@ public class IPMatcherTest {
      * @throws IPMatcherException if there is an error parsing the specification (i.e. it is
      *                            somehow malformed)
      */
-    @BeforeClass
+    @BeforeAll
     static public void setUp() throws IPMatcherException {
         ip6FullMatcher = new IPMatcher(IP6_FULL_ADDRESS1);
         ip6MaskedMatcher = new IPMatcher(IP6_MASKED_ADDRESS);
@@ -49,37 +50,41 @@ public class IPMatcherTest {
     /**
      * Test method for {@link org.dspace.authenticate.IPMatcher#IPMatcher(java.lang.String)}.
      */
-    @Test(expected = IPMatcherException.class)
-    public void testIPMatcherIp6Incomplete()
-        throws IPMatcherException {
-        new IPMatcher("1234:5"); // Incomplete IPv6 address
+    @Test
+    public void testIPMatcherIp6Incomplete() {
+        assertThrows(IPMatcherException.class, () -> {
+            new IPMatcher("1234:5"); // Incomplete IPv6 address
+        }); // Incomplete IPv6 address
     }
 
     /**
      * Test method for {@link org.dspace.authenticate.IPMatcher#IPMatcher(java.lang.String)}.
      */
-    @Test(expected = IPMatcherException.class)
-    public void testIPMatcherIp6MaskOutOfRange()
-        throws IPMatcherException {
-        new IPMatcher("123::456/999"); // Mask bits out of range
+    @Test
+    public void testIPMatcherIp6MaskOutOfRange() {
+        assertThrows(IPMatcherException.class, () -> {
+            new IPMatcher("123::456/999"); // Mask bits out of range
+        }); // Mask bits out of range
     }
 
     /**
      * Test method for {@link org.dspace.authenticate.IPMatcher#IPMatcher(java.lang.String)}.
      */
-    @Test(expected = IPMatcherException.class)
-    public void testIPMatcherIp6MaskNotNumeric()
-        throws IPMatcherException {
-        new IPMatcher("123::456/abc"); // Mask is not a number
+    @Test
+    public void testIPMatcherIp6MaskNotNumeric() {
+        assertThrows(IPMatcherException.class, () -> {
+            new IPMatcher("123::456/abc"); // Mask is not a number
+        }); // Mask is not a number
     }
 
     /**
      * Test method for {@link org.dspace.authenticate.IPMatcher#IPMatcher(java.lang.String)}.
      */
-    @Test(expected = IPMatcherException.class)
-    public void testIPMatcherIp6TooManySlashes()
-        throws IPMatcherException {
-        new IPMatcher("123::456/12/12"); // Too many slashes
+    @Test
+    public void testIPMatcherIp6TooManySlashes() {
+        assertThrows(IPMatcherException.class, () -> {
+            new IPMatcher("123::456/12/12"); // Too many slashes
+        }); // Too many slashes
     }
 
     /**
@@ -89,8 +94,8 @@ public class IPMatcherTest {
     @Test
     public void testIp6FullMatch()
         throws IPMatcherException {
-        assertTrue("IPv6 full match fails", ip6FullMatcher
-            .match(IP6_FULL_ADDRESS1));
+        assertTrue(ip6FullMatcher
+            .match(IP6_FULL_ADDRESS1), "IPv6 full match fails");
     }
 
     /**
@@ -100,8 +105,8 @@ public class IPMatcherTest {
     @Test
     public void testIp6MisMatch()
         throws IPMatcherException {
-        assertFalse("IPv6 full nonmatch succeeds", ip6FullMatcher
-            .match(IP6_FULL_ADDRESS2));
+        assertFalse(ip6FullMatcher
+            .match(IP6_FULL_ADDRESS2), "IPv6 full nonmatch succeeds");
     }
 
     /**
@@ -111,8 +116,8 @@ public class IPMatcherTest {
     @Test
     public void testIp6MaskedMatch()
         throws IPMatcherException {
-        assertTrue("IPv6 masked match fails", ip6MaskedMatcher
-            .match(IP6_FULL_ADDRESS2));
+        assertTrue(ip6MaskedMatcher
+            .match(IP6_FULL_ADDRESS2), "IPv6 masked match fails");
     }
 
     @Test
@@ -326,7 +331,7 @@ public class IPMatcherTest {
     }
 
 
-    @AfterClass
+    @AfterAll
     static public void cleanup() {
         ip6FullMatcher = null;
         ip6MaskedMatcher = null;

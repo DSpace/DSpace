@@ -217,6 +217,9 @@
                              maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
                         <argLine>${test.argLine} ${surefireJacoco}</argLine>
                         <!-- tests whose name starts by Abstract will be ignored -->
+                        <includes>
+                            <include>**/*Test.java</include>
+                        </includes>
                         <excludes>
                             <exclude>**/Abstract*</exclude>
                         </excludes>
@@ -242,11 +245,14 @@
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-failsafe-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
-                        <argLine>${test.argLine} ${failsafeJacoco}</argLine>
+                        <argLine>${test.argLine} ${failsafeJacoco} -javaagent:${settings.localRepository}/com/ginsberg/junit5-system-exit/2.0.2/junit5-system-exit-2.0.2.jar</argLine>
+                        <includes>
+                            <include>**/*IT.java</include>
+                        </includes>
                         <excludes>
                             <exclude>**/Abstract*</exclude>
                         </excludes>
-                         <!-- Detailed logs in failsafe-reports/testName-output.txt instead of stdout -->
+                        <!-- Detailed logs in failsafe-reports/testName-output.txt instead of stdout -->
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <!-- Ensure full stacktrace is logged (when errors occur) -->
                         <trimStackTrace>false</trimStackTrace>
@@ -380,8 +386,8 @@
                         <failOnError>false</failOnError>
                         <detectLinks />
                         <links>
-                          <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
-                          <link>https://docs.spring.io/spring-security/site/docs/current/api/</link>
+                            <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
+                            <link>https://docs.spring.io/spring-security/site/docs/current/api/</link>
                         </links>
                     </configuration>
                 </plugin>
@@ -1252,39 +1258,23 @@
                 <artifactId>spring-expression</artifactId>
                 <version>${spring.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-test</artifactId>
-                <version>${spring.version}</version>
-                <scope>test</scope>
-            </dependency>
-
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring-boot.version}</version>
                 <scope>test</scope>
-                <exclusions>
-                    <!-- We are still using JUnit 4, while Spring Boot defaults to JUnit 5 -->
-                    <exclusion>
-                        <groupId>org.junit.jupiter</groupId>
-                        <artifactId>junit-jupiter</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.junit.vintage</groupId>
-                        <artifactId>junit-vintage-engine</artifactId>
-                    </exclusion>
-                    <!-- We use a later version of Mockito -->
-                    <exclusion>
-                        <groupId>org.mockito</groupId>
-                        <artifactId>mockito-junit-jupiter</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.mockito</groupId>
-                        <artifactId>mockito-core</artifactId>
-                    </exclusion>
-                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.ginsberg</groupId>
+                <artifactId>junit5-system-exit</artifactId>
+                <version>2.0.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.github.stefanbirkner</groupId>
+                <artifactId>system-lambda</artifactId>
+                <version>1.2.1</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
@@ -1706,31 +1696,6 @@
                 <artifactId>error_prone_annotations</artifactId>
                 <version>${errorprone.version}</version>
                 <scope>compile</scope>
-            </dependency>
-            <!-- JUnit, Mockito and Hamcrest are used for Unit/Integration tests -->
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest</artifactId>
-                <version>2.2</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-core</artifactId>
-                <version>2.2</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.13.2</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-inline</artifactId>
-                <version>3.12.4</version>
-                <scope>test</scope>
             </dependency>
             <!-- H2 is an in-memory database used for Unit/Integration tests -->
             <dependency>

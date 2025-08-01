@@ -27,7 +27,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.supervision.factory.SupervisionOrderServiceFactory;
 import org.dspace.supervision.service.SupervisionOrderService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for the {@link SupervisionOrderService}

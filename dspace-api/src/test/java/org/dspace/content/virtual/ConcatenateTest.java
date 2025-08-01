@@ -7,7 +7,7 @@
  */
 package org.dspace.content.virtual;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,13 +19,16 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class ConcatenateTest {
 
     @InjectMocks
@@ -47,7 +50,7 @@ public class ConcatenateTest {
     @Test
     public void testGetFields() {
         // The reported Class should match our mocked fields class
-        assertEquals("TestGetFields 0", fields.getClass(), concatenate.getFields().getClass());
+        assertEquals(fields.getClass(), concatenate.getFields().getClass(), "TestGetFields 0");
     }
 
     @Test
@@ -55,7 +58,7 @@ public class ConcatenateTest {
         // Setup objects utilized in unit test
         concatenate.setFields(fields);
         // The reported Class should match our mocked fields class
-        assertEquals("TestSetFields 0", fields, concatenate.getFields());
+        assertEquals(fields, concatenate.getFields(), "TestSetFields 0");
     }
 
     @Test
@@ -65,7 +68,7 @@ public class ConcatenateTest {
         concatenate.setSeparator(",");
 
         // The reported separator should match our defined separator
-        assertEquals("TestGetSeperator 0", separator, concatenate.getSeparator());
+        assertEquals(separator, concatenate.getSeparator(), "TestGetSeperator 0");
     }
 
     @Test
@@ -74,7 +77,7 @@ public class ConcatenateTest {
         concatenate.setSeparator(",");
 
         // The reported separator should match our defined separator
-        assertEquals("TestSetSeperator 0", ",", concatenate.getSeparator());
+        assertEquals(",", concatenate.getSeparator(), "TestSetSeperator 0");
     }
 
     @Test
@@ -83,7 +86,7 @@ public class ConcatenateTest {
         concatenate.setUseForPlace(true);
 
         // The reported separator should match our defined separator
-        assertEquals("TestSetUseForPlace 0", true, concatenate.getUseForPlace());
+        assertEquals(true, concatenate.getUseForPlace(), "TestSetUseForPlace 0");
 
     }
 
@@ -94,7 +97,7 @@ public class ConcatenateTest {
         concatenate.setUseForPlace(true);
 
         // The reported boolean should match our defined bool
-        assertEquals("TestGetUseForPlace 0", bool, concatenate.getUseForPlace());
+        assertEquals(bool, concatenate.getUseForPlace(), "TestGetUseForPlace 0");
     }
 
     @Test
@@ -114,13 +117,13 @@ public class ConcatenateTest {
 
         // Mock the state of objects utilized in getValues() to meet the success criteria of an invocation
         when(itemService.getMetadata(item, splittedString.size() > 0 ? splittedString.get(0) : null,
-                                     splittedString.size() > 1 ? splittedString.get(1) : null,
-                                     splittedString.size() > 2 ? splittedString.get(2) : null,
-                                     Item.ANY, false)).thenReturn(metadataValueList);
+            splittedString.size() > 1 ? splittedString.get(1) : null,
+            splittedString.size() > 2 ? splittedString.get(2) : null,
+            Item.ANY, false)).thenReturn(metadataValueList);
         when(metadataValue.getValue()).thenReturn("TestValue");
 
 
         // The reported values should match our defined valueList
-        assertEquals("TestGetValues 0", valueList, concatenate.getValues(context, item));
+        assertEquals(valueList, concatenate.getValues(context, item), "TestGetValues 0");
     }
 }

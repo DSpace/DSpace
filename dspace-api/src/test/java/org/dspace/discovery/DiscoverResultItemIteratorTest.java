@@ -7,8 +7,9 @@
  */
 package org.dspace.discovery;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -28,8 +29,8 @@ import org.dspace.discovery.indexobject.IndexableWorkspaceItem;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 /**
@@ -53,7 +54,7 @@ public class DiscoverResultItemIteratorTest {
     private PoolTask mockPoolTask;
     private ClaimedTask mockClaimedTask;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         mockContext = mock(Context.class);
         mockDiscoverQuery = mock(DiscoverQuery.class);
@@ -185,19 +186,21 @@ public class DiscoverResultItemIteratorTest {
         }
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testNextWithInvalidObjectType() throws SearchServiceException {
-        mockDiscoverResult = mock(DiscoverResult.class);
-        IndexableObject invalidObject = mock(IndexableObject.class);
-        when(invalidObject.getIndexedObject()).thenReturn(mockItem);
-        when(invalidObject.getType()).thenReturn("InvalidObjectType");
-        when(mockDiscoverResult.getIndexableObjects()).thenReturn(Collections.singletonList(invalidObject));
-        when(mockSearchService.search(eq(mockContext), any(DiscoverQuery.class))).thenReturn(mockDiscoverResult);
+    @Test
+    public void testNextWithInvalidObjectType() {
+        assertThrows(IllegalStateException.class, () -> {
+            mockDiscoverResult = mock(DiscoverResult.class);
+            IndexableObject invalidObject = mock(IndexableObject.class);
+            when(invalidObject.getIndexedObject()).thenReturn(mockItem);
+            when(invalidObject.getType()).thenReturn("InvalidObjectType");
+            when(mockDiscoverResult.getIndexableObjects()).thenReturn(Collections.singletonList(invalidObject));
+            when(mockSearchService.search(eq(mockContext), any(DiscoverQuery.class))).thenReturn(mockDiscoverResult);
 
-        try (MockedStatic<SearchUtils> mockedStatic = mockStatic(SearchUtils.class)) {
-            mockedStatic.when(SearchUtils::getSearchService).thenReturn(mockSearchService);
-            DiscoverResultItemIterator iterator = new DiscoverResultItemIterator(mockContext, mockDiscoverQuery);
-            iterator.next();
-        }
+            try (MockedStatic<SearchUtils> mockedStatic = mockStatic(SearchUtils.class)) {
+                mockedStatic.when(SearchUtils::getSearchService).thenReturn(mockSearchService);
+                DiscoverResultItemIterator iterator = new DiscoverResultItemIterator(mockContext, mockDiscoverQuery);
+                iterator.next();
+            }
+        });
     }
 }

@@ -7,7 +7,7 @@
  */
 package org.dspace.app.requestitem;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -23,10 +23,10 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -40,7 +40,7 @@ public class RequestItemSubmitterStrategyTest
 
     private Item item;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass()
             throws SQLException {
         AbstractBuilder.init(); // AbstractUnitTest doesn't do this for us.
@@ -55,14 +55,14 @@ public class RequestItemSubmitterStrategyTest
         ctx.complete();
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
         // AbstractUnitTest doesn't do this for us.
         AbstractBuilder.cleanupObjects();
         AbstractBuilder.destroy();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         context = new Context();
         context.setCurrentUser(johnDoe);
@@ -84,6 +84,6 @@ public class RequestItemSubmitterStrategyTest
             throws Exception {
         RequestItemSubmitterStrategy instance = new RequestItemSubmitterStrategy();
         List<RequestItemAuthor> author = instance.getRequestItemAuthor(context, item);
-        assertEquals("Wrong author address", AUTHOR_ADDRESS, author.get(0).getEmail());
+        assertEquals(AUTHOR_ADDRESS, author.get(0).getEmail(), "Wrong author address");
     }
 }

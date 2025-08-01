@@ -33,8 +33,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by pbecker to write a test against DS-3572.
@@ -95,9 +95,11 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
 
         try {
             // eperson1 should be able to write as it is a member of a group that has write permissions
-            Assert.assertTrue(authorizeService.authorizeActionBoolean(context, eperson1, dso, Constants.WRITE, true));
+            Assertions.assertTrue(authorizeService.authorizeActionBoolean(
+                    context, eperson1, dso, Constants.WRITE, true));
             // person2 shouldn't have write access
-            Assert.assertFalse(authorizeService.authorizeActionBoolean(context, eperson2, dso, Constants.WRITE, true));
+            Assertions.assertFalse(authorizeService.authorizeActionBoolean(
+                    context, eperson2, dso, Constants.WRITE, true));
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
@@ -136,7 +138,7 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
         }
 
         try {
-            Assert.assertTrue(authorizeService.authorizeActionBoolean(context, eperson, dso, Constants.ADD, true));
+            Assertions.assertTrue(authorizeService.authorizeActionBoolean(context, eperson, dso, Constants.ADD, true));
         } catch (SQLException ex) {
             throw new AssertionError(ex);
         }

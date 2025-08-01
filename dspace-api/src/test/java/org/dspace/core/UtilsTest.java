@@ -7,9 +7,9 @@
  */
 package org.dspace.core;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mockStatic;
 
 import java.net.InetAddress;
@@ -18,7 +18,7 @@ import java.net.UnknownHostException;
 import org.dspace.AbstractUnitTest;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 /**
@@ -33,26 +33,32 @@ public class UtilsTest extends AbstractUnitTest {
      */
     @Test
     public void testGetBaseUrl() {
-        assertEquals("Test remove /server", "http://dspace.org",
-                     Utils.getBaseUrl("http://dspace.org/server"));
+        assertEquals("http://dspace.org",
+                     Utils.getBaseUrl("http://dspace.org/server"),
+                     "Test remove /server");
 
-        assertEquals("Test remove /server/api/core/items", "https://dspace.org",
-                     Utils.getBaseUrl("https://dspace.org/server/api/core/items"));
+        assertEquals("https://dspace.org",
+                     Utils.getBaseUrl("https://dspace.org/server/api/core/items"),
+                     "Test remove /server/api/core/items");
 
-        assertEquals("Test remove trailing slash", "https://dspace.org",
-                     Utils.getBaseUrl("https://dspace.org/"));
+        assertEquals("https://dspace.org",
+                     Utils.getBaseUrl("https://dspace.org/"),
+                     "Test remove trailing slash");
 
-        assertEquals("Test keep url", "https://demo.dspace.org",
-                     Utils.getBaseUrl("https://demo.dspace.org"));
+        assertEquals("https://demo.dspace.org",
+                     Utils.getBaseUrl("https://demo.dspace.org"),
+                     "Test keep url");
 
-        assertEquals("Test keep url", "http://localhost:8080",
-                     Utils.getBaseUrl("http://localhost:8080"));
+        assertEquals("http://localhost:8080",
+                     Utils.getBaseUrl("http://localhost:8080"),
+                     "Test keep url");
 
-        assertEquals("Test keep url", "http://localhost:8080",
-                     Utils.getBaseUrl("http://localhost:8080/server"));
+        assertEquals("http://localhost:8080",
+                     Utils.getBaseUrl("http://localhost:8080/server"),
+                     "Test keep url");
 
         // This uses a bunch of reserved URI characters
-        assertNull("Test invalid URI returns null", Utils.getBaseUrl("&+,?/@="));
+        assertNull(Utils.getBaseUrl("&+,?/@="), "Test invalid URI returns null");
     }
 
     /**
@@ -60,29 +66,36 @@ public class UtilsTest extends AbstractUnitTest {
      */
     @Test
     public void testGetHostName() {
-        assertEquals("Test remove HTTP", "dspace.org",
-                     Utils.getHostName("http://dspace.org"));
+        assertEquals("dspace.org",
+                     Utils.getHostName("http://dspace.org"),
+                     "Test remove HTTP");
 
-        assertEquals("Test remove HTTPS", "dspace.org",
-                     Utils.getHostName("https://dspace.org"));
+        assertEquals("dspace.org",
+                     Utils.getHostName("https://dspace.org"),
+                     "Test remove HTTPS");
 
-        assertEquals("Test remove trailing slash", "dspace.org",
-                     Utils.getHostName("https://dspace.org/"));
+        assertEquals("dspace.org",
+                     Utils.getHostName("https://dspace.org/"),
+                     "Test remove trailing slash");
 
-        assertEquals("Test remove www.", "dspace.org",
-                     Utils.getHostName("https://www.dspace.org"));
+        assertEquals("dspace.org",
+                     Utils.getHostName("https://www.dspace.org"),
+                     "Test remove www.");
 
-        assertEquals("Test keep other prefixes", "demo.dspace.org",
-                     Utils.getHostName("https://demo.dspace.org"));
+        assertEquals("demo.dspace.org",
+                     Utils.getHostName("https://demo.dspace.org"),
+                     "Test keep other prefixes");
 
-        assertEquals("Test with parameter", "demo.dspace.org",
-                     Utils.getHostName("https://demo.dspace.org/search?query=test"));
+        assertEquals("demo.dspace.org",
+                     Utils.getHostName("https://demo.dspace.org/search?query=test"),
+                     "Test with parameter");
 
-        assertEquals("Test with parameter with space", "demo.dspace.org",
-                     Utils.getHostName("https://demo.dspace.org/search?query=test turbine"));
+        assertEquals("demo.dspace.org",
+                     Utils.getHostName("https://demo.dspace.org/search?query=test turbine"),
+                     "Test with parameter with space");
 
         // This uses a bunch of reserved URI characters
-        assertNull("Test invalid URI returns null", Utils.getHostName("&+,?/@="));
+        assertNull(Utils.getHostName("&+,?/@="), "Test invalid URI returns null");
     }
 
     /**
@@ -101,12 +114,12 @@ public class UtilsTest extends AbstractUnitTest {
             // When fakeHostname is passed to InetAddress, return fakeInetAddresses
             mockedInetAddress.when(() -> InetAddress.getAllByName(fakeHostname)).thenReturn(fakeInetAddresses);
 
-            assertNull("Test invalid URL returns null",
-                       Utils.getIPAddresses("not/a-real;url"));
+            assertNull(Utils.getIPAddresses("not/a-real;url"),
+                       "Test invalid URL returns null");
 
-            assertArrayEquals("Test fake URL returns fake IPs converted to String Array",
-                              new String[] {"1.2.3.4", "5.6.7.8"},
-                              Utils.getIPAddresses(fakeUrl));
+            assertArrayEquals(new String[] {"1.2.3.4", "5.6.7.8"},
+                              Utils.getIPAddresses(fakeUrl),
+                              "Test fake URL returns fake IPs converted to String Array");
         }
     }
 
@@ -126,8 +139,9 @@ public class UtilsTest extends AbstractUnitTest {
         String stringWithVariable = "The config " + configName + " has a value of ${" + configName + "}!";
         String expectedValue = "The config " + configName + " has a value of " + configValue + "!";
 
-        assertEquals("Test config interpolation", expectedValue,
-                     Utils.interpolateConfigsInString(stringWithVariable));
+        assertEquals(expectedValue,
+                     Utils.interpolateConfigsInString(stringWithVariable),
+                     "Test config interpolation");
 
         // remove the config we added
         configurationService.setProperty(configName, null);

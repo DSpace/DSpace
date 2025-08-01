@@ -11,14 +11,14 @@ import static org.dspace.app.rest.repository.RegistrationRestRepository.TOKEN_QU
 import static org.dspace.app.rest.repository.RegistrationRestRepository.TYPE_FORGOT;
 import static org.dspace.app.rest.repository.RegistrationRestRepository.TYPE_QUERY_PARAM;
 import static org.dspace.app.rest.repository.RegistrationRestRepository.TYPE_REGISTER;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -58,10 +58,10 @@ import org.dspace.eperson.service.CaptchaService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -84,7 +84,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
     private static MockedStatic<Email> emailMockedStatic;
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         Iterator<RegistrationData> iterator = registrationDataDAO.findAll(context, RegistrationData.class).iterator();
         while (iterator.hasNext()) {
@@ -93,12 +93,12 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         }
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void init() throws Exception {
         emailMockedStatic = Mockito.mockStatic(Email.class);
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
         emailMockedStatic.close();
     }

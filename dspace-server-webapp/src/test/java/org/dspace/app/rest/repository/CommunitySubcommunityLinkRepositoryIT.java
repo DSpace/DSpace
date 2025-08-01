@@ -16,8 +16,8 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Community;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class for {@link CommunitySubcommunityLinkRepository}
@@ -29,7 +29,7 @@ public class CommunitySubcommunityLinkRepositoryIT extends AbstractControllerInt
     Community subCommunity2;
     Community subCommunity3;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
