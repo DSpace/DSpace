@@ -37,6 +37,7 @@ import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -83,6 +84,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         Context context = obtainContext();
 
         IndexableObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
+        validateScope(dsoScope, scopeObject);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrIndexableObject(context, configuration, scopeObject);
 
@@ -95,6 +97,9 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
                                               final Projection projection) {
         Context context = obtainContext();
         IndexableObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
+
+        validateScope(dsoScope, scopeObject);
+
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrIndexableObject(context, configuration, scopeObject);
 
@@ -116,10 +121,18 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
                      discoveryConfiguration, projection);
     }
 
+    private static void validateScope(String dsoScope, IndexableObject scopeObject) {
+        if (dsoScope != null && !dsoScope.isEmpty() && scopeObject == null) {
+            log.error("Error invalid dso scope");
+            throw new ResourceNotFoundException("Invalid dso scope");
+        }
+    }
+
     public FacetConfigurationRest getFacetsConfiguration(final String dsoScope, final String configuration) {
         Context context = obtainContext();
 
         IndexableObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
+        validateScope(dsoScope, scopeObject);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrIndexableObject(context, configuration, scopeObject);
 
@@ -137,6 +150,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         Context context = obtainContext();
 
         IndexableObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
+        validateScope(dsoScope, scopeObject);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrIndexableObject(context, configuration, scopeObject);
 
@@ -156,6 +170,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         Context context = obtainContext();
         Pageable page = PageRequest.of(1, 1);
         IndexableObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
+        validateScope(dsoScope, scopeObject);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrIndexableObject(context, configuration, scopeObject);
 
