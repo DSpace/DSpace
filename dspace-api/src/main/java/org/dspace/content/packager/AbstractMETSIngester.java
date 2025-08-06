@@ -498,8 +498,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 // Finish creating the item. This actually assigns the handle,
                 // and will either install item immediately or start a workflow, based on params
                 PackageUtils.finishCreateItem(context, wsi, handle, params);
+            } else {
+                // We should have a workspace item during ingest, so this code is only here for safety.
+                // Update the object to make sure all changes are committed
+                PackageUtils.updateDSpaceObject(context, dso);
             }
-
         } else if (type == Constants.COLLECTION || type == Constants.COMMUNITY) {
             // Add logo if one is referenced from manifest
             addContainerLogo(context, dso, manifest, pkgFile, params);
@@ -513,6 +516,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // (this allows subclasses to do some final validation / changes as
             // necessary)
             finishObject(context, dso, params);
+
+            // Update the object to make sure all changes are committed
+            PackageUtils.updateDSpaceObject(context, dso);
         } else if (type == Constants.SITE) {
             // Do nothing by default -- Crosswalks will handle anything necessary to ingest at Site-level
 
@@ -520,17 +526,14 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // (this allows subclasses to do some final validation / changes as
             // necessary)
             finishObject(context, dso, params);
+
+            // Update the object to make sure all changes are committed
+            PackageUtils.updateDSpaceObject(context, dso);
         } else {
             throw new PackageValidationException(
                 "Unknown DSpace Object type in package, type="
                     + String.valueOf(type));
         }
-
-        // -- Step 6 --
-        // Finish things up!
-
-        // Update the object to make sure all changes are committed
-        PackageUtils.updateDSpaceObject(context, dso);
 
         return dso;
     }
