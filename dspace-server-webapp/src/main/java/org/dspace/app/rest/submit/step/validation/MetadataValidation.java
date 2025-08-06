@@ -23,9 +23,15 @@ import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
+import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 
 /**
@@ -53,6 +59,11 @@ public class MetadataValidation extends AbstractValidation {
     private MetadataAuthorityService metadataAuthorityService;
 
     private ConfigurationService configurationService;
+
+    private RelationshipTypeService relationshipTypeService =
+        ContentServiceFactory.getInstance().getRelationshipTypeService();
+
+    private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
 
     @Override
     public List<ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
@@ -147,9 +158,40 @@ public class MetadataValidation extends AbstractValidation {
                         }
                     }
                 }
+                relationshipRequiredFieldCheck(ContextUtil.obtainCurrentRequestContext(), obj.getItem(), input, errors,
+                    config);
             }
         }
         return errors;
+    }
+
+    /**
+     * Checks if the relation type exists on the item. If not, sets the error state.
+     *
+     * @param context the current context
+     * @param item item in the submission
+     * @param input input field
+     * @param errors List holding all errors
+     * @param config submission step config
+     * @throws SQLException
+     */
+    private void relationshipRequiredFieldCheck(Context context, Item item, DCInput input, List<ErrorRest> errors,
+                                        SubmissionStepConfig config) throws SQLException {
+        if (input.isRelationshipField() && input.isRequired()) {
+            String relationshipType = input.getRelationshipType();
+            if (itemService.getMetadataByMetadataString(item, "relation." + relationshipType).isEmpty()) {
+                List<RelationshipType> relationTypes =
+                    relationshipTypeService.findByLeftwardOrRightwardTypeName(context, relationshipType);
+                for (RelationshipType relationType : relationTypes) {
+                    if (!relationshipService.findByItemAndRelationshipType(context, item, relationType).isEmpty()) {
+                        return;
+                    }
+                }
+                addError(errors, ERROR_VALIDATION_REQUIRED,
+                    "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                        input.getFieldName());
+            }
+        }
     }
 
 
