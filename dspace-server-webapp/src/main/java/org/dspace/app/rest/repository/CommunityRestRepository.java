@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedMap;
@@ -224,9 +225,14 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         Pageable pageable, @Parameter(value = "query") String query) {
         try {
             Context context = obtainContext();
-            List<Community> communities = authorizeService.findAdminAuthorizedCommunity(context, query,
+            List<Community> communities = new ArrayList<Community>();
+            DiscoverResult discoverResult = authorizeService.findAdminAuthorizedCommunity(context, query,
                 Math.toIntExact(pageable.getOffset()),
                 Math.toIntExact(pageable.getPageSize()));
+            for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
+                Community community = ((IndexableCommunity) solrCollections).getIndexedObject();
+                communities.add(community);
+            }
             long tot = authorizeService.countAdminAuthorizedCommunity(context, query);
             return converter.toRestPage(communities, pageable, tot , utils.obtainProjection());
         } catch (SearchServiceException | SQLException e) {

@@ -13,10 +13,9 @@ import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -557,7 +556,7 @@ public interface AuthorizeService {
      * @throws SearchServiceException
      * @throws SQLException
      */
-    List<Community> findAdminAuthorizedCommunity(Context context, String query, int offset, int limit)
+    DiscoverResult findAdminAuthorizedCommunity(Context context, String query, int offset, int limit)
         throws SearchServiceException, SQLException;
 
     /**
@@ -583,7 +582,7 @@ public interface AuthorizeService {
      * @throws SearchServiceException
      * @throws SQLException
      */
-    List<Collection> findAdminAuthorizedCollection(Context context, String query, int offset, int limit)
+    DiscoverResult findAdminAuthorizedCollection(Context context, String query, int offset, int limit)
         throws SearchServiceException, SQLException;
 
     /**
