@@ -239,7 +239,8 @@ public class DiscoveryRestController implements InitializingBean {
                     produces = "application/json" )
     public String suggest(@PathVariable(name = "dictionary") String dictionary,
                           @PathVariable(name = "query") String query) {
-        SolrSuggestService solrSuggestService = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrSuggestService.class).get(0);
+        SolrSuggestService solrSuggestService = DSpaceServicesFactory.getInstance().getServiceManager()
+                .getServicesByType(SolrSuggestService.class).get(0);
         return solrSuggestService.getSuggestions(query, dictionary);
     }
 }
