@@ -143,7 +143,7 @@ public class Swordv1IT extends AbstractWebClientIntegrationTest {
         // Send POST to upload Zip file via SWORD
         ResponseEntity<String> response = postResponseAsString(DEPOSIT_PATH + "/" + collection.getHandle(),
                                                                eperson.getEmail(), password,
-                                                               new HttpEntity<>(zipFile.getContentAsByteArray(),
+                                                               new HttpEntity<>(zipFile.getInputStream().readAllBytes(),
                                                                                 headers));
 
         // Expect a 201 CREATED response with ATOM content returned
