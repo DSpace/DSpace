@@ -138,22 +138,26 @@ public class IndexEventConsumer implements Consumer {
                                  + ", perhaps it has been deleted.");
                     }
                 } else {
-                    log.debug("consume() adding event to update queue: " + event.toString());
-                    if (event.getSubjectType() == Constants.ITEM) {
-                    // if it is an item we cannot know about its previous state, so it could be a
-                    // workspaceitem that has been deposited right now or an approved/reject
-                    // workflowitem.
-                    // As the workflow is not necessary enabled it can happen than a workspaceitem
-                    // became directly an item without giving us the chance to retrieve a
-                    // workflowitem... so we need to force the unindex of all the related data
-                    // before to index it again to be sure to don't leave any zombie in solr
-                        IndexFactory indexableObjectService = IndexObjectFactoryFactory.getInstance()
-                                              .getIndexFactoryByType(Constants.typeText[event.getSubjectType()]);
-                        String detail = indexableObjectService.getType() + "-" + event.getSubjectID().toString();
-                        uniqueIdsToDelete.add(detail);
-                    }
+                    if (event.getSubjectType() == Constants.SITE) {
+                        log.debug(event.getEventTypeAsString() + " event triggered for Site object. Skipping it.");
+                    } else {
+                        log.debug("consume() adding event to update queue: " + event.toString());
+                        if (event.getSubjectType() == Constants.ITEM) {
+                        // if it is an item we cannot know about its previous state, so it could be a
+                        // workspaceitem that has been deposited right now or an approved/reject
+                        // workflowitem.
+                        // As the workflow is not necessary enabled it can happen than a workspaceitem
+                        // became directly an item without giving us the chance to retrieve a
+                        // workflowitem... so we need to force the unindex of all the related data
+                        // before to index it again to be sure to don't leave any zombie in solr
+                            IndexFactory indexableObjectService = IndexObjectFactoryFactory.getInstance()
+                                                  .getIndexFactoryByType(Constants.typeText[event.getSubjectType()]);
+                            String detail = indexableObjectService.getType() + "-" + event.getSubjectID().toString();
+                            uniqueIdsToDelete.add(detail);
+                        }
 
-                    objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, subject));
+                        objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, subject));
+                    }
                 }
                 break;
 
