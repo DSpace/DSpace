@@ -14,9 +14,8 @@ services:
       # See https://github.com/DSpace/DSpace/blob/main/dspace/config/config-definition.xml
       # __P__ => "." (e.g. dspace__P__dir => dspace.dir)
       # __D__ => "-" (e.g. google__D__metadata => google-metadata)
-      # dspace.dir: Must match with Dockerfile's DSPACE_INSTALL directory.
-      dspace__P__dir: /dspace
-      # Uncomment to set a non-default value for dspace.server.url or dspace.ui.url
+      # Uncomment to set a non-default value for dspace.dir, dspace.server.url or dspace.ui.url
+      # dspace__P__dir: /dspace
       # dspace__P__server__P__url: http://localhost:8080/server
       # dspace__P__ui__P__url: http://localhost:4000
       dspace__P__name: 'DSpace Started with Docker Compose'
@@ -61,7 +60,7 @@ services:
     - |
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
-      java -jar /dspace/webapps/server-boot.jar --dspace.dir=/dspace
+      java -jar /dspace/webapps/server-boot.jar
   # DSpace PostgreSQL database container
   dspacedb:
     container_name: dspacedb
