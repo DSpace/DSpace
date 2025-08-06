@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.discovery;
@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SolrServiceIndexSuggestFieldPlugin implements SolrServiceIndexPlugin {
     private static final Logger log = org.apache.logging.log4j.LogManager
-        .getLogger();
+            .getLogger();
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -46,17 +46,18 @@ public class SolrServiceIndexSuggestFieldPlugin implements SolrServiceIndexPlugi
                     // Index all metadata fields configured as suggestion fields
                     String[] suggestionFields = configurationService.getArrayProperty("discovery.suggest.field");
                     for (String suggestionField : suggestionFields) {
-                            List<MetadataValue> suggestionValues = itemService.getMetadataByMetadataString(item, suggestionField);
-                            List<String> sv = new ArrayList<String>();
-                            for (MetadataValue v : suggestionValues) {
-                                sv.add(v.getValue());
-                            }
-                            String docField = suggestionField + "_suggest";
-                            document.addField(docField, sv);
+                        List<MetadataValue> suggestionValues =
+                                itemService.getMetadataByMetadataString(item, suggestionField);
+                        List<String> sv = new ArrayList<String>();
+                        for (MetadataValue v : suggestionValues) {
+                            sv.add(v.getValue());
+                        }
+                        String docField = suggestionField + "_suggest";
+                        document.addField(docField, sv);
                     }
                 } catch (Exception e) {
-                    log.error("Error while indexing suggestion fields," + 
-                            "Item: (id " + item.getID() + " name " + item.getName() + ")" );
+                    log.error("Error while indexing suggestion fields," +
+                            "Item: (id " + item.getID() + " name " + item.getName() + ")");
                 }
             }
         }

@@ -8,6 +8,7 @@
 package org.dspace.discovery;
 
 import java.io.IOException;
+
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
