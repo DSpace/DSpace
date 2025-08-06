@@ -143,7 +143,7 @@ public class ItemUtils {
                     bitstream.getField().add(createValue("name", name));
                 }
                 if (oname != null) {
-                    bitstream.getField().add(createValue("originalName", name));
+                    bitstream.getField().add(createValue("originalName", oname));
                 }
                 if (description != null) {
                     bitstream.getField().add(createValue("description", description));
