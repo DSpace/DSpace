@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -84,7 +85,7 @@ public class PdfGenerator {
     public PDDocument generate(String html) {
         try (var out = new ByteArrayOutputStream()) {
             generate(html, out);
-            return PDDocument.load(out.toByteArray());
+            return Loader.loadPDF(out.toByteArray());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
