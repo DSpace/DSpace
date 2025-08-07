@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.dspace.content.Bitstream;
@@ -153,8 +153,8 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         // the CropBox is missing or empty because pdfbox will set it to the
         // same size as the MediaBox if it doesn't exist. Also note that we
         // only need to check the first page, since that's what we use for
-        // generating the thumbnail (PDDocument uses a zero-based index).
-        PDPage pdfPage = PDDocument.load(f).getPage(0);
+        // generating the thumbnail (PDPage uses a zero-based index).
+        PDPage pdfPage = Loader.loadPDF(f).getPage(0);
         PDRectangle pdfPageMediaBox = pdfPage.getMediaBox();
         PDRectangle pdfPageCropBox = pdfPage.getCropBox();
 
