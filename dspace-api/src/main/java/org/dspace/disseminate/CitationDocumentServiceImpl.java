@@ -20,6 +20,8 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.dspace.authorize.AuthorizeException;
@@ -264,7 +266,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     private PDDocument loadDocumentFromDB(Context context, Bitstream bitstream) {
         try (var inputStream = bitstreamService.retrieve(context, bitstream)) {
-            return PDDocument.load(inputStream);
+            return Loader.loadPDF(new RandomAccessReadBuffer(inputStream));
         } catch (IOException | SQLException | AuthorizeException e) {
             throw new RuntimeException(e);
         }
