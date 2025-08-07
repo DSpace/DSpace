@@ -146,7 +146,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
 
             if (query != null) {
                 query.append(")");
-            }   
+            }
         }
 
         SolrQuery sQuery = new SolrQuery("*:*");
