@@ -69,7 +69,7 @@
     <bean id="ArXivImportService"
           class="org.dspace.importer.external.arxiv.service.ArXivImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="ArXivMetadataFieldMapping"/>
-        <property name="baseAddress" value="http://export.arxiv.org/api/query"/>
+        <property name="baseAddress" value="https://export.arxiv.org/api/query"/>
     </bean>
     <bean id="ArXivMetadataFieldMapping"
           class="org.dspace.importer.external.arxiv.metadatamapping.ArXivFieldMapping">
@@ -80,6 +80,7 @@
         <property name="metadataFieldMapping" ref="pubmedMetadataFieldMapping"/>
         <property name="urlFetch" value="${pubmed.url.fetch}"/>
         <property name="urlSearch" value="${pubmed.url.search}"/>
+        <property name="apiKey" value="${pubmed.apiKey}"/>
         <property name="generateQueryForItem" ref="pubmedService"></property>
         <property name="interRequestTime" value="500"/>
         <property name="supportedExtensions">
@@ -315,6 +316,10 @@
 
     <bean id="openalexFunderMetadataFieldMapping"
           class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexFunderFieldMapping">
+    </bean>
+
+    <bean class="java.lang.Integer" id="maxRetry">
+        <constructor-arg value="3"/>
     </bean>
 
 </beans>

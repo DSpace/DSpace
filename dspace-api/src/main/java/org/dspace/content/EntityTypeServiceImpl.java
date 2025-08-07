@@ -30,6 +30,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.SolrSearchCore;
 import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,22 +124,33 @@ public class EntityTypeServiceImpl implements EntityTypeService {
     @Override
     public List<String> getSubmitAuthorizedTypes(Context context)
             throws SQLException, SolrServerException, IOException {
-        List<String> types = new ArrayList<>();
-
-        SolrQuery sQuery = new SolrQuery("*:*");
+        StringBuilder query = null;
         if (!authorizeService.isAdmin(context)) {
-            StringBuilder query = new StringBuilder();
-            org.dspace.eperson.EPerson currentUser = context.getCurrentUser();
-            String userId = "";
+            EPerson currentUser = context.getCurrentUser();
             if (currentUser != null) {
-                userId = currentUser.getID().toString();
+                String userId = currentUser.getID().toString();
+                query = new StringBuilder();
+                query.append("submit:(e").append(userId);
             }
-            query.append("submit:(e").append(userId);
+
             Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
             for (Group group : groups) {
-                query.append(" OR g").append(group.getID());
+                if (query == null) {
+                    query = new StringBuilder();
+                    query.append("submit:(g");
+                } else {
+                    query.append(" OR g");
+                }
+                query.append(group.getID());
             }
-            query.append(")");
+
+            if (query != null) {
+                query.append(")");
+            }          
+        }
+
+        SolrQuery sQuery = new SolrQuery("*:*");
+        if (query != null) {
             sQuery.addFilterQuery(query.toString());
         }
         sQuery.addFilterQuery("search.resourcetype:" + IndexableCollection.TYPE);
@@ -149,6 +161,8 @@ public class EntityTypeServiceImpl implements EntityTypeService {
         sQuery.setFacetSort(FacetParams.FACET_SORT_INDEX);
         QueryResponse qResp = solrSearchCore.getSolr().query(sQuery, solrSearchCore.REQUEST_METHOD);
         FacetField facetField = qResp.getFacetField("search.entitytype");
+
+        List<String> types = new ArrayList<>();      
         if (Objects.nonNull(facetField)) {
             for (Count c : facetField.getValues()) {
                 types.add(c.getName());
