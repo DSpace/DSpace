@@ -29,9 +29,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.jena.ext.xerces.impl.dv.util.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.xerces.impl.dv.util.Base64;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
@@ -57,7 +57,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implements a data source for querying EPO
- * 
+ *
  * @author Pasquale Cavallo (pasquale.cavallo at 4Science dot it)
  */
 public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Element>
@@ -82,7 +82,8 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     private LiveImportClient liveImportClient;
 
     @Override
-    public void init() throws Exception {}
+    public void init() throws Exception {
+    }
 
     /**
      * The string that identifies this import implementation. Preferable a URI
@@ -136,7 +137,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     /***
      * Log to EPO, bearer is valid for 20 minutes
-     * 
+     *
      * @param consumerKey       The consumer Key
      * @param consumerSecretKey The consumer secret key
      * @return
@@ -154,7 +155,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     }
 
     private Map<String, Map<String, String>> getLoginParams() {
-        Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+        Map<String, Map<String, String>> params = new HashMap<String, Map<String, String>>();
         Map<String, String> headerParams = getLoginHeaderParams();
         params.put(HEADER_PARAMETERS, headerParams);
         return params;
@@ -198,7 +199,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     @Override
     public Collection<ImportRecord> getRecords(String query, int start,
-            int count) throws MetadataSourceException {
+                                               int count) throws MetadataSourceException {
         if (StringUtils.isNotBlank(consumerKey) && StringUtils.isNotBlank(consumerSecret)) {
             try {
                 String bearer = login();
@@ -263,7 +264,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
      * This Callable use as query value to EPO the string queryString passed to constructor.
      * If the object will be construct through Query.class instance, the value of the Query's
      * map with the key "query" will be used.
-     * 
+     *
      * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
      */
     private class CountRecordsCallable implements Callable<Integer> {
@@ -310,16 +311,16 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 docType = id.substring(0, positionToSplit);
                 idS = id.substring(positionToSplit + 1, id.length());
             } else if (id.contains(APP_NO_DATE_SEPARATOR)) {
-                 // special case the id is the combination of the applicationnumber and date filed
+                // special case the id is the combination of the applicationnumber and date filed
                 String query = "applicationnumber=" + id.split(APP_NO_DATE_SEPARATOR_REGEX)[0];
                 SearchByQueryCallable search = new SearchByQueryCallable(query, bearer, 0, 10);
                 List<ImportRecord> records = search.call().stream()
                         .filter(r -> r.getValue(dateFiled.getSchema(), dateFiled.getElement(),
-                                    dateFiled.getQualifier())
+                                        dateFiled.getQualifier())
                                 .stream()
                                 .anyMatch(m -> StringUtils.equals(m.getValue(),
                                         id.split(APP_NO_DATE_SEPARATOR_REGEX)[1])
-                        ))
+                                ))
                         .limit(1).collect(Collectors.toList());
                 return records;
             }
@@ -336,7 +337,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
      * This Callable use as query value the string queryString passed to constructor.
      * If the object will be construct through Query.class instance, a Query's map entry with key "query" will be used.
      * Pagination is supported too, using the value of the Query's map with keys "start" and "count".
-     * 
+     *
      * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
      */
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
@@ -355,9 +356,9 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             this.query = new Query();
             query.addParameter("query", queryValue);
             this.start = query.getParameterAsClass("start", Integer.class) != null ?
-                query.getParameterAsClass("start", Integer.class) : 0;
+                    query.getParameterAsClass("start", Integer.class) : 0;
             this.count = query.getParameterAsClass("count", Integer.class) != null ?
-                query.getParameterAsClass("count", Integer.class) : 20;
+                    query.getParameterAsClass("count", Integer.class) : 20;
             this.bearer = bearer;
         }
 
@@ -387,7 +388,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             return null;
         }
         try {
-            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String, String>>();
             Map<String, String> headerParameters = new HashMap<String, String>();
             headerParameters.put("Authorization", "Bearer " + bearer);
             headerParameters.put("X-OPS-Range", "1-1");
@@ -407,9 +408,9 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             Element root = document.getRootElement();
 
             List<Namespace> namespaces = Arrays.asList(
-                 Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink"),
-                 Namespace.getNamespace("ops", "http://ops.epo.org"),
-                 Namespace.getNamespace("ns", "http://www.epo.org/exchange"));
+                    Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink"),
+                    Namespace.getNamespace("ops", "http://ops.epo.org"),
+                    Namespace.getNamespace("ns", "http://www.epo.org/exchange"));
 
             String totalRes = getElement(root, namespaces, "//ops:biblio-search/@total-result-count");
             return Integer.parseInt(totalRes);
@@ -426,7 +427,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             return results;
         }
         try {
-            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String, String>>();
             Map<String, String> headerParameters = new HashMap<String, String>();
             headerParameters.put("Authorization", "Bearer " + bearer);
             if (start >= 1 && end > start) {
@@ -444,9 +445,9 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             Element root = document.getRootElement();
 
             List<Namespace> namespaces = Arrays.asList(
-                 Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink"),
-                 Namespace.getNamespace("ops", "http://ops.epo.org"),
-                 Namespace.getNamespace("ns", "http://www.epo.org/exchange"));
+                    Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink"),
+                    Namespace.getNamespace("ops", "http://ops.epo.org"),
+                    Namespace.getNamespace("ns", "http://www.epo.org/exchange"));
             XPathExpression<Element> xpath = XPathFactory.instance()
                     .compile("//ns:document-id", Filters.element(), null, namespaces);
 
@@ -470,7 +471,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             return results;
         }
         try {
-            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String, String>>();
             Map<String, String> headerParameters = new HashMap<String, String>();
             headerParameters.put("Authorization", "Bearer " + bearer);
             params.put(HEADER_PARAMETERS, headerParameters);
@@ -522,7 +523,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         } else if (el instanceof Attribute) {
             return ((Attribute) el).getValue();
         } else if (el instanceof String) {
-            return (String)el;
+            return (String) el;
         } else if (el instanceof Text) {
             return ((Text) el).getText();
         } else {
