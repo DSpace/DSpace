@@ -20,6 +20,7 @@ import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -265,12 +266,13 @@ public class METSManifest {
     public static METSManifest create(InputStream is, boolean validate, String configName)
         throws IOException,
         MetadataValidationException {
-        SAXBuilder builder = new SAXBuilder(validate);
 
+        SAXBuilder builder = XMLUtils.getSAXBuilder();
         builder.setIgnoringElementContentWhitespace(true);
 
         // Set validation feature
         if (validate) {
+            builder.setValidation(true);
             builder.setFeature("http://apache.org/xml/features/validation/schema", true);
 
             // Tell the parser where local copies of schemas are, to speed up
@@ -278,10 +280,6 @@ public class METSManifest {
             if (localSchemas.length() > 0) {
                 builder.setProperty("http://apache.org/xml/properties/schema/external-schemaLocation", localSchemas);
             }
-        } else {
-            // disallow DTD parsing to ensure no XXE attacks can occur.
-            // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
-            builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         }
 
         // Parse the METS file

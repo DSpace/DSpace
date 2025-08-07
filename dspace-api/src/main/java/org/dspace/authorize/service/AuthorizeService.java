@@ -328,6 +328,19 @@ public interface AuthorizeService {
      * @param c    context
      * @param src  source of policies
      * @param dest destination of inherited policies
+     * @param includeCustom whether TYPE_CUSTOM policies should be inherited
+     * @throws SQLException       if there's a database problem
+     * @throws AuthorizeException if the current user is not authorized to add these policies
+     */
+    public void inheritPolicies(Context c, DSpaceObject src, DSpaceObject dest, boolean includeCustom)
+            throws SQLException, AuthorizeException;
+
+    /**
+     * Add policies to an object to match those from a previous object
+     *
+     * @param c    context
+     * @param src  source of policies
+     * @param dest destination of inherited policies
      * @throws SQLException       if there's a database problem
      * @throws AuthorizeException if the current user is not authorized to add these policies
      */
@@ -604,5 +617,11 @@ public interface AuthorizeService {
      */
     public void replaceAllPolicies(Context context, DSpaceObject source, DSpaceObject dest)
             throws SQLException, AuthorizeException;
+
+    public void addDefaultPoliciesNotInPlace(Context context, DSpaceObject dso,
+            List<ResourcePolicy> defaultCollectionPolicies) throws SQLException, AuthorizeException;
+
+    public void addCustomPoliciesNotInPlace(Context context, DSpaceObject dso,
+            List<ResourcePolicy> defaultCollectionPolicies) throws SQLException, AuthorizeException;
 
 }
