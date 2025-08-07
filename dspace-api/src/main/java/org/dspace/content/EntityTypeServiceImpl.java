@@ -146,7 +146,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
 
             if (query != null) {
                 query.append(")");
-            }          
+            }   
         }
 
         SolrQuery sQuery = new SolrQuery("*:*");
@@ -162,7 +162,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
         QueryResponse qResp = solrSearchCore.getSolr().query(sQuery, solrSearchCore.REQUEST_METHOD);
         FacetField facetField = qResp.getFacetField("search.entitytype");
 
-        List<String> types = new ArrayList<>();      
+        List<String> types = new ArrayList<>();
         if (Objects.nonNull(facetField)) {
             for (Count c : facetField.getValues()) {
                 types.add(c.getName());
