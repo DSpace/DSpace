@@ -18,6 +18,8 @@ import java.util.List;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import com.lyncode.xoai.util.Base64Utils;
+
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.factory.UtilServiceFactory;
@@ -166,8 +168,8 @@ public class ItemUtils {
     }
 
     /**
-     * Sanitizes a string to remove characters that are invalid in XML 1.0.
-     * Currently targets the non-characters U+FFFE and U+FFFF.
+     * Sanitizes a string to remove characters that are invalid 
+     * in XML 1.0 using the Apache Commons Text library.
      * @param value The string to sanitize.
      * @return A sanitized string, or null if the input was null.
      */
@@ -175,7 +177,7 @@ public class ItemUtils {
         if (value == null) {
             return null;
         }
-        return value.replace("\ufffe", "").replace("\uffff", "");
+        return StringEscapeUtils.escapeXml10(value);
     }
 
     /**
