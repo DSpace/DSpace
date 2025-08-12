@@ -66,6 +66,7 @@ public class PasswordAuthentication
      * <p>
      * Example - aber.ac.uk domain : @aber.ac.uk
      * Example - MIT domain and all .ac.uk domains: @mit.edu, .ac.uk
+     * Example - MIT domain and NOT example.org: @mit.edu, !example.org
      *
      * @param email email
      * @throws SQLException if database error
@@ -87,7 +88,7 @@ public class PasswordAuthentication
             email = email.trim().toLowerCase();
             for (int i = 0; i < domains.length; i++) {
                 check = domains[i].trim().toLowerCase();
-                if (email.endsWith(check)) {
+                if (email.endsWith(check) || (check.startsWith("!") && !email.endsWith(check.substring(1)))) {
                     // A match, so we can register this user
                     return true;
                 }
