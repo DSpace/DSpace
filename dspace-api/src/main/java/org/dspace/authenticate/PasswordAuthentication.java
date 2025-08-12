@@ -79,7 +79,7 @@ public class PasswordAuthentication
         // Is there anything set in domain.valid?
         String[] domains = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                 .getArrayProperty("authentication-password.domain.valid");
-        if ((domains == null) || (domains.length == 0)) {
+        if (domains == null || domains.length == 0) {
             // No conditions set, so must be able to self register
             return true;
         } else {
