@@ -167,7 +167,7 @@ public class ItemUtils {
     }
 
     /**
-     * Sanitizes a string to remove characters that are invalid 
+     * Sanitizes a string to remove characters that are invalid
      * in XML 1.0 using the Apache Commons Text library.
      * @param value The string to sanitize.
      * @return A sanitized string, or null if the input was null.
