@@ -31,7 +31,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * See the <code>AuthenticationMethod</code> interface for more details.
  * <p>
  * The <em>username</em> is the E-Person's email address,
- * and and the <em>password</em> (given to the <code>authenticate()</code>
+ * and the <em>password</em> (given to the <code>authenticate()</code>
  * method) must match the EPerson password.
  * <p>
  * This is the default method for a new DSpace configuration.
