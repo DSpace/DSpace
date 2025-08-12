@@ -50,6 +50,9 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
     @Autowired
     private LDNMessageService ldnMessageService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Test
     public void oneStatusReviewedTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -70,7 +73,6 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
         String announceReview = IOUtils.toString(offerReviewStream, Charset.defaultCharset());
         offerReviewStream.close();
         String message = announceReview.replaceAll("<<object_handle>>", object);
-        ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
             .perform(post("/ldn/inbox")
@@ -117,7 +119,6 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
         String announceReview = IOUtils.toString(offerReviewStream, Charset.defaultCharset());
         offerReviewStream.close();
         String message = announceReview.replaceAll("<<object_handle>>", object);
-        ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
             .perform(post("/ldn/inbox")
@@ -152,7 +153,6 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
         String announceReview = IOUtils.toString(offerReviewStream, Charset.defaultCharset());
         offerReviewStream.close();
         String message = announceReview.replaceAll("<<object_handle>>", object);
-        ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
             .perform(post("/ldn/inbox")
@@ -173,8 +173,7 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
         ackMessage = ackMessage.replaceAll(
             "<<ldn_offer_review_uuid>>", "urn:uuid:0370c0fb-bb78-4a9b-87f5-bed307a509df");
 
-        ObjectMapper ackMapper = new ObjectMapper();
-        Notification ackNotification = ackMapper.readValue(ackMessage, Notification.class);
+        Notification ackNotification = mapper.readValue(ackMessage, Notification.class);
         getClient()
             .perform(post("/ldn/inbox")
                 .contentType("application/ld+json")
@@ -195,7 +194,7 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.notifyStatus").isArray())
             .andExpect(jsonPath("$.notifyStatus").isNotEmpty())
-            .andExpect(jsonPath("$.notifyStatus[0].status").value("REJECTED"))
+            .andExpect(jsonPath("$.notifyStatus[0].status").value("TENTATIVE_REJECT"))
             .andExpect(jsonPath("$.notifyStatus[0].serviceUrl").value("https://review-service.com/inbox/about/"))
             .andExpect(jsonPath("$.notifyStatus[0].offerType").value("Review"))
             ;

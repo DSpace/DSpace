@@ -9,7 +9,7 @@ package org.dspace.builder;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -146,7 +146,7 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
         return this;
     }
 
-    public OrcidHistoryBuilder withTimestamp(Date timestamp) {
+    public OrcidHistoryBuilder withTimestamp(Instant timestamp) {
         orcidHistory.setTimestamp(timestamp);
         return this;
     }

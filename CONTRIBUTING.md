@@ -10,7 +10,7 @@ DSpace is a community built and supported project. We do not have a centralized 
 ## Contribute new code via a Pull Request
 
 We accept [GitHub Pull Requests (PRs)](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork) at any time from anyone.
-Contributors to each release are recognized in our [Release Notes](https://wiki.lyrasis.org/display/DSDOC8x/Release+Notes).
+Contributors to each release are recognized in our [Release Notes](https://wiki.lyrasis.org/display/DSDOC9x/Release+Notes).
 
 Code Contribution Checklist
 - [ ] PRs _should_ be smaller in size (ideally less than 1,000 lines of code, not including comments & tests)

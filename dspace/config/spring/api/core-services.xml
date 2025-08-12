@@ -98,6 +98,7 @@
     <bean class='org.dspace.curate.XmlWorkflowCuratorServiceImpl'/>
 
     <bean class="org.dspace.disseminate.CitationDocumentServiceImpl"/>
+    <bean class="org.dspace.disseminate.CoverPageService"/>
 
     <!-- Ensure EmbargoService and AccessStatusService are initialized properly via init() method -->
     <bean class="org.dspace.embargo.EmbargoServiceImpl" init-method="init"/>
@@ -107,8 +108,12 @@
     <bean class="org.dspace.eperson.EPersonServiceImpl"/>
     <bean class="org.dspace.eperson.GroupServiceImpl"/>
     <bean class="org.dspace.eperson.RegistrationDataServiceImpl"/>
+    <bean class="org.dspace.eperson.RegistrationDataMetadataServiceImpl"/>
     <bean class="org.dspace.eperson.SubscribeServiceImpl"/>
-    <bean class="org.dspace.eperson.CaptchaServiceImpl"/>
+    <!-- Use CaptchaServiceImpl for Google ReCaptcha -->
+    <bean class="org.dspace.eperson.CaptchaServiceImpl" id="googleCaptchaService"/>
+    <!-- Use AltchaCaptchaServiceImpl for ALTCHA captcha -->
+    <bean class="org.dspace.eperson.AltchaCaptchaServiceImpl" id="altchaCaptchaService"/>
     <bean class="org.dspace.event.EventServiceImpl"/>
 
     <bean class="org.dspace.handle.HandleServiceImpl"/>
@@ -156,6 +161,9 @@
 
     <bean class="org.dspace.authorize.ValidatePasswordServiceImpl"/>
     <bean class="org.dspace.authorize.RegexPasswordValidator" />
+
+    <bean id="org.dspace.app.client.DSpaceHttpClientFactory" class="org.dspace.app.client.DSpaceHttpClientFactory"/>
+    <bean class="org.dspace.app.client.DSpaceProxyRoutePlanner"/>
 
     <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
 

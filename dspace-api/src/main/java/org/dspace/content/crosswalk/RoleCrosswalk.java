@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.packager.PackageDisseminator;
@@ -208,7 +209,7 @@ public class RoleCrosswalk
 
             try {
                 //Try to parse our XML results (which were disseminated by the Packager)
-                SAXBuilder builder = new SAXBuilder();
+                SAXBuilder builder = XMLUtils.getSAXBuilder();
                 Document xmlDocument = builder.build(tempFile);
                 //If XML parsed successfully, return root element of doc
                 if (xmlDocument != null && xmlDocument.hasRootElement()) {

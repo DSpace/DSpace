@@ -15,11 +15,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
-import java.text.DateFormat;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.time.Period;
-import java.util.Date;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
@@ -361,7 +358,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         }
 
         try (InputStream is = IOUtils.toInputStream("test", CharEncoding.UTF_8)) {
-            Bitstream bitstream4 = BitstreamBuilder.createBitstream(context, item, is, "LICENSE")
+            Bitstream bitstream4 = BitstreamBuilder.createBitstream(context, item, is, Constants.LICENSE_BUNDLE_NAME)
                     .withName("Bitstream 4")
                     .withDescription("description")
                     .withMimeType("application/pdf")
@@ -867,8 +864,6 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
     @Test
     public void getDescribedBy() throws Exception {
         context.turnOffAuthorisationSystem();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String currentDateInFormat = dateFormat.format(new Date());
         String title = "Item Test";
         Item item = ItemBuilder.createItem(context, collection)
                 .withTitle(title)

@@ -8,7 +8,7 @@
 package org.dspace.authorize.service;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
@@ -328,6 +328,19 @@ public interface AuthorizeService {
      * @param c    context
      * @param src  source of policies
      * @param dest destination of inherited policies
+     * @param includeCustom whether TYPE_CUSTOM policies should be inherited
+     * @throws SQLException       if there's a database problem
+     * @throws AuthorizeException if the current user is not authorized to add these policies
+     */
+    public void inheritPolicies(Context c, DSpaceObject src, DSpaceObject dest, boolean includeCustom)
+            throws SQLException, AuthorizeException;
+
+    /**
+     * Add policies to an object to match those from a previous object
+     *
+     * @param c    context
+     * @param src  source of policies
+     * @param dest destination of inherited policies
      * @throws SQLException       if there's a database problem
      * @throws AuthorizeException if the current user is not authorized to add these policies
      */
@@ -475,10 +488,11 @@ public interface AuthorizeService {
 
     public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson,
                                                int type, String rpType, String rpName, String rpDescription,
-                                               Date startDate, Date endDate) throws SQLException, AuthorizeException;
+                                               LocalDate startDate, LocalDate endDate)
+        throws SQLException, AuthorizeException;
 
     public ResourcePolicy createOrModifyPolicy(ResourcePolicy policy, Context context, String name, Group group,
-                                               EPerson ePerson, Date embargoDate, int action, String reason,
+                                               EPerson ePerson, LocalDate embargoDate, int action, String reason,
                                                DSpaceObject dso) throws AuthorizeException, SQLException;
 
     /**
@@ -603,5 +617,11 @@ public interface AuthorizeService {
      */
     public void replaceAllPolicies(Context context, DSpaceObject source, DSpaceObject dest)
             throws SQLException, AuthorizeException;
+
+    public void addDefaultPoliciesNotInPlace(Context context, DSpaceObject dso,
+            List<ResourcePolicy> defaultCollectionPolicies) throws SQLException, AuthorizeException;
+
+    public void addCustomPoliciesNotInPlace(Context context, DSpaceObject dso,
+            List<ResourcePolicy> defaultCollectionPolicies) throws SQLException, AuthorizeException;
 
 }

@@ -23,10 +23,10 @@ import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jakarta.el.MethodNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -152,7 +152,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item)
             throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for Scopus");
+        throw new UnsupportedOperationException("This method is not implemented for Scopus");
     }
 
     @Override
@@ -209,9 +209,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                     return 0;
                 }
 
-                SAXBuilder saxBuilder = new SAXBuilder();
-                // disallow DTD parsing to ensure no XXE attacks can occur
-                saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
+                SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
                 Document document = saxBuilder.build(new StringReader(response));
                 Element root = document.getRootElement();
 
@@ -398,9 +396,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private List<Element> splitToRecords(String recordsSrc) {
         try {
-            SAXBuilder saxBuilder = new SAXBuilder();
-            // disallow DTD parsing to ensure no XXE attacks can occur
-            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
+            SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
             Document document = saxBuilder.build(new StringReader(recordsSrc));
             Element root = document.getRootElement();
             String totalResults = root.getChildText("totalResults", Namespace.getNamespace("http://a9.com/-/spec/opensearch/1.1/"));

@@ -57,6 +57,11 @@ public class IdentifierServiceImpl implements IdentifierService {
         }
     }
 
+    @Override
+    public List<IdentifierProvider> getProviders() {
+        return this.providers;
+    }
+
     /**
      * Reserves identifiers for the item
      *

@@ -7,17 +7,18 @@
  */
 package org.dspace.external;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 
 /**
  * @author Antoine Snyers (antoine at atmire.com)
@@ -39,7 +40,7 @@ public class OrcidRestConnector {
     }
 
     public InputStream get(String path, String accessToken) {
-        HttpResponse getResponse = null;
+        CloseableHttpResponse getResponse = null;
         InputStream result = null;
         path = trimSlashes(path);
 
@@ -49,11 +50,13 @@ public class OrcidRestConnector {
             httpGet.addHeader("Content-Type", "application/vnd.orcid+xml");
             httpGet.addHeader("Authorization","Bearer " + accessToken);
         }
-        try {
-            HttpClient httpClient = HttpClientBuilder.create().build();
+        try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
             getResponse = httpClient.execute(httpGet);
-            //do not close this httpClient
-            result = getResponse.getEntity().getContent();
+            try (InputStream responseStream = getResponse.getEntity().getContent()) {
+                // Read all the content of the response stream into a byte array to prevent TruncatedChunkException
+                byte[] content = responseStream.readAllBytes();
+                result = new ByteArrayInputStream(content);
+            }
         } catch (Exception e) {
             getGotError(e, fullPath);
         }

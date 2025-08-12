@@ -136,5 +136,22 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
         <module name="OneStatementPerLine"/>
         <!-- Require that "catch" statements are not empty (must at least contain a comment) -->
         <module name="EmptyCatchBlock"/>
+
+        <!-- Require to use DSpaceHttpClientFactory.getClient() statement instead of creating directly the client -->
+        <module name="Regexp">
+            <property name="format" value="HttpClientBuilder\.create\s*\(\s*\)" />
+            <property name="message" value="Use DSpaceHttpClientFactory.getClient() instead of HttpClientBuilder.create()" />
+            <property name="illegalPattern" value="true"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <!-- Require to use DSpaceHttpClientFactory.getClient() statement instead of creating directly the client -->
+        <module name="Regexp">
+            <property name="format" value="HttpClients\.createDefault\s*\(\s*\)" />
+            <property name="message" value="Use DSpaceHttpClientFactory.getClient() instead of HttpClients.createDefault()" />
+            <property name="illegalPattern" value="true"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+
     </module>
 </module>

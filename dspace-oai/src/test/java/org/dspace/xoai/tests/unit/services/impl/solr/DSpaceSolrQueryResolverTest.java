@@ -10,8 +10,8 @@ package org.dspace.xoai.tests.unit.services.impl.solr;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.lyncode.xoai.dataprovider.data.Filter;
@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class DSpaceSolrQueryResolverTest extends AbstractQueryResolverTest {
-    private static final Date DATE = new Date();
+    private static final Instant DATE = Instant.now();
     private static final String SET = "col_testSet";
     private static final String FIELD_1 = "dc.title";
     private static final String FIELD_2 = "dc.type";
