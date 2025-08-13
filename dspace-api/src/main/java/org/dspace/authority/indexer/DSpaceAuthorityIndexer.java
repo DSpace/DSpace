@@ -80,7 +80,15 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
             throws SQLException, AuthorizeException {
         List<AuthorityValue> values = new ArrayList<>();
         for (String metadataField : metadataFields) {
-            List<MetadataValue> metadataValues = itemService.getMetadataByMetadataString(item, metadataField);
+
+            String[] fieldParts = metadataField.split("\\.");
+            String schema = (fieldParts.length > 0 ? fieldParts[0] : null);
+            String element = (fieldParts.length > 1 ? fieldParts[1] : null);
+            String qualifier = (fieldParts.length > 2 ? fieldParts[2] : null);
+
+            // Get metadata values without virtual metadata
+            List<MetadataValue> metadataValues = itemService.getMetadata(item, schema, element, qualifier, Item.ANY,
+                false);
             for (MetadataValue metadataValue : metadataValues) {
                 String content = metadataValue.getValue();
                 String authorityKey = metadataValue.getAuthority();
@@ -140,12 +148,12 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                 !metadataAuthorityKey.startsWith(AuthorityValueService.GENERATE)) {
             // !uid.startsWith(AuthorityValueGenerator.GENERATE) is not strictly
             // necessary here but it prevents exceptions in solr
-            AuthorityValue value = authorityValueService.findByUID(context, metadataAuthorityKey);
+            AuthorityValue value = authorityValueService.findByUID(metadataAuthorityKey);
             if (value != null) {
                 return value;
             }
         }
-        return authorityValueService.generate(context, metadataAuthorityKey,
+        return authorityValueService.generate(metadataAuthorityKey,
                 metadataContent, metadataField.replaceAll("\\.", "_"));
     }
 

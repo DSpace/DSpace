@@ -331,21 +331,21 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
 
         // Calling public parentCommunity as an admin user
         // Should succeed
-        getClient(adminToken).perform(get("/api/core/community/" + parentCommunity.getID()))
+        getClient(adminToken).perform(get("/api/core/communities/" + parentCommunity.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", CommunityMatcher
                                  .matchCommunityEntry(parentCommunity.getID(), parentCommunity.getHandle())));
 
         // Calling public parentCommunity as a normal EPerson
         // Should succeed
-        getClient(epersonToken).perform(get("/api/core/community/" + parentCommunity.getID()))
+        getClient(epersonToken).perform(get("/api/core/communities/" + parentCommunity.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", CommunityMatcher
                                  .matchCommunityEntry(parentCommunity.getID(), parentCommunity.getHandle())));
 
         // Calling public parentCommunity as an anon user
         // Should succeed
-        getClient().perform(get("/api/core/community/" + parentCommunity.getID()))
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", CommunityMatcher
                                  .matchCommunityEntry(parentCommunity.getID(), parentCommunity.getHandle())));
@@ -404,19 +404,19 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
 
         // Calling private parentCommunity as an admin user
         // Should succeed
-        getClient(adminToken).perform(get("/api/core/community/" + parentCommunity.getID()))
+        getClient(adminToken).perform(get("/api/core/communities/" + parentCommunity.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", CommunityMatcher
                                  .matchCommunityEntry(parentCommunity.getID(), parentCommunity.getHandle())));
 
         // Calling private parentCommunity as a normal EPerson
         // Shouldn't succeed
-        getClient(epersonToken).perform(get("/api/core/community/" + parentCommunity.getID()))
+        getClient(epersonToken).perform(get("/api/core/communities/" + parentCommunity.getID()))
                                .andExpect(status().isForbidden());
 
         // Calling private parentCommunity as an anon user
         // Shouldn't succeed
-        getClient().perform(get("/api/core/community/" + parentCommunity.getID()))
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID()))
                    .andExpect(status().isUnauthorized());
 
         // Calling fullProjection, as an admin user, of a private Collection should contain the parentCommunity

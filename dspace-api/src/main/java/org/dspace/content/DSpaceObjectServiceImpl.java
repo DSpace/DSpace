@@ -187,11 +187,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                                            String authority) {
         List<MetadataValue> metadata = getMetadata(dso, schema, element, qualifier, lang);
         List<MetadataValue> result = new ArrayList<>(metadata);
-        if (!authority.equals(Item.ANY)) {
+        if (!Item.ANY.equals(authority)) {
             Iterator<MetadataValue> iterator = result.iterator();
             while (iterator.hasNext()) {
                 MetadataValue metadataValue = iterator.next();
-                if (!authority.equals(metadataValue.getAuthority())) {
+                if (!StringUtils.equals(authority, metadataValue.getAuthority())) {
                     iterator.remove();
                 }
             }
@@ -242,9 +242,30 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     }
 
+    /**
+     * Add metadata value(s) to a MetadataField of a DSpace Object
+     * @param context current DSpace context
+     * @param dso DSpaceObject to modify
+     * @param metadataField MetadataField to add values to
+     * @param lang Language code to add
+     * @param values One or more metadata values to add
+     * @param authorities One or more authorities to add
+     * @param confidences One or more confidences to add (for authorities)
+     * @param placeSupplier Supplier of "place" for new metadata values
+     * @return List of newly added metadata values
+     * @throws SQLException if database error occurs
+     * @throws IllegalArgumentException for an empty list of values
+     */
     public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
             List<String> values, List<String> authorities, List<Integer> confidences, Supplier<Integer> placeSupplier)
                     throws SQLException {
+
+        // Throw an error if we are attempting to add empty values
+        if (values == null || values.isEmpty()) {
+            throw new IllegalArgumentException("Cannot add empty values to a new metadata field " +
+                                                   metadataField.toString() + " on object with uuid = " +
+                                                   dso.getID().toString() + " and type = " + getTypeText(dso));
+        }
 
         boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
@@ -302,7 +323,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     }
                 }
                 metadataValue.setValue(String.valueOf(dcvalue));
-                //An update here isn't needed, this is persited upon the merge of the owning object
+                //An update here isn't needed, this is persisted upon the merge of the owning object
 //            metadataValueService.update(context, metadataValue);
                 dso.addDetails(metadataField.toString());
             }
@@ -314,20 +335,26 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language,
                             String value, String authority, int confidence) throws SQLException {
-        return addMetadata(context, dso, metadataField, language, Arrays.asList(value), Arrays.asList(authority),
-                    Arrays.asList(confidence)).get(0);
+        List<MetadataValue> metadataValues =
+            addMetadata(context, dso, metadataField, language, Arrays.asList(value), Arrays.asList(authority),
+                        Arrays.asList(confidence));
+        return CollectionUtils.isNotEmpty(metadataValues) ? metadataValues.get(0) : null;
     }
 
     @Override
     public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
                              String lang, String value) throws SQLException {
-        return addMetadata(context, dso, schema, element, qualifier, lang, Arrays.asList(value)).get(0);
+        List<MetadataValue> metadataValues =
+            addMetadata(context, dso, schema, element, qualifier, lang, Arrays.asList(value));
+        return CollectionUtils.isNotEmpty(metadataValues) ? metadataValues.get(0) : null;
     }
 
     @Override
     public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language, String value)
         throws SQLException {
-        return addMetadata(context, dso, metadataField, language, Arrays.asList(value)).get(0);
+        List<MetadataValue> metadataValues =
+            addMetadata(context, dso, metadataField, language, Arrays.asList(value));
+        return CollectionUtils.isNotEmpty(metadataValues) ? metadataValues.get(0) : null;
     }
 
     @Override
@@ -482,7 +509,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         MetadataField metadataField = metadataValue.getMetadataField();
         MetadataSchema metadataSchema = metadataField.getMetadataSchema();
         // We will attempt to disprove a match - if we can't we have a match
-        if (!element.equals(Item.ANY) && !element.equals(metadataField.getElement())) {
+        if (!Item.ANY.equals(element) && !StringUtils.equals(element, metadataField.getElement())) {
             // Elements do not match, no wildcard
             return false;
         }
@@ -493,9 +520,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 // Value is qualified, so no match
                 return false;
             }
-        } else if (!qualifier.equals(Item.ANY)) {
+        } else if (!Item.ANY.equals(qualifier)) {
             // Not a wildcard, so qualifier must match exactly
-            if (!qualifier.equals(metadataField.getQualifier())) {
+            if (!StringUtils.equals(qualifier, metadataField.getQualifier())) {
                 return false;
             }
         }
@@ -506,15 +533,15 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 // Value is qualified, so no match
                 return false;
             }
-        } else if (!language.equals(Item.ANY)) {
+        } else if (!Item.ANY.equals(language)) {
             // Not a wildcard, so language must match exactly
-            if (!language.equals(metadataValue.getLanguage())) {
+            if (!StringUtils.equals(language, metadataValue.getLanguage())) {
                 return false;
             }
         }
 
-        if (!schema.equals(Item.ANY)) {
-            if (metadataSchema != null && !metadataSchema.getName().equals(schema)) {
+        if (!Item.ANY.equals(schema)) {
+            if (!StringUtils.equals(schema, metadataSchema.getName())) {
                 // The namespace doesn't match
                 return false;
             }
@@ -629,6 +656,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     // E.g. for an Author relationship,
                     //   the place should be updated using the same principle as dc.contributor.author.
                     StringUtils.startsWith(metadataValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)
+                        && metadataValue instanceof RelationshipMetadataValue
                         && ((RelationshipMetadataValue) metadataValue).isUseForPlace()
                 ) {
                     int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);

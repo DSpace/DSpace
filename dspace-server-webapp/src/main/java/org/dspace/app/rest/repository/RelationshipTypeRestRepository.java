@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * This is the repository that is responsible to manage RelationshipType Rest objects
  */
-@Component(RelationshipTypeRest.CATEGORY + "." + RelationshipTypeRest.NAME)
+@Component(RelationshipTypeRest.CATEGORY + "." + RelationshipTypeRest.PLURAL_NAME)
 public class RelationshipTypeRestRepository extends DSpaceRestRepository<RelationshipTypeRest, Integer> {
 
     @Autowired

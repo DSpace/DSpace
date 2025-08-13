@@ -76,15 +76,15 @@ public class SolrAuthority implements ChoiceAuthority {
                 Integer.parseInt(locale);
                 locale = null;
             } catch (NumberFormatException e) {
-                //Everything is allright
+                //Everything is alright
             }
             if (locale != null && !"".equals(locale)) {
                 localSearchField = searchField + "_" + locale;
             }
 
-            String query = "(" + toQuery(searchField, text) + ") ";
+            String query = "(" + toQuery(searchField, text) + ")";
             if (!localSearchField.equals("")) {
-                query += " or (" + toQuery(localSearchField, text) + ")";
+                query += " OR (" + toQuery(localSearchField, text) + ")";
             }
             queryArgs.setQuery(query);
         }
@@ -200,7 +200,7 @@ public class SolrAuthority implements ChoiceAuthority {
     }
 
     private String toQuery(String searchField, String text) {
-        return searchField + ":(" + text.toLowerCase().replaceAll(":", "\\\\:") + "*) or " + searchField + ":(" + text
+        return searchField + ":(" + text.toLowerCase().replaceAll(":", "\\\\:") + "*) OR " + searchField + ":(" + text
             .toLowerCase().replaceAll(":", "\\\\:") + ")";
     }
 

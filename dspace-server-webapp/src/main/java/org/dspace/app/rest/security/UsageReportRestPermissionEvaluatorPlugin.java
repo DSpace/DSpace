@@ -13,6 +13,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.UsageReportRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
@@ -22,8 +24,6 @@ import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UsageReportRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(UsageReportRestPermissionEvaluatorPlugin.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private ConfigurationService configurationService;
@@ -95,7 +95,7 @@ public class UsageReportRestPermissionEvaluatorPlugin extends RestObjectPermissi
                 }
                 return authorizeService.authorizeActionBoolean(context, dso, restPermission.getDspaceApiActionId());
             } catch (SQLException e) {
-                log.error(e.getMessage(), e);
+                log.error(e::getMessage, e);
             }
         }
         return false;

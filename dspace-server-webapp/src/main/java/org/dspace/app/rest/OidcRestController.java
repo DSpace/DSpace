@@ -10,15 +10,15 @@ package org.dspace.app.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Rest controller that handles redirect after OIDC authentication succeded.
+ * Rest controller that handles redirect after OIDC authentication succeeded.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api/" + AuthnRest.CATEGORY + "/oidc")
 public class OidcRestController {
 
-    private static final Logger log = LoggerFactory.getLogger(OidcRestController.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private ConfigurationService configurationService;
@@ -66,11 +66,12 @@ public class OidcRestController {
         }
 
         if (StringUtils.equalsAnyIgnoreCase(redirectHostName, allowedHostNames.toArray(new String[0]))) {
-            log.debug("OIDC redirecting to " + redirectUrl);
+            log.debug("OIDC redirecting to {}", redirectUrl);
             response.sendRedirect(redirectUrl); // lgtm [java/unvalidated-url-redirection]
         } else {
-            log.error("Invalid OIDC redirectURL=" + redirectUrl +
-                          ". URL doesn't match hostname of server or UI!");
+            log.error("Invalid OIDC redirectURL={}."
+                    + " URL doesn't match hostname of server or UI!",
+                    redirectUrl);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST,
                                "Invalid redirectURL! Must match server or ui hostname.");
         }

@@ -23,7 +23,7 @@ public class SubmissionAccessOptionRest extends BaseObjectRest<String> {
     private static final long serialVersionUID = -7708437586052984082L;
 
     public static final String NAME = "submissionaccessoption";
-    public static final String PLURAL = "submissionaccessoptions";
+    public static final String PLURAL_NAME = "submissionaccessoptions";
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
     private String id;
@@ -62,6 +62,11 @@ public class SubmissionAccessOptionRest extends BaseObjectRest<String> {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

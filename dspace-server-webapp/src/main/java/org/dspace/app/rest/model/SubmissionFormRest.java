@@ -18,6 +18,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class SubmissionFormRest extends BaseObjectRest<String> {
     public static final String NAME = "submissionform";
+    public static final String PLURAL_NAME = "submissionforms";
     public static final String NAME_LINK_ON_PANEL = RestAddressableModel.CONFIGURATION;
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
@@ -59,6 +60,11 @@ public class SubmissionFormRest extends BaseObjectRest<String> {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

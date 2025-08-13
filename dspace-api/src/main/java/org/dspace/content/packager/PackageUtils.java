@@ -503,7 +503,7 @@ public class PackageUtils {
                     wsi = workspaceItemService.create(context, (Collection)parent, params.useCollectionTemplate());
                 } else {
                     wsi = workspaceItemService.create(context, (Collection)parent,
-                            uuid, params.useCollectionTemplate());
+                            uuid, params.useCollectionTemplate(), false);
                 }
 
                 // Please note that we are returning an Item which is *NOT* yet in the Archive,

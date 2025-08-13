@@ -8,7 +8,9 @@
 package org.dspace.versioning;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -74,7 +76,7 @@ public class VersioningServiceImpl implements VersioningService {
 
                 // get dc:date.accessioned to be set as first version date...
                 List<MetadataValue> values = itemService.getMetadata(item, "dc", "date", "accessioned", Item.ANY);
-                Date versionDate = new Date();
+                ZonedDateTime versionDate = ZonedDateTime.now(ZoneOffset.UTC);
                 if (values != null && values.size() > 0) {
                     String date = values.get(0).getValue();
                     versionDate = new DCDate(date).toDate();
@@ -85,7 +87,7 @@ public class VersioningServiceImpl implements VersioningService {
             Item itemNew = provider.createNewItemAndAddItInWorkspace(c, item);
 
             // create new version
-            Version version = createVersion(c, vh, itemNew, summary, new Date());
+            Version version = createVersion(c, vh, itemNew, summary, ZonedDateTime.now(ZoneOffset.UTC));
 
             // Complete any update of the Item and new Identifier generation that needs to happen
             provider.updateItemState(c, itemNew, item);
@@ -193,7 +195,7 @@ public class VersioningServiceImpl implements VersioningService {
     }
 
     @Override
-    public Version createNewVersion(Context context, VersionHistory history, Item item, String summary, Date date,
+    public Version createNewVersion(Context context, VersionHistory history, Item item, String summary, Instant date,
                                     int versionNumber) {
         try {
             Version version = versionDAO.create(context, new Version());
@@ -239,15 +241,15 @@ public class VersioningServiceImpl implements VersioningService {
 
 // **** PROTECTED METHODS!!
 
-    protected Version createVersion(Context c, VersionHistory vh, Item item, String summary, Date date)
+    protected Version createVersion(Context c, VersionHistory vh, Item item, String summary, ZonedDateTime date)
         throws SQLException {
-        return createNewVersion(c, vh, item, summary, date, getNextVersionNumer(c, vh));
+        return createNewVersion(c, vh, item, summary, date.toInstant(), getNextVersionNumer(c, vh));
     }
 
     protected int getNextVersionNumer(Context c, VersionHistory vh) throws SQLException {
         int next = versionDAO.getNextVersionNumber(c, vh);
 
-        // check if we have uncommited versions in DSpace's cache
+        // check if we have uncommitted versions in DSpace's cache
         if (versionHistoryService.getLatestVersion(c, vh) != null
             && versionHistoryService.getLatestVersion(c, vh).getVersionNumber() >= next) {
             next = versionHistoryService.getLatestVersion(c, vh).getVersionNumber() + 1;

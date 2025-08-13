@@ -11,8 +11,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -21,7 +19,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -496,8 +498,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 // Finish creating the item. This actually assigns the handle,
                 // and will either install item immediately or start a workflow, based on params
                 PackageUtils.finishCreateItem(context, wsi, handle, params);
+            } else {
+                // We should have a workspace item during ingest, so this code is only here for safety.
+                // Update the object to make sure all changes are committed
+                PackageUtils.updateDSpaceObject(context, dso);
             }
-
         } else if (type == Constants.COLLECTION || type == Constants.COMMUNITY) {
             // Add logo if one is referenced from manifest
             addContainerLogo(context, dso, manifest, pkgFile, params);
@@ -511,6 +516,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // (this allows subclasses to do some final validation / changes as
             // necessary)
             finishObject(context, dso, params);
+
+            // Update the object to make sure all changes are committed
+            PackageUtils.updateDSpaceObject(context, dso);
         } else if (type == Constants.SITE) {
             // Do nothing by default -- Crosswalks will handle anything necessary to ingest at Site-level
 
@@ -518,17 +526,14 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // (this allows subclasses to do some final validation / changes as
             // necessary)
             finishObject(context, dso, params);
+
+            // Update the object to make sure all changes are committed
+            PackageUtils.updateDSpaceObject(context, dso);
         } else {
             throw new PackageValidationException(
                 "Unknown DSpace Object type in package, type="
                     + String.valueOf(type));
         }
-
-        // -- Step 6 --
-        // Finish things up!
-
-        // Update the object to make sure all changes are committed
-        PackageUtils.updateDSpaceObject(context, dso);
 
         return dso;
     }
@@ -635,6 +640,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 }
                 owningCollection = inProgressSubmission.getCollection();
             }
+
+            itemService.populateWithTemplateItemMetadata(context, owningCollection, params.useCollectionTemplate(),
+                item);
 
             addLicense(context, item, license, owningCollection
                 , params);
@@ -1307,13 +1315,12 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         if (params.getBooleanProperty("manifestOnly", false)) {
             // NOTE: since we are only dealing with a METS manifest,
             // we will assume all external files are available via URLs.
-            try {
+            try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
                 // attempt to open a connection to given URL
-                URL fileURL = new URL(path);
-                URLConnection connection = fileURL.openConnection();
-
-                // open stream to access file contents
-                return connection.getInputStream();
+                try (CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(path))) {
+                    // open stream to access file contents
+                    return httpResponse.getEntity().getContent();
+                }
             } catch (IOException io) {
                 log
                     .error("Unable to retrieve external file from URL '"

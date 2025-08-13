@@ -96,7 +96,7 @@
 
     <bean id="arxivAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="arxiv.author.name"/>
-        <property name="query" value="ns:author/name"/>
+        <property name="query" value="ns:author/ns:name"/>
         <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
     </bean>
     <bean id="arxiv.author.name" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
@@ -113,9 +113,5 @@
         key-type="java.lang.String" value-type="java.lang.String">
     	<entry key="http://arxiv.org/schemas/atom" value="arxiv" />
     </util:map>
-
-    <bean class="java.lang.Integer" id="maxRetry">
-        <constructor-arg value="3"/>
-    </bean>
 
 </beans>

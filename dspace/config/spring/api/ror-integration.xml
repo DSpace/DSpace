@@ -1,0 +1,111 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config/>
+    <!-- allows us to use spring annotations in beans -->
+    
+     <util:map id="rorMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig" value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <entry key-ref="ror.title" value-ref="rorTitleContrib"/>
+        <entry key-ref="ror.identifier" value-ref="rorIdentifierContrib"/>
+        <entry key-ref="ror.links" value-ref="rorLinksContrib"/>
+        <entry key-ref="ror.types" value-ref="rorTypesContrib"/>
+        <entry key-ref="ror.acronym" value-ref="rorAcronymContrib"/>
+        <entry key-ref="ror.country" value-ref="rorCountryContrib"/>
+        <entry key-ref="ror.established" value-ref="rorEstablishedContrib"/>
+        <entry key-ref="ror.fundref" value-ref="rorFundRefContrib"/>
+        <entry key-ref="ror.isni" value-ref="rorISNIContrib"/>
+        <entry key-ref="ror.parent" value-ref="rorParentContrib"/>
+    </util:map>
+
+    <bean id="rorTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="ror.title"/>
+        <property name="query" value="/name"/>
+    </bean>
+    <bean id="ror.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.legalName"/>
+    </bean>
+
+    <bean id="rorIdentifierContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="ror.identifier"/>
+        <property name="query" value="/id"/>
+    </bean>
+    <bean id="ror.identifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.identifier.ror"/>
+    </bean>
+
+    <bean id="rorAcronymContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="ror.acronym"/>
+        <property name="query" value="/acronyms"/>
+    </bean>
+    <bean id="ror.acronym" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.alternateName"/>
+    </bean>
+
+    <bean id="rorLinksContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="ror.links"/>
+        <property name="query" value="/links"/>
+    </bean>
+    <bean id="ror.links" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.url"/>
+    </bean>
+
+    <bean id="rorTypesContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="ror.types"/>
+        <property name="query" value="/types"/>
+    </bean>
+    <bean id="ror.types" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.type"/>
+    </bean>
+
+    <bean id="rorCountryContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="ror.country"/>
+        <property name="query" value="/country/country_code"/>
+    </bean>
+    <bean id="ror.country" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.address.addressCountry"/>
+    </bean>
+
+    <bean id="rorEstablishedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="ror.established"/>
+        <property name="query" value="/established"/>
+    </bean>
+    <bean id="ror.established" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.foundingDate"/>
+    </bean>
+
+    <bean id="rorFundRefContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="ror.fundref"/>
+        <property name="query" value="/external_ids/FundRef/all"/>
+    </bean>
+    <bean id="ror.fundref" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.identifier.crossrefid"/>
+    </bean>
+
+    <bean id="rorISNIContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="ror.isni"/>
+        <property name="query" value="/external_ids/ISNI/all"/>
+    </bean>
+    <bean id="ror.isni" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.identifier.isni"/>
+    </bean>
+
+    <bean id="rorParentContrib" class="org.dspace.importer.external.metadatamapping.contributor.RorParentOrgUnitMetadataContributor">
+        <property name="field" ref="ror.parent"/>
+        <property name="query" value="/relationships"/>
+        <property name="typeField" value="type"/>
+        <property name="labelField" value="label"/>
+        <property name="parentType" value="Parent"/>
+    </bean>
+    
+    <bean id="ror.parent" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.parentOrganization"/>
+    </bean>
+    
+</beans>

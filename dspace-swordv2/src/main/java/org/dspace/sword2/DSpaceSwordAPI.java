@@ -20,9 +20,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -247,7 +249,7 @@ public class DSpaceSwordAPI {
                                Context context, VerboseDescription verboseDescription,
                                Deposit deposit, DepositResult result)
         throws DSpaceSwordException, SwordServerException {
-        // if there's an item availalble, and we want to keep the original
+        // if there's an item available, and we want to keep the original
         // then do that
         try {
             if (swordConfig.isKeepOriginal()) {
@@ -376,9 +378,8 @@ public class DSpaceSwordAPI {
 
             String fn = deposit.getFilename();
             if (fn == null || "".equals(fn)) {
-                SimpleDateFormat sdf = new SimpleDateFormat(
-                    "yyyy-MM-dd'T'HH:mm:ss");
-                fn = "sword-" + sdf.format(new Date());
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+                fn = "sword-" + formatter.format(LocalDateTime.now(ZoneOffset.UTC));
                 if (original) {
                     fn = fn + ".original";
                 }
@@ -397,8 +398,8 @@ public class DSpaceSwordAPI {
                                       boolean original)
         throws DSpaceSwordException {
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        String fn = "sword-" + sdf.format(new Date());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        String fn = "sword-" + formatter.format(LocalDateTime.now(ZoneOffset.UTC));
         if (original) {
             fn = fn + ".original";
         }
@@ -426,7 +427,7 @@ public class DSpaceSwordAPI {
         }
 
         String filenameBase =
-            "sword-" + auth.getUsername() + "-" + (new Date()).getTime();
+            "sword-" + auth.getUsername() + "-" + Instant.now().toEpochMilli();
 
         File packageFile = new File(path, filenameBase);
         File headersFile = new File(path, filenameBase + "-headers");
@@ -472,7 +473,7 @@ public class DSpaceSwordAPI {
         }
 
         String filenameBase =
-            "sword-" + auth.getUsername() + "-" + (new Date()).getTime();
+            "sword-" + auth.getUsername() + "-" + Instant.now().toEpochMilli();
 
         File packageFile = new File(path, filenameBase);
         File headersFile = new File(path, filenameBase + "-headers");

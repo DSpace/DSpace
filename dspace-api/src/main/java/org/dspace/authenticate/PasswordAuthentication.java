@@ -11,9 +11,9 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -82,7 +82,7 @@ public class PasswordAuthentication
             // No conditions set, so must be able to self register
             return true;
         } else {
-            // Itterate through all domains
+            // Iterate through all domains
             String check;
             email = email.trim().toLowerCase();
             for (int i = 0; i < domains.length; i++) {
