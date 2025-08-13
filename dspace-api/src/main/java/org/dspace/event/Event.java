@@ -80,7 +80,7 @@ public class Event implements Serializable {
     public static final int EVENT_MASK = 1; // mask of event type
 
     // XXX NOTE: keep this up to date with any changes to event (action) types.
-    protected static final String eventTypeText[] = {"CREATE", "MODIFY",
+    protected static final String[] eventTypeText = {"CREATE", "MODIFY",
         "MODIFY_METADATA", "ADD", "REMOVE", "DELETE", "INSTALL"};
 
     /** XXX NOTE: These constants must be kept synchronized * */
@@ -590,7 +590,7 @@ public class Event implements Serializable {
     public boolean pass(List<int[]> filters) {
         boolean result = false;
 
-        for (int filter[] : filters) {
+        for (int[] filter : filters) {
             if ((subjectType & filter[SUBJECT_MASK]) != 0 && (eventType & filter[EVENT_MASK]) != 0) {
                 result = true;
             }
