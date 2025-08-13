@@ -21,7 +21,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSDocument;
+import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.io.RandomAccessReadBuffer;
+import org.apache.pdfbox.io.ScratchFile;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.dspace.authorize.AuthorizeException;
@@ -67,8 +69,8 @@ import org.dspace.workflow.WorkflowException;
  * @see PackageDisseminator
  */
 public class PDFPackager
-    extends SelfNamedPlugin
-    implements PackageIngester, PackageDisseminator {
+        extends SelfNamedPlugin
+        implements PackageIngester, PackageDisseminator {
     /**
      * log4j category
      */
@@ -85,14 +87,14 @@ public class PDFPackager
     protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
     protected final BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
-                                                                                         .getBitstreamFormatService();
+            .getBitstreamFormatService();
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected final WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance()
-                                                                                     .getWorkspaceItemService();
+            .getWorkspaceItemService();
 
     // utility to grovel bitstream formats..
     protected void setFormatToMIMEType(Context context, Bitstream bs, String mimeType)
-        throws SQLException {
+            throws SQLException {
         List<BitstreamFormat> bf = bitstreamFormatService.findNonInternal(context);
         for (BitstreamFormat aBf : bf) {
             if (aBf.getMIMEType().equalsIgnoreCase(mimeType)) {
@@ -130,8 +132,8 @@ public class PDFPackager
     public DSpaceObject ingest(Context context, DSpaceObject parent,
                                File pkgFile, PackageParameters params,
                                String license)
-        throws PackageValidationException, CrosswalkException,
-        AuthorizeException, SQLException, IOException, WorkflowException {
+            throws PackageValidationException, CrosswalkException,
+            AuthorizeException, SQLException, IOException, WorkflowException {
         boolean success = false;
         Bundle original = null;
         Bitstream bs = null;
@@ -166,8 +168,8 @@ public class PDFPackager
             workspaceItemService.update(context, wi);
             success = true;
             log.info(LogHelper.getHeader(context, "ingest",
-                                          "Created new Item, db ID=" + String.valueOf(myitem.getID()) +
-                                              ", WorkspaceItem ID=" + String.valueOf(wi.getID())));
+                    "Created new Item, db ID=" + String.valueOf(myitem.getID()) +
+                            ", WorkspaceItem ID=" + String.valueOf(wi.getID())));
 
             myitem = PackageUtils.finishCreateItem(context, wi, null, params);
             return myitem;
@@ -198,11 +200,11 @@ public class PDFPackager
     @Override
     public List<String> ingestAll(Context context, DSpaceObject parent, File pkgFile,
                                   PackageParameters params, String license)
-        throws PackageException, UnsupportedOperationException,
-        CrosswalkException, AuthorizeException,
-        SQLException, IOException {
+            throws PackageException, UnsupportedOperationException,
+            CrosswalkException, AuthorizeException,
+            SQLException, IOException {
         throw new UnsupportedOperationException(
-            "PDF packager does not support the ingestAll() operation at this time.");
+                "PDF packager does not support the ingestAll() operation at this time.");
     }
 
 
@@ -219,9 +221,9 @@ public class PDFPackager
     @Override
     public DSpaceObject replace(Context context, DSpaceObject dso,
                                 File pkgFile, PackageParameters params)
-        throws PackageException, UnsupportedOperationException,
-        CrosswalkException, AuthorizeException,
-        SQLException, IOException {
+            throws PackageException, UnsupportedOperationException,
+            CrosswalkException, AuthorizeException,
+            SQLException, IOException {
         throw new UnsupportedOperationException("PDF packager does not support the replace() operation at this time.");
     }
 
@@ -238,11 +240,11 @@ public class PDFPackager
     @Override
     public List<String> replaceAll(Context context, DSpaceObject dso,
                                    File pkgFile, PackageParameters params)
-        throws PackageException, UnsupportedOperationException,
-        CrosswalkException, AuthorizeException,
-        SQLException, IOException {
+            throws PackageException, UnsupportedOperationException,
+            CrosswalkException, AuthorizeException,
+            SQLException, IOException {
         throw new UnsupportedOperationException(
-            "PDF packager does not support the replaceAll() operation at this time.");
+                "PDF packager does not support the replaceAll() operation at this time.");
     }
 
     /**
@@ -259,15 +261,15 @@ public class PDFPackager
     @Override
     public void disseminate(Context context, DSpaceObject dso,
                             PackageParameters params, File pkgFile)
-        throws PackageValidationException, CrosswalkException,
-        AuthorizeException, SQLException, IOException {
+            throws PackageValidationException, CrosswalkException,
+            AuthorizeException, SQLException, IOException {
         if (dso.getType() != Constants.ITEM) {
             throw new PackageValidationException("This disseminator can only handle objects of type ITEM.");
         }
 
         Item item = (Item) dso;
         BitstreamFormat pdff = bitstreamFormatService.findByShortDescription(context,
-                                                                             BITSTREAM_FORMAT_NAME);
+                BITSTREAM_FORMAT_NAME);
         if (pdff == null) {
             throw new PackageValidationException("Cannot find BitstreamFormat \"" + BITSTREAM_FORMAT_NAME + "\"");
         }
@@ -306,10 +308,10 @@ public class PDFPackager
     @Override
     public List<File> disseminateAll(Context context, DSpaceObject dso,
                                      PackageParameters params, File pkgFile)
-        throws PackageException, CrosswalkException,
-        AuthorizeException, SQLException, IOException {
+            throws PackageException, CrosswalkException,
+            AuthorizeException, SQLException, IOException {
         throw new UnsupportedOperationException(
-            "PDF packager does not support the disseminateAll() operation at this time.");
+                "PDF packager does not support the disseminateAll() operation at this time.");
     }
 
 
@@ -325,13 +327,27 @@ public class PDFPackager
     }
 
     private void crosswalkPDF(Context context, Item item, InputStream metadata)
-        throws CrosswalkException, IOException, SQLException, AuthorizeException {
+            throws CrosswalkException, IOException, SQLException, AuthorizeException {
         COSDocument cos = null;
 
         try {
-            PDDocument document = Loader.loadPDF(new RandomAccessReadBuffer(metadata));
-            cos = document.getDocument();
+            PDDocument document = null;
 
+            long useRAM = Runtime.getRuntime().freeMemory() * 80 / 100; // use up to 80% of JVM free memory
+            try {
+                document = Loader.loadPDF(
+                        new RandomAccessReadBuffer(metadata),
+                        () -> new ScratchFile(MemoryUsageSetting.setupMixed(useRAM))); // then fallback to temp file (unlimited size)
+            } catch (IOException ioe) {
+                log.warn("Error initializing scratch file: " + ioe.getMessage());
+            }
+
+            // sanity check: loaded PDF document must not be null.
+            if(document == null) {
+                throw new MetadataValidationException("The provided stream could not be parsed into a PDF document.");
+            }
+
+            cos = document.getDocument();
             // sanity check: PDFBox breaks on encrypted documents, so give up.
             if (cos.getEncryptionDictionary() != null) {
                 throw new MetadataValidationException("This packager cannot accept an encrypted PDF document.");
@@ -361,7 +377,7 @@ public class PDFPackager
             // sanity check: item must have a title.
             if (title == null) {
                 throw new MetadataValidationException(
-                    "This PDF file is unacceptable, it does not have a value for \"Title\" in its Info dictionary.");
+                        "This PDF file is unacceptable, it does not have a value for \"Title\" in its Info dictionary.");
             }
             if (log.isDebugEnabled()) {
                 log.debug("PDF Info dict title=\"" + title + "\"");
@@ -370,7 +386,7 @@ public class PDFPackager
             String value = docinfo.getAuthor();
             if (value != null) {
                 itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
-                                        "contributor", "author", null, value);
+                        "contributor", "author", null, value);
                 if (log.isDebugEnabled()) {
                     log.debug("PDF Info dict author=\"" + value + "\"");
                 }
@@ -379,28 +395,28 @@ public class PDFPackager
             value = docinfo.getCreator();
             if (value != null) {
                 itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
-                                        "description", "provenance", "en",
-                                        "Application that created the original document: " + value);
+                        "description", "provenance", "en",
+                        "Application that created the original document: " + value);
             }
 
             value = docinfo.getProducer();
             if (value != null) {
                 itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
-                                        "description", "provenance", "en",
-                                        "Original document converted to PDF by: " + value);
+                        "description", "provenance", "en",
+                        "Original document converted to PDF by: " + value);
             }
 
             value = docinfo.getSubject();
             if (value != null) {
                 itemService
-                    .addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
-                                 "description", "abstract", null, value);
+                        .addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                "description", "abstract", null, value);
             }
 
             value = docinfo.getKeywords();
             if (value != null) {
                 itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
-                                        "subject", "other", null, value);
+                        "subject", "other", null, value);
             }
 
             // Take either CreationDate or ModDate as "date.created",
@@ -412,9 +428,9 @@ public class PDFPackager
 
             if (calValue != null) {
                 itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "date", "created", null,
-                                        new DCDate(
-                                            ZonedDateTime.ofInstant(calValue.toInstant(), ZoneOffset.UTC)
-                                        ).toString());
+                        new DCDate(
+                                ZonedDateTime.ofInstant(calValue.toInstant(), ZoneOffset.UTC)
+                        ).toString());
             }
             itemService.update(context, item);
         } finally {
