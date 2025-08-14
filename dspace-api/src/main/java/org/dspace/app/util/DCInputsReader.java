@@ -167,7 +167,7 @@ public class DCInputsReader {
             List<DCInputSet> results = new ArrayList<DCInputSet>();
             for (int idx = 0; idx < config.getNumberOfSteps(); idx++) {
                 SubmissionStepConfig step = config.getStep(idx);
-                if (SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(step.getType())) {
+                if (step.supportsType(SubmissionStepConfig.INPUT_FORM_STEP_NAME)) {
                     results.add(getInputsByFormName(step.getId()));
                 }
             }
@@ -190,7 +190,7 @@ public class DCInputsReader {
             List<DCInputSet> results = new ArrayList<DCInputSet>();
             for (int idx = 0; idx < config.getNumberOfSteps(); idx++) {
                 SubmissionStepConfig step = config.getStep(idx);
-                if (SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(step.getType())) {
+                if (step.supportsType(SubmissionStepConfig.INPUT_FORM_STEP_NAME)) {
                     results.add(getInputsByFormName(step.getId()));
                 }
             }
