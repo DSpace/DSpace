@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
@@ -26,7 +28,9 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.discovery.SolrSuggestService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Execute three validation check on fields validation:
@@ -44,6 +48,8 @@ public class MetadataValidation extends AbstractValidation {
 
     private static final String ERROR_VALIDATION_REGEX = "error.validation.regex";
 
+    private static final String ERROR_VALIDATION_DICTIONARY = "error.validation.dictionary";
+
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataValidation.class);
 
     private DCInputsReader inputReader;
@@ -53,6 +59,9 @@ public class MetadataValidation extends AbstractValidation {
     private MetadataAuthorityService metadataAuthorityService;
 
     private ConfigurationService configurationService;
+
+    private final SolrSuggestService solrSuggestService = DSpaceServicesFactory.getInstance()
+            .getServiceManager().getServicesByType(SolrSuggestService.class).get(0);
 
     @Override
     public List<ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
@@ -90,10 +99,10 @@ public class MetadataValidation extends AbstractValidation {
 
                         // Check the lookup list. If no other inputs of the same field name allow this type,
                         // then remove. This includes field name without qualifier.
-                        if (!input.isAllowedFor(documentTypeValue) &&  (!allowedFieldNames.contains(fullFieldname)
+                        if (!input.isAllowedFor(documentTypeValue) && (!allowedFieldNames.contains(fullFieldname)
                                 && !allowedFieldNames.contains(input.getFieldName()))) {
                             itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
-                                        obj.getItem(), mdv);
+                                    obj.getItem(), mdv);
                         } else {
                             validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
                             if (mdv.size() > 0 && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
@@ -135,7 +144,7 @@ public class MetadataValidation extends AbstractValidation {
                     }
                     validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
                     if ((input.isRequired() && mdv.size() == 0) && input.isVisible(DCInput.SUBMISSION_SCOPE)
-                                                                && !valuesRemoved) {
+                            && !valuesRemoved) {
                         // Is the input required for *this* type? In other words, are we looking at a required
                         // input that is also allowed for this document type
                         if (input.isAllowedFor(documentTypeValue)) {
@@ -143,7 +152,7 @@ public class MetadataValidation extends AbstractValidation {
                             // fields
                             addError(errors, ERROR_VALIDATION_REQUIRED, "/"
                                     + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                                            input.getFieldName());
+                                    input.getFieldName());
                         }
                     }
                 }
@@ -157,18 +166,47 @@ public class MetadataValidation extends AbstractValidation {
                                         boolean isAuthorityControlled, String fieldKey,
                                         List<ErrorRest> errors) {
         for (MetadataValue md : mdv) {
-            if (! (input.validate(md.getValue()))) {
+            if (!(input.validate(md.getValue()))) {
                 addError(errors, ERROR_VALIDATION_REGEX,
-                    "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                        input.getFieldName() + "/" + md.getPlace());
+                        "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                                input.getFieldName() + "/" + md.getPlace());
             }
             if (isAuthorityControlled) {
                 String authKey = md.getAuthority();
                 if (metadataAuthorityService.isAuthorityRequired(fieldKey) &&
-                    StringUtils.isBlank(authKey)) {
+                        StringUtils.isBlank(authKey)) {
                     addError(errors, ERROR_VALIDATION_AUTHORITY_REQUIRED,
-                        "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() +
-                            "/" + input.getFieldName() + "/" + md.getPlace());
+                            "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() +
+                                    "/" + input.getFieldName() + "/" + md.getPlace());
+                }
+            }
+
+            // If a validation dictionary is set, search the Solr suggest dictionary for the
+            // metadatavalue and return an error if it is not present
+            if (input.getValidationDictionary() != null && !StringUtils.isEmpty(md.getValue())) {
+                try {
+                    String json = solrSuggestService.getSuggestions(md.getValue(),
+                            input.getValidationDictionary());
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode root = mapper.readTree(json);
+                    JsonNode suggest = root.get("suggest");
+                    if (suggest != null) {
+                        JsonNode firstNode = suggest.fields().next().getValue();
+                        JsonNode term = firstNode.fields().next().getValue();
+                        JsonNode suggestions = term.get("suggestions");
+                        if (suggestions != null && suggestions.isArray() && suggestions.size() > 0
+                                && md.getValue().equals(suggestions.get(0)
+                                .get("term").asText().replaceAll("</?b>", ""))) {
+                            log.debug("successfully validated {}={} for dict {}",
+                                    input.getFieldName(), md.getValue(), input.getValidationDictionary());
+                        } else {
+                            addError(errors, ERROR_VALIDATION_DICTIONARY + "." + input.getValidationDictionary(),
+                                    "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS
+                                            + "/" + config.getId() + "/" + input.getFieldName() + "/" + md.getPlace());
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error(e.getMessage());
                 }
             }
         }
