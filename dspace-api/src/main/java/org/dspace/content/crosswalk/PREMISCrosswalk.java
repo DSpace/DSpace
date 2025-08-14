@@ -58,7 +58,7 @@ public class PREMISCrosswalk
     private final String schemaLocation =
         PREMIS_NS.getURI() + " http://www.loc.gov/standards/premis/PREMIS-v1-0.xsd";
 
-    private static final Namespace namespaces[] = {PREMIS_NS};
+    private static final Namespace[] namespaces = {PREMIS_NS};
 
     protected BitstreamService bitstreamService
             = ContentServiceFactory.getInstance().getBitstreamService();

@@ -116,7 +116,7 @@ public class MetadataFieldConfig {
      * @param full A string representing the schema.element.qualifier triplet
      */
     public MetadataFieldConfig(String full) {
-        String elements[] = full.split("\\.");
+        String[] elements = full.split("\\.");
         if (elements.length == 2) {
             this.schema = elements[0];
             this.element = elements[1];

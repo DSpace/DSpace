@@ -224,7 +224,7 @@ public class Packager {
             } else {
                 //otherwise, display list of valid packager types
                 System.out.println("\nAvailable Submission Package (SIP) types:");
-                String pn[] = pluginService
+                String[] pn = pluginService
                     .getAllPluginNames(PackageIngester.class);
                 for (int i = 0; i < pn.length; ++i) {
                     System.out.println("  " + pn[i]);
@@ -274,7 +274,7 @@ public class Packager {
             // process
             pkgParams.setRecursiveModeEnabled(true);
         }
-        String files[] = line.getArgs();
+        String[] files = line.getArgs();
         if (files.length > 0) {
             sourceFile = files[0];
         }
@@ -282,9 +282,9 @@ public class Packager {
             myPackager.submit = false;
         }
         if (line.hasOption('o')) {
-            String popt[] = line.getOptionValues('o');
+            String[] popt = line.getOptionValues('o');
             for (int i = 0; i < popt.length; ++i) {
-                String pair[] = popt[i].split("\\=", 2);
+                String[] pair = popt[i].split("\\=", 2);
                 if (pair.length == 2) {
                     pkgParams.addProperty(pair[0].trim(), pair[1].trim());
                 } else if (pair.length == 1) {
@@ -383,7 +383,7 @@ public class Packager {
             }
 
             // validate each parent arg (if any)
-            DSpaceObject parentObjs[] = null;
+            DSpaceObject[] parentObjs = null;
             if (parents != null) {
                 System.out.println("Destination parents:");
 
@@ -461,7 +461,7 @@ public class Packager {
      * @throws PackageException      if packaging error
      */
     protected void ingest(Context context, PackageIngester sip, PackageParameters pkgParams, String sourceFile,
-                          DSpaceObject parentObjs[])
+                          DSpaceObject[] parentObjs)
         throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException,
         PackageException {
         // make sure we have an input file

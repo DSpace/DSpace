@@ -172,10 +172,10 @@ public class EventServiceImpl implements EventService {
             if (dispClass != null) {
                 try {
                     // all this to call a constructor with an argument
-                    final Class argTypes[] = {String.class};
+                    final Class[] argTypes = {String.class};
                     Constructor dc = Class.forName(dispClass).getConstructor(
                         argTypes);
-                    Object args[] = new Object[1];
+                    Object[] args = new Object[1];
                     args[0] = dispatcherName;
                     dispatcher = (Dispatcher) dc.newInstance(args);
 

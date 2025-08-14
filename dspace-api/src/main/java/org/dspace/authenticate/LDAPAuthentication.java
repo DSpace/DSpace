@@ -535,7 +535,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
                             resultDN = (sr.getName() + "," + ldap_search_context);
                         }
 
-                        String attlist[] = {ldap_email_field, ldap_givenname_field,
+                        String[] attlist = {ldap_email_field, ldap_givenname_field,
                             ldap_surname_field, ldap_phone_field, ldap_group_field};
                         Attributes atts = sr.getAttributes();
                         Attribute att;
@@ -743,7 +743,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
             // groupmap contains the mapping of LDAP groups to DSpace groups
             // outer loop with the DSpace groups
             while (groupMap != null) {
-                String t[] = groupMap.split(":");
+                String[] t = groupMap.split(":");
                 String ldapSearchString = t[0];
                 String dspaceGroupName = t[1];
 

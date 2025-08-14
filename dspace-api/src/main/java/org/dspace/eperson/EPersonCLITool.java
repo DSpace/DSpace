@@ -86,7 +86,7 @@ public class EPersonCLITool {
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      */
-    public static void main(String argv[])
+    public static void main(String[] argv)
         throws ParseException, SQLException, AuthorizeException {
         final OptionGroup VERBS = new OptionGroup();
         VERBS.addOption(VERB_ADD);

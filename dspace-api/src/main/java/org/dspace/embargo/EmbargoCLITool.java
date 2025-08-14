@@ -79,7 +79,7 @@ public class EmbargoCLITool {
      *
      * @param argv the command line arguments given
      */
-    public static void main(String argv[]) {
+    public static void main(String[] argv) {
         int status = 0;
 
         Options options = new Options();

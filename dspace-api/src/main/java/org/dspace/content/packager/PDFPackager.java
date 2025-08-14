@@ -78,10 +78,10 @@ public class PDFPackager
 
     protected static final String BITSTREAM_FORMAT_NAME = "Adobe PDF";
 
-    protected static String aliases[] = {"PDF", "Adobe PDF", "pdf", "application/pdf"};
+    protected static String[] aliases = {"PDF", "Adobe PDF", "pdf", "application/pdf"};
 
     public static String[] getPluginNames() {
-        return (String[]) ArrayUtils.clone(aliases);
+        return ArrayUtils.clone(aliases);
     }
 
     protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
