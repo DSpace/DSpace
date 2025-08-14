@@ -15,12 +15,12 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -33,8 +33,7 @@ import org.junit.runners.Parameterized;
  */
 @RunWith(Parameterized.class)
 public class MultiFormatDateParserTest {
-    private static Locale vmLocale;
-    private final String toParseDate;
+	private final String toParseDate;
     private final String expectedFormat;
     private final String expectedResult;
 
@@ -82,10 +81,18 @@ public class MultiFormatDateParserTest {
             {"1957/01/2720:06:20", "yyyy/MM/ddHH:mm:ss", ""}
         });
     }
+    
+    // 
+    /**
+     * Rule for setting the locale to english. This is necessary to test with the english month names.
+     * The rule restore the default locale after test.
+     */
+    @ClassRule
+    public static DefaultLocaleForTestRule defaultLocaleRule = DefaultLocaleForTestRule.en();
 
     @BeforeClass
     public static void setUpClass() {
-        Map<String, String> formats = new HashMap<>(32);
+    	Map<String, String> formats = new HashMap<>(32);
         formats.put("\\d{8}", "yyyyMMdd");
         formats.put("\\d{1,2}-\\d{1,2}-\\d{4}", "dd-MM-yyyy");
         formats.put("\\d{4}-\\d{1,2}-\\d{1,2}", "yyyy-MM-dd");
@@ -130,7 +137,7 @@ public class MultiFormatDateParserTest {
     /**
      * Test of parse method, of class MultiFormatDateParser.
      */
-    @Test
+    @Test    
     public void testParse() {
         ZonedDateTime result = MultiFormatDateParser.parse(toParseDate);
         // Verify that the parsed ZonedDateTime is equal to the expected String result (or null if result is empty)
@@ -139,5 +146,5 @@ public class MultiFormatDateParserTest {
         } else {
             assertNull("Should not parse: " + expectedFormat, result);
         }
-    }
+    }    
 }
