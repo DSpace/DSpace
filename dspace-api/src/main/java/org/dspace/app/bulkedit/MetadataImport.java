@@ -495,7 +495,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                 // Check it has an owning collection
                 List<String> collections = line.get("collection");
-                if (collections == null) {
+                if (collections == null || collections.isEmpty()) {
                     throw new MetadataImportException(
                         "New items must have a 'collection' assigned in the form of a handle");
                 }
