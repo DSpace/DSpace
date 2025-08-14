@@ -24,4 +24,4 @@ services:
       - |
         while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
         /dspace/bin/dspace database migrate ignored
-        java -jar /dspace/webapps/server-boot.jar --dspace.dir=/dspace
+        java -jar /dspace/webapps/server-boot.jar
