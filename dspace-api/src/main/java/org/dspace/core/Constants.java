@@ -67,6 +67,13 @@ public class Constants {
         "EPERSON", "LDN_MESSAGE"};
 
     /**
+     * lets you look up type name plurals from the type IDs
+     */
+    public static final String[] typeTextPlural = { "BITSTREAMS", "BUNDLES",
+        "ITEMS", "COLLECTIONS", "COMMUNITIES", "SITES", "GROUPS", "EPERSONS",
+        "LDN_MESSAGES"};
+
+    /**
      * Special Bundle and Bitstream Names:
      */
 
