@@ -14,40 +14,40 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
 public class DefaultLocaleForTestRule extends TestWatcher {
-	
-	private Locale originalDefault;
+
+    private Locale originalDefault;
     private Locale testDefault;
-    
+
     public DefaultLocaleForTestRule() {
         this(null);
     }
-    
+
     public DefaultLocaleForTestRule(Locale testDefault) {
-    	this.testDefault = testDefault;
+        this.testDefault = testDefault;
     }
-    
+
     @Override
     protected void starting(Description description) {
-    	 originalDefault = Locale.getDefault();
-         
-         if(null != testDefault) {
-             Locale.setDefault(testDefault);
-         };
+        originalDefault = Locale.getDefault();
+
+        if (null != testDefault) {
+            Locale.setDefault(testDefault);
+        }
     }
-    
+
     @Override
     protected void succeeded(Description description) {
-    	Locale.setDefault(originalDefault);
+        Locale.setDefault(originalDefault);
     }
-    
+
     public void setDefault(Locale locale) {
-        if(null == locale) {
+        if (null == locale) {
             locale = originalDefault;
         }
-        
+
         Locale.setDefault(locale);
     }
-    
+
     public static DefaultLocaleForTestRule en() {
         return new DefaultLocaleForTestRule(Locale.ENGLISH);
     }
