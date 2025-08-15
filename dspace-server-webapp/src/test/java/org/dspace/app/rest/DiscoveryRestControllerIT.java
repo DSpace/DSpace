@@ -956,12 +956,13 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/discover/facets")
                         .param("scope", "testScope"))
 
-                //** THEN **
-                //The status has to be 404 Not Found
-                .andExpect(status().isNotFound());
+                // Invalid or unknown scope returns an empty list (HTTP 200).
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.facets", Matchers.empty()));
 
     }
 
+    @Test
     public void discoverFacetsTestWithScopeWithUnknownUUID() throws Exception {
         //We turn off the authorization system in order to create the structure defined below
         context.turnOffAuthorisationSystem();
@@ -1008,16 +1009,16 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/discover/facets")
                         .param("scope", UUID.randomUUID().toString()))
 
-                //** THEN **
-                //The status has to be 404 Not Found
-                .andExpect(status().isNotFound());
+                // Invalid or unknown scope returns an empty list (HTTP 200).
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.facets", Matchers.empty()));
 
     }
 
 
     @Test
     public void discoverFacetsNameTestWithScopeWithInvalidUuidFormat() throws Exception {
-        //We turn off the authorization system in order to create the structure defined below
+        //We turn off the authorization system in order to construct the structure defined below
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -1035,21 +1036,24 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John").withAuthor("Smith, Maria")
+                .withAuthor("Doe, Jane")
                 .withSubject("ExtraEntry")
                 .build();
 
         Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
-                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Doe, John")
+                .withAuthor("Smith, Donald")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
         Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
-                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
@@ -1062,12 +1066,13 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/discover/facets/author")
                 .param("scope", "testScope"))
 
-                //** THEN **
-                //The status has to be 404 Not Found
-                .andExpect(status().isNotFound());
+                // Invalid or unknown scope returns an empty list (HTTP 200).
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.values", Matchers.empty()));
 
     }
 
+    @Test
     public void discoverFacetsNameTestWithScopeWithUnknownUUID() throws Exception {
         //We turn off the authorization system in order to create the structure defined below
         context.turnOffAuthorisationSystem();
@@ -1114,9 +1119,10 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/discover/facets/author")
                         .param("scope", UUID.randomUUID().toString()))
 
-                //** THEN **
-                //The status has to be 404 Not Found
-                .andExpect(status().isNotFound());
+
+                // Invalid or unknown scope returns an empty list (HTTP 200).
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.values", Matchers.empty()));
 
     }
 
@@ -1841,9 +1847,10 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/discover/search/objects")
                 .param("scope", "test"))
 
-                //** THEN **
-                //The status has to be 404 Not Found
-                .andExpect(status().isNotFound());
+
+                // Invalid or unknown scope returns an empty list (HTTP 200).
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.empty()));
     }
 
     @Test
@@ -1894,9 +1901,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/discover/search/objects")
                         .param("scope", UUID.randomUUID().toString()))
 
-                //** THEN **
-                //The status has to be 404 Not Found
-                .andExpect(status().isNotFound());
+                // Invalid or unknown scope returns an empty list (HTTP 200).
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.empty()));
 
     }
 
@@ -1948,9 +1955,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/discover/search")
                         .param("scope", "test"))
 
-                //** THEN **
-                //The status has to be 404 Not Found
-                .andExpect(status().isNotFound());
+                // Invalid or unknown scope returns an empty list (HTTP 200).
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.filters", Matchers.empty()));
     }
 
     @Test
@@ -2001,9 +2008,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/discover/search")
                         .param("scope", UUID.randomUUID().toString()))
 
-                //** THEN **
-                //The status has to be 404 Not Found
-                .andExpect(status().isNotFound());
+                // Invalid or unknown scope returns an empty list (HTTP 200).
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.filters", Matchers.empty()));
 
     }
 
@@ -2055,9 +2062,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/discover/search/facets")
                         .param("scope", "test"))
 
-                //** THEN **
-                //The status has to be 404 Not Found
-                .andExpect(status().isNotFound());
+                // Invalid or unknown scope returns an empty list (HTTP 200).
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.facets", Matchers.empty()));
     }
 
     @Test
@@ -2108,9 +2115,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/discover/search/facets")
                         .param("scope", UUID.randomUUID().toString()))
 
-                //** THEN **
-                //The status has to be 404 Not Found
-                .andExpect(status().isNotFound());
+                // Invalid or unknown scope returns an empty list (HTTP 200).
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.facets", Matchers.empty()));
 
     }
 
