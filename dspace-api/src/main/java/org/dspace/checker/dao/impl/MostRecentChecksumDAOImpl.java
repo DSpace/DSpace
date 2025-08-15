@@ -74,13 +74,13 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
                 "CASE WHEN deleted = false THEN true ELSE false END, " +
                 "CASE WHEN checksum IS NULL THEN '' ELSE checksum END, " +
                 "CASE WHEN checksum IS NULL THEN '' ELSE checksum END, " +
-                "current_date(), current_date(), " +
+                "current_timestamp(), current_timestamp(), " +
                 "CASE WHEN checksumAlgorithm IS NULL THEN 'MD5' ELSE checksumAlgorithm END, " +
                 "CAST(1 AS boolean), " +
                 "(SELECT cr FROM ChecksumResult AS cr WHERE " +
-                "(resultCode='BITSTREAM_MARKED_DELETED' AND b.deleted = true) " +
-                "OR (resultCode='CHECKSUM_MATCH' AND b.deleted = false)) " +
-                "FROM Bitstream AS b WHERE NOT EXISTS(SELECT 'x' FROM MostRecentChecksum WHERE id=b.id)";
+                "(resultCode = 'BITSTREAM_MARKED_DELETED' AND b.deleted = true) " +
+                "OR (resultCode = 'CHECKSUM_MATCH' AND b.deleted = false)) " +
+                "FROM Bitstream AS b WHERE NOT EXISTS(SELECT 'x' FROM MostRecentChecksum AS c WHERE c.bitstream = b)";
         Query query = createQuery(context, hql);
         return query.executeUpdate();
     }
