@@ -114,8 +114,4 @@
     	<entry key="http://arxiv.org/schemas/atom" value="arxiv" />
     </util:map>
 
-    <bean class="java.lang.Integer" id="maxRetry">
-        <constructor-arg value="3"/>
-    </bean>
-
 </beans>
