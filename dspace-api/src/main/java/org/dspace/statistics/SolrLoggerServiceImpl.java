@@ -133,7 +133,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     private static final List<String> statisticYearCores = new ArrayList<>();
     private static boolean statisticYearCoresInit = false;
 
-    private static final String IP_V4_REGEX = "^((?:\\d{1,3}\\.){3})\\d{1,3}$";
+    private static final String DEFAULT_IP_V4_REGEX = "^((?:\\d{1,3}\\.){3})\\d{1,3}$";
     private static final String IP_V6_REGEX = "^(.*):.*:.*$";
 
     @Autowired(required = true)
@@ -349,11 +349,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
 
         SolrInputDocument doc1 = new SolrInputDocument();
+        boolean isAnonymizeOnLogEnabled =
+            configurationService.getBooleanProperty("anonymize_statistics.anonymize_on_log", false);
+
         // Save our basic info that we already have
 
         if (request != null) {
             String ip = clientInfoService.getClientIp(request);
-            if (configurationService.getBooleanProperty("anonymize_statistics.anonymize_on_log", false)) {
+            if (isAnonymizeOnLogEnabled) {
                 try {
                     doc1.addField("ip", anonymizeIp(ip));
                 } catch (UnknownHostException e) {
@@ -373,15 +376,15 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             InetAddress ipAddress = null;
             try {
                 String dns;
-                if (!configurationService.getBooleanProperty("anonymize_statistics.anonymize_on_log", false)) {
-                    ipAddress = InetAddress.getByName(ip);
+                ipAddress = InetAddress.getByName(ip);
+                if (!isAnonymizeOnLogEnabled) {
                     dns = ipAddress.getHostName();
                 } else {
                     dns = configurationService.getProperty("anonymize_statistics.dns_mask", "anonymized");
                 }
                 doc1.addField("dns", dns.toLowerCase(Locale.ROOT));
             } catch (UnknownHostException e) {
-                log.info("Failed DNS Lookup for IP:  {}", ip);
+                log.info("IP is no valid InetAdress. IP:  {}", ip);
                 log.debug(e.getMessage(), e);
             }
             if (request.getHeader("User-Agent") != null) {
@@ -427,7 +430,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
         // Save the current time
         doc1.addField("time", Instant.now().toString());
-        if (currentUser != null) {
+        if (currentUser != null && !isAnonymizeOnLogEnabled) {
             doc1.addField("epersonid", currentUser.getID().toString());
         }
 
@@ -444,10 +447,13 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
 
         SolrInputDocument doc1 = new SolrInputDocument();
+        boolean isAnonymizeOnLogEnabled =
+            configurationService.getBooleanProperty("anonymize_statistics.anonymize_on_log", false);
+
         // Save our basic info that we already have
 
         ip = clientInfoService.getClientIp(ip, xforwardedfor);
-        if (configurationService.getBooleanProperty("anonymize_statistics.anonymize_on_log", false)) {
+        if (isAnonymizeOnLogEnabled) {
             try {
                 doc1.addField("ip", anonymizeIp(ip));
             } catch (UnknownHostException e) {
@@ -465,15 +471,15 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         InetAddress ipAddress = null;
         try {
             String dns;
-            if (!configurationService.getBooleanProperty("anonymize_statistics.anonymize_on_log", false)) {
-                ipAddress = InetAddress.getByName(ip);
+            ipAddress = InetAddress.getByName(ip);
+            if (!isAnonymizeOnLogEnabled) {
                 dns = ipAddress.getHostName();
             } else {
                 dns = configurationService.getProperty("anonymize_statistics.dns_mask", "anonymized");
             }
             doc1.addField("dns", dns.toLowerCase(Locale.ROOT));
         } catch (UnknownHostException e) {
-            log.info("Failed DNS Lookup for IP:  {}", ip);
+            log.info("IP is no valid InetAdress. IP:  {}", ip);
             log.debug(e.getMessage(), e);
         }
         if (userAgent != null) {
@@ -482,7 +488,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         doc1.addField("isBot", isSpiderBot);
         // Save the location information if valid, save the event without
         // location information if not valid
-        if (locationService != null) {
+        if (locationService != null && ipAddress != null) {
             try {
                 CityResponse location = locationService.city(ipAddress);
                 String countryCode = location.getCountry().getIsoCode();
@@ -519,7 +525,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
         // Save the current time
         doc1.addField("time", Instant.now().toString());
-        if (currentUser != null) {
+        if (currentUser != null && !isAnonymizeOnLogEnabled) {
             doc1.addField("epersonid", currentUser.getID().toString());
         }
 
@@ -1608,7 +1614,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     public Object anonymizeIp(String ip) throws UnknownHostException {
         InetAddress address = InetAddress.getByName(ip);
         if (address instanceof Inet4Address) {
-            return ip.replaceFirst(IP_V4_REGEX, "$1" + configurationService.getProperty(
+            return ip.replaceFirst(getIp4Regex(), "$1" + configurationService.getProperty(
                     "anonymize_statistics.ip_v4_mask", "255"));
         } else if (address instanceof Inet6Address) {
             return ip.replaceFirst(IP_V6_REGEX, "$1:" + configurationService.getProperty(
@@ -1617,4 +1623,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
         throw new UnknownHostException("unknown ip format");
     }
+
+    private String getIp4Regex() {
+        return configurationService.getProperty("anonymize_statistics.ip_v4_regex", DEFAULT_IP_V4_REGEX);
+    }
+
 }
