@@ -35,23 +35,25 @@ import org.xml.sax.InputSource;
  * from {@code ${dspace.dir}/config/controlled-vocabularies/*.xml} and turns
  * them into autocompleting authorities.
  *
- * Configuration: This MUST be configured as a self-named plugin, e.g.: {@code
- * plugin.selfnamed.org.dspace.content.authority.ChoiceAuthority = \
+ * <p>Configuration: This MUST be configured as a self-named plugin, e.g.: {@code
+ * plugin.selfnamed.org.dspace.content.authority.ChoiceAuthority =
  * org.dspace.content.authority.DSpaceControlledVocabulary
  * }
  *
- * It AUTOMATICALLY configures a plugin instance for each XML file in the
+ * <p>It AUTOMATICALLY configures a plugin instance for each XML file in the
  * controlled vocabularies directory. The name of the plugin is the basename of
  * the file; e.g., {@code ${dspace.dir}/config/controlled-vocabularies/nsi.xml}
  * would generate a plugin called "nsi".
  *
- * Each configured plugin comes with three configuration options: {@code
- * vocabulary.plugin._plugin_.hierarchy.store = <true|false>
- * # Store entire hierarchy along with selected value. Default: TRUE
- * vocabulary.plugin._plugin_.hierarchy.suggest =
- * <true|false>  # Display entire hierarchy in the suggestion list.  Default: TRUE
- * vocabulary.plugin._plugin_.delimiter = "<string>"
- * # Delimiter to use when building hierarchy strings. Default: "::"
+ * <p>Each configured plugin comes with three configuration options:
+ * <ul>
+ *  <li>{@code vocabulary.plugin._plugin_.hierarchy.store = <true|false>
+ * # Store entire hierarchy along with selected value. Default: TRUE}</li>
+ *  <li>{@code vocabulary.plugin._plugin_.hierarchy.suggest =
+ * <true|false>  # Display entire hierarchy in the suggestion list.  Default: TRUE}</li>
+ *  <li>{@code vocabulary.plugin._plugin_.delimiter = "<string>"
+ * # Delimiter to use when building hierarchy strings. Default: "::"}</li>
+ * </ul>
  * }
  *
  * @author Michael B. Klein
@@ -59,11 +61,12 @@ import org.xml.sax.InputSource;
 
 public class DSpaceControlledVocabulary extends SelfNamedPlugin implements HierarchicalAuthority {
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceControlledVocabulary.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
     protected static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
-        "'abcdefghijklmnopqrstuvwxyz'),'%s')]";
-    protected static String idTemplate = "//node[@id = '%s']";
-    protected static String labelTemplate = "//node[@label = '%s']";
+        "'abcdefghijklmnopqrstuvwxyz'),%s)]";
+    protected static String idTemplate = "//node[@id = %s]";
+    protected static String idTemplateQuoted = "//node[@id = '%s']";
+    protected static String labelTemplate = "//node[@label = %s]";
     protected static String idParentTemplate = "//node[@id = '%s']/parent::isComposedBy/parent::node";
     protected static String rootTemplate = "/node";
     protected static String idAttribute = "id";
@@ -110,7 +113,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
                                                            File.separator + "config" +
                                                            File.separator + "controlled-vocabularies";
             String[] xmlFiles = (new File(vocabulariesPath)).list(new xmlFilter());
-            List<String> names = new ArrayList<String>();
+            List<String> names = new ArrayList<>();
             for (String filename : xmlFiles) {
                 names.add((new File(filename)).getName().replace(".xml", ""));
             }
@@ -178,15 +181,23 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     public Choices getMatches(String text, int start, int limit, String locale) {
         init(locale);
         log.debug("Getting matches for '" + text + "'");
-        String xpathExpression = "";
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
+        StringBuilder xpathExpressionBuilder = new StringBuilder();
         for (int i = 0; i < textHierarchy.length; i++) {
-            xpathExpression +=
-                String.format(xpathTemplate, textHierarchy[i].replaceAll("'", "&apos;").toLowerCase());
+            xpathExpressionBuilder.append(String.format(xpathTemplate, "$var" + i));
         }
+        String xpathExpression = xpathExpressionBuilder.toString();
         XPath xpath = XPathFactory.newInstance().newXPath();
-        int total = 0;
-        List<Choice> choices = new ArrayList<Choice>();
+        xpath.setXPathVariableResolver(variableName -> {
+            String varName = variableName.getLocalPart();
+            if (varName.startsWith("var")) {
+                int index = Integer.parseInt(varName.substring(3));
+                return textHierarchy[index].toLowerCase();
+            }
+            throw new IllegalArgumentException("Unexpected variable: " + varName);
+        });
+        int total;
+        List<Choice> choices;
         try {
             NodeList results = (NodeList) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODESET);
             total = results.getLength();
@@ -202,15 +213,23 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     @Override
     public Choices getBestMatch(String text, String locale) {
         init(locale);
-        log.debug("Getting best matches for '" + text + "'");
-        String xpathExpression = "";
+        log.debug("Getting best matches for {}'", text);
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
+        StringBuilder xpathExpressionBuilder = new StringBuilder();
         for (int i = 0; i < textHierarchy.length; i++) {
-            xpathExpression +=
-                String.format(valueTemplate, textHierarchy[i].replaceAll("'", "&apos;"));
+            xpathExpressionBuilder.append(String.format(valueTemplate, "$var" + i));
         }
+        String xpathExpression = xpathExpressionBuilder.toString();
         XPath xpath = XPathFactory.newInstance().newXPath();
-        List<Choice> choices = new ArrayList<Choice>();
+        xpath.setXPathVariableResolver(variableName -> {
+            String varName = variableName.getLocalPart();
+            if (varName.startsWith("var")) {
+                int index = Integer.parseInt(varName.substring(3));
+                return textHierarchy[index];
+            }
+            throw new IllegalArgumentException("Unexpected variable: " + varName);
+        });
+        List<Choice> choices;
         try {
             NodeList results = (NodeList) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODESET);
             choices = getChoicesFromNodeList(results, 0, 1);
@@ -258,7 +277,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     @Override
     public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale) {
         init(locale);
-        String xpathExpression = String.format(idTemplate, parentId);
+        String xpathExpression = String.format(idTemplateQuoted, parentId);
         return getChoicesByXpath(xpathExpression, start, limit);
     }
 
@@ -282,15 +301,12 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     }
 
     private boolean isRootElement(Node node) {
-        if (node != null && node.getOwnerDocument().getDocumentElement().equals(node)) {
-            return true;
-        }
-        return false;
+        return node != null && node.getOwnerDocument().getDocumentElement().equals(node);
     }
 
     private Node getNode(String key, String locale) throws XPathExpressionException {
         init(locale);
-        String xpathExpression = String.format(idTemplate, key);
+        String xpathExpression = String.format(idTemplateQuoted, key);
         Node node = getNodeFromXPath(xpathExpression);
         return node;
     }
@@ -302,7 +318,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     }
 
     private List<Choice> getChoicesFromNodeList(NodeList results, int start, int limit) {
-        List<Choice> choices = new ArrayList<Choice>();
+        List<Choice> choices = new ArrayList<>();
         for (int i = 0; i < results.getLength(); i++) {
             if (i < start) {
                 continue;
@@ -321,17 +337,17 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
 
     private Map<String, String> addOtherInformation(String parentCurr, String noteCurr,
             List<String> childrenCurr, String authorityCurr) {
-        Map<String, String> extras = new HashMap<String, String>();
+        Map<String, String> extras = new HashMap<>();
         if (StringUtils.isNotBlank(parentCurr)) {
             extras.put("parent", parentCurr);
         }
         if (StringUtils.isNotBlank(noteCurr)) {
             extras.put("note", noteCurr);
         }
-        if (childrenCurr.size() > 0) {
-            extras.put("hasChildren", "true");
-        } else {
+        if (childrenCurr.isEmpty()) {
             extras.put("hasChildren", "false");
+        } else {
+            extras.put("hasChildren", "true");
         }
         extras.put("id", authorityCurr);
         return extras;
@@ -386,7 +402,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     }
 
     private List<String> getChildren(Node node) {
-        List<String> children = new ArrayList<String>();
+        List<String> children = new ArrayList<>();
         NodeList childNodes = node.getChildNodes();
         for (int ci = 0; ci < childNodes.getLength(); ci++) {
             Node firstChild = childNodes.item(ci);
@@ -409,7 +425,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     private boolean isSelectable(Node node) {
         Node selectableAttr = node.getAttributes().getNamedItem("selectable");
         if (null != selectableAttr) {
-            return Boolean.valueOf(selectableAttr.getNodeValue());
+            return Boolean.parseBoolean(selectableAttr.getNodeValue());
         } else { // Default is true
             return true;
         }
@@ -436,7 +452,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     }
 
     private Choices getChoicesByXpath(String xpathExpression, int start, int limit) {
-        List<Choice> choices = new ArrayList<Choice>();
+        List<Choice> choices = new ArrayList<>();
         XPath xpath = XPathFactory.newInstance().newXPath();
         try {
             Node parentNode = (Node) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
