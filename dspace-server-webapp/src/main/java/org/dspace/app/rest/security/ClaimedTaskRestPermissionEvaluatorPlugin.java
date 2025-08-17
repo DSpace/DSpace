@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ClaimedTaskRest;
@@ -50,7 +51,7 @@ public class ClaimedTaskRestPermissionEvaluatorPlugin extends RestObjectPermissi
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId,
                                  String targetType, DSpaceRestPermission permission) {
 
-        if (!StringUtils.equalsIgnoreCase(ClaimedTaskRest.NAME, targetType)) {
+        if (!Strings.CI.equals(ClaimedTaskRest.NAME, targetType)) {
             return false;
         }
 
