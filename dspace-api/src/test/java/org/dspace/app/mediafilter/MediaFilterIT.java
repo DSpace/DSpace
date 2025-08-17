@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.BitstreamBuilder;
@@ -192,17 +193,17 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private void checkItemHasBeenProcessed(Item item) throws IOException, SQLException, AuthorizeException {
-        String expectedFileName = StringUtils.endsWith(item.getName(), "_a") ? "test.csv.txt" : "test.txt.txt";
-        String expectedContent = StringUtils.endsWith(item.getName(), "_a") ? "data3,3" : "quick brown fox";
+        String expectedFileName = Strings.CS.endsWith(item.getName(), "_a") ? "test.csv.txt" : "test.txt.txt";
+        String expectedContent = Strings.CS.endsWith(item.getName(), "_a") ? "data3,3" : "quick brown fox";
         List<Bundle> textBundles = item.getBundles("TEXT");
         assertTrue("The item " + item.getName() + " has NOT the TEXT bundle", textBundles.size() == 1);
         List<Bitstream> bitstreams = textBundles.get(0).getBitstreams();
         assertTrue("The item " + item.getName() + " has NOT exactly 1 bitstream in the TEXT bundle",
                 bitstreams.size() == 1);
         assertTrue("The text bitstream in the " + item.getName() + " is NOT named properly [" + expectedFileName + "]",
-                StringUtils.equals(bitstreams.get(0).getName(), expectedFileName));
+                Strings.CS.equals(bitstreams.get(0).getName(), expectedFileName));
         assertTrue("The text bitstream in the " + item.getName() + " doesn't contain the proper content ["
-                + expectedContent + "]", StringUtils.contains(getContent(bitstreams.get(0)), expectedContent));
+                + expectedContent + "]", Strings.CS.contains(getContent(bitstreams.get(0)), expectedContent));
     }
 
     private CharSequence getContent(Bitstream bitstream) throws IOException, SQLException, AuthorizeException {

@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -85,7 +86,7 @@ public class CanSynchronizeWithORCID implements AuthorizationFeature {
             return false;
         }
         List<MetadataValue> owners = itemService.getMetadataByMetadataString(item, "dspace.object.owner");
-        Predicate<MetadataValue> checkOwner = v -> StringUtils.equals(v.getAuthority(), eperson.getID().toString());
+        Predicate<MetadataValue> checkOwner = v -> Strings.CS.equals(v.getAuthority(), eperson.getID().toString());
         return owners.stream().anyMatch(checkOwner);
     }
 }
