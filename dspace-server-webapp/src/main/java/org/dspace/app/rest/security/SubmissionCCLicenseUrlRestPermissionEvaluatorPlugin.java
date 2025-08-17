@@ -9,7 +9,6 @@ package org.dspace.app.rest.security;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.SubmissionCCLicenseUrlRest;
 import org.springframework.security.core.Authentication;

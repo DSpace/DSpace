@@ -9,7 +9,6 @@ package org.dspace.app.rest.repository.patch.operation;
 
 import java.sql.SQLException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.content.QAEvent;

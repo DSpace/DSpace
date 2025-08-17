@@ -13,7 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.query.RestSearchOperator;
 import org.dspace.app.rest.parameter.SearchFilter;

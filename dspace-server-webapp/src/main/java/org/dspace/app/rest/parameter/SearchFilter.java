@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.parameter;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
 /**

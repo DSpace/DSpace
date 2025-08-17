@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.utils;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.CommunityRest;
 import org.springframework.stereotype.Component;
