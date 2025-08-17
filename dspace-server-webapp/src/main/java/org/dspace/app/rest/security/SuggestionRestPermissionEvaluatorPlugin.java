@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.SuggestionRest;
 import org.dspace.app.rest.utils.ContextUtil;

@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;

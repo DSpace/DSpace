@@ -9,7 +9,6 @@ package org.dspace.app.rest.authorization.impl;
 
 import java.sql.SQLException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
