@@ -56,8 +56,8 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         criteriaQuery.where(criteriaBuilder.and(
             criteriaBuilder.equal(mostRecentChecksumRoot.get(MostRecentChecksum_.toBeProcessed), false),
             criteriaBuilder
-                .lessThanOrEqualTo(mostRecentChecksumRoot.get(MostRecentChecksum_.processStartDate), startDate),
-            criteriaBuilder.greaterThan(mostRecentChecksumRoot.get(MostRecentChecksum_.processStartDate), endDate)
+                .lessThanOrEqualTo(mostRecentChecksumRoot.get(MostRecentChecksum_.processStartDate), endDate),
+            criteriaBuilder.greaterThan(mostRecentChecksumRoot.get(MostRecentChecksum_.processStartDate), startDate)
                             )
         );
         List<Order> orderList = new LinkedList<>();
