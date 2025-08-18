@@ -119,9 +119,10 @@ public class DailyReportEmailer {
         options.addOption("a", "all", false,
                           "Send all email reports (used by default)");
         options.addOption("u", "unchecked", false,
-                          "Send the Unchecked bitstream email report");
+                          "Send the unchecked (i.e. recently added) bitstream email report");
         options.addOption("n", "not-processed", false,
-                          "Send email report for all bitstreams set to longer be processed for today");
+                          "Send email report for all bitstreams set to no longer be processed for today (includes"
+                            + " bitstreams marked as deleted or not found)");
 
         try {
             line = parser.parse(options, args);
@@ -189,7 +190,9 @@ public class DailyReportEmailer {
                 writer.write("\n--------------------------------- Report Spacer ---------------------------\n\n");
                 numBitstreams += reporter.getBitstreamNotFoundReport(context, yesterday, tomorrow, writer);
                 writer.write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getNotToBeProcessedReport(context, yesterday, tomorrow, writer);
+                // not to be processed report includes deleted and not found bitstreams so it is not necessary to
+                // incude the sum in the counter
+                reporter.getNotToBeProcessedReport(context, yesterday, tomorrow, writer);
                 writer.write("\n--------------------------------- Report Spacer ---------------------------\n\n");
                 numBitstreams += reporter.getUncheckedBitstreamsReport(context, writer);
                 writer.write("\n--------------------------------- End Report ---------------------------\n\n");
