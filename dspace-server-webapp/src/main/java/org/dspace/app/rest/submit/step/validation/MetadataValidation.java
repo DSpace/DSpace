@@ -99,10 +99,10 @@ public class MetadataValidation extends AbstractValidation {
 
                         // Check the lookup list. If no other inputs of the same field name allow this type,
                         // then remove. This includes field name without qualifier.
-                        if (!input.isAllowedFor(documentTypeValue) && (!allowedFieldNames.contains(fullFieldname)
+                        if (!input.isAllowedFor(documentTypeValue) &&  (!allowedFieldNames.contains(fullFieldname)
                                 && !allowedFieldNames.contains(input.getFieldName()))) {
                             itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
-                                    obj.getItem(), mdv);
+                                        obj.getItem(), mdv);
                         } else {
                             validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
                             if (mdv.size() > 0 && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
@@ -144,7 +144,7 @@ public class MetadataValidation extends AbstractValidation {
                     }
                     validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
                     if ((input.isRequired() && mdv.size() == 0) && input.isVisible(DCInput.SUBMISSION_SCOPE)
-                            && !valuesRemoved) {
+                                                                && !valuesRemoved) {
                         // Is the input required for *this* type? In other words, are we looking at a required
                         // input that is also allowed for this document type
                         if (input.isAllowedFor(documentTypeValue)) {
@@ -152,7 +152,7 @@ public class MetadataValidation extends AbstractValidation {
                             // fields
                             addError(errors, ERROR_VALIDATION_REQUIRED, "/"
                                     + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                                    input.getFieldName());
+                                            input.getFieldName());
                         }
                     }
                 }
