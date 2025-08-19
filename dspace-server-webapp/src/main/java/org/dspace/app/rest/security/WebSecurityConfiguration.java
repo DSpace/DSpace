@@ -92,7 +92,7 @@ public class WebSecurityConfiguration {
         // In DSpace 8+, the upgrade to Spring Security 6 changed the default behavior to "deferred loading",
         // which meant the DSPACE-XSRF-TOKEN was no longer automatically sent on most GET requests.
         // This was a breaking change for REST API clients expecting the DSpace 7.x behavior.
-        // <P>
+        //
         // By setting the csrfRequestAttributeName to null, we explicitly opt-out of deferred loading and
         // force Spring Security to load the token on every request, restoring the old functionality.
         // This resolves https://github.com/DSpace/DSpace/issues/9774
