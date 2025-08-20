@@ -353,7 +353,7 @@ public class ItemExportServiceImpl implements ItemExportService {
 
     /**
      * Create the 'collections' file.  List handles of all Collections which
-     * contain this Item.  The "owning" Collection is listed first.
+     * contain this Item. The "owning" Collection is listed first.
      *
      * @param item list collections holding this Item.
      * @param destDir write the file here.
@@ -364,12 +364,14 @@ public class ItemExportServiceImpl implements ItemExportService {
         File outFile = new File(destDir, "collections");
         if (outFile.createNewFile()) {
             try (PrintWriter out = new PrintWriter(new FileWriter(outFile))) {
-                String ownerHandle = item.getOwningCollection().getHandle();
-                out.println(ownerHandle);
+                Collection owningCollection = item.getOwningCollection();
+                // The owning collection is null for workspace and workflow items
+                if (owningCollection != null) {
+                    out.println(owningCollection.getHandle());
+                }
                 for (Collection collection : item.getCollections()) {
-                    String collectionHandle = collection.getHandle();
-                    if (!collectionHandle.equals(ownerHandle)) {
-                        out.println(collectionHandle);
+                    if (!collection.equals(owningCollection)) {
+                        out.println(collection.getHandle());
                     }
                 }
             }
