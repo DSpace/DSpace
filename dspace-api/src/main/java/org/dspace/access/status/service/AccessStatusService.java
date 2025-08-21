@@ -9,6 +9,8 @@ package org.dspace.access.status.service;
 
 import java.sql.SQLException;
 
+import org.dspace.content.AccessStatus;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -18,7 +20,7 @@ import org.dspace.core.Context;
  * Configuration properties: (with examples)
  * {@code
  * # values for the forever embargo date threshold
- * # This threshold date is used in the default access status helper to dermine if an item is
+ * # This threshold date is used in the default access status helper to determine if an item is
  * # restricted or embargoed based on the start date of the primary (or first) file policies.
  * # In this case, if the policy start date is inferior to the threshold date, the status will
  * # be embargo, else it will be restricted.
@@ -39,19 +41,29 @@ public interface AccessStatusService {
      * Calculate the access status for an Item while considering the forever embargo date threshold.
      *
      * @param context the DSpace context
-     * @param item    the item
-     * @return an access status value
+     * @param item the item
+     * @return the access status
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public String getAccessStatus(Context context, Item item) throws SQLException;
+    public AccessStatus getAccessStatus(Context context, Item item) throws SQLException;
 
     /**
-     * Retrieve embargo information for the item
+     * Calculate the anonymous access status for an Item while considering the forever embargo date threshold.
      *
      * @param context the DSpace context
      * @param item the item to check for embargo information
-     * @return an embargo date
+     * @return the access status
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public String getEmbargoFromItem(Context context, Item item) throws SQLException;
+    public AccessStatus getAnonymousAccessStatus(Context context, Item item) throws SQLException;
+
+    /**
+     * Calculate the access status for a bitstream while considering the forever embargo date threshold.
+     *
+     * @param context the DSpace context
+     * @param bitstream the bitstream
+     * @return the access status
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    public AccessStatus getAccessStatus(Context context, Bitstream bitstream) throws SQLException;
 }

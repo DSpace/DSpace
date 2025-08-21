@@ -11,10 +11,10 @@ import static org.dspace.content.Item.ANY;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -343,11 +343,11 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         try {
             delete(context, ePerson, true);
         } catch (AuthorizeException ex) {
-            log.error("This AuthorizeException: " + ex + " occured while deleting Eperson with the ID: " +
+            log.error("This AuthorizeException: " + ex + " occurred while deleting Eperson with the ID: " +
                       ePerson.getID());
             throw new AuthorizeException(ex);
         } catch (IOException ex) {
-            log.error("This IOException: " + ex + " occured while deleting Eperson with the ID: " + ePerson.getID());
+            log.error("This IOException: " + ex + " occurred while deleting Eperson with the ID: " + ePerson.getID());
             throw new AuthorizeException(ex);
         } catch (EPersonDeletionException e) {
             throw new IllegalStateException(e);
@@ -451,7 +451,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                                                                               ePerson, task.getStepID());
                             } catch (WorkflowConfigurationException ex) {
                                 log.error("This WorkflowConfigurationException: " + ex +
-                                          " occured while deleting Eperson with the ID: " + ePerson.getID());
+                                          " occurred while deleting Eperson with the ID: " + ePerson.getID());
                                 throw new AuthorizeException(new EPersonDeletionException(Collections
                                                                                           .singletonList(tableName)));
                             }
@@ -695,7 +695,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     }
 
     @Override
-    public List<EPerson> findNotActiveSince(Context context, Date date) throws SQLException {
+    public List<EPerson> findNotActiveSince(Context context, Instant date) throws SQLException {
         return ePersonDAO.findNotActiveSince(context, date);
     }
 

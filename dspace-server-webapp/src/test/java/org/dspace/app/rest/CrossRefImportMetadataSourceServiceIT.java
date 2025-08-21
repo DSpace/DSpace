@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import jakarta.el.MethodNotFoundException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -135,7 +134,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         }
     }
 
-    @Test(expected = MethodNotFoundException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void crossRefImportMetadataFindMatchingRecordsTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -162,8 +161,9 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         MetadatumDTO title = createMetadatumDTO("dc", "title", null,
                 "State of Awareness of Freshers’ Groups Chortkiv State"
                 + " Medical College of Prevention of Iodine Deficiency Diseases");
-        MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "L.V. Senyuk");
-        MetadatumDTO type = createMetadatumDTO("dc", "type", null, "journal-article");
+        MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "Senyuk, L.V.");
+        // is expected the dc.type to be mapped from journal-article to Article
+        MetadatumDTO type = createMetadatumDTO("dc", "type", null, "Article");
         MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2016-05-19");
         MetadatumDTO ispartof = createMetadatumDTO("dc", "relation", "ispartof",
                                    "Ukraïnsʹkij žurnal medicini, bìologìï ta sportu");
@@ -191,8 +191,9 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         List<MetadatumDTO> metadatums2  = new ArrayList<MetadatumDTO>();
         MetadatumDTO title2 = createMetadatumDTO("dc", "title", null,
                 "Ischemic Heart Disease and Role of Nurse of Cardiology Department");
-        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "K. І. Kozak");
-        MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "journal-article");
+        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "Kozak, K. І.");
+        // is expected the dc.type to be mapped from journal-article to Article
+        MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "Article");
         MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2016-05-19");
         MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof",
                                      "Ukraïnsʹkij žurnal medicini, bìologìï ta sportu");

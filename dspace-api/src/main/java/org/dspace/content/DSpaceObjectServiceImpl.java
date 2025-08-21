@@ -187,11 +187,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                                            String authority) {
         List<MetadataValue> metadata = getMetadata(dso, schema, element, qualifier, lang);
         List<MetadataValue> result = new ArrayList<>(metadata);
-        if (!authority.equals(Item.ANY)) {
+        if (!Item.ANY.equals(authority)) {
             Iterator<MetadataValue> iterator = result.iterator();
             while (iterator.hasNext()) {
                 MetadataValue metadataValue = iterator.next();
-                if (!authority.equals(metadataValue.getAuthority())) {
+                if (!StringUtils.equals(authority, metadataValue.getAuthority())) {
                     iterator.remove();
                 }
             }
@@ -323,7 +323,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     }
                 }
                 metadataValue.setValue(String.valueOf(dcvalue));
-                //An update here isn't needed, this is persited upon the merge of the owning object
+                //An update here isn't needed, this is persisted upon the merge of the owning object
 //            metadataValueService.update(context, metadataValue);
                 dso.addDetails(metadataField.toString());
             }
@@ -509,7 +509,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         MetadataField metadataField = metadataValue.getMetadataField();
         MetadataSchema metadataSchema = metadataField.getMetadataSchema();
         // We will attempt to disprove a match - if we can't we have a match
-        if (!element.equals(Item.ANY) && !element.equals(metadataField.getElement())) {
+        if (!Item.ANY.equals(element) && !StringUtils.equals(element, metadataField.getElement())) {
             // Elements do not match, no wildcard
             return false;
         }
@@ -520,9 +520,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 // Value is qualified, so no match
                 return false;
             }
-        } else if (!qualifier.equals(Item.ANY)) {
+        } else if (!Item.ANY.equals(qualifier)) {
             // Not a wildcard, so qualifier must match exactly
-            if (!qualifier.equals(metadataField.getQualifier())) {
+            if (!StringUtils.equals(qualifier, metadataField.getQualifier())) {
                 return false;
             }
         }
@@ -533,15 +533,15 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 // Value is qualified, so no match
                 return false;
             }
-        } else if (!language.equals(Item.ANY)) {
+        } else if (!Item.ANY.equals(language)) {
             // Not a wildcard, so language must match exactly
-            if (!language.equals(metadataValue.getLanguage())) {
+            if (!StringUtils.equals(language, metadataValue.getLanguage())) {
                 return false;
             }
         }
 
-        if (!schema.equals(Item.ANY)) {
-            if (metadataSchema != null && !metadataSchema.getName().equals(schema)) {
+        if (!Item.ANY.equals(schema)) {
+            if (!StringUtils.equals(schema, metadataSchema.getName())) {
                 // The namespace doesn't match
                 return false;
             }

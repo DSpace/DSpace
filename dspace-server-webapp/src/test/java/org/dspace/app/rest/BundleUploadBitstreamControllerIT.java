@@ -48,6 +48,9 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
     @Autowired
     private AuthorizeService authorizeService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Test
     public void uploadBitstreamAllPossibleFieldsProperties() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -99,7 +102,6 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
         metadataRest.put("dc.title", title);
 
         bitstreamRest.setMetadata(metadataRest);
-        ObjectMapper mapper = new ObjectMapper();
 
         context.restoreAuthSystemState();
         MvcResult mvcResult = getClient(token).perform(
@@ -175,8 +177,6 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                 .andExpect(jsonPath("$.sequenceId", is(1)))
                 .andReturn();
 
-        ObjectMapper mapper = new ObjectMapper();
-
         String content = mvcResult.getResponse().getContentAsString();
         Map<String, Object> map = mapper.readValue(content, Map.class);
         String bitstreamId = String.valueOf(map.get("id"));
@@ -227,8 +227,6 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                                                .file(file))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.uuid", notNullValue())).andReturn();
-
-        ObjectMapper mapper = new ObjectMapper();
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String, Object> map = mapper.readValue(content, Map.class);
@@ -362,9 +360,6 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
 
         BitstreamRest bitstreamRest = new BitstreamRest();
 
-        ObjectMapper mapper = new ObjectMapper();
-
-
         context.restoreAuthSystemState();
         MvcResult mvcResult = getClient(token)
                 .perform(MockMvcRequestBuilders.multipart("/api/core/bundles/" + bundle.getID() + "/bitstreams")
@@ -387,7 +382,7 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                                 BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize()))));
     }
 
-    // TODO This test doesn't work either as it seems that only the first file is ever transfered into the request
+    // TODO This test doesn't work either as it seems that only the first file is ever transferred into the request
     // Thus we cannot check for this and we have no way of knowing how many files we gave to the request
     @Test
     @Ignore

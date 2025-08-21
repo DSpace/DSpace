@@ -9,8 +9,10 @@ package org.dspace.app.util;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -135,8 +137,6 @@ public class SyndicationFeed {
     protected String[] podcastableMIMETypes =
         configurationService.getArrayProperty("webui.feed.podcast.mimetypes", new String[] {"audio/x-mpeg"});
 
-    // -------- Instance variables:
-
     // the feed object we are building
     protected SyndFeed feed = null;
 
@@ -146,9 +146,6 @@ public class SyndicationFeed {
     protected CommunityService communityService;
     protected ItemService itemService;
 
-    /**
-     * Constructor.
-     */
     public SyndicationFeed() {
         feed = new SyndFeedImpl();
         ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
@@ -158,31 +155,23 @@ public class SyndicationFeed {
     }
 
     /**
-     * Returns list of metadata selectors used to compose the description element
-     *
-     * @return selector list - format 'schema.element[.qualifier]'
-     */
-    public static String[] getDescriptionSelectors() {
-        return (String[]) ArrayUtils.clone(descriptionFields);
-    }
-
-
-    /**
      * Fills in the feed and entry-level metadata from DSpace objects.
      *
      * @param request request
      * @param context context
      * @param dso     the scope
      * @param items   array of objects
-     * @param labels  label map
      */
     public void populate(HttpServletRequest request, Context context, IndexableObject dso,
-                         List<IndexableObject> items, Map<String, String> labels) {
+                         List<IndexableObject> items) {
         String logoURL = null;
         String objectURL = null;
         String defaultTitle = null;
         boolean podcastFeed = false;
         this.request = request;
+
+        Map<String, String> labels = getLabels();
+
         // dso is null for the whole site, or a search without scope
         if (dso == null) {
             defaultTitle = configurationService.getProperty("dspace.name");
@@ -227,7 +216,7 @@ public class SyndicationFeed {
 
         feed.setDescription(defaultDescriptionField);
         feed.setLink(objectURL);
-        feed.setPublishedDate(new Date());
+        feed.setPublishedDate(java.util.Date.from(Instant.now()));
         feed.setUri(objectURL);
 
         // add logo if we found one:
@@ -265,13 +254,20 @@ public class SyndicationFeed {
                 entry.setTitle(title == null ? localize(labels, MSG_UNTITLED) : title);
 
                 // "published" date -- should be dc.date.issued
-                String pubDate = getOneDC(item, dateField);
-                if (pubDate != null) {
-                    entry.setPublishedDate((new DCDate(pubDate)).toDate());
-                    hasDate = true;
+                String pubDateString = getOneDC(item, dateField);
+                if (pubDateString != null) {
+                    ZonedDateTime pubDate = new DCDate(pubDateString).toDate();
+                    // If date string could not be parsed as a date, then pubDate will be null
+                    if (pubDate != null) {
+                        entry.setPublishedDate(java.util.Date.from(pubDate.toInstant()));
+                        hasDate = true;
+                    } else {
+                        log.warn("Date field {} for item {} could not be parsed: {}", dateField, item.getID(),
+                                 pubDateString);
+                    }
                 }
                 // date of last change to Item
-                entry.setUpdatedDate(item.getLastModified());
+                entry.setUpdatedDate(java.util.Date.from(item.getLastModified()));
 
                 StringBuilder db = new StringBuilder();
                 for (String df : descriptionFields) {
@@ -336,7 +332,8 @@ public class SyndicationFeed {
                     if (dcDateField != null && !hasDate) {
                         List<MetadataValue> v = itemService.getMetadataByMetadataString(item, dcDateField);
                         if (v.size() > 0) {
-                            dc.setDate((new DCDate(v.get(0).getValue())).toDate());
+                            ZonedDateTime dateTime = (new DCDate(v.get(0).getValue())).toDate();
+                            dc.setDate(java.util.Date.from(dateTime.toInstant()));
                         }
                     }
                     if (dcDescriptionField != null) {
@@ -523,7 +520,7 @@ public class SyndicationFeed {
      */
     protected String resolveURL(HttpServletRequest request, DSpaceObject dso) {
         // If no object given then just link to the whole repository,
-        // since no offical handle exists so we have to use local resolution.
+        // since no official handle exists so we have to use local resolution.
         if (dso == null) {
             if (baseURL == null) {
                 if (request == null) {
@@ -553,5 +550,19 @@ public class SyndicationFeed {
         List<MetadataValue> dcv = itemService.getMetadataByMetadataString(item, field);
         return (dcv.size() > 0) ? dcv.get(0).getValue() : null;
     }
-}
 
+    /**
+     * Internal method to get labels for the returned document
+     */
+    private Map<String, String> getLabels() {
+        // TODO: get strings from translation file or configuration
+        Map<String, String> labelMap = new HashMap<>();
+        labelMap.put(SyndicationFeed.MSG_UNTITLED, "notitle");
+        labelMap.put(SyndicationFeed.MSG_LOGO_TITLE, "logo.title");
+        labelMap.put(SyndicationFeed.MSG_FEED_DESCRIPTION, "general-feed.description");
+        for (String selector : descriptionFields) {
+            labelMap.put("metadata." + selector, selector);
+        }
+        return labelMap;
+    }
+}

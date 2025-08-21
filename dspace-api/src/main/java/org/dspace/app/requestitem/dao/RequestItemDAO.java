@@ -26,7 +26,7 @@ import org.dspace.core.GenericDAO;
  */
 public interface RequestItemDAO extends GenericDAO<RequestItem> {
     /**
-     * Fetch a request named by its unique token (passed in emails).
+     * Fetch a request named by its unique approval token (passed in emails).
      *
      * @param context the current DSpace context.
      * @param token uniquely identifies the request.
@@ -35,5 +35,18 @@ public interface RequestItemDAO extends GenericDAO<RequestItem> {
      */
     public RequestItem findByToken(Context context, String token) throws SQLException;
 
+    /**
+     * Fetch a request named by its unique access token (passed in emails).
+     * Note this is the token used by the requester to access an approved resource, not the token
+     * used by the item submitter or helpdesk to grant the access.
+     *
+     * @param context the current DSpace context.
+     * @param accessToken uniquely identifies the request
+     * @return the found request or {@code null}
+     * @throws SQLException passed through.
+     */
+    public RequestItem findByAccessToken(Context context, String accessToken) throws SQLException;
+
     public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException;
+
 }

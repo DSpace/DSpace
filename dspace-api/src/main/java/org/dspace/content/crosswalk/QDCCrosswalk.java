@@ -22,6 +22,7 @@ import java.util.Properties;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -113,7 +114,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
     private static final Namespace DCTERMS_NS =
         Namespace.getNamespace("dcterms", "http://purl.org/dc/terms/");
 
-    // sentinal: done init?
+    // sentinel: done init?
     private boolean inited = false;
 
     // my plugin name
@@ -125,7 +126,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
     // XML schemaLocation fragment for this crosswalk, from config.
     private String schemaLocation = null;
 
-    private static final SAXBuilder builder = new SAXBuilder();
+    private static final SAXBuilder builder = XMLUtils.getSAXBuilder();
 
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 

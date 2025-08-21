@@ -71,7 +71,7 @@ import org.junit.rules.TemporaryFolder;
 
 /**
  * Basic integration testing for the AIP Backup and Restore feature
- * https://wiki.duraspace.org/display/DSDOC5x/AIP+Backup+and+Restore
+ * https://wiki.lyrasis.org/display/DSDOC9x/AIP+Backup+and+Restore
  *
  * @author Tim Donohue
  */
@@ -146,7 +146,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
             InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
 
             log.info("setUpClass() - CREATE TEST HIERARCHY");
-            // Create a hierachy of sub-Communities and Collections and Items,
+            // Create a hierarchy of sub-Communities and Collections and Items,
             // which looks like this:
             //  "Top Community"
             //      - "Child Community"

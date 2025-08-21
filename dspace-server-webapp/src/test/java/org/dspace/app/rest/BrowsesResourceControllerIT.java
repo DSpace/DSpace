@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.matcher.BrowseIndexMatcher.bis;
+import static org.dspace.app.rest.matcher.BrowseIndexMatcher.browseMatchers;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.model.BrowseIndexRest.BROWSE_TYPE_VALUE_LIST;
 import static org.hamcrest.Matchers.contains;
@@ -66,24 +68,18 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //Our default Discovery config has 5 browse indexes, so we expect this to be reflected in the page
-                   // object
+                   // Dynamically obtain the total number of browse indices configured in dspace.cfg and check that the
+                   // response contains the correct number of browse indices
                    .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", is(5)))
+                   .andExpect(jsonPath("$.page.totalElements", is(bis.length)))
                    .andExpect(jsonPath("$.page.totalPages", is(1)))
                    .andExpect(jsonPath("$.page.number", is(0)))
 
-                   //The array of browse index should have a size 5
-                   .andExpect(jsonPath("$._embedded.browses", hasSize(5)))
+                   //The array of browse index should match the size of the total number of browse indices configured
+                   .andExpect(jsonPath("$._embedded.browses", hasSize(bis.length)))
 
-                   //Check that all (and only) the default browse indexes are present
-                   .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(
-                       BrowseIndexMatcher.dateIssuedBrowseIndex("asc"),
-                       BrowseIndexMatcher.contributorBrowseIndex("asc"),
-                       BrowseIndexMatcher.titleBrowseIndex("asc"),
-                       BrowseIndexMatcher.subjectBrowseIndex("asc"),
-                       BrowseIndexMatcher.hierarchicalBrowseIndex("srsc")
-                   )))
+                   //Check that all (and only) the configured browse indexes are present
+                   .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(browseMatchers)))
         ;
     }
 
@@ -259,6 +255,185 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                                 BrowseEntryResourceMatcher.matchBrowseEntry("ExtraEntry", 3),
                                                 BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1)
                                        )));
+    }
+
+    @Test
+    public void findBrowseBySubjectEntriesPagination() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+            .withTitle("Public item 1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald").withAuthor("Doe, John")
+            .withSubject("ExtraEntry")
+            .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+            .withTitle("Public item 2")
+            .withIssueDate("2016-02-13")
+            .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+            .withSubject("TestingForMore").withSubject("ExtraEntry")
+            .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+            .withTitle("Public item 2")
+            .withIssueDate("2016-02-13")
+            .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+            .withSubject("AnotherTest").withSubject("TestingForMore")
+            .withSubject("ExtraEntry")
+            .build();
+        Item withdrawnItem1 = ItemBuilder.createItem(context, col2)
+            .withTitle("Withdrawn item 1")
+            .withIssueDate("2016-02-13")
+            .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+            .withSubject("AnotherTest").withSubject("TestingForMore")
+            .withSubject("ExtraEntry").withSubject("WithdrawnEntry")
+            .withdrawn()
+            .build();
+        Item privateItem1 = ItemBuilder.createItem(context, col2)
+            .withTitle("Private item 1")
+            .withIssueDate("2016-02-13")
+            .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+            .withSubject("AnotherTest").withSubject("TestingForMore")
+            .withSubject("ExtraEntry").withSubject("PrivateEntry")
+            .makeUnDiscoverable()
+            .build();
+
+
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses this endpoint to find which subjects are currently in the repository
+        getClient().perform(get("/api/discover/browses/subject/entries")
+                .param("projection", "full")
+                .param("size", "1"))
+
+            //** THEN **
+            //The status has to be 200
+            .andExpect(status().isOk())
+
+            //We expect the content type to be "application/hal+json;charset=UTF-8"
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.size", is(1)))
+            .andExpect(jsonPath("$.page.number", is(0)))
+            //Check that there are indeed 3 different subjects
+            .andExpect(jsonPath("$.page.totalElements", is(3)))
+            //Check that the subject matches as expected
+            .andExpect(jsonPath("$._embedded.entries",
+                contains(BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1)
+                )));
+
+        getClient().perform(get("/api/discover/browses/subject/entries")
+                .param("projection", "full")
+                .param("size", "1")
+                .param("page","1"))
+
+            //** THEN **
+            //The status has to be 200
+            .andExpect(status().isOk())
+
+            //We expect the content type to be "application/hal+json;charset=UTF-8"
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.size", is(1)))
+            .andExpect(jsonPath("$.page.number", is(1)))
+            //Check that there are indeed 3 different subjects
+            .andExpect(jsonPath("$.page.totalElements", is(3)))
+            //Check that the subject matches as expected
+            .andExpect(jsonPath("$._embedded.entries",
+                contains(BrowseEntryResourceMatcher.matchBrowseEntry("ExtraEntry", 3)
+                )));
+
+        getClient().perform(get("/api/discover/browses/subject/entries")
+                .param("projection", "full")
+                .param("size", "1")
+                .param("page","2"))
+
+            //** THEN **
+            //The status has to be 200
+            .andExpect(status().isOk())
+
+            //We expect the content type to be "application/hal+json;charset=UTF-8"
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.size", is(1)))
+            .andExpect(jsonPath("$.page.number", is(2)))
+            //Check that there are indeed 3 different subjects
+            .andExpect(jsonPath("$.page.totalElements", is(3)))
+            //Check that the subject matches as expected
+            .andExpect(jsonPath("$._embedded.entries",
+                contains(BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2)
+                )));
+
+        getClient().perform(get("/api/discover/browses/subject/entries")
+                .param("sort", "value,desc")
+                .param("size", "1"))
+
+            //** THEN **
+            //The status has to be 200
+            .andExpect(status().isOk())
+
+            //We expect the content type to be "application/hal+json;charset=UTF-8"
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.size", is(1)))
+            .andExpect(jsonPath("$.page.number", is(0)))
+            //Check that there are indeed 3 different subjects
+            .andExpect(jsonPath("$.page.totalElements", is(3)))
+            //Check that the subject matches as expected
+            .andExpect(jsonPath("$._embedded.entries",
+                contains(BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2)
+                )));
+
+        getClient().perform(get("/api/discover/browses/subject/entries")
+                .param("sort", "value,desc")
+                .param("size", "1")
+                .param("page","1"))
+
+            //** THEN **
+            //The status has to be 200
+            .andExpect(status().isOk())
+
+            //We expect the content type to be "application/hal+json;charset=UTF-8"
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.size", is(1)))
+            .andExpect(jsonPath("$.page.number", is(1)))
+            //Check that there are indeed 3 different subjects
+            .andExpect(jsonPath("$.page.totalElements", is(3)))
+            //Check that the subject matches as expected
+            .andExpect(jsonPath("$._embedded.entries",
+                contains(BrowseEntryResourceMatcher.matchBrowseEntry("ExtraEntry", 3)
+                )));
+
+        getClient().perform(get("/api/discover/browses/subject/entries")
+                .param("sort", "value,desc")
+                .param("size", "1")
+                .param("page","2"))
+
+            //** THEN **
+            //The status has to be 200
+            .andExpect(status().isOk())
+
+            //We expect the content type to be "application/hal+json;charset=UTF-8"
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.size", is(1)))
+            .andExpect(jsonPath("$.page.number", is(2)))
+            //Check that there are indeed 3 different subjects
+            .andExpect(jsonPath("$.page.totalElements", is(3)))
+            //Check that the subject matches as expected
+            .andExpect(jsonPath("$._embedded.entries",
+                contains(BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1)
+                )));
     }
 
     @Test
@@ -1456,7 +1631,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(jsonPath("$._embedded.entries",
                                        contains(BrowseEntryResourceMatcher.matchBrowseEntry("Turing, Alan Mathison", 1)
                                        )))
-                   //Verify that the startsWith paramater is included in the links
+                   //Verify that the startsWith parameter is included in the links
                     .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=T")));
 
         //** WHEN **
@@ -1479,7 +1654,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(jsonPath("$._embedded.entries",
                                        contains(BrowseEntryResourceMatcher.matchBrowseEntry("Computing", 3)
                                        )))
-                   //Verify that the startsWith paramater is included in the links
+                   //Verify that the startsWith parameter is included in the links
                     .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=C")));
 
     };
@@ -1581,7 +1756,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                        contains(BrowseEntryResourceMatcher.matchBrowseEntry("Ögren, Name", 1),
                                                 BrowseEntryResourceMatcher.matchBrowseEntry("Ortiz, Nombre", 1)
                                                )))
-                   //Verify that the startsWith paramater is included in the links
+                   //Verify that the startsWith parameter is included in the links
                    .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=Ó")));
 
 
@@ -1608,7 +1783,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                                 BrowseEntryResourceMatcher.matchBrowseEntry("Teléfono", 1),
                                                 BrowseEntryResourceMatcher.matchBrowseEntry("Televisor", 1)
                                                )))
-                   //Verify that the startsWith paramater is included in the links
+                   //Verify that the startsWith parameter is included in the links
                    .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=Tele")));
 
         //** WHEN **
@@ -1631,7 +1806,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(jsonPath("$._embedded.entries",
                                        contains(BrowseEntryResourceMatcher.matchBrowseEntry("Guion", 1)
                                                )))
-                   //Verify that the startsWith paramater is included in the links
+                   //Verify that the startsWith parameter is included in the links
                    .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=Guión")));
 
     };

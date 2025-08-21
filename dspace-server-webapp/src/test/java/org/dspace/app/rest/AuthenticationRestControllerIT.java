@@ -110,6 +110,9 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     @Autowired
     private Utils utils;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     public static final String[] PASS_ONLY = {"org.dspace.authenticate.PasswordAuthentication"};
     public static final String[] SHIB_ONLY = {"org.dspace.authenticate.ShibAuthentication"};
     public static final String[] ORCID_ONLY = { "org.dspace.authenticate.OrcidAuthentication" };
@@ -943,7 +946,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         //request a new token
         token = getAuthToken(eperson.getEmail(), password);
 
-        //Check if we succesfully authenticated again
+        //Check if we successfully authenticated again
         getClient(token).perform(get("/api/authn/status"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
@@ -1708,8 +1711,6 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     // Get a short-lived token based on an active login token
     private String getShortLivedToken(String loginToken) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-
         MvcResult mvcResult = getClient(loginToken).perform(post("/api/authn/shortlivedtokens"))
             .andReturn();
 

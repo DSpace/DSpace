@@ -302,7 +302,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
         if (StringUtils.isNotBlank(sortBy) && !isConfigured(sortBy, searchSortConfiguration)) {
             throw new SearchServiceException(
-                    "The field: " + sortBy + "is not configured for the configuration!");
+                    "The field: " + sortBy + " is not configured for the configuration!");
         }
 
 

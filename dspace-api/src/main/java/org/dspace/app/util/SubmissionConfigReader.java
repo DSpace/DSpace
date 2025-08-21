@@ -16,7 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.apache.commons.lang3.StringUtils;
@@ -158,7 +157,7 @@ public class SubmissionConfigReader {
      * <li>Hashmap of Collection to Submission definition mappings -
      * defines which Submission process a particular collection uses
      * <li>Hashmap of all Submission definitions.  List of all valid
-     * Submision Processes by name.
+     * Submission Processes by name.
      * </ul>
      */
     private void buildInputs(String fileName) throws SubmissionConfigReaderException {
@@ -170,13 +169,10 @@ public class SubmissionConfigReader {
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory
-                .newInstance();
-            factory.setValidating(false);
-            factory.setIgnoringComments(true);
-            factory.setIgnoringElementContentWhitespace(true);
-
-            DocumentBuilder db = factory.newDocumentBuilder();
+            // This document builder factory will *not* disable external
+            // entities as they can be useful in managing large forms, but
+            // it will restrict them to the config dir containing submission definitions
+            DocumentBuilder db = XMLUtils.getTrustedDocumentBuilder(configDir);
             Document doc = db.parse(uri);
             doNodes(doc);
         } catch (FactoryConfigurationError fe) {
@@ -358,7 +354,7 @@ public class SubmissionConfigReader {
         throws SubmissionConfigReaderException {
         // We should already have the step definitions loaded
         if (stepDefns != null) {
-            // retreive step info
+            // retrieve step info
             Map<String, String> stepInfo = stepDefns.get(stepID);
 
             if (stepInfo != null) {

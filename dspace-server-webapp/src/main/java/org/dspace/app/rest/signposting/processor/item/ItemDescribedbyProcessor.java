@@ -10,7 +10,8 @@ package org.dspace.app.rest.signposting.processor.item;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.signposting.model.LinksetNode;
 import org.dspace.app.rest.signposting.model.LinksetRelationType;
 import org.dspace.content.Item;
@@ -23,7 +24,7 @@ import org.dspace.util.FrontendUrlService;
  */
 public class ItemDescribedbyProcessor extends ItemSignpostingProcessor {
 
-    private static final Logger log = Logger.getLogger(ItemDescribedbyProcessor.class);
+    private static final Logger log = LogManager.getLogger(ItemDescribedbyProcessor.class);
 
     private final ConfigurationService configurationService;
 
@@ -40,8 +41,12 @@ public class ItemDescribedbyProcessor extends ItemSignpostingProcessor {
             String signpostingPath = configurationService.getProperty("signposting.path");
             String baseUrl = configurationService.getProperty("dspace.ui.url");
             String mimeType = configurationService.getProperty("signposting.describedby.mime-type");
+            String profile = configurationService.getProperty("signposting.describedby.profile");
             String describedByUrl = baseUrl + "/" + signpostingPath + "/describedby/" + item.getID();
-            LinksetNode node = new LinksetNode(describedByUrl, getRelation(), mimeType, buildAnchor(context, item));
+            LinksetNode node = profile != null ?
+                    new LinksetNode(describedByUrl, getRelation(), mimeType, profile, buildAnchor(context, item)) :
+                    new LinksetNode(describedByUrl, getRelation(), mimeType, buildAnchor(context, item));
+
             linksetNodes.add(node);
         } catch (Exception e) {
             log.error(e.getMessage(), e);

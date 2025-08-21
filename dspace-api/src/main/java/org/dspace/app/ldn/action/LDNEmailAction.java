@@ -9,9 +9,8 @@ package org.dspace.app.ldn.action;
 
 import static java.lang.String.format;
 
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -27,14 +26,12 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Action to send email to receipients provided in actionSendFilter. The email
+ * Action to send email to recipients provided in actionSendFilter. The email
  * body will be result of templating actionSendFilter.
  */
 public class LDNEmailAction implements LDNAction {
 
     private static final Logger log = LogManager.getLogger(LDNEmailAction.class);
-
-    private final static String DATE_PATTERN = "dd-MM-yyyy HH:mm:ss";
 
     @Autowired
     private ConfigurationService configurationService;
@@ -80,7 +77,7 @@ public class LDNEmailAction implements LDNAction {
                 email.addRecipient(recipient);
             }
 
-            String date = new SimpleDateFormat(DATE_PATTERN).format(Calendar.getInstance().getTime());
+            String date = Instant.now().toString();
 
             email.addArgument(notification.getActor().getName());
             email.addArgument(item.getName());
@@ -139,7 +136,13 @@ public class LDNEmailAction implements LDNAction {
         List<String> recipients = new LinkedList<String>();
 
         if (actionSendFilter.startsWith("SUBMITTER")) {
-            recipients.add(item.getSubmitter().getEmail());
+            if (item.getSubmitter() != null) {
+                recipients.add(item.getSubmitter().getEmail());
+            } else {
+                // Fallback configured option
+                recipients.add(configurationService.getProperty("ldn.notification.email.submitter.fallback"));
+            }
+
         } else if (actionSendFilter.startsWith("GROUP:")) {
             String groupName = actionSendFilter.replace("GROUP:", "");
             String property = format("email.%s.list", groupName);

@@ -8,7 +8,7 @@
 package org.dspace.authorize;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -137,7 +137,7 @@ public class PolicySet {
      *                      otherwise add to existing policies
      * @param clearOnly     if non-null, only process bitstreams whose names contain filter
      * @param name          policy name
-     * @param description   policy descrption
+     * @param description   policy description
      * @param startDate     policy start date
      * @param endDate       policy end date
      * @throws SQLException       if database error
@@ -146,7 +146,7 @@ public class PolicySet {
     public static void setPolicies(Context c, int containerType,
                                    UUID containerID, int contentType, int actionID, UUID groupID,
                                    boolean isReplace, boolean clearOnly,
-                                   String name, String description, Date startDate, Date endDate)
+                                   String name, String description, LocalDate startDate, LocalDate endDate)
         throws SQLException, AuthorizeException {
         setPoliciesFilter(c, containerType, containerID, contentType,
                           actionID, groupID, isReplace, clearOnly, null, name, description, startDate, endDate);
@@ -207,7 +207,7 @@ public class PolicySet {
     public static void setPoliciesFilter(Context c, int containerType,
                                          UUID containerID, int contentType, int actionID, UUID groupID,
                                          boolean isReplace, boolean clearOnly, String filter,
-                                         String name, String description, Date startDate, Date endDate)
+                                         String name, String description, LocalDate startDate, LocalDate endDate)
         throws SQLException, AuthorizeException {
         if (containerType == Constants.COLLECTION) {
             Collection collection = collectionService.find(c, containerID);

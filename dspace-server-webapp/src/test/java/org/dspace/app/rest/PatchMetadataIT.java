@@ -261,7 +261,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
         for (String author : authorsOriginalOrder) {
             itemService.addMetadata(
-                context, publicationItem, "dc", "contributor", "author", Item.ANY, author
+                context, publicationItem, "dc", "contributor", "author", null, author
             );
         }
 
@@ -1424,6 +1424,27 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         );
 
         moveMetadataAuthorTest(moves, expectedOrder);
+    }
+
+    @Test
+    public void replaceInvalidMetadataShouldFailTest() throws Exception {
+        initSimplePublicationItem();
+        assertEquals(11, publicationItem.getMetadata().size());
+
+        String patchBody = getPatchContent(List.of(
+            new ReplaceOperation("/metadata/dc.contributor.invalid/0", "some value")
+        ));
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/items/" + publicationItem.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isUnprocessableEntity());
+
+        publicationItem = context.reloadEntity(publicationItem);
+
+        assertEquals(11, publicationItem.getMetadata().size());
+        assertEquals(0,
+            itemService.getMetadata(publicationItem, "dc", "contributor", "invalid", Item.ANY, false).size());
     }
 
     /**

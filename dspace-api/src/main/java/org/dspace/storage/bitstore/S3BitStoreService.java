@@ -553,15 +553,15 @@ public class S3BitStoreService extends BaseBitStoreService {
         store.bucketName = DEFAULT_BUCKET_PREFIX + hostname + ".s3test";
         store.s3Service.createBucket(store.bucketName);
         /* Broken in DSpace 6 TODO Refactor
-        // time everything, todo, swtich to caliper
-        long start = System.currentTimeMillis();
+        // time everything, todo, switch to caliper
+        long start = Instant.now().toEpochMilli();
         // Case 1: store a file
         String id = store.generateId();
         System.out.print("put() file " + assetFile + " under ID " + id + ": ");
         FileInputStream fis = new FileInputStream(assetFile);
         //TODO create bitstream for assetfile...
         Map attrs = store.put(fis, id);
-        long now =  System.currentTimeMillis();
+        long now =  Instant.now().toEpochMilli();
         System.out.println((now - start) + " msecs");
         start = now;
         // examine the metadata returned
@@ -575,7 +575,7 @@ public class S3BitStoreService extends BaseBitStoreService {
         // Case 2: get metadata and compare
         System.out.print("about() file with ID " + id + ": ");
         Map attrs2 = store.about(id, attrs);
-        now =  System.currentTimeMillis();
+        now =  Instant.now().toEpochMilli();
         System.out.println((now - start) + " msecs");
         start = now;
         iter = attrs2.keySet().iterator();
@@ -592,13 +592,13 @@ public class S3BitStoreService extends BaseBitStoreService {
         Utils.bufferedCopy(in, fos);
         fos.close();
         in.close();
-        now =  System.currentTimeMillis();
+        now =  Instant.now().toEpochMilli();
         System.out.println((now - start) + " msecs");
         start = now;
         // Case 4: remove asset
         System.out.print("remove() file with ID: " + id + ": ");
         store.remove(id);
-        now =  System.currentTimeMillis();
+        now =  Instant.now().toEpochMilli();
         System.out.println((now - start) + " msecs");
         System.out.flush();
         // should get nothing back now - will throw exception

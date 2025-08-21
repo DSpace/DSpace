@@ -193,7 +193,7 @@ public class FullTextContentStreamsTest {
                    content.contains("This is text 1"));
         assertFalse("The data should NOT contain data of the second bitstream that is corrupt",
                     content.contains("This is text 2"));
-        assertTrue("The data should contain data of the third bistream that is not corrupt",
+        assertTrue("The data should contain data of the third bitstream that is not corrupt",
                    content.contains("This is text 3"));
         assertTrue("The data should contain data on the exception that occurred",
                    content.contains("java.io.IOException"));

@@ -51,6 +51,9 @@ public class HdlResolverRestController {
     @Autowired
     private HdlResolverService hdlResolverService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @GetMapping(
         value = "**",
         produces = "application/json;charset=UTF-8"
@@ -63,7 +66,7 @@ public class HdlResolverRestController {
                     request,
                     Optional.ofNullable(request.getRequestURI().split(LISTHANDLES))
                         .filter(split -> split.length > 1)
-                        .map(splitted -> splitted[1])
+                        .map(split -> split[1])
                         .orElse(null)
             );
         } else if (LISTPREFIXES.contains(hdlService)) {
@@ -187,7 +190,7 @@ public class HdlResolverRestController {
         String json = "null";
         if (jsonList != null && !jsonList.isEmpty()) {
             try {
-                json = new ObjectMapper().writeValueAsString(jsonList);
+                json = mapper.writeValueAsString(jsonList);
             } catch (JsonProcessingException e) {
                 log.error("Error during conversion of response!", e);
             }

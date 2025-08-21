@@ -398,7 +398,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                           + " (ad esempio, se è un set di dati o un'immagine) selezionare (N/A)",
                           null, "dc.language.iso", "common_iso_languages"))));
 
-        // user select ukranian language
+        // user select ukrainian language
         getClient(tokenEperson).perform(get("/api/config/submissionforms/languagetest").locale(uk))
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
@@ -478,7 +478,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                           + " (ad esempio, se è un set di dati o un'immagine) selezionare (N/A)",
                           null, "dc.language.iso", "common_iso_languages"))));
 
-        // user with ukranian prefer language
+        // user with ukrainian prefer language
         getClient(tokenEpersonUK).perform(get("/api/config/submissionforms/languagetest"))
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
@@ -528,7 +528,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
 
         String tokenEpersonUK = getAuthToken(epersonUK.getEmail(), password);
 
-        // user prefer ukranian but choice italian language
+        // user prefer ukrainian but choice italian language
         getClient(tokenEpersonUK).perform(get("/api/config/submissionforms/languagetest").locale(it))
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))

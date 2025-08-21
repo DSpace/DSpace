@@ -435,7 +435,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
 
     /**
      * Test of setWorkflowGroup method, of class Collection.
-     * The setWorkflowGroup ajust the policies for the basic Workflow. This test
+     * The setWorkflowGroup adjust the policies for the basic Workflow. This test
      * shall assure that now exception (e.g. ConcurrentModificationException is
      * thrown during these adjustments.
      */
