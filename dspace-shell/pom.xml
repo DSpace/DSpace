@@ -18,8 +18,20 @@
     <name>DSpace Spring Shell</name>
 
     <properties>
-        <spring-shell.version>3.2.3</spring-shell.version>
+        <spring-shell.version>3.3.0</spring-shell.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>3.5.4</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- Spring Shell -->
@@ -56,4 +68,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
