@@ -168,7 +168,7 @@ Common usage:
     <!-- ============================================================= -->
 
     <target name="update"
-            depends="update_configs,update_code,test_database,update_webapps"
+            depends="update_configs,update_code,test_database,update_webapps,copy-spring-shell-jar"
             description="Update installed code and web applications (without clobbering data/config)">
     </target>
 
@@ -844,6 +844,8 @@ Common usage:
 
         <antcall target="copy_webapps" />
 
+        <antcall target="copy-spring-shell-jar" />
+
         <antcall target="init_spiders" />
 
         <echo>
@@ -896,6 +898,13 @@ Common usage:
 
     <target name="init_spiders" depends="check_spiders" if="need.spiders">
         <antcall target="update_spiders" />
+    </target>
+
+    <!-- copy or replace DSpace Spring Shell jar into [dspace]/bin folder -->
+    <target name="copy-spring-shell-jar" depends="package">
+        <echo>Copying file to: ${dspace.dir}/bin/dspace.jar</echo>
+        <copy file="dspace-shell/target/dspace.jar"
+              todir="${dspace.dir}/bin" overwrite="true" />
     </target>
 
 </project>

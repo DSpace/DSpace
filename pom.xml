@@ -940,6 +940,21 @@
         </profile>
 
         <!--
+           Builds DSpace Shell
+        -->
+        <profile>
+            <id>dspace-shell</id>
+            <activation>
+                <file>
+                    <exists>dspace-shell/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-shell</module>
+            </modules>
+        </profile>
+
+        <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven Central.
          This profile contains settings which are ONLY enabled when performing
