@@ -25,7 +25,6 @@ import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.MetadataAuthorityService;
@@ -68,11 +67,9 @@ public class UploadValidation extends AbstractValidation {
                          + config.getId());
         }
         if (itemService.hasUploadedFiles(obj.getItem())) {
-            List<Bundle> bundles = itemService.getBundles(obj.getItem(), "ORIGINAL");
-            for (Bundle bundle : bundles) {
-                for (Bitstream bitstream : bundle.getBitstreams()) {
-                    errors.addAll(metadataValidate(bitstream, config, uploadConfig));
-                }
+            List<Bitstream> bitstreams = itemService.getBundles(obj.getItem(), "ORIGINAL").get(0).getBitstreams();
+            for (Bitstream bitstream : bitstreams) {
+                errors.addAll(metadataValidate(bitstream, config, uploadConfig));
             }
         }
         return errors;
