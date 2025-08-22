@@ -7,22 +7,20 @@
  */
 package org.dspace.shell.commands;
 
-import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseInfo;
-import org.springframework.shell.command.annotation.Command;
+import org.springframework.shell.standard.ShellCommandGroup;
+import org.springframework.shell.standard.ShellComponent;
+import org.springframework.shell.standard.ShellMethod;
+//import org.springframework.shell.standard.ShellOption;
 
 /**
  * Database commands for the DSpace Spring Shell
  */
-@Command(group = "Database", command = "db-info")
+@ShellComponent
+@ShellCommandGroup("database")
 public class DatabaseCommands {
 
-    @Command(description = "Displays database information using the DSpace context")
+    @ShellMethod(key="info", value="Displays database information using the DSpace context")
     public void dbInfo() {
-        try (Context context = new Context()) {
-            DatabaseInfo.printInfo(context);
-        } catch (Exception e) {
-            System.err.println("Error while retrieving database information: " + e.getMessage());
-        }
+        System.out.println("hello!");
     }
 }
