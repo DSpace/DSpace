@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -27,6 +29,8 @@ import org.dspace.core.Utils;
 public abstract class MetadataValueRemovePatchOperation<DSO extends DSpaceObject>
     extends RemovePatchOperation<MetadataValueRest> {
 
+    private static final Logger log = LogManager.getLogger();
+
     @Override
     protected Class<MetadataValueRest[]> getArrayClassForEvaluation() {
         return MetadataValueRest[].class;
@@ -42,7 +46,12 @@ public abstract class MetadataValueRemovePatchOperation<DSO extends DSpaceObject
         List<MetadataValue> mm = getDSpaceObjectService().getMetadata(source, metadata[0], metadata[1], metadata[2],
                                                                       Item.ANY);
         if (index != -1) {
-            getDSpaceObjectService().removeMetadataValues(context, source, Arrays.asList(mm.get(index)));
+            if (index < mm.size()) {
+                getDSpaceObjectService().removeMetadataValues(context, source, Arrays.asList(mm.get(index)));
+            } else {
+                log.warn("value of index ({}) is out of range of the metadata value list of size {} (target: {})",
+                        index, mm.size(), target);
+            }
         } else {
             getDSpaceObjectService().clearMetadata(context, source, metadata[0], metadata[1], metadata[2], Item.ANY);
         }
