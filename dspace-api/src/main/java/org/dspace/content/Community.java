@@ -163,7 +163,7 @@ public class Community extends CacheableDSpaceObject implements DSpaceObjectLega
         collections.add(collection);
     }
 
-    void removeCollection(Collection collection) {
+    public void removeCollection(Collection collection) {
         collections.remove(collection);
     }
 
