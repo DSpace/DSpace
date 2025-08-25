@@ -10,6 +10,7 @@ package org.dspace.storage.bitstore;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -88,6 +89,11 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 
     protected BitstreamStorageServiceImpl() {
 
+    }
+
+    @Override
+    public void setIncomingExternal(int incoming) {
+        this.incoming = incoming;
     }
 
     @Override
@@ -423,7 +429,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             //modulo
             if ((processedCounter % batchCommitSize) == 0) {
                 log.info("Migration Commit Checkpoint: " + processedCounter);
-                context.dispatchEvents();
+                context.commit();
             }
         }
 
@@ -478,7 +484,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
      * @return True if this file is too recent to be deleted
      */
     protected boolean isRecent(Long lastModified) {
-        long now = new java.util.Date().getTime();
+        long now = Instant.now().toEpochMilli();
 
         if (lastModified >= now) {
             return true;

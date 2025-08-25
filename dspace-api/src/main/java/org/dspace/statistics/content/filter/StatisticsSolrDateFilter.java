@@ -7,20 +7,19 @@
  */
 package org.dspace.statistics.content.filter;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
-import org.dspace.statistics.SolrLoggerServiceImpl;
-
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 /**
  * Encapsulate a range of dates for Solr query filtering.
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class StatisticsSolrDateFilter implements StatisticsFilter {
-    private Date startDate;
-    private Date endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String startStr;
     private String endStr;
     private String typeStr;
@@ -65,10 +64,10 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
      *
      * @param startDate statistics start date object
      *
-     *                  Must be paired with {@link #setEndDate(Date)}.
+     *                  Must be paired with {@link #setEndDate(LocalDateTime)}.
      */
-    public void setStartDate(Date startDate) {
-        this.startDate = (startDate == null ? null : new Date(startDate.getTime()));
+    public void setStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
     }
 
     /**
@@ -76,10 +75,10 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
      *
      * @param endDate statistics end date object
      *
-     *                Must be paired with {@link #setStartDate(Date)}.
+     *                Must be paired with {@link #setStartDate(LocalDateTime)}.
      */
-    public void setEndDate(Date endDate) {
-        this.endDate = (endDate == null ? null : new Date(endDate.getTime()));
+    public void setEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
     }
 
     /**
@@ -92,52 +91,42 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
         if (startDate == null || endDate == null) {
             // We have got strings instead of dates so calculate our dates out
             // of these strings
-            Calendar startCal = Calendar.getInstance();
+            LocalDate startCal = LocalDate.now();
 
-            startCal.clear(Calendar.MILLISECOND);
-            startCal.clear(Calendar.SECOND);
-            startCal.clear(Calendar.MINUTE);
-            startCal.set(Calendar.HOUR_OF_DAY, 0);
-
-            int dateType = -1;
+            ChronoUnit dateType;
             if (typeStr.equalsIgnoreCase("day")) {
-                dateType = Calendar.DATE;
+                dateType = ChronoUnit.DAYS;
             } else if (typeStr.equalsIgnoreCase("month")) {
-                dateType = Calendar.MONTH;
-                startCal.set(Calendar.DATE, 1);
+                dateType = ChronoUnit.MONTHS;
+                startCal = startCal.withDayOfMonth(1);
             } else if (typeStr.equalsIgnoreCase("year")) {
-                startCal.clear(Calendar.MONTH);
-                startCal.set(Calendar.DATE, 1);
-                dateType = Calendar.YEAR;
+                startCal = startCal.withDayOfYear(1);
+                dateType = ChronoUnit.YEARS;
             } else {
                 return "";
             }
 
-            Calendar endCal = (Calendar) startCal.clone();
+            LocalDate endCal = startCal;
 
             if (startDate == null) {
                 if (startStr.startsWith("+")) {
                     startStr = startStr.substring(startStr.indexOf('+') + 1);
                 }
-
-                startCal.add(dateType, Integer.parseInt(startStr));
-                startDate = startCal.getTime();
+                startDate = startCal.plus(Integer.parseInt(startStr), dateType).atStartOfDay();
             }
 
             if (endDate == null) {
                 if (endStr.startsWith("+")) {
                     endStr = endStr.substring(endStr.indexOf('+') + 1);
                 }
-
-                endCal.add(dateType, Integer.parseInt(endStr));
-                endDate = endCal.getTime();
+                endDate = endCal.plus(Integer.parseInt(endStr), dateType).atStartOfDay();
             }
         }
 
         //Parse the dates
-        SimpleDateFormat formatter = new SimpleDateFormat(SolrLoggerServiceImpl.DATE_FORMAT_8601);
-        String startDateParsed = formatter.format(startDate);
-        String endDateParsed = formatter.format(endDate);
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+        String startDateParsed = formatter.format(startDate.toInstant(ZoneOffset.UTC));
+        String endDateParsed = formatter.format(endDate.toInstant(ZoneOffset.UTC));
 
         //Create our string
         return "time:[" + startDateParsed + " TO " + endDateParsed + "]";

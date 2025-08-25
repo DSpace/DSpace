@@ -8,18 +8,16 @@
 package org.dspace.util;
 
 import java.text.ParseException;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -80,7 +78,7 @@ import org.apache.logging.log4j.Logger;
  * distinct calls to parse (Assuming no other thread calls
  * "<code>setNow</code>" in the interim).  The default value of 'now' is
  * the time at the moment the <code>DateMathParser</code> instance is
- * constructed, unless overridden by the {@link CommonParams#NOW NOW}
+ * constructed, unless overridden by the <code>NOW</code>
  * request parameter.
  * </p>
  *
@@ -90,8 +88,7 @@ import org.apache.logging.log4j.Logger;
  * day starts.  This not only impacts rounding/adding of DAYs, but also
  * cascades to rounding of HOUR, MIN, MONTH, YEAR as well.  The default
  * <code>TimeZone</code> used is <code>UTC</code> unless  overridden by the
- * {@link CommonParams#TZ TZ}
- * request parameter.
+ * <code>TZ</code> request parameter.
  * </p>
  *
  * <p>
@@ -99,15 +96,12 @@ import org.apache.logging.log4j.Logger;
  * Gregorian system/algorithm.  It does <em>not</em> switch to Julian or
  * anything else, unlike the default {@link java.util.GregorianCalendar}.
  * </p>
- *
- * @see SolrRequestInfo#getClientTimeZone
- * @see SolrRequestInfo#getNOW
  */
 public class DateMathParser {
 
     private static final Logger LOG = LogManager.getLogger();
 
-    public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+    public static final TimeZone UTC = TimeZone.getTimeZone(ZoneOffset.UTC);
 
     /**
      * Default TimeZone for DateMath rounding (UTC)
@@ -132,8 +126,6 @@ public class DateMathParser {
      * for convenience (i.e. <code>DATE==DAYS</code>,
      * <code>MILLI==MILLIS</code>)
      * </p>
-     *
-     * @see Calendar
      */
     public static final Map<String, ChronoUnit> CALENDAR_UNITS = makeUnitsMap();
 
@@ -228,7 +220,7 @@ public class DateMathParser {
      * @return result of applying the parsed expression to "NOW".
      * @throws Exception
      */
-    public static Date parseMath(Date now, String val) throws Exception {
+    public static LocalDateTime parseMath(LocalDateTime now, String val) throws Exception {
         String math;
         final DateMathParser p = new DateMathParser();
 
@@ -269,24 +261,21 @@ public class DateMathParser {
      * Parsing Solr dates <b>without DateMath</b>.
      * This is the standard/pervasive ISO-8601 UTC format but is configured with some leniency.
      *
-     * Callers should almost always call {@link #parseMath(Date, String)} instead.
+     * Callers should almost always call {@link #parseMath(LocalDateTime, String)} instead.
      *
      * @throws DateTimeParseException if it can't parse
      */
-    private static Date parseNoMath(String val) {
-        //TODO write the equivalent of a Date::from; avoids Instant -> Date
-        return new Date(PARSER.parse(val, Instant::from).toEpochMilli());
+    private static LocalDateTime parseNoMath(String val) {
+        return PARSER.parse(val, LocalDateTime::from);
     }
 
     private TimeZone zone;
     private Locale loc;
-    private Date now;
+    private LocalDateTime now;
 
     /**
      * Default constructor that assumes UTC should be used for rounding unless
      * otherwise specified in the SolrRequestInfo
-     *
-     * @see SolrRequestInfo#getClientTimeZone
      */
     public DateMathParser() {
         this(null);
@@ -297,8 +286,6 @@ public class DateMathParser {
      *           defaults
      *           to the value dictated by the SolrRequestInfo if it exists -- otherwise it uses UTC.
      * @see #DEFAULT_MATH_TZ
-     * @see Calendar#getInstance(TimeZone, Locale)
-     * @see SolrRequestInfo#getClientTimeZone
      */
     public DateMathParser(TimeZone tz) {
         zone = (null != tz) ? tz : DEFAULT_MATH_TZ;
@@ -317,7 +304,7 @@ public class DateMathParser {
      * @param n new value of "now".
      * @see #getNow
      */
-    public void setNow(Date n) {
+    public void setNow(LocalDateTime n) {
         now = n;
     }
 
@@ -330,14 +317,13 @@ public class DateMathParser {
      *
      * @return "now".
      * @see #setNow
-     * @see SolrRequestInfo#getNOW
      */
-    public Date getNow() {
+    public LocalDateTime getNow() {
         if (now == null) {
             // fall back to current time if no request info set
-            now = new Date();
+            now = LocalDateTime.now(zone.toZoneId());
         }
-        return (Date) now.clone();
+        return now;
     }
 
     /**
@@ -348,7 +334,7 @@ public class DateMathParser {
      * @throws ParseException positions in ParseExceptions are token positions,
      *          not character positions.
      */
-    public Date parseMath(String math) throws ParseException {
+    public LocalDateTime parseMath(String math) throws ParseException {
         /* check for No-Op */
         if (0 == math.length()) {
             return getNow();
@@ -358,7 +344,7 @@ public class DateMathParser {
 
         ZoneId zoneId = zone.toZoneId();
         // localDateTime is a date and time local to the timezone specified
-        LocalDateTime localDateTime = ZonedDateTime.ofInstant(getNow().toInstant(), zoneId).toLocalDateTime();
+        LocalDateTime localDateTime = ZonedDateTime.of(getNow(), zoneId).toLocalDateTime();
 
         String[] ops = splitter.split(math);
         int pos = 0;
@@ -407,7 +393,7 @@ public class DateMathParser {
         }
 
         LOG.debug("returning {}", localDateTime);
-        return Date.from(ZonedDateTime.of(localDateTime, zoneId).toInstant());
+        return ZonedDateTime.of(localDateTime, zoneId).toLocalDateTime();
     }
 
     private static Pattern splitter = Pattern.compile("\\b|(?<=\\d)(?=\\D)");
@@ -423,7 +409,7 @@ public class DateMathParser {
             throws Exception {
         DateMathParser parser = new DateMathParser();
         try {
-            Date parsed;
+            LocalDateTime parsed;
 
             if (argv.length <= 0) {
                 System.err.println("Date math expression(s) expected.");
@@ -436,7 +422,7 @@ public class DateMathParser {
             }
 
             if (argv.length > 1) {
-                parsed = DateMathParser.parseMath(new Date(), argv[1]);
+                parsed = DateMathParser.parseMath(LocalDateTime.now(ZoneOffset.UTC), argv[1]);
                 System.out.format("Applied %s to explicit current time:  %s%n",
                         argv[1], parsed.toString());
             }

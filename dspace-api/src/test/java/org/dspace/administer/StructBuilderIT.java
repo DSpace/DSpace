@@ -7,6 +7,7 @@
  */
 package org.dspace.administer;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -29,6 +30,7 @@ import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -74,9 +76,9 @@ public class StructBuilderIT
     /**
      * Ensure that there is no left-over structure to confuse a test.
      *
-     * @throws SQLException passed through.
+     * @throws SQLException       passed through.
      * @throws AuthorizeException passed through.
-     * @throws IOException passed through.
+     * @throws IOException        passed through.
      */
     @Before
     public void setUp() throws Exception {
@@ -95,63 +97,65 @@ public class StructBuilderIT
     private static final String COLLECTION_0_0_0_HANDLE = "https://hdl.handle.net/1/1.1.1";
     private static final String COLLECTION_0_1_HANDLE = "https://hdl.handle.net/1/1.2";
 
-    /** Test structure document. */
+    /**
+     * Test structure document.
+     */
     private static final String IMPORT_DOCUMENT =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<import_structure>\n" +
-            "  <community identifier='" + COMMUNITY_0_HANDLE + "'>\n" +
-            "    <name>Top Community 0</name>\n" +
-            "    <description>A top level community</description>\n" +
-            "    <intro>Testing 1 2 3</intro>\n" +
-            "    <copyright>1969</copyright>\n" +
-            "    <sidebar>A sidebar</sidebar>\n" +
-            "    <community identifier='" + COMMUNITY_0_0_HANDLE + "'>\n" +
-            "      <name>Sub Community 0.0</name>\n" +
-            "      <description>A sub community</description>\n" +
-            "      <intro>Live from New York....</intro>\n" +
-            "      <copyright>1957</copyright>\n" +
-            "      <sidebar>Another sidebar</sidebar>\n" +
-            "      <collection identifier='" + COLLECTION_0_0_0_HANDLE + "'>\n" +
-            "        <name>Collection 0.0.0</name>\n" +
-            "        <description>A collection</description>\n" +
-            "        <intro>Our next guest needs no introduction</intro>\n" +
-            "        <copyright>1776</copyright>\n" +
-            "        <sidebar>Yet another sidebar</sidebar>\n" +
-            "        <license>MIT</license>\n" +
-            "        <provenance>Testing</provenance>\n" +
-            "      </collection>\n" +
-            "    </community>\n" +
-            "    <community>\n" +
-            "      <name>Sub Community 0.1</name>\n" +
-            "      <description>A sub community with no handle</description>\n" +
-            "      <intro>Stop me if you've heard this one</intro>\n" +
-            "      <copyright>2525</copyright>\n" +
-            "      <sidebar>One more sidebar</sidebar>\n" +
-            "    </community>\n" +
-            "    <collection identifier='" + COLLECTION_0_1_HANDLE + "'>\n" +
-            "      <name>Collection 0.1</name>\n" +
-            "      <description>Another collection</description>\n" +
-            "      <intro>Fourscore and seven years ago</intro>\n" +
-            "      <copyright>1863</copyright>\n" +
-            "      <sidebar>No sidebar</sidebar>\n" +
-            "      <license>Public domain</license>\n" +
-            "      <provenance>Testing again</provenance>\n" +
-            "    </collection>\n" +
-            "  </community>\n" +
-            "</import_structure>\n";
+                    "<import_structure>\n" +
+                    "  <community identifier='" + COMMUNITY_0_HANDLE + "'>\n" +
+                    "    <name>Top Community 0</name>\n" +
+                    "    <description>A top level community</description>\n" +
+                    "    <intro>Testing 1 2 3</intro>\n" +
+                    "    <copyright>1969</copyright>\n" +
+                    "    <sidebar>A sidebar</sidebar>\n" +
+                    "    <community identifier='" + COMMUNITY_0_0_HANDLE + "'>\n" +
+                    "      <name>Sub Community 0.0</name>\n" +
+                    "      <description>A sub community</description>\n" +
+                    "      <intro>Live from New York....</intro>\n" +
+                    "      <copyright>1957</copyright>\n" +
+                    "      <sidebar>Another sidebar</sidebar>\n" +
+                    "      <collection identifier='" + COLLECTION_0_0_0_HANDLE + "'>\n" +
+                    "        <name>Collection 0.0.0</name>\n" +
+                    "        <description>A collection</description>\n" +
+                    "        <intro>Our next guest needs no introduction</intro>\n" +
+                    "        <copyright>1776</copyright>\n" +
+                    "        <sidebar>Yet another sidebar</sidebar>\n" +
+                    "        <license>MIT</license>\n" +
+                    "        <provenance>Testing</provenance>\n" +
+                    "      </collection>\n" +
+                    "    </community>\n" +
+                    "    <community>\n" +
+                    "      <name>Sub Community 0.1</name>\n" +
+                    "      <description>A sub community with no handle</description>\n" +
+                    "      <intro>Stop me if you've heard this one</intro>\n" +
+                    "      <copyright>2525</copyright>\n" +
+                    "      <sidebar>One more sidebar</sidebar>\n" +
+                    "    </community>\n" +
+                    "    <collection identifier='" + COLLECTION_0_1_HANDLE + "'>\n" +
+                    "      <name>Collection 0.1</name>\n" +
+                    "      <description>Another collection</description>\n" +
+                    "      <intro>Fourscore and seven years ago</intro>\n" +
+                    "      <copyright>1863</copyright>\n" +
+                    "      <sidebar>No sidebar</sidebar>\n" +
+                    "      <license>Public domain</license>\n" +
+                    "      <provenance>Testing again</provenance>\n" +
+                    "    </collection>\n" +
+                    "  </community>\n" +
+                    "</import_structure>\n";
 
     private static final String EXPORT_DOCUMENT =
             "<?xml version='1.0' encoding='UTF-8'?>\n" +
-            "<import_structure>\n" +
-            "  <community>\n" +
-            "    <name>Top Community 0</name>\n" +
-            "    <description/><intro/><copyright/><sidebar/>\n" +
-            "    <collection>\n" +
-            "      <name>Collection 0.0</name>\n" +
-            "      <description/><intro/><copyright/><sidebar/><license/>\n" +
-            "    </collection>\n" +
-            "  </community>\n" +
-            "</import_structure>\n";
+                    "<import_structure>\n" +
+                    "  <community>\n" +
+                    "    <name>Top Community 0</name>\n" +
+                    "    <description/><intro/><copyright/><sidebar/>\n" +
+                    "    <collection>\n" +
+                    "      <name>Collection 0.0</name>\n" +
+                    "      <description/><intro/><copyright/><sidebar/><license/>\n" +
+                    "    </collection>\n" +
+                    "  </community>\n" +
+                    "</import_structure>\n";
 
     /**
      * Test of importStructure method, of class StructBuilder.
@@ -168,8 +172,8 @@ public class StructBuilderIT
                 = new ByteArrayOutputStream(IMPORT_DOCUMENT.length() * 2 * 2);
         byte[] inputBytes = IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8);
         context.turnOffAuthorisationSystem();
-        try (InputStream input = new ByteArrayInputStream(inputBytes);) {
-            StructBuilder.importStructure(context, input, outputDocument, false);
+        try (InputStream input = new ByteArrayInputStream(inputBytes)) {
+            StructBuilder.importStructure(context, input, outputDocument, null, false);
         } finally {
             context.restoreAuthSystemState();
         }
@@ -218,7 +222,7 @@ public class StructBuilderIT
         byte[] inputBytes = IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8);
         context.turnOffAuthorisationSystem();
         try (InputStream input = new ByteArrayInputStream(inputBytes);) {
-            StructBuilder.importStructure(context, input, outputDocument, true);
+            StructBuilder.importStructure(context, input, outputDocument, null, true);
         } finally {
             context.restoreAuthSystemState();
         }
@@ -277,12 +281,73 @@ public class StructBuilderIT
         // TODO spot-check some objects.
     }
 
+    @Test
+    public void testImportStructureWithParent()
+            throws Exception {
+        System.out.println("importStructure (to parent community)");
+
+        // Create a temporary parent community to import beneath
+        context.turnOffAuthorisationSystem();
+        Community parent = communityService.create(null, context);
+        communityService.setMetadataSingleValue(context, parent,
+                MetadataSchemaEnum.DC.getName(), "title", null,
+                null, "Parent Community 0");
+        context.restoreAuthSystemState();
+
+//        String normalizedExpected = IMPORT_DOCUMENT
+//                .replaceAll(">\\s+<", "><")
+//                .replaceAll("\\n\\s*", "");
+
+        // Run the method under test and collect its output.
+        ByteArrayOutputStream outputDocument
+                = new ByteArrayOutputStream(IMPORT_DOCUMENT.length() * 2 * 2);
+        byte[] inputBytes = IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8);
+        context.turnOffAuthorisationSystem();
+        try (InputStream input = new ByteArrayInputStream(inputBytes)) {
+            StructBuilder.importStructure(context, input, outputDocument, parent, false);
+        } finally {
+            context.restoreAuthSystemState();
+        }
+
+        // Compare import's output with its input.
+        // Because this test has imported beneath an existing parent community,
+        // the output is compared to a different document which includes the
+        // parent community, which will be exported along with the rest.
+        // N.B. here we rely on StructBuilder to emit communities and
+        // collections in the same order as the input document.  If that changes,
+        // we will need a smarter NodeMatcher, probably based on <name> children.
+        Source output = new StreamSource(
+                new ByteArrayInputStream(outputDocument.toByteArray()));
+        Source reference = new StreamSource(
+                new ByteArrayInputStream(
+                        IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8)));
+        Diff myDiff = DiffBuilder.compare(reference).withTest(output)
+                .normalizeWhitespace()
+                .withAttributeFilter((Attr attr) ->
+                        !attr.getName().equals("identifier"))
+                .checkForIdentical()
+                .build();
+
+        // Was there a difference?
+        // Always output differences -- one is expected.
+        ComparisonFormatter formatter = new DefaultComparisonFormatter();
+        for (Difference difference : myDiff.getDifferences()) {
+            System.err.println(difference.toString(formatter));
+        }
+        // Test for *significant* differences.
+        assertFalse("Output does not match input.", isDifferent(myDiff));
+
+        // Does the "top" community sit beneath the new parent?
+        assertEquals("Top Community 0", parent.getSubcommunities().get(0).getName());
+    }
+
     /**
      * Test of exportStructure method, of class StructBuilder.
-     * @throws ParserConfigurationException passed through.
-     * @throws org.xml.sax.SAXException passed through.
-     * @throws java.io.IOException passed through.
-     * @throws java.sql.SQLException passed through.
+     *
+     * @throws ParserConfigurationException            passed through.
+     * @throws org.xml.sax.SAXException                passed through.
+     * @throws java.io.IOException                     passed through.
+     * @throws java.sql.SQLException                   passed through.
      * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     @Test
@@ -331,9 +396,9 @@ public class StructBuilderIT
      * All descendant collections must be empty of Items.
      *
      * @param c the Community to be pruned of all descendants.
-     * @throws SQLException passed through.
+     * @throws SQLException       passed through.
      * @throws AuthorizeException passed through.
-     * @throws IOException passed through.
+     * @throws IOException        passed through.
      */
     private void deleteSubCommunities(Community c)
             throws SQLException, AuthorizeException, IOException {
@@ -352,7 +417,7 @@ public class StructBuilderIT
      *
      * @param diff
      * @return true if these are otherwise-identical "import_structure" and
-     *          "imported_structure" documents.
+     * "imported_structure" documents.
      */
     private boolean isDifferent(Diff diff) {
         Iterator<Difference> diffIterator = diff.getDifferences().iterator();
