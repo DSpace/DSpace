@@ -359,6 +359,16 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
         // Process each change
         rowCount = 1;
+
+        int maxItems = configurationService.getIntProperty("bulkedit.import.max-items", 1000);
+        int numItems = toImport.size();
+        if (numItems > maxItems && maxItems > 0) {
+            throw new MetadataImportException(
+                "Import contains " + numItems + " items, which exceeds the configured "
+                + "maximum of " + maxItems + ". You can change this limit by setting "
+                + "'bulkedit.import.max-items' in your local configuration.");
+        }
+
         for (DSpaceCSVLine line : toImport) {
             // Resolve target references to other items
             populateRefAndRowMap(line, line.getID());
