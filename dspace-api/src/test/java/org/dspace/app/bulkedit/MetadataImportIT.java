@@ -313,7 +313,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
     @Test
     public void metadataImportExceedsLimitTest() throws Exception {
-        configurationService.setProperty("bulkedit.import.max-items", 1);
+        configurationService.setProperty("bulkedit.import.max.items", 1);
         String[] csv = {"id,collection,dc.title",
             "+," + collection.getHandle() + ",\"Title 1\"",
             "+," + collection.getHandle() + ",\"Title 2\""};
@@ -347,7 +347,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
     @Test
     public void metadataImportWithItemCountBelowLimitTest() throws Exception {
-        configurationService.setProperty("bulkedit.import.max-items", 2);
+        configurationService.setProperty("bulkedit.import.max.items", 2);
         String[] csv = {"id,collection,dc.title",
             "+," + collection.getHandle() + ",\"Title 1\"",
             "+," + collection.getHandle() + ",\"Title 2\""};
@@ -360,7 +360,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
     @Test
     public void metadataImportWithLimitDisabledTest() throws Exception {
-        configurationService.setProperty("bulkedit.import.max-items", 0);
+        configurationService.setProperty("bulkedit.import.max.items", 0);
         String[] csv = {"id,collection,dc.title",
             "+," + collection.getHandle() + ",\"Title 1\"",
             "+," + collection.getHandle() + ",\"Title 2\""};
