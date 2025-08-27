@@ -87,6 +87,7 @@ public class OrcidLoginFilter extends StatelessLoginFilter {
             String baseRediredirectUrl = configurationService.getProperty("dspace.ui.url");
             String redirectUrl = baseRediredirectUrl + "/error?status=401&code=orcid.generic-error";
             response.sendRedirect(redirectUrl); // lgtm [java/unvalidated-url-redirection]
+            this.closeOpenContext(request);
         } else {
             super.unsuccessfulAuthentication(request, response, failed);
         }
