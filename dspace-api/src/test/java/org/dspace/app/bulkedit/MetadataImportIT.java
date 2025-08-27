@@ -10,6 +10,7 @@ package org.dspace.app.bulkedit;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -43,6 +44,8 @@ import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -54,6 +57,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             = EPersonServiceFactory.getInstance().getEPersonService();
     private final RelationshipService relationshipService
             = ContentServiceFactory.getInstance().getRelationshipService();
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private Collection collection;
     private Collection publicationCollection;
@@ -304,5 +309,72 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         } finally {
             csvFile.delete();
         }
+    }
+
+    @Test
+    public void metadataImportExceedsLimitTest() throws Exception {
+        configurationService.setProperty("bulkedit.import.max-items", 1);
+        String[] csv = {"id,collection,dc.title",
+            "+," + collection.getHandle() + ",\"Title 1\"",
+            "+," + collection.getHandle() + ",\"Title 2\""};
+        File csvFile = File.createTempFile("dspace-test-import", "csv");
+        try {
+            try (BufferedWriter out = new BufferedWriter(
+                new OutputStreamWriter(new FileOutputStream(csvFile), "UTF-8"))) {
+                for (String csvLine : csv) {
+                    out.write(csvLine + "\n");
+                }
+            }
+            String fileLocation = csvFile.getAbsolutePath();
+            String[] args = new String[] {"metadata-import", "-f", fileLocation, "-e", eperson.getEmail(), "-s"};
+            TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+            ScriptLauncher.handleScript(
+                args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+
+            assertNotNull("The handler should contain an exception",
+                testDSpaceRunnableHandler.getException());
+
+            assertTrue("The exception cause should be a MetadataImportException",
+                testDSpaceRunnableHandler.getException().getCause() instanceof MetadataImportException);
+
+            String exceptionMessage = testDSpaceRunnableHandler.getException().getCause().getMessage();
+            assertTrue("The error message does not contain the expected text.",
+                    exceptionMessage.contains("exceeds the configured maximum of 1"));
+        } finally {
+            csvFile.delete();
+        }
+    }
+
+    @Test
+    public void metadataImportWithItemCountBelowLimitTest() throws Exception {
+        configurationService.setProperty("bulkedit.import.max-items", 2);
+        String[] csv = {"id,collection,dc.title",
+            "+," + collection.getHandle() + ",\"Title 1\"",
+            "+," + collection.getHandle() + ",\"Title 2\""};
+        performImportScript(csv);
+        Item importedItem1 = findItemByName("Title 1");
+        Item importedItem2 = findItemByName("Title 2");
+        assertNotNull("Should have imported Title 1", importedItem1);
+        assertNotNull("Should have imported Title 2", importedItem2);
+    }
+
+    @Test
+    public void metadataImportWithLimitDisabledTest() throws Exception {
+        configurationService.setProperty("bulkedit.import.max-items", 0);
+        String[] csv = {"id,collection,dc.title",
+            "+," + collection.getHandle() + ",\"Title 1\"",
+            "+," + collection.getHandle() + ",\"Title 2\""};
+        performImportScript(csv);
+        Item importedItem1 = findItemByName("Title 1");
+        Item importedItem2 = findItemByName("Title 2");
+        assertNotNull("Should have imported Title 1 with limit disabled", importedItem1);
+        assertNotNull("Should have imported Title 2 with limit disabled", importedItem2);
+    }
+
+    @Test
+    public void metadataImportWithEmptyCSVTest() throws Exception {
+        String[] csv = {"id,collection,dc.title"};
+        performImportScript(csv);
+        assertEquals(0, IteratorUtils.toList(itemService.findAll(context)).size());
     }
 }
