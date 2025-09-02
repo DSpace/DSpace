@@ -38,7 +38,7 @@
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
         <jcache-version>1.1.1</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
-        <jetty.version>9.4.57.v20241219</jetty.version>
+        <jetty.version>9.4.58.v20250814</jetty.version>
         <log4j.version>2.25.1</log4j.version>
         <pdfbox-version>3.0.5</pdfbox-version>
         <rome.version>1.19.0</rome.version>
