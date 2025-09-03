@@ -224,29 +224,17 @@ public class PREMISCrosswalk
         //  c. made-up name based on sequence ID and extension.
         String sid = String.valueOf(bitstream.getSequenceID());
         String baseUrl = configurationService.getProperty("dspace.ui.url");
-        String handle = null;
-        // get handle of parent Item of this bitstream, if there is one:
-        List<Bundle> bn = bitstream.getBundles();
-        if (bn.size() > 0) {
-            List<Item> bi = bn.get(0).getItems();
-            if (bi.size() > 0) {
-                handle = bi.get(0).getHandle();
-            }
-        }
         // get or make up name for bitstream:
         String bsName = bitstream.getName();
         if (bsName == null) {
             List<String> ext = bitstream.getFormat(context).getExtensions();
             bsName = "bitstream_" + sid + (ext.size() > 0 ? ext.get(0) : "");
         }
-        if (handle != null && baseUrl != null) {
+        if (baseUrl != null) {
             oiv.setText(baseUrl
-                            + "/bitstream/"
-                            + URLEncoder.encode(handle, "UTF-8")
-                            + "/"
-                            + sid
-                            + "/"
-                            + URLEncoder.encode(bsName, "UTF-8"));
+                + "/bitstreams/"
+                + bitstream.getID()
+                + "/download");
         } else {
             oiv.setText(URLEncoder.encode(bsName, "UTF-8"));
         }
