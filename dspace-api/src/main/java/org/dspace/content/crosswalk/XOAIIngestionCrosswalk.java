@@ -17,6 +17,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -130,37 +131,73 @@ public class XOAIIngestionCrosswalk implements IngestionCrosswalk {
                             language = ("none".equals(language) ? null : language);
 
                             // Fifth level: FIELD VALUE
-                            List<Element> fifthLevelNodes = fourthLevelNode.getChildren();
-                            for (Element fifthLevelNode : fifthLevelNodes) {
-                                String value = fifthLevelNode.getText();
-                                MetadataField metadataField = metadataValidator.checkMetadata(context,
-                                        schema,
-                                        element,
-                                        qualifier,
-                                        createMissingMetadataFields);
-                                itemService.addMetadata(context, item, metadataField, language, value);
+                            processValueNodes(context, createMissingMetadataFields, item, schema, element,
+                                    qualifier, language, fourthLevelNode.getChildren());
 
-                            }
+
                         }
                     } else {
                         // Third level: LANGUAGE
                         String language = qualifier;
-
                         // Fourth level: FIELD VALUE
-                        List<Element> fieldNodes = thirdLevelNode.getChildren();
-                        for (Element fieldNode : fieldNodes) {
-                            String value = fieldNode.getText();
-                            MetadataField metadataField = metadataValidator.checkMetadata(context,
-                                    schema,
-                                    element,
-                                    null,
-                                    createMissingMetadataFields);
-                            itemService.addMetadata(context, item, metadataField, language, value);
-                        }
+                        processValueNodes(context, createMissingMetadataFields, item, schema, element,
+                                qualifier, language, thirdLevelNode.getChildren());
                     }
 
                 }
             }
+        }
+    }
+
+    /**
+     * Process the value nodes which could appear in various levels, and in the case of values with authority
+     * will be listed in order like value, authority, confidence, value, authority, confidence
+     * so they need to be reconstructed properly
+     *
+     * @param context DSpace context
+     * @param createMissingMetadataFields create new field in registry if missing
+     * @param item the item being processed
+     * @param schema metadata field schema
+     * @param element metadata field element
+     * @param qualifier metadata field qualifier
+     * @param language metadata value language
+     * @param nodes the list of value element nodes
+     */
+    private void processValueNodes(Context context, boolean createMissingMetadataFields, Item item,
+            String schema, String element, String qualifier, String language, List<Element> nodes)
+            throws SQLException, CrosswalkException, AuthorizeException {
+        MetadataField metadataField = metadataValidator.checkMetadata(context,
+                schema,
+                element,
+                qualifier,
+                createMissingMetadataFields);
+        MetadataValueDTO mv = new MetadataValueDTO(schema, element, qualifier, null, null);
+        for (Element valueNode : nodes) {
+            String text = valueNode.getText();
+            String name = valueNode.getAttributeValue("name");
+            if ("value".equals(name)) {
+                // Is there a previous non-null metadata value DTO waiting to be added?
+                if (null != mv.getValue()) {
+                    itemService.addMetadata(context, item, metadataField, language,
+                            mv.getValue(), mv.getAuthority(), mv.getConfidence());
+                }
+                // (Re)initialize new value
+                mv = new MetadataValueDTO(schema, element, qualifier, language, text, null, -1);
+            } else if ("authority".equals(name)) {
+                mv.setAuthority(text);
+            } else if ("confidence".equals(name)) {
+                int confidence = -1;
+                try {
+                    confidence = Integer.parseInt(text);
+                } finally {
+                    mv.setConfidence(confidence);
+                }
+            }
+        }
+        // There should be one final mv to add
+        if (null != mv.getValue()) {
+            itemService.addMetadata(context, item, metadataField, language,
+                    mv.getValue(), mv.getAuthority(), mv.getConfidence());
         }
     }
 }
