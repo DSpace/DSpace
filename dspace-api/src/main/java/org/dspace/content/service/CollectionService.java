@@ -491,4 +491,19 @@ public interface CollectionService
      * @return                 total collection archived items
      */
     int countArchivedItems(Context context, Collection collection);
+
+    /**
+     * Moves the Collection from one community to another one
+     *
+     * @param context                DSpace context object
+     * @param collection             Collection to move
+     * @param from                   Community to move from
+     * @param to                     Community to move to
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException        if IO error
+     */
+    void move(Context context, Collection collection, Community from, Community to, boolean inheritDefaultPolicies)
+            throws SQLException, AuthorizeException, IOException;
+
 }

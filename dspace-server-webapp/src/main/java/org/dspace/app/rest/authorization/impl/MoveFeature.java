@@ -15,13 +15,16 @@ import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.authorization.AuthorizeServiceRestUtil;
 import org.dspace.app.rest.model.BaseObjectRest;
+import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.security.DSpaceRestPermission;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -50,6 +53,8 @@ public class MoveFeature implements AuthorizationFeature {
     @Autowired
     private ItemService itemService;
     @Autowired
+    private CollectionService collectionService;
+    @Autowired
     private AuthorizeService authorizeService;
 
     @Override
@@ -69,6 +74,21 @@ public class MoveFeature implements AuthorizationFeature {
 
             return authorizeService.authorizeActionBoolean(context, context.getCurrentUser(), owningObject,
                 Constants.REMOVE, true);
+        } else if (object instanceof CollectionRest) {
+            if (!authorizeServiceRestUtil.authorizeActionBoolean(context, object, DSpaceRestPermission.WRITE)) {
+                return false;
+            }
+
+            DSpaceObject owningObject = collectionService.getParentObject(context,
+                (Collection)utils.getDSpaceAPIObjectFromRest(context, object));
+
+            if (!(owningObject instanceof Community)) {
+                log.error("The Parent object of collection " + object.getType() + " is not a community");
+                return false;
+            }
+
+            return authorizeService.authorizeActionBoolean(context, context.getCurrentUser(), owningObject,
+                Constants.REMOVE, true);
         }
         return false;
     }
@@ -76,7 +96,8 @@ public class MoveFeature implements AuthorizationFeature {
     @Override
     public String[] getSupportedTypes() {
         return new String[]{
-            ItemRest.CATEGORY + "." + ItemRest.NAME
+            ItemRest.CATEGORY + "." + ItemRest.NAME,
+            CollectionRest.CATEGORY + "." + CollectionRest.NAME
         };
     }
 }
