@@ -63,7 +63,7 @@ public class XSLTIngestionCrosswalk
 
     private static final String DIRECTION = "submission";
 
-    private static final String aliases[] = makeAliases(DIRECTION);
+    private static final String[] aliases = makeAliases(DIRECTION);
 
     private static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     private static final CollectionService collectionService = ContentServiceFactory.getInstance()

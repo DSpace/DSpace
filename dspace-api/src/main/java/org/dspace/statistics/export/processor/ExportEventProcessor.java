@@ -137,9 +137,10 @@ public abstract class ExportEventProcessor {
             .append(URLEncoder.encode(clientUA, UTF_8));
 
         String hostName = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
+        String oaiPrefix = configurationService.getProperty("oai.identifier.prefix");
 
         data.append("&").append(URLEncoder.encode("rft.artnum", UTF_8)).append("=").
-                append(URLEncoder.encode("oai:" + hostName + ":" + item
+                append(URLEncoder.encode("oai:" + oaiPrefix + ":" + item
                         .getHandle(), UTF_8));
         data.append("&").append(URLEncoder.encode("rfr_dat", UTF_8)).append("=")
             .append(URLEncoder.encode(referer, UTF_8));

@@ -110,9 +110,9 @@ public class ConsumerProfile {
 
         // Each "filter" is <objectTypes> + <eventTypes> : ...
         filters = new ArrayList<>();
-        String part[] = filterString.trim().split(":");
+        String[] part = filterString.trim().split(":");
         for (int j = 0; j < part.length; ++j) {
-            String fpart[] = part[j].split("\\+");
+            String[] fpart = part[j].split("\\+");
             if (fpart.length != 2) {
                 log.error("Bad Filter clause in consumer stanza in Configuration entry for "
                               + CONSUMER_PREFIX
@@ -120,10 +120,10 @@ public class ConsumerProfile {
                               + ".consumers: "
                               + part[j]);
             } else {
-                int filter[] = new int[2];
+                int[] filter = new int[2];
                 filter[0] = 0;
                 filter[1] = 0;
-                String objectNames[] = fpart[0].split("\\|");
+                String[] objectNames = fpart[0].split("\\|");
                 for (int k = 0; k < objectNames.length; ++k) {
                     int ot = Event.parseObjectType(objectNames[k]);
                     if (ot == 0) {
@@ -135,7 +135,7 @@ public class ConsumerProfile {
                         filter[Event.SUBJECT_MASK] |= ot;
                     }
                 }
-                String eventNames[] = fpart[1].split("\\|");
+                String[] eventNames = fpart[1].split("\\|");
                 for (int k = 0; k < eventNames.length; ++k) {
                     int et = Event.parseEventType(eventNames[k]);
                     if (et == 0) {

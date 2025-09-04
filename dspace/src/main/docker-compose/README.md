@@ -297,17 +297,8 @@ Here's how to fix those issues by migrating your old Postgres data to the new ve
 1. First, you must start up the older PostgreSQL image (to dump your existing data to a `*.sql` file)
     ```
     # This command assumes you are using the process described above to start all your containers
-    docker compose -p d9 up -d
+    POSTGRES_VERSION=11 docker compose -p d9 up -d
     ```
-    * If you've already accidentally updated to the new PostgreSQL image, you have a few options:
-        * Pull down an older version of the image from Dockerhub (using a tag)
-        * Or, temporarily rebuild your local image with the old version of Postgres. For example:
-          ```
-          # This command will rebuild using PostgreSQL v11 & tag it locally as "latest"
-          docker build --build-arg POSTGRES_VERSION=11 -t dspace/dspace-postgres-pgcrypto:latest ./dspace/src/main/docker/dspace-postgres-pgcrypto/
-          # Then restart container with that image
-          docker compose -p d9 up -d
-          ```
 2. Dump your entire "dspace" database out of the old "dspacedb" container to a local file named `pgdump.sql`
     ```
     # NOTE: WE HIGHLY RECOMMEND LOGGING INTO THE CONTAINER and doing the pg_dump within the container.
@@ -336,7 +327,7 @@ Here's how to fix those issues by migrating your old Postgres data to the new ve
     # Assumes you are using `-p d9` which prefixes all volumes with `d9_`
     docker volume rm d9_pgdata
     ```
-5. Now, pull down the latest PostgreSQL image with the NEW version of PostgreSQL.
+5. Just for safety, pull down the latest versions of all images
     ```
     docker compose -f docker-compose.yml -f docker-compose-cli.yml pull
     ```
