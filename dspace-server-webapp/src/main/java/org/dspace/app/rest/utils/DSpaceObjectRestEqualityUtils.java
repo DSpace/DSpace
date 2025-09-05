@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.utils;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.springframework.stereotype.Component;
 
@@ -25,9 +25,9 @@ public class DSpaceObjectRestEqualityUtils {
      * @return          A boolean indicating whether they're equal or not
      */
     public boolean isDSpaceObjectEqualsWithoutMetadata(DSpaceObjectRest original, DSpaceObjectRest updated) {
-        return StringUtils.equals(original.getId(), updated.getId()) &&
-            StringUtils.equals(original.getCategory(), updated.getCategory()) &&
-            StringUtils.equals(original.getHandle(), updated.getHandle());
+        return Strings.CS.equals(original.getId(), updated.getId()) &&
+            Strings.CS.equals(original.getCategory(), updated.getCategory()) &&
+            Strings.CS.equals(original.getHandle(), updated.getHandle());
 
     }
 }
