@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.submit.step.validation.UploadValidation.ERROR_VALIDATION_METADATA_PENDING;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -2264,6 +2265,72 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.sections.upload-no-required-metadata.files",hasSize(0)));
+    }
+
+    @Test
+    public void verifyMetadataOfBitstreamsIsChecked()
+            throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .build();
+
+        Collection collection2 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 2")
+                .withWorkflowGroup(1, eperson).build();
+
+        WorkspaceItem witem = null;
+
+        String bitstreamContent = "0123456789";
+
+        //3. a workflow item will all the required fields
+        XmlWorkflowItem workflowItem = WorkflowItemBuilder.createWorkflowItem(context, collection2)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .build();
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, Charset.defaultCharset())) {
+
+            context.setCurrentUser(admin);
+            witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
+                    .withTitle("Test WorkspaceItem")
+                    .withIssueDate("2019-10-01")
+                    .grantLicense()
+                    .build();
+
+            BitstreamBuilder.createBitstream(context, witem.getItem(), is)
+                    .withDescription("This is a bitstream to test range requests")
+                    .withMimeType("text/plain")
+                    .build();
+
+            BitstreamBuilder.createBitstream(context, workflowItem.getItem(), is)
+                    .withDescription("This is a bitstream to test range requests")
+                    .withMimeType("text/plain")
+                    .build();
+
+        }
+
+        context.restoreAuthSystemState();
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        // check that the item can't be submitted due to not having dc.title on the bitstream
+        getClient(adminToken).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                        .content("/api/submission/workspaceitems/" + witem.getID())
+                        .contentType(textUriContentType))
+                .andExpect(status().is4xxClientError());
+
+        // check that the errors returned mentions that the dc.title is missing from upload section
+        getClient(epersonToken).perform(get("/api/workflow/workflowitems/" + workflowItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors[?(@.message=='" + ERROR_VALIDATION_METADATA_PENDING + "')]",
+                        Matchers.contains(
+                                hasJsonPath("$.paths", Matchers.contains(
+                                        hasJsonPath("$", Matchers.is("/sections/upload/dc.title"))
+                                )))));
     }
 
 }
