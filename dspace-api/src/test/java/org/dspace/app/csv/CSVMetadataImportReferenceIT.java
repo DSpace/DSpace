@@ -107,6 +107,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                                               "isPublicationOfProject", 0, null, 0,
                                                               null).withCopyToRight(true).build();
 
+        context.commit();
+
         context.restoreAuthSystemState();
     }
 
