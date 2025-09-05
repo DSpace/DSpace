@@ -1718,7 +1718,7 @@
             <dependency>
                 <groupId>io.grpc</groupId>
                 <artifactId>grpc-context</artifactId>
-                <version>1.74.0</version>
+                <version>1.75.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.http-client</groupId>
