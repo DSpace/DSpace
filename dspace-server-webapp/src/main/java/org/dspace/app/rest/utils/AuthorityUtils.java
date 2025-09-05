@@ -47,7 +47,11 @@ public class AuthorityUtils {
 
 
     public boolean isChoice(String schema, String element, String qualifier) {
-        return cas.isChoicesConfigured(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"), null);
+        try {
+            return cas.isChoicesConfigured(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"), null);
+        } catch (IllegalStateException e) {
+            return false;
+        }
     }
 
     public String getAuthorityName(String schema, String element, String qualifier) {
