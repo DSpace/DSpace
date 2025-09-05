@@ -283,6 +283,8 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         itemService.addMetadata(context, item, "dc", "title", null, null, fullName);
         itemService.addMetadata(context, item, "person", "email", null, null, ePerson.getEmail());
         itemService.addMetadata(context, item, "dspace", "object", "owner", null, fullName, id, CF_ACCEPTED);
+        itemService.addMetadata(context, item, "person", "familyName", null, null, ePerson.getLastName());
+        itemService.addMetadata(context, item, "person", "givenName", null, null, ePerson.getFirstName());
 
         item = installItemService.installItem(context, workspaceItem);
 
