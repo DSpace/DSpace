@@ -857,6 +857,18 @@ public interface ItemService
         throws SQLException;
 
     /**
+     * Get all the archived items in this collection, last modified since a given Date. The order is indeterminate.
+     *
+     * @param context    DSpace context object
+     * @param collection Collection (parent)
+     * @param last       Earliest interesting last-modified date.
+     * @return an iterator over the items in the collection.
+     * @throws SQLException if database error
+     */
+    Iterator<Item> findByCollectionLastModifiedSince(Context context, Collection collection, Instant last)
+        throws SQLException;
+
+    /**
      * counts items in the given community
      *
      * @param context   DSpace context object
