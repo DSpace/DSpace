@@ -18,6 +18,10 @@ import org.dspace.app.rest.DiscoveryRestController;
 /**
  * This class' purpose is to store the information that'll be shown on the /search endpoint.
  */
+@LinksRest(links = {
+    @LinkRest(name = DiscoveryConfigurationRest.SEARCH_FILTER, method = "getSearchFilters"),
+    @LinkRest(name = DiscoveryConfigurationRest.SORT_OPTION, method = "getSortOptions"),
+})
 public class DiscoveryConfigurationRest extends BaseObjectRest<String> {
 
     public static final String NAME = "discover";
