@@ -31,8 +31,8 @@
         <ehcache.version>3.10.8</ehcache.version>
         <errorprone.version>2.41.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-databind.version below -->
-        <jackson.version>2.19.2</jackson.version>
-        <jackson-databind.version>2.19.2</jackson-databind.version>
+        <jackson.version>2.20</jackson.version>
+        <jackson-databind.version>2.20.0</jackson-databind.version>
         <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
         <jaxb-api.version>4.0.2</jaxb-api.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
