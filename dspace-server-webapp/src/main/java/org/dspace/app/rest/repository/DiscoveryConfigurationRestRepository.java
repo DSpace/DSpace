@@ -62,7 +62,7 @@ public class DiscoveryConfigurationRestRepository extends DSpaceRestRepository<D
             discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration("default");
         }
 
-        return null; // TODO
+        return converter.toRest(discoveryConfiguration, utils.obtainProjection());
     }
 
     @Override
