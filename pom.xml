@@ -49,7 +49,7 @@
         <bouncycastle.version>1.81</bouncycastle.version>
         <asm.version>8.0.1</asm.version>
         <!-- Jersey is used to integrate with external sources/services -->
-        <jersey.version>3.1.10</jersey.version>
+        <jersey.version>3.1.11</jersey.version>
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
         <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath (used by Server webapp) -->
         <json-path.version>2.9.0</json-path.version>
