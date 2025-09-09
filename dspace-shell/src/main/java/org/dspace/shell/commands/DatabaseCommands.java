@@ -12,10 +12,15 @@ import org.springframework.shell.command.annotation.Command;
 /**
  * Database commands for the DSpace Spring Shell
  */
-@Command(command = "database")
+@Command(
+    command = "database"
+)
 public class DatabaseCommands {
 
-    @Command(command = "info", description="Displays database information using the DSpace context")
+    @Command(
+        command = "info",
+        description = "Displays database information using the DSpace context"
+    )
     public void dbInfo() {
         System.out.println("hello!");
     }

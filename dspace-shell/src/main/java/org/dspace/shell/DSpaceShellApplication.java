@@ -9,17 +9,12 @@ package org.dspace.shell;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.shell.command.annotation.CommandScan;
 
-@SpringBootApplication(
-        scanBasePackages = {"org.dspace.shell"},
-        exclude = { DataSourceAutoConfiguration.class }
-    )
-
+@SuppressWarnings({ "checkstyle:hideutilityclassconstructor" })
+@SpringBootApplication
 @CommandScan
 public class DSpaceShellApplication {
-
     public static void main(String[] args) {
         // Start Spring Boot (Spring Shell) application
         SpringApplication.run(DSpaceShellApplication.class, args);

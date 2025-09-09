@@ -13,8 +13,20 @@ import org.springframework.shell.command.annotation.Option;
 @Command
 public class EmbargoCommands {
 
-    @Command(command = "embargo-lifter", description="this command executes embargo lifter by reindexing content")
-    public String embargoLifter(@Option(longNames="nDays", description="The number of past days to process embargo. As an example, nDays=5 means, process the past 5 days.", defaultValue="1") int nDays) throws Exception {
+    @Command(
+        command = "embargo-lifter",
+        description = "this command executes embargo lifter by reindexing content"
+    )
+    public String embargoLifter(
+        @Option(
+            longNames = "nDays",
+            description =
+                "The number of past days to process embargo. As an example, "
+                + "nDays=5 means, process the past 5 days.",
+            defaultValue = "1"
+        )
+        int nDays
+    ) throws Exception {
         return "number of days " + nDays;
     }
 
