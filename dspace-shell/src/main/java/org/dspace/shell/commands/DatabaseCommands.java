@@ -7,19 +7,15 @@
  */
 package org.dspace.shell.commands;
 
-import org.springframework.shell.standard.ShellCommandGroup;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-//import org.springframework.shell.standard.ShellOption;
+import org.springframework.shell.command.annotation.Command;
 
 /**
  * Database commands for the DSpace Spring Shell
  */
-@ShellComponent
-@ShellCommandGroup("database")
+@Command(command = "database")
 public class DatabaseCommands {
 
-    @ShellMethod(key="info", value="Displays database information using the DSpace context")
+    @Command(command = "info", description="Displays database information using the DSpace context")
     public void dbInfo() {
         System.out.println("hello!");
     }

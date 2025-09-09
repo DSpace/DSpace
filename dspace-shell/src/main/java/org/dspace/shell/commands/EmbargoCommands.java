@@ -7,17 +7,14 @@
  */
 package org.dspace.shell.commands;
 
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellOption;
+import org.springframework.shell.command.annotation.Command;
+import org.springframework.shell.command.annotation.Option;
 
-@ShellComponent
 public class EmbargoCommands {
-    
-    @ShellMethod(key="embargo-lifter", value="this command executes embargo lifter by reindexing content")
-    public String embargoLifter(@ShellOption(value="nDays", defaultValue=1) int nDays) throws Exception {
 
-        return "number of days " + Integer.toString(nDays);
+    @Command(command = "embargo-lifter", description="this command executes embargo lifter by reindexing content")
+    public String embargoLifter(@Option(longNames="nDays", defaultValue="1") int nDays) throws Exception {
+        return "number of days " + nDays;
     }
 
 }

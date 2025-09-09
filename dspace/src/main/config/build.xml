@@ -901,9 +901,9 @@ Common usage:
     </target>
 
     <!-- copy or replace DSpace Spring Shell jar into [dspace]/bin folder -->
-    <target name="copy-spring-shell-jar" depends="package">
+    <target name="copy-spring-shell-jar">
         <echo>Copying file to: ${dspace.dir}/bin/dspace.jar</echo>
-        <copy file="dspace-shell/target/dspace.jar"
+        <copy file="../../../dspace-shell/target/dspace.jar"
               todir="${dspace.dir}/bin" overwrite="true" />
     </target>
 
