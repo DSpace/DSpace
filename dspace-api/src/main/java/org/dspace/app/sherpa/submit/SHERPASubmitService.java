@@ -47,7 +47,7 @@ public class SHERPASubmitService {
     }
 
     /**
-     * Setter for SHERPA service, reponsible for actual HTTP API calls
+     * Setter for SHERPA service, responsible for actual HTTP API calls
      * @see "dspace-dspace-addon-sherpa-configuration-services.xml"
      * @param sherpaService
      */

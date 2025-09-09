@@ -8,13 +8,16 @@
 package org.dspace.app.rest.security;
 
 import java.io.IOException;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.sql.SQLException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.core.Context;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -23,7 +26,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * This class will filter /api/authn/login requests to try and authenticate them. Keep in mind, this filter runs *after*
- * StatelessAuthenticationFilter (which looks for authentication data in the request itself). So, in some scenarios
+ * {@link StatelessAuthenticationFilter} (which looks for authentication data in the request itself). So, in some scenarios
  * (e.g. after a Shibboleth login) the StatelessAuthenticationFilter does the actual authentication, and this Filter
  * just ensures the auth token (JWT) is sent back in an Authorization header.
  *
@@ -31,7 +34,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
 public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter {
-    private static final Logger log = LoggerFactory.getLogger(StatelessLoginFilter.class);
+    private static final Logger log = LogManager.getLogger();
 
     protected AuthenticationManager authenticationManager;
 
@@ -41,9 +44,20 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
     public void afterPropertiesSet() {
     }
 
-    public StatelessLoginFilter(String url, AuthenticationManager authenticationManager,
+    /**
+     * Initialize a StatelessLoginFilter for the given URL and HTTP method. This login filter will ONLY attempt
+     * authentication for requests that match this URL and method. The URL & method are defined in the configuration
+     * in WebSecurityConfiguration.
+     * @see org.dspace.app.rest.security.WebSecurityConfiguration
+     * @param url URL path to attempt to authenticate (e.g. "/api/authn/login")
+     * @param httpMethod HTTP method to attempt to authentication (e.g. "POST")
+     * @param authenticationManager Spring Security AuthenticationManager to use for authentication
+     * @param restAuthenticationService DSpace RestAuthenticationService to use for authentication
+     */
+    public StatelessLoginFilter(String url, String httpMethod, AuthenticationManager authenticationManager,
                                 RestAuthenticationService restAuthenticationService) {
-        super(new AntPathRequestMatcher(url));
+        // NOTE: attemptAuthentication() below will only be triggered by requests that match both this URL and method
+        super(new AntPathRequestMatcher(url, httpMethod));
         this.authenticationManager = authenticationManager;
         this.restAuthenticationService = restAuthenticationService;
     }
@@ -97,7 +111,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
                                             Authentication auth) throws IOException, ServletException {
 
         DSpaceAuthentication dSpaceAuthentication = (DSpaceAuthentication) auth;
-        log.debug("Authentication successful for EPerson {}", dSpaceAuthentication.getName());
+        log.debug("Authentication successful for EPerson {}", dSpaceAuthentication::getName);
         restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication, false);
     }
 
@@ -122,6 +136,27 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed!");
         log.error("Authentication failed (status:{})",
                   HttpServletResponse.SC_UNAUTHORIZED, failed);
+        this.closeOpenContext(request);
+    }
+
+    /**
+     * Manually closes the open {@link Context} if one exists. We need to do this manually because
+     * {@link #continueChainBeforeSuccessfulAuthentication} is {@code false} by default, which prevents the
+     * {@link org.dspace.app.rest.filter.DSpaceRequestContextFilter} from being called. Without this call, the request
+     * would leave an open database connection.
+     *
+     * @param request The current request.
+     */
+    protected void closeOpenContext(HttpServletRequest request) {
+        if (ContextUtil.isContextAvailable(request)) {
+            try (Context context = ContextUtil.obtainContext(request)) {
+                if (context != null && context.isValid()) {
+                    context.complete();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

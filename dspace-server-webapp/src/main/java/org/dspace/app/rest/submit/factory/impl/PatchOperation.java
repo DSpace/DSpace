@@ -9,8 +9,8 @@ package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.content.InProgressSubmission;
@@ -58,6 +58,15 @@ public abstract class PatchOperation<T extends Object> {
             absolutePath = path[2];
         }
         return absolutePath;
+    }
+
+    public String getStepId(String fullpath) {
+        String[] path = fullpath.substring(1).split("/", 3);
+        String stepId = "";
+        if (path.length > 1) {
+            stepId = path[1];
+        }
+        return stepId;
     }
 
     protected abstract Class<T[]> getArrayClassForEvaluation();

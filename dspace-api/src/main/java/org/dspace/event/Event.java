@@ -9,6 +9,7 @@ package org.dspace.event;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -79,7 +80,7 @@ public class Event implements Serializable {
     public static final int EVENT_MASK = 1; // mask of event type
 
     // XXX NOTE: keep this up to date with any changes to event (action) types.
-    protected static final String eventTypeText[] = {"CREATE", "MODIFY",
+    protected static final String[] eventTypeText = {"CREATE", "MODIFY",
         "MODIFY_METADATA", "ADD", "REMOVE", "DELETE", "INSTALL"};
 
     /** XXX NOTE: These constants must be kept synchronized * */
@@ -104,8 +105,10 @@ public class Event implements Serializable {
 
     protected static final int EPERSON = 1 << Constants.EPERSON; // 7
 
+    protected static final int LDN_MESSAGE = 1 << Constants.LDN_MESSAGE; // 8
+
     protected static final int ALL_OBJECTS_MASK = BITSTREAM | BUNDLE | ITEM
-        | COLLECTION | COMMUNITY | SITE | GROUP | EPERSON;
+        | COLLECTION | COMMUNITY | SITE | GROUP | EPERSON | LDN_MESSAGE;
 
     protected static Map<Integer, Integer> objTypeToMask = new HashMap<Integer, Integer>();
 
@@ -135,6 +138,9 @@ public class Event implements Serializable {
 
         objTypeToMask.put(Constants.EPERSON, EPERSON);
         objMaskToType.put(EPERSON, Constants.EPERSON);
+
+        objTypeToMask.put(Constants.LDN_MESSAGE, LDN_MESSAGE);
+        objMaskToType.put(LDN_MESSAGE, Constants.LDN_MESSAGE);
     }
 
     /** ---------- Event Fields ------------- * */
@@ -188,7 +194,7 @@ public class Event implements Serializable {
      * Contains all identifiers of the DSpaceObject that was changed (added,
      * modified, deleted, ...).
      *
-     * All events gets fired when a context that contains events gets commited.
+     * All events gets fired when a context that contains events gets committed.
      * When the delete event is fired, a deleted DSpaceObject is already gone.
      * This array contains all identifiers of the object, not only the handle
      * as the detail field does. The field may be an empty array if no
@@ -252,7 +258,7 @@ public class Event implements Serializable {
         this.eventType = eventType;
         this.subjectType = coreTypeToMask(subjectType);
         this.subjectID = subjectID;
-        timeStamp = System.currentTimeMillis();
+        timeStamp = Instant.now().toEpochMilli();
         this.detail = detail;
         this.identifiers = (ArrayList<String>) identifiers.clone();
     }
@@ -294,7 +300,7 @@ public class Event implements Serializable {
         this.subjectID = subjectID;
         this.objectType = coreTypeToMask(objectType);
         this.objectID = objectID;
-        timeStamp = System.currentTimeMillis();
+        timeStamp = Instant.now().toEpochMilli();
         this.detail = detail;
         this.identifiers = (ArrayList<String>) identifiers.clone();
     }
@@ -584,7 +590,7 @@ public class Event implements Serializable {
     public boolean pass(List<int[]> filters) {
         boolean result = false;
 
-        for (int filter[] : filters) {
+        for (int[] filter : filters) {
             if ((subjectType & filter[SUBJECT_MASK]) != 0 && (eventType & filter[EVENT_MASK]) != 0) {
                 result = true;
             }

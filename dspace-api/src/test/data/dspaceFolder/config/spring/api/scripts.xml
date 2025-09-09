@@ -27,6 +27,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportSearchCli" />
     </bean>
 
+    <bean name="metadata-export-filtered-items-report" class="org.dspace.app.bulkedit.MetadataExportFilteredItemsReportCliScriptConfiguration">
+        <property name="description" value="Export metadata from item results in a Metadata Query Report" />
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportFilteredItemsReportCli" />
+    </bean>
+
     <bean id="curate"
           class="org.dspace.curate.CurationCliScriptConfiguration">
         <property name="description"
@@ -63,6 +68,11 @@
     <bean id="orcid-bulk-push" class="org.dspace.orcid.script.OrcidBulkPushScriptConfiguration">
         <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
         <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
+    </bean>
+    
+    <bean id="import-openaire-events" class="org.dspace.qaevent.script.OpenaireEventsImportCliScriptConfiguration" primary="true">
+        <property name="description" value="Import new openaire quality assurance broker events"/>
+        <property name="dspaceRunnableClass" value="org.dspace.qaevent.script.OpenaireEventsImportCli"/>
     </bean>
 
     <bean id="process-cleaner" class="org.dspace.administer.ProcessCleanerCliConfiguration">

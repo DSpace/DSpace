@@ -12,6 +12,7 @@
  <!ELEMENT name-map EMPTY >
  <!ATTLIST name-map 
            collection-handle CDATA #IMPLIED
+           community-handle CDATA #IMPLIED
            collection-entity-type CDATA #IMPLIED
            submission-name NMTOKEN #REQUIRED>
 

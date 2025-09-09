@@ -775,7 +775,7 @@
 # UA "fscrawler/3.0 (www.e-dintorni.it;Windows NT 5.0)"
 213.215.160.170
 
-# EDSA Phillipines
+# EDSA Philippines
 210.16.10.40
 
 # eFamily

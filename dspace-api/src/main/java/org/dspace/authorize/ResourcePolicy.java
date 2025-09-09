@@ -7,31 +7,28 @@
  */
 package org.dspace.authorize;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
-import org.apache.solr.common.StringUtils;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.core.HibernateProxyHelper;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.hibernate.annotations.Type;
-import org.hibernate.proxy.HibernateProxyHelper;
+import org.hibernate.Length;
 
 /**
  * Database entity representation of the ResourcePolicy table
@@ -85,12 +82,10 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     private Group epersonGroup;
 
     @Column(name = "start_date")
-    @Temporal(TemporalType.DATE)
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    @Temporal(TemporalType.DATE)
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "rpname", length = 30)
     private String rpname;
@@ -99,9 +94,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     @Column(name = "rptype", length = 30)
     private String rptype;
 
-    @Lob
-    @Type(type = "org.hibernate.type.TextType")
-    @Column(name = "rpdescription")
+    @Column(name = "rpdescription", length = Length.LONG32)
     private String rpdescription;
 
     /**
@@ -250,7 +243,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
      * @return start date, or null if there is no start date set (probably most
      * common case)
      */
-    public java.util.Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
@@ -259,7 +252,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
      *
      * @param d date, or null for no start date
      */
-    public void setStartDate(java.util.Date d) {
+    public void setStartDate(LocalDate d) {
         startDate = d;
     }
 
@@ -268,7 +261,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
      *
      * @return end date or null for no end date
      */
-    public java.util.Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
@@ -277,7 +270,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
      *
      * @param d end date, or null
      */
-    public void setEndDate(java.util.Date d) {
+    public void setEndDate(LocalDate d) {
         this.endDate = d;
     }
 
@@ -303,5 +296,24 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
 
     public void setRpDescription(String description) {
         this.rpdescription = description;
+    }
+
+    /**
+     * Describe the ResourcePolicy in String form. Useful for debugging ResourcePolicy issues in tests or similar.
+     * @return String representation of ResourcePolicy object
+     */
+    @Override
+    public String toString() {
+        return "ResourcePolicy{" +
+            "id='" + id + '\'' +
+            ", action_id='" + actionId + '\'' +
+            ", eperson='" + eperson + '\'' +
+            ", group='" + epersonGroup + '\'' +
+            ", type='" + rptype + '\'' +
+            ", name='" + rpname + '\'' +
+            ", description='" + rpdescription + '\'' +
+            ", start_date='" + startDate + '\'' +
+            ", end_date='" + endDate + '\'' +
+            '}';
     }
 }

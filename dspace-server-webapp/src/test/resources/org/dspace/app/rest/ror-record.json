@@ -1,0 +1,93 @@
+{
+  "admin": {
+    "created": {
+      "date": "2018-11-14",
+      "schema_version": "1.0"
+    },
+    "last_modified": {
+      "date": "2024-12-11",
+      "schema_version": "2.1"
+    }
+  },
+  "domains": [],
+  "established": 1972,
+  "external_ids": [
+    {
+      "all": [
+        "grid.430864.d"
+      ],
+      "preferred": "grid.430864.d",
+      "type": "grid"
+    },
+    {
+      "all": [
+        "0000 0000 9018 7542"
+      ],
+      "preferred": null,
+      "type": "isni"
+    }
+  ],
+  "id": "https://ror.org/02437s643",
+  "links": [
+    {
+      "type": "website",
+      "value": "https://www.uillinois.edu"
+    }
+  ],
+  "locations": [
+    {
+      "geonames_details": {
+        "continent_code": "NA",
+        "continent_name": "North America",
+        "country_code": "US",
+        "country_name": "United States",
+        "country_subdivision_code": "IL",
+        "country_subdivision_name": "Illinois",
+        "lat": 42.27113,
+        "lng": -89.094,
+        "name": "Rockford"
+      },
+      "geonames_id": 4907959
+    }
+  ],
+  "names": [
+    {
+      "lang": null,
+      "types": [
+        "acronym"
+      ],
+      "value": "UICOMR"
+    },
+    {
+      "lang": "en",
+      "types": [
+        "ror_display",
+        "label"
+      ],
+      "value": "University of Illinois Chicago, Rockford campus"
+    },
+    {
+      "lang": "en",
+      "types": [
+        "alias"
+      ],
+      "value": "University of Illinois at Rockford"
+    }
+  ],
+  "relationships": [
+    {
+      "label": "University of Illinois Chicago",
+      "type": "parent",
+      "id": "https://ror.org/02mpq6x41"
+    },
+    {
+      "label": "Swedish American Hospital",
+      "type": "related",
+      "id": "https://ror.org/05scd7d31"
+    }
+  ],
+  "status": "active",
+  "types": [
+    "education"
+  ]
+}

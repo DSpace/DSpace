@@ -25,10 +25,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.text.ParseException;
 import java.util.Map;
-import javax.servlet.http.Cookie;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.servlet.http.Cookie;
 import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.app.rest.security.jwt.EPersonClaimProvider;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;

@@ -9,7 +9,7 @@ package org.dspace.embargo;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.List;
 
@@ -129,7 +129,7 @@ public class EmbargoServiceImpl implements EmbargoService {
         }
 
         // new DCDate(non-date String) means toDate() will return null
-        Date liftDate = result.toDate();
+        ZonedDateTime liftDate = result.toDate();
         if (liftDate == null) {
             throw new IllegalArgumentException(
                 "Embargo lift date is uninterpretable:  "
@@ -199,19 +199,19 @@ public class EmbargoServiceImpl implements EmbargoService {
 
     // return the schema part of "schema.element.qualifier" metadata field spec
     protected String getSchemaOf(String field) {
-        String sa[] = field.split("\\.", 3);
+        String[] sa = field.split("\\.", 3);
         return sa[0];
     }
 
     // return the element part of "schema.element.qualifier" metadata field spec, if any
     protected String getElementOf(String field) {
-        String sa[] = field.split("\\.", 3);
+        String[] sa = field.split("\\.", 3);
         return sa.length > 1 ? sa[1] : null;
     }
 
     // return the qualifier part of "schema.element.qualifier" metadata field spec, if any
     protected String getQualifierOf(String field) {
-        String sa[] = field.split("\\.", 3);
+        String[] sa = field.split("\\.", 3);
         return sa.length > 2 ? sa[2] : null;
     }
 
@@ -223,7 +223,7 @@ public class EmbargoServiceImpl implements EmbargoService {
         if (lift.size() > 0) {
             liftDate = new DCDate(lift.get(0).getValue());
             // sanity check: do not allow an embargo lift date in the past.
-            if (liftDate.toDate().before(new Date())) {
+            if (liftDate.toDate().isBefore(ZonedDateTime.now())) {
                 liftDate = null;
             }
         }

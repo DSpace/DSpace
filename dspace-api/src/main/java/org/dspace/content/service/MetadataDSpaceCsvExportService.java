@@ -44,7 +44,8 @@ public interface MetadataDSpaceCsvExportService {
      * @return              A DSpaceCSV object containing the exported information
      * @throws Exception    If something goes wrong
      */
-    public DSpaceCSV export(Context context, Iterator<Item> toExport, boolean exportAll) throws Exception;
+    public DSpaceCSV export(Context context, Iterator<Item> toExport,
+                            boolean exportAll, DSpaceRunnableHandler handler) throws Exception;
 
     /**
      * This method will export all the Items within the given Community to a DSpaceCSV
@@ -54,6 +55,9 @@ public interface MetadataDSpaceCsvExportService {
      * @return              A DSpaceCSV object containing the exported information
      * @throws Exception    If something goes wrong
      */
-    public DSpaceCSV export(Context context, Community community, boolean exportAll) throws Exception;
+    public DSpaceCSV export(Context context, Community community,
+                            boolean exportAll, DSpaceRunnableHandler handler) throws Exception;
+
+    int getCsvExportLimit();
 
 }

@@ -21,8 +21,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -116,6 +116,7 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
         configurationService.setProperty("irus.statistics.tracker.enabled", true);
         configurationService.setProperty("irus.statistics.tracker.type-field", "dc.type");
         configurationService.setProperty("irus.statistics.tracker.type-value", "Excluded type");
+        configurationService.setProperty("oai.identifier.prefix", "localhost");
 
 
         context.turnOffAuthorisationSystem();

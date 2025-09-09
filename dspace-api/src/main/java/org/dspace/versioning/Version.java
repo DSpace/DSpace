@@ -7,25 +7,24 @@
  */
 package org.dspace.versioning;
 
-import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import java.time.Instant;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.core.HibernateProxyHelper;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
-import org.hibernate.proxy.HibernateProxyHelper;
+
 
 /**
  * @author Fabio Bolognesi (fabio at atmire dot com)
@@ -54,8 +53,7 @@ public class Version implements ReloadableEntity<Integer> {
     private EPerson ePerson;
 
     @Column(name = "version_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date versionDate;
+    private Instant versionDate;
 
     @Column(name = "version_summary", length = 255)
     private String summary;
@@ -71,7 +69,7 @@ public class Version implements ReloadableEntity<Integer> {
      * {@link org.dspace.versioning.service.VersioningService#createNewVersion(Context, Item, String)}
      * or
      * {@link org.dspace.versioning.service.VersioningService#createNewVersion(Context, VersionHistory,
-     * Item, String, Date, int)}
+     * Item, String, Instant, int)}
      */
     protected Version() {
 
@@ -106,11 +104,11 @@ public class Version implements ReloadableEntity<Integer> {
         this.ePerson = ePerson;
     }
 
-    public Date getVersionDate() {
+    public Instant getVersionDate() {
         return versionDate;
     }
 
-    public void setVersionDate(Date versionDate) {
+    public void setVersionDate(Instant versionDate) {
         this.versionDate = versionDate;
     }
 

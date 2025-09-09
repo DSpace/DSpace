@@ -12,20 +12,27 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import java.util.UUID;
 
+import jakarta.persistence.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Root;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bitstream_;
+import org.dspace.content.Bundle;
+import org.dspace.content.Bundle_;
 import org.dspace.content.Collection;
+import org.dspace.content.Collection_;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.Item_;
 import org.dspace.content.dao.BitstreamDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.UUIDIterator;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Bitstream object.
@@ -68,56 +75,82 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public List<Bitstream> findBitstreamsWithNoRecentChecksum(Context context) throws SQLException {
-        Query query = createQuery(context,
-                                  "select b from Bitstream b where b not in (select c.bitstream from " +
-                                      "MostRecentChecksum c)");
+        Query query = createQuery(context, "SELECT b FROM MostRecentChecksum c RIGHT JOIN Bitstream b " +
+            "ON c.bitstream = b WHERE c IS NULL" );
+
         return query.getResultList();
     }
 
     @Override
     public Iterator<Bitstream> findByCommunity(Context context, Community community) throws SQLException {
-        Query query = createQuery(context, "select b from Bitstream b " +
-            "join b.bundles bitBundles " +
-            "join bitBundles.items item " +
-            "join item.collections itemColl " +
-            "join itemColl.communities community " +
-            "WHERE :community IN community");
+        // Select UUID of all bitstreams, joining from Bitstream -> Bundle -> Item -> Collection -> Community
+        // to find all that exist under the given community.
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<UUID> criteriaQuery = criteriaBuilder.createQuery(UUID.class);
+        Root<Bitstream> bitstreamRoot = criteriaQuery.from(Bitstream.class);
+        criteriaQuery.select(bitstreamRoot.get(Bitstream_.id));
+        // Joins from Bitstream -> Bundle -> Item -> Collection
+        Join<Bitstream, Bundle> joinBundle = bitstreamRoot.join(Bitstream_.bundles);
+        Join<Bundle, Item> joinItem = joinBundle.join(Bundle_.items);
+        Join<Item, Collection> joinCollection = joinItem.join(Item_.collections);
+        // Where "community" is a member of the list of Communities linked by the collection(s)
+        criteriaQuery.where(criteriaBuilder.isMember(community, joinCollection.get(Collection_.COMMUNITIES)));
 
-        query.setParameter("community", community);
-
-        return iterate(query);
+        // Transform into a query object to execute
+        Query query = createQuery(context, criteriaQuery);
+        @SuppressWarnings("unchecked")
+        List<UUID> uuids = query.getResultList();
+        return new UUIDIterator<Bitstream>(context, uuids, Bitstream.class, this);
     }
 
     @Override
     public Iterator<Bitstream> findByCollection(Context context, Collection collection) throws SQLException {
-        Query query = createQuery(context, "select b from Bitstream b " +
-            "join b.bundles bitBundles " +
-            "join bitBundles.items item " +
-            "join item.collections c " +
-            "WHERE :collection IN c");
+        // Select UUID of all bitstreams, joining from Bitstream -> Bundle -> Item -> Collection
+        // to find all that exist under the given collection.
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<UUID> criteriaQuery = criteriaBuilder.createQuery(UUID.class);
+        Root<Bitstream> bitstreamRoot = criteriaQuery.from(Bitstream.class);
+        criteriaQuery.select(bitstreamRoot.get(Bitstream_.id));
+        // Joins from Bitstream -> Bundle -> Item
+        Join<Bitstream, Bundle> joinBundle = bitstreamRoot.join(Bitstream_.bundles);
+        Join<Bundle, Item> joinItem = joinBundle.join(Bundle_.items);
+        // Where "collection" is a member of the list of Collections linked by the item(s)
+        criteriaQuery.where(criteriaBuilder.isMember(collection, joinItem.get(Item_.collections)));
 
-        query.setParameter("collection", collection);
-
-        return iterate(query);
+        // Transform into a query object to execute
+        Query query = createQuery(context, criteriaQuery);
+        @SuppressWarnings("unchecked")
+        List<UUID> uuids = query.getResultList();
+        return new UUIDIterator<Bitstream>(context, uuids, Bitstream.class, this);
     }
 
     @Override
     public Iterator<Bitstream> findByItem(Context context, Item item) throws SQLException {
-        Query query = createQuery(context, "select b from Bitstream b " +
-            "join b.bundles bitBundles " +
-            "join bitBundles.items item " +
-            "WHERE :item IN item");
+        // Select UUID of all bitstreams, joining from Bitstream -> Bundle -> Item
+        // to find all that exist under the given item.
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<UUID> criteriaQuery = criteriaBuilder.createQuery(UUID.class);
+        Root<Bitstream> bitstreamRoot = criteriaQuery.from(Bitstream.class);
+        criteriaQuery.select(bitstreamRoot.get(Bitstream_.id));
+        // Join from Bitstream -> Bundle
+        Join<Bitstream, Bundle> joinBundle = bitstreamRoot.join(Bitstream_.bundles);
+        // Where "item" is a member of the list of Items linked by the bundle(s)
+        criteriaQuery.where(criteriaBuilder.isMember(item, joinBundle.get(Bundle_.items)));
 
-        query.setParameter("item", item);
-
-        return iterate(query);
+        // Transform into a query object to execute
+        Query query = createQuery(context, criteriaQuery);
+        @SuppressWarnings("unchecked")
+        List<UUID> uuids = query.getResultList();
+        return new UUIDIterator<Bitstream>(context, uuids, Bitstream.class, this);
     }
 
     @Override
     public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException {
-        Query query = createQuery(context, "select b from Bitstream b where b.storeNumber = :storeNumber");
+        Query query = createQuery(context, "select b.id from Bitstream b where b.storeNumber = :storeNumber");
         query.setParameter("storeNumber", storeNumber);
-        return iterate(query);
+        @SuppressWarnings("unchecked")
+        List<UUID> uuids = query.getResultList();
+        return new UUIDIterator<Bitstream>(context, uuids, Bitstream.class, this);
     }
 
     @Override

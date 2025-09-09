@@ -1,0 +1,21 @@
+{
+  "meta": {
+    "count": 2,
+    "db_response_time_ms": 30,
+    "page": 1,
+    "per_page": 25,
+    "groups_count": null
+  },
+  "results": [
+    {
+      "id": "https://openalex.org/A5016721535",
+      "orcid": "https://orcid.org/0000-0002-9429-5000",
+      "display_name": "Claudio Cortese"
+    },
+    {
+      "id": "https://openalex.org/A5008845767",
+      "display_name": "Claudio Giovanni Cortese"
+    }
+  ],
+  "group_by": []
+}

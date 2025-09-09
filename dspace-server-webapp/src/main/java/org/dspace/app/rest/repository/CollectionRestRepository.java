@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.SortedMap;
 import java.util.UUID;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -81,7 +81,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME)
+@Component(CollectionRest.CATEGORY + "." + CollectionRest.PLURAL_NAME)
 public class CollectionRestRepository extends DSpaceObjectRestRepository<Collection, CollectionRest> {
 
     public static Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionRestRepository.class);
@@ -121,6 +121,9 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
     @Autowired
     SearchService searchService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     public CollectionRestRepository(CollectionService dsoService) {
         super(dsoService);
@@ -319,7 +322,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest;
         try {
             ServletInputStream input = req.getInputStream();
@@ -352,7 +354,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
         CollectionRest collectionRest;
         try {
-            collectionRest = new ObjectMapper().readValue(jsonNode.toString(), CollectionRest.class);
+            collectionRest = mapper.readValue(jsonNode.toString(), CollectionRest.class);
         } catch (IOException e) {
             throw new UnprocessableEntityException("Error parsing collection json: " + e.getMessage());
         }
@@ -603,7 +605,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
     private GroupRest populateGroupInformation(Context context, HttpServletRequest request, Group group)
         throws SQLException, AuthorizeException {
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         try {
             ServletInputStream input = request.getInputStream();

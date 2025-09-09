@@ -1,0 +1,49 @@
+{
+	"@context": [
+	   "https://www.w3.org/ns/activitystreams",
+	   "https://purl.org/coar/notify"
+	 ],
+	 "actor": {
+	   "id": "https://overlay-journal.com",
+	   "name": "Overlay Journal",
+	   "type": ["Service"]
+	 }, 
+	 "context": {
+		"id": "<<object>>",
+	   "ietf:cite-as": "https://doi.org/10.5555/12345680",
+	   "type": ["sorg:AboutPage"],
+	   "ietf:item": {
+	     "id": "https://research-organisation.org/repository/preprint/201203/421/content.pdf",
+	     "mediaType": "application/pdf",
+	     "type": [
+	       "Article",
+	       "sorg:ScholarlyArticle"
+	     ]
+	   }
+	 },
+	 "id": "urn:uuid:94ecae35-dcfd-4182-8550-22c7164fe23f",
+	 "object": {
+		"id": "<<object_handle>>",
+		"id_oai": "oai:www.openstarts.units.it:<<object_handle>>",
+	    "id_old": "https://review-service.com/review/geo/202103/0021",
+	   "ietf:cite-as": "https://overlay-journal.com/articles/00001/",
+	   "type": [
+	     "Page",
+	     "sorg:WebPage"
+	   ]
+	 },
+	 "origin": {
+	   "id": "https://overlay-journal.com/system",
+	   "inbox": "https://overlay-journal.com/inbox/",
+	   "type": ["Service"]
+	 },
+	 "target": {
+	   "id": "https://research-organisation.org/repository",
+	   "inbox": "https://research-organisation.org/inbox/",
+	   "type": ["Service"]
+	 },
+	 "type": [
+	   "Announce",
+	   "coar-notify:EndorsementAction"
+	 ]
+ }

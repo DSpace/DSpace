@@ -18,10 +18,10 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.google.GoogleAnalyticsEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link GoogleAnalyticsClient}.
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GoogleAnalyticsClientImpl implements GoogleAnalyticsClient {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GoogleAnalyticsClientImpl.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final String keyPrefix;
 
@@ -42,7 +42,7 @@ public class GoogleAnalyticsClientImpl implements GoogleAnalyticsClient {
     public GoogleAnalyticsClientImpl(String keyPrefix, GoogleAnalyticsClientRequestBuilder requestBuilder) {
         this.keyPrefix = keyPrefix;
         this.requestBuilder = requestBuilder;
-        this.httpclient = HttpClients.createDefault();
+        this.httpclient = DSpaceHttpClientFactory.getInstance().build();
     }
 
     @Override

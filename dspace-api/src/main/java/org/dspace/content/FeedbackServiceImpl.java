@@ -7,11 +7,11 @@
  */
 package org.dspace.content;
 import java.io.IOException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Objects;
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.content.service.FeedbackService;
 import org.dspace.core.Context;
@@ -37,7 +37,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         }
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "feedback"));
         email.addRecipient(recipientEmail);
-        email.addArgument(new Date());         // Date
+        email.addArgument(Instant.now());      // Date
         email.addArgument(senderEmail);       // Email
         email.addArgument(currentUserEmail); // Logged in as
         email.addArgument(page);            // Referring page

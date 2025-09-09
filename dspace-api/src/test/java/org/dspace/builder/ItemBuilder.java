@@ -13,6 +13,7 @@ import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Period;
 import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
@@ -112,6 +113,14 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dc", "identifier", "scopus", scopus);
     }
 
+    public ItemBuilder withISSN(String issn) {
+        return addMetadataValue(item, "dc", "identifier", "issn", issn);
+    }
+
+    public ItemBuilder withISBN(String isbn) {
+        return addMetadataValue(item, "dc", "identifier", "isbn", isbn);
+    }
+
     public ItemBuilder withRelationFunding(String funding) {
         return addMetadataValue(item, "dc", "relation", "funding", funding);
     }
@@ -183,6 +192,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withIIIFCanvasHeight(int i) {
         return addMetadataValue(item, "iiif", "image", "height", String.valueOf(i));
+    }
+
+    public ItemBuilder withDSpaceObjectOwner(String name, String authority) {
+        return addMetadataValue(item, "dspace", "object", "owner", null, name, authority, 600);
     }
 
     public ItemBuilder withMetadata(final String schema, final String element, final String qualifier,
@@ -281,8 +294,8 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     /**
-     * Withdrawn the item under build. Please note that an user need to be loggedin the context to avoid NPE during the
-     * creation of the provenance metadata
+     * Withdraw the item under build. Please note that the Context must be
+     * logged in to avoid NPE during the creation of the provenance metadata.
      *
      * @return the ItemBuilder
      */
@@ -291,7 +304,13 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return this;
     }
 
-    public ItemBuilder withEmbargoPeriod(String embargoPeriod) {
+    /**
+     * Set an embargo to end after some time from "now".
+     *
+     * @param embargoPeriod embargo starting "now", for this long.
+     * @return the ItemBuilder.
+     */
+    public ItemBuilder withEmbargoPeriod(Period embargoPeriod) {
         return setEmbargo(embargoPeriod, item);
     }
 

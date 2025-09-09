@@ -46,7 +46,7 @@ public class AIPDIMCrosswalk
      */
     @Override
     public Namespace[] getNamespaces() {
-        Namespace result[] = new Namespace[1];
+        Namespace[] result = new Namespace[1];
         result[0] = XSLTCrosswalk.DIM_NS;
         return result;
     }

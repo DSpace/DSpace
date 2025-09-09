@@ -14,8 +14,6 @@ import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.storage.rdbms.migration.MigrationUtils;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class automatically migrates your DSpace Database to use the
@@ -35,11 +33,6 @@ import org.slf4j.LoggerFactory;
  */
 public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
     extends BaseJavaMigration {
-    /**
-     * logging category
-     */
-    private static final Logger log = LoggerFactory.getLogger(V5_0_2014_11_04__Enable_XMLWorkflow_Migration.class);
-
     // Size of migration script run
     Integer migration_file_size = -1;
 
