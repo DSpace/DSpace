@@ -13,7 +13,8 @@ import org.springframework.shell.command.annotation.Command;
  * Database commands for the DSpace Spring Shell
  */
 @Command(
-    command = "database"
+    command = "database",
+    group = "Database commands"
 )
 public class DatabaseCommands {
 
