@@ -366,7 +366,7 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
 
     @Override
     public String getName() {
-        return getEmail();
+        return this.getFullName();
     }
 
     String getDigestAlgorithm() {
