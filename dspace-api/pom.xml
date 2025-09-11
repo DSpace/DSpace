@@ -720,7 +720,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.12.788</version>
+            <version>1.12.791</version>
         </dependency>
 
         <!-- TODO: This may need to be replaced with the "orcid-model" artifact once this ticket is resolved:
@@ -915,7 +915,7 @@
         <dependency>
             <groupId>org.xhtmlrenderer</groupId>
             <artifactId>flying-saucer-pdf</artifactId>
-            <version>9.13.1</version>
+            <version>9.13.3</version>
             <exclusions>
                 <!-- Conflicts with Hibernate. Use version that is brought in via Hibernate -->
                 <exclusion>

@@ -28,7 +28,7 @@
         <flyway.version>10.22.0</flyway.version>
         <solr.client.version>8.11.4</solr.client.version>
 
-        <ehcache.version>3.10.8</ehcache.version>
+        <ehcache.version>3.11.1</ehcache.version>
         <errorprone.version>2.41.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-databind.version below -->
         <jackson.version>2.19.2</jackson.version>
@@ -49,7 +49,7 @@
         <bouncycastle.version>1.81</bouncycastle.version>
         <asm.version>9.8</asm.version>
         <!-- Jersey is used to integrate with external sources/services -->
-        <jersey.version>3.1.10</jersey.version>
+        <jersey.version>3.1.11</jersey.version>
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
         <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath (used by Server webapp) -->
         <json-path.version>2.9.0</json-path.version>
@@ -306,7 +306,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.4.0</version>
+                    <version>4.9.4.2</version>
                     <configuration>
                         <effort>Max</effort>
                         <threshold>Low</threshold>
@@ -1381,7 +1381,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.49.5</version>
+                <version>3.50.0</version>
             </dependency>
 
             <!-- Several dependencies disagree on version of GSON including Jena, Google-OAuth-Client
