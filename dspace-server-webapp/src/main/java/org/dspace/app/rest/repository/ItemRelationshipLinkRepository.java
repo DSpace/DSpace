@@ -47,7 +47,7 @@ public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
                                                    @Nullable Pageable optionalPageable,
                                                    Projection projection) {
         try {
-            Context context = obtainContext();
+            Context context = obtainReadOnlyContext();
             Item item = itemService.find(context, itemId);
             if (item == null) {
                 throw new ResourceNotFoundException("No such item: " + itemId);
