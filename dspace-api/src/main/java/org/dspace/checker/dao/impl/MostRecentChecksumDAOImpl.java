@@ -66,6 +66,24 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         return list(context, criteriaQuery, false, MostRecentChecksum.class, -1, -1);
     }
 
+    @Override
+    public int updateMissingBitstreams(Context context) throws SQLException {
+        String hql = "INSERT INTO MostRecentChecksum(bitstream, toBeProcessed, expectedChecksum, currentChecksum, " +
+                "processStartDate, processEndDate, checksumAlgorithm, matchedPrevChecksum, checksumResult) " +
+                "SELECT b, " +
+                "CASE WHEN deleted = false THEN true ELSE false END, " +
+                "CASE WHEN checksum IS NULL THEN '' ELSE checksum END, " +
+                "CASE WHEN checksum IS NULL THEN '' ELSE checksum END, " +
+                "current_timestamp(), current_timestamp(), " +
+                "CASE WHEN checksumAlgorithm IS NULL THEN 'MD5' ELSE checksumAlgorithm END, " +
+                "CAST(1 AS boolean), " +
+                "(SELECT cr FROM ChecksumResult AS cr WHERE " +
+                "(resultCode = 'BITSTREAM_MARKED_DELETED' AND b.deleted = true) " +
+                "OR (resultCode = 'CHECKSUM_MATCH' AND b.deleted = false)) " +
+                "FROM Bitstream AS b WHERE NOT EXISTS(SELECT 'x' FROM MostRecentChecksum AS c WHERE c.bitstream = b)";
+        Query query = createQuery(context, hql);
+        return query.executeUpdate();
+    }
 
     @Override
     public MostRecentChecksum findByBitstream(Context context, Bitstream bitstream) throws SQLException {
