@@ -38,11 +38,11 @@ import org.dspace.services.ConfigurationService;
  */
 public class MetadataValidation extends AbstractValidation {
 
-    private static final String ERROR_VALIDATION_REQUIRED = "error.validation.required";
+    public static final String ERROR_VALIDATION_REQUIRED = "error.validation.required";
 
-    private static final String ERROR_VALIDATION_AUTHORITY_REQUIRED = "error.validation.authority.required";
+    public static final String ERROR_VALIDATION_AUTHORITY_REQUIRED = "error.validation.authority.required";
 
-    private static final String ERROR_VALIDATION_REGEX = "error.validation.regex";
+    public static final String ERROR_VALIDATION_REGEX = "error.validation.regex";
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataValidation.class);
 
@@ -57,10 +57,10 @@ public class MetadataValidation extends AbstractValidation {
     @Override
     public List<ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
                                     SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
-
         List<ErrorRest> errors = new ArrayList<>();
         String documentTypeValue = "";
-        DCInputSet inputConfig = getInputReader().getInputsByFormName(config.getId());
+        DCInputSet inputConfig;
+        inputConfig = getInputReader().getInputsByFormName(config.getId());
         List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(),
                 configurationService.getProperty("submit.type-bind.field", "dc.type"));
         if (documentType.size() > 0) {
@@ -74,7 +74,8 @@ public class MetadataValidation extends AbstractValidation {
         for (DCInput[] row : inputConfig.getFields()) {
             for (DCInput input : row) {
                 String fieldKey =
-                    metadataAuthorityService.makeFieldKey(input.getSchema(), input.getElement(), input.getQualifier());
+                        metadataAuthorityService.makeFieldKey(input.getSchema(), input.getElement(),
+                                input.getQualifier());
                 boolean isAuthorityControlled = metadataAuthorityService.isAuthorityControlled(fieldKey);
 
                 List<String> fieldsName = new ArrayList<String>();
@@ -93,7 +94,7 @@ public class MetadataValidation extends AbstractValidation {
                         if (!input.isAllowedFor(documentTypeValue) &&  (!allowedFieldNames.contains(fullFieldname)
                                 && !allowedFieldNames.contains(input.getFieldName()))) {
                             itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
-                                        obj.getItem(), mdv);
+                                    obj.getItem(), mdv);
                         } else {
                             validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
                             if (mdv.size() > 0 && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
@@ -135,7 +136,7 @@ public class MetadataValidation extends AbstractValidation {
                     }
                     validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
                     if ((input.isRequired() && mdv.size() == 0) && input.isVisible(DCInput.SUBMISSION_SCOPE)
-                                                                && !valuesRemoved) {
+                            && !valuesRemoved) {
                         // Is the input required for *this* type? In other words, are we looking at a required
                         // input that is also allowed for this document type
                         if (input.isAllowedFor(documentTypeValue)) {
@@ -143,7 +144,7 @@ public class MetadataValidation extends AbstractValidation {
                             // fields
                             addError(errors, ERROR_VALIDATION_REQUIRED, "/"
                                     + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                                            input.getFieldName());
+                                    input.getFieldName());
                         }
                     }
                 }
@@ -151,7 +152,6 @@ public class MetadataValidation extends AbstractValidation {
         }
         return errors;
     }
-
 
     private void validateMetadataValues(List<MetadataValue> mdv, DCInput input, SubmissionStepConfig config,
                                         boolean isAuthorityControlled, String fieldKey,
@@ -200,5 +200,4 @@ public class MetadataValidation extends AbstractValidation {
     public void setInputReader(DCInputsReader inputReader) {
         this.inputReader = inputReader;
     }
-
 }

@@ -25,6 +25,8 @@
         <property name="name" value="upload"/>
         <property name="itemService" ref="org.dspace.content.ItemServiceImpl"/>
         <property name="uploadConfigurationService" ref="uploadConfigurationService"/>
+        <property name="metadataAuthorityService" ref="org.dspace.content.authority.MetadataAuthorityServiceImpl"/>
+        <property name="bitstreamService" ref="org.dspace.content.BitstreamServiceImpl"/>
     </bean>
 
     <bean name="cclicenseValidation" class="org.dspace.app.rest.submit.step.validation.CclicenseValidator">
