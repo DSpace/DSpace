@@ -1179,10 +1179,10 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     private Triple<String, String, String> getValueAndAuthorityAndConfidence(String value) {
         // Cells with valid authority are composed of three parts ~ <value>, <authority>, <confidence>
         // The value itself may also include the authority separator though
-        String[] parts = value.split(csv.getAuthoritySeparator());
+        String[] parts = value.split(csv.getEscapedAuthoritySeparator());
 
         if (parts.length < 3) {
-            return Triple.of(String.join(csv.getAuthoritySeparator(),
+            return Triple.of(String.join(csv.getEscapedAuthoritySeparator(),
                 Arrays.copyOfRange(parts, 0, parts.length)), null, null);
         }
 
@@ -1190,12 +1190,12 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         try {
             Integer.parseInt(parts[parts.length - 1]);
         } catch (NumberFormatException e) {
-            return Triple.of(String.join(csv.getAuthoritySeparator(),
+            return Triple.of(String.join(csv.getEscapedAuthoritySeparator(),
                 Arrays.copyOfRange(parts, 0, parts.length)), null, null);
 
         }
 
-        return Triple.of(String.join(csv.getAuthoritySeparator(),
+        return Triple.of(String.join(csv.getEscapedAuthoritySeparator(),
                 Arrays.copyOfRange(parts, 0, parts.length - 2)),
             parts[parts.length - 2], parts[parts.length - 1]);
     }
