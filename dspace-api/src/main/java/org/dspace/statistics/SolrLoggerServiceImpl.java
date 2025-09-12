@@ -28,6 +28,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumSet;
@@ -228,6 +229,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             throw new RuntimeException(e);
         }
 
+        if (dspaceObject instanceof Bitstream && !isBitstreamLoggable((Bitstream) dspaceObject)) {
+            return;
+        }
+
         if (solr == null) {
             return;
         }
@@ -275,6 +280,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public void postView(DSpaceObject dspaceObject,
                          String ip, String userAgent, String xforwardedfor, EPerson currentUser, String referrer) {
+        if (dspaceObject instanceof Bitstream && !isBitstreamLoggable((Bitstream) dspaceObject)) {
+            return;
+        }
+
         if (solr == null) {
             return;
         }
@@ -1633,5 +1642,36 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
 
         throw new UnknownHostException("unknown ip format");
+    }
+
+    /**
+     * Checks if a given Bitstream's bundles are configured to be logged in Solr statistics.
+     *
+     * @param bitstream The bitstream to check.
+     * @return {@code true} if the bitstream event should be logged, {@code false} otherwise.
+     */
+    private boolean isBitstreamLoggable(Bitstream bitstream) {
+        String[] allowedBundles = configurationService
+            .getArrayProperty("solr-statistics.query.filter.bundles");
+        if (allowedBundles == null || allowedBundles.length == 0) {
+            return true;
+        }
+        List<String> allowedBundlesList = Arrays.asList(allowedBundles);
+        try {
+            List<Bundle> actualBundles = bitstream.getBundles();
+            if (actualBundles.isEmpty()) {
+                return true;
+            }
+            for (Bundle bundle : actualBundles) {
+                if (allowedBundlesList.contains(bundle.getName())) {
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error checking bitstream bundles for logging statistics for bitstream {}",
+                bitstream.getID(), e);
+            return true;
+        }
+        return false;
     }
 }
