@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -165,10 +165,10 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
         // (with this operator virtual value can only be moved or deleted).
         int idx = 0;
         for (MetadataValueRest ll : list) {
-            if (StringUtils.startsWith(ll.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+            if (Strings.CS.startsWith(ll.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
 
                 Optional<MetadataValue> preExistentMv = preExistentMetadata.stream().filter(mvr ->
-                    StringUtils.equals(ll.getAuthority(), mvr.getAuthority())).findFirst();
+                    Strings.CS.equals(ll.getAuthority(), mvr.getAuthority())).findFirst();
 
                 if (!preExistentMv.isPresent()) {
                     throw new UnprocessableEntityException(
