@@ -31,7 +31,9 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.event.EventDetail;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -191,7 +193,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         setFormat(context, bitstream, null);
 
         context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM,
-                                   bitstream.getID(), "REGISTER", getIdentifiers(context, bitstream)));
+                                   bitstream.getID(), new EventDetail(
+            DetailType.INFO, "REGISTER"), getIdentifiers(context, bitstream)));
 
         return bitstream;
     }
@@ -250,7 +253,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         }
         if (bitstream.isMetadataModified()) {
             context.addEvent(
-                new Event(Event.MODIFY_METADATA, Constants.BITSTREAM, bitstream.getID(), bitstream.getDetails(),
+                new Event(Event.MODIFY_METADATA, Constants.BITSTREAM, bitstream.getID(),
+                    new EventDetail(DetailType.DSO_SUMMARY, bitstream.getDetails()),
                           getIdentifiers(context, bitstream)));
             bitstream.clearModified();
             bitstream.clearDetails();
@@ -269,7 +273,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
                                       "bitstream_id=" + bitstream.getID()));
 
         context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(),
-                                   String.valueOf(bitstream.getSequenceID()), getIdentifiers(context, bitstream)));
+            new EventDetail(DetailType.BITSTREAM_SEQUENCE_ID, String.valueOf(bitstream.getSequenceID())),
+            getIdentifiers(context, bitstream)));
 
         // Remove bitstream itself
         bitstream.setDeleted(true);
