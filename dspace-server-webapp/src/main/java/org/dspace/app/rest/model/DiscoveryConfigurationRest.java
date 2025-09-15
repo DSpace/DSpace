@@ -25,7 +25,7 @@ import org.dspace.app.rest.DiscoveryRestController;
 public class DiscoveryConfigurationRest extends BaseObjectRest<String> {
 
     public static final String NAME = "discover";
-    public static final String PLURAL_NAME = NAME;
+    public static final String PLURAL_NAME = "configurations";
     public static final String CATEGORY = RestModel.DISCOVER;
     public static final String SEARCH_FILTER = "search-filter";
     public static final String SORT_OPTION = "sort-option";
@@ -103,15 +103,15 @@ public class DiscoveryConfigurationRest extends BaseObjectRest<String> {
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof SearchConfigurationRest &&
-            new EqualsBuilder().append(this.getCategory(), ((SearchConfigurationRest) object).getCategory())
-                .append(this.getType(), ((SearchConfigurationRest) object).getType())
-                .append(this.getController(), ((SearchConfigurationRest) object).getController())
-                .append(this.getScope(), ((SearchConfigurationRest) object).getScope())
+        return (object instanceof DiscoveryConfigurationRest &&
+            new EqualsBuilder().append(this.getCategory(), ((DiscoveryConfigurationRest) object).getCategory())
+                .append(this.getType(), ((DiscoveryConfigurationRest) object).getType())
+                .append(this.getController(), ((DiscoveryConfigurationRest) object).getController())
+                .append(this.getScope(), ((DiscoveryConfigurationRest) object).getScope())
                 .append(this.getConfiguration(),
-                    ((SearchConfigurationRest) object).getConfiguration())
-                .append(this.getFilters(), ((SearchConfigurationRest) object).getFilters())
-                .append(this.getSortOptions(), ((SearchConfigurationRest) object).getSortOptions())
+                    ((DiscoveryConfigurationRest) object).getConfiguration())
+                .append(this.getFilters(), ((DiscoveryConfigurationRest) object).getFilters())
+                .append(this.getSortOptions(), ((DiscoveryConfigurationRest) object).getSortOptions())
                 .isEquals());
     }
 

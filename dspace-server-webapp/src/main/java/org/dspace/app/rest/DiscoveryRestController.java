@@ -21,15 +21,11 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.FacetConfigurationRest;
 import org.dspace.app.rest.model.FacetResultsRest;
-import org.dspace.app.rest.model.SearchConfigurationRest;
 import org.dspace.app.rest.model.SearchResultsRest;
-import org.dspace.app.rest.model.SearchSupportRest;
 import org.dspace.app.rest.model.hateoas.FacetConfigurationResource;
 import org.dspace.app.rest.model.hateoas.FacetResultsResource;
 import org.dspace.app.rest.model.hateoas.FacetsResource;
-import org.dspace.app.rest.model.hateoas.SearchConfigurationResource;
 import org.dspace.app.rest.model.hateoas.SearchResultsResource;
-import org.dspace.app.rest.model.hateoas.SearchSupportResource;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.repository.DiscoveryRestRepository;
 import org.dspace.app.rest.utils.Utils;
@@ -74,33 +70,6 @@ public class DiscoveryRestController implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService
             .register(this, Arrays.asList(Link.of("/api/" + SearchResultsRest.CATEGORY, SearchResultsRest.CATEGORY)));
-    }
-
-    @RequestMapping(method = RequestMethod.GET)
-    public SearchSupportResource getSearchSupport(@RequestParam(name = "scope", required = false) String dsoScope,
-                                                  @RequestParam(name = "configuration", required = false) String
-                                                  configuration)
-        throws Exception {
-
-        SearchSupportRest searchSupportRest = discoveryRestRepository.getSearchSupport();
-        SearchSupportResource searchSupportResource = converter.toResource(searchSupportRest);
-        return searchSupportResource;
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/search")
-    public SearchConfigurationResource getSearchConfiguration(
-        @RequestParam(name = "scope", required = false) String dsoScope,
-        @RequestParam(name = "configuration", required = false) String configuration) throws Exception {
-        if (log.isTraceEnabled()) {
-            log.trace("Retrieving search configuration for scope " + StringUtils.trimToEmpty(dsoScope)
-                          + " and configuration name " + StringUtils.trimToEmpty(configuration));
-        }
-
-        SearchConfigurationRest searchConfigurationRest = discoveryRestRepository
-            .getSearchConfiguration(dsoScope, configuration);
-
-        SearchConfigurationResource searchConfigurationResource = converter.toResource(searchConfigurationRest);
-        return searchConfigurationResource;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/search/facets")

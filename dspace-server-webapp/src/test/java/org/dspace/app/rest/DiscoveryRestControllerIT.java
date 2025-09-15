@@ -17,7 +17,6 @@ import static org.dspace.app.rest.matcher.FacetEntryMatcher.workflowAdminFacetMa
 import static org.dspace.app.rest.matcher.FacetEntryMatcher.workflowFacetMatchers;
 import static org.dspace.app.rest.matcher.FacetEntryMatcher.workspaceFacetMatchers;
 import static org.dspace.app.rest.matcher.FacetValueMatcher.entrySupervisedBy;
-import static org.dspace.app.rest.matcher.SearchFilterMatcher.searchFilterMatchers;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -75,7 +74,6 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
-import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
@@ -101,24 +99,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     @Autowired
     private ObjectMapper mapper;
-
-    @Test
-    public void rootDiscoverTest() throws Exception {
-
-        //When we call this endpoint
-        getClient().perform(get("/api/discover"))
-
-                //The status has to be 200 OK
-                .andExpect(status().isOk())
-                //The type has to be 'discover'
-                .andExpect(jsonPath("$.type", is("discover")))
-                //There needs to be a link to the facets endpoint
-                .andExpect(jsonPath("$._links.facets.href", containsString("api/discover/facets")))
-                //There needs to be a link to the search endpoint
-                .andExpect(jsonPath("$._links.search.href", containsString("api/discover/search")))
-                //There needs to be a self link
-                .andExpect(jsonPath("$._links.self.href", containsString("api/discover")));
-    }
 
     @Test
     public void discoverFacetsTestWithoutParameters() throws Exception {
@@ -1202,66 +1182,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         ;
     }
 
-
-    @Test
-    public void discoverSearchTest() throws Exception {
-
-        //When calling this root endpoint
-        getClient().perform(get("/api/discover/search"))
-                   //** THEN **
-                   //The status has to be 200 OK
-                   .andExpect(status().isOk())
-                   //The type has to be 'discover'
-                   .andExpect(jsonPath("$.type", is("discover")))
-                   //There needs to be a link to the objects that contains a string as specified below
-                   .andExpect(jsonPath("$._links.objects.href", containsString("api/discover/search/objects")))
-                   //There always needs to be a self link available
-                   .andExpect(jsonPath("$._links.self.href", containsString("api/discover/search")))
-                   //There needs to be a section where these filters as specified as they're the default filters
-                   // given in the configuration
-                   .andExpect(jsonPath("$.filters", containsInAnyOrder(searchFilterMatchers)))
-                   //These sortOptions need to be present as it's the default in the configuration
-                   .andExpect(jsonPath("$.sortOptions", contains(
-            SortOptionMatcher.sortOptionMatcher(
-                "score", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
-            SortOptionMatcher.sortOptionMatcher(
-                "dc.title", DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
-            SortOptionMatcher.sortOptionMatcher(
-                "dc.date.issued", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
-            SortOptionMatcher.sortOptionMatcher(
-                "dc.date.accessioned", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name())
-                   )));
-    }
-
-    @Test
-    public void checkSortOrderInPersonOrOrgunitConfigurationTest() throws Exception {
-        getClient().perform(get("/api/discover/search")
-                   .param("configuration", "personOrOrgunit"))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
-                   .andExpect(jsonPath("$._links.objects.href", containsString("api/discover/search/objects")))
-                   .andExpect(jsonPath("$._links.self.href", containsString("api/discover/search")))
-                   .andExpect(jsonPath("$.sortOptions", contains(
-                       SortOptionMatcher.sortOptionMatcher("dspace.entity.type",
-                                         DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
-                       SortOptionMatcher.sortOptionMatcher("organization.legalName",
-                                         DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
-                       SortOptionMatcher.sortOptionMatcher("organization.address.addressCountry",
-                                         DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
-                       SortOptionMatcher.sortOptionMatcher("organization.address.addressLocality",
-                                         DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
-                       SortOptionMatcher.sortOptionMatcher("organization.foundingDate",
-                                         DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
-                       SortOptionMatcher.sortOptionMatcher("dc.date.accessioned",
-                                         DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
-                       SortOptionMatcher.sortOptionMatcher("person.familyName",
-                                         DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
-                       SortOptionMatcher.sortOptionMatcher("person.givenName",
-                                         DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
-                       SortOptionMatcher.sortOptionMatcher("person.birthDate",
-                                         DiscoverySortFieldConfiguration.SORT_ORDER.desc.name())
-                    )));
-    }
 
     @Test
     public void discoverSearchByFieldNotConfiguredTest() throws Exception {

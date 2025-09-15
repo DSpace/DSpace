@@ -9,7 +9,7 @@ package org.dspace.app.rest.repository;
 
 import static java.lang.Integer.parseInt;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.dspace.app.rest.model.SearchConfigurationRest.Filter.OPERATOR_EQUALS;
+import static org.dspace.app.rest.model.SearchFilterRest.OPERATOR_EQUALS;
 
 import java.io.IOException;
 import java.sql.SQLException;

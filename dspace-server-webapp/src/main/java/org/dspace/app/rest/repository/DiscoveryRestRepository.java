@@ -11,17 +11,13 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.converter.DiscoverConfigurationConverter;
 import org.dspace.app.rest.converter.DiscoverFacetConfigurationConverter;
 import org.dspace.app.rest.converter.DiscoverFacetResultsConverter;
 import org.dspace.app.rest.converter.DiscoverFacetsConverter;
 import org.dspace.app.rest.converter.DiscoverResultConverter;
-import org.dspace.app.rest.converter.DiscoverSearchSupportConverter;
 import org.dspace.app.rest.model.FacetConfigurationRest;
 import org.dspace.app.rest.model.FacetResultsRest;
-import org.dspace.app.rest.model.SearchConfigurationRest;
 import org.dspace.app.rest.model.SearchResultsRest;
-import org.dspace.app.rest.model.SearchSupportRest;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.RestDiscoverQueryBuilder;
@@ -64,14 +60,10 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
     @Autowired
     private DiscoverResultConverter discoverResultConverter;
 
-    @Autowired
-    private DiscoverConfigurationConverter discoverConfigurationConverter;
 
     @Autowired
     private DiscoverFacetConfigurationConverter discoverFacetConfigurationConverter;
 
-    @Autowired
-    private DiscoverSearchSupportConverter discoverSearchSupportConverter;
 
     @Autowired
     private DiscoverFacetResultsConverter discoverFacetResultsConverter;
@@ -79,15 +71,6 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
     @Autowired
     private DiscoverFacetsConverter discoverFacetsConverter;
 
-    public SearchConfigurationRest getSearchConfiguration(final String dsoScope, final String configuration) {
-        Context context = obtainContext();
-
-        IndexableObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
-        DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
-            .getDiscoveryConfigurationByNameOrIndexableObject(context, configuration, scopeObject);
-
-        return discoverConfigurationConverter.convert(discoveryConfiguration, utils.obtainProjection());
-    }
 
     public SearchResultsRest getSearchObjects(final String query, final List<String> dsoTypes, final String dsoScope,
                                               final String configuration,
@@ -124,10 +107,6 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
             .getDiscoveryConfigurationByNameOrIndexableObject(context, configuration, scopeObject);
 
         return discoverFacetConfigurationConverter.convert(configuration, dsoScope, discoveryConfiguration);
-    }
-
-    public SearchSupportRest getSearchSupport() {
-        return discoverSearchSupportConverter.convert();
     }
 
     public FacetResultsRest getFacetObjects(String facetName, String prefix, String query, List<String> dsoTypes,

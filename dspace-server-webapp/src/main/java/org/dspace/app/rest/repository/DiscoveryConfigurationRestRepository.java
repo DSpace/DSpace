@@ -23,6 +23,7 @@ import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 @Component(DiscoveryConfigurationRest.CATEGORY + "." + DiscoveryConfigurationRest.PLURAL_NAME)
@@ -33,16 +34,16 @@ public class DiscoveryConfigurationRestRepository extends DSpaceRestRepository<D
     @Autowired
     protected IndexObjectFactoryFactory indexObjectServiceFactory;
 
-    @Override
-    public DiscoveryConfigurationRest findOne(Context context, String param) {
+    @PreAuthorize("permitAll()")
+    public DiscoveryConfigurationRest findOne(Context context, String s) {
 
         DiscoveryConfiguration discoveryConfiguration = null;
         try {
             // check if the param is an UUID -> if not IllegalArgumentException is thrown
-            UUID.fromString(param);
+            UUID.fromString(s);
 
             Optional indexableObject = indexObjectServiceFactory
-                .getIndexableObjectFactory(RESOURCE_ID_FIELD).findIndexableObject(context, param);
+                .getIndexableObjectFactory(RESOURCE_ID_FIELD).findIndexableObject(context, s);
 
             if (indexableObject.isPresent()) {
                 discoveryConfiguration = searchConfigurationService
@@ -52,7 +53,7 @@ public class DiscoveryConfigurationRestRepository extends DSpaceRestRepository<D
 
         } catch (IllegalArgumentException e) {
             // If the param is not an UUID -> it must be the name
-            discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration(param);
+            discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration(s);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -68,7 +69,7 @@ public class DiscoveryConfigurationRestRepository extends DSpaceRestRepository<D
     @Override
     public Page<DiscoveryConfigurationRest> findAll(Context context, Pageable pageable) {
         throw new NotImplementedException(
-            "DiscoveryConfigurationRestRepository#findOne(context, String) not implemented"
+            "DiscoveryConfigurationRestRepository#findAll(context, String) not implemented"
         );
     }
 
