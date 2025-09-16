@@ -156,7 +156,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 displayChanges(changes, true);
             }
 
-            // Finsh off and tidy up
+            // Finish off and tidy up
             c.restoreAuthSystemState();
             c.complete();
         } catch (Exception e) {

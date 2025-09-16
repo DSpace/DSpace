@@ -99,27 +99,29 @@ public class BulkEditServiceImpl implements BulkEditService {
         int i = 1;
         int batchSize = configurationService.getIntProperty("bulkedit.change.commit.count", 100);
         int changeCount = bulkEditChanges.size();
+        int totalCommits = (int) Math.ceil((double) changeCount / batchSize);
         int commitCount = 0;
+        int iAtLastCommit = 0;
         for (BulkEditChange bechange : bulkEditChanges) {
             applyBulkEditChange(c, bechange);
 
-            if (i % batchSize == 0) {
+            if (i % batchSize == 0 || i == changeCount) {
                 c.commit();
                 commitCount++;
                 if (handler != null) {
                     handler.logInfo(String.format(
                         "Commit %d/%d: The changes in rows %s-%s have been persisted to the database",
                         commitCount,
-                        (int) Math.ceil((double) changeCount / batchSize),
-                        i - batchSize + 1,
+                        totalCommits,
+                        iAtLastCommit + 1,
                         i
                     ));
                 }
+                iAtLastCommit = i;
             }
 
             i++;
         }
-        c.commit();
     }
 
     @Override
