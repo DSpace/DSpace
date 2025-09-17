@@ -7,9 +7,11 @@
  */
 package org.dspace.shell;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.shell.command.annotation.CommandScan;
 
 /**
@@ -43,6 +45,9 @@ import org.springframework.shell.command.annotation.CommandScan;
     )
 @CommandScan
 public class DSpaceShellApplication {
+
+    private static final Logger log = LoggerFactory.getLogger(DSpaceShellApplication.class);
+
     public static void main(String[] args) {
         // Always ensure dspace.dir is set BEFORE starting Spring
         if (System.getProperty("dspace.dir") == null) {
@@ -61,9 +66,9 @@ public class DSpaceShellApplication {
                 java.io.File dspaceDir = binDir.getParentFile(); // .../dspace
 
                 System.setProperty("dspace.dir", dspaceDir.getAbsolutePath());
-                System.out.println("Auto-detected dspace.dir=" + dspaceDir.getAbsolutePath());
+                log.info("Auto-detected dspace.dir={}", dspaceDir.getAbsolutePath());
             } catch (Exception e) {
-                System.err.println("Failed to auto-detect dspace.dir, using current directory");
+                log.info("Failed to auto-detect dspace.dir, using current directory");
                 System.setProperty("dspace.dir", new java.io.File(".").getAbsolutePath());
             }
         }
