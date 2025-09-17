@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.security.BitstreamMetadataReadPermissionEvaluatorPlugin;
 import org.dspace.app.rest.signposting.model.LinksetNode;
 import org.dspace.app.rest.signposting.processor.bitstream.BitstreamSignpostingProcessor;
+import org.dspace.app.rest.signposting.processor.item.ItemLinksetProcessor;
 import org.dspace.app.rest.signposting.processor.item.ItemSignpostingProcessor;
 import org.dspace.app.rest.signposting.processor.metadata.MetadataSignpostingProcessor;
 import org.dspace.app.rest.signposting.service.LinksetService;
@@ -28,6 +29,7 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,10 +43,16 @@ public class LinksetServiceImpl implements LinksetService {
     private static final Logger log = LogManager.getLogger(LinksetServiceImpl.class);
 
     @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
     protected ItemService itemService;
 
     @Autowired
     private BitstreamMetadataReadPermissionEvaluatorPlugin bitstreamMetadataReadPermissionEvaluatorPlugin;
+
+    @Autowired
+    ItemLinksetProcessor itemLinksetProcessor;
 
     private final List<BitstreamSignpostingProcessor> bitstreamProcessors = new DSpace().getServiceManager()
             .getServicesByType(BitstreamSignpostingProcessor.class);
@@ -74,10 +82,20 @@ public class LinksetServiceImpl implements LinksetService {
             Context context,
             DSpaceObject object
     ) {
+        int itemBitstreamsLimit = configurationService.getIntProperty("signposting.item.bitstreams.limit", 10);
+
         List<LinksetNode> linksetNodes = new ArrayList<>();
         if (object.getType() == Constants.ITEM) {
-            for (ItemSignpostingProcessor processor : itemProcessors) {
-                processor.addLinkSetNodes(context, request, (Item) object, linksetNodes);
+            int itemBitstreamsCount = countItemBitstreams((Item) object);
+
+            // Do not include individual bitstream typed links if their number exceeds
+            // the limit in the configuration.
+            if (itemBitstreamsCount < itemBitstreamsLimit) {
+                for (ItemSignpostingProcessor processor : itemProcessors) {
+                    processor.addLinkSetNodes(context, request, (Item) object, linksetNodes);
+                }
+            } else {
+                itemLinksetProcessor.addLinkSetNodes(context, request, (Item) object, linksetNodes);
             }
         } else if (object.getType() == Constants.BITSTREAM) {
             for (BitstreamSignpostingProcessor processor : bitstreamProcessors) {
@@ -147,6 +165,19 @@ public class LinksetServiceImpl implements LinksetService {
         try {
             List<Bundle> bundles = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
             return bundles.stream().flatMap(bundle -> bundle.getBitstreams().stream()).iterator();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private int countItemBitstreams(Item item) {
+        try {
+            int countBitstreams = 0;
+            List<Bundle> bundles = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
+            for (Bundle bundle: bundles) {
+                countBitstreams += bundle.getBitstreams().size();
+            }
+            return countBitstreams;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
