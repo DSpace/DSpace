@@ -26,10 +26,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.deletion.process.strategies.CollectionDeletionStrategy;
-import org.dspace.deletion.process.strategies.CommunityDeletionStrategy;
 import org.dspace.deletion.process.strategies.DSpaceObjectDeletionStrategy;
-import org.dspace.deletion.process.strategies.ItemDeletionStrategy;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -61,16 +58,13 @@ public class DSpaceObjectDeletionProcess
 
     @Override
     public void setup() throws ParseException {
-        ServiceManager sm = new DSpace().getServiceManager();
+        ServiceManager serviceManager = new DSpace().getServiceManager();
         itemService = ContentServiceFactory.getInstance().getItemService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
         communityService = ContentServiceFactory.getInstance().getCommunityService();
         collectionService = ContentServiceFactory.getInstance().getCollectionService();
         authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-
-        deletionStrategies.add(sm.getServiceByName("itemDeletionStrategy", ItemDeletionStrategy.class));
-        deletionStrategies.add(sm.getServiceByName("communityDeletionStrategy", CommunityDeletionStrategy.class));
-        deletionStrategies.add(sm.getServiceByName("collectionDeletionStrategy", CollectionDeletionStrategy.class));
+        deletionStrategies.addAll(serviceManager.getServicesByType(DSpaceObjectDeletionStrategy.class));
 
         parseCommandLineOptions();
     }
