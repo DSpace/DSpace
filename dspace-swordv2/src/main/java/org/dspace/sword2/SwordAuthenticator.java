@@ -617,8 +617,8 @@ public class SwordAuthenticator {
             Context authContext = swordContext.getAuthenticatorContext();
 
             // short cut by obtaining the collections to which the authenticated user can submit
-            List<Collection> cols = collectionService.findAuthorized(
-                authContext, community, Constants.ADD);
+            List<Collection> cols = collectionService.findAuthorizedByEPerson(
+                authContext, authContext.getCurrentUser(), Constants.ADD);
             List<org.dspace.content.Collection> allowed = new ArrayList<>();
 
             // now find out if the obo user is allowed to submit to any of these collections

@@ -21,6 +21,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
 /**
@@ -328,6 +329,20 @@ public interface CollectionService
         throws java.sql.SQLException;
 
     /**
+     * return an array of collections that user has a given permission on
+     * (useful for trimming 'select to collection' list) or figuring out which
+     * collections a person is an editor for.
+     *
+     * @param context   DSpace Context
+     * @param eperson The current user
+     * @param actionID  of the action
+     * @return Collection [] of collections with matching permissions
+     * @throws SQLException if database error
+     */
+    public List<Collection> findAuthorizedByEPerson(Context context, EPerson eperson, int actionID)
+        throws java.sql.SQLException;
+
+        /**
      *
      * @param context DSpace Context
      * @param group EPerson Group

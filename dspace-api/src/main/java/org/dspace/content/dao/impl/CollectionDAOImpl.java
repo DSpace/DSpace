@@ -31,6 +31,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.query.NativeQuery;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Collection object.
@@ -155,6 +156,45 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         return list(persistenceQuery);
 
 
+    }
+
+    @Override
+    public List<Collection> findAuthorizedByEPerson(Context context, EPerson ePerson, List<Integer> actions)
+            throws SQLException {
+
+        StringBuilder query = new StringBuilder();
+
+        query.append("WITH RECURSIVE parent(epgid) AS ( ");
+        query.append("    SELECT eperson_group_id AS epgid ");
+        query.append("    FROM epersongroup2eperson ");
+        query.append("    WHERE eperson_id = :eperson_id ");
+        query.append("    UNION ");
+        query.append("    SELECT g2g.parent_id ");
+        query.append("    FROM group2group g2g ");
+        query.append("    INNER JOIN parent p ON p.epgid = g2g.child_id ");
+        query.append(") ");
+        query.append("SELECT DISTINCT c.* ");
+        query.append("FROM collection c ");
+        query.append("JOIN resourcepolicy rp ON rp.dspace_object = c.uuid WHERE ");
+        for (int i = 0; i < actions.size(); i++) {
+            Integer action = actions.get(i);
+            if (i != 0) {
+                query.append(" AND ");
+            }
+            query.append("rp.action_id=").append(action);
+        }
+        query.append(" AND rp.resource_type_id=").append(Constants.COLLECTION);// only Collections
+        query.append(" AND ( ");
+        query.append("        rp.eperson_id = :eperson_id ");  // direct permission
+        query.append("        OR rp.epersongroup_id IN (SELECT epgid FROM parent) "); // permission via group
+        query.append("    )");
+
+        NativeQuery<Collection> nativeQuery = getHibernateSession(context).createNativeQuery(query
+            .toString(), Collection.class);
+        nativeQuery.setParameter("eperson_id", ePerson.getID());
+        nativeQuery.setHint("org.hibernate.cacheable", Boolean.TRUE);
+
+        return nativeQuery.getResultList();
     }
 
     @Override

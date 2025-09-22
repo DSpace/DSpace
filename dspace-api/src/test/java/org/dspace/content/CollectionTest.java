@@ -1160,6 +1160,49 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     }
 
     /**
+     * Test of findAuthorizedEpersonAndGroups method, of class Collection.
+     * We create some collections and a user and groups and subgroups and add the user to one subgroup
+     * and one collection
+     * The parent group will be added to the other collection.
+     */
+    @Test
+    public void testFindAuthorizedByEPerson() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community com = communityService.create(null, context);
+        Collection collectionA = collectionService.create(context, com);
+        Collection collectionB = collectionService.create(context, com);
+        Collection collectionC = collectionService.create(context, com);
+
+        com.addCollection(collectionA);
+        com.addCollection(collectionB);
+        com.addCollection(collectionC);
+
+        Group groupParent = groupService.create(context);
+        Group groupChild = groupService.create(context);
+
+        groupService.addMember(context, groupParent, groupChild);
+
+        EPerson epersonA = ePersonService.create(context);
+
+        //Add  epersonA to the child group
+        groupService.addMember(context, groupChild, epersonA);
+
+        //personA can submit to collectionA and collectionC
+        authorizeService.addPolicy(context, collectionA, Constants.ADD, epersonA);
+        authorizeService.addPolicy(context, collectionB, Constants.ADD, groupParent);
+
+        context.restoreAuthSystemState();
+
+        context.setCurrentUser(epersonA);
+        List<Collection> personACollections =
+            collectionService.findAuthorizedByEPerson(context, epersonA,Constants.ADD);
+        assertTrue("testFindAuthorizedByEPerson A", personACollections.size() == 2);
+        assertTrue("testFindAuthorizedByEPerson A.A", personACollections.contains(collectionA));
+        assertTrue("testFindAuthorizedByEPerson A.B", personACollections.contains(collectionB));
+        assertFalse("testFindAuthorizedByEPerson A.C", personACollections.contains(collectionC));
+    }
+
+    /**
      * Test of countItems method, of class Collection.
      */
     @Test

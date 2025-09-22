@@ -839,6 +839,14 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
+    public List<Collection> findAuthorizedByEPerson(Context context, EPerson eperson, int actionID)
+        throws SQLException {
+        List<Integer> actions = new ArrayList<Integer>();
+        actions.add(actionID);
+        return  collectionDAO.findAuthorizedByEPerson(context, eperson, actions);
+    }
+
+    @Override
     public Collection findByGroup(Context context, Group group) throws SQLException {
         return collectionDAO.findByGroup(context, group);
     }
