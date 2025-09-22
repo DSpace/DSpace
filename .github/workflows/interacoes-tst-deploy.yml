@@ -1,26 +1,70 @@
-name: Deploy Backend (DSpace) - Branch tst
+name: Deploy Backend (DSpace) - Branch develop.
 
 on:
+  workflow_dispatch:
   push:
     branches:
-      - tst
+      - develop
 
 jobs:
   deploy:
     runs-on: [self-hosted, Linux, X64, tst-backend-runner]
+    env:
+      JAVA_VERSION: '17'
 
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Derrubar containers e remover imagens antigas (preservando volumes)
-        run: |
-          docker compose -p d8 down --rmi all --remove-orphans
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
 
-      - name: Build dos containers
+      - name: Criar arquivo local.cfg (configuração DSpace)
         run: |
-          docker compose -f docker-compose.yml -f docker-compose-cli.yml build
+          cat <<EOF > dspace/config/local.cfg
+          dspace.dir = /volumes/interacoes/dspaceinstall
+          dspace.server.url = https://dspace.tst.interacoes.ltap.ifce.edu.br/server
+          dspace.server.ssr.url = https://dspace.tst.interacoes.ltap.ifce.edu.br/server
+          dspace.ui.url = https://dspace.tst.interacoes.ltap.ifce.edu.br
+          dspace.name = InterAções - SASE/MEC
+          dspace.shortname = InterAções
+          default.language = pt_BR
+          solr.server = http://localhost:8983/solr
+          solr.multicorePrefix =
+          db.url = jdbc:postgresql://localhost:5432/dspace
+          db.driver = org.postgresql.Driver
+          db.dialect = org.dspace.util.DSpacePostgreSQLDialect
+          db.username = dspace
+          db.password = dspace
+          db.schema = public
+          db.maxconnections = 30
+          db.maxwait = 10000
+          db.minidle = 0
+          db.maxidle = 10
+          db.initialsize = 0
+          db.maxconnlifetime = -1
+          db.removeabandoned = false
+          db.removeabandonedtimeout = 300
+          logging.server.include-after-request = false
+          logging.server.include-client-info = false
+          logging.server.include-headers = false
+          logging.server.include-payload = false
+          logging.server.include-query-string = false
+          logging.server.include-stacktrace-for-httpcode = 422
+          logging.server.max-payload-length = 10000
+          EOF
 
-      - name: Subir os containers com Docker Compose
+      - name: Build with Maven
+        run: mvn package
+
+      - name: Fresh Install DSpace (ant fresh_install)
         run: |
-          docker compose -p d8 up -d
+          cd dspace/target/dspace-installer
+          ant fresh_install
+          
+      - name: Reiniciar DSpace REST (systemd)
+        run: sudo systemctl restart dspace-rest
