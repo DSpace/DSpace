@@ -61,6 +61,7 @@ import org.springframework.shell.standard.AbstractShellComponent;
  */
 @Command(
     command = "database",
+    alias = "database",
     group = "Database commands"
 )
 public class DatabaseCommands extends AbstractShellComponent {
@@ -83,7 +84,6 @@ public class DatabaseCommands extends AbstractShellComponent {
 
     @Command(
         command = "test",
-        alias = "database test",
         description = "Test Database Connection"
     )
     public void dbTest() {
@@ -197,7 +197,7 @@ public class DatabaseCommands extends AbstractShellComponent {
 
     @Command(
         command = "info",
-        alias = "database status",
+        alias = "status",
         description = "Displays database information using the DSpace context"
     )
     public void dbInfo() {
