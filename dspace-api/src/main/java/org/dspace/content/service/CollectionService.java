@@ -334,12 +334,13 @@ public interface CollectionService
      * collections a person is an editor for.
      *
      * @param context   DSpace Context
+     * @param community The community restriction to gt own collections
      * @param eperson The current user
      * @param actionID  of the action
      * @return Collection [] of collections with matching permissions
      * @throws SQLException if database error
      */
-    public List<Collection> findAuthorizedByEPerson(Context context, EPerson eperson, int actionID)
+    public List<Collection> findAuthorized(Context context, Community community, EPerson eperson, int actionID)
         throws java.sql.SQLException;
 
         /**
