@@ -838,7 +838,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         return myResults;
     }
 
-   @Override
+    @Override
     public List<Collection> findAuthorized(Context context, Community community, EPerson eperson, int actionID)
         throws SQLException {
 
