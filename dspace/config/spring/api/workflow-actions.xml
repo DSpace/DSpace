@@ -21,7 +21,6 @@
         <property name="minimumAcceptanceScore" value="3" />
     </bean>
 
-
     <bean id="autoassignactionAPI" class="org.dspace.xmlworkflow.state.actions.userassignment.AutoAssignAction" scope="prototype"/>
     <bean id="noUserSelectionActionAPI" class="org.dspace.xmlworkflow.state.actions.userassignment.NoUserSelectionAction" scope="prototype"/>
     <bean id="assignoriginalsubmitteractionAPI" class="org.dspace.xmlworkflow.state.actions.userassignment.AssignOriginalSubmitterAction" scope="prototype"/>
@@ -44,7 +43,6 @@
         <property name="requiresUI" value="true"/>
     </bean>
 
-
     <!--Action for the select single reviewer workflow -->
     <bean id="selectrevieweraction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
         <constructor-arg type="java.lang.String" value="selectrevieweraction"/>
@@ -64,21 +62,14 @@
         <property name="requiresUI" value="true"/>
     </bean>
 
-    <bean id="ratingreviewaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
-        <constructor-arg type="java.lang.String" value="ratingreviewaction"/>
-        <property name="processingAction" ref="ratingreviewactionAPI" />
-        <property name="requiresUI" value="true"/>
-    </bean>
-
-    <!--Autmatic step that evaluates scores (workflow.score) and checks if they match the configured minimum for archiving -->
+    <!--Automatic step that evaluates scores (workflow.score) and checks if they match the configured minimum for archiving -->
     <bean id="evaluationaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
         <constructor-arg type="java.lang.String" value="evaluationaction"/>
         <property name="processingAction" ref="evaluationactionAPI" />
         <property name="requiresUI" value="false"/>
     </bean>
 
-
-<!--User selection actions-->
+    <!--User selection actions-->
     <bean id="claimaction" class="org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig" scope="prototype">
         <constructor-arg type="java.lang.String" value="claimaction"/>
         <property name="processingAction" ref="claimactionAPI"/>
