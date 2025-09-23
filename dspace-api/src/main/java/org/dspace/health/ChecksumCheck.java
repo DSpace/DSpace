@@ -49,7 +49,7 @@ public class ChecksumCheck extends Check {
             }
         }
 
-        if (collector.arr.size() > 0) {
+        if (!collector.arr.isEmpty()) {
             ret = String.format("Checksum performed on [%d] items:\n",
                                 collector.arr.size());
             int ok_items = 0;
