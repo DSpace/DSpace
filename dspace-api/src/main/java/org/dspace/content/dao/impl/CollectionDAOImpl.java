@@ -158,6 +158,16 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
 
     }
 
+    /**
+     * Get all collections in the system. These are alphabetically sorted by
+     * collection name.
+     *
+     * @param context DSpace context object
+     * @param eperson the current EPerson to get all collections where is able to deposit
+     * @param actions list of actionsID ADD, READ, etc.
+     * @return the collections the eperson is defined
+     * @throws SQLException if database error
+     */    
     @Override
     public List<Collection> findAuthorizedByEPerson(Context context, EPerson ePerson, List<Integer> actions)
             throws SQLException {
