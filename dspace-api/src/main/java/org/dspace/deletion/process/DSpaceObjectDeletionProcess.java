@@ -101,7 +101,9 @@ public class DSpaceObjectDeletionProcess
             throw new AuthorizeException("Current user is not eligible to execute script 'dspace-object-deletion'");
         }
 
+        handler.logInfo("Performing deletion of DSpaceObject id:" + dso.getID());
         getStrategy(dso).delete(this.context, dso, this.copyVirtualMetadata);
+        handler.logInfo("Deletion completed!");
     }
 
     private DSpaceObjectDeletionStrategy getStrategy(DSpaceObject dso) {
