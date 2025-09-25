@@ -164,7 +164,7 @@ jobs:
           # Use GitHub cache to load cached Docker images and cache the results of this build
           # This decreases the number of images we need to fetch from DockerHub
           cache-from: type=gha,scope=${{ inputs.build_id }}
-          cache-to: type=gha,scope=${{ inputs.build_id }},mode=max
+          cache-to: type=gha,scope=${{ inputs.build_id }},mode=min
 
       # Export the digest of Docker build locally
       - name: Export Docker build digest
@@ -216,7 +216,7 @@ jobs:
           # Use GitHub cache to load cached Docker images and cache the results of this build
           # This decreases the number of images we need to fetch from DockerHub
           cache-from: type=gha,scope=${{ inputs.build_id }}
-          cache-to: type=gha,scope=${{ inputs.build_id }},mode=max
+          cache-to: type=gha,scope=${{ inputs.build_id }},mode=min
           # Export image to a local TAR file
           outputs: type=docker,dest=/tmp/${{ inputs.build_id }}.tar
 
