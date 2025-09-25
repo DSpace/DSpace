@@ -287,7 +287,7 @@ public class ProvenanceServiceImpl implements ProvenanceService {
                         ProvenanceMessageTemplates.ITEM_REPLACE_SINGLE_METADATA.getTemplate(), item,
                         messageProvider.getMessage(bitstream),
                         messageProvider.getMetadata(messageProvider.getMetadataField(metadataField), oldMtdVal));
-                addProvenanceMetadata(context, item, msg);;
+                addProvenanceMetadata(context, item, msg);
             }
         } catch (SQLException | AuthorizeException e) {
             log.error("Unable to add new provenance metadata when replacing metadata in a item.", e);
@@ -325,7 +325,9 @@ public class ProvenanceServiceImpl implements ProvenanceService {
 
     private String extractAccessConditions(List<AccessCondition> accessConditions) {
         return accessConditions.stream()
-                .map(AccessCondition::getName)
+                .map(ac -> ac.getName() +
+                    (ac.getStartDate() != null ? " [from: " + ac.getStartDate().toString() + "]" : "") +
+                    (ac.getEndDate() != null ? " [till: " + ac.getEndDate().toString() + "]" : ""))
                 .collect(Collectors.joining(";"));
     }
 

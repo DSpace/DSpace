@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +29,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.ws.rs.core.MediaType;
 
+import org.dspace.app.bulkaccesscontrol.model.AccessCondition;
+import org.dspace.app.bulkaccesscontrol.model.AccessConditionBitstream;
+import org.dspace.app.bulkaccesscontrol.model.BulkAccessControlInput;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
@@ -55,6 +59,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.clarin.ClarinLicenseLabelService;
 import org.dspace.content.service.clarin.ClarinLicenseService;
 import org.dspace.core.Constants;
+import org.dspace.core.ProvenanceService;
 import org.dspace.discovery.SearchServiceException;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -72,6 +77,8 @@ public class ProvenanceServiceIT extends AbstractControllerIntegrationTest {
     private ClarinLicenseLabelService clarinLicenseLabelService;
     @Autowired
     private ClarinLicenseService clarinLicenseService;
+    @Autowired
+    private ProvenanceService provenanceService;
 
     private Collection  collection;
     private Item item;
@@ -371,6 +378,33 @@ public class ProvenanceServiceIT extends AbstractControllerIntegrationTest {
         deleteCollection(col.getID());
     }
 
+    @Test
+    public void checkEmbargoProvenanceTest() throws Exception {
+        context.setCurrentUser(admin);
+        Bitstream bitstream = createBitstream(item, Constants.CONTENT_BUNDLE_NAME);
+
+        BulkAccessControlInput bulk = new BulkAccessControlInput();
+        AccessConditionBitstream bitstreamNode = new AccessConditionBitstream();
+        List<AccessCondition> acList = new ArrayList<>();
+        Calendar cal = Calendar.getInstance();
+        cal.set(2030, Calendar.JANUARY, 1, 0, 0, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        AccessCondition embargo = new AccessCondition("embargo", "test", cal.getTime(), null);
+        acList.add(embargo);
+        bitstreamNode.setAccessConditions(acList);
+        bulk.setBitstream(bitstreamNode);
+
+        provenanceService.setBitstreamPolicies(context, bitstream, item, bulk);
+
+        // Build full expected message
+        String expected = "Access condition (embargo [from: " + cal.getTime() + "]) was added to bitstream ("
+                + bitstream.getID() + ") by first (admin) last (admin) ("
+                + admin.getEmail() + ") on ";
+
+        objectCheck(itemService.find(context, item.getID()), expected);
+
+        deleteBitstream(bitstream);
+    }
 
     private String provenanceMetadataModified(String metadata) {
         // Regex to match the date pattern
