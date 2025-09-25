@@ -18,14 +18,14 @@ public enum ProvenanceExpectedMessages {
     NON_DISCOVERABLE("Item was made non-discoverable by first (admin) last (admin) (admin@email.com) on " +
             "\nNo. of bitstreams: 0\nItem was in collections:\n"),
     MAPPED_COL("was mapped to collection"),
-    ADD_ITEM_MTD("Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on"),
-    REPLACE_ITEM_MTD("Item metadata (dc.title: Public item 1) was updated by first (admin) last (admin) " +
-            "(admin@email.com) on \nNo. of bitstreams: 0"),
+    ADD_ITEM_MTD("Item metadata (dc.title: Test) was added by first (admin) last (admin) (admin@email.com) on"),
+    REPLACE_ITEM_MTD("Item metadata (dc.title [Public item 1 -> Test]) was updated by first (admin) last (admin) " +
+            "(admin@email.com) on "),
     REMOVE_ITEM_MTD("Item metadata (dc.title: Public item 1) was deleted by first (admin) last (admin) " +
-            "(admin@email.com) on \nNo. of bitstreams: 0"),
-    REMOVE_BITSTREAM_MTD("Item metadata (dc.description) was added by bitstream"),
+            "(admin@email.com) on "),
+    REMOVE_BITSTREAM_MTD("Item metadata (dc.description: test) was added by bitstream"),
     REPLACE_BITSTREAM_MTD("metadata (dc.title: test) was updated by first (admin) last (admin) " +
-            "(admin@email.com) on \nNo. of bitstreams: 1\n"),
+            "(admin@email.com) on "),
     REMOVE_BITSTREAM("was deleted bitstream"),
     ADD_BITSTREAM("Item was added bitstream to bundle"),
     UPDATE_LICENSE("License (Test 1) was updated by first (admin) last (admin) (admin@email.com) " +

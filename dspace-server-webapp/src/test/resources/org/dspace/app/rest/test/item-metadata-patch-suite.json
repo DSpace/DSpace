@@ -23,7 +23,7 @@
       ],
       "expect": {
         "dc.description.provenance" : [
-          { "value" : "Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ", "language" : "en", "authority" : null, "confidence" : -1, "place" : 0}
+          { "value" : "Item metadata (dc.title: title 1) was added by first (admin) last (admin) (admin@email.com) on ", "language" : "en", "authority" : null, "confidence" : -1, "place" : 0}
         ],
         "dc.title": [
           { "value": "title 1", "language": null, "authority": null, "confidence": -1, "place": 0}
@@ -41,9 +41,9 @@
       ],
       "expect": {
         "dc.description.provenance":[
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: title 1) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":0},
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: 最後のタイトル) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":1}
         ],
         "dc.title": [
@@ -65,11 +65,11 @@
       ],
       "expect": {
         "dc.description.provenance":[
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: title 1) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":0},
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: 最後のタイトル) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":1},
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: title 0) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":2}
         ],
         "dc.title": [
@@ -90,11 +90,11 @@
       ],
       "expect": {
         "dc.description.provenance":[
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: title 1) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":0},
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: 最後のタイトル) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":1},
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: title 0) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":2}
         ],
         "dc.title": [
@@ -120,11 +120,11 @@
       ],
       "expect": {
         "dc.description.provenance":[
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: title 1) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":0},
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: 最後のタイトル) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":1},
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: title 0) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":2}
         ],
         "dc.title": [
@@ -145,11 +145,11 @@
       ],
       "expect": {
         "dc.description.provenance":[
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: title 1) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":0},
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: 最後のタイトル) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":1},
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: title 0) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":2}
         ],
         "dc.title": [
@@ -174,15 +174,15 @@
       ],
       "expect": {
         "dc.description.provenance":[
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: title 1) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":0},
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: 最後のタイトル) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":1},
-          {"value":"Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value":"Item metadata (dc.title: title 0) was added by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":2},
-          {"value":"Item metadata (dc.title: title A) was deleted by first (admin) last (admin) (admin@email.com) on \nNo. of bitstreams: 0",
+          {"value":"Item metadata (dc.title: title A) was deleted by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":3},
-          {"value":"Item metadata (dc.title: title A) was deleted by first (admin) last (admin) (admin@email.com) on \nNo. of bitstreams: 0",
+          {"value":"Item metadata (dc.title: title A) was deleted by first (admin) last (admin) (admin@email.com) on ",
             "language":"en","authority":null,"confidence":-1,"place":4}
         ],
         "dc.title": [
@@ -202,15 +202,15 @@
       "expect": {
         "dc.description.provenance": [
           {
-            "value": "Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+            "value": "Item metadata (dc.title: title 1) was added by first (admin) last (admin) (admin@email.com) on ",
             "language": "en", "authority": null, "confidence": -1, "place": 0},
-          {"value": "Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value": "Item metadata (dc.title: 最後のタイトル) was added by first (admin) last (admin) (admin@email.com) on ",
             "language": "en", "authority": null, "confidence": -1, "place": 1},
-          {"value": "Item metadata (dc.title) was added by first (admin) last (admin) (admin@email.com) on ",
+          {"value": "Item metadata (dc.title: title 0) was added by first (admin) last (admin) (admin@email.com) on ",
             "language": "en", "authority": null, "confidence": -1, "place": 2},
-          {"value": "Item metadata (dc.title: title A) was deleted by first (admin) last (admin) (admin@email.com) on \nNo. of bitstreams: 0",
+          {"value": "Item metadata (dc.title: title A) was deleted by first (admin) last (admin) (admin@email.com) on ",
             "language": "en", "authority": null, "confidence": -1, "place": 3},
-          {"value": "Item metadata (dc.title: title A) was deleted by first (admin) last (admin) (admin@email.com) on \nNo. of bitstreams: 0",
+          {"value": "Item metadata (dc.title: title A) was deleted by first (admin) last (admin) (admin@email.com) on ",
             "language": "en", "authority": null, "confidence": -1, "place": 4}
         ]
       }
