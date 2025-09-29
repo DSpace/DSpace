@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS curation_task_queue (
     submit_time BIGINT NOT NULL,
     tasks TEXT NOT NULL,
     object_id TEXT,
-    UNIQUE (tasks, object_id)
+    UNIQUE (queue_name, tasks, object_id)
 );
 -- New table to manage locks on curation queues
 CREATE TABLE IF NOT EXISTS curation_queue_lock (
