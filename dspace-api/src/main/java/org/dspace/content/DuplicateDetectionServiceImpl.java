@@ -81,6 +81,15 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
     SearchService searchService;
     Map<String, DuplicateComparisonValueTransformer> duplicateComparisonValueTransformers;
 
+    /**
+     * Initializes the DuplicateDetectionServiceImpl instance by ensuring the
+     * internal map for duplicate comparison value transformers is properly
+     * instantiated. This method is annotated with @PostConstruct, indicating
+     * that it will be invoked after the dependency injection is complete.
+     *
+     * If the field 'duplicateComparisonValueTransformers' is null during
+     * initialization, it will be initialized to an empty HashMap.
+     */
     @PostConstruct
     public void init() {
         if (duplicateComparisonValueTransformers == null) {
@@ -336,7 +345,7 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
      *
      * @param context DSpace context
      * @param item    The DSpace item
-     * @return a constructed, normalised string
+     * @return a list of lists of DuplicateComparison objects, each list representing a group of comparison values
      */
     @Override
     public List<List<DuplicateComparison>> buildComparisonValueGroups(Context context, Item item) {
@@ -409,6 +418,17 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
         return groupedComparisonValues;
     }
 
+    /**
+     * Sets the map of duplicate comparison value transformers, which are responsible for
+     * transforming comparison values during the duplicate detection process. Each entry
+     * in the map associates a string key with a specific {@link DuplicateComparisonValueTransformer},
+     * defining how certain fields' values should be transformed for comparison purposes.
+     *
+     * @param duplicateComparisonValueTransformers a map where the keys are strings
+     *        representing field identifiers or transformation contexts, and the values
+     *        are instances of {@link DuplicateComparisonValueTransformer} that handle
+     *        the transformation logic for each specified field or context
+     */
     public void setDuplicateComparisonValueTransformers(
         Map<String, DuplicateComparisonValueTransformer> duplicateComparisonValueTransformers) {
         this.duplicateComparisonValueTransformers = duplicateComparisonValueTransformers;
