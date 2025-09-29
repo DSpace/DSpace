@@ -285,14 +285,17 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
         // Construct query
         if (groupedComparisonValues != null && !groupedComparisonValues.isEmpty()) {
             List<String> queryGroups = new ArrayList<>();
+            // iterate over each group (groups will be combined using OR)
             for (List<DuplicateComparison> comparisonValues : groupedComparisonValues) {
                 if (comparisonValues != null && !comparisonValues.isEmpty()) {
+                    // get a map of DuplicateComparison objects grouped by fieldName
                     Map<String, List<DuplicateComparison>> queryComparisonMap =
                         comparisonValues.stream()
                             .collect(
                                 Collectors.groupingBy(DuplicateComparison::fieldName, TreeMap::new,
                                     Collectors.toList()));
 
+                    // iterate over DuplicateComparison objects grouped by fieldName (combined using OR)
                     List<String> queryParts = queryComparisonMap.values().stream()
                         .map(duplicateComparisons -> "(" + duplicateComparisons.stream()
                             .map(comparisonValue ->
@@ -301,12 +304,12 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
                                     "~" + comparisonValue.distance())
                             .collect(Collectors.joining(" OR ")) + ")")
                         .toList();
+                    // combine fieldName based subqueries using AND
                     queryGroups.add("(" + StringUtils.join(queryParts.iterator(), " AND ") + ")");
                 }
             }
-            // Combine the query parts using the defined query operator
+            // Combine the query groups
             String keywordQuery = StringUtils.join(queryGroups.iterator(), " OR ");
-            // Construct discovery query based on comparison value
             DiscoverQuery discoverQuery = new DiscoverQuery();
             discoverQuery.setQuery("(" + keywordQuery + ")");
             // Add filter queries for the resource type
