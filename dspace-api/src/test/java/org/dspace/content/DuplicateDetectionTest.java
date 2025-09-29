@@ -66,7 +66,6 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         configurationService.setProperty("duplicate.comparison.normalise.whitespace", true);
         configurationService.setProperty("duplicate.comparison.solr.field", "deduplication_keyword");
         configurationService.setProperty("duplicate.comparison.metadata.field", new String[]{"dc.title"});
-        configurationService.setProperty("duplicate.comparison.query.operator", "AND");
         configurationService.setProperty("duplicate.preview.metadata.field",
                 new String[]{"dc.date.issued", "dc.subject"});
 
