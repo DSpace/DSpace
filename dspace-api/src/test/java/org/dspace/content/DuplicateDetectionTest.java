@@ -66,6 +66,7 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         configurationService.setProperty("duplicate.comparison.normalise.whitespace", true);
         configurationService.setProperty("duplicate.comparison.solr.field", "deduplication_keyword");
         configurationService.setProperty("duplicate.comparison.metadata.field", new String[]{"dc.title"});
+        configurationService.setProperty("duplicate.comparison.query.operator", "AND");
         configurationService.setProperty("duplicate.preview.metadata.field",
                 new String[]{"dc.date.issued", "dc.subject"});
 
@@ -425,6 +426,68 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         assertEquals("Item 11 should be be the detected duplicate",
                 item11.getID(), potentialDuplicates.get(0).getUuid());
 
+    }
+
+    @Test
+    public void testSearchDuplicatesWithMultipleFieldsAndGroups() throws Exception {
+        // Set the query operator to OR
+        // Set configure to use (title AND author) OR (identifier) fields, use distance 0 for identifier
+        configurationService.setProperty("duplicate.comparison.metadata.field",
+            new String[]{"dc.title", "dc.contributor.author"});
+        configurationService.setProperty("duplicate.comparison.metadata.field.1",
+            new String[]{"dc.identifier:0"});
+
+        Item item1 = ItemBuilder.createItem(context, col)
+            .withTitle("Compare both title and author")
+            .withIssueDate(item1IssueDate)
+            .withAuthor("Surname, F.")
+            .withIdentifier("I1")
+            .withSubject(item1Subject)
+            .build();
+        //Item matching title field comparison
+        Item item2 = ItemBuilder.createItem(context, col)
+            .withTitle("Compare both title and author")
+            .withIssueDate("2012-10-17")
+            .withAuthor("Surname, F.")
+            .withIdentifier("I2")
+            .withSubject("ExtraEntry 2")
+            .build();
+        //Item matching identifier field comparison
+        Item item3 = ItemBuilder.createItem(context, col)
+            .withTitle("Compare both title and author")
+            .withIssueDate("2012-10-17")
+            .withAuthor("Lastname, First.")
+            .withIdentifier("I1")
+            .withSubject("ExtraEntry 2")
+            .build();
+        //Item not matching any field comparison
+        Item item4 = ItemBuilder.createItem(context, col)
+            .withTitle("Compare both title and author")
+            .withIssueDate("2012-10-17")
+            .withAuthor("Lastname, First.")
+            .withIdentifier("I3")
+            .withSubject("ExtraEntry 2")
+            .build();
+
+        // Get potential duplicates of item 10 and make sure no exceptions are thrown
+        List<PotentialDuplicate> potentialDuplicates = new ArrayList<>();
+        try {
+            potentialDuplicates = duplicateDetectionService.getPotentialDuplicates(context, item1);
+        } catch (SearchServiceException e) {
+            fail("Duplicate search with title or identifier (" +
+                e.getMessage() + ")");
+        }
+
+        // Make sure result list is size 2
+        int size = 2;
+        assertEquals("Potential duplicates of item1 (title or identifier) should have size " + size,
+            size, potentialDuplicates.size());
+
+        // The only member should be item 11 since item 12 has a different author (but hte same title
+        assertEquals("Item 2 should be be the detected duplicate",
+            item2.getID(), potentialDuplicates.get(0).getUuid());
+        assertEquals("Item 3 should be be the detected duplicate",
+            item3.getID(), potentialDuplicates.get(1).getUuid());
     }
 
 }
