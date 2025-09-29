@@ -101,8 +101,9 @@ public class DuplicateDetectionServiceImplTest {
         when(searchService.search(any(), any())).thenAnswer(invocation -> {
             DiscoverQuery discoverQuery = invocation.getArgument(1);
             assertEquals(
-                "(((deduplication_dc_contributor_author_keyword:" + value2 + "~0) AND (deduplication_dc_title_keyword:" +
-                    value1 + "~1)) OR ((deduplication_local_custom_keyword:" + value3.replace("/", "\\/") +
+                "(((deduplication_dc_contributor_author_keyword:" + value2 + "~0)" +
+                    " AND (deduplication_dc_title_keyword:" + value1 + "~1))" +
+                    " OR ((deduplication_local_custom_keyword:" + value3.replace("/", "\\/") +
                     "~0 OR deduplication_local_custom_keyword:" + value4.replace("/", "\\/") + "~0)))",
                 discoverQuery.getQuery());
             return discoverResult;
