@@ -16,6 +16,7 @@ import static org.dspace.app.audit.MetadataEvent.INITIAL_ADD;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +36,11 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Item;
+import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.event.DetailType;
@@ -42,6 +48,7 @@ import org.dspace.event.Event;
 import org.dspace.event.EventDetail;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.SolrUtils;
+import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -69,6 +76,10 @@ public class AuditService {
 
     @Autowired
     private ConfigurationService configurationService;
+    private PoolTaskService poolTaskService;
+    @Autowired
+    private WorkspaceItemService workspaceItemService;
+
 
     private static Logger log = LogManager.getLogger(AuditService.class);
 
@@ -87,8 +98,12 @@ public class AuditService {
         return solr;
     }
 
-    public void store(Context context, Event event) {
+    public void store(Context context, Event event) throws SQLException {
         if (!isProcessableEvent(event)) {
+            return;
+        }
+
+        if (!isAuditableItem(context, event)) {
             return;
         }
         List<AuditEvent> audits = getAuditEventsFromEvent(context, event);
@@ -105,6 +120,46 @@ public class AuditService {
     private boolean isProcessableEvent(Event event) {
         return event.getDetail() != null && (DetailType.BITSTREAM_CHECKSUM.equals(event.getDetail().getDetailKey())
             || DetailType.DSO_SUMMARY.equals(event.getDetail().getDetailKey()));
+    }
+
+    private boolean isAuditableItem(Context context, Event event) throws SQLException {
+        if (event.getSubjectType() != Constants.ITEM && event.getSubjectType() != Constants.BITSTREAM
+            && event.getSubjectType() != Constants.BUNDLE) {
+            return true;
+        }
+
+        Item item = retrieveItem(context, event);
+
+        if (item.isArchived()) {
+            return true;
+        }
+
+        boolean result = false;
+        if (configurationService.getBooleanProperty("audit.item.in-workflow")) {
+            result = poolTaskService.findAll(context).stream()
+                .anyMatch(pt -> StringUtils.equalsIgnoreCase(pt.getWorkflowItem().getItem().getID().toString(),
+                    item.getID().toString()));
+        }
+
+        if (!result && configurationService.getBooleanProperty("audit.item.in-workspace")) {
+            result = workspaceItemService.findAll(context).stream()
+                .anyMatch(wi -> StringUtils.equalsIgnoreCase(wi.getItem().getID().toString(),
+                    item.getID().toString()));
+        }
+
+        return result;
+    }
+
+    private Item retrieveItem(Context context, Event event) throws SQLException {
+        if (event.getSubjectType() == Constants.BITSTREAM) {
+            Bitstream bitstream = (Bitstream) event.getSubject(context);
+            return bitstream.getBundles().get(0).getItems().get(0);
+        } else if (event.getSubjectType() == Constants.BUNDLE) {
+            Bundle bundle = (Bundle) event.getSubject(context);
+            return bundle.getItems().get(0);
+        }
+
+        return (Item) event.getSubject(context);
     }
 
     /**

@@ -18,8 +18,6 @@ import org.dspace.utils.DSpace;
 
 /**
  * Class to store all received events in an audit log
- * 
- * @version $Revision$
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
