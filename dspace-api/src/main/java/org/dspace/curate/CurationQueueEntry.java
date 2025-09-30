@@ -43,7 +43,7 @@ public class CurationQueueEntry {
     private long submitTime;
 
     @Column(name = "tasks", nullable = false)
-    private String tasks; // comma separated task plugin names
+    private String tasks;
 
     @Column(name = "object_id")
     private String objectId;

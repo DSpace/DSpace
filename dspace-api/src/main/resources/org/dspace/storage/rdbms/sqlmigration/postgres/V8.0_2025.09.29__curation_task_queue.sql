@@ -14,7 +14,6 @@
 --               from previous file-based implementation (DBTaskQueue).
 --               Each row represents a TaskQueueEntry.
 --
---  Format corresponds to: epersonId|submitTime|tasks|objectId
 -- =======================================================================
 
 CREATE TABLE IF NOT EXISTS curation_task_queue (
