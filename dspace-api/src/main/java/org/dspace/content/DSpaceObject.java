@@ -119,10 +119,10 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     }
 
     /**
-     * @return summary of event details, never null
+     * @return summary of event details, never null but possibly empty
      */
     public List<Object> getDetails() {
-        return this.eventDetails;
+        return eventDetails == null ? List.of() : eventDetails;
     }
 
     /**

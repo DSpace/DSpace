@@ -129,6 +129,9 @@ public class AuditService {
         }
 
         Item item = retrieveItem(context, event);
+        if (item == null) {
+            return true;
+        }
 
         if (item.isArchived()) {
             return true;
@@ -151,12 +154,16 @@ public class AuditService {
     }
 
     private Item retrieveItem(Context context, Event event) throws SQLException {
-        if (event.getSubjectType() == Constants.BITSTREAM) {
-            Bitstream bitstream = (Bitstream) event.getSubject(context);
-            return bitstream.getBundles().get(0).getItems().get(0);
-        } else if (event.getSubjectType() == Constants.BUNDLE) {
-            Bundle bundle = (Bundle) event.getSubject(context);
-            return bundle.getItems().get(0);
+        try {
+            if (event.getSubjectType() == Constants.BITSTREAM) {
+                Bitstream bitstream = (Bitstream) event.getSubject(context);
+                return bitstream.getBundles().get(0).getItems().get(0);
+            } else if (event.getSubjectType() == Constants.BUNDLE) {
+                Bundle bundle = (Bundle) event.getSubject(context);
+                return bundle.getItems().get(0);
+            }
+        } catch (Exception e) {
+            return null;
         }
 
         return (Item) event.getSubject(context);
