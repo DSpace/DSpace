@@ -166,7 +166,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
 
     @Override
     public List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException {
-        return list(createQuery(context, "SELECT DISTINCT c FROM Collection c JOIN Subscription s ON c.id = " +
+        return list(createQuery(context, "SELECT DISTINCT c FROM Collection c JOIN Subscription s ON c = " +
                 "s.dSpaceObject"));
     }
 
