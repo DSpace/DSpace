@@ -320,7 +320,7 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
             // Combine the query groups
             String keywordQuery = StringUtils.join(queryGroups.iterator(), " OR ");
             DiscoverQuery discoverQuery = new DiscoverQuery();
-            discoverQuery.setQuery("(" + keywordQuery + ")");
+            discoverQuery.setQuery(keywordQuery);
             // Add filter queries for the resource type
             discoverQuery.addFilterQueries("(search.resourcetype:Item OR " +
                     "search.resourcetype:WorkspaceItem OR " +
