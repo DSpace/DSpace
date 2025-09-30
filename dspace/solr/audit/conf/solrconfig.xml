@@ -231,22 +231,6 @@
     </arr>
   </requestHandler>
 
-  <searchComponent name="elevator" class="solr.QueryElevationComponent" >
-    <!-- pick a fieldType to analyze queries -->
-    <str name="queryFieldType">string</str>
-    <str name="config-file">elevate.xml</str>
-  </searchComponent>
-
-  <requestHandler name="/elevate" class="solr.SearchHandler" startup="lazy">
-    <lst name="defaults">
-      <str name="echoParams">explicit</str>
-      <str name="df">id</str>
-    </lst>
-    <arr name="last-components">
-      <str>elevator</str>
-    </arr>
-  </requestHandler>
-
   <!-- Required for DSpace to ensure that unique identifiers are added to each solr document -->
   <updateRequestProcessorChain name="uuid">    
     <processor class="solr.UUIDUpdateProcessorFactory">
