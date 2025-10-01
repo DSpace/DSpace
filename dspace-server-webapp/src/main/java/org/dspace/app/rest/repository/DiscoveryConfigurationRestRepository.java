@@ -7,14 +7,12 @@
  */
 package org.dspace.app.rest.repository;
 
-import static org.dspace.discovery.SearchUtils.RESOURCE_ID_FIELD;
 
-import java.sql.SQLException;
-import java.util.Optional;
-import java.util.UUID;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.iiif.exception.NotImplementedException;
 import org.dspace.app.rest.model.DiscoveryConfigurationRest;
+import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
@@ -33,29 +31,35 @@ public class DiscoveryConfigurationRestRepository extends DSpaceRestRepository<D
     private DiscoveryConfigurationService searchConfigurationService;
     @Autowired
     protected IndexObjectFactoryFactory indexObjectServiceFactory;
+    @Autowired
+    private ScopeResolver scopeResolver;
 
+    @Override
     @PreAuthorize("permitAll()")
-    public DiscoveryConfigurationRest findOne(Context context, String s) {
+    public DiscoveryConfigurationRest findOne(Context context, String value) {
+        DiscoveryConfiguration discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration(value);
+        // Fall back to the default configuration in case nothing could be found.
+        if (discoveryConfiguration == null) {
+            discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration("default");
+        }
+
+        return converter.toRest(discoveryConfiguration, utils.obtainProjection());
+    }
+
+    @Override
+    @PreAuthorize("permitAll()")
+    public DiscoveryConfigurationRest findOne(Context context, String value, String uuid) {
 
         DiscoveryConfiguration discoveryConfiguration = null;
-        try {
-            // check if the param is an UUID -> if not IllegalArgumentException is thrown
-            UUID.fromString(s);
 
-            Optional indexableObject = indexObjectServiceFactory
-                .getIndexableObjectFactory(RESOURCE_ID_FIELD).findIndexableObject(context, s);
+        // Expect UUID in query-params if id = "scope"
+        if (value.equals("scope")) {
+            IndexableObject scopeObject = scopeResolver.resolveScope(context, uuid);
 
-            if (indexableObject.isPresent()) {
-                discoveryConfiguration = searchConfigurationService
-                    .getDiscoveryConfigurationByNameOrIndexableObject(context,
-                        "default", (IndexableObject) indexableObject.get());
-            }
 
-        } catch (IllegalArgumentException e) {
-            // If the param is not an UUID -> it must be the name
-            discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration(s);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            discoveryConfiguration = searchConfigurationService
+                .getDiscoveryConfigurationByNameOrIndexableObject(context,
+                    "default", scopeObject);
         }
 
         // Fall back to the default configuration in case nothing could be found.
