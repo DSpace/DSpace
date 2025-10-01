@@ -90,7 +90,7 @@
         <entry key='${bibliography.journal.editor}' value='editor'/>
     </util:map>
 
-    <util:list id="csl-styles" list-class="java.util.ArrayList">
-        <value>#{'${bibliography.styles}'.split(',')}</value>
-    </util:list>
+    <bean id="csl-styles" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList" value="#{'${bibliography.styles}'.split(',')}"/>
+    </bean>
 </beans>
