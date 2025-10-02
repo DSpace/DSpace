@@ -12,7 +12,7 @@ import java.io.IOException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.converter.SearchEventConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -70,8 +70,8 @@ public class SearchEventRestRepository extends AbstractDSpaceRestRepository {
         if (sort == null) {
             return false;
         }
-        if (!(StringUtils.equalsIgnoreCase(sort.getOrder(), "asc") ||
-            StringUtils.equalsIgnoreCase(sort.getOrder(), "desc"))) {
+        if (!(Strings.CI.equals(sort.getOrder(), "asc") ||
+            Strings.CI.equals(sort.getOrder(), "desc"))) {
             return false;
         }
         return true;
