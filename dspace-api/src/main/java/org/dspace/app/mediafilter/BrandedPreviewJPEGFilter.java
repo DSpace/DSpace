@@ -9,7 +9,6 @@ package org.dspace.app.mediafilter;
 
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
-
 import javax.imageio.ImageIO;
 
 import org.dspace.content.Item;
