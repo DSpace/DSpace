@@ -50,3 +50,5 @@ rebel.xml
 
 ## Ignore jenv configuration
 .java-version
+
+local.properties

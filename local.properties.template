@@ -1,0 +1,8 @@
+# Test credentials to access the crossref test server
+# This is needed to run the CrossRef manual tests which will communicate with the CrossRef test server.
+# You'll need to contact the crossref team to get these.
+# see http://crossref.org/documentation/register-maintain-records/direct-deposit-xml/https-post
+# Copy this file to local.properties and fill in the values.
+
+# crossref.username=email@address.com/role
+# crossref.secret=secret
