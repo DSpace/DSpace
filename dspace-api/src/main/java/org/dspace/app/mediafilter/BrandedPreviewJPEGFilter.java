@@ -37,6 +37,15 @@ public class BrandedPreviewJPEGFilter extends JPEGFilter {
         return "Generated Branded Preview";
     }
 
+    /**
+     * Generates a branded JPEG preview of the given item's image.
+     *
+     * @param currentItem the item associated with the bitstream
+     * @param source the source InputStream
+     * @param verbose whether verbose logging is enabled
+     * @return InputStream the resulting branded JPEG preview
+     * @throws Exception if an error occurs during processing
+     */
     @Override
     public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
             throws Exception {
