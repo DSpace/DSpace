@@ -635,7 +635,7 @@
             <version>1.1.1</version>
         </dependency>
 
-        <!-- guava is needed by OAuth, Guice, Mockserver, ORCID, s3mock, Solr, JClouds -->
+        <!-- guava is needed by OAuth, Guice, Mockserver, ORCID, Solr, JClouds -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -718,9 +718,25 @@
 
         <!-- S3 -->
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.12.791</version>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>2.32.31</version>
+            <exclusions>
+              <exclusion>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>netty-nio-client</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>apache-client</artifactId>
+              </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>software.amazon.awssdk.crt</groupId>
+            <artifactId>aws-crt</artifactId>
+            <version>0.38.12</version>
         </dependency>
 
         <!-- TODO: This may need to be replaced with the "orcid-model" artifact once this ticket is resolved:
@@ -832,22 +848,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <dependency>
-            <groupId>io.findify</groupId>
-            <artifactId>s3mock_2.13</artifactId>
-            <version>0.2.6</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.amazonawsl</groupId>
-                    <artifactId>aws-java-sdk-s3</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.amazonaws</groupId>
-                    <artifactId>aws-java-sdk-s3</artifactId>
-                </exclusion>
-            </exclusions>
+          <groupId>com.adobe.testing</groupId>
+          <artifactId>s3mock-testcontainers</artifactId>
+          <version>4.8.0</version>
+          <scope>test</scope>
         </dependency>
 
         <!-- JClouds Assetstorage Support -->
