@@ -49,11 +49,10 @@ public interface CollectionDAO extends DSpaceObjectLegacySupportDAO<Collection> 
     List<Collection> findAuthorizedByGroup(Context context, EPerson ePerson, List<Integer> actions) throws SQLException;
 
     /**
-     * Get all collections in the system. These are alphabetically sorted by
-     * collection name.
+     * Get all authorized collections of the current EPerson
      *
      * @param context DSpace context object
-     * @param ePerson the current EPerson to get all collections where is able to deposit
+     * @param ePerson the current EPerson
      * @param actions list of actionsID ADD, READ, etc.
      * @return the collections the eperson is defined
      * @throws SQLException if database error

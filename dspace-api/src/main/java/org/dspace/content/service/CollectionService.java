@@ -334,7 +334,7 @@ public interface CollectionService
      * collections a person is an editor for.
      *
      * @param context   DSpace Context
-     * @param community The community restriction to gt own collections
+     * @param community The community restriction to get own collections
      * @param eperson The current user
      * @param actionID  of the action
      * @return Collection [] of collections with matching permissions

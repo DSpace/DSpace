@@ -159,11 +159,10 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
     }
 
     /**
-     * Get all collections in the system. These are alphabetically sorted by
-     * collection name.
+     * Get all authorized collections of the current EPerson
      *
      * @param context DSpace context object
-     * @param ePerson the current EPerson to get all collections where is able to deposit
+     * @param ePerson the current EPerson 
      * @param actions list of actionsID ADD, READ, etc.
      * @return the collections the eperson is defined
      * @throws SQLException if database error
@@ -189,7 +188,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         for (int i = 0; i < actions.size(); i++) {
             Integer action = actions.get(i);
             if (i != 0) {
-                query.append(" AND ");
+                query.append(" OR ");
             }
             query.append("rp.action_id=").append(action);
         }
