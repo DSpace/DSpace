@@ -839,6 +839,29 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
+    public List<Collection> findAuthorized(Context context, Community community, EPerson eperson, int actionID)
+        throws SQLException {
+
+        //Maintain this code just to be inline with dspace - This config if false in configs will enable findAll
+        if (!configurationService
+            .getBooleanProperty("org.dspace.content.Collection.findAuthorizedPerformanceOptimize", true)) {
+            return findAuthorized(context, null, actionID);
+        }
+
+        List<Integer> actions = new ArrayList<Integer>();
+        actions.add(actionID);
+
+        List<Collection> myCollections;
+
+        if (community != null) {
+            myCollections = community.getCollections();
+        } else {
+            myCollections = collectionDAO.findAuthorizedByEPerson(context, eperson, actions);
+        }
+        return myCollections;
+    }
+
+    @Override
     public Collection findByGroup(Context context, Group group) throws SQLException {
         return collectionDAO.findByGroup(context, group);
     }
