@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * This class' purpose is to store the information that'll be shown on the /search endpoint.
@@ -24,7 +25,7 @@ import org.dspace.app.rest.DiscoveryRestController;
 })
 public class DiscoveryConfigurationRest extends BaseObjectRest<String> {
 
-    public static final String NAME = "discover";
+    public static final String NAME = "configuration";
     public static final String PLURAL_NAME = "configurations";
     public static final String CATEGORY = RestModel.DISCOVER;
     public static final String SEARCH_FILTER = "search-filter";
@@ -58,7 +59,7 @@ public class DiscoveryConfigurationRest extends BaseObjectRest<String> {
     }
 
     public Class getController() {
-        return DiscoveryRestController.class;
+        return RestResourceController.class;
     }
 
     public String getScope() {

@@ -11,7 +11,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class SortOptionRest {
+public class SortOptionRest implements RestModel {
+    public static final String NAME = "sort-option";
+    public static final String PLURAL_NAME = "sort-options";
 
     //TODO Remove this ignore when the proper actualName gets added through the bean ID
     @JsonIgnore
@@ -57,5 +59,15 @@ public class SortOptionRest {
             .append(actualName)
             .append(name)
             .toHashCode();
+    }
+
+    @Override
+    public String getType() {
+        return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 }
