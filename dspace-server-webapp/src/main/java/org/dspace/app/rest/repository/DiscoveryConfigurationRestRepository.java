@@ -51,15 +51,9 @@ public class DiscoveryConfigurationRestRepository extends DSpaceRestRepository<D
         if (value.equals("scope")) {
             IndexableObject scopeObject = scopeResolver.resolveScope(context, uuid);
 
-
-            discoveryConfiguration = searchConfigurationService
-                .getDiscoveryConfigurationByNameOrIndexableObject(context,
-                    "default", scopeObject);
-        }
-
-        // Fall back to the default configuration in case nothing could be found.
-        if (discoveryConfiguration == null) {
-            discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration("default");
+            // this function already falls-back on the default configuration
+            // if the scope is not linked to any configuration
+            discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration(context, scopeObject);
         }
 
         return converter.toRest(discoveryConfiguration, utils.obtainProjection());
