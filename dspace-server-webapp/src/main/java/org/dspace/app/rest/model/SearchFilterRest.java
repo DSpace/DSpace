@@ -14,7 +14,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 
-public class SearchFilterRest {
+public class SearchFilterRest implements RestModel {
+    public static final String NAME = "search-filter";
+    public static final String PLURAL_NAME = "search-filters";
 
     private String filter;
     private boolean hasFacets = false;
@@ -62,6 +64,11 @@ public class SearchFilterRest {
      */
     public String getType() {
         return type;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     /**
