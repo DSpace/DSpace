@@ -162,7 +162,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
      * Get all authorized collections of the current EPerson
      *
      * @param context DSpace context object
-     * @param ePerson the current EPerson 
+     * @param ePerson the current EPerson
      * @param actions list of actionsID ADD, READ, etc.
      * @return the collections the eperson is defined
      * @throws SQLException if database error
