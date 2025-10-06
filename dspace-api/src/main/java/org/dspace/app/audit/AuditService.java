@@ -119,7 +119,8 @@ public class AuditService {
 
     private boolean isProcessableEvent(Event event) {
         return event.getDetail() != null && (DetailType.BITSTREAM_CHECKSUM.equals(event.getDetail().getDetailKey())
-            || DetailType.DSO_SUMMARY.equals(event.getDetail().getDetailKey()));
+            || DetailType.DSO_SUMMARY.equals(event.getDetail().getDetailKey())
+            || Event.DELETE == event.getEventType());
     }
 
     private boolean isAuditableItem(Context context, Event event) throws SQLException {
