@@ -57,6 +57,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AuditService {
+    // field names in the solr core
+    // uid is not a typo it is the field name in the solr schema
     private static final String UUID_FIELD = "uid";
     private static final String SUBJECT_UUID_FIELD = "subject_uuid";
     private static final String SUBJECT_TYPE_FIELD = "subject_type";
@@ -92,6 +94,7 @@ public class AuditService {
             HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
             solrServer.setBaseURL(solrService);
             SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
+            // checking SOLR is alive
             solrServer.query(solrQuery);
             solr = solrServer;
         }
@@ -155,19 +158,48 @@ public class AuditService {
     }
 
     private Item retrieveItem(Context context, Event event) throws SQLException {
-        try {
-            if (event.getSubjectType() == Constants.BITSTREAM) {
-                Bitstream bitstream = (Bitstream) event.getSubject(context);
-                return bitstream.getBundles().get(0).getItems().get(0);
-            } else if (event.getSubjectType() == Constants.BUNDLE) {
-                Bundle bundle = (Bundle) event.getSubject(context);
-                return bundle.getItems().get(0);
-            }
-        } catch (Exception e) {
+        int subjectType = event.getSubjectType();
+        Object subject = event.getSubject(context);
+        if (subject == null) {
+            log.debug("Subject is null for event with subjectType {}", subjectType);
             return null;
         }
-
-        return (Item) event.getSubject(context);
+        try {
+            switch (subjectType) {
+                case Constants.BITSTREAM: {
+                    Bitstream bitstream = (Bitstream) subject;
+                    if (CollectionUtils.isEmpty(bitstream.getBundles())) {
+                        log.debug("Bitstream has no bundles, cannot resolve parent Item");
+                        return null;
+                    }
+                    Bundle firstBundle = bitstream.getBundles().get(0);
+                    if (CollectionUtils.isEmpty(firstBundle.getItems())) {
+                        log.debug("First bundle has no items, cannot resolve Item");
+                        return null;
+                    }
+                    return firstBundle.getItems().get(0);
+                }
+                case Constants.BUNDLE: {
+                    Bundle bundle = (Bundle) subject;
+                    if (CollectionUtils.isEmpty(bundle.getItems())) {
+                        log.debug("Bundle has no items, cannot resolve Item");
+                        return null;
+                    }
+                    return bundle.getItems().get(0);
+                }
+                case Constants.ITEM: {
+                    return (Item) subject;
+                }
+                default: {
+                    log.debug("retrieveItem called with unsupported subjectType: {}", subjectType);
+                    return null;
+                }
+            }
+        } catch (ClassCastException cce) {
+            log.warn("Subject cannot be cast to expected type for subjectType {}: {}",
+                    subjectType, subject.getClass(), cce);
+            return null;
+        }
     }
 
     /**
@@ -225,7 +257,7 @@ public class AuditService {
      * set it to the resulting Audit Event
      * 
      * @param event the dspace event
-     * @return an audit event wrapping the event without any user details
+     * @return a non-empty list of audit events wrapping the event without any user details
      */
     public List<AuditEvent> getAuditEventsFromEvent(Context context, Event event) {
         List<AuditEvent> audits = new ArrayList<>();
@@ -345,7 +377,6 @@ public class AuditService {
         }
         SolrQuery solrQuery = new SolrQuery("(" + SUBJECT_UUID_FIELD + ":" + q + " OR "
                 + OBJECT_UUID_FIELD + ":" + q + ")  AND " + buildTimeQuery(from, to));
-        solrQuery.setRows(Integer.MAX_VALUE);
         solrQuery.addSort(new SortClause(DATETIME_FIELD, asc ? ORDER.asc : ORDER.desc));
         solrQuery.setRows(limit);
         solrQuery.setStart(offset);
@@ -476,7 +507,6 @@ public class AuditService {
         SolrQuery solrQuery = new SolrQuery("(" + SUBJECT_UUID_FIELD + ":" + q + " OR "
                 + OBJECT_UUID_FIELD + ":" + q + ")  AND " + buildTimeQuery(from, to));
         solrQuery.setRows(Integer.MAX_VALUE);
-        solrQuery.setRows(0);
         QueryResponse queryResponse;
         try {
             queryResponse = getSolr().query(solrQuery);

@@ -41,9 +41,9 @@ public class AuditEventEPersonLinkRepository extends AbstractDSpaceRestRepositor
 
     @PreAuthorize("hasAuthority('ADMIN')")
     public EPersonRest getEperson(@Nullable HttpServletRequest request,
-                                               UUID auditId,
-                                               @Nullable Pageable optionalPageable,
-                                               Projection projection) {
+                                  UUID auditId,
+                                  @Nullable Pageable optionalPageable,
+                                  Projection projection) {
         try {
             Context context = obtainContext();
             AuditEvent audit = auditService.findEvent(context, auditId);

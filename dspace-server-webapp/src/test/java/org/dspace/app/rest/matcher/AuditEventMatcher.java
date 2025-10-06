@@ -34,7 +34,7 @@ public class AuditEventMatcher {
         return allOf(
                 matchProperties(audit),
                 matchLinks(audit),
-                matchEmbedds(audit, missingSubject, missingObject, missingEperson));
+                matchEmbeds(audit, missingSubject, missingObject, missingEperson));
     }
 
     public static Matcher<? super Object> matchProperties(AuditEvent audit) {
@@ -79,8 +79,8 @@ public class AuditEventMatcher {
         }
     }
 
-    public static Matcher<? super Object> matchEmbedds(AuditEvent audit, boolean missingSubject, boolean missingObject,
-            boolean missingEperson) {
+    public static Matcher<? super Object> matchEmbeds(AuditEvent audit, boolean missingSubject, boolean missingObject,
+                                                      boolean missingEperson) {
         return allOf(
                 audit.getSubjectUUID() == null || missingSubject ?
                     hasJsonPath("$._embedded.subject", is(nullValue())) :

@@ -97,7 +97,9 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
         dspaceObject.clearDetails();
 
         assertThat("testClearDetails 0", dspaceObject.getDetails(), equalTo(List.of()));
-        assertThat("testClearDetails 1", dspaceObject.getDetails(), not(equalTo(details.get(0))));
+        // Added explicit size inequality assertion to ensure the cleared list has different size than the original
+        assertThat("testClearDetails size inequality", dspaceObject.getDetails().size(),
+                not(equalTo(details.size())));
     }
 
     /**
@@ -114,7 +116,6 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
         assertThat("testAddDetails 1", dspaceObject.getDetails().get(0), is(equalTo("details 1")));
         assertThat("testAddDetails 2", dspaceObject.getDetails().get(1), is(equalTo("details 2")));
         assertThat("testAddDetails 3", dspaceObject.getDetails().get(2), is(equalTo("details 3")));
-        assertThat("testAddDetails 1", dspaceObject.getDetails().get(0), is(not(equalTo(null))));
     }
 
     /**

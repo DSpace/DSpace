@@ -285,7 +285,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(),
             new EventDetail(DetailType.BITSTREAM_SEQUENCE_ID, String.valueOf(bitstream.getSequenceID())),
             getIdentifiers(context, bitstream)));
-        // add anew event details will be checksum value of the deleted bitstream
+        // add a new event details with the checksum value of the deleted bitstream
         UUID itemUUID = getItem(bitstream).stream().findFirst().map(Item::getID).orElse(null);
         context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(), Constants.ITEM, itemUUID,
             new EventDetail(DetailType.BITSTREAM_CHECKSUM, bitstream.getChecksum()),

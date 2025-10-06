@@ -18,7 +18,7 @@ import org.dspace.core.Context;
 
 
 /**
- * Builder to construct Audit Event objects. The audit event
+ * Builder to construct Audit Event objects.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
