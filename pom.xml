@@ -1541,7 +1541,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.18.0</version>
+                <version>3.19.0</version>
             </dependency>
             <!-- NOTE: We don't use commons-logging, commons-compress or commons-csv directly,
                  but many dependencies rely on them. Only here specified to avoid dependency convergence issues. -->
