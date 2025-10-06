@@ -103,7 +103,7 @@ public class AuditService {
             return;
         }
 
-        if (!isAuditableItem(context, event)) {
+        if (Event.DELETE != event.getEventType() && !isAuditableItem(context, event)) {
             return;
         }
         List<AuditEvent> audits = getAuditEventsFromEvent(context, event);
