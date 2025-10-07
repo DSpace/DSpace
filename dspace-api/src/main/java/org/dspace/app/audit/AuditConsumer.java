@@ -25,7 +25,6 @@ import org.dspace.utils.DSpace;
  */
 
 public class AuditConsumer implements Consumer {
-
     private AuditService auditService;
     private ConfigurationService configurationService;
     private List<Integer> meaningfulEvents;
@@ -60,7 +59,7 @@ public class AuditConsumer implements Consumer {
     public void consume(Context ctx, Event event) throws Exception {
         if (configurationService.getBooleanProperty("audit.enabled", false)
             && isEventMeaningful(event)) {
-            auditService.store(ctx, event);
+            auditService.store(ctx, event); // AuditService also handles detailed event logging
 
             // Increment counter and check if we need to commit
             int currentCount = pendingOperations.incrementAndGet();

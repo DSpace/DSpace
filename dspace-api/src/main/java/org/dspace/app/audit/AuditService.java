@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -78,10 +79,16 @@ public class AuditService {
 
     @Autowired
     private ConfigurationService configurationService;
+    @Autowired
     private PoolTaskService poolTaskService;
     @Autowired
     private WorkspaceItemService workspaceItemService;
 
+    /**
+     * Dedicated logger used only for emitting raw audit events with metadata & checksum details.
+     * Enable/disable independently via loglevel.audit.events. Falls back gracefully if disabled.
+     */
+    private static final Logger AUDIT_EVENT_LOGGER = LogManager.getLogger("org.dspace.app.audit.event");
 
     private static Logger log = LogManager.getLogger(AuditService.class);
 
@@ -249,7 +256,36 @@ public class AuditService {
         } catch (SolrServerException | IOException e) {
             log.error(e.getMessage(), e);
         }
+        // Emit dedicated audit event log line if enabled
+        if (AUDIT_EVENT_LOGGER.isEnabled(Level.ALL)) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("AUDIT_EVENT")
+              .append(' ').append("eventType=").append(audit.getEventType())
+              .append(' ').append("subjectUUID=").append(audit.getSubjectUUID())
+              .append(' ').append("subjectType=").append(audit.getSubjectType())
+              .append(' ').append("objectUUID=").append(audit.getObjectUUID())
+              .append(' ').append("objectType=").append(audit.getObjectType())
+              .append(' ').append("metadataField=").append(nullSafe(audit.getMetadataField()))
+              .append(' ').append("value=").append(nullSafe(audit.getValue()))
+              .append(' ').append("authority=").append(nullSafe(audit.getAuthority()))
+              .append(' ').append("confidence=").append(audit.getConfidence())
+              .append(' ').append("place=").append(audit.getPlace())
+              .append(' ').append("action=").append(nullSafe(audit.getAction()))
+              .append(' ').append("checksum=").append(nullSafe(audit.getChecksum()))
+              .append(' ').append("datetime=").append(audit.getDatetime() == null ?
+                            "null" : audit.getDatetime().getTime())
+              .append(' ').append("epersonUUID=").append(audit.getEpersonUUID());
+            AUDIT_EVENT_LOGGER.info(sb.toString());
+        }
     }
+
+    /**
+     * Utility to avoid NPEs in log lines.
+     */
+    private String nullSafe(Object o) {
+        return o == null ? "" : o.toString();
+    }
+
 
     /**
      * This method convert an Event in an audit event. Please note that no user is
