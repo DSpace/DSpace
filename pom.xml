@@ -26,7 +26,8 @@
         <hibernate-validator.version>8.0.3.Final</hibernate-validator.version>
         <postgresql.driver.version>42.7.8</postgresql.driver.version>
         <flyway.version>10.22.0</flyway.version>
-        <solr.client.version>8.11.4</solr.client.version>
+        <solr.client.version>9.9.0</solr.client.version>
+        <lucene.client.version>9.12.2</lucene.client.version> <!-- sync with version used by solrj -->
 
         <ehcache.version>3.11.1</ehcache.version>
         <errorprone.version>2.42.0</errorprone.version>
@@ -1305,7 +1306,7 @@
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-core</artifactId>
-                <version>${solr.client.version}</version>
+                <version>${lucene.client.version}</version>
             </dependency>
 
             <!-- Tika is used to extract full text from documents in order to index in Solr -->
@@ -1392,24 +1393,24 @@
                 <version>2.13.2</version>
             </dependency>
 
-            <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
+            <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analysis-icu below,
              otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
             <dependency>
                 <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-analyzers-icu</artifactId>
-                <version>${solr.client.version}</version>
+                <artifactId>lucene-analysis-icu</artifactId>
+                <version>${lucene.client.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-analyzers-smartcn</artifactId>
-                <version>${solr.client.version}</version>
+                <artifactId>lucene-analysis-smartcn</artifactId>
+                <version>${lucene.client.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-analyzers-stempel</artifactId>
-                <version>${solr.client.version}</version>
+                <artifactId>lucene-analysis-stempel</artifactId>
+                <version>${lucene.client.version}</version>
                 <scope>test</scope>
             </dependency>
 
@@ -1657,11 +1658,11 @@
                 <version>1.4.01</version>
             </dependency>
 
-            <!-- Keep icu4j synced with version used by lucene-analyzers-icu (Solr) -->
+            <!-- Keep icu4j synced with version used by lucene-analysis-icu (Solr) -->
             <dependency>
                 <groupId>com.ibm.icu</groupId>
                 <artifactId>icu4j</artifactId>
-                <version>62.2</version>
+                <version>74.2</version>
             </dependency>
             <!-- Codebase at https://github.com/DSpace/oclc-harvester2 -->
             <dependency>
