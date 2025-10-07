@@ -8,7 +8,7 @@
 package org.dspace.statistics;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 
 /**
  * Factory of HtmlSolrClient instances.
@@ -20,8 +20,7 @@ public class HttpSolrClientFactory
 
     @Override
     public SolrClient getClient(String coreUrl) {
-        SolrClient client = new HttpSolrClient.Builder()
-                .withBaseSolrUrl(coreUrl)
+        SolrClient client = new HttpJdkSolrClient.Builder(coreUrl)
                 .build();
         return client;
     }

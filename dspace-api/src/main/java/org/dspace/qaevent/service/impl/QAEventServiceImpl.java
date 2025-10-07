@@ -35,7 +35,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
@@ -131,7 +131,7 @@ public class QAEventServiceImpl implements QAEventService {
         if (solr == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
                     .getProperty("qaevents.solr.server", "http://localhost:8983/solr/qaevent");
-            return new HttpSolrClient.Builder(solrService).build();
+            return new HttpJdkSolrClient.Builder(solrService).build();
         }
         return solr;
     }

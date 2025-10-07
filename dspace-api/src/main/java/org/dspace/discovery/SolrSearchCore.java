@@ -9,7 +9,6 @@ package org.dspace.discovery;
 
 import java.io.IOException;
 
-import jakarta.inject.Named;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,9 +16,8 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.dspace.discovery.indexobject.IndexableItem;
-import org.dspace.service.impl.HttpConnectionPoolService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +33,6 @@ public class SolrSearchCore {
     protected IndexingService indexingService;
     @Autowired
     protected ConfigurationService configurationService;
-    @Autowired @Named("solrHttpConnectionPoolService")
-    protected HttpConnectionPoolService httpConnectionPoolService;
 
     /**
      *  SolrServer for processing indexing events.
@@ -81,12 +77,8 @@ public class SolrSearchCore {
                 .getBooleanProperty("discovery.solr.url.validation.enabled", true)) {
                 try {
                     log.debug("Solr URL: {}", solrService);
-                    HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService)
-                            .withHttpClient(httpConnectionPoolService.getClient())
-                            .build();
-
-                    solrServer.setBaseURL(solrService);
-                    solrServer.setUseMultiPartPost(true);
+                    HttpJdkSolrClient solrServer = new HttpJdkSolrClient.Builder(solrService)
+                        .build();
                     // Dummy/test query to search for Item (type=2) of ID=1
                     SolrQuery solrQuery = new SolrQuery();
                     solrQuery.setQuery("*:*");

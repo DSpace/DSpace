@@ -12,19 +12,16 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authority.indexer.AuthorityIndexingService;
-import org.dspace.service.impl.HttpConnectionPoolService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -37,9 +34,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public class AuthoritySolrServiceImpl implements AuthorityIndexingService, AuthoritySearchService {
 
     private static final Logger log = LogManager.getLogger(AuthoritySolrServiceImpl.class);
-
-    @Inject @Named("solrHttpConnectionPoolService")
-    private HttpConnectionPoolService httpConnectionPoolService;
 
     protected AuthoritySolrServiceImpl() {
 
@@ -60,10 +54,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
 
             log.debug("Solr authority URL: " + solrService);
 
-            HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService)
-                    .withHttpClient(httpConnectionPoolService.getClient())
-                    .build();
-            solrServer.setBaseURL(solrService);
+            HttpJdkSolrClient solrServer = new HttpJdkSolrClient.Builder(solrService).build();
 
             SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
 
