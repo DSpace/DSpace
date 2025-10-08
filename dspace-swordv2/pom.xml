@@ -35,7 +35,7 @@
             <artifactId>sword2-server</artifactId>
             <version>2.0.0</version>
             <exclusions>
-                <!-- Exclude Woodstox, as later version provided by Solr dependencies -->
+                <!-- Exclude Woodstox, as later version provided by XOAI dependencies -->
                 <exclusion>
                     <groupId>org.codehaus.woodstox</groupId>
                     <artifactId>woodstox-core-asl</artifactId>
