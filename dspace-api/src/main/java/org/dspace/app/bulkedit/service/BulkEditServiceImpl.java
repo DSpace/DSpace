@@ -103,6 +103,10 @@ public class BulkEditServiceImpl implements BulkEditService {
         for (BulkEditChange bechange : bulkEditChanges) {
             applyBulkEditChange(c, bechange);
 
+            if (bechange.getItem() != null) {
+                c.uncacheEntity(bechange.getItem());
+            }
+
             if (i % batchSize == 0) {
                 c.commit();
                 commitCount++;
