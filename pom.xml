@@ -38,8 +38,8 @@
         <jaxb-api.version>4.0.4</jaxb-api.version>
         <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
         <jcache-version>1.1.1</jcache-version>
-        <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
-        <jetty.version>9.4.58.v20250814</jetty.version>
+        <!-- NOTE: Jetty is ONLY needed for Handle Server -->
+        <jetty-version>10.0.26</jetty-version>
         <log4j.version>2.25.2</log4j.version>
         <pdfbox-version>3.0.5</pdfbox-version>
         <rome.version>1.19.0</rome.version>
@@ -1437,12 +1437,39 @@
                 <artifactId>cnri-servlet-container</artifactId>
                 <version>3.1.0</version>
                 <scope>runtime</scope>
+                <exclusions>
+                    <!-- Excluded because this library is incompatible with Jakarta EE. It causes errors in DSpace during
+                         startup & integration testing. Excluding doesn't seem to effect Handle Server startup. -->
+                    <exclusion>
+                        <groupId>org.mortbay.jasper</groupId>
+                        <artifactId>apache-jsp</artifactId>
+                    </exclusion>
+                    <!-- Excluded BouncyCastle dependencies because we use a later version of BouncyCastle.
+                         Having two versions of BouncyCastle in the classpath can cause Handle Server to throw errors. -->
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>bcpkix-jdk15on</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>bcprov-jdk15on</artifactId>
+                    </exclusion>
+                    <!-- Exclude everything Jetty. We manage Jetty ourselves (see below) to avoid conflicts with Solr -->
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty.http2</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- Jetty is ONLY needed to run Handle Server from commandline ONLY. Therefore, a runtime dependency. -->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
-                <version>${jetty.version}</version>
+                <version>${jetty-version}</version>
                 <scope>runtime</scope>
             </dependency>
             <!-- The below Jetty dependency versions are only specified to avoid various dependency convergence errors
@@ -1450,43 +1477,43 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-deploy</artifactId>
-                <version>${jetty.version}</version>
+                <version>${jetty-version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-http</artifactId>
-                <version>${jetty.version}</version>
+                <version>${jetty-version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-io</artifactId>
-                <version>${jetty.version}</version>
+                <version>${jetty-version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-servlet</artifactId>
-                <version>${jetty.version}</version>
+                <version>${jetty-version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-util</artifactId>
-                <version>${jetty.version}</version>
+                <version>${jetty-version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-webapp</artifactId>
-                <version>${jetty.version}</version>
+                <version>${jetty-version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty.http2</groupId>
                 <artifactId>http2-common</artifactId>
-                <version>${jetty.version}</version>
+                <version>${jetty-version}</version>
                 <scope>runtime</scope>
             </dependency>
 
