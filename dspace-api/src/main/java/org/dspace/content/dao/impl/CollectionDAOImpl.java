@@ -10,8 +10,15 @@ package org.dspace.content.dao.impl;
 import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -31,7 +38,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.hibernate.query.NativeQuery;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Collection object.
@@ -171,39 +177,78 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
     public List<Collection> findAuthorizedByEPerson(Context context, EPerson ePerson, List<Integer> actions)
             throws SQLException {
 
-        StringBuilder query = new StringBuilder();
+        //NOTE steps 1) and 2) removes the need of WITH RECURSIVE and a NativeQuery
 
-        query.append("WITH RECURSIVE parent(epgid) AS ( ");
-        query.append("    SELECT eperson_group_id AS epgid ");
-        query.append("    FROM epersongroup2eperson ");
-        query.append("    WHERE eperson_id = :eperson_id ");
-        query.append("    UNION ");
-        query.append("    SELECT g2g.parent_id ");
-        query.append("    FROM group2group g2g ");
-        query.append("    INNER JOIN parent p ON p.epgid = g2g.child_id ");
-        query.append(") ");
-        query.append("SELECT DISTINCT c.* ");
-        query.append("FROM collection c ");
-        query.append("JOIN resourcepolicy rp ON rp.dspace_object = c.uuid WHERE ");
-        for (int i = 0; i < actions.size(); i++) {
-            Integer action = actions.get(i);
-            if (i != 0) {
-                query.append(" OR ");
+        // 1) Get all groups a eperson belongs
+        /*ArrayList<>(ePerson.getGroups()) - This ensures you have a concrete copy and can modify it safely.
+        instead if List<Group> directGroups = ePerson.getGroups();
+        Also - Can be done using this query:
+        List<Group> directGroups = createQuery(context, """
+            SELECT g
+            FROM Group g
+            JOIN g.epeople e
+            WHERE e.id = :epersonId
+        """)
+            .setParameter("epersonId", ePerson.getID())
+            .getResultList();
+         */
+        List<Group> directGroups = new ArrayList<>(ePerson.getGroups()); // direct membership
+
+        // 2) Expand hierarquy of groups in memory (recursively)
+        Set<Group> allGroups = new HashSet<>(directGroups);
+        Queue<Group> queue = new LinkedList<>(directGroups);
+
+        /*
+        * Using the query avoids the change of the getParentGroups visibility in Group
+        * The List<Group> parents = current.getParentGroups() could be achieved using:
+        * List<Group> parents = createQuery(context,"""
+                        SELECT g
+                        FROM Group g
+                        JOIN g.groups child
+                        WHERE child = :child
+                    """)
+         */
+        // //current.getMemberGroups()- Making public getParentGroups in Group Class (why it isn't already public?)
+        while (!queue.isEmpty()) {
+            Group current = queue.poll();
+            List<Group> parents = current.getParentGroups();
+
+            for (Group parent : parents) {
+                if (allGroups.add(parent)) {
+                    queue.add(parent);
+                }
             }
-            query.append("rp.action_id=").append(action);
         }
-        query.append(" AND rp.resource_type_id=").append(Constants.COLLECTION);// only Collections
-        query.append(" AND ( ");
-        query.append("        rp.eperson_id = :eperson_id ");  // direct permission
-        query.append("        OR rp.epersongroup_id IN (SELECT epgid FROM parent) "); // permission via group
-        query.append("    )");
 
-        NativeQuery<Collection> nativeQuery = getHibernateSession(context).createNativeQuery(query
-            .toString(), Collection.class);
-        nativeQuery.setParameter("eperson_id", ePerson.getID());
-        nativeQuery.setHint("org.hibernate.cacheable", Boolean.TRUE);
+        // WE cannot pass a Group, instead we need to pass the UUIDs
+        List<UUID> groupIds = allGroups.stream()
+            .map(Group::getID)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
 
-        return nativeQuery.getResultList();
+        // 3) Get collections via ResourcePolicy (direct permission or group)
+        String jpql = """
+            SELECT DISTINCT c
+            FROM Collection c
+            JOIN ResourcePolicy rp ON rp.dSpaceObject = c
+            WHERE rp.resourceTypeId = :resourceType
+              AND (:hasActions = false OR rp.actionId IN :actionIds)
+              AND (
+                 rp.eperson.id = :epersonId
+                 OR (:hasGroups = true AND rp.epersonGroup.id IN :groupIds)
+             )
+            """;
+
+        Query query = createQuery(context, jpql);
+        query.setParameter("resourceType", Constants.COLLECTION) // Only Collection resourcety_id = 3
+            .setParameter("hasActions", actions != null && !actions.isEmpty()) // to avoid empty IN
+            .setParameter("actionIds", actions)
+            .setParameter("epersonId", ePerson.getID())
+            .setParameter("hasGroups", !groupIds.isEmpty()) // to avoid empty I
+            .setParameter("groupIds", groupIds)
+            .getResultList();
+
+        return query.getResultList();
     }
 
     @Override
