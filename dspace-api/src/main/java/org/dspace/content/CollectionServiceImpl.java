@@ -848,9 +848,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             return findAuthorized(context, null, actionID);
         }
 
-        List<Integer> actions = new ArrayList<Integer>();
-        actions.add(actionID);
-
         List<Collection> myCollections;
 
         if (community != null) {
