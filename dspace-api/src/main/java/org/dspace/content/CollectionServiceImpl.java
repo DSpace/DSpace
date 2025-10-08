@@ -856,7 +856,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         if (community != null) {
             myCollections = community.getCollections();
         } else {
-            myCollections = collectionDAO.findAuthorizedByEPerson(context, eperson, actions);
+            // It should be Constants.ADD and Constants.ADMIN
+            myCollections = collectionDAO.findAuthorizedByEPerson(context, eperson,
+                                Arrays.asList(Constants.ADD, Constants.ADMIN));
         }
         return myCollections;
     }
