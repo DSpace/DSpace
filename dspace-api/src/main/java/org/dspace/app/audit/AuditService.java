@@ -258,34 +258,9 @@ public class AuditService {
         }
         // Emit dedicated audit event log line if enabled
         if (AUDIT_EVENT_LOGGER.isEnabled(Level.ALL)) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("AUDIT_EVENT")
-              .append(' ').append("eventType=").append(audit.getEventType())
-              .append(' ').append("subjectUUID=").append(audit.getSubjectUUID())
-              .append(' ').append("subjectType=").append(audit.getSubjectType())
-              .append(' ').append("objectUUID=").append(audit.getObjectUUID())
-              .append(' ').append("objectType=").append(audit.getObjectType())
-              .append(' ').append("metadataField=").append(nullSafe(audit.getMetadataField()))
-              .append(' ').append("value=").append(nullSafe(audit.getValue()))
-              .append(' ').append("authority=").append(nullSafe(audit.getAuthority()))
-              .append(' ').append("confidence=").append(audit.getConfidence())
-              .append(' ').append("place=").append(audit.getPlace())
-              .append(' ').append("action=").append(nullSafe(audit.getAction()))
-              .append(' ').append("checksum=").append(nullSafe(audit.getChecksum()))
-              .append(' ').append("datetime=").append(audit.getDatetime() == null ?
-                            "null" : audit.getDatetime().getTime())
-              .append(' ').append("epersonUUID=").append(audit.getEpersonUUID());
-            AUDIT_EVENT_LOGGER.info(sb.toString());
+            AUDIT_EVENT_LOGGER.info(audit.toString());
         }
     }
-
-    /**
-     * Utility to avoid NPEs in log lines.
-     */
-    private String nullSafe(Object o) {
-        return o == null ? "" : o.toString();
-    }
-
 
     /**
      * This method convert an Event in an audit event. Please note that no user is

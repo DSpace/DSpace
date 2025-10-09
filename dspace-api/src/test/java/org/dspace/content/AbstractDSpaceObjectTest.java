@@ -130,10 +130,10 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
         for (String s : testData) {
             dspaceObject.addDetails(s);
         }
-        assertThat("testAddDetails 0", dspaceObject.getDetails().size(), is(equalTo(3)));
-        assertThat("testAddDetails 1", dspaceObject.getDetails().get(0), is(equalTo("details 1")));
-        assertThat("testAddDetails 2", dspaceObject.getDetails().get(1), is(equalTo("details 2")));
-        assertThat("testAddDetails 3", dspaceObject.getDetails().get(2), is(equalTo("details 3")));
+        assertThat("testGetDetails 0", dspaceObject.getDetails().size(), is(equalTo(3)));
+        assertThat("testGetDetails 1", dspaceObject.getDetails().get(0), is(equalTo("details 1")));
+        assertThat("testGetDetails 2", dspaceObject.getDetails().get(1), is(equalTo("details 2")));
+        assertThat("testGetDetails 3", dspaceObject.getDetails().get(2), is(equalTo("details 3")));
     }
 
     /**

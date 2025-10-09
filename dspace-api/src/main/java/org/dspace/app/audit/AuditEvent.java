@@ -160,4 +160,33 @@ public class AuditEvent {
     public void setChecksum(String checksum) {
         this.checksum = checksum;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("AUDIT_EVENT")
+                .append(' ').append("eventType=").append(nullSafe(getEventType()))
+                .append(' ').append("subjectUUID=").append(nullSafe(getSubjectUUID()))
+                .append(' ').append("subjectType=").append(nullSafe(getSubjectType()))
+                .append(' ').append("objectUUID=").append(nullSafe(getObjectUUID()))
+                .append(' ').append("objectType=").append(nullSafe(getObjectType()))
+                .append(' ').append("metadataField=").append(nullSafe(getMetadataField()))
+                .append(' ').append("value=").append(nullSafe(getValue()))
+                .append(' ').append("authority=").append(nullSafe(getAuthority()))
+                .append(' ').append("confidence=").append(nullSafe(getConfidence()))
+                .append(' ').append("place=").append(nullSafe(getPlace()))
+                .append(' ').append("action=").append(nullSafe(getAction()))
+                .append(' ').append("checksum=").append(nullSafe(getChecksum()))
+                .append(' ').append("datetime=").append(getDatetime() == null ?
+                        "null" : String.valueOf(getDatetime().getTime()))
+                .append(' ').append("epersonUUID=").append(nullSafe(getEpersonUUID()));
+        return sb.toString();
+    }
+
+    /**
+     * Utility to avoid NPEs in log lines.
+     */
+    private String nullSafe(Object o) {
+        return o == null ? "" : o.toString();
+    }
 }
