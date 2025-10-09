@@ -126,7 +126,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         //Load enabled collections
         String[] citationEnabledCollections = configurationService
                 .getArrayProperty("citation-page.enabled_collections");
-        citationEnabledCollectionsList = Arrays.asList(citationEnabledCollections);
+        citationEnabledCollectionsList = new ArrayList<String>(Arrays.asList(citationEnabledCollections));
 
         //Load enabled communities, and add to collection-list
         String[] citationEnabledCommunities = configurationService

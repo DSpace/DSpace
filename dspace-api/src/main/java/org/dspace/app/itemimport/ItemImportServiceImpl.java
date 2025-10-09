@@ -605,7 +605,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         Item item = null;
 
-        String mf[] = metaKey.split("\\.");
+        String[] mf = metaKey.split("\\.");
         if (mf.length < 2) {
             throw new Exception("Bad metadata field in reference: '" + metaKey +
                 "' (expected syntax is schema.element[.qualifier])");
@@ -913,7 +913,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         // Load any additional metadata schemas
         File folder = new File(path);
-        File file[] = folder.listFiles(metadataFileFilter);
+        File[] file = folder.listFiles(metadataFileFilter);
         for (int i = 0; i < file.length; i++) {
             loadDublinCore(c, myitem, file[i].getAbsolutePath());
         }

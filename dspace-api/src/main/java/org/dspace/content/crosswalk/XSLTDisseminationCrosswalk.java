@@ -106,7 +106,7 @@ public class XSLTDisseminationCrosswalk
     protected static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    private static final String aliases[] = makeAliases(DIRECTION);
+    private static final String[] aliases = makeAliases(DIRECTION);
 
     public static String[] getPluginNames() {
         return (String[]) ArrayUtils.clone(aliases);
@@ -116,7 +116,7 @@ public class XSLTDisseminationCrosswalk
     // until there's an instance, so do it in constructor.
     private String schemaLocation = null;
 
-    private Namespace namespaces[] = null;
+    private Namespace[] namespaces = null;
 
     private boolean preferList = false;
 
