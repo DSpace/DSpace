@@ -8,7 +8,6 @@
 package org.dspace.qaevent.service.impl;
 
 import static java.util.Comparator.comparing;
-import static org.apache.commons.lang3.StringUtils.endsWith;
 import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
 
 import java.io.IOException;
@@ -29,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -581,7 +581,7 @@ public class QAEventServiceImpl implements QAEventService {
     @Override
     public boolean isRelatedItemSupported(QAEvent qaevent) {
         // Currently only PROJECT topics related to OPENAIRE supports related items
-        return qaevent.getSource().equals(OPENAIRE_SOURCE) && endsWith(qaevent.getTopic(), "/PROJECT");
+        return qaevent.getSource().equals(OPENAIRE_SOURCE) && Strings.CS.endsWith(qaevent.getTopic(), "/PROJECT");
     }
 
     private SolrInputDocument createSolrDocument(Context context, QAEvent dto, String checksum) throws Exception {
