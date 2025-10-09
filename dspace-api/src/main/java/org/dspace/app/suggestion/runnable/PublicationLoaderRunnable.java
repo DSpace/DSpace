@@ -159,7 +159,7 @@ public class PublicationLoaderRunnable
     private DiscoverResultItemIterator findResearchers() {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(profile)) {
+        if (StringUtils.isNotBlank(profile)) {
             discoverQuery.setQuery("search.resourceid:" + profile);
         }
         discoverQuery.addFilterQueries("search.resourcetype:Item");
