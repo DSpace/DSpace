@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.iiif.model.generator.ImageContentGenerator;
@@ -220,7 +220,7 @@ public class CanvasService extends AbstractResourceService {
     private CanvasGenerator addMetadata(Context context, Bitstream bitstream, CanvasGenerator canvasGenerator) {
         BitstreamService bService = ContentServiceFactory.getInstance().getBitstreamService();
         for (String field : BITSTREAM_METADATA_FIELDS) {
-            if (StringUtils.startsWith(field, "@") && StringUtils.endsWith(field, "@")) {
+            if (Strings.CS.startsWith(field, "@") && Strings.CS.endsWith(field, "@")) {
                 String virtualFieldName = field.substring(1, field.length() - 1);
                 String beanName = BitstreamIIIFVirtualMetadata.IIIF_BITSTREAM_VIRTUAL_METADATA_BEAN_PREFIX +
                         virtualFieldName;

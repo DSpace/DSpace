@@ -15,6 +15,7 @@ import com.google.common.net.InetAddresses;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Utils;
@@ -195,7 +196,7 @@ public class ClientInfoServiceImpl implements ClientInfoService {
                remote address. ordering in spec is vague, we'll just take the last
                not equal to the proxy
             */
-            if (!StringUtils.equals(remoteIp, xfip) && StringUtils.isNotBlank(xfip)
+            if (!Strings.CS.equals(remoteIp, xfip) && StringUtils.isNotBlank(xfip)
                     // if we have trusted proxies, we'll assume that they are not the client IP
                     && !isRequestFromTrustedProxy(xfip)) {
                 ip = xfip;

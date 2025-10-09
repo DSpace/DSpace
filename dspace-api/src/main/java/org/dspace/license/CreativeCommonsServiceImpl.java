@@ -25,6 +25,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -623,7 +624,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     private boolean containsAnswerEnum(final String enumAnswer, final CCLicenseField ccLicenseField) {
         List<CCLicenseFieldEnum> fieldEnums = ccLicenseField.getFieldEnum();
         for (CCLicenseFieldEnum fieldEnum : fieldEnums) {
-            if (StringUtils.equals(fieldEnum.getId(), enumAnswer)) {
+            if (Strings.CS.equals(fieldEnum.getId(), enumAnswer)) {
                 return true;
             }
         }
@@ -632,7 +633,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     private CCLicenseField findCCLicenseField(final String field, final List<CCLicenseField> ccLicenseFieldList) {
         for (CCLicenseField ccLicenseField : ccLicenseFieldList) {
-            if (StringUtils.equals(ccLicenseField.getId(), field)) {
+            if (Strings.CS.equals(ccLicenseField.getId(), field)) {
                 return ccLicenseField;
             }
         }

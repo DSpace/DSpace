@@ -23,7 +23,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -190,7 +191,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         String newValue = value.name();
         String oldValue = itemService.getMetadataFirstValue(profile, "dspace", "orcid", "sync-mode", Item.ANY);
 
-        if (StringUtils.equals(oldValue, newValue)) {
+        if (Strings.CS.equals(oldValue, newValue)) {
             return false;
         } else {
             itemService.setMetadataSingleValue(context, profile, "dspace", "orcid", "sync-mode", null, value.name());

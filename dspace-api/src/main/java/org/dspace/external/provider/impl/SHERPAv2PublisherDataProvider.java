@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.sherpa.SHERPAService;
 import org.dspace.app.sherpa.v2.SHERPAPublisher;
 import org.dspace.app.sherpa.v2.SHERPAPublisherResponse;
@@ -132,7 +133,7 @@ public class SHERPAv2PublisherDataProvider extends AbstractExternalDataProvider 
 
     @Override
     public boolean supports(String source) {
-        return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
+        return Strings.CI.equals(sourceIdentifier, source);
     }
 
     /**
