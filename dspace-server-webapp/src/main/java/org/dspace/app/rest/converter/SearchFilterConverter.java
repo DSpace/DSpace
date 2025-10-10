@@ -7,33 +7,30 @@
  */
 package org.dspace.app.rest.converter;
 
-
-
 import org.dspace.app.rest.model.SearchFilterRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+/**
+ * Converter to convert from {@link DiscoverySearchFilter} objects to {@link SearchFilterRest} objects.
+ */
 @Component
 public class SearchFilterConverter implements DSpaceConverter<DiscoverySearchFilter, SearchFilterRest> {
-
-    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
-    @Lazy
-    @Autowired
-    ConverterService converter;
 
     @Override
     public SearchFilterRest convert(DiscoverySearchFilter filter, Projection projection) {
         SearchFilterRest searchFilterRest = new SearchFilterRest();
 
         searchFilterRest.setFilter(filter.getIndexFieldName());
-        searchFilterRest.setType(filter.getType());
+        searchFilterRest.setFilterType(filter.getType());
         searchFilterRest.setOpenByDefault(filter.isOpenByDefault());
         searchFilterRest.setHasFacets(filter instanceof DiscoverySearchFilterFacet);
         searchFilterRest.setPageSize(filter.getPageSize());
+        searchFilterRest.addDefaultOperatorsToList();
+        searchFilterRest.setProjection(projection);
+
         return searchFilterRest;
     }
 

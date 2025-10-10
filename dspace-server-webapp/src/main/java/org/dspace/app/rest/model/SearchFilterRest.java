@@ -10,20 +10,21 @@ package org.dspace.app.rest.model;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 
-public class SearchFilterRest implements RestModel {
-    public static final String NAME = "search-filter";
-    public static final String PLURAL_NAME = "search-filters";
+/**
+ * This class serves as a REST representation for the {@link DiscoverySearchFilter} class.
+ */
+public class SearchFilterRest extends RestAddressableModel {
+    public static final String NAME = "searchfilter";
+    public static final String PLURAL_NAME = "searchfilters";
 
     private String filter;
     private boolean hasFacets = false;
-    private String type;
+    private String filterType;
     private boolean isOpenByDefault = false;
-    private List<SearchFilterRest.Operator> operators = new LinkedList<>();
     private int pageSize;
+    private List<SearchFilterRest.Operator> operators = new LinkedList<>();
 
     public static final String OPERATOR_EQUALS = "equals";
     public static final String OPERATOR_NOTEQUALS = "notequals";
@@ -33,21 +34,36 @@ public class SearchFilterRest implements RestModel {
     public static final String OPERATOR_NOTCONTAINS = "notcontains";
     public static final String OPERATOR_QUERY = "query";
 
-    /**
-     * Specifies whether this filter has facets or not
-     * @return  A boolean indicating whether this filter has facets or not
-     */
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
+
     public boolean isHasFacets() {
         return hasFacets;
     }
 
-    /**
-     * Sets the hasFacets property of the filter class to the given boolean
-     *
-     * @param hasFacets The boolean that the hasFacets property will be set to
-     */
     public void setHasFacets(boolean hasFacets) {
         this.hasFacets = hasFacets;
+    }
+
+    public String getFilterType() {
+        return filterType;
+    }
+
+    public void setFilterType(String filterType) {
+        this.filterType = filterType;
+    }
+
+    public boolean isOpenByDefault() {
+        return isOpenByDefault;
+    }
+
+    public void setOpenByDefault(boolean openByDefault) {
+        isOpenByDefault = openByDefault;
     }
 
     public int getPageSize() {
@@ -56,48 +72,6 @@ public class SearchFilterRest implements RestModel {
 
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
-    }
-
-    /**
-     * This is the same type as described in {@link DiscoverySearchFilter#getType()}
-     * @return  The type of this filter
-     */
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public String getTypePlural() {
-        return PLURAL_NAME;
-    }
-
-    /**
-     * This is the same type as described in {@link org.dspace.discovery.configuration.DiscoverySearchFilter#setType(String)}
-     *
-     * @param type  The type for this Filter to be set to
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
-    /**
-     * See documentantion at {@link DiscoverySearchFilter#isOpenByDefault()}
-     */
-    public boolean isOpenByDefault() {
-        return isOpenByDefault;
-    }
-    /**
-     * See documentantion at {@link DiscoverySearchFilter#setIsOpenByDefault(boolean)}
-     */
-    public void setOpenByDefault(boolean openByDefault) {
-        isOpenByDefault = openByDefault;
-    }
-
-    public void setFilter(String filter) {
-        this.filter = filter;
-    }
-
-    public String getFilter() {
-        return filter;
     }
 
     public void addOperator(SearchFilterRest.Operator operator) {
@@ -119,19 +93,23 @@ public class SearchFilterRest implements RestModel {
     }
 
     @Override
-    public boolean equals(Object object) {
-        return (object instanceof SearchFilterRest &&
-            new EqualsBuilder().append(this.filter, ((SearchFilterRest) object).filter)
-                .append(this.getOperators(), ((SearchFilterRest) object).getOperators())
-                .isEquals());
+    public String getCategory() {
+        return null;
     }
 
     @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-            .append(filter)
-            .append(operators)
-            .toHashCode();
+    public String getType() {
+        return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
+    @Override
+    public Class getController() {
+        return null;
     }
 
     public static class Operator {
@@ -143,20 +121,6 @@ public class SearchFilterRest implements RestModel {
 
         public String getOperator() {
             return operator;
-        }
-
-        @Override
-        public boolean equals(Object object) {
-            return (object instanceof SearchFilterRest.Operator &&
-                new EqualsBuilder()
-                    .append(this.getOperator(), ((SearchFilterRest.Operator) object).getOperator()).isEquals());
-        }
-
-        @Override
-        public int hashCode() {
-            return new HashCodeBuilder(17, 37)
-                .append(operator)
-                .toHashCode();
         }
     }
 }

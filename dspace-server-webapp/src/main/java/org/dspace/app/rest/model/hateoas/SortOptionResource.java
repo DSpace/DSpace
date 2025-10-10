@@ -7,22 +7,14 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import org.dspace.app.rest.model.AccessStatusRest;
 import org.dspace.app.rest.model.SortOptionRest;
-import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 
-@RelNameDSpaceResource(SortOptionRest.NAME)
+/**
+ * The Resource representation of a {@link SortOptionRest} object.
+ */
 public class SortOptionResource extends HALResource<SortOptionRest> {
-
-    @JsonUnwrapped
-    private AccessStatusRest data;
 
     public SortOptionResource(SortOptionRest content) {
         super(content);
-    }
-
-    public AccessStatusRest getData() {
-        return data;
     }
 }

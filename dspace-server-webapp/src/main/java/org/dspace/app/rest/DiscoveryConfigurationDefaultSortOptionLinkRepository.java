@@ -10,40 +10,43 @@ package org.dspace.app.rest;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.DiscoveryConfigurationRest;
-import org.dspace.app.rest.model.SearchFilterRest;
+import org.dspace.app.rest.model.SortOptionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.AbstractDSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * LinkRepository for the "searchfilters" subresource of an individual DiscoveryConfiguration.
+ * LinkRepository for the "defaultsortoption" subresource of an individual DiscoveryConfiguration.
  */
 @Component(DiscoveryConfigurationRest.CATEGORY + "." + DiscoveryConfigurationRest.PLURAL_NAME + "."
-    + DiscoveryConfigurationRest.SEARCH_FILTERS)
-public class DiscoveryConfigurationSearchFilterLinkRepository extends AbstractDSpaceRestRepository
-    implements LinkRestRepository {
+        + DiscoveryConfigurationRest.DEFAULT_SORT_OPTION)
+public class DiscoveryConfigurationDefaultSortOptionLinkRepository extends AbstractDSpaceRestRepository
+        implements LinkRestRepository {
 
     @Autowired
     private DiscoveryConfigurationService searchConfigurationService;
 
     @PreAuthorize("permitAll()")
-    public Page<SearchFilterRest> getSearchFilters(@Nullable HttpServletRequest request, String name,
-                                                   @Nullable Pageable optionalPageable, Projection projection) {
+    public SortOptionRest getDefaultSortOption(@Nullable HttpServletRequest request, String name,
+                                               @Nullable Pageable optionalPageable, Projection projection) {
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration(name);
         if (discoveryConfiguration == null) {
             throw new ResourceNotFoundException("No such DiscoveryConfiguration: " + name);
         }
 
-        Pageable pageable = optionalPageable != null ? optionalPageable : PageRequest.of(0, 20);
-        return converter.toRestPage(discoveryConfiguration.getSearchFilters(), pageable, projection);
+        if (discoveryConfiguration.getSearchSortConfiguration() != null &&
+                discoveryConfiguration.getSearchSortConfiguration().getDefaultSortField() != null) {
+            return converter.toRest(discoveryConfiguration.getSearchSortConfiguration().getDefaultSortField(),
+                                    projection);
+        }
+
+        return null;
     }
 }

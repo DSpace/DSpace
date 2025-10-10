@@ -152,7 +152,7 @@ public class RestResourceController implements InitializingBean {
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
     public HALResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
                                                         @PathVariable Integer id) {
-        return findOneInternal(apiCategory, model, id, null);
+        return findOneInternal(apiCategory, model, id);
     }
 
     /**
@@ -182,10 +182,8 @@ public class RestResourceController implements InitializingBean {
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG)
     public HALResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
-                                                        @PathVariable String id,
-                                                        @RequestParam(name = "uuid", required = false) String uuid) {
-
-        return findOneInternal(apiCategory, model, id, uuid);
+                                                        @PathVariable String id) {
+        return findOneInternal(apiCategory, model, id);
     }
 
     /**
@@ -205,7 +203,7 @@ public class RestResourceController implements InitializingBean {
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     public HALResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
                                                         @PathVariable UUID uuid) {
-        return findOneInternal(apiCategory, model, uuid, null);
+        return findOneInternal(apiCategory, model, uuid);
     }
 
     /**
@@ -217,16 +215,11 @@ public class RestResourceController implements InitializingBean {
      * @return single DSpaceResource
      */
     private <ID extends Serializable> HALResource<RestAddressableModel> findOneInternal(String apiCategory,
-                                                                                        String model, ID id,
-                                                                                        String uuid) {
+                                                                                           String model, ID id) {
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         Optional<RestAddressableModel> modelObject = Optional.empty();
         try {
-            if (uuid != null) {
-                modelObject = repository.findById(id, uuid);
-            } else {
-                modelObject = repository.findById(id);
-            }
+            modelObject = repository.findById(id);
         } catch (ClassCastException | IllegalArgumentException | AopInvocationException e) {
             // These exceptions may be thrown if the "id" param above is not valid for DSpaceRestRepository.findById()
             // (e.g. passing an Integer param when a UUID is expected, or similar).

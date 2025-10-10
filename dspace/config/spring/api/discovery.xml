@@ -190,6 +190,7 @@
 
     <!--The default configuration settings for discovery-->
     <bean id="defaultConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <property name="id" value="default"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
@@ -344,6 +345,7 @@
 
     <bean id="communityConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype" parent="defaultConfiguration">
+        <property name="id" value="community"/>
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
@@ -361,6 +363,7 @@
 
     <bean id="collectionConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype" parent="defaultConfiguration">
+        <property name="id" value="collection"/>
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
@@ -377,6 +380,7 @@
     </bean>
 
     <bean id="defaultRelationshipsConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <property name="id" value="defaultRelationship"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>

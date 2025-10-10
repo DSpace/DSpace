@@ -120,21 +120,6 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         return null;
     }
 
-    /**
-     * Return a specific REST object and passes a uuid if this was provided
-     *
-     * @return the REST object identified by its ID
-     */
-    public Optional<T> findById(ID id, String uuid) {
-        Context context = obtainContext();
-        final T object = getThisRepository().findOne(context, id, uuid);
-        if (object == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(object);
-        }
-    }
-
     @Override
     /**
      * Return a specific REST object
@@ -161,10 +146,6 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @return the REST object identified by its ID
      */
     public abstract T findOne(Context context, ID id);
-
-    public T findOne(Context context, ID id, String uuid) {
-        throw new UnsupportedOperationException("Not supported for this class");
-    }
 
     @Override
     /**

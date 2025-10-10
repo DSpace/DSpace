@@ -1,20 +1,20 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.model.hateoas;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.dspace.app.rest.model.SearchFilterRest;
-import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 
-@RelNameDSpaceResource(SearchFilterRest.NAME)
+/**
+ * The Resource representation of a {@link SearchFilterRest} object.
+ */
 public class SearchFilterResource extends HALResource<SearchFilterRest> {
-
-    @JsonUnwrapped
-    private SearchFilterRest data;
 
     public SearchFilterResource(SearchFilterRest content) {
         super(content);
-    }
-
-    public SearchFilterRest getData() {
-        return data;
     }
 }

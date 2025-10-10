@@ -7,125 +7,43 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.dspace.app.rest.DiscoveryRestController;
 import org.dspace.app.rest.RestResourceController;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
 
 /**
- * This class' purpose is to store the information that'll be shown on the /search endpoint.
+ * This class serves as a REST representation for the {@link DiscoveryConfiguration} class.
  */
 @LinksRest(links = {
-    @LinkRest(name = DiscoveryConfigurationRest.SEARCH_FILTER, method = "getSearchFilters"),
-    @LinkRest(name = DiscoveryConfigurationRest.SORT_OPTION, method = "getSortOptions"),
+    @LinkRest(name = DiscoveryConfigurationRest.SEARCH_FILTERS, method = "getSearchFilters"),
+    @LinkRest(name = DiscoveryConfigurationRest.SORT_OPTIONS, method = "getSortOptions"),
+    @LinkRest(name = DiscoveryConfigurationRest.DEFAULT_SORT_OPTION, method = "getDefaultSortOption"),
 })
 public class DiscoveryConfigurationRest extends BaseObjectRest<String> {
-
-    public static final String NAME = "configuration";
-    public static final String PLURAL_NAME = "configurations";
+    public static final String NAME = "discoveryconfiguration";
+    public static final String PLURAL_NAME = "discoveryconfigurations";
     public static final String CATEGORY = RestModel.DISCOVER;
-    public static final String SEARCH_FILTER = "search-filter";
-    public static final String SORT_OPTION = "sort-option";
 
+    public static final String SEARCH_FILTERS = "searchfilters";
+    public static final String SORT_OPTIONS = "sortoptions";
+    public static final String DEFAULT_SORT_OPTION = "defaultsortoption";
 
-    @JsonIgnore
-    private String scope;
-    @JsonIgnore
-    private String configuration;
-
-    private List<SearchFilterRest> filters = new LinkedList<>();
-    private List<SortOptionRest> sortOptions = new LinkedList<>();
-
-    private SortOptionRest defaultSortOption;
-
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public String getType() {
         return NAME;
     }
 
-    /**
-     * The plural name is the same as the singular name
-     */
     @Override
     public String getTypePlural() {
         return PLURAL_NAME;
     }
 
+    @Override
     public Class getController() {
         return RestResourceController.class;
-    }
-
-    public String getScope() {
-        return scope;
-    }
-
-    public void setScope(String scope) {
-        this.scope = scope;
-    }
-
-    public String getConfiguration() {
-        return configuration;
-    }
-
-    public void setConfiguration(String configurationName) {
-        this.configuration = configurationName;
-    }
-
-    public void addFilter(SearchFilterRest filter) {
-        filters.add(filter);
-    }
-
-    public List<SearchFilterRest> getFilters() {
-        return filters;
-    }
-
-    public void addSortOption(SortOptionRest sortOption) {
-        sortOptions.add(sortOption);
-    }
-
-    public List<SortOptionRest> getSortOptions() {
-        return sortOptions;
-    }
-
-    public SortOptionRest getDefaultSortOption() {
-        return defaultSortOption;
-    }
-
-    public void setDefaultSortOption(SortOptionRest defaultSortOption) {
-        this.defaultSortOption = defaultSortOption;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        return (object instanceof DiscoveryConfigurationRest &&
-            new EqualsBuilder().append(this.getCategory(), ((DiscoveryConfigurationRest) object).getCategory())
-                .append(this.getType(), ((DiscoveryConfigurationRest) object).getType())
-                .append(this.getController(), ((DiscoveryConfigurationRest) object).getController())
-                .append(this.getScope(), ((DiscoveryConfigurationRest) object).getScope())
-                .append(this.getConfiguration(),
-                    ((DiscoveryConfigurationRest) object).getConfiguration())
-                .append(this.getFilters(), ((DiscoveryConfigurationRest) object).getFilters())
-                .append(this.getSortOptions(), ((DiscoveryConfigurationRest) object).getSortOptions())
-                .isEquals());
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-            .append(this.getCategory())
-            .append(this.getType())
-            .append(this.getController())
-            .append(this.getScope())
-            .append(this.getConfiguration())
-            .append(this.getFilters())
-            .append(this.getSortOptions())
-            .toHashCode();
     }
 }

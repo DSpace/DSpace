@@ -8,12 +8,14 @@
 package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 
-public class SortOptionRest implements RestModel {
-    public static final String NAME = "sort-option";
-    public static final String PLURAL_NAME = "sort-options";
+/**
+ * This class serves as a REST representation for the {@link DiscoverySortFieldConfiguration} class.
+ */
+public class SortOptionRest extends RestAddressableModel {
+    public static final String NAME = "sortoption";
+    public static final String PLURAL_NAME = "sortoptions";
 
     //TODO Remove this ignore when the proper actualName gets added through the bean ID
     @JsonIgnore
@@ -46,22 +48,6 @@ public class SortOptionRest implements RestModel {
     }
 
     @Override
-    public boolean equals(Object object) {
-        return (object instanceof SortOptionRest &&
-            new EqualsBuilder().append(this.getName(), ((SortOptionRest) object).getName())
-                .append(this.getActualName(), ((SortOptionRest) object).getActualName())
-                .isEquals());
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-            .append(actualName)
-            .append(name)
-            .toHashCode();
-    }
-
-    @Override
     public String getType() {
         return NAME;
     }
@@ -69,5 +55,15 @@ public class SortOptionRest implements RestModel {
     @Override
     public String getTypePlural() {
         return PLURAL_NAME;
+    }
+
+    @Override
+    public String getCategory() {
+        return null;
+    }
+
+    @Override
+    public Class getController() {
+        return null;
     }
 }

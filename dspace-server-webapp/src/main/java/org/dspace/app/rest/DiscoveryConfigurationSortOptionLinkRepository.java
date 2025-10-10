@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest;
 
-
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.DiscoveryConfigurationRest;
@@ -17,7 +16,6 @@ import org.dspace.app.rest.repository.AbstractDSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
-import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,8 +24,11 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+/**
+ * LinkRepository for the "sortoptions" subresource of an individual DiscoveryConfiguration.
+ */
 @Component(DiscoveryConfigurationRest.CATEGORY + "." + DiscoveryConfigurationRest.PLURAL_NAME + "."
-    + DiscoveryConfigurationRest.SORT_OPTION)
+    + DiscoveryConfigurationRest.SORT_OPTIONS)
 public class DiscoveryConfigurationSortOptionLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 
@@ -35,14 +36,13 @@ public class DiscoveryConfigurationSortOptionLinkRepository extends AbstractDSpa
     private DiscoveryConfigurationService searchConfigurationService;
 
     @PreAuthorize("permitAll()")
-    public Page<SortOptionRest> getSortOptions(@Nullable HttpServletRequest request,
-                                               String name,
-                                               @Nullable Pageable optionalPageable,
-                                               Projection projection) {
+    public Page<SortOptionRest> getSortOptions(@Nullable HttpServletRequest request, String name,
+                                               @Nullable Pageable optionalPageable, Projection projection) {
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration(name);
         if (discoveryConfiguration == null) {
-            throw new ResourceNotFoundException("No such discoveryConfiguration: " + name);
+            throw new ResourceNotFoundException("No such DiscoveryConfiguration: " + name);
         }
+
         Pageable pageable = optionalPageable != null ? optionalPageable : PageRequest.of(0, 20);
         return converter.toRestPage(discoveryConfiguration.getSearchSortConfiguration().getSortFields(),
             pageable, projection);

@@ -12,15 +12,19 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.springframework.stereotype.Component;
 
+/**
+ * Converter to convert from {@link DiscoverySortFieldConfiguration} objects to {@link SortOptionRest} objects.
+ */
 @Component
 public class SortOptionConverter implements DSpaceConverter<DiscoverySortFieldConfiguration, SortOptionRest> {
+
     @Override
-    public SortOptionRest convert(DiscoverySortFieldConfiguration defaultSortField, Projection projection) {
+    public SortOptionRest convert(DiscoverySortFieldConfiguration sortOption, Projection projection) {
         SortOptionRest sortOptionRest = new SortOptionRest();
 
-        sortOptionRest.setName(defaultSortField.getMetadataField());
-        sortOptionRest.setActualName(defaultSortField.getType());
-        sortOptionRest.setSortOrder(defaultSortField.getDefaultSortOrder().name());
+        sortOptionRest.setName(sortOption.getMetadataField());
+        sortOptionRest.setSortOrder(sortOption.getDefaultSortOrder().name());
+        sortOptionRest.setProjection(projection);
 
         return sortOptionRest;
     }
