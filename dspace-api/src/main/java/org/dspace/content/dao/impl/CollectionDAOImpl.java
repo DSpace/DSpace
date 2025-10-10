@@ -14,11 +14,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -181,7 +179,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
      */
     @Override
     public List<Collection> findAuthorizedByEPerson(Context context, EPerson ePerson, List<Integer> actions)
-            throws SQLException {
+        throws SQLException {
 
         //NOTE steps 1) and 2) removes the need of WITH RECURSIVE and a NativeQuery
 
@@ -226,34 +224,42 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
             }
         }
 
-        // WE cannot pass a Group, instead we need to pass the UUIDs
-        List<UUID> groupIds = allGroups.stream()
-            .map(Group::getID)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+        CriteriaBuilder cb = getCriteriaBuilder(context);
+        CriteriaQuery<Collection> cq = getCriteriaQuery(cb, Collection.class);
+        Root<Collection> collectionRoot = cq.from(Collection.class);
 
-        // 3) Get collections via ResourcePolicy (direct permission or group)
-        String jpql = """
-            SELECT DISTINCT c
-            FROM Collection c
-            JOIN ResourcePolicy rp ON rp.dSpaceObject = c
-            WHERE rp.resourceTypeId = :resourceType
-              AND (:hasActions = false OR rp.actionId IN :actionIds)
-              AND (
-                 rp.eperson.id = :epersonId
-                 OR (:hasGroups = true AND rp.epersonGroup.id IN :groupIds)
-             )
-            """;
+        // Join to ResourcePolicy using metamodel
+        Join<Collection, ResourcePolicy> rpJoin = collectionRoot.join("resourcePolicies");
+        // Use metamodel for typesafe access
+        cq.select(collectionRoot).distinct(true);
 
-        Query query = createQuery(context, jpql);
-        query.setParameter("resourceType", Constants.COLLECTION) // Only Collection resourcety_id = 3
-            .setParameter("hasActions", actions != null && !actions.isEmpty()) // to avoid empty IN
-            .setParameter("actionIds", actions)
-            .setParameter("epersonId", ePerson.getID())
-            .setParameter("hasGroups", !groupIds.isEmpty()) // to avoid empty I
-            .setParameter("groupIds", groupIds)
-            .getResultList();
+        List<Predicate> predicates = new ArrayList<>(actions.size());
+        // WHERE rp.resourceTypeId = :resourceType
+        predicates.add(cb.equal(rpJoin.get(ResourcePolicy_.resourceTypeId), Constants.COLLECTION));
+        // AND (:hasActions = false OR rp.actionId IN :actionIds)
+        if (actions != null && !actions.isEmpty()) {
+            predicates.add(rpJoin.get(ResourcePolicy_.actionId).in(actions));
+        }
 
+        // AND (rp.eperson.id = :epersonId OR (:hasGroups = true AND rp.epersonGroup.id IN :groupIds))
+        Predicate epersonPredicate = cb.equal(
+            rpJoin.get(ResourcePolicy_.eperson), ePerson
+        );
+        // Using only groups instead of groupsIDs
+        Predicate groupPredicate = cb.disjunction(); // false by default
+        if (allGroups != null && !allGroups.isEmpty()) {
+            groupPredicate = rpJoin.get(ResourcePolicy_.epersonGroup).in(allGroups);
+        }
+
+        // Combine access condition
+        Predicate accessPredicate = cb.or(epersonPredicate, groupPredicate);
+        predicates.add(accessPredicate);
+
+        // Apply WHERE clause
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
+
+        // Execute
+        Query query = createQuery(context, cq);
         return query.getResultList();
     }
 
