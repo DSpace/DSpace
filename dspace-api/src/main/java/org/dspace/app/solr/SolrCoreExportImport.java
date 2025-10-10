@@ -693,7 +693,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
      * @return the full core name with prefix (e.g., "dspace-search", "dspace-statistics")
      */
     private String getFullCoreName(String baseName) {
-        String multicorePrefix = configurationService.getProperty("solr.multicoreprefix");
+        String multicorePrefix = configurationService.getProperty("solr.multicorePrefix");
 
         if (StringUtils.isNotBlank(multicorePrefix)) {
             return multicorePrefix + baseName;
