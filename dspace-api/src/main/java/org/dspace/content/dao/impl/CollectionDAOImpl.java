@@ -259,8 +259,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         cq.where(cb.and(predicates.toArray(new Predicate[0])));
 
         // Execute
-        Query query = createQuery(context, cq);
-        return query.getResultList();
+        return list(context, cq, true, Collection.class, -1, -1);
     }
 
     @Override
