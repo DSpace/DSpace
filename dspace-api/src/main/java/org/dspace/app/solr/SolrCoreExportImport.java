@@ -8,12 +8,17 @@
 package org.dspace.app.solr;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -21,23 +26,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -49,6 +43,7 @@ import org.dspace.utils.DSpace;
 
 /**
  * Script for complete export and import of SOLR cores with multithreading support.
+ * Uses direct HTTP calls to SOLR for maximum performance and simplicity.
  * Supports both CSV and JSON formats for data exchange.
  *
  * REST version requires admin privileges, CLI version can be executed freely.
@@ -70,9 +65,10 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     private ObjectMapper jsonMapper = new ObjectMapper();
+    private HttpClient httpClient;
 
-    // Cache for field types per core to avoid repeated SOLR schema queries
-    private java.util.Map<String, java.util.Set<String>> dateFieldsCache = new java.util.HashMap<>();
+    // Cache for fields list to avoid multiple calls to SOLR
+    private List<String> cachedFields = null;
 
     /**
      * Determines if this script execution requires authentication.
@@ -93,6 +89,11 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         }
 
         this.epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
+        // Initialize HTTP client for SOLR calls
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(30))
+                .build();
 
         mode = commandLine.getOptionValue('m');
         if (StringUtils.isBlank(mode) || (!mode.equals("export") && !mode.equals("import"))) {
@@ -197,509 +198,368 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
     }
 
     /**
-     * Export complete SOLR core data to files
+     * Export complete SOLR core data to files using direct HTTP calls
      */
     private void exportCore() throws Exception {
+        long startTime = System.currentTimeMillis();
         String solrUrl = configurationService.getProperty("solr.server");
         String fullCoreName = getFullCoreName(coreName);
+        String baseUrl = solrUrl + "/" + fullCoreName;
 
-        try (SolrClient solrClient = new HttpSolrClient.Builder(solrUrl + "/" + fullCoreName).build()) {
-            // Get total document count
-            SolrQuery countQuery = new SolrQuery("*:*");
-            countQuery.setRows(0);
-            QueryResponse countResponse = solrClient.query(countQuery);
-            long totalDocs = countResponse.getResults().getNumFound();
+        log.info("Starting export from SOLR core: {}", baseUrl);
+        handler.logInfo("Exporting from SOLR core: " + baseUrl);
 
-            log.info("Starting export of {} documents from core '{}' (full name: '{}') using {} threads",
-                    totalDocs, coreName, fullCoreName, threadCount);
-            handler.logInfo("Exporting " + totalDocs + " documents from SOLR core: " + fullCoreName);
+        // Get total document count first
+        long totalDocs = getTotalDocumentCount(baseUrl);
+        log.info("Total documents to export: {}", totalDocs);
 
-            if (totalDocs == 0) {
-                log.warn("No documents found in core '{}'", coreName);
-                handler.logWarning("No documents found in core: " + coreName);
-                return;
-            }
-
-            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-            List<CompletableFuture<Void>> futures = new ArrayList<>();
-
-            // Calculate batches for parallel processing
-            long numBatches = (totalDocs + batchSize - 1) / batchSize;
-
-            for (int i = 0; i < numBatches; i++) {
-                final int batchIndex = i;
-                final int start = i * batchSize;
-                final int rows = (int) Math.min(batchSize, totalDocs - start);
-
-                CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                    try {
-                        exportBatch(solrClient, batchIndex, start, rows);
-                    } catch (Exception e) {
-                        log.error("Error exporting batch {}: {}", batchIndex, e.getMessage(), e);
-                        throw new RuntimeException(e);
-                    }
-                }, executor);
-
-                futures.add(future);
-            }
-
-            // Wait for all batches to complete
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-            executor.shutdown();
-            executor.awaitTermination(30, TimeUnit.SECONDS);
-
-            log.info("Export completed successfully for core '{}'", coreName);
-            handler.logInfo("Export completed successfully");
+        if (totalDocs == 0) {
+            log.warn("No documents found in core '{}'", fullCoreName);
+            handler.logWarning("No documents found in core: " + fullCoreName);
+            return;
         }
+
+        // Calculate batches for parallel processing
+        long numBatches = (totalDocs + batchSize - 1) / batchSize;
+        log.info("Processing {} documents in {} batches using {} threads", totalDocs, numBatches, threadCount);
+
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+        long processingStart = System.currentTimeMillis();
+        for (int i = 0; i < numBatches; i++) {
+            final int batchIndex = i;
+            final int start = i * batchSize;
+            final int rows = (int) Math.min(batchSize, totalDocs - start);
+
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                try {
+                    exportBatch(baseUrl, batchIndex, start, rows);
+                } catch (Exception e) {
+                    log.error("Error exporting batch {}: {}", batchIndex, e.getMessage(), e);
+                    throw new RuntimeException(e);
+                }
+            }, executor);
+
+            futures.add(future);
+        }
+
+        // Wait for all batches to complete
+        log.info("Waiting for {} export tasks to complete...", futures.size());
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        long processingTime = System.currentTimeMillis() - processingStart;
+
+        executor.shutdown();
+        if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+            log.warn("Executor did not terminate gracefully, forcing shutdown");
+            executor.shutdownNow();
+        }
+
+        long totalTime = System.currentTimeMillis() - startTime;
+        double docsPerSecond = totalDocs / (totalTime / 1000.0);
+        log.info("Export completed in {} ms ({} docs/sec)", totalTime, String.format("%.2f", docsPerSecond));
+        handler.logInfo("Export completed successfully");
     }
 
     /**
-     * Export a single batch of documents
+     * Get total document count using a simple HTTP call to SOLR
      */
-    private void exportBatch(SolrClient solrClient, int batchIndex, int start, int rows)
-            throws SolrServerException, IOException {
+    private long getTotalDocumentCount(String baseUrl) throws Exception {
+        String url = baseUrl + "/select?q=*:*&rows=0&wt=json";
 
-        SolrQuery query = new SolrQuery("*:*");
-        query.setStart(start);
-        query.setRows(rows);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(Duration.ofMinutes(2))
+                .GET()
+                .build();
 
-        // Use appropriate sort field based on core name
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new RuntimeException("SOLR count query failed with status: " + response.statusCode());
+        }
+
+        JsonNode jsonResponse = jsonMapper.readTree(response.body());
+        return jsonResponse.path("response").path("numFound").asLong();
+    }
+
+    /**
+     * Export a single batch using direct HTTP call to SOLR
+     */
+    private void exportBatch(String baseUrl, int batchIndex, int start, int rows) throws Exception {
+        long batchStart = System.currentTimeMillis();
+        Thread currentThread = Thread.currentThread();
+
+        log.debug("Thread '{}' exporting batch {} (start={}, rows={})",
+                currentThread.getName(), batchIndex, start, rows);
+
+        // Build SOLR URL - similar to your curl example
         String sortField = getSortFieldForCore();
-        query.addSort(sortField, SolrQuery.ORDER.asc); // Ensure consistent ordering
+        String url = String.format("%s/select?q=*:*&start=%d&rows=%d&sort=%s%%20asc&wt=%s",
+                baseUrl, start, rows, sortField, format);
 
-        QueryResponse response = solrClient.query(query);
-        SolrDocumentList docs = response.getResults();
+        // Add field list to exclude problematic fields
+        List<String> fields = getAvailableFields(baseUrl);
+        String fieldList = String.join(",", fields);
+        url += "&fl=" + fieldList;
 
+        log.debug("Thread '{}' calling SOLR URL: {}", currentThread.getName(), url);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(Duration.ofMinutes(5))
+                .GET()
+                .build();
+
+        long queryStart = System.currentTimeMillis();
+        HttpResponse<InputStream> response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        long queryTime = System.currentTimeMillis() - queryStart;
+
+        if (response.statusCode() != 200) {
+            throw new RuntimeException("SOLR export failed with status: " + response.statusCode());
+        }
+
+        // Write response directly to file
         String filename = String.format("solr_export_batch_%04d.%s", batchIndex, format);
         Path filePath = Paths.get(directory, filename);
 
-        if (format.equals("csv")) {
-            exportBatchToCSV(docs, filePath);
-        } else {
-            exportBatchToJSON(docs, filePath);
+        log.debug("Thread '{}' writing to file: {}", currentThread.getName(), filename);
+        long writeStart = System.currentTimeMillis();
+
+        try (InputStream inputStream = response.body();
+             FileOutputStream outputStream = new FileOutputStream(filePath.toFile())) {
+            inputStream.transferTo(outputStream);
         }
 
-        log.debug("Exported batch {} ({} documents) to {}", batchIndex, docs.size(), filename);
+        long writeTime = System.currentTimeMillis() - writeStart;
+        long totalTime = System.currentTimeMillis() - batchStart;
+
+        log.info("Thread '{}' completed batch {} in {} ms (query: {}ms, write: {}ms)",
+                currentThread.getName(), batchIndex, totalTime, queryTime, writeTime);
     }
 
     /**
-     * Determine the appropriate sort field based on core name.
-     *
-     * @return the field name to use for sorting
+     * Determine the appropriate sort field based on core name
      */
     private String getSortFieldForCore() {
         return switch (coreName) {
             case "search" -> "search.uniqueid";
             case "suggestion" -> "suggestion_id";
             case "qaevent" -> "event_id";
-            default -> "uid"; // Default sort field for other cores, generally statistics and audit
+            default -> "uid"; // Default for statistics, audit, etc.
         };
     }
 
     /**
-     * Export batch to CSV format
-     */
-    private void exportBatchToCSV(SolrDocumentList docs, Path filePath) throws IOException {
-        try (FileWriter writer = new FileWriter(filePath.toFile());
-             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
-
-            if (!docs.isEmpty()) {
-                // Filter out problematic fields from the first document to create header
-                SolrDocument firstDoc = docs.get(0);
-                List<String> allowedFields = firstDoc.getFieldNames().stream()
-                    .filter(this::isFieldAllowedForExport)
-                    .collect(java.util.stream.Collectors.toList());
-
-                csvPrinter.printRecord(allowedFields);
-
-                // Write document data using only allowed fields
-                for (SolrDocument doc : docs) {
-                    List<Object> values = new ArrayList<>();
-                    for (String fieldName : allowedFields) {
-                        Object value = doc.getFieldValue(fieldName);
-                        values.add(formatValueForExport(fieldName, value));
-                    }
-                    csvPrinter.printRecord(values);
-                }
-            }
-        }
-    }
-
-    /**
-     * Export batch to JSON format
-     */
-    private void exportBatchToJSON(SolrDocumentList docs, Path filePath) throws IOException {
-        // Filter out problematic fields from documents before serialization
-        List<java.util.Map<String, Object>> filteredDocs = new ArrayList<>();
-
-        for (SolrDocument doc : docs) {
-            java.util.Map<String, Object> filteredDoc = new java.util.HashMap<>();
-            for (String fieldName : doc.getFieldNames()) {
-                if (isFieldAllowedForExport(fieldName)) {
-                    Object value = doc.getFieldValue(fieldName);
-                    filteredDoc.put(fieldName, formatValueForExport(fieldName, value));
-                }
-            }
-            filteredDocs.add(filteredDoc);
-        }
-
-        jsonMapper.writeValue(filePath.toFile(), filteredDocs);
-    }
-
-    /**
-     * Format a field value for proper export handling.
-     * Ensures dates are in ISO format and arrays are properly serialized.
-     *
-     * @param fieldName the name of the field
-     * @param value the original value from SOLR
-     * @return the formatted value for export
-     */
-    private Object formatValueForExport(String fieldName, Object value) {
-        if (value == null) {
-            return "";
-        }
-
-        // Handle date fields - convert to ISO format for proper reimport
-        if (isDateField(fieldName) && value instanceof java.util.Date) {
-            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ISO_INSTANT;
-            return formatter.format(((java.util.Date) value).toInstant());
-        }
-
-        // Handle collection/array fields
-        if (value instanceof java.util.Collection) {
-            java.util.Collection<?> collection = (java.util.Collection<?>) value;
-            if (collection.isEmpty()) {
-                return "";
-            }
-            // Convert to JSON array string for CSV compatibility
-            return collection.stream()
-                    .map(Object::toString)
-                    .collect(java.util.stream.Collectors.joining(",", "[", "]"));
-        }
-
-        return value.toString();
-    }
-
-    /**
-     * Determines if a field is a date field by querying SOLR schema.
-     * Results are cached per core to avoid repeated queries.
-     *
-     * @param fieldName the field name to check
-     * @return true if it's actually a date field according to SOLR schema
-     */
-    private boolean isDateField(String fieldName) {
-        String fullCoreName = getFullCoreName(coreName);
-
-        // Check cache first
-        java.util.Set<String> dateFields = dateFieldsCache.get(fullCoreName);
-        if (dateFields != null) {
-            return dateFields.contains(fieldName);
-        }
-
-        // Query SOLR schema and populate cache
-        dateFields = fetchDateFieldsFromSchema(fullCoreName);
-        dateFieldsCache.put(fullCoreName, dateFields);
-
-        return dateFields.contains(fieldName);
-    }
-
-    /**
-     * Fetch actual date fields from SOLR schema using Luke Request Handler.
-     * This gives us the real field types as defined in the schema.
-     *
-     * @param fullCoreName the complete core name with prefix
-     * @return set of field names that are date types
-     */
-    private java.util.Set<String> fetchDateFieldsFromSchema(String fullCoreName) {
-        java.util.Set<String> dateFields = new java.util.HashSet<>();
-        String solrUrl = configurationService.getProperty("solr.server");
-
-        try (SolrClient solrClient = new HttpSolrClient.Builder(solrUrl + "/" + fullCoreName).build()) {
-
-            // Use Luke Request Handler to get field information
-            org.apache.solr.client.solrj.request.LukeRequest lukeRequest =
-                new org.apache.solr.client.solrj.request.LukeRequest();
-            lukeRequest.setShowSchema(true);
-
-            org.apache.solr.client.solrj.response.LukeResponse lukeResponse =
-                lukeRequest.process(solrClient);
-
-            // Get field information from Luke response
-            java.util.Map<String, org.apache.solr.client.solrj.response.LukeResponse.FieldInfo> fields =
-                lukeResponse.getFieldInfo();
-
-            for (java.util.Map.Entry<String, org.apache.solr.client.solrj.response.LukeResponse.FieldInfo> entry :
-                 fields.entrySet()) {
-
-                String fieldName = entry.getKey();
-                org.apache.solr.client.solrj.response.LukeResponse.FieldInfo fieldInfo = entry.getValue();
-                String fieldType = fieldInfo.getType();
-
-                // Check if field type indicates it's a date field
-                if (isDateType(fieldType)) {
-                    dateFields.add(fieldName);
-                    log.debug("Identified date field '{}' with type '{}'", fieldName, fieldType);
-                }
-            }
-
-            log.info("Found {} date fields in core '{}': {}", dateFields.size(), fullCoreName, dateFields);
-
-        } catch (Exception e) {
-            log.warn("Could not fetch schema for core '{}', falling back to pattern matching: {}",
-                    fullCoreName, e.getMessage());
-
-            // Fallback to the old pattern-based approach if schema query fails
-            return getFallbackDateFields();
-        }
-
-        return dateFields;
-    }
-
-    /**
-     * Determines if a SOLR field type represents a date/time field.
-     *
-     * @param fieldType the SOLR field type string
-     * @return true if it's a date/time type
-     */
-    private boolean isDateType(String fieldType) {
-        if (StringUtils.isBlank(fieldType)) {
-            return false;
-        }
-
-        String type = fieldType.toLowerCase();
-        return type.contains("date") ||
-               type.contains("time") ||
-               type.equals("pdate") ||
-               type.equals("tdate") ||
-               type.startsWith("date") ||
-               type.endsWith("_dt");
-    }
-
-    /**
-     * Fallback method using pattern matching when schema query fails.
-     * Uses the old logic as a backup.
-     *
-     * @return set of likely date field names based on patterns
-     */
-    private java.util.Set<String> getFallbackDateFields() {
-        java.util.Set<String> fallbackFields = new java.util.HashSet<>();
-
-        // Add common known date field names as fallback
-        fallbackFields.add("time");
-        fallbackFields.add("timestamp");
-        // Add more known patterns specific to your DSpace instance if needed
-
-        log.info("Using fallback date field detection with {} known fields", fallbackFields.size());
-        return fallbackFields;
-    }
-
-    /**
-     * Determines if a field should be included in the export.
-     * Excludes internal SOLR fields that cause problems during import.
-     *
-     * @param fieldName the name of the field to check
-     * @return true if the field should be exported, false otherwise
-     */
-    private boolean isFieldAllowedForExport(String fieldName) {
-        // Exclude internal SOLR fields that cause import issues
-        return !fieldName.equals("_version_") &&
-               !fieldName.equals("_root_") &&
-               !fieldName.startsWith("_nest_");
-    }
-
-    /**
-     * Import SOLR core data from files
+     * Import SOLR core data from files using direct HTTP calls
      */
     private void importCore() throws Exception {
+        long startTime = System.currentTimeMillis();
         String solrUrl = configurationService.getProperty("solr.server");
         String fullCoreName = getFullCoreName(coreName);
+        String baseUrl = solrUrl + "/" + fullCoreName;
 
-        try (SolrClient solrClient = new HttpSolrClient.Builder(solrUrl + "/" + fullCoreName).build()) {
-            File[] files = new File(directory).listFiles((dir, name) ->
+        log.info("Starting import to SOLR core: {}", baseUrl);
+        handler.logInfo("Importing to SOLR core: " + baseUrl);
+
+        File[] files = new File(directory).listFiles((dir, name) ->
                 name.startsWith("solr_export_batch_") && name.endsWith("." + format));
 
-            if (files == null || files.length == 0) {
-                throw new IllegalArgumentException("No export files found in directory: " + directory);
-            }
-
-            log.info("Starting import of {} files to core '{}' (full name: '{}') using {} threads",
-                    files.length, coreName, fullCoreName, threadCount);
-            handler.logInfo("Importing " + files.length + " files to SOLR core: " + fullCoreName);
-
-            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-            List<CompletableFuture<Void>> futures = new ArrayList<>();
-
-            for (File file : files) {
-                CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                    try {
-                        importFile(solrClient, file);
-                    } catch (Exception e) {
-                        log.error("Error importing file {}: {}", file.getName(), e.getMessage(), e);
-                        throw new RuntimeException(e);
-                    }
-                }, executor);
-
-                futures.add(future);
-            }
-
-            // Wait for all imports to complete
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-            executor.shutdown();
-            executor.awaitTermination(30, TimeUnit.SECONDS);
-
-            // Final commit
-            solrClient.commit();
-
-            log.info("Import completed successfully for core '{}'", coreName);
-            handler.logInfo("Import completed successfully");
-        }
-    }
-
-    /**
-     * Import a single file
-     */
-    private void importFile(SolrClient solrClient, File file) throws Exception {
-        if (format.equals("csv")) {
-            importFromCSV(solrClient, file);
-        } else {
-            importFromJSON(solrClient, file);
+        if (files == null || files.length == 0) {
+            throw new IllegalArgumentException("No export files found in directory: " + directory);
         }
 
-        log.debug("Imported file: {}", file.getName());
-    }
+        // Sort files to ensure consistent processing order
+        java.util.Arrays.sort(files, java.util.Comparator.comparing(File::getName));
 
-    /**
-     * Import from CSV format
-     */
-    private void importFromCSV(SolrClient solrClient, File file) throws Exception {
-        try (CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(
-                Files.newBufferedReader(file.toPath()))) {
+        log.info("Found {} files to import using {} threads", files.length, threadCount);
 
-            List<SolrInputDocument> docs = new ArrayList<>();
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-            for (CSVRecord record : parser) {
-                SolrInputDocument doc = new SolrInputDocument();
-                for (String header : parser.getHeaderNames()) {
-                    String value = record.get(header);
-                    if (StringUtils.isNotBlank(value)) {
-                        Object parsedValue = parseValueForImport(header, value);
-                        if (parsedValue != null) {
-                            doc.addField(header, parsedValue);
-                        }
-                    }
-                }
-                docs.add(doc);
-
-                // Batch commit for memory efficiency
-                if (docs.size() >= 10000) { // Reduced batch size for safer import
-                    solrClient.add(docs);
-                    docs.clear();
-                }
-            }
-
-            // Add remaining documents
-            if (!docs.isEmpty()) {
-                solrClient.add(docs);
-            }
-        }
-    }
-
-    /**
-     * Import from JSON format
-     */
-    private void importFromJSON(SolrClient solrClient, File file) throws Exception {
-        @SuppressWarnings("unchecked")
-        List<java.util.Map<String, Object>> docs = jsonMapper.readValue(file, List.class);
-        List<SolrInputDocument> inputDocs = new ArrayList<>();
-
-        for (java.util.Map<String, Object> docMap : docs) {
-            SolrInputDocument inputDoc = new SolrInputDocument();
-            for (java.util.Map.Entry<String, Object> entry : docMap.entrySet()) {
-                String fieldName = entry.getKey();
-                Object value = entry.getValue();
-
-                if (value != null) {
-                    Object parsedValue = parseValueForImport(fieldName, value.toString());
-                    if (parsedValue != null) {
-                        inputDoc.addField(fieldName, parsedValue);
-                    }
-                }
-            }
-            inputDocs.add(inputDoc);
-
-            // Batch commit for memory efficiency
-            if (inputDocs.size() >= 10000) { // Reduced batch size for safer import
-                solrClient.add(inputDocs);
-                inputDocs.clear();
-            }
-        }
-
-        // Add remaining documents
-        if (!inputDocs.isEmpty()) {
-            solrClient.add(inputDocs);
-        }
-    }
-
-    /**
-     * Parse a value from import data to proper SOLR format.
-     * Handles date conversion and array deserialization.
-     *
-     * @param fieldName the field name
-     * @param value the string value from export
-     * @return the parsed value for SOLR import
-     */
-    private Object parseValueForImport(String fieldName, String value) {
-        if (StringUtils.isBlank(value) || value.equals("null")) {
-            return null;
-        }
-
-        // Handle array fields (detect JSON array format)
-        if (value.startsWith("[") && value.endsWith("]")) {
-            String arrayContent = value.substring(1, value.length() - 1);
-            if (StringUtils.isNotBlank(arrayContent)) {
-                return java.util.Arrays.asList(arrayContent.split(",\\s*"));
-            }
-            return new ArrayList<>();
-        }
-
-        // Handle date fields - parse ISO format back to proper format
-        if (isDateField(fieldName)) {
-            try {
-                // Try parsing ISO instant format first
-                java.time.Instant instant = java.time.Instant.parse(value);
-                return java.util.Date.from(instant);
-            } catch (Exception e) {
-                // If that fails, try other common formats
+        long processingStart = System.currentTimeMillis();
+        for (File file : files) {
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 try {
-                    java.time.format.DateTimeFormatter formatter =
-                        java.time.format.DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy",
-                                                                     java.util.Locale.ENGLISH);
-                    java.time.ZonedDateTime zdt = java.time.ZonedDateTime.parse(value, formatter);
-                    return java.util.Date.from(zdt.toInstant());
-                } catch (Exception e2) {
-                    log.warn("Could not parse date field '{}' with value '{}', using as string", fieldName, value);
-                    return value; // Fallback to string
+                    importFile(baseUrl, file);
+                } catch (Exception e) {
+                    log.error("Error importing file {}: {}", file.getName(), e.getMessage(), e);
+                    throw new RuntimeException(e);
                 }
-            }
+            }, executor);
+
+            futures.add(future);
         }
 
-        return value;
+        // Wait for all imports to complete
+        log.info("Waiting for {} import tasks to complete...", futures.size());
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        long processingTime = System.currentTimeMillis() - processingStart;
+
+        executor.shutdown();
+        if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+            log.warn("Executor did not terminate gracefully, forcing shutdown");
+            executor.shutdownNow();
+        }
+
+        // Final commit
+        log.info("Performing final SOLR commit...");
+        long commitStart = System.currentTimeMillis();
+        commitToSolr(baseUrl);
+        long commitTime = System.currentTimeMillis() - commitStart;
+
+        long totalTime = System.currentTimeMillis() - startTime;
+        log.info("Import completed in {} ms (processing: {}ms, commit: {}ms)",
+                totalTime, processingTime, commitTime);
+        handler.logInfo("Import completed successfully");
     }
 
     /**
-     * Get the full core name including the multicore prefix if configured.
-     *
-     * @param baseName the base core name (e.g., "search", "statistics")
-     * @return the full core name with prefix (e.g., "dspace-search", "dspace-statistics")
+     * Import a single file using HTTP POST to SOLR
+     */
+    private void importFile(String baseUrl, File file) throws Exception {
+        long fileStart = System.currentTimeMillis();
+        Thread currentThread = Thread.currentThread();
+
+        log.info("Thread '{}' importing file: {} ({}KB)",
+                currentThread.getName(), file.getName(), file.length() / 1024);
+
+        String url = baseUrl + "/update";
+        String contentType = format.equals("csv") ? "application/csv" : "application/json";
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(Duration.ofMinutes(10))
+                .header("Content-Type", contentType)
+                .POST(HttpRequest.BodyPublishers.ofFile(file.toPath()))
+                .build();
+
+        long uploadStart = System.currentTimeMillis();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        long uploadTime = System.currentTimeMillis() - uploadStart;
+
+        if (response.statusCode() != 200) {
+            throw new RuntimeException("SOLR import failed for file " + file.getName() +
+                    " with status: " + response.statusCode() + " - " + response.body());
+        }
+
+        long totalTime = System.currentTimeMillis() - fileStart;
+        log.info("Thread '{}' completed import of '{}' in {} ms (upload: {}ms)",
+                currentThread.getName(), file.getName(), totalTime, uploadTime);
+    }
+
+    /**
+     * Commit changes to SOLR
+     */
+    private void commitToSolr(String baseUrl) throws Exception {
+        String url = baseUrl + "/update?commit=true";
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(Duration.ofMinutes(5))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString("{}"))
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new RuntimeException("SOLR commit failed with status: " + response.statusCode());
+        }
+    }
+
+    /**
+     * Get the full core name including the multicore prefix if configured
      */
     private String getFullCoreName(String baseName) {
-        String multicorePrefix = configurationService.getProperty("solr.multicorePrefix");
+        String multicorePrefix = configurationService.getProperty("solr.multicoreprefix");
 
         if (StringUtils.isNotBlank(multicorePrefix)) {
             return multicorePrefix + baseName;
         }
 
         return baseName;
+    }
+
+    /**
+     * Get available fields from SOLR core schema
+     */
+    private List<String> getAvailableFields(String baseUrl) throws Exception {
+        // Return cached fields if available
+        if (cachedFields != null) {
+            return cachedFields;
+        }
+
+        String url = baseUrl + "/schema/fields?wt=json";
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(Duration.ofMinutes(1))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            log.warn("Could not retrieve schema fields from {}, using fallback method", baseUrl);
+            return getFieldsFromSampleQuery(baseUrl);
+        }
+
+        List<String> fields = new ArrayList<>();
+        JsonNode jsonResponse = jsonMapper.readTree(response.body());
+        JsonNode fieldsArray = jsonResponse.path("fields");
+
+        if (fieldsArray.isArray()) {
+            for (JsonNode field : fieldsArray) {
+                String fieldName = field.path("name").asText();
+                // Exclude problematic fields
+                if (!fieldName.startsWith("_") && !fieldName.equals("_version_") && !fieldName.equals("_root_")) {
+                    fields.add(fieldName);
+                }
+            }
+        }
+
+        log.info("Retrieved {} fields from schema for core '{}'", fields.size(), coreName);
+
+        // Cache the retrieved fields
+        cachedFields = fields;
+        return fields;
+    }
+
+    /**
+     * Fallback method to get fields from a sample query when schema endpoint is not available
+     */
+    private List<String> getFieldsFromSampleQuery(String baseUrl) throws Exception {
+        String url = baseUrl + "/select?q=*:*&rows=1&wt=json";
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(Duration.ofMinutes(1))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new RuntimeException("Could not retrieve sample document from SOLR core");
+        }
+
+        List<String> fields = new ArrayList<>();
+        JsonNode jsonResponse = jsonMapper.readTree(response.body());
+        JsonNode docs = jsonResponse.path("response").path("docs");
+
+        if (docs.isArray() && docs.size() > 0) {
+            JsonNode firstDoc = docs.get(0);
+            firstDoc.fieldNames().forEachRemaining(fieldName -> {
+                // Exclude problematic fields
+                if (!fieldName.startsWith("_") && !fieldName.equals("_version_") && !fieldName.equals("_root_")) {
+                    fields.add(fieldName);
+                }
+            });
+        }
+
+        log.info("Retrieved {} fields from sample document for core '{}'", fields.size(), coreName);
+        return fields;
     }
 
     @Override
