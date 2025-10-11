@@ -8,8 +8,10 @@
 package org.dspace.xoai.util;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,8 +40,9 @@ public class DateUtils {
         // as YYYY-MM-DDThh:mm:ssZ  For more details, see
         // http://www.openarchives.org/OAI/openarchivesprotocol.html#DatestampsResponses
 
-        // toString returns the correct format
-        return date.toString();
+        Instant truncated = date.truncatedTo(ChronoUnit.SECONDS);
+        return DateTimeFormatter.ISO_INSTANT.format(truncated);
+        
     }
 
     /**
