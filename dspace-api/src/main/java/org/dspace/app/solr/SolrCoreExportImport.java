@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.app.solr;
@@ -59,7 +59,10 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
     private String directory;
     private String format = "csv";
     private int threadCount = 1;
-    private int batchSize = 250_000;
+    private String dateField;
+    private String startDate;
+    private String endDate;
+    private String dateIncrement = "MONTH"; // WEEK, MONTH, YEAR
     private boolean help = false;
     protected EPersonService epersonService;
 
@@ -128,14 +131,18 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
             }
         }
 
-        if (commandLine.hasOption('b')) {
-            try {
-                batchSize = Integer.parseInt(commandLine.getOptionValue('b'));
-                if (batchSize < 1) {
-                    throw new ParseException("Batch size must be at least 1");
-                }
-            } catch (NumberFormatException e) {
-                throw new ParseException("Invalid batch size: " + commandLine.getOptionValue('b'));
+        if (commandLine.hasOption('s')) {
+            startDate = commandLine.getOptionValue('s');
+        }
+
+        if (commandLine.hasOption('e')) {
+            endDate = commandLine.getOptionValue('e');
+        }
+
+        if (commandLine.hasOption('i')) {
+            dateIncrement = commandLine.getOptionValue('i').toUpperCase();
+            if (!dateIncrement.equals("WEEK") && !dateIncrement.equals("MONTH") && !dateIncrement.equals("YEAR")) {
+                throw new ParseException("Date increment must be WEEK, MONTH, or YEAR");
             }
         }
     }
@@ -143,7 +150,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
     @Override
     public void internalRun() throws Exception {
         if (help) {
-            printHelp();
+            printVerboseHelp();
             return;
         }
 
@@ -198,7 +205,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
     }
 
     /**
-     * Export complete SOLR core data to files using direct HTTP calls
+     * Export complete SOLR core data to files using date ranges instead of pagination
      */
     private void exportCore() throws Exception {
         long startTime = System.currentTimeMillis();
@@ -209,34 +216,37 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         log.info("Starting export from SOLR core: {}", baseUrl);
         handler.logInfo("Exporting from SOLR core: " + baseUrl);
 
-        // Get total document count first
-        long totalDocs = getTotalDocumentCount(baseUrl);
-        log.info("Total documents to export: {}", totalDocs);
+        // Determine date field based on core type
+        dateField = getDateFieldForCore();
+        log.info("Using date field '{}' for range queries", dateField);
 
-        if (totalDocs == 0) {
-            log.warn("No documents found in core '{}'", fullCoreName);
-            handler.logWarning("No documents found in core: " + fullCoreName);
+        // Get date range boundaries
+        DateRange totalRange = getDateRange(baseUrl);
+        if (totalRange == null) {
+            log.warn("No date range found in core '{}'", fullCoreName);
+            handler.logWarning("No date range found in core: " + fullCoreName);
             return;
         }
 
-        // Calculate batches for parallel processing
-        long numBatches = (totalDocs + batchSize - 1) / batchSize;
-        log.info("Processing {} documents in {} batches using {} threads", totalDocs, numBatches, threadCount);
+        log.info("Date range: {} to {}", totalRange.start, totalRange.end);
+
+        // Generate date ranges based on increment
+        List<DateRange> dateRanges = generateDateRanges(totalRange);
+        log.info("Created {} date ranges using {} increment", dateRanges.size(), dateIncrement);
 
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         List<CompletableFuture<Void>> futures = new ArrayList<>();
 
         long processingStart = System.currentTimeMillis();
-        for (int i = 0; i < numBatches; i++) {
-            final int batchIndex = i;
-            final int start = i * batchSize;
-            final int rows = (int) Math.min(batchSize, totalDocs - start);
+        for (int i = 0; i < dateRanges.size(); i++) {
+            final int rangeIndex = i;
+            final DateRange range = dateRanges.get(i);
 
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 try {
-                    exportBatch(baseUrl, batchIndex, start, rows);
+                    exportDateRange(baseUrl, rangeIndex, range);
                 } catch (Exception e) {
-                    log.error("Error exporting batch {}: {}", batchIndex, e.getMessage(), e);
+                    log.error("Error exporting date range {} ({}): {}", rangeIndex, range, e.getMessage(), e);
                     throw new RuntimeException(e);
                 }
             }, executor);
@@ -244,7 +254,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
             futures.add(future);
         }
 
-        // Wait for all batches to complete
+        // Wait for all ranges to complete
         log.info("Waiting for {} export tasks to complete...", futures.size());
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
         long processingTime = System.currentTimeMillis() - processingStart;
@@ -256,49 +266,145 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         }
 
         long totalTime = System.currentTimeMillis() - startTime;
-        double docsPerSecond = totalDocs / (totalTime / 1000.0);
-        log.info("Export completed in {} ms ({} docs/sec)", totalTime, String.format("%.2f", docsPerSecond));
+        log.info("Export completed in {} ms", totalTime);
         handler.logInfo("Export completed successfully");
     }
 
     /**
-     * Get total document count using a simple HTTP call to SOLR
+     * Get the appropriate date field based on core name
      */
-    private long getTotalDocumentCount(String baseUrl) throws Exception {
-        String url = baseUrl + "/select?q=*:*&rows=0&wt=json";
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .timeout(Duration.ofMinutes(2))
-                .GET()
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() != 200) {
-            throw new RuntimeException("SOLR count query failed with status: " + response.statusCode());
-        }
-
-        JsonNode jsonResponse = jsonMapper.readTree(response.body());
-        return jsonResponse.path("response").path("numFound").asLong();
+    private String getDateFieldForCore() {
+        return switch (coreName) {
+            case "statistics" -> "time";
+            case "audit" -> "timeStamp";
+            default -> "lastModified"; // Default fallback
+        };
     }
 
     /**
-     * Export a single batch using direct HTTP call to SOLR
+     * Get min/max date range from SOLR or use provided parameters
      */
-    private void exportBatch(String baseUrl, int batchIndex, int start, int rows) throws Exception {
-        long batchStart = System.currentTimeMillis();
+    private DateRange getDateRange(String baseUrl) throws Exception {
+        String minDate = startDate;
+        String maxDate = endDate;
+
+        // If dates not provided, get them from SOLR
+        if (StringUtils.isBlank(minDate) || StringUtils.isBlank(maxDate)) {
+            String statsUrl = String.format("%s/select?q=*:*&rows=0&wt=json&stats=true&stats.field=%s",
+                    baseUrl, dateField);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(statsUrl))
+                    .timeout(Duration.ofMinutes(2))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("SOLR stats query failed with status: " + response.statusCode());
+            }
+
+            JsonNode jsonResponse = jsonMapper.readTree(response.body());
+            JsonNode stats = jsonResponse.path("stats").path("stats_fields").path(dateField);
+
+            if (StringUtils.isBlank(minDate)) {
+                String solrMinDate = stats.path("min").asText();
+                // Normalize to date-only format
+                minDate = solrMinDate.length() >= 10 ? solrMinDate.substring(0, 10) : solrMinDate;
+            }
+            if (StringUtils.isBlank(maxDate)) {
+                String solrMaxDate = stats.path("max").asText();
+                // Normalize to date-only format
+                maxDate = solrMaxDate.length() >= 10 ? solrMaxDate.substring(0, 10) : solrMaxDate;
+            }
+
+            if (StringUtils.isBlank(minDate) || StringUtils.isBlank(maxDate)) {
+                return null;
+            }
+
+            log.info("Retrieved date range from SOLR: {} to {}", minDate, maxDate);
+        }
+
+        return new DateRange(minDate, maxDate);
+    }
+
+    /**
+     * Generate date ranges based on the increment setting
+     */
+    private List<DateRange> generateDateRanges(DateRange totalRange) {
+        List<DateRange> ranges = new ArrayList<>();
+
+        try {
+            // Parse dates - handle both full ISO format and date-only format
+            java.time.LocalDate startDate = parseInputDate(totalRange.start);
+            java.time.LocalDate endDate = parseInputDate(totalRange.end);
+
+            java.time.LocalDate current = startDate;
+
+            while (current.isBefore(endDate) || current.isEqual(endDate)) {
+                java.time.LocalDate next = switch (dateIncrement) {
+                    case "WEEK" -> current.plusWeeks(1).minusDays(1);
+                    case "MONTH" -> current.plusMonths(1).minusDays(1);
+                    case "YEAR" -> current.plusYears(1).minusDays(1);
+                    default -> current.plusMonths(1).minusDays(1);
+                };
+
+                // Don't exceed the end date
+                if (next.isAfter(endDate)) {
+                    next = endDate;
+                }
+
+                ranges.add(new DateRange(
+                        current.atStartOfDay() + ":00.000Z",  // 00:00:00.000Z
+                        next.atTime(23, 59, 59, 999_000_000).toString() + "Z"  // 23:59:59.999Z
+                ));
+
+                // Next range starts the day after this one ends
+                current = next.plusDays(1);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to parse dates, creating single range: {}", e.getMessage());
+            ranges.add(totalRange);
+        }
+
+        return ranges;
+    }
+
+    /**
+     * Parse input date handling both ISO format and date-only format
+     */
+    private java.time.LocalDate parseInputDate(String dateStr) {
+        if (dateStr.length() == 10) {
+            // Date only format: 2023-01-01
+            return java.time.LocalDate.parse(dateStr);
+        } else {
+            // Full ISO format: 2023-01-01T00:00:00Z
+            return java.time.LocalDateTime.parse(dateStr.substring(0, 19)).toLocalDate();
+        }
+    }
+
+    /**
+     * Export data for a specific date range
+     */
+    private void exportDateRange(String baseUrl, int rangeIndex, DateRange range) throws Exception {
+        long rangeStart = System.currentTimeMillis();
         Thread currentThread = Thread.currentThread();
 
-        log.debug("Thread '{}' exporting batch {} (start={}, rows={})",
-                currentThread.getName(), batchIndex, start, rows);
+        log.info("Thread '{}' exporting range {} ({} to {})",
+                currentThread.getName(), rangeIndex, range.start, range.end);
 
-        // Build SOLR URL - similar to your curl example
-        String sortField = getSortFieldForCore();
-        String url = String.format("%s/select?q=*:*&start=%d&rows=%d&sort=%s%%20asc&wt=%s",
-                baseUrl, start, rows, sortField, format);
+        // Build SOLR query for date range using filter query
+        String query = "*:*";
+        String filterQuery = String.format("%s:[%s TO %s]", dateField, range.start, range.end);
+        String url = String.format("%s/select?q=%s&fq=%s&rows=%d&wt=%s",
+                baseUrl,
+                java.net.URLEncoder.encode(query, "UTF-8"),
+                java.net.URLEncoder.encode(filterQuery, "UTF-8"),
+                Integer.MAX_VALUE,
+                format);
 
-        // Add field list to exclude problematic fields
+        // Add field list
         List<String> fields = getAvailableFields(baseUrl);
         String fieldList = String.join(",", fields);
         url += "&fl=" + fieldList;
@@ -320,7 +426,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         }
 
         // Write response directly to file
-        String filename = String.format("solr_export_batch_%04d.%s", batchIndex, format);
+        String filename = String.format("solr_export_range_%04d.%s", rangeIndex, format);
         Path filePath = Paths.get(directory, filename);
 
         log.debug("Thread '{}' writing to file: {}", currentThread.getName(), filename);
@@ -332,22 +438,28 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         }
 
         long writeTime = System.currentTimeMillis() - writeStart;
-        long totalTime = System.currentTimeMillis() - batchStart;
+        long totalTime = System.currentTimeMillis() - rangeStart;
 
-        log.info("Thread '{}' completed batch {} in {} ms (query: {}ms, write: {}ms)",
-                currentThread.getName(), batchIndex, totalTime, queryTime, writeTime);
+        log.info("Thread '{}' completed range {} in {} ms (query: {}ms, write: {}ms)",
+                currentThread.getName(), rangeIndex, totalTime, queryTime, writeTime);
     }
 
     /**
-     * Determine the appropriate sort field based on core name
+     * Simple data class to hold date range information
      */
-    private String getSortFieldForCore() {
-        return switch (coreName) {
-            case "search" -> "search.uniqueid";
-            case "suggestion" -> "suggestion_id";
-            case "qaevent" -> "event_id";
-            default -> "uid"; // Default for statistics, audit, etc.
-        };
+    private static class DateRange {
+        final String start;
+        final String end;
+
+        DateRange(String start, String end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        @Override
+        public String toString() {
+            return start + " to " + end;
+        }
     }
 
     /**
@@ -362,8 +474,10 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         log.info("Starting import to SOLR core: {}", baseUrl);
         handler.logInfo("Importing to SOLR core: " + baseUrl);
 
+        // Look for both old batch files and new range files
         File[] files = new File(directory).listFiles((dir, name) ->
-                name.startsWith("solr_export_batch_") && name.endsWith("." + format));
+                name.startsWith("solr_export_range_")
+                        && name.endsWith("." + format));
 
         if (files == null || files.length == 0) {
             throw new IllegalArgumentException("No export files found in directory: " + directory);
@@ -566,5 +680,44 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
     public SolrCoreExportImportScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager().getServiceByName("solr-core-management",
                 SolrCoreExportImportScriptConfiguration.class);
+    }
+
+    /**
+     * Print help information for the script
+     */
+    private void printVerboseHelp() {
+        handler.logInfo("SOLR Core Management Script");
+        handler.logInfo("===========================");
+        handler.logInfo("This script allows complete export and import of SOLR cores using date ranges for "
+                + "optimal performance.");
+        handler.logInfo("");
+        handler.logInfo("Parameters:");
+        handler.logInfo("  -m <mode>        : Required. Mode: 'export' or 'import'");
+        handler.logInfo("  -c <core>        : Required. SOLR core name (statistics, audit, search, etc.)");
+        handler.logInfo("  -d <directory>   : Required. Directory for export/import files");
+        handler.logInfo("  -f <format>      : Optional. Format: 'csv' or 'json' (default: csv)");
+        handler.logInfo("  -t <threads>     : Optional. Number of threads (default: 1)");
+        handler.logInfo("  -s <startdate>   : Optional. Start date (format: 2023-01-01)");
+        handler.logInfo("  -e <enddate>     : Optional. End date (format: 2023-12-31)");
+        handler.logInfo("  -i <increment>   : Optional. Date increment: WEEK, MONTH, YEAR (default: MONTH)");
+        handler.logInfo("  -h               : Show this help");
+        handler.logInfo("");
+        handler.logInfo("Examples:");
+        handler.logInfo("  Export statistics core using date ranges:");
+        handler.logInfo("    ./dspace solr-core-management -m export -c statistics -d /tmp/export -f csv -t 4");
+        handler.logInfo("");
+        handler.logInfo("  Export with specific date range:");
+        handler.logInfo("    ./dspace solr-core-management -m export -c audit -d /tmp/export "
+                + "-s 2023-01-01 -e 2023-06-30");
+        handler.logInfo("");
+        handler.logInfo("  Import from exported files:");
+        handler.logInfo("    ./dspace solr-core-management -m import -c statistics -d /tmp/export -f csv -t 4");
+        handler.logInfo("");
+        handler.logInfo("Notes:");
+        handler.logInfo("- Export uses date ranges instead of pagination for better performance on large datasets");
+        handler.logInfo("- Dates should be in YYYY-MM-DD format, time is automatically set to start/end of day");
+        handler.logInfo("- If start/end dates are not specified, they will be retrieved from SOLR");
+        handler.logInfo("- Date increment determines how data is split across threads");
+        handler.logInfo("- Import can process both old batch files and new range files");
     }
 }

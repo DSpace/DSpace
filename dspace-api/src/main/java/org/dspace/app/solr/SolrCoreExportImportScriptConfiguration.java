@@ -50,8 +50,14 @@ public class SolrCoreExportImportScriptConfiguration<T extends SolrCoreExportImp
             options.addOption("t", "threads", true,
                 "Number of threads for parallel processing (default: 1)");
 
-            options.addOption("b", "batch-size", true,
-                "Batch size for processing documents (default: 250000)");
+            options.addOption("s", "start-date", true,
+                "Start date for export (format: 2023-01-01). If not specified, will be retrieved from SOLR");
+
+            options.addOption("e", "end-date", true,
+                "End date for export (format: 2023-12-31). If not specified, will be retrieved from SOLR");
+
+            options.addOption("i", "increment", true,
+                "Date increment for range splitting: WEEK, MONTH, or YEAR (default: MONTH)");
 
             options.addOption("h", "help", false, "Display help information");
 
