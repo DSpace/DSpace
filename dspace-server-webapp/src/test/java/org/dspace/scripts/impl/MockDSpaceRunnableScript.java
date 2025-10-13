@@ -7,7 +7,10 @@
  */
 package org.dspace.scripts.impl;
 
+import java.util.Optional;
+
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.MockDSpaceRunnableScriptConfiguration;
 import org.dspace.utils.DSpace;
@@ -32,5 +35,12 @@ public class MockDSpaceRunnableScript extends DSpaceRunnable<MockDSpaceRunnableS
         if (!commandLine.hasOption("i")) {
             throw new ParseException("-i is a mandatory parameter");
         }
+    }
+
+    @Override
+    public Optional<String> fileParameterToBitstreamType(String fileParameter) {
+        // Return the type of the file if possible
+        String extension = StringUtils.substringAfterLast(fileParameter, ".");
+        return StringUtils.isNotBlank(extension) ? Optional.of(extension) : Optional.empty();
     }
 }
