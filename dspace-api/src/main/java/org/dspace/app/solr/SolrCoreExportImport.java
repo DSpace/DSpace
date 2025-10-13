@@ -177,8 +177,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
                 }
             } else {
                 // CLI execution - log that we're running without authentication
-                log.info("Running SOLR core export/import from CLI without authentication");
-                handler.logInfo("Running from command line without authentication checks");
+                handler.logInfo("Running SOLR core export/import from CLI without authentication");
             }
 
             // Validate directory
@@ -186,7 +185,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
             if (!Files.exists(dirPath)) {
                 if (mode.equals("export")) {
                     Files.createDirectories(dirPath);
-                    log.info("Created directory: {}", directory);
+                    handler.logInfo("Created directory: " + directory);
                 } else {
                     throw new IllegalArgumentException("Import directory does not exist: " + directory);
                 }
@@ -213,12 +212,11 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         String fullCoreName = getFullCoreName(coreName);
         String baseUrl = solrUrl + "/" + fullCoreName;
 
-        log.info("Starting export from SOLR core: {}", baseUrl);
-        handler.logInfo("Exporting from SOLR core: " + baseUrl);
+        handler.logInfo("Starting export from SOLR core: " + baseUrl);
 
         // Determine date field based on core type
         dateField = getDateFieldForCore();
-        log.info("Using date field '{}' for range queries", dateField);
+        handler.logInfo("Using date field '" + dateField + "' for range queries");
 
         // Get date range boundaries
         DateRange totalRange = getDateRange(baseUrl);
@@ -228,11 +226,11 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
             return;
         }
 
-        log.info("Date range: {} to {}", totalRange.start, totalRange.end);
+        handler.logInfo("Date range: " + totalRange.start + " to " + totalRange.end);
 
         // Generate date ranges based on increment
         List<DateRange> dateRanges = generateDateRanges(totalRange);
-        log.info("Created {} date ranges using {} increment", dateRanges.size(), dateIncrement);
+        handler.logInfo("Created " + dateRanges.size() + " date ranges using " + dateIncrement + " increment");
 
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         List<CompletableFuture<Void>> futures = new ArrayList<>();
@@ -255,7 +253,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         }
 
         // Wait for all ranges to complete
-        log.info("Waiting for {} export tasks to complete...", futures.size());
+        handler.logInfo("Waiting for " + futures.size() + " export tasks to complete...");
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
         long processingTime = System.currentTimeMillis() - processingStart;
 
@@ -266,8 +264,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         }
 
         long totalTime = System.currentTimeMillis() - startTime;
-        log.info("Export completed in {} ms", totalTime);
-        handler.logInfo("Export completed successfully");
+        handler.logInfo("Export completed in " + totalTime + " ms");
     }
 
     /**
@@ -302,7 +299,8 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                throw new RuntimeException("SOLR stats query failed with status: " + response.statusCode());
+                throw new RuntimeException("SOLR stats query failed with status: " + response.statusCode() +
+                        "Solr Core might be empty or not available");
             }
 
             JsonNode jsonResponse = jsonMapper.readTree(response.body());
@@ -323,7 +321,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
                 return null;
             }
 
-            log.info("Retrieved date range from SOLR: {} to {}", minDate, maxDate);
+            handler.logInfo("Retrieved date range from SOLR: " + minDate + " to " + maxDate);
         }
 
         return new DateRange(minDate, maxDate);
@@ -391,8 +389,8 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         long rangeStart = System.currentTimeMillis();
         Thread currentThread = Thread.currentThread();
 
-        log.info("Thread '{}' exporting range {} ({} to {})",
-                currentThread.getName(), rangeIndex, range.start, range.end);
+        handler.logInfo("Thread '" + currentThread.getName() + "' exporting range " + rangeIndex +
+                        " (" + range.start + " to " + range.end + ")");
 
         // Build SOLR query for date range using filter query
         String query = "*:*";
@@ -440,8 +438,8 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         long writeTime = System.currentTimeMillis() - writeStart;
         long totalTime = System.currentTimeMillis() - rangeStart;
 
-        log.info("Thread '{}' completed range {} in {} ms (query: {}ms, write: {}ms)",
-                currentThread.getName(), rangeIndex, totalTime, queryTime, writeTime);
+        handler.logInfo("Thread '" + currentThread.getName() + "' completed range " + rangeIndex +
+                        " in " + totalTime + " ms (query: " + queryTime + "ms, write: " + writeTime + "ms)");
     }
 
     /**
@@ -471,8 +469,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         String fullCoreName = getFullCoreName(coreName);
         String baseUrl = solrUrl + "/" + fullCoreName;
 
-        log.info("Starting import to SOLR core: {}", baseUrl);
-        handler.logInfo("Importing to SOLR core: " + baseUrl);
+        handler.logInfo("Starting import to SOLR core: " + baseUrl);
 
         // Look for both old batch files and new range files
         File[] files = new File(directory).listFiles((dir, name) ->
@@ -486,7 +483,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         // Sort files to ensure consistent processing order
         java.util.Arrays.sort(files, java.util.Comparator.comparing(File::getName));
 
-        log.info("Found {} files to import using {} threads", files.length, threadCount);
+        handler.logInfo("Found " + files.length + " files to import using " + threadCount + " threads");
 
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         List<CompletableFuture<Void>> futures = new ArrayList<>();
@@ -506,7 +503,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         }
 
         // Wait for all imports to complete
-        log.info("Waiting for {} import tasks to complete...", futures.size());
+        handler.logInfo("Waiting for " + futures.size() + " import tasks to complete...");
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
         long processingTime = System.currentTimeMillis() - processingStart;
 
@@ -517,15 +514,14 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         }
 
         // Final commit
-        log.info("Performing final SOLR commit...");
+        handler.logInfo("Performing final SOLR commit...");
         long commitStart = System.currentTimeMillis();
         commitToSolr(baseUrl);
         long commitTime = System.currentTimeMillis() - commitStart;
 
         long totalTime = System.currentTimeMillis() - startTime;
-        log.info("Import completed in {} ms (processing: {}ms, commit: {}ms)",
-                totalTime, processingTime, commitTime);
-        handler.logInfo("Import completed successfully");
+        handler.logInfo("Import completed in " + totalTime + " ms (processing: " + processingTime +
+                "ms, commit: " + commitTime + "ms)");
     }
 
     /**
@@ -535,8 +531,8 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         long fileStart = System.currentTimeMillis();
         Thread currentThread = Thread.currentThread();
 
-        log.info("Thread '{}' importing file: {} ({}KB)",
-                currentThread.getName(), file.getName(), file.length() / 1024);
+        handler.logInfo("Thread '" + currentThread.getName() + "' importing file: " + file.getName() +
+                        " (" + (file.length() / 1024) + "KB)");
 
         String url = baseUrl + "/update";
         String contentType = format.equals("csv") ? "application/csv" : "application/json";
@@ -558,8 +554,8 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         }
 
         long totalTime = System.currentTimeMillis() - fileStart;
-        log.info("Thread '{}' completed import of '{}' in {} ms (upload: {}ms)",
-                currentThread.getName(), file.getName(), totalTime, uploadTime);
+        handler.logInfo("Thread '" + currentThread.getName() + "' completed import of '" + file.getName() +
+                        "' in " + totalTime + " ms (upload: " + uploadTime + "ms)");
     }
 
     /**
@@ -633,7 +629,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
             }
         }
 
-        log.info("Retrieved {} fields from schema for core '{}'", fields.size(), coreName);
+        handler.logInfo("Retrieved " + fields.size() + " fields from schema for core '" + coreName + "'");
 
         // Cache the retrieved fields
         cachedFields = fields;
@@ -672,7 +668,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
             });
         }
 
-        log.info("Retrieved {} fields from sample document for core '{}'", fields.size(), coreName);
+        handler.logInfo("Retrieved " + fields.size() + " fields from sample document for core '" + coreName + "'");
         return fields;
     }
 
