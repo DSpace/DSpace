@@ -75,6 +75,7 @@ public class ResourcePolicyEPersonReplaceRestController {
         }
         EPerson newEPerson = (EPerson) dsoList.get(0);
         resourcePolicy.setEPerson(newEPerson);
+        resourcePolicyService.update(context, resourcePolicy);
         context.commit();
         return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
     }
