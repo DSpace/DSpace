@@ -1123,4 +1123,19 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     public int countArchivedItems(Context context, Collection collection) {
         return itemCounter.getCount(context, collection);
     }
+
+    @Override
+    public void move(Context context, Collection collection, Community from, Community to,
+            boolean inheritDefaultPolicies) throws SQLException, AuthorizeException, IOException {
+        // If the two communities are the same, do nothing.
+        if (from.equals(to)) {
+            return;
+        }
+
+        authorizeService.authorizeAction(context, collection, Constants.WRITE);
+
+        // Move the Collection from one Community to the other
+        communityService.addCollection(context, to, collection);
+        communityService.removeCollection(context, from, collection);
+    }
 }
