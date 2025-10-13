@@ -149,6 +149,12 @@
         </lst>
     </searchComponent>
 
+    <searchComponent class="solr.HighlightComponent" name="highlight">
+        <highlighting>
+            <encoder name="html" class="solr.highlight.HtmlEncoder"/>
+        </highlighting>
+    </searchComponent>
+
     <requestHandler name="/spell" class="solr.SearchHandler" lazy="true">
         <lst name="defaults">
             <str name="spellcheck.onlyMorePopular">false</str>
