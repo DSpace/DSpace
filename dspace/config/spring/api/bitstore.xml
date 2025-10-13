@@ -35,6 +35,22 @@
         <!-- Subfolder to organize assets within the bucket, in case this bucket is shared  -->
         <!-- Optional, default is root level of bucket -->
         <property name="subfolder" value="${assetstore.s3.subfolder}"/>
+
+        <!-- The target throughput for transfer requests in Gbps. Higher value means more connections will be established with S3.  -->
+        <property name="targetThroughputGbps" value="${assetstore.s3.targetThroughputGbps}"/>
+
+        <!-- Sets the minimum part size for transfer parts. Decreasing the minimum part size causes multipart transfer
+             to be split into a larger number of smaller parts.
+        -->
+        <property name="minPartSizeBytes" value="${assetstore.s3.minPartSizeBytes}"/>
+
+        <!-- Specifies the maximum number of S3 connections that should be established during a transfer.
+             If not provided, it will be based on targetThroughputGbps
+        -->
+        <property name="maxConcurrency" value="${assetstore.s3.maxConcurrency}"/>
+
+        <!-- The algorithm the S3 client will use to create a checksum when doing putObject. -->        
+        <property name="s3ChecksumAlgorithm" value="${assetstore.s3.s3ChecksumAlgorithm}"/>        
     </bean>
 
     <!-- 
