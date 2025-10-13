@@ -21,7 +21,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.common.params.CommonParams;
@@ -86,8 +86,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
                 .getBooleanProperty("discovery.solr.url.validation.enabled");
         UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
         if (urlValidator.isValid(solrService) || validationEnabled) {
-            HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
-            solrServer.setUseMultiPartPost(true);
+            HttpJdkSolrClient solrServer = new HttpJdkSolrClient.Builder(solrService).build();
             SolrQuery solrQuery = getSolrQuery(adjustQuery(query), manifestId);
             QueryRequest req = new QueryRequest(solrQuery);
             // returns raw json response.

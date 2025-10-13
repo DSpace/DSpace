@@ -24,7 +24,7 @@ import org.dspace.statistics.ObjectCount;
 import org.dspace.usage.UsageWorkflowEvent;
 
 /**
- * Static holder for a HttpSolrClient connection pool to issue
+ * Static holder for a HttpJdkSolrClient connection pool to issue
  * usage logging events to Solr from DSpace libraries, and some static query
  * composers.
  *

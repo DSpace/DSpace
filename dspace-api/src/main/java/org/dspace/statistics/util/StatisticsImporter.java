@@ -38,7 +38,7 @@ import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -76,7 +76,7 @@ public class StatisticsImporter {
     /**
      * Solr server connection
      */
-    private static HttpSolrClient solr;
+    private static HttpJdkSolrClient solr;
 
     /**
      * GEOIP lookup service
@@ -463,7 +463,7 @@ public class StatisticsImporter {
         if (verbose) {
             System.out.println("Writing to solr server at: " + sserver);
         }
-        solr = new HttpSolrClient.Builder(sserver).build();
+        solr = new HttpJdkSolrClient.Builder(sserver).build();
 
         String dbPath = configurationService.getProperty("usage-statistics.dbfile");
         try {
