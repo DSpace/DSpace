@@ -21,7 +21,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
@@ -121,7 +121,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
             return false;
         }
         final ResourcePolicy other = (ResourcePolicy) obj;
-        if (!StringUtils.equals(getRpName(), other.getRpName())) {
+        if (!Strings.CS.equals(getRpName(), other.getRpName())) {
             return false;
         }
         if (getAction() != other.getAction()) {

@@ -35,6 +35,7 @@ import java.util.zip.ZipOutputStream;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.content.Bitstream;
@@ -799,7 +800,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 "A dspace.cfg entry for 'org.dspace.app.itemexport.work.dir' does not exist.");
         }
         // clean work dir path from duplicate separators
-        return StringUtils.replace(exportDir, File.separator + File.separator, File.separator);
+        return Strings.CS.replace(exportDir, File.separator + File.separator, File.separator);
     }
 
     @Override
@@ -1058,7 +1059,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 }
                 String strAbsPath = cpFile.getPath();
                 int startIndex = strSource.length();
-                if (!StringUtils.endsWith(strSource, File.separator)) {
+                if (!Strings.CS.endsWith(strSource, File.separator)) {
                     startIndex++;
                 }
                 String strZipEntryName = strAbsPath.substring(startIndex, strAbsPath.length());

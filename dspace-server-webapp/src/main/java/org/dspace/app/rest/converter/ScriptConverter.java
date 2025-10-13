@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.ParameterRest;
 import org.dspace.app.rest.model.ScriptRest;
 import org.dspace.app.rest.projection.Projection;
@@ -64,7 +64,7 @@ public class ScriptConverter implements DSpaceConverter<ScriptConfiguration, Scr
      */
     private String getType(Option option) {
         String simpleName = ((Class) option.getType()).getSimpleName();
-        if (StringUtils.equalsIgnoreCase(simpleName, "string")) {
+        if (Strings.CI.equals(simpleName, "string")) {
             if (!option.hasArg()) {
                 return boolean.class.getSimpleName();
             }

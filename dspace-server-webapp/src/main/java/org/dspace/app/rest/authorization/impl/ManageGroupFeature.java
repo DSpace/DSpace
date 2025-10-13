@@ -9,7 +9,7 @@ package org.dspace.app.rest.authorization.impl;
 
 import java.sql.SQLException;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -61,8 +61,8 @@ public class ManageGroupFeature implements AuthorizationFeature {
 
         // Community/Collection admins cannot manage groups that are not COMMUNITY/COLLECTION bound
         // This check is required until https://github.com/DSpace/DSpace/issues/3323 is fixed.
-        if (!(StringUtils.startsWith(group.getName(), "COLLECTION_")
-              || StringUtils.startsWith(group.getName(), "COMMUNITY_"))) {
+        if (!(Strings.CS.startsWith(group.getName(), "COLLECTION_")
+              || Strings.CS.startsWith(group.getName(), "COMMUNITY_"))) {
             return false;
         }
 

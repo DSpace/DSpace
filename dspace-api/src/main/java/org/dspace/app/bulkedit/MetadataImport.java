@@ -25,6 +25,7 @@ import jakarta.annotation.Nullable;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.RelationshipUtils;
 import org.dspace.authority.AuthorityValue;
@@ -552,7 +553,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                     // Add the metadata to the item
                     for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                        if (!StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
+                        if (!Strings.CS.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
                             itemService.addMetadata(c, item, dcv.getSchema(),
                                                     dcv.getElement(),
                                                     dcv.getQualifier(),
@@ -564,7 +565,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                     }
                     //Add relations after all metadata has been processed
                     for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                        if (StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
+                        if (Strings.CS.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
                             addRelationship(c, item, dcv.getElement(), dcv.getValue());
                         }
                     }
@@ -810,7 +811,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 }
             }
 
-            if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
+            if (Strings.CS.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
                 List<RelationshipType> relationshipTypeList = relationshipTypeService
                     .findByLeftwardOrRightwardTypeName(c, element);
                 for (RelationshipType relationshipType : relationshipTypeList) {
@@ -1734,7 +1735,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                                 if (relTypes != null && relTypes.size() > 0) {
                                     String relTypeValue = relTypes.get(0);
-                                    relTypeValue = StringUtils.remove(relTypeValue, "\"").trim();
+                                    relTypeValue = Strings.CS.remove(relTypeValue, "\"").trim();
                                     originType = entityTypeService.findByEntityType(c, relTypeValue).getLabel();
                                     validateTypesByTypeByTypeName(c, targetType, originType, typeName, originRow);
                                 } else {

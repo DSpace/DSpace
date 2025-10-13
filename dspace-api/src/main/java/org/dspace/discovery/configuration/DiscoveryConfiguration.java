@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -124,7 +124,7 @@ public class DiscoveryConfiguration implements InitializingBean {
 
     public DiscoverySearchFilter getSearchFilter(String name) {
         for (DiscoverySearchFilter filter : CollectionUtils.emptyIfNull(searchFilters)) {
-            if (StringUtils.equals(name, filter.getIndexFieldName())) {
+            if (Strings.CS.equals(name, filter.getIndexFieldName())) {
                 return filter;
             }
         }
@@ -216,7 +216,7 @@ public class DiscoveryConfiguration implements InitializingBean {
 
     public DiscoverySearchFilterFacet getSidebarFacet(final String facetName) {
         for (DiscoverySearchFilterFacet sidebarFacet : sidebarFacets) {
-            if (StringUtils.equals(sidebarFacet.getIndexFieldName(), facetName)) {
+            if (Strings.CS.equals(sidebarFacet.getIndexFieldName(), facetName)) {
                 return sidebarFacet;
             }
         }

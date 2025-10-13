@@ -38,7 +38,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.matcher.RegistrationMatcher;
 import org.dspace.app.rest.model.RegistrationRest;
 import org.dspace.app.rest.model.patch.AddOperation;
@@ -185,7 +185,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(status().isCreated());
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertEquals(1, registrationDataList.size());
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), eperson.getEmail()));
 
             String newEmail = "newEPersonTest@gmail.com";
             registrationRest.setEmail(newEmail);
@@ -196,8 +196,8 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(status().isCreated());
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertTrue(registrationDataList.size() == 2);
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) ||
-                           StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), newEmail) ||
+                           Strings.CI.equals(registrationDataList.get(1).getEmail(), newEmail));
             configurationService.setProperty("user.registration", false);
 
             newEmail = "newEPersonTestTwo@gmail.com";
@@ -209,8 +209,8 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(status().is(HttpServletResponse.SC_UNAUTHORIZED));
 
             assertEquals(2, registrationDataList.size());
-            assertTrue(!StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) &&
-                           !StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
+            assertTrue(!Strings.CI.equals(registrationDataList.get(0).getEmail(), newEmail) &&
+                           !Strings.CI.equals(registrationDataList.get(1).getEmail(), newEmail));
         } finally {
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
@@ -238,7 +238,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertEquals(1, registrationDataList.size());
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), eperson.getEmail()));
 
             // Try to register the same email again
             getClient().perform(post("/api/eperson/registrations")
@@ -275,7 +275,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(status().isCreated());
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertEquals(1, registrationDataList.size());
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), email));
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), email));
         } finally {
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
@@ -331,7 +331,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(status().isCreated());
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertEquals(1, registrationDataList.size());
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), email));
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), email));
         } finally {
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
@@ -358,7 +358,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(status().isCreated());
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertEquals(1, registrationDataList.size());
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), eperson.getEmail()));
         } finally {
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
@@ -479,7 +479,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertEquals(1, registrationDataList.size());
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), eperson.getEmail()));
 
             String newEmail = "newEPersonTest@gmail.com";
             registrationRest.setEmail(newEmail);
@@ -492,8 +492,8 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertTrue(registrationDataList.size() == 2);
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) ||
-                       StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), newEmail) ||
+                       Strings.CI.equals(registrationDataList.get(1).getEmail(), newEmail));
 
             configurationService.setProperty("user.registration", false);
 
@@ -507,8 +507,8 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(status().is(HttpServletResponse.SC_UNAUTHORIZED));
 
             assertEquals(2, registrationDataList.size());
-            assertTrue(!StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) &&
-                       !StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
+            assertTrue(!Strings.CI.equals(registrationDataList.get(0).getEmail(), newEmail) &&
+                       !Strings.CI.equals(registrationDataList.get(1).getEmail(), newEmail));
         } finally {
             registrationRestRepository.setCaptchaService(captchaService);
             Iterator<RegistrationData> iterator = registrationDataList.iterator();

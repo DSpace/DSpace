@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.external.model.ExternalDataObject;
 
 /**
@@ -37,9 +37,9 @@ public class SuggestionUtils {
             String qualifier) {
         return record.getMetadata().stream()
                 .filter(x ->
-                    StringUtils.equals(x.getSchema(), schema)
-                        && StringUtils.equals(x.getElement(), element)
-                        && StringUtils.equals(x.getQualifier(), qualifier))
+                    Strings.CS.equals(x.getSchema(), schema)
+                        && Strings.CS.equals(x.getElement(), element)
+                        && Strings.CS.equals(x.getQualifier(), qualifier))
                 .map(x -> x.getValue()).collect(Collectors.toList());
     }
 
@@ -80,9 +80,9 @@ public class SuggestionUtils {
             String qualifier) {
         return record.getMetadata().stream()
                 .filter(x ->
-                    StringUtils.equals(x.getSchema(), schema)
-                        && StringUtils.equals(x.getElement(), element)
-                        && StringUtils.equals(x.getQualifier(), qualifier))
+                    Strings.CS.equals(x.getSchema(), schema)
+                        && Strings.CS.equals(x.getElement(), element)
+                        && Strings.CS.equals(x.getQualifier(), qualifier))
                 .map(x -> x.getValue()).findFirst().orElse(null);
     }
 

@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.utils;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.CommunityRest;
 import org.springframework.stereotype.Component;
 
@@ -26,8 +26,8 @@ public class CommunityRestEqualityUtils extends DSpaceObjectRestEqualityUtils {
      */
     public boolean isCommunityRestEqualWithoutMetadata(CommunityRest original, CommunityRest updated) {
         return super.isDSpaceObjectEqualsWithoutMetadata(original, updated) &&
-            StringUtils.equals(original.getCategory(), updated.getCategory()) &&
-            StringUtils.equals(original.getType(), updated.getType());
+            Strings.CS.equals(original.getCategory(), updated.getCategory()) &&
+            Strings.CS.equals(original.getType(), updated.getType());
 
     }
 }

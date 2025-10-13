@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
@@ -203,7 +203,7 @@ public class RegistrationDataServiceImpl implements RegistrationDataService {
     private boolean areEquals(RegistrationDataMetadata m, String schema, String element, String qualifier) {
         return m.getMetadataField().getMetadataSchema().getName().equals(schema)
             && m.getMetadataField().getElement().equals(element)
-            && StringUtils.equals(m.getMetadataField().getQualifier(), qualifier);
+            && Strings.CS.equals(m.getMetadataField().getQualifier(), qualifier);
     }
 
     private RegistrationDataMetadata createMetadata(
