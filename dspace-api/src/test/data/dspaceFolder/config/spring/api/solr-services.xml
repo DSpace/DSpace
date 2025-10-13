@@ -62,7 +62,7 @@
     </bean>
 
     <!-- audit -->
-    <bean id="org.dspace.app.audit.AuditService" class="org.dspace.app.audit.MockAuditService"/>
+    <bean id="org.dspace.app.audit.AuditSolrServiceImpl" class="org.dspace.app.audit.MockAuditSolrService" autowire-candidate="true"/>
 
 
 </beans>

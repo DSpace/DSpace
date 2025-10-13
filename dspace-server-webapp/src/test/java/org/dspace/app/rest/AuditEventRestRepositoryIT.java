@@ -26,7 +26,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.dspace.app.audit.AuditEvent;
-import org.dspace.app.audit.AuditService;
+import org.dspace.app.audit.AuditSolrServiceImpl;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.AuditEventBuilder;
 import org.dspace.builder.BitstreamBuilder;
@@ -55,13 +55,13 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
     private ConfigurationService configurationService;
 
     @Autowired
-    private AuditService auditService;
+    private AuditSolrServiceImpl auditSolrService;
 
     @Autowired
     private BitstreamService bitstreamService;
 
     private void loadSomeObjects() throws Exception {
-        auditService.deleteEvents(context, null, null);
+        auditSolrService.deleteEvents(context, null, null);
 
         // We turn off the authorization system in order to create the structure as
         // defined below
@@ -71,14 +71,14 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
         item = ItemBuilder.createItem(context, collection).withTitle("My Item").withAuthor("Test, Author")
                 .withIssueDate("2020-10-31").build();
         context.commit();
-        auditService.commit();
+        auditSolrService.commit();
         context.restoreAuthSystemState();
     }
 
     @After
     public void cleanAuditCore() {
-        auditService.deleteEvents(context, null, null);
-        auditService.commit();
+        auditSolrService.deleteEvents(context, null, null);
+        auditSolrService.commit();
         // this is required if the configuration is not present in the files
         configurationService.setProperty("audit.enabled", false);
     }
@@ -87,7 +87,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
     public void findAllTest() throws Exception {
         configurationService.setProperty("audit.enabled", true);
         loadSomeObjects();
-        List<AuditEvent> events = auditService.findAllEvents(context, Integer.MAX_VALUE, 0, false);
+        List<AuditEvent> events = auditSolrService.findAllEvents(context, Integer.MAX_VALUE, 0, false);
         assertTrue(events.size() > 0);
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/system/auditevents").param("size", "100")).andExpect(status().isOk())
@@ -114,7 +114,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
     public void findAllDisabledTest() throws Exception {
         configurationService.setProperty("audit.enabled", false);
         loadSomeObjects();
-        List<AuditEvent> events = auditService.findAllEvents(context, Integer.MAX_VALUE, 0, false);
+        List<AuditEvent> events = auditSolrService.findAllEvents(context, Integer.MAX_VALUE, 0, false);
         assertEquals(0, events.size());
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/system/auditevents")).andExpect(status().isNotFound());
@@ -134,7 +134,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
         AuditEvent auditWithMissingObject = AuditEventBuilder.createAuditEvent(context)
                 .withEpersonUUID(UUID.randomUUID()).withDetail("some information").withEventType("MODIFY")
                 .withSubject(UUID.randomUUID(), "ITEM").build();
-        auditService.commit();
+        auditSolrService.commit();
         context.restoreAuthSystemState();
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/system/auditevents")
@@ -234,7 +234,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
         AuditEvent auditWithMissingObjectAndSubject = AuditEventBuilder.createAuditEvent(context)
                 .withEpersonUUID(eperson.getID()).withDetail("some information").withEventType("ADD")
                 .withSubject(UUID.randomUUID(), "COLLECTION").withObject(UUID.randomUUID(), "ITEM").build();
-        auditService.commit();
+        auditSolrService.commit();
         context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -289,7 +289,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
         context.turnOffAuthorisationSystem();
         AuditEvent audit = AuditEventBuilder.createAuditEvent(context).withEpersonUUID(eperson.getID())
                 .withDetail("some information").withEventType("ADD").withSubject(collection).withObject(item).build();
-        auditService.commit();
+        auditSolrService.commit();
         context.restoreAuthSystemState();
         String epersonToken = getAuthToken(eperson.getEmail(), password);
         String auditUUID = audit.getUuid().toString();
@@ -309,7 +309,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
     public void findByObjectTest() throws Exception {
         configurationService.setProperty("audit.enabled", true);
         loadSomeObjects();
-        List<AuditEvent> events = auditService.findEvents(context, item.getID(), null, null, Integer.MAX_VALUE, 0,
+        List<AuditEvent> events = auditSolrService.findEvents(item.getID(), null, null, Integer.MAX_VALUE, 0,
                 false);
         assertTrue(events.size() > 0);
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -350,7 +350,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
     public void findByObjectDisabledTest() throws Exception {
         configurationService.setProperty("audit.enabled", false);
         loadSomeObjects();
-        List<AuditEvent> events = auditService.findAllEvents(context, Integer.MAX_VALUE, 0, false);
+        List<AuditEvent> events = auditSolrService.findAllEvents(context, Integer.MAX_VALUE, 0, false);
         assertEquals(0, events.size());
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/system/auditevents/search/findByObject")
@@ -372,7 +372,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
         AuditEvent auditWithMissingObject = AuditEventBuilder.createAuditEvent(context)
                 .withEpersonUUID(UUID.randomUUID()).withDetail("some information").withEventType("MODIFY")
                 .withSubject(UUID.randomUUID(), "ITEM").build();
-        auditService.commit();
+        auditSolrService.commit();
         context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -451,7 +451,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
         context.commit();
         context.restoreAuthSystemState();
 
-        List<AuditEvent> events = auditService.findEvents(context, bitstream.getID(), null, null, Integer.MAX_VALUE, 0,
+        List<AuditEvent> events = auditSolrService.findEvents(bitstream.getID(), null, null, Integer.MAX_VALUE, 0,
             false);
         assertTrue(events.size() > 4);
         String adminToken = getAuthToken(admin.getEmail(), password);

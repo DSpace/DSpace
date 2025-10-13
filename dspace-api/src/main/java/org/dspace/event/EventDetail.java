@@ -7,7 +7,13 @@
  */
 package org.dspace.event;
 
+import static org.dspace.app.audit.MetadataEvent.INITIAL_ADD;
+
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.dspace.app.audit.MetadataEvent;
 
 /**
  * Represents the details of an event, including a key and an associated object.
@@ -71,5 +77,34 @@ public class EventDetail {
     @Override
     public int hashCode() {
         return Objects.hash(detailKey, detailObject);
+    }
+
+    public List<MetadataEvent> extractMetadataDetail() {
+        try {
+            if (this.getDetailObject() == null ||
+                !this.getDetailKey().equals(DetailType.DSO_SUMMARY)) {
+                return List.of();
+            }
+
+            List<Object> details = (List<Object>)this.getDetailObject();
+            List<MetadataEvent> metadataEvents = details.stream().filter(obj -> obj instanceof MetadataEvent)
+                .map(obj -> (MetadataEvent) obj)
+                .toList();
+
+            return metadataEvents.stream()
+                .filter(metadataEvent ->
+                    !metadataEvent.getAction().equals(INITIAL_ADD))
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
+    public String extractChecksumDetail() {
+        if (this.getDetailObject() == null ||
+            !this.getDetailKey().equals(DetailType.BITSTREAM_CHECKSUM)) {
+            return "";
+        }
+        return (String)this.getDetailObject();
     }
 }

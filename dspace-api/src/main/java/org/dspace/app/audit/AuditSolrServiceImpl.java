@@ -12,8 +12,6 @@ package org.dspace.app.audit;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-import static org.dspace.app.audit.MetadataEvent.INITIAL_ADD;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
@@ -21,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +43,6 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
-import org.dspace.event.EventDetail;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.SolrUtils;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
@@ -57,7 +53,7 @@ import org.springframework.stereotype.Service;
  * Service to interact with the Solr audit core
  */
 @Service
-public class AuditService {
+public class AuditSolrServiceImpl {
     // field names in the solr core
     // uid is not a typo it is the field name in the solr schema
     private static final String UUID_FIELD = "uid";
@@ -90,7 +86,7 @@ public class AuditService {
      */
     private static final Logger AUDIT_EVENT_LOGGER = LogManager.getLogger("org.dspace.app.audit.event");
 
-    private static Logger log = LogManager.getLogger(AuditService.class);
+    private static Logger log = LogManager.getLogger(AuditSolrServiceImpl.class);
 
     protected SolrClient solr = null;
 
@@ -123,7 +119,7 @@ public class AuditService {
                 continue;
             }
 
-            store(context, audit);
+            store(audit);
         }
     }
 
@@ -211,12 +207,11 @@ public class AuditService {
 
     /**
      * Store an audit event as is in the Solr audit core
-     * 
-     * @param context DSpace Context
+     *
      * @param audit   the complete audit event to store, no details about the
      *                current user are extracted from the context
      */
-    public void store(Context context, AuditEvent audit) {
+    public void store(AuditEvent audit) {
         SolrInputDocument solrInDoc = new SolrInputDocument();
         // this is usually NOT the case, as the audit event get a random uuid by solr
         // but it is convenient for testing purpose
@@ -272,7 +267,7 @@ public class AuditService {
      */
     public List<AuditEvent> getAuditEventsFromEvent(Context context, Event event) {
         List<AuditEvent> audits = new ArrayList<>();
-        List<MetadataEvent> metadataEvents = extractMetadataDetail(event.getDetail());
+        List<MetadataEvent> metadataEvents = event.getDetail().extractMetadataDetail();
 
         for (MetadataEvent metadataEvent : metadataEvents) {
             audits.add(getAuditEvent(context, event, metadataEvent));
@@ -283,35 +278,6 @@ public class AuditService {
         }
 
         return audits;
-    }
-
-    private List<MetadataEvent> extractMetadataDetail(EventDetail detail) {
-        try {
-            if (detail == null || detail.getDetailObject() == null ||
-                !detail.getDetailKey().equals(DetailType.DSO_SUMMARY)) {
-                return List.of();
-            }
-
-            List<Object> details = (List<Object>)detail.getDetailObject();
-            List<MetadataEvent> metadataEvents = details.stream().filter(obj -> obj instanceof MetadataEvent)
-                                          .map(obj -> (MetadataEvent) obj)
-                                          .toList();
-
-            return metadataEvents.stream()
-                                 .filter(metadataEvent ->
-                                     !metadataEvent.getAction().equals(INITIAL_ADD))
-                                 .collect(Collectors.toList());
-        } catch (Exception e) {
-            return List.of();
-        }
-    }
-
-    private String extractChecksumDetail(EventDetail detail) {
-        if (detail == null || detail.getDetailObject() == null ||
-            !detail.getDetailKey().equals(DetailType.BITSTREAM_CHECKSUM)) {
-            return "";
-        }
-        return (String)detail.getDetailObject();
     }
 
     private AuditEvent getAuditEvent(Context context, Event event, MetadataEvent metadataEvent) {
@@ -341,7 +307,7 @@ public class AuditService {
             audit.setAction(metadataEvent.getAction());
         }
 
-        String checksum = extractChecksumDetail(event.getDetail());
+        String checksum = event.getDetail().extractChecksumDetail();
         if (!checksum.isEmpty()) {
             audit.setChecksum(checksum);
         }
@@ -351,7 +317,7 @@ public class AuditService {
 
     /**
      * Shortcut for
-     * {@link #findEvents(Context, UUID, Date, Date, int, int, boolean)} with
+     * {@link #findEvents(UUID, Date, Date, int, int, boolean)} with
      * objectUuid, from and to null
      * 
      * @param context DSpace context
@@ -362,14 +328,13 @@ public class AuditService {
      */
     public List<AuditEvent> findAllEvents(Context context, int limit, int offset,
             boolean asc) {
-        return findEvents(context, null, null, null, limit, offset, asc);
+        return findEvents(null, null, null, limit, offset, asc);
     }
 
     /**
      * Return the list of events in the specified time window for the requested
      * object
-     * 
-     * @param context    DSpace context
+     *
      * @param objectUuid can be null. If not null limit the audit events to the ones
      *                   where the subject or the object
      * @param from       the start date (inclusive) can be null
@@ -380,7 +345,7 @@ public class AuditService {
      * @return the list of events in the specified time window for the requested
      *         object
      */
-    public List<AuditEvent> findEvents(Context context, UUID objectUuid, Date from, Date to, int limit, int offset,
+    public List<AuditEvent> findEvents(UUID objectUuid, Date from, Date to, int limit, int offset,
             boolean asc) {
         String q = "*";
         if (objectUuid != null) {
@@ -449,12 +414,11 @@ public class AuditService {
 
     /**
      * Return the audit event for the specified uuid if any
-     * 
-     * @param context the DSpace Context
+     *
      * @param uuid    the uuid of the Audit Event
      * @return the audit event for the specified uuid if any
      */
-    public AuditEvent getAuditEvent(Context context, UUID uuid) {
+    public AuditEvent getAuditEvent(UUID uuid) {
         SolrQuery solrQuery = new SolrQuery(UUID_FIELD + ":" + uuid.toString());
         QueryResponse queryResponse;
         try {

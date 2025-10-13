@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.audit.AuditEvent;
-import org.dspace.app.audit.AuditService;
+import org.dspace.app.audit.AuditSolrServiceImpl;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.ConverterService;
@@ -43,7 +43,7 @@ public class AuditEventRestRepository extends DSpaceRestRepository<AuditEventRes
     private static final Logger log = LoggerFactory.getLogger(AuditEventRestRepository.class);
 
     @Autowired
-    private AuditService auditService;
+    private AuditSolrServiceImpl auditSolrService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -55,7 +55,7 @@ public class AuditEventRestRepository extends DSpaceRestRepository<AuditEventRes
     @PreAuthorize("hasAuthority('ADMIN')")
     public AuditEventRest findOne(Context context, UUID id) {
         returnNotFoundIfDisabled();
-        AuditEvent audit = auditService.findEvent(context, id);
+        AuditEvent audit = auditSolrService.findEvent(context, id);
         return converter.toRest(audit, utils.obtainProjection());
     }
 
@@ -68,9 +68,9 @@ public class AuditEventRestRepository extends DSpaceRestRepository<AuditEventRes
         Context context = obtainContext();
         Sort sort = pageable.getSort();
         boolean asc = sort.isUnsorted() || (sort.isSorted() && sort.getOrderFor("timeStamp").isAscending());
-        List<AuditEvent> events = auditService.findEvents(context, uuid, null, null, pageable.getPageSize(),
+        List<AuditEvent> events = auditSolrService.findEvents(uuid, null, null, pageable.getPageSize(),
                 (int) pageable.getOffset(), asc);
-        long total = auditService.countEvents(context, uuid, null, null);
+        long total = auditSolrService.countEvents(context, uuid, null, null);
         return converter.toRestPage(events, pageable, total, utils.obtainProjection());
 
     }
@@ -86,9 +86,9 @@ public class AuditEventRestRepository extends DSpaceRestRepository<AuditEventRes
         returnNotFoundIfDisabled();
         Sort sort = pageable.getSort();
         boolean asc = sort.isUnsorted() || (sort.isSorted() && sort.getOrderFor("timeStamp").isAscending());
-        List<AuditEvent> events = auditService.findAllEvents(context, pageable.getPageSize(),
+        List<AuditEvent> events = auditSolrService.findAllEvents(context, pageable.getPageSize(),
                 (int) pageable.getOffset(), asc);
-        long total = auditService.countAllEvents(context);
+        long total = auditSolrService.countAllEvents(context);
         return converter.toRestPage(events, pageable, total, utils.obtainProjection());
     }
 

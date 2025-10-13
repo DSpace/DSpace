@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import org.dspace.app.audit.AuditEvent;
-import org.dspace.app.audit.AuditService;
+import org.dspace.app.audit.AuditSolrServiceImpl;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -22,7 +22,7 @@ import org.dspace.core.Context;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class AuditEventBuilder extends AbstractBuilder<AuditEvent, AuditService> {
+public class AuditEventBuilder extends AbstractBuilder<AuditEvent, AuditSolrServiceImpl> {
 
     private AuditEvent audit;
 
@@ -99,7 +99,7 @@ public class AuditEventBuilder extends AbstractBuilder<AuditEvent, AuditService>
     @Override
     public AuditEvent build() {
         try {
-            auditService.store(context, audit);
+            auditSolrService.store(audit);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -113,8 +113,8 @@ public class AuditEventBuilder extends AbstractBuilder<AuditEvent, AuditService>
     }
 
     @Override
-    protected AuditService getService() {
-        return auditService;
+    protected AuditSolrServiceImpl getService() {
+        return auditSolrService;
     }
 
     @Override

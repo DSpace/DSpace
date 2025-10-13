@@ -13,7 +13,7 @@ import java.util.UUID;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.audit.AuditEvent;
-import org.dspace.app.audit.AuditService;
+import org.dspace.app.audit.AuditSolrServiceImpl;
 import org.dspace.app.rest.model.AuditEventRest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.projection.Projection;
@@ -34,7 +34,7 @@ public class AuditEventEPersonLinkRepository extends AbstractDSpaceRestRepositor
         implements LinkRestRepository {
 
     @Autowired
-    private AuditService auditService;
+    private AuditSolrServiceImpl auditSolrService;
 
     @Autowired
     private EPersonService epersonService;
@@ -46,7 +46,7 @@ public class AuditEventEPersonLinkRepository extends AbstractDSpaceRestRepositor
                                   Projection projection) {
         try {
             Context context = obtainContext();
-            AuditEvent audit = auditService.findEvent(context, auditId);
+            AuditEvent audit = auditSolrService.findEvent(context, auditId);
             if (audit == null) {
                 throw new ResourceNotFoundException("No such audit event: " + auditId.toString());
             }

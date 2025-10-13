@@ -25,7 +25,7 @@ import org.dspace.utils.DSpace;
  */
 
 public class AuditConsumer implements Consumer {
-    private AuditService auditService;
+    private AuditSolrServiceImpl auditSolrService;
     private ConfigurationService configurationService;
     private List<Integer> meaningfulEvents;
 
@@ -41,7 +41,7 @@ public class AuditConsumer implements Consumer {
 
     public void initialize() throws Exception {
         DSpace dSpace = new DSpace();
-        auditService = dSpace.getSingletonService(AuditService.class);
+        auditSolrService = dSpace.getSingletonService(AuditSolrServiceImpl.class);
         configurationService = dSpace.getConfigurationService();
         meaningfulEvents = List.of(Event.MODIFY_METADATA, Event.CREATE, Event.DELETE,
             Event.REMOVE);
@@ -59,14 +59,14 @@ public class AuditConsumer implements Consumer {
     public void consume(Context ctx, Event event) throws Exception {
         if (configurationService.getBooleanProperty("audit.enabled", false)
             && isEventMeaningful(event)) {
-            auditService.store(ctx, event); // AuditService also handles detailed event logging
+            auditSolrService.store(ctx, event); // AuditSolrService also handles detailed event logging
 
             // Increment counter and check if we need to commit
             int currentCount = pendingOperations.incrementAndGet();
             if (currentCount >= commitBatchSize) {
                 // Use compareAndSet to atomically reset counter only if it's still >= batchSize
                 if (pendingOperations.compareAndSet(currentCount, 0)) {
-                    auditService.commit();
+                    auditSolrService.commit();
                 }
             }
         }
@@ -85,7 +85,7 @@ public class AuditConsumer implements Consumer {
             // Always commit any pending operations at the end
             int remaining = pendingOperations.getAndSet(0);
             if (remaining > 0) {
-                auditService.commit();
+                auditSolrService.commit();
             }
         }
     }

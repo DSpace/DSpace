@@ -11,7 +11,7 @@ import org.dspace.solr.MockSolrServer;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
-public class MockAuditService extends AuditService implements InitializingBean, DisposableBean {
+public class MockAuditSolrService extends AuditSolrServiceImpl implements InitializingBean, DisposableBean {
     private MockSolrServer mockSolrServer;
 
     @Override
