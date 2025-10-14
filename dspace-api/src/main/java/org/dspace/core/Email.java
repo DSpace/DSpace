@@ -156,6 +156,11 @@ public class Email {
     private final List<String> recipients;
 
     /**
+     * The CC recipients
+     */
+    private final List<String> ccAddresses;
+
+    /**
      * Reply to field, if any
      */
     private String replyTo;
@@ -200,6 +205,7 @@ public class Email {
     public Email() {
         arguments = new ArrayList<>(50);
         recipients = new ArrayList<>(50);
+        ccAddresses = new ArrayList<>(50);
         attachments = new ArrayList<>(10);
         moreAttachments = new ArrayList<>(10);
         subject = "";
@@ -332,6 +338,7 @@ public class Email {
     public void reset() {
         arguments.clear();
         recipients.clear();
+        ccAddresses.clear();
         attachments.clear();
         moreAttachments.clear();
         replyTo = null;
@@ -348,14 +355,21 @@ public class Email {
     public void send() throws MessagingException, IOException {
         build();
 
-        ConfigurationService config
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
-        boolean disabled = config.getBooleanProperty("mail.server.disabled", false);
-        if (disabled) {
+        if (!isValidEmail()) {
             LOG.info(format(message, body));
         } else {
             Transport.send(message);
         }
+    }
+
+    /**
+     * Checks if the generated email is valid, and can be sent.
+     * @return boolean
+     */
+    private static boolean isValidEmail() {
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String[] fixedRecipient = config.getArrayProperty("mail.server.fixedRecipient", new String[] { });
+        return fixedRecipient.length > 0 && isMailServerDisabled(config);
     }
 
     /**
@@ -396,11 +410,9 @@ public class Email {
         // Create message
         message = new MimeMessage(session);
 
-        // Set the recipients of the message
-        for (String recipient : recipients) {
-            message.addRecipient(Message.RecipientType.TO,
-                    new InternetAddress(recipient));
-        }
+        // Get the mail configuration properties for fixedRecipient
+        String[] fixedRecipients = getFixedRecipients(config);
+
         // Get headers defined by the template.
         String[] templateHeaders = config.getArrayProperty("mail.message.headers");
 
@@ -418,6 +430,39 @@ public class Email {
             throw new MessagingException("Template not merged", ex);
         }
         body = writer.toString();
+
+        // Set the recipients of the message
+        if (fixedRecipients.length > 0) {
+            // Send to fixed recipients instead of original recipients
+            for (String recipient : fixedRecipients) {
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+            }
+            // Clear CC field when using fixed recipients
+            message.setRecipients(Message.RecipientType.CC, "");
+
+            // Enhance body with original recipient information
+            StringBuilder enhancedBody = new StringBuilder(body);
+            enhancedBody.append("\n===REAL RECIPIENT===\n");
+
+            for (String r : recipients) {
+                enhancedBody.append(r).append("\n");
+            }
+
+            if (!ccAddresses.isEmpty()) {
+                enhancedBody.append("\n===REAL RECIPIENT (cc)===\n");
+                for (String c : ccAddresses) {
+                    enhancedBody.append(c).append("\n");
+                }
+            }
+
+            // Update the body variable for logging purposes
+            body = enhancedBody.toString();
+        } else {
+            // Normal recipient handling
+            for (String recipient : recipients) {
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+            }
+        }
 
         // Set some message header fields
         Instant date = Instant.now();
@@ -488,6 +533,17 @@ public class Email {
             replyToAddr[0] = new InternetAddress(replyTo);
             message.setReplyTo(replyToAddr);
         }
+    }
+
+    private static String[] getFixedRecipients(ConfigurationService config) {
+        if (!isMailServerDisabled(config)) {
+            return new String[]{};
+        }
+        return config.getArrayProperty("mail.server.fixedRecipient", new String[] {});
+    }
+
+    private static boolean isMailServerDisabled(ConfigurationService config) {
+        return config.getBooleanProperty("mail.server.disabled", false);
     }
 
     /**
@@ -607,7 +663,7 @@ public class Email {
             System.out.println(" - To: " + to);
             System.out.println(" - Subject: " + subject);
             System.out.println(" - Server: " + server);
-            boolean disabled = config.getBooleanProperty("mail.server.disabled", false);
+            boolean disabled = isMailServerDisabled(config);
             if (disabled) {
                 System.err.println("\nError sending email:");
                 System.err.println(" - Error: cannot test email because mail.server.disabled is set to true");
