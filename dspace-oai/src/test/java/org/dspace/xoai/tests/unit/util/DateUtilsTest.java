@@ -7,13 +7,12 @@
  */
 package org.dspace.xoai.tests.unit.util;
 
+import static org.junit.Assert.assertEquals;
+
 import java.time.Instant;
 
-import org.junit.Test;
-
 import org.dspace.xoai.util.DateUtils;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class DateUtilsTest {
 
