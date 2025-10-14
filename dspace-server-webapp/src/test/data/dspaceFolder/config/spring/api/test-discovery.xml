@@ -31,6 +31,8 @@
                     -->
                 <!-- The default entry, DO NOT REMOVE the system requires this -->
                 <entry key="default" value-ref="defaultConfiguration" />
+                <entry key="123456789/unique-handle-here" value-ref="NOTIFY.outgoing.involvedItems" />
+                <entry key="workspace" value-ref="workspaceConfiguration" />
                 <!-- Same as the "default" configuration, but does NOT filter out older versions of items -->
                 <!-- Used to display related items on single-item pages, because a relationship does not always point to the latest version of the related item -->
                 <entry key="default-relationships" value-ref="defaultRelationshipsConfiguration" />

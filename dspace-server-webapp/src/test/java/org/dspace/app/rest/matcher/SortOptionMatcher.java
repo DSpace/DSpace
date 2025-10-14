@@ -10,7 +10,11 @@ package org.dspace.app.rest.matcher;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
+import java.util.List;
+
+import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.hamcrest.Matcher;
 
 public class SortOptionMatcher {
@@ -53,5 +57,36 @@ public class SortOptionMatcher {
             hasJsonPath("$.name", is(name)),
             hasJsonPath("$.sortOrder", is(sortDirection))
         );
+    }
+
+
+    public static Matcher<? super Object> matchSortFieldConfiguration(DiscoverySortFieldConfiguration sortFieldConfiguration) {
+
+        Matcher<? super Object> nameMatcher;
+        if (sortFieldConfiguration.getMetadataField() == null) {
+            nameMatcher = nullValue();
+        } else {
+            nameMatcher = is(sortFieldConfiguration.getMetadataField());
+        }
+
+        Matcher<? super Object> typeMatcher;
+        if (sortFieldConfiguration.getType() == null) {
+            typeMatcher = nullValue();
+        } else {
+            typeMatcher = is(sortFieldConfiguration.getType());
+        }
+
+        return allOf(
+            hasJsonPath("$.name", nameMatcher),
+            hasJsonPath("$.sortOrder", is(sortFieldConfiguration.getDefaultSortOrder().toString())),
+            hasJsonPath("$.type", typeMatcher)
+        );
+    }
+
+
+    public static Matcher<? super Object>[] createSortOptionMatchers(List<DiscoverySortFieldConfiguration> sortFields) {
+        return sortFields.stream()
+            .map(SortOptionMatcher::matchSortFieldConfiguration)
+            .toArray(Matcher[]::new);
     }
 }
