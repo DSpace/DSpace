@@ -64,7 +64,8 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
         getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
             DiscoveryConfigurationRest.PLURAL_NAME, configName)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration(defaultConf)));
+            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher
+                .matchDiscoveryConfiguration(defaultConf)));
 
 
 
@@ -112,13 +113,15 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         String configName = "does-not-exist";
-        DiscoveryConfiguration defaultConf = SearchUtils.getDiscoveryConfiguration(context, "default", null);
+        DiscoveryConfiguration defaultConf = SearchUtils
+            .getDiscoveryConfiguration(context, "default", null);
 
 
         getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
                 DiscoveryConfigurationRest.PLURAL_NAME, configName)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration(defaultConf)));
+            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher
+                .matchDiscoveryConfiguration(defaultConf)));
     }
 
 
@@ -130,14 +133,16 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        DiscoveryConfiguration defaultConf = SearchUtils.getDiscoveryConfiguration(context, "default", null);
+        DiscoveryConfiguration defaultConf = SearchUtils
+            .getDiscoveryConfiguration(context, "default", null);
 
 
         getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
                 DiscoveryConfigurationRest.PLURAL_NAME, "scope"))
                 .queryParam("uuid", UUID.randomUUID().toString())) // random UUID
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration(defaultConf)));
+            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher
+                .matchDiscoveryConfiguration(defaultConf)));
     }
 
 
@@ -150,7 +155,8 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         String configName = "default";
-        DiscoveryConfiguration defaultConf = SearchUtils.getDiscoveryConfiguration(context, "default", null);
+        DiscoveryConfiguration defaultConf = SearchUtils
+            .getDiscoveryConfiguration(context, "default", null);
 
         getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
                 DiscoveryConfigurationRest.PLURAL_NAME, configName)))
@@ -175,7 +181,8 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
             DiscoveryConfigurationRest.PLURAL_NAME, configName))
                 .queryParam("embed", "searchfilters"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.searchfilters.page.totalElements", is(defaultConf.getSearchFilters().size())))
+            .andExpect(jsonPath("$._embedded.searchfilters.page.totalElements",
+                is(defaultConf.getSearchFilters().size())))
             .andExpect(jsonPath("$._embedded.searchfilters._embedded.searchfilters",
                 containsInAnyOrder(SearchFilterMatcher.createSearchFilterMatchers(defaultConf.getSearchFilters()))));
     }
@@ -191,12 +198,14 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         String configName = "default";
-        DiscoveryConfiguration defaultConf = SearchUtils.getDiscoveryConfiguration(context, "default", null);
+        DiscoveryConfiguration defaultConf = SearchUtils
+            .getDiscoveryConfiguration(context, "default", null);
 
         getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
                 DiscoveryConfigurationRest.PLURAL_NAME, configName)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration(defaultConf)))
+            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher
+                .matchDiscoveryConfiguration(defaultConf)))
             .andExpect(jsonPath("$._links.sortoptions", not(empty())));
 
 
@@ -205,18 +214,22 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
 
         getClient(adminToken).perform(get(followLink))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page.totalElements", is(defaultConf.getSearchSortConfiguration().getSortFields().size())))
+            .andExpect(jsonPath("$.page.totalElements", is(defaultConf
+                .getSearchSortConfiguration().getSortFields().size())))
             .andExpect(jsonPath("$._embedded.sortoptions",
-                containsInAnyOrder(SortOptionMatcher.createSortOptionMatchers(defaultConf.getSearchSortConfiguration().getSortFields()))));
+                containsInAnyOrder(SortOptionMatcher.createSortOptionMatchers(defaultConf
+                    .getSearchSortConfiguration().getSortFields()))));
 
 
         getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
                 DiscoveryConfigurationRest.PLURAL_NAME, configName))
                 .queryParam("embed", "sortoptions"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.sortoptions.page.totalElements", is(defaultConf.getSearchSortConfiguration().getSortFields().size())))
+            .andExpect(jsonPath("$._embedded.sortoptions.page.totalElements",
+                is(defaultConf.getSearchSortConfiguration().getSortFields().size())))
             .andExpect(jsonPath("$._embedded.sortoptions._embedded.sortoptions",
-                containsInAnyOrder(SortOptionMatcher.createSortOptionMatchers(defaultConf.getSearchSortConfiguration().getSortFields()))));
+                containsInAnyOrder(SortOptionMatcher.createSortOptionMatchers(defaultConf
+                    .getSearchSortConfiguration().getSortFields()))));
     }
 
 
@@ -236,7 +249,8 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
         getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
                 DiscoveryConfigurationRest.PLURAL_NAME, configName)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration(workspaceConf)))
+            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher
+                .matchDiscoveryConfiguration(workspaceConf)))
             .andExpect(jsonPath("$._links.defaultsortoption", not(empty())));
 
 
@@ -276,7 +290,8 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
                 DiscoveryConfigurationRest.PLURAL_NAME, configName))
                 .param("projection", "full"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration(workspaceConf)))
+            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher
+                .matchDiscoveryConfiguration(workspaceConf)))
             .andExpect(jsonPath("$._embedded.searchfilters._embedded.searchfilters",
                 containsInAnyOrder(SearchFilterMatcher.createSearchFilterMatchers(workspaceConf.getSearchFilters()))))
             .andExpect(jsonPath("$._embedded.sortoptions._embedded.sortoptions",

@@ -60,7 +60,8 @@ public class SortOptionMatcher {
     }
 
 
-    public static Matcher<? super Object> matchSortFieldConfiguration(DiscoverySortFieldConfiguration sortFieldConfiguration) {
+    public static Matcher<? super Object> matchSortFieldConfiguration(
+        DiscoverySortFieldConfiguration sortFieldConfiguration) {
 
         Matcher<? super Object> nameMatcher;
         if (sortFieldConfiguration.getMetadataField() == null) {
