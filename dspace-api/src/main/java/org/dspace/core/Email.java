@@ -368,8 +368,9 @@ public class Email {
      */
     private static boolean isValidEmail() {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
+        boolean disabled = isMailServerDisabled(config);
         String[] fixedRecipient = config.getArrayProperty("mail.server.fixedRecipient", new String[] { });
-        return fixedRecipient.length > 0 && isMailServerDisabled(config);
+        return !disabled || fixedRecipient.length > 0;
     }
 
     /**
