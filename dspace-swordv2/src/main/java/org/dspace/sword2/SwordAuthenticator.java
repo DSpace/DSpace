@@ -9,6 +9,7 @@ package org.dspace.sword2;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -618,7 +619,8 @@ public class SwordAuthenticator {
 
             // short cut by obtaining the collections to which the authenticated user can submit
             List<Collection> cols = collectionService.findAuthorized(
-                authContext, community, authContext.getCurrentUser(), Constants.ADD);
+                authContext, community, Arrays.asList(Constants.ADD, Constants.ADMIN));
+
             List<org.dspace.content.Collection> allowed = new ArrayList<>();
 
             // now find out if the obo user is allowed to submit to any of these collections

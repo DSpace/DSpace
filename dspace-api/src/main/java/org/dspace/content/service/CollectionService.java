@@ -21,7 +21,6 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
-import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
 /**
@@ -330,20 +329,17 @@ public interface CollectionService
 
     /**
      * return an array of collections that user has a given permission on
-     * (useful for trimming 'select to collection' list) or figuring out which
-     * collections a person is an editor for.
      *
-     * @param context   DSpace Context
-     * @param community The community restriction to get own collections
-     * @param eperson The current user
-     * @param actionID  of the action
+     * @param context DSpace Context
+     * @param community (optional) restrict search to a community, else null
+     * @param actions  Listo of the of the action ADD, READ, ADMIN, etc.
      * @return Collection [] of collections with matching permissions
      * @throws SQLException if database error
      */
-    public List<Collection> findAuthorized(Context context, Community community, EPerson eperson, int actionID)
+    public List<Collection> findAuthorized(Context context, Community community, List<Integer> actions)
         throws java.sql.SQLException;
 
-        /**
+    /**
      *
      * @param context DSpace Context
      * @param group EPerson Group

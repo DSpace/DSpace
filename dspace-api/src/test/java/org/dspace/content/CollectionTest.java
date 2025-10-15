@@ -1195,7 +1195,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
 
         context.setCurrentUser(epersonA);
         List<Collection> personACollections =
-            collectionService.findAuthorized(context, null, epersonA, Constants.ADD);
+            collectionService.findAuthorized(context, null, List.of(Constants.ADD, Constants.ADMIN));
         assertTrue("testFindAuthorizedByEPerson A", personACollections.size() == 2);
         assertTrue("testFindAuthorizedByEPerson A.A", personACollections.contains(collectionA));
         assertTrue("testFindAuthorizedByEPerson A.B", personACollections.contains(collectionB));
