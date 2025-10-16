@@ -38,6 +38,8 @@ import org.xml.sax.SAXException;
 public class TikaTextExtractionFilter
     extends MediaFilter {
     private final static Logger log = LogManager.getLogger();
+    private static final int DEFAULT_MAX_CHARS = 100_000;
+    private static final int DEFAULT_MAX_ARRAY = 1_000_000;
 
     @Override
     public String getFilteredName(String oldFilename) {
@@ -71,15 +73,16 @@ public class TikaTextExtractionFilter
         }
 
         // Not using temporary file. We'll use Tika's default in-memory parsing.
-        // Get maximum characters to extract. Default is 100,000 chars, which is also Tika's default setting.
         String extractedText;
-        int maxChars = configurationService.getIntProperty("textextractor.max-chars", 100_000);
+        // Get maximum characters to extract. Default is 100,000 chars, which is also Tika's default setting.
+        int maxChars = configurationService.getIntProperty("textextractor.max-chars", DEFAULT_MAX_CHARS);
+        // Get maximum size of structure that Tika will try to buffer.
+        int maxArray = configurationService.getIntProperty("textextractor.max-array", DEFAULT_MAX_ARRAY);
+        IOUtils.setByteArrayMaxOverride(maxArray);
         try {
             // Use Tika to extract text from input. Tika will automatically detect the file type.
             Tika tika = new Tika();
             tika.setMaxStringLength(maxChars); // Tell Tika the maximum number of characters to extract
-            IOUtils.setByteArrayMaxOverride(
-                    configurationService.getIntProperty("textextractor.max-array", 100_000_000));
             extractedText = tika.parseToString(source);
         } catch (IOException e) {
             System.err.format("Unable to extract text from bitstream in Item %s%n", currentItem.getID().toString());
@@ -169,6 +172,10 @@ public class TikaTextExtractionFilter
                     }
                 }
             });
+
+            ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+            int maxArray = configurationService.getIntProperty("textextractor.max-array", DEFAULT_MAX_ARRAY);
+            IOUtils.setByteArrayMaxOverride(maxArray);
 
             AutoDetectParser parser = new AutoDetectParser();
             Metadata metadata = new Metadata();

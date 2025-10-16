@@ -37,6 +37,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -176,7 +177,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
         fieldSeparator = (fldSep != null) ? fldSep : " ";
         urlTemplate = taskProperty("template");
         templateParam = urlTemplate.substring(urlTemplate.indexOf("{") + 1,
-                                              urlTemplate.indexOf("}"));
+                urlTemplate.indexOf("}"));
         String[] parsed = parseTransform(templateParam);
         lookupField = parsed[0];
         lookupTransform = parsed[1];
@@ -204,13 +205,9 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
             }
         }
         // initialize response document parser
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
         try {
-            // disallow DTD parsing to ensure no XXE attacks can occur
-            // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory.setXIncludeAware(false);
+            DocumentBuilderFactory factory = XMLUtils.getDocumentBuilderFactory();
+            factory.setNamespaceAware(true);
             docBuilder = factory.newDocumentBuilder();
         } catch (ParserConfigurationException pcE) {
             log.error("caught exception: " + pcE);

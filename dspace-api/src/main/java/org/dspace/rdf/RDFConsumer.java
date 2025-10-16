@@ -201,7 +201,7 @@ public class RDFConsumer implements Consumer {
         }
 
         EventDetail detail = event.getDetail();
-        if (event.getEventType() == Event.DELETE && detail.getDetailKey().equals(DetailType.HANDLE)) {
+        if (event.getEventType() == Event.DELETE && detail.getDetailType().equals(DetailType.HANDLE)) {
             DSOIdentifier id = new DSOIdentifier(event.getSubjectType(),
                 event.getSubjectID(), (String)detail.getDetailObject(), event.getIdentifiers());
 
