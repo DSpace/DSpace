@@ -82,7 +82,7 @@ public class EventDetail {
     public List<MetadataEvent> extractMetadataDetail() {
         try {
             if (this.getDetailObject() == null ||
-                !this.getDetailKey().equals(DetailType.DSO_SUMMARY)) {
+                !this.getDetailType().equals(DetailType.DSO_SUMMARY)) {
                 return List.of();
             }
 
@@ -102,7 +102,7 @@ public class EventDetail {
 
     public String extractChecksumDetail() {
         if (this.getDetailObject() == null ||
-            !this.getDetailKey().equals(DetailType.BITSTREAM_CHECKSUM)) {
+            !this.getDetailType().equals(DetailType.BITSTREAM_CHECKSUM)) {
             return "";
         }
         return (String)this.getDetailObject();
