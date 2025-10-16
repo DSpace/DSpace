@@ -61,4 +61,8 @@
         <description>Connection to an embedded Solr instance.</description>
     </bean>
 
+    <!-- audit -->
+    <bean id="org.dspace.app.audit.AuditSolrServiceImpl" class="org.dspace.app.audit.MockAuditSolrService" autowire-candidate="true"/>
+
+
 </beans>
