@@ -81,6 +81,7 @@
         <entry key='${bibliography.medium}' value='medium'/>
         <entry key='${bibliography.publisher}' value='publisher'/>
         <entry key='${bibliography.title}' value='title'/>
+        <entry key='${bibliography.doi}' value='DOI'/>
         <entry key='${bibliography.title.alternative' value='container-title'/> <!-- XXX -->
         <entry key='${bibliography.type}' value='type'/> <!-- see csl-types -->
         <entry key='${bibliography.journal.name}' value='container-title'/>
