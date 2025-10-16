@@ -145,6 +145,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             new Event(Event.ADD, Constants.GROUP, group.getID(), Constants.EPERSON, e.getID(),
                 new EventDetail(DetailType.EPERSON_EMAIL, e.getEmail()),
                 getIdentifiers(context, group)));
+        log.info(LogHelper.getHeader(context, "add_group_eperson",
+            "group_id=" + group.getID() + ", eperson_id=" + e.getID()));
     }
 
     @Override
@@ -160,6 +162,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
         context.addEvent(new Event(Event.ADD, Constants.GROUP, groupParent.getID(), Constants.GROUP, groupChild.getID(),
             new EventDetail(DetailType.DSO_NAME, groupChild.getName()), getIdentifiers(context, groupParent)));
+        log.info(LogHelper.getHeader(context, "add_group_subgroup",
+                "group_id=" + groupParent.getID() + ", subgroup_id=" + groupChild.getID()));
+
     }
 
     /**
@@ -217,6 +222,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         if (group.remove(ePerson)) {
             context.addEvent(new Event(Event.REMOVE, Constants.GROUP, group.getID(), Constants.EPERSON, ePerson.getID(),
                 new EventDetail(DetailType.EPERSON_EMAIL, ePerson.getEmail()), getIdentifiers(context, group)));
+            log.info(LogHelper.getHeader(context, "remove_group_eperson",
+                    "group_id=" + group.getID() + ", eperson_id=" + ePerson.getID()));
         }
     }
 
@@ -245,6 +252,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             context.addEvent(
                 new Event(Event.REMOVE, Constants.GROUP, groupParent.getID(), Constants.GROUP, childGroup.getID(),
                     new EventDetail(DetailType.DSO_NAME, childGroup.getName()), getIdentifiers(context, groupParent)));
+            log.info(LogHelper.getHeader(context, "remove_group_subgroup",
+                    "group_id=" + groupParent.getID() + ", subgroup_id=" + childGroup.getID()));
         }
     }
 

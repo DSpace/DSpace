@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -48,7 +49,6 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
@@ -68,6 +68,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.app.util.LocalSchemaFilenameFilter;
 import org.dspace.app.util.RelationshipUtils;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -179,6 +180,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected RelationshipTypeService relationshipTypeService;
     @Autowired(required = true)
     protected MetadataValueService metadataValueService;
+
+    protected DocumentBuilder builder;
 
     protected String tempWorkDir;
 
@@ -602,7 +605,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         Item item = null;
 
-        String mf[] = metaKey.split("\\.");
+        String[] mf = metaKey.split("\\.");
         if (mf.length < 2) {
             throw new Exception("Bad metadata field in reference: '" + metaKey +
                 "' (expected syntax is schema.element[.qualifier])");
@@ -743,15 +746,22 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             myitem = wi.getItem();
         }
 
+        // normalize and validate path to make sure itemname doesn't contain path traversal
+        Path itemPath = new File(path + File.separatorChar + itemname + File.separatorChar)
+            .toPath().normalize();
+        if (!itemPath.startsWith(path)) {
+            throw new IOException("Illegal item metadata path: '" + itemPath);
+        }
+        // Normalization chops off the last separator, and we need to put it back
+        String itemPathDir = itemPath.toString() + File.separatorChar;
+
         // now fill out dublin core for item
-        loadMetadata(c, myitem, path + File.separatorChar + itemname
-            + File.separatorChar);
+        loadMetadata(c, myitem, itemPathDir);
 
         // and the bitstreams from the contents file
         // process contents file, add bistreams and bundles, return any
         // non-standard permissions
-        List<String> options = processContentsFile(c, myitem, path
-            + File.separatorChar + itemname, "contents");
+        List<String> options = processContentsFile(c, myitem, itemPathDir, "contents");
 
         if (useWorkflow) {
             // don't process handle file
@@ -769,8 +779,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             }
         } else {
             // only process handle file if not using workflow system
-            String myhandle = processHandleFile(c, myitem, path
-                + File.separatorChar + itemname, "handle");
+            String myhandle = processHandleFile(c, myitem, itemPathDir, "handle");
 
             // put item in system
             if (!isTest) {
@@ -904,7 +913,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         // Load any additional metadata schemas
         File folder = new File(path);
-        File file[] = folder.listFiles(metadataFileFilter);
+        File[] file = folder.listFiles(metadataFileFilter);
         for (int i = 0; i < file.length; i++) {
             loadDublinCore(c, myitem, file[i].getAbsolutePath());
         }
@@ -999,6 +1008,34 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         "registry.");
                 return;
             }
+        }
+    }
+
+    /**
+     * Ensures a file path does not attempt to access files outside the designated parent directory.
+     *
+     * @param parentDir          The absolute path to the parent directory that should contain the file
+     * @param fileName           The name or path of the file to validate
+     * @throws IOException       If an error occurs while resolving canonical paths, or the file path attempts
+     *                           to access a location outside the parent directory
+     */
+    private void validateFilePath(String parentDir, String fileName) throws IOException {
+        File parent = new File(parentDir);
+        File file = new File(fileName);
+
+        // If the fileName is not an absolute path, we resolve it against the parentDir
+        if (!file.isAbsolute()) {
+            file = new File(parent, fileName);
+        }
+
+        String parentCanonicalPath = parent.getCanonicalPath();
+        String fileCanonicalPath = file.getCanonicalPath();
+
+        if (!fileCanonicalPath.startsWith(parentCanonicalPath)) {
+            log.error("File path outside of canonical root requested: fileCanonicalPath={} does not begin " +
+                "with parentCanonicalPath={}", fileCanonicalPath, parentCanonicalPath);
+            throw new IOException("Illegal file path '" + fileName + "' encountered. This references a path " +
+                "outside of the import package. Please see the system logs for more details.");
         }
     }
 
@@ -1202,6 +1239,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                             sDescription = sDescription.replaceFirst("description:", "");
                         }
 
+                        validateFilePath(path, sFilePath);
                         registerBitstream(c, i, iAssetstore, sFilePath, sBundle, sDescription);
                         logInfo("\tRegistering Bitstream: " + sFilePath
                             + "\tAssetstore: " + iAssetstore
@@ -1415,6 +1453,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             return;
         }
 
+        validateFilePath(path, fileName);
         String fullpath = path + File.separatorChar + fileName;
 
         // get an input stream
@@ -1426,11 +1465,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         if (bundleName == null) {
             // is it license.txt?
-            if ("license.txt".equals(fileName)) {
-                newBundleName = "LICENSE";
+            if (Constants.LICENSE_BITSTREAM_NAME.equals(fileName)) {
+                newBundleName = Constants.LICENSE_BUNDLE_NAME;
             } else {
                 // call it ORIGINAL
-                newBundleName = "ORIGINAL";
+                newBundleName = Constants.CONTENT_BUNDLE_NAME;
             }
         }
 
@@ -1494,11 +1533,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         if (StringUtils.isBlank(bundleName)) {
             // is it license.txt?
-            if (bitstreamPath.endsWith("license.txt")) {
-                newBundleName = "LICENSE";
+            if (bitstreamPath.endsWith(Constants.LICENSE_BITSTREAM_NAME)) {
+                newBundleName = Constants.LICENSE_BUNDLE_NAME;
             } else {
                 // call it ORIGINAL
-                newBundleName = "ORIGINAL";
+                newBundleName = Constants.CONTENT_BUNDLE_NAME;
             }
         }
 
@@ -1889,9 +1928,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      */
     protected Document loadXML(String filename) throws IOException,
         ParserConfigurationException, SAXException {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-                                                        .newDocumentBuilder();
-
+        DocumentBuilder builder = XMLUtils.getDocumentBuilder();
         return builder.parse(new File(filename));
     }
 

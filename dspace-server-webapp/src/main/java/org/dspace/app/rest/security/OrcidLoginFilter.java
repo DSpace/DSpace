@@ -113,6 +113,7 @@ public class OrcidLoginFilter extends StatelessLoginFilter {
         }
 
         response.sendRedirect(redirectUrl); // lgtm [java/unvalidated-url-redirection]
+        this.closeOpenContext(request);
     }
 
     /**

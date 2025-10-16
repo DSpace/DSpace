@@ -495,7 +495,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                 // Check it has an owning collection
                 List<String> collections = line.get("collection");
-                if (collections == null) {
+                if (collections == null || collections.isEmpty()) {
                     throw new MetadataImportException(
                         "New items must have a 'collection' assigned in the form of a handle");
                 }
@@ -1143,12 +1143,12 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             }
 
             // look up the value and authority in solr
-            List<AuthorityValue> byValue = authorityValueService.findByValue(c, schema, element, qualifier, value);
+            List<AuthorityValue> byValue = authorityValueService.findByValue(schema, element, qualifier, value);
             AuthorityValue authorityValue = null;
             if (byValue.isEmpty()) {
                 String toGenerate = fromAuthority.generateString() + value;
                 String field = schema + "_" + element + (StringUtils.isNotBlank(qualifier) ? "_" + qualifier : "");
-                authorityValue = authorityValueService.generate(c, toGenerate, value, field);
+                authorityValue = authorityValueService.generate(toGenerate, value, field);
                 dcv.setAuthority(toGenerate);
             } else {
                 authorityValue = byValue.get(0);
@@ -1560,7 +1560,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 ContentServiceFactory.getInstance().getMetadataFieldService();
             int i = reference.indexOf(":");
             String mfValue = reference.substring(i + 1);
-            String mf[] = reference.substring(0, i).split("\\.");
+            String[] mf = reference.substring(0, i).split("\\.");
             if (mf.length < 2) {
                 throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
                                                       "Bad metadata field in reference: '" + reference
