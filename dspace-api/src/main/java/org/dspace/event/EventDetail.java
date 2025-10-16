@@ -26,7 +26,7 @@ import java.util.Objects;
  * <p>Example usage:
  * <pre>
  *     EventDetail eventDetail = new EventDetail(DetailType.SOME_TYPE, someObject);
- *     DetailType key = eventDetail.getDetailKey();
+ *     DetailType key = eventDetail.getDetailType();
  *     Object detail = eventDetail.getDetailObject();
  * </pre>
  *
