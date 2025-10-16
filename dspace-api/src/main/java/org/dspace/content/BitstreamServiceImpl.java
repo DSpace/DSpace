@@ -264,7 +264,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             context.addEvent(
                 new Event(Event.MODIFY_METADATA, Constants.BITSTREAM, bitstream.getID(),
                     Constants.ITEM, itemUUID,
-                    new EventDetail(DetailType.DSO_SUMMARY, bitstream.getDetails()),
+                    new EventDetail(DetailType.DSO_SUMMARY, bitstream.getMetadataEventDetails()),
                           getIdentifiers(context, bitstream)));
             bitstream.clearModified();
             bitstream.clearDetails();

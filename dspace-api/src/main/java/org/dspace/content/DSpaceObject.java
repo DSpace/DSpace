@@ -47,7 +47,13 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     // accumulate information to add to "detail" element of content Event,
     // e.g. to document metadata fields touched, etc.
     @Transient
-    private List<Object> eventDetails = null;
+    private StringBuffer eventDetails = null;
+
+
+    // accumulate information to be stored in the Audit system
+    // data is stored in a structured way, so no need to concatenate
+    @Transient
+    private ArrayList<MetadataEvent> metadataEventDetails;
 
     /**
      * The same order should be applied inside this comparator
@@ -88,6 +94,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
      */
     @Transient
     protected UUID predefinedUUID;
+
     public UUID getPredefinedUUID() {
         return predefinedUUID;
     }
@@ -104,25 +111,50 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     }
 
     /**
+     * Deprecated: Use dedicated metadata event detail methods instead.
      * Add a string to the cache of event details.  Automatically
      * separates entries with a comma.
      * Subclass can just start calling addDetails, since it creates
      * the cache if it needs to.
      *
-     * @param d detail object to add.
+     * @param d detail string to add.
      */
-    public void addDetails(Object d) {
+    protected void addDetails(String d) {
         if (eventDetails == null) {
-            eventDetails = new ArrayList();
+            eventDetails = new StringBuffer(d);
+        } else {
+            eventDetails.append(", ").append(d);
         }
-        eventDetails.add(d);
     }
 
     /**
-     * @return summary of event details, never null but possibly empty
+     * Deprecated: Use dedicated metadata event detail methods instead.
+     *
+     * @return summary of event details, or null if there are none.
      */
-    public List<Object> getDetails() {
-        return eventDetails == null ? List.of() : eventDetails;
+    @Deprecated
+    public String getDetails() {
+        return eventDetails == null ? null : eventDetails.toString();
+    }
+
+    /**
+     * Add a MetadataEvent event in the list of metadata event details.
+     * so that is stored in the audit system.
+     *
+     * @param event detail object to add.
+     */
+    public void addMetadataEventDetails(MetadataEvent event) {
+        if (metadataEventDetails == null) {
+            metadataEventDetails = new ArrayList<>();
+        }
+        metadataEventDetails.add(event);
+    }
+
+    /**
+     * @return list of metadata event details, or empty list if there is none.
+     */
+    public List<MetadataEvent> getMetadataEventDetails() {
+        return metadataEventDetails == null ? List.of() : metadataEventDetails;
     }
 
     /**
@@ -192,7 +224,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     protected void addMetadata(MetadataValue metadataValue) {
         setMetadataModified();
         getMetadata().add(metadataValue);
-        addDetails(new MetadataEvent(metadataValue, MetadataEvent.INITIAL_ADD));
+        addMetadataEventDetails(new MetadataEvent(metadataValue, MetadataEvent.INITIAL_ADD));
     }
 
     public List<ResourcePolicy> getResourcePolicies() {

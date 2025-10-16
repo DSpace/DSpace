@@ -10,6 +10,7 @@ package org.dspace.app.audit;
 /**
  * Service to store and retrieve DSpace Events from the audit solr core
  * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Stefano Maffei (stefano.maffei @ 4science.com)
  */
 
 import java.io.IOException;
@@ -53,7 +54,7 @@ import org.springframework.stereotype.Service;
  * Service to interact with the Solr audit core
  */
 @Service
-public class AuditSolrServiceImpl {
+public class AuditSolrServiceImpl implements AuditService {
     // field names in the solr core
     // uid is not a typo it is the field name in the solr schema
     private static final String UUID_FIELD = "uid";

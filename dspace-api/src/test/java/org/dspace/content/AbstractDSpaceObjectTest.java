@@ -16,7 +16,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -93,13 +92,11 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
             dspaceObject.addDetails(s);
         }
 
-        List<Object> details = dspaceObject.getDetails();
+        String details = dspaceObject.getDetails();
         dspaceObject.clearDetails();
 
-        assertThat("testClearDetails 0", dspaceObject.getDetails(), equalTo(List.of()));
-        // Added explicit size inequality assertion to ensure the cleared list has different size than the original
-        assertThat("testClearDetails size inequality", dspaceObject.getDetails().size(),
-                not(equalTo(details.size())));
+        assertThat("testClearDetails 0", dspaceObject.getDetails(), nullValue());
+        assertThat("testClearDetails 1", dspaceObject.getDetails(), not(equalTo(details)));
     }
 
     /**
@@ -112,10 +109,8 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
         for (String s : testData) {
             dspaceObject.addDetails(s);
         }
-        assertThat("testAddDetails 0", dspaceObject.getDetails().size(), is(equalTo(3)));
-        assertThat("testAddDetails 1", dspaceObject.getDetails().get(0), is(equalTo("details 1")));
-        assertThat("testAddDetails 2", dspaceObject.getDetails().get(1), is(equalTo("details 2")));
-        assertThat("testAddDetails 3", dspaceObject.getDetails().get(2), is(equalTo("details 3")));
+        assertThat("testAddDetails 0", dspaceObject.getDetails(), is(equalTo("details 1, details 2, details 3")));
+        assertThat("testAddDetails 1", dspaceObject.getDetails(), is(not(equalTo(null))));
     }
 
     /**
@@ -124,16 +119,13 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
     @Test
     public void testGetDetails() {
         dspaceObject.clearDetails();
-        assertThat("testGetDetails 0", dspaceObject.getDetails(), equalTo(List.of()));
+        assertThat("testGetDetails 0", dspaceObject.getDetails(), nullValue());
 
         String[] testData = new String[] {"details 1", "details 2", "details 3"};
         for (String s : testData) {
             dspaceObject.addDetails(s);
         }
-        assertThat("testGetDetails 0", dspaceObject.getDetails().size(), is(equalTo(3)));
-        assertThat("testGetDetails 1", dspaceObject.getDetails().get(0), is(equalTo("details 1")));
-        assertThat("testGetDetails 2", dspaceObject.getDetails().get(1), is(equalTo("details 2")));
-        assertThat("testGetDetails 3", dspaceObject.getDetails().get(2), is(equalTo("details 3")));
+        assertThat("testGetDetails 1", dspaceObject.getDetails(), is(equalTo("details 1, details 2, details 3")));
     }
 
     /**

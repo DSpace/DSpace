@@ -48,7 +48,7 @@
     <bean id="org.dspace.qaevent.service.QAEventService" class="org.dspace.qaevent.service.impl.QAEventServiceImpl" />
 
     <!-- audit -->
-    <bean id="org.dspace.app.audit.AuditSolrServiceImpl" class="org.dspace.app.audit.AuditSolrServiceImpl"  autowire-candidate="true"/>
+    <bean class="org.dspace.app.audit.AuditSolrServiceImpl"  autowire-candidate="true"/>
 
     <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
     

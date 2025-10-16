@@ -81,12 +81,12 @@ public class SiteServiceImpl extends DSpaceObjectServiceImpl<Site> implements Si
 
         if (site.isMetadataModified()) {
             context.addEvent(new Event(Event.MODIFY_METADATA, site.getType(), site.getID(),
-                new EventDetail(DetailType.DSO_SUMMARY, site.getDetails()),
+                new EventDetail(DetailType.DSO_SUMMARY, site.getMetadataEventDetails()),
                 getIdentifiers(context, site)));
         }
         if (site.isModified()) {
             context.addEvent(new Event(Event.MODIFY, site.getType(), site.getID(),
-                new EventDetail(DetailType.DSO_SUMMARY, site.getDetails()),
+                new EventDetail(DetailType.DSO_SUMMARY, site.getMetadataEventDetails()),
                 getIdentifiers(context, site)));
         }
         site.clearModified();

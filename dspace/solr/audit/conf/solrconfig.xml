@@ -51,7 +51,7 @@
  
      <autoCommit> 
        <maxDocs>10000</maxDocs> <!--Commit every 10.000 documents-->
-       <maxTime>${solr.autoCommit.maxTime:900000}</maxTime> <!--Default commit every 15 minutes--> 
+       <maxTime>${solr.autoCommit.maxTime:10000}</maxTime> <!--Default commit every 10 seconds-->
        <openSearcher>true</openSearcher> 
      </autoCommit>
 

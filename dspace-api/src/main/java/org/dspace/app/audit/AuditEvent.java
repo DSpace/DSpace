@@ -13,7 +13,7 @@ import java.util.UUID;
 
 /**
  * @author Andrea Bollini (andrea.bollini at 4science.it)
- * @author Andrea Petrucci (andrea.petrucci at 4science.it)
+ * @author Stefano Maffei (stefano.maffei at 4science.com)
  */
 public class AuditEvent {
     private UUID uuid;

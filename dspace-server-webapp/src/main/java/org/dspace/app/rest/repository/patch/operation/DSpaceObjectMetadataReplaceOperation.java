@@ -162,7 +162,7 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
                 existingMdv.setConfidence(metadataValue.getConfidence());
                 existingMdv.setLanguage(metadataValue.getLanguage());
                 existingMdv.setValue(metadataValue.getValue());
-                dso.addDetails(new MetadataEvent(existingMdv, MetadataEvent.MODIFY));
+                dso.addMetadataEventDetails(new MetadataEvent(existingMdv, MetadataEvent.MODIFY));
                 dsoService.setMetadataModified(dso);
             } else {
                 throw new UnprocessableEntityException("There is no metadata of this type at that index");
@@ -204,7 +204,7 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
                 if (propertyOfMd.equals("value")) {
                     existingMdv.setValue(valueMdProperty);
                 }
-                dso.addDetails(new MetadataEvent(existingMdv, MetadataEvent.MODIFY));
+                dso.addMetadataEventDetails(new MetadataEvent(existingMdv, MetadataEvent.MODIFY));
                 dsoService.setMetadataModified(dso);
             } else {
                 throw new UnprocessableEntityException("There is no metadata of this type at that index");

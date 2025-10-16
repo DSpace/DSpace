@@ -117,7 +117,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         // identifiers to it.
         context.addEvent(new Event(Event.CREATE, Constants.BUNDLE,
             bundle.getID(), Constants.ITEM, item.getID(),
-            new EventDetail(DetailType.DSO_SUMMARY, bundle.getDetails()),
+            new EventDetail(DetailType.DSO_SUMMARY, bundle.getMetadataEventDetails()),
             getIdentifiers(context, bundle)));
 
         return bundle;
@@ -535,7 +535,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         if (bundle.isModified() || bundle.isMetadataModified()) {
             if (bundle.isMetadataModified()) {
                 context.addEvent(new Event(Event.MODIFY_METADATA, bundle.getType(), bundle.getID(),
-                    new EventDetail(DetailType.DSO_SUMMARY, bundle.getDetails()),
+                    new EventDetail(DetailType.DSO_SUMMARY, bundle.getMetadataEventDetails()),
                         getIdentifiers(context, bundle)));
             }
             context.addEvent(new Event(Event.MODIFY, Constants.BUNDLE, bundle.getID(),
