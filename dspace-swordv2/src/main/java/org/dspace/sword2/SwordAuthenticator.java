@@ -624,27 +624,28 @@ public class SwordAuthenticator {
             List<org.dspace.content.Collection> allowed = new ArrayList<>();
 
             // now find out if the obo user is allowed to submit to any of these collections
-            for (Collection col : cols) {
-                boolean oboAllowed = false;
+            if (swordContext.getOnBehalfOf() != null) {
+                for (Collection col : cols) {
+                    boolean oboAllowed = false;
 
-                // check for obo null
-                if (swordContext.getOnBehalfOf() == null) {
-                    oboAllowed = true;
-                }
+                    //if we have not already determined that the obo user is ok to submit,
+                    //look up the READ policy on the
+                    // community.  THis will include determining if the user is an administrator.
+                    if (!oboAllowed) {
+                        oboAllowed = authorizeService.authorizeActionBoolean(
+                            swordContext.getOnBehalfOfContext(), col,
+                            Constants.ADD);
+                    }
 
-                // if we have not already determined that the obo user is ok to submit, look up the READ policy on the
-                // community.  THis will include determining if the user is an administrator.
-                if (!oboAllowed) {
-                    oboAllowed = authorizeService.authorizeActionBoolean(
-                        swordContext.getOnBehalfOfContext(), col,
-                        Constants.ADD);
+                    // final check to see if we are allowed to READ
+                    if (oboAllowed) {
+                        allowed.add(col);
+                    }
                 }
-
-                // final check to see if we are allowed to READ
-                if (oboAllowed) {
-                    allowed.add(col);
-                }
+            } else {
+                return cols;
             }
+
             return allowed;
 
         } catch (SQLException e) {
