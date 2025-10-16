@@ -34,21 +34,21 @@ import java.util.Objects;
  */
 public class EventDetail {
 
-    private DetailType detailKey;
+    private DetailType detailType;
 
     private Object detailObject;
 
-    public EventDetail(DetailType detailKey, Object detailObject) {
-        setDetailKey(detailKey);
+    public EventDetail(DetailType detailType, Object detailObject) {
+        setDetailType(detailType);
         setDetailObject(detailObject);
     }
 
-    public DetailType getDetailKey() {
-        return detailKey;
+    public DetailType getDetailType() {
+        return detailType;
     }
 
-    private void setDetailKey(DetailType detailKey) {
-        this.detailKey = detailKey;
+    private void setDetailType(DetailType detailType) {
+        this.detailType = detailType;
     }
 
     public Object getDetailObject() {
@@ -65,11 +65,11 @@ public class EventDetail {
             return false;
         }
         EventDetail that = (EventDetail) o;
-        return detailKey == that.detailKey && Objects.equals(detailObject, that.detailObject);
+        return detailType == that.detailType && Objects.equals(detailObject, that.detailObject);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(detailKey, detailObject);
+        return Objects.hash(detailType, detailObject);
     }
 }

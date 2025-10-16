@@ -121,7 +121,7 @@ public class IndexEventConsumer implements Consumer {
                         // Update the indexable objects of type in event.detail of objects with ids in event.identifiers
                         for (String id : event.getIdentifiers()) {
                             EventDetail detail = event.getDetail();
-                            if (!detail.getDetailKey().equals(DetailType.DSO_TYPE)) {
+                            if (!detail.getDetailType().equals(DetailType.DSO_TYPE)) {
                                 break;
                             }
                             IndexFactory indexableObjectService = IndexObjectFactoryFactory.getInstance().
