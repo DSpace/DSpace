@@ -138,7 +138,7 @@ public class Group extends CacheableDSpaceObject implements DSpaceObjectLegacySu
         return getMembers().contains(e);
     }
 
-    List<Group> getParentGroups() {
+    public List<Group> getParentGroups() {
         return parentGroups;
     }
 
