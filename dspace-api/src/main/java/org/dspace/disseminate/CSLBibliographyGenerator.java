@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.disseminate;
@@ -124,14 +124,15 @@ public class CSLBibliographyGenerator {
      * @return the formatted bibliography string for the given metadata
      * @throws IOException if an error occurs while generating the bibliography
      */
-    public List<CSLBibliography> getBibliographies(List<MetadataValue> metadata, OutputFormat outputFormat) throws IOException {
+    public List<CSLBibliography> getBibliographies(List<MetadataValue> metadata, OutputFormat outputFormat)
+            throws IOException {
         CSLItemData cslItemData = buildItem(metadata);
 
         List<CSLBibliography> bibliographies = new ArrayList<>();
 
         for (String style : bibliographyStyles) {
             String bibliography = CSL.makeAdhocBibliography(style, outputFormat.value, cslItemData).makeString();
-           bibliographies.add(new CSLBibliography(style, bibliography));
+            bibliographies.add(new CSLBibliography(style, bibliography));
         }
         return bibliographies;
     }
