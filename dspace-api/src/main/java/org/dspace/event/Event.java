@@ -230,6 +230,7 @@ public class Event implements Serializable {
      */
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Event.class);
 
+
     /**
      * Constructor.
      *
@@ -279,7 +280,7 @@ public class Event implements Serializable {
     public Event(int eventType, int subjectType, UUID subjectID, int objectType,
                  UUID objectID, EventDetail detail) {
         this(eventType, subjectType, subjectID, objectType, objectID, detail,
-             new ArrayList<String>());
+                new ArrayList<String>());
     }
 
     /**
@@ -303,6 +304,85 @@ public class Event implements Serializable {
         timeStamp = Instant.now().toEpochMilli();
         this.detail = detail;
         this.identifiers = (ArrayList<String>) identifiers.clone();
+    }
+
+    /**
+     * Constructor.
+     * Deprecated should use EventDetail instead of String for detail.
+     *
+     * You should consider to use
+     * {@link Event#Event(int, int, UUID, java.lang.String)}.
+     *
+     * @param eventType   action type, e.g. Event.ADD.
+     * @param subjectType DSpace Object Type of subject e.g. Constants.ITEM.
+     * @param subjectID   database ID of subject instance.
+     * @param detail      detail information that depends on context.
+     */
+    @Deprecated
+    public Event(int eventType, int subjectType, UUID subjectID, String detail) {
+        this(eventType, subjectType, subjectID, detail, new ArrayList<String>());
+    }
+
+    /**
+     * Constructor.
+     * Deprecated should use EventDetail instead of String for detail.
+     *
+     * @param eventType   action type, e.g. Event.ADD.
+     * @param subjectType DSpace Object Type of subject e.g. Constants.ITEM.
+     * @param subjectID   database ID of subject instance.
+     * @param detail      detail information that depends on context.
+     * @param identifiers array containing all identifiers of the dso or an empty array
+     */
+    @Deprecated
+    public Event(int eventType, int subjectType, UUID subjectID, String detail, ArrayList<String> identifiers) {
+        this.eventType = eventType;
+        this.subjectType = coreTypeToMask(subjectType);
+        this.subjectID = subjectID;
+        timeStamp = Instant.now().toEpochMilli();
+        this.detail = new EventDetail(DetailType.INFO, detail);
+        this.identifiers = (ArrayList<String>) identifiers.clone();
+    }
+
+    /**
+     * Constructor.
+     * Deprecated should use EventDetail instead of String for detail.
+     *
+     * You should consider to use
+     * {@link Event#Event(int, int, UUID, int, UUID, java.lang.String)} instead.
+     *
+     * @param eventType   action type, e.g. Event.ADD.
+     * @param subjectType DSpace Object Type of subject e.g. Constants.ITEM.
+     * @param subjectID   database ID of subject instance.
+     * @param objectType  DSpace Object Type of object e.g. Constants.BUNDLE.
+     * @param objectID    database ID of object instance.
+     * @param detail      detail information that depends on context.
+     */
+    @Deprecated
+    public Event(int eventType, int subjectType, UUID subjectID, int objectType,
+                 UUID objectID, String detail) {
+        this(eventType, subjectType, subjectID, objectType, objectID, detail,
+             new ArrayList<String>());
+    }
+
+    /**
+     * Constructor.
+     * Deprecated should use EventDetail instead of String for detail.
+     *
+     * @param eventType   action type, e.g. Event.ADD.
+     * @param subjectType DSpace Object Type of subject e.g. Constants.ITEM.
+     * @param subjectID   database ID of subject instance.
+     * @param objectType  DSpace Object Type of object e.g. Constants.BUNDLE.
+     * @param objectID    database ID of object instance.
+     * @param detail      detail information that depends on context.
+     * @param identifiers array containing all identifiers of the dso or an empty array
+     */
+    @Deprecated
+    public Event(int eventType, int subjectType, UUID subjectID, int objectType,
+                 UUID objectID, String detail, ArrayList<String> identifiers) {
+        this(eventType, subjectType, subjectID,
+                objectType, objectID,
+                new EventDetail(DetailType.INFO, detail),
+                (ArrayList<String>) identifiers.clone());
     }
 
     /**
