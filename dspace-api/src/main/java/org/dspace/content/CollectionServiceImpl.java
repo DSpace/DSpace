@@ -54,6 +54,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.service.HarvestedCollectionService;
@@ -182,7 +183,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
         context.addEvent(new Event(Event.CREATE, Constants.COLLECTION,
-                newCollection.getID(), newCollection.getHandle(),
+                newCollection.getID(), newCollection.getHandle(), DetailType.HANDLE,
                 getIdentifiers(context, newCollection)));
 
         log.info(LogHelper.getHeader(context, "create_collection",
@@ -618,7 +619,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
         context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION,
-                                   collection.getID(), "remove_template_item", getIdentifiers(context, collection)));
+            collection.getID(), "remove_template_item", DetailType.ACTION,
+            getIdentifiers(context, collection)));
     }
 
     @Override
@@ -637,8 +639,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
         context.addEvent(new Event(Event.ADD, Constants.COLLECTION, collection.getID(),
-                                   Constants.ITEM, item.getID(), item.getHandle(),
-                                   getIdentifiers(context, collection)));
+                Constants.ITEM, item.getID(), item.getHandle(), DetailType.HANDLE,
+                getIdentifiers(context, collection)));
     }
 
     @Override
@@ -658,8 +660,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
         context.addEvent(new Event(Event.REMOVE, Constants.COLLECTION,
-                                   collection.getID(), Constants.ITEM, item.getID(), item.getHandle(),
-                                   getIdentifiers(context, collection)));
+            collection.getID(), Constants.ITEM, item.getID(),
+            item.getHandle(), DetailType.HANDLE,
+            getIdentifiers(context, collection)));
     }
 
     @Override
@@ -680,7 +683,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
         if (collection.isMetadataModified()) {
             context.addEvent(new Event(Event.MODIFY_METADATA, Constants.COLLECTION, collection.getID(),
-                                         collection.getDetails(),getIdentifiers(context, collection)));
+                collection.getDetails(), DetailType.DSO_SUMMARY,
+                getIdentifiers(context, collection)));
             collection.clearModified();
         }
         collection.clearDetails();
@@ -737,7 +741,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
         context.addEvent(new Event(Event.DELETE, Constants.COLLECTION,
-                                   collection.getID(), collection.getHandle(), getIdentifiers(context, collection)));
+            collection.getID(), collection.getHandle(), DetailType.HANDLE,
+            getIdentifiers(context, collection)));
 
         // remove subscriptions - hmm, should this be in Subscription.java?
         subscribeService.deleteByDspaceObject(context, collection);
