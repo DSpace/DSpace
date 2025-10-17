@@ -79,6 +79,12 @@ public class EventDetail {
         return Objects.hash(detailType, detailObject);
     }
 
+    /**
+     * Extracts a list of {@link MetadataEvent} objects from the detail object if the detail type is {@code DSO_SUMMARY}.
+     * Returns an empty list if the detail object is null if the type is not {@code DSO_SUMMARY}.
+     *
+     * @return a list of {@link MetadataEvent} excluding those with action {@code INITIAL_ADD}
+     */
     public List<MetadataEvent> extractMetadataDetail() {
         try {
             if (this.getDetailObject() == null ||

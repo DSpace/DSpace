@@ -33,6 +33,8 @@ public class AuditEvent {
     private String action;
     private String checksum;
 
+    private final static String LOG_FIELD_SEPARATOR = " || ";
+
     public UUID getUuid() {
         return uuid;
     }
@@ -165,21 +167,21 @@ public class AuditEvent {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("AUDIT_EVENT")
-                .append(' ').append("eventType=").append(nullSafe(getEventType()))
-                .append(' ').append("subjectUUID=").append(nullSafe(getSubjectUUID()))
-                .append(' ').append("subjectType=").append(nullSafe(getSubjectType()))
-                .append(' ').append("objectUUID=").append(nullSafe(getObjectUUID()))
-                .append(' ').append("objectType=").append(nullSafe(getObjectType()))
-                .append(' ').append("metadataField=").append(nullSafe(getMetadataField()))
-                .append(' ').append("value=").append(nullSafe(getValue()))
-                .append(' ').append("authority=").append(nullSafe(getAuthority()))
-                .append(' ').append("confidence=").append(nullSafe(getConfidence()))
-                .append(' ').append("place=").append(nullSafe(getPlace()))
-                .append(' ').append("action=").append(nullSafe(getAction()))
-                .append(' ').append("checksum=").append(nullSafe(getChecksum()))
-                .append(' ').append("datetime=").append(getDatetime() == null ?
+                .append(LOG_FIELD_SEPARATOR).append("eventType=").append(nullSafe(getEventType()))
+                .append(LOG_FIELD_SEPARATOR).append("subjectUUID=").append(nullSafe(getSubjectUUID()))
+                .append(LOG_FIELD_SEPARATOR).append("subjectType=").append(nullSafe(getSubjectType()))
+                .append(LOG_FIELD_SEPARATOR).append("objectUUID=").append(nullSafe(getObjectUUID()))
+                .append(LOG_FIELD_SEPARATOR).append("objectType=").append(nullSafe(getObjectType()))
+                .append(LOG_FIELD_SEPARATOR).append("metadataField=").append(nullSafe(getMetadataField()))
+                .append(LOG_FIELD_SEPARATOR).append("value=").append(nullSafe(getValue()))
+                .append(LOG_FIELD_SEPARATOR).append("authority=").append(nullSafe(getAuthority()))
+                .append(LOG_FIELD_SEPARATOR).append("confidence=").append(nullSafe(getConfidence()))
+                .append(LOG_FIELD_SEPARATOR).append("place=").append(nullSafe(getPlace()))
+                .append(LOG_FIELD_SEPARATOR).append("action=").append(nullSafe(getAction()))
+                .append(LOG_FIELD_SEPARATOR).append("checksum=").append(nullSafe(getChecksum()))
+                .append(LOG_FIELD_SEPARATOR).append("datetime=").append(getDatetime() == null ?
                         "null" : String.valueOf(getDatetime().getTime()))
-                .append(' ').append("epersonUUID=").append(nullSafe(getEpersonUUID()));
+                .append(LOG_FIELD_SEPARATOR).append("epersonUUID=").append(nullSafe(getEpersonUUID()));
         return sb.toString();
     }
 

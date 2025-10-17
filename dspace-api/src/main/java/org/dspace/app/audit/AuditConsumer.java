@@ -10,14 +10,15 @@ package org.dspace.app.audit;
 import java.util.List;
 import java.util.UUID;
 
+import org.dspace.app.audit.factory.AuditServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Class to store all received events in an audit log
+ * Class to store all received events in the audit system, if auditing is enabled.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @author Stefano Maffei (stefano.maffei at 4science.com)
@@ -30,13 +31,8 @@ public class AuditConsumer implements Consumer {
 
 
     public void initialize() throws Exception {
-        DSpace dSpace = new DSpace();
-        auditService = dSpace.getServiceManager()
-                .getServicesByType(AuditService.class)
-                .stream()
-                .findFirst()
-                .orElseThrow();
-        configurationService = dSpace.getConfigurationService();
+        auditService = AuditServiceFactory.getInstance().getAuditService();
+        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         meaningfulEvents = List.of(Event.MODIFY_METADATA, Event.CREATE, Event.DELETE,
             Event.REMOVE);
     }
@@ -63,7 +59,6 @@ public class AuditConsumer implements Consumer {
      *
      * @param event the event to check
      * @return true if the event is meaningful, false otherwise
-     * @author Stefano Maffei (stefano.maffei at 4science.com)
      */
     private boolean isEventMeaningful(Event event) {
         if (meaningfulEvents.contains(event.getEventType())) {

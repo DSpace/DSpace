@@ -10,10 +10,12 @@ package org.dspace.app.audit;
 import org.dspace.content.MetadataValue;
 
 /**
- * class that contains details about the event in the audit solr core of
- * modifying the metadata value
+ * Represents an event related to the modification of a metadata value,
+ * storing details for audit purposes in the Solr core.
+ * This class is used to track changes such as addition, modification, or removal
+ * of metadata values, including field, value, authority, confidence, and place.
  *
- * @author Mohamed Eskander (mohamed.eskander at 4science.com)
+ * @author Stefano Maffei (stefano.maffei at 4science.com)
  */
 public class MetadataEvent {
 

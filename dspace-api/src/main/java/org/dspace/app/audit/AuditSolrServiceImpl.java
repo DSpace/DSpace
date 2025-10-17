@@ -31,7 +31,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -41,10 +40,12 @@ import org.dspace.content.Item;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.SolrDocumentFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
+import org.dspace.statistics.HttpSolrClientFactory;
 import org.dspace.util.SolrUtils;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +53,12 @@ import org.springframework.stereotype.Service;
 
 /**
  * Service to interact with the Solr audit core
+ *
+ * @author Stefano Maffei (stefano.maffei at 4science.com)
  */
 @Service
 public class AuditSolrServiceImpl implements AuditService {
+
     // field names in the solr core
     // uid is not a typo it is the field name in the solr schema
     private static final String UUID_FIELD = "uid";
@@ -81,6 +85,10 @@ public class AuditSolrServiceImpl implements AuditService {
     @Autowired
     private WorkspaceItemService workspaceItemService;
 
+    private HttpSolrClientFactory httpSolrClientFactory;
+
+    private SolrDocumentFactory solrDocumentFactory;
+
     /**
      * Dedicated logger used only for emitting raw audit events with metadata & checksum details.
      * Enable/disable independently via loglevel.audit.events. Falls back gracefully if disabled.
@@ -95,8 +103,7 @@ public class AuditSolrServiceImpl implements AuditService {
         if (solr == null) {
             String solrService = configurationService.getProperty("solr.audit.server");
             log.debug("Solr audit URL: " + solrService);
-            HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
-            solrServer.setBaseURL(solrService);
+            SolrClient solrServer = httpSolrClientFactory.getClient(solrService);
             SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
             // checking SOLR is alive
             solrServer.query(solrQuery);
@@ -124,15 +131,47 @@ public class AuditSolrServiceImpl implements AuditService {
         }
     }
 
+    /**
+     * Checks if the provided event is processable for audit purposes.
+     * An event is considered processable if its detail is not null and its detail type
+     * is either BITSTREAM_CHECKSUM or DSO_SUMMARY, or if the event type is DELETE.
+     * Not all the events are relevant for auditing, some of them may contain
+     * unnecessary or unprocessable information
+     *
+     * @param event the event to check
+     * @return true if the event is processable, false otherwise
+     */
     private boolean isProcessableEvent(Event event) {
         return event.getDetail() != null && (DetailType.BITSTREAM_CHECKSUM.equals(event.getDetail().getDetailType())
             || DetailType.DSO_SUMMARY.equals(event.getDetail().getDetailType())
             || Event.DELETE == event.getEventType());
     }
 
+    /**
+     * Checks if the provided event refers to an auditable item.
+     * <p>
+     * An event is considered always auditable if it not any of these types ITEM, BITSTREAM, or BUNDLE,
+     * for the given types ITEM, BITSTREAM, or BUNDLE a check is performed to verify if the item (or related item)
+     * is either in workflow or in workspace.
+     *
+     * Audit of deleted items is always allowed.
+     * <br>
+     * Audit of items that are archived is always allowed.
+     * <br>
+     * Audit of items in workflow or workspace is configurable via
+     * "audit.item.in-workflow" and "audit.item.in-workspace" properties.
+     * <br>
+     * This method avoids NPE and uses StringUtils for string comparison.
+     * </p>
+     *
+     * @param context the DSpace context
+     * @param event the event to check
+     * @return true if the event refers to an auditable item, false otherwise
+     * @throws SQLException if a database access error occurs
+     */
     private boolean isAuditableItem(Context context, Event event) throws SQLException {
         if (event.getSubjectType() != Constants.ITEM && event.getSubjectType() != Constants.BITSTREAM
-            && event.getSubjectType() != Constants.BUNDLE) {
+                && event.getSubjectType() != Constants.BUNDLE) {
             return true;
         }
 
@@ -148,19 +187,32 @@ public class AuditSolrServiceImpl implements AuditService {
         boolean result = false;
         if (configurationService.getBooleanProperty("audit.item.in-workflow")) {
             result = poolTaskService.findAll(context).stream()
-                .anyMatch(pt -> StringUtils.equalsIgnoreCase(pt.getWorkflowItem().getItem().getID().toString(),
-                    item.getID().toString()));
+                    .anyMatch(pt -> StringUtils.equalsIgnoreCase(pt.getWorkflowItem().getItem().getID().toString(),
+                            item.getID().toString()));
         }
 
         if (!result && configurationService.getBooleanProperty("audit.item.in-workspace")) {
             result = workspaceItemService.findAll(context).stream()
-                .anyMatch(wi -> StringUtils.equalsIgnoreCase(wi.getItem().getID().toString(),
-                    item.getID().toString()));
+                    .anyMatch(wi -> StringUtils.equalsIgnoreCase(wi.getItem().getID().toString(),
+                            item.getID().toString()));
         }
 
         return result;
     }
 
+    /**
+     * Retrieves the {@link Item} associated with the given {@link Event} subject.
+     * <p>
+     * Handles subject types: BITSTREAM, BUNDLE, ITEM. For BITSTREAM, returns the first item of the first bundle.
+     * For BUNDLE, returns the first item. For ITEM, returns the subject itself.
+     * If the subject is null or cannot be cast to the expected type, returns null and logs the issue.
+     * </p>
+     *
+     * @param context the DSpace context
+     * @param event the event containing the subject
+     * @return the associated {@link Item}, or null if not resolvable
+     * @throws SQLException if a database access error occurs
+     */
     private Item retrieveItem(Context context, Event event) throws SQLException {
         int subjectType = event.getSubjectType();
         Object subject = event.getSubject(context);
@@ -213,7 +265,7 @@ public class AuditSolrServiceImpl implements AuditService {
      *                current user are extracted from the context
      */
     public void store(AuditEvent audit) {
-        SolrInputDocument solrInDoc = new SolrInputDocument();
+        SolrInputDocument solrInDoc = solrDocumentFactory.create();
         // this is usually NOT the case, as the audit event get a random uuid by solr
         // but it is convenient for testing purpose
         if (audit.getUuid() != null) {
@@ -254,7 +306,7 @@ public class AuditSolrServiceImpl implements AuditService {
         }
         // Emit dedicated audit event log line if enabled
         if (AUDIT_EVENT_LOGGER.isEnabled(Level.ALL)) {
-            AUDIT_EVENT_LOGGER.info(audit.toString());
+            AUDIT_EVENT_LOGGER.info(audit);
         }
     }
 
@@ -492,4 +544,19 @@ public class AuditSolrServiceImpl implements AuditService {
         return queryResponse.getResults().getNumFound();
     }
 
+    public SolrDocumentFactory getSolrDocumentFactory() {
+        return solrDocumentFactory;
+    }
+
+    public void setSolrDocumentFactory(SolrDocumentFactory solrDocumentFactory) {
+        this.solrDocumentFactory = solrDocumentFactory;
+    }
+
+    public HttpSolrClientFactory getHttpSolrClientFactory() {
+        return httpSolrClientFactory;
+    }
+
+    public void setHttpSolrClientFactory(HttpSolrClientFactory httpSolrClientFactory) {
+        this.httpSolrClientFactory = httpSolrClientFactory;
+    }
 }

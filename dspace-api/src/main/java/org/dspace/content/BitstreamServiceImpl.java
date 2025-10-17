@@ -34,7 +34,6 @@ import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
-import org.dspace.event.EventDetail;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -67,4 +67,9 @@
 
     <bean id="captchaServiceFactory" class="org.dspace.eperson.factory.CaptchaServiceFactoryImpl"/>
 
+    <!-- solrDocumentFactory Default factory -->
+    <bean id="defaultSolrDocumentFactory" class="org.dspace.discovery.DefaultSolrDocumentFactory" autowire-candidate="true"/>
+
+    <bean id="auditServiceFactory" class="org.dspace.app.audit.factory.AuditServiceFactoryImpl"/>
+
 </beans>
