@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.model.Event;
 import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.usage.AbstractUsageEventListener;
@@ -34,43 +35,54 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
     protected SolrLoggerService solrLoggerService;
 
     @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
     public void setSolrLoggerService(SolrLoggerService solrLoggerService) {
         this.solrLoggerService = solrLoggerService;
     }
 
     @Override
     public void receiveEvent(Event event) {
+        if (configurationService.getBooleanProperty("usage-statistics.enabled", true)) {
 
-        if (event instanceof UsageEvent) {
-            log.debug("Usage event received " + event.getName());
-            try {
-                UsageEvent ue = (UsageEvent) event;
+            if (event instanceof UsageEvent) {
+                log.debug("Usage event received " + event.getName());
+                try {
+                    UsageEvent ue = (UsageEvent) event;
 
-                EPerson currentUser = ue.getContext() == null ? null : ue.getContext().getCurrentUser();
+                    EPerson currentUser = ue.getContext() == null ? null : ue.getContext().getCurrentUser();
 
-                if (UsageEvent.Action.VIEW == ue.getAction()) {
-                    if (ue.getRequest() != null) {
-                        solrLoggerService.postView(ue.getObject(), ue.getRequest(), currentUser, ue.getReferrer());
-                    } else {
-                        solrLoggerService.postView(ue.getObject(), ue.getIp(), ue.getUserAgent(), ue.getXforwardedfor(),
-                                                   currentUser, ue.getReferrer());
+                    if (UsageEvent.Action.VIEW == ue.getAction()) {
+                        if (ue.getRequest() != null) {
+                            solrLoggerService.postView(ue.getObject(), ue.getRequest(), currentUser, ue.getReferrer());
+                        } else {
+                            solrLoggerService.postView(
+                                                    ue.getObject(),
+                                                    ue.getIp(),
+                                                    ue.getUserAgent(),
+                                                    ue.getXforwardedfor(),
+                                                    currentUser,
+                                                    ue.getReferrer()
+                            );
+                        }
+                    } else if (UsageEvent.Action.SEARCH == ue.getAction()) {
+                        UsageSearchEvent usageSearchEvent = (UsageSearchEvent) ue;
+                        List<String> queries = new ArrayList<>();
+                        queries.add(usageSearchEvent.getQuery());
+                        solrLoggerService.postSearch(usageSearchEvent.getObject(), usageSearchEvent.getRequest(),
+                                        currentUser, queries, usageSearchEvent.getPage().getSize(),
+                                        usageSearchEvent.getSort().getBy(), usageSearchEvent.getSort().getOrder(),
+                                        usageSearchEvent.getPage().getNumber(), usageSearchEvent.getScope());
+                    } else if (UsageEvent.Action.WORKFLOW == ue.getAction()) {
+                        UsageWorkflowEvent usageWorkflowEvent = (UsageWorkflowEvent) ue;
+
+                        solrLoggerService.postWorkflow(usageWorkflowEvent);
                     }
-                } else if (UsageEvent.Action.SEARCH == ue.getAction()) {
-                    UsageSearchEvent usageSearchEvent = (UsageSearchEvent) ue;
-                    List<String> queries = new ArrayList<>();
-                    queries.add(usageSearchEvent.getQuery());
-                    solrLoggerService.postSearch(usageSearchEvent.getObject(), usageSearchEvent.getRequest(),
-                                    currentUser, queries, usageSearchEvent.getPage().getSize(),
-                                    usageSearchEvent.getSort().getBy(), usageSearchEvent.getSort().getOrder(),
-                                    usageSearchEvent.getPage().getNumber(), usageSearchEvent.getScope());
-                } else if (UsageEvent.Action.WORKFLOW == ue.getAction()) {
-                    UsageWorkflowEvent usageWorkflowEvent = (UsageWorkflowEvent) ue;
 
-                    solrLoggerService.postWorkflow(usageWorkflowEvent);
+                } catch (Exception e) {
+                    log.error("Error processing/logging UsageEvent {}", event.getName(), e);
                 }
-
-            } catch (Exception e) {
-                log.error("Error processing/logging UsageEvent {}", event.getName(), e);
             }
         }
 
