@@ -12,6 +12,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -19,6 +20,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.ResourcePolicy_;
 import org.dspace.content.Collection;
@@ -40,6 +42,11 @@ import org.dspace.eperson.Group;
  * @author kevinvandevelde at atmire.com
  */
 public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> implements CollectionDAO {
+    /**
+     * log4j logger
+     */
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionDAOImpl.class);
+
     protected CollectionDAOImpl() {
         super();
     }
@@ -159,7 +166,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
 
     @Override
     public List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException {
-        return list(createQuery(context, "SELECT DISTINCT c FROM Collection c JOIN Subscription s ON c.id = " +
+        return list(createQuery(context, "SELECT DISTINCT c FROM Collection c JOIN Subscription s ON c = " +
                 "s.dSpaceObject"));
     }
 
@@ -172,14 +179,25 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
     @SuppressWarnings("unchecked")
     public List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context)
         throws SQLException {
-        String q = "select col as collection, sum(bit.sizeBytes) as totalBytes from Item i join i.collections col " +
-            "join i.bundles bun join bun.bitstreams bit group by col";
+        String q = "select col.id, sum(bit.sizeBytes) as totalBytes from Item i join i.collections col " +
+            "join i.bundles bun join bun.bitstreams bit group by col.id";
         Query query = createQuery(context, q);
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
 
         List<Object[]> list = query.getResultList();
         List<Map.Entry<Collection, Long>> returnList = new ArrayList<>(list.size());
         for (Object[] o : list) {
-            returnList.add(new AbstractMap.SimpleEntry<>((Collection) o[0], (Long) o[1]));
+            CriteriaQuery<Collection> criteriaQuery = criteriaBuilder.createQuery(Collection.class);
+            Root<Collection> collectionRoot = criteriaQuery.from(Collection.class);
+            criteriaQuery.select(collectionRoot).where(criteriaBuilder.equal(collectionRoot.get("id"), (UUID) o[0]));
+            Query collectionQuery = createQuery(context, criteriaQuery);
+            Collection collection = (Collection) collectionQuery.getSingleResult();
+            if (collection != null) {
+                returnList.add(new AbstractMap.SimpleEntry<>(collection, (Long) o[1]));
+            } else {
+                log.warn("Unable to find Collection with UUID: {}", o[0]);
+            }
         }
         return returnList;
     }

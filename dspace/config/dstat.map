@@ -101,3 +101,7 @@ create_dc_type=New Dublin Core Type Created
 remove_template_item=Item Template Removed
 withdraw_item=Item Withdrawn
 download_export_archive = Download Export Archive
+add_group_eperson = EPerson Added to Group
+remove_group_eperson = EPerson Removed from Group
+add_group_subgroup = Child Group Added to Group
+remove_group_subgroup = Child Group Removed from Group
