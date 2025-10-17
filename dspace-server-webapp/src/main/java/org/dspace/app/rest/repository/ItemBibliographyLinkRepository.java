@@ -7,10 +7,17 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.converter.ItemConverter;
-import org.dspace.app.rest.model.*;
+import org.dspace.app.rest.model.BibliographyRest;
+import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
@@ -22,10 +29,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Link repository for "relationships" subresource of an individual item.
@@ -58,7 +61,8 @@ public class ItemBibliographyLinkRepository extends AbstractDSpaceRestRepository
 
             BibliographyRest citationRest = new BibliographyRest();
             try {
-                List<CSLBibliography> bibliographies = cSLBibliographyGenerator.getBibliographies(metadataValues,CSLBibliographyGenerator.OutputFormat.TEXT);
+                List<CSLBibliography> bibliographies = cSLBibliographyGenerator.getBibliographies(metadataValues,
+                        CSLBibliographyGenerator.OutputFormat.TEXT);
                 citationRest.addBibliographies(bibliographies);
 
             } catch (IOException e) {
