@@ -19,7 +19,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
-import org.dspace.event.EventDetail;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -81,12 +80,12 @@ public class SiteServiceImpl extends DSpaceObjectServiceImpl<Site> implements Si
 
         if (site.isMetadataModified()) {
             context.addEvent(new Event(Event.MODIFY_METADATA, site.getType(), site.getID(),
-                new EventDetail(DetailType.DSO_SUMMARY, site.getDetails()),
+                site.getDetails(), DetailType.DSO_SUMMARY,
                 getIdentifiers(context, site)));
         }
         if (site.isModified()) {
             context.addEvent(new Event(Event.MODIFY, site.getType(), site.getID(),
-                new EventDetail(DetailType.DSO_SUMMARY, site.getDetails()),
+                site.getDetails(), DetailType.DSO_SUMMARY,
                 getIdentifiers(context, site)));
         }
         site.clearModified();

@@ -26,7 +26,6 @@ import org.dspace.core.Context;
 import org.dspace.embargo.service.EmbargoService;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
-import org.dspace.event.EventDetail;
 import org.dspace.identifier.Identifier;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
@@ -226,7 +225,7 @@ public class InstallItemServiceImpl implements InstallItemService {
 
         // Notify interested parties of newly archived Item
         c.addEvent(new Event(Event.INSTALL, Constants.ITEM, item.getID(),
-            new EventDetail(DetailType.HANDLE, item.getHandle()), itemService.getIdentifiers(c, item)));
+            item.getHandle(), DetailType.HANDLE, itemService.getIdentifiers(c, item)));
 
         // remove in-progress submission
         contentServiceFactory.getInProgressSubmissionService(is).deleteWrapper(c, is);

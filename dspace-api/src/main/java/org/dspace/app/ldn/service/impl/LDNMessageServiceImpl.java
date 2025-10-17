@@ -44,9 +44,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableLDNNotification;
-import org.dspace.event.DetailType;
 import org.dspace.event.Event;
-import org.dspace.event.EventDetail;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -216,7 +214,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         context.addEvent(
             new Event(Event.MODIFY, Constants.LDN_MESSAGE,
                 notificationUUID,
-                new EventDetail(DetailType.DSO_TYPE, IndexableLDNNotification.TYPE), identifiersList));
+                IndexableLDNNotification.TYPE, identifiersList));
     }
 
     private DSpaceObject findDspaceObjectByUrl(Context context, String url) throws SQLException {

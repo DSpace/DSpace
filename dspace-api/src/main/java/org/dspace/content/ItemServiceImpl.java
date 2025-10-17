@@ -65,7 +65,6 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
-import org.dspace.event.EventDetail;
 import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.DOI;
@@ -490,7 +489,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         context.addEvent(new Event(Event.ADD, Constants.ITEM, item.getID(),
             Constants.BUNDLE, bundle.getID(),
-            new EventDetail(DetailType.DSO_NAME, bundle.getName()),
+            bundle.getName(), DetailType.DSO_NAME,
             getIdentifiers(context, item)));
     }
 
@@ -504,7 +503,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             + item.getID() + ",bundle_id=" + bundle.getID()));
 
         context.addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(),
-            Constants.BUNDLE, bundle.getID(), new EventDetail(DetailType.DSO_NAME, bundle.getName()),
+            Constants.BUNDLE, bundle.getID(), bundle.getName(), DetailType.DSO_NAME,
             getIdentifiers(context, item)));
 
         bundleService.delete(context, bundle);
@@ -691,7 +690,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
             if (item.isMetadataModified()) {
                 context.addEvent(new Event(Event.MODIFY_METADATA, item.getType(), item.getID(),
-                    new EventDetail(DetailType.DSO_SUMMARY, item.getDetails()),
+                    item.getDetails(), DetailType.DSO_SUMMARY,
                     getIdentifiers(context, item)));
             }
 
@@ -741,7 +740,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         update(context, item);
 
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(),
-            new EventDetail(DetailType.ACTION, "WITHDRAW"), getIdentifiers(context, item)));
+            "WITHDRAW", DetailType.ACTION, getIdentifiers(context, item)));
 
         // switch all READ authorization policies to WITHDRAWN_READ
         authorizeService.switchPoliciesAction(context, item, Constants.READ, Constants.WITHDRAWN_READ);
@@ -796,7 +795,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         update(context, item);
 
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(),
-            new EventDetail(DetailType.ACTION, "REINSTATE"), getIdentifiers(context, item)));
+            "REINSTATE", DetailType.ACTION, getIdentifiers(context, item)));
 
         // restore all WITHDRAWN_READ authorization policies back to READ
         for (Bundle bnd : item.getBundles()) {
@@ -838,7 +837,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         authorizeService.authorizeAction(context, item, Constants.REMOVE);
 
         context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(),
-            new EventDetail(DetailType.HANDLE, item.getHandle()), getIdentifiers(context, item)));
+            item.getHandle(), DetailType.HANDLE, getIdentifiers(context, item)));
 
         log.info(LogHelper.getHeader(context, "delete_item", "item_id="
             + item.getID()));
@@ -927,7 +926,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             + item.getID() + ",bundle_id=" + b.getID()));
         context
             .addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(), Constants.BUNDLE, b.getID(),
-                new EventDetail(DetailType.DSO_NAME, b.getName())));
+                b.getName(), DetailType.DSO_NAME));
     }
 
     protected void removeVersion(Context context, Item item) throws AuthorizeException, SQLException {

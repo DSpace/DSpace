@@ -40,7 +40,6 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
-import org.dspace.event.EventDetail;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,14 +136,14 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         }
 
         context.addEvent(new Event(Event.CREATE, Constants.COMMUNITY, newCommunity.getID(),
-            new EventDetail(DetailType.HANDLE, newCommunity.getHandle()),
+                newCommunity.getHandle(), DetailType.HANDLE,
                 getIdentifiers(context, newCommunity)));
 
         // if creating a top-level Community, simulate an ADD event at the Site.
         if (parent == null) {
             context.addEvent(new Event(Event.ADD, Constants.SITE, siteService.findSite(context).getID(),
                     Constants.COMMUNITY, newCommunity.getID(),
-                new EventDetail(DetailType.HANDLE, newCommunity.getHandle()),
+                    newCommunity.getHandle(), DetailType.HANDLE,
                     getIdentifiers(context, newCommunity)));
         }
 
@@ -280,9 +279,9 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         }
         if (community.isMetadataModified()) {
             context.addEvent(
-                new Event(Event.MODIFY_METADATA, Constants.COMMUNITY, community.getID(),
-                    new EventDetail(DetailType.DSO_SUMMARY, community.getDetails()),
-                          getIdentifiers(context, community)));
+                    new Event(Event.MODIFY_METADATA, Constants.COMMUNITY, community.getID(),
+                            community.getDetails(), DetailType.DSO_SUMMARY,
+                            getIdentifiers(context, community)));
             community.clearModified();
         }
         community.clearDetails();
@@ -399,7 +398,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         }
         context.addEvent(
             new Event(Event.ADD, Constants.COMMUNITY, community.getID(), Constants.COLLECTION, collection.getID(),
-                new EventDetail(DetailType.HANDLE, community.getHandle()), getIdentifiers(context, community)));
+                community.getHandle(), DetailType.HANDLE, getIdentifiers(context, community)));
     }
 
     @Override
@@ -444,8 +443,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             childCommunity.addParentCommunity(parentCommunity);
         }
         context.addEvent(new Event(Event.ADD, Constants.COMMUNITY, parentCommunity.getID(), Constants.COMMUNITY,
-            childCommunity.getID(), new EventDetail(DetailType.HANDLE, parentCommunity.getHandle()),
-                                   getIdentifiers(context, parentCommunity)));
+                childCommunity.getID(), parentCommunity.getHandle(), DetailType.HANDLE,
+                getIdentifiers(context, parentCommunity)));
     }
 
     @Override
@@ -470,7 +469,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         // Remove any mappings
         context.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, community.getID(),
-            Constants.COLLECTION, removedId, new EventDetail(DetailType.HANDLE, removedHandle),
+            Constants.COLLECTION, removedId, removedHandle, DetailType.HANDLE,
             removedIdentifiers));
     }
 
@@ -492,7 +491,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         context.addEvent(
             new Event(Event.REMOVE, Constants.COMMUNITY, parentCommunity.getID(), Constants.COMMUNITY, removedId,
-                new EventDetail(DetailType.HANDLE, removedHandle), removedIdentifiers));
+                removedHandle, DetailType.HANDLE, removedIdentifiers));
     }
 
     @Override
@@ -532,8 +531,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         rawDelete(context, community);
         context.addEvent(
-            new Event(Event.REMOVE, Constants.SITE, siteService.findSite(context).getID(), Constants.COMMUNITY,
-                      removedId, new EventDetail(DetailType.HANDLE, removedHandle), removedIdentifiers));
+                new Event(Event.REMOVE, Constants.SITE, siteService.findSite(context).getID(), Constants.COMMUNITY,
+                        removedId, removedHandle, DetailType.HANDLE, removedIdentifiers));
 
     }
 
@@ -558,7 +557,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
                                       "community_id=" + community.getID()));
 
         context.addEvent(new Event(Event.DELETE, Constants.COMMUNITY, community.getID(),
-            new EventDetail(DetailType.HANDLE, community.getHandle()),
+            community.getHandle(), DetailType.HANDLE,
             getIdentifiers(context, community)));
 
         subscribeService.deleteByDspaceObject(context, community);
