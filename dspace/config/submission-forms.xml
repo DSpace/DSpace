@@ -94,7 +94,7 @@
                     <dc-qualifier>issued</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Date of Issue</label>
-                    <style>col-sm-4</style>
+                    <style>col-md-4</style>
                     <input-type>date</input-type>
                     <hint>Please give the date of previous publication or public distribution.
                         You can leave out the day and/or month if they aren't applicable.
@@ -108,7 +108,7 @@
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Publisher</label>
-                    <style>col-sm-8</style>
+                    <style>col-md-8</style>
                     <input-type>onebox</input-type>
                     <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
                     <required></required>
@@ -296,7 +296,7 @@
                     <dc-qualifier>issued</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Date of Issue</label>
-                    <style>col-sm-4</style>
+                    <style>col-md-4</style>
                     <input-type>date</input-type>
                     <hint>Please give the date of previous publication or public distribution.
                         You can leave out the day and/or month if they aren't applicable.
@@ -310,7 +310,7 @@
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Publisher</label>
-                    <style>col-sm-8</style>
+                    <style>col-md-8</style>
                     <input-type>onebox</input-type>
                     <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
                     <required></required>
@@ -874,7 +874,7 @@
                     <dc-qualifier>issued</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Date of Issue</label>
-                    <style>col-sm-4</style>
+                    <style>col-md-4</style>
                     <input-type>date</input-type>
                     <hint>Please give the date of previous publication or public distribution.
                         You can leave out the day
@@ -890,7 +890,7 @@
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Publisher</label>
-                    <style>col-sm-8</style>
+                    <style>col-md-8</style>
                     <input-type>onebox</input-type>
                     <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
                     <required></required>
