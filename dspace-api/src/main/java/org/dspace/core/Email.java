@@ -355,22 +355,12 @@ public class Email {
     public void send() throws MessagingException, IOException {
         build();
 
-        if (!isValidEmail()) {
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
+        if (isMailServerDisabled(config)) {
             LOG.info(format(message, body));
         } else {
             Transport.send(message);
         }
-    }
-
-    /**
-     * Checks if the generated email is valid, and can be sent.
-     * @return boolean
-     */
-    private static boolean isValidEmail() {
-        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
-        boolean disabled = isMailServerDisabled(config);
-        String[] fixedRecipient = config.getArrayProperty("mail.server.fixedRecipient", new String[] { });
-        return !disabled || fixedRecipient.length > 0;
     }
 
     /**
@@ -411,8 +401,8 @@ public class Email {
         // Create message
         message = new MimeMessage(session);
 
-        // Get the mail configuration properties for fixedRecipient
-        String[] fixedRecipients = getFixedRecipients(config);
+        // Get the mail configuration properties for catchAllRecipient
+        String[] catchAllRecipient = getCatchAllRecipient(config);
 
         // Get headers defined by the template.
         String[] templateHeaders = config.getArrayProperty("mail.message.headers");
@@ -433,12 +423,12 @@ public class Email {
         body = writer.toString();
 
         // Set the recipients of the message
-        if (fixedRecipients.length > 0) {
-            // Send to fixed recipients instead of original recipients
-            for (String recipient : fixedRecipients) {
+        if (catchAllRecipient.length > 0) {
+            // Send to catchAllRecipients instead of original recipients
+            for (String recipient : catchAllRecipient) {
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
             }
-            // Clear CC field when using fixed recipients
+            // Clear CC field when using catchAllRecipients
             message.setRecipients(Message.RecipientType.CC, "");
 
             // Enhance body with original recipient information
@@ -536,11 +526,15 @@ public class Email {
         }
     }
 
-    private static String[] getFixedRecipients(ConfigurationService config) {
-        if (!isMailServerDisabled(config)) {
+    private static String[] getCatchAllRecipient(ConfigurationService config) {
+        if (!isCatchAllSystemEnabled(config)) {
             return new String[]{};
         }
-        return config.getArrayProperty("mail.server.fixedRecipient", new String[] {});
+        return config.getArrayProperty("mail.server.catchAll.recipient", new String[] {});
+    }
+
+    private static boolean isCatchAllSystemEnabled(ConfigurationService config) {
+        return config.getBooleanProperty("mail.server.catchAll.enabled", false);
     }
 
     private static boolean isMailServerDisabled(ConfigurationService config) {

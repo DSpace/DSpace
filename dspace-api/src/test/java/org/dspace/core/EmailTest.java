@@ -70,23 +70,22 @@ public class EmailTest
     }
 
     @Test
-    public void testFixedRecipientWithDisabledServer()
+    public void testCatchAllRecipientWithDisabledServer()
             throws MessagingException, IOException {
-        // Configure mail server as disabled with fixed recipient
-        config.setProperty("mail.server.disabled", "true");
-        config.setProperty("mail.server.fixedRecipient", "fixed@example.com");
+        config.setProperty("mail.server.catchAll.enabled", "true");
+        config.setProperty("mail.server.catchAll.recipient", "fixed@example.com");
 
         Email email = new Email();
         email.setContent("fixed recipient test",
-                "This is a test email that should go to fixed recipient.");
+                "This is a test email that should go to catchAll recipient.");
         email.addRecipient("original@example.com");
         email.build();
 
         MimeMessage message = email.message;
         InternetAddress[] recipients = (InternetAddress[]) message.getRecipients(MimeMessage.RecipientType.TO);
 
-        assertThat("Email should be sent to fixed recipient", recipients.length, is(1));
-        assertThat("Fixed recipient should receive the email", recipients[0].getAddress(), is("fixed@example.com"));
+        assertThat("Email should be sent to catchAll recipient", recipients.length, is(1));
+        assertThat("CatchAll recipient should receive the email", recipients[0].getAddress(), is("fixed@example.com"));
 
         // Check that original recipient is included in the body
         String messageBody = message.getContent().toString();
@@ -97,34 +96,32 @@ public class EmailTest
     }
 
     @Test
-    public void testMultipleFixedRecipients()
+    public void testMultipleCatchAllRecipients()
             throws MessagingException, IOException {
-        // Configure mail server as disabled with multiple fixed recipients
         config.setProperty("mail.server.disabled", "true");
-        config.setProperty("mail.server.fixedRecipient", "fixed1@example.com,fixed2@example.com");
+        config.setProperty("mail.server.catchAll.recipient", "fixed1@example.com,fixed2@example.com");
 
         Email email = new Email();
-        email.setContent("multiple fixed recipients test",
-                "This is a test email that should go to multiple fixed recipients.");
+        email.setContent("multiple catchAll recipients test",
+                "This is a test email that should go to multiple catchAll recipients.");
         email.addRecipient("original@example.com");
         email.build();
 
         MimeMessage message = email.message;
         InternetAddress[] recipients = (InternetAddress[]) message.getRecipients(MimeMessage.RecipientType.TO);
 
-        assertThat("Email should be sent to both fixed recipients", recipients.length, is(2));
-        assertThat("First fixed recipient should receive the email", recipients[0].getAddress(),
+        assertThat("Email should be sent to both catchAll recipients", recipients.length, is(2));
+        assertThat("First catchAll recipient should receive the email", recipients[0].getAddress(),
                    is("fixed1@example.com"));
-        assertThat("Second fixed recipient should receive the email", recipients[1].getAddress(),
+        assertThat("Second catchAll recipient should receive the email", recipients[1].getAddress(),
                    is("fixed2@example.com"));
     }
 
     @Test
-    public void testDisabledServerWithoutFixedRecipient()
+    public void testDisabledServerWithoutCatchAllRecipient()
             throws MessagingException, IOException {
-        // Configure mail server as disabled but without fixed recipient
         config.setProperty("mail.server.disabled", "true");
-        config.setProperty("mail.server.fixedRecipient", "");
+        config.setProperty("mail.server.catchAll.recipient", "");
 
         Email email = new Email();
         email.setContent("disabled server test",
@@ -132,12 +129,11 @@ public class EmailTest
         email.addRecipient("original@example.com");
         email.build();
 
-        // When disabled and no fixed recipient, message is still created but sent to original recipient
         MimeMessage message = email.message;
         InternetAddress[] recipients = (InternetAddress[]) message.getRecipients(MimeMessage.RecipientType.TO);
 
         assertThat("Message should be created", message, is(not((MimeMessage) null)));
-        assertThat("Email should be sent to original recipient when no fixed recipient configured",
+        assertThat("Email should be sent to original recipient when no catchAll recipient configured",
                 recipients.length, is(1));
         assertThat("Original recipient should receive the email", recipients[0].getAddress(),
                    is("original@example.com"));
@@ -149,11 +145,10 @@ public class EmailTest
     }
 
     @Test
-    public void testNormalEmailSendingWithFixedRecipientConfigured()
+    public void testNormalEmailSendingWithCatchAllRecipientConfigured()
             throws MessagingException, IOException {
-        // Configure mail server as enabled but with fixed recipient configured
-        config.setProperty("mail.server.disabled", "false");
-        config.setProperty("mail.server.fixedRecipient", "fixed@example.com");
+        config.setProperty("mail.server.catchAll.enabled", "false");
+        config.setProperty("mail.server.catchAll.recipient", "fixed@example.com");
 
         Email email = new Email();
         email.setContent("normal sending test",
@@ -176,11 +171,10 @@ public class EmailTest
     }
 
     @Test
-    public void testFixedRecipientWithCCRecipients()
+    public void testCatchAllRecipientWithCCRecipients()
             throws MessagingException, IOException {
-        // Configure mail server as disabled with fixed recipient
-        config.setProperty("mail.server.disabled", "true");
-        config.setProperty("mail.server.fixedRecipient", "fixed@example.com");
+        config.setProperty("mail.server.catchAll.enabled", "true");
+        config.setProperty("mail.server.catchAll.recipient", "fixed@example.com");
 
         Email email = new Email();
         email.setContent("CC recipients test",
@@ -194,9 +188,9 @@ public class EmailTest
         InternetAddress[] recipients = (InternetAddress[]) message.getRecipients(MimeMessage.RecipientType.TO);
         InternetAddress[] ccRecipients = (InternetAddress[]) message.getRecipients(MimeMessage.RecipientType.CC);
 
-        assertThat("Email should be sent to fixed recipient", recipients.length, is(1));
-        assertThat("Fixed recipient should receive the email", recipients[0].getAddress(), is("fixed@example.com"));
-        assertThat("CC field should be null for fixed recipient", ccRecipients, is((InternetAddress[]) null));
+        assertThat("Email should be sent to catchAll recipient", recipients.length, is(1));
+        assertThat("CatchAll recipient should receive the email", recipients[0].getAddress(), is("fixed@example.com"));
+        assertThat("CC field should be null for catchAll recipient", ccRecipients, is((InternetAddress[]) null));
 
 
         // Check that original recipient is included in the body
@@ -206,11 +200,10 @@ public class EmailTest
     }
 
     @Test
-    public void testFixedRecipientLogging()
+    public void testCatchAllRecipientsLogging()
             throws MessagingException, IOException {
-        // Configure mail server as disabled with fixed recipient
-        config.setProperty("mail.server.disabled", "true");
-        config.setProperty("mail.server.fixedRecipient", "fixed@example.com");
+        config.setProperty("mail.server.catchAll.enabled", "true");
+        config.setProperty("mail.server.catchAll.recipient", "fixed@example.com");
 
         Email email = new Email();
         email.setContent("logging test",
@@ -221,12 +214,10 @@ public class EmailTest
         // Get the logged message (this simulates what would be logged)
         String loggedMessage = email.getMessage();
 
-        assertThat("Logged message should contain fixed recipient info",
+        assertThat("Logged message should contain catchAllrecipient info",
                 loggedMessage, containsString("fixed@example.com"));
         assertThat("Logged message should contain original recipient info",
                 loggedMessage, containsString("original@example.com"));
-        assertThat("Logged message should indicate disabled server",
-                loggedMessage, containsString("Message not sent due to mail.server.disabled"));
         assertThat("Logged message should contain REAL RECIPIENT section",
                 loggedMessage, containsString("===REAL RECIPIENT==="));
     }
