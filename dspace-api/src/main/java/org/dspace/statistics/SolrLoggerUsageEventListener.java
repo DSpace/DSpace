@@ -37,6 +37,14 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
     @Autowired
     private ConfigurationService configurationService;
 
+    /**
+     * Setter for ConfigurationService, primarily for dependency injection.
+     * @param configurationService the configuration service
+     */
+    public void setConfigurationService(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
+
     @Autowired
     public void setSolrLoggerService(SolrLoggerService solrLoggerService) {
         this.solrLoggerService = solrLoggerService;
