@@ -38,6 +38,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.json.BucketBasedJsonFacet;
+import org.apache.solr.client.solrj.response.json.BucketJsonFacet;
 import org.apache.solr.client.solrj.response.json.NestableJsonFacet;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
@@ -70,6 +71,7 @@ import org.dspace.discovery.indexobject.IndexableCommunity;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
+import org.dspace.discovery.indexobject.factory.ItemIndexFactory;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
@@ -339,6 +341,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         try {
             final List<IndexFactory> indexableObjectServices = indexObjectServiceFactory.
                 getIndexFactories();
+            int indexObject = 0;
             for (IndexFactory indexableObjectService : indexableObjectServices) {
                 if (type == null || StringUtils.equals(indexableObjectService.getType(), type)) {
                     final Iterator<IndexableObject> indexableObjects = indexableObjectService.findAll(context);
@@ -346,6 +349,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         final IndexableObject indexableObject = indexableObjects.next();
                         indexContent(context, indexableObject, force);
                         context.uncacheEntity(indexableObject.getIndexedObject());
+                        indexObject++;
+                        if ((indexObject % 100) == 0 && indexableObjectService instanceof ItemIndexFactory) {
+                            context.uncacheEntities();
+                        }
                     }
                 }
             }
@@ -785,16 +792,20 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         solrQuery.setQuery(query);
 
-        // Add any search fields to our query. This is the limited list
-        // of fields that will be returned in the solr result
-        for (String fieldName : discoveryQuery.getSearchFields()) {
-            solrQuery.addField(fieldName);
+        if (discoveryQuery.getMaxResults() != 0) {
+            // set search fields in Solr query only if we are interested in the actual search results
+
+            // Add any search fields to our query. This is the limited list
+            // of fields that will be returned in the solr result
+            for (String fieldName : discoveryQuery.getSearchFields()) {
+                solrQuery.addField(fieldName);
+            }
+            // Also ensure a few key obj identifier fields are returned with every query
+            solrQuery.addField(SearchUtils.RESOURCE_TYPE_FIELD);
+            solrQuery.addField(SearchUtils.RESOURCE_ID_FIELD);
+            solrQuery.addField(SearchUtils.RESOURCE_UNIQUE_ID);
+            solrQuery.addField(STATUS_FIELD);
         }
-        // Also ensure a few key obj identifier fields are returned with every query
-        solrQuery.addField(SearchUtils.RESOURCE_TYPE_FIELD);
-        solrQuery.addField(SearchUtils.RESOURCE_ID_FIELD);
-        solrQuery.addField(SearchUtils.RESOURCE_UNIQUE_ID);
-        solrQuery.addField(STATUS_FIELD);
 
         if (discoveryQuery.isSpellCheck()) {
             solrQuery.setParam(SpellingParams.SPELLCHECK_Q, query);
@@ -988,8 +999,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
                 //Resolve our facet field values
                 resolveFacetFields(context, query, result, skipLoadingResponse, solrQueryResponse);
-                //Add total entries count for metadata browsing
-                resolveEntriesCount(result, solrQueryResponse);
+                //Resolve our json facet field values used for metadata browsing
+                resolveJsonFacetFields(context, result, solrQueryResponse);
             }
             // If any stale entries are found in the current page of results,
             // we remove those stale entries and rerun the same query again.
@@ -1016,33 +1027,38 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     /**
-     * Stores the total count of entries for metadata index browsing. The count is calculated by the
-     * <code>json.facet</code> parameter with the following value:
+     * Process the 'json.facet' response, which is currently only used for metadata browsing
      *
-     * <pre><code>
-     * {
-     *     "entries_count": {
-     *         "type": "terms",
-     *         "field": "facetNameField_filter",
-     *         "limit": 0,
-     *         "prefix": "prefix_value",
-     *         "numBuckets": true
-     *     }
-     * }
-     * </code></pre>
-     *
-     * This value is returned in the <code>facets</code> field of the Solr response.
-     *
-     * @param result DiscoverResult object where the total entries count will be stored
-     * @param solrQueryResponse QueryResponse object containing the solr response
+     * @param context context object
+     * @param result the result object to add the facet results to
+     * @param solrQueryResponse the solr query response
+     * @throws SQLException if database error
      */
-    private void resolveEntriesCount(DiscoverResult result, QueryResponse solrQueryResponse) {
+    private void resolveJsonFacetFields(Context context, DiscoverResult result, QueryResponse solrQueryResponse)
+        throws SQLException {
 
         NestableJsonFacet response = solrQueryResponse.getJsonFacetingResponse();
-        if (response != null) {
-            BucketBasedJsonFacet facet = response.getBucketBasedFacets("entries_count");
-            if (facet != null) {
-                result.setTotalEntries(facet.getNumBucketsCount());
+        if (response != null && response.getBucketBasedFacetNames() != null) {
+            for (String facetName : response.getBucketBasedFacetNames()) {
+                BucketBasedJsonFacet facet = response.getBucketBasedFacets(facetName);
+                if (facet != null) {
+                    result.setTotalEntries(facet.getNumBucketsCount());
+                    for (BucketJsonFacet bucket : facet.getBuckets()) {
+                        String facetValue = bucket.getVal() != null ? bucket.getVal().toString() : "";
+                        String field = facetName + "_filter";
+                        String displayedValue = transformDisplayedValue(context, field, facetValue);
+                        String authorityValue = transformAuthorityValue(context, field, facetValue);
+                        String sortValue = transformSortValue(context, field, facetValue);
+                        String filterValue = displayedValue;
+                        if (StringUtils.isNotBlank(authorityValue)) {
+                            filterValue = authorityValue;
+                        }
+                        result.addFacetResult(facetName,
+                            new DiscoverResult.FacetResult(filterValue, displayedValue,
+                                authorityValue, sortValue, bucket.getCount(),
+                                DiscoveryConfigurationParameters.TYPE_TEXT));
+                    }
+                }
             }
         }
     }
@@ -1266,7 +1282,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         try {
             SolrQuery solrQuery = new SolrQuery();
             //Set the query to handle since this is unique
-            solrQuery.setQuery(SearchUtils.RESOURCE_UNIQUE_ID + ": " + new IndexableItem(item).getUniqueIndexID());
+            solrQuery.setQuery(SearchUtils.RESOURCE_UNIQUE_ID + ":" + new IndexableItem(item).getUniqueIndexID());
             //Only return obj identifier fields in result doc
             solrQuery.setFields(SearchUtils.RESOURCE_TYPE_FIELD, SearchUtils.RESOURCE_ID_FIELD);
             //Add the more like this parameters !

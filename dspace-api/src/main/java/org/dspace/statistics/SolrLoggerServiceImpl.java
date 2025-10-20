@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,7 +55,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -84,6 +84,7 @@ import org.apache.solr.common.params.MapSolrParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.ShardParams;
 import org.apache.solr.common.util.NamedList;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -231,6 +232,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             throw new RuntimeException(e);
         }
 
+        if (dspaceObject instanceof Bitstream && !isBitstreamLoggable((Bitstream) dspaceObject)) {
+            return;
+        }
+
         if (solr == null) {
             return;
         }
@@ -278,6 +283,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public void postView(DSpaceObject dspaceObject,
                          String ip, String userAgent, String xforwardedfor, EPerson currentUser, String referrer) {
+        if (dspaceObject instanceof Bitstream && !isBitstreamLoggable((Bitstream) dspaceObject)) {
+            return;
+        }
+
         if (solr == null) {
             return;
         }
@@ -1034,7 +1043,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             return null;
         }
 
-        // System.out.println("QUERY");
         SolrQuery solrQuery = new SolrQuery().setRows(rows).setQuery(query)
                                              .setFacetMinCount(facetMinCount);
         addAdditionalSolrYearCores(solrQuery);
@@ -1208,7 +1216,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                         + "."
                         + i
                         + ".csv");
-                try ( CloseableHttpClient hc = HttpClientBuilder.create().build(); ) {
+                try (CloseableHttpClient hc = DSpaceHttpClientFactory.getInstance().buildWithoutProxy()) {
                     HttpResponse response = hc.execute(get);
                     csvInputstream = response.getEntity().getContent();
                     //Write the csv output to a file !
@@ -1350,7 +1358,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
                 HttpGet get = new HttpGet(solrRequestUrl);
                 List<String[]> rows;
-                try ( CloseableHttpClient hc = HttpClientBuilder.create().build(); ) {
+                try (CloseableHttpClient hc = DSpaceHttpClientFactory.getInstance().buildWithoutProxy()) {
                     HttpResponse response = hc.execute(get);
                     InputStream csvOutput = response.getEntity().getContent();
                     Reader csvReader = new InputStreamReader(csvOutput);
@@ -1617,5 +1625,36 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
 
         throw new UnknownHostException("unknown ip format");
+    }
+
+    /**
+     * Checks if a given Bitstream's bundles are configured to be logged in Solr statistics.
+     *
+     * @param bitstream The bitstream to check.
+     * @return {@code true} if the bitstream event should be logged, {@code false} otherwise.
+     */
+    private boolean isBitstreamLoggable(Bitstream bitstream) {
+        String[] allowedBundles = configurationService
+            .getArrayProperty("solr-statistics.query.filter.bundles");
+        if (allowedBundles == null || allowedBundles.length == 0) {
+            return true;
+        }
+        List<String> allowedBundlesList = Arrays.asList(allowedBundles);
+        try {
+            List<Bundle> actualBundles = bitstream.getBundles();
+            if (actualBundles.isEmpty()) {
+                return true;
+            }
+            for (Bundle bundle : actualBundles) {
+                if (allowedBundlesList.contains(bundle.getName())) {
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error checking bitstream bundles for logging statistics for bitstream {}",
+                bitstream.getID(), e);
+            return true;
+        }
+        return false;
     }
 }

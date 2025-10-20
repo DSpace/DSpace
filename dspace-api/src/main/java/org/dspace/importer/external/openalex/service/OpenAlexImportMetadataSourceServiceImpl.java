@@ -17,7 +17,6 @@ import java.util.concurrent.Callable;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.el.MethodNotFoundException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -131,7 +130,7 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
 
     @Override
     public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for OpenAlex");
+        throw new UnsupportedOperationException("This method is not implemented for OpenAlex");
     }
 
     /**
@@ -152,12 +151,12 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for OpenAlex");
+        throw new UnsupportedOperationException("This method is not implemented for OpenAlex");
     }
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for OpenAlex");
+        throw new UnsupportedOperationException("This method is not implemented for OpenAlex");
     }
 
     /**

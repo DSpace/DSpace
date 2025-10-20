@@ -18,6 +18,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -62,7 +63,7 @@ public class XSLTIngestionCrosswalk
 
     private static final String DIRECTION = "submission";
 
-    private static final String aliases[] = makeAliases(DIRECTION);
+    private static final String[] aliases = makeAliases(DIRECTION);
 
     private static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     private static final CollectionService collectionService = ContentServiceFactory.getInstance()
@@ -301,7 +302,7 @@ public class XSLTIngestionCrosswalk
                 "Failed to initialize transformer, probably error loading stylesheet.");
         }
 
-        SAXBuilder builder = new SAXBuilder();
+        SAXBuilder builder = XMLUtils.getSAXBuilder();
         List dimList;
         try (FileInputStream is = new FileInputStream(argv[i + 1])) {
             Document inDoc = builder.build(is);

@@ -113,7 +113,7 @@ public class SyndicationFeed {
         configurationService.getProperty("webui.feed.item.date", defaultDateField);
 
     // metadata field for Item description in entry:
-    private static final String descriptionFields[] =
+    private static final String[] descriptionFields =
         DSpaceServicesFactory.getInstance().getConfigurationService()
                              .getArrayProperty("webui.feed.item.description", defaultDescriptionFields);
 
@@ -257,8 +257,14 @@ public class SyndicationFeed {
                 String pubDateString = getOneDC(item, dateField);
                 if (pubDateString != null) {
                     ZonedDateTime pubDate = new DCDate(pubDateString).toDate();
-                    entry.setPublishedDate(java.util.Date.from(pubDate.toInstant()));
-                    hasDate = true;
+                    // If date string could not be parsed as a date, then pubDate will be null
+                    if (pubDate != null) {
+                        entry.setPublishedDate(java.util.Date.from(pubDate.toInstant()));
+                        hasDate = true;
+                    } else {
+                        log.warn("Date field {} for item {} could not be parsed: {}", dateField, item.getID(),
+                                 pubDateString);
+                    }
                 }
                 // date of last change to Item
                 entry.setUpdatedDate(java.util.Date.from(item.getLastModified()));

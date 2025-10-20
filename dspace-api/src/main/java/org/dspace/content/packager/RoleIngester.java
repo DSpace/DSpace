@@ -22,6 +22,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.codec.DecoderException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -386,7 +387,7 @@ public class RoleIngester implements PackageIngester {
         Document document;
 
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory dbf = XMLUtils.getDocumentBuilderFactory();
             dbf.setIgnoringComments(true);
             dbf.setCoalescing(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -420,7 +421,7 @@ public class RoleIngester implements PackageIngester {
         Document document;
 
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory dbf = XMLUtils.getDocumentBuilderFactory();
             dbf.setIgnoringComments(true);
             dbf.setCoalescing(true);
             DocumentBuilder db = dbf.newDocumentBuilder();

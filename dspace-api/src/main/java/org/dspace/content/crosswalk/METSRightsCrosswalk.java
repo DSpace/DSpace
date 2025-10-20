@@ -70,7 +70,7 @@ public class METSRightsCrosswalk
     private String schemaLocation =
         METSRights_NS.getURI() + " http://cosimo.stanford.edu/sdr/metsrights.xsd";
 
-    private static final Namespace namespaces[] = {METSRights_NS};
+    private static final Namespace[] namespaces = {METSRights_NS};
 
     private static final Map<Integer, String> otherTypesMapping = new HashMap<Integer, String>();
 

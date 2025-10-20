@@ -142,7 +142,8 @@ public class MetadataExportFilteredItemsReport extends DSpaceRunnable
 
         FilteredItems items = contentReportService.findFilteredItems(context, query);
         handler.logDebug("creating dspacecsv");
-        DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService.export(context, items.getItems().iterator(), true);
+        DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService.export(context, items.getItems().iterator(),
+                true, handler);
         handler.logDebug("writing to file " + getFileNameOrExportFile());
         handler.writeFilestream(context, getFileNameOrExportFile(), dSpaceCSV.getInputStream(), EXPORT_CSV);
         context.restoreAuthSystemState();

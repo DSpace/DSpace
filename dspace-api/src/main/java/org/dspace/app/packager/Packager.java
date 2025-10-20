@@ -252,7 +252,7 @@ public class Packager {
             } else {
                 //otherwise, display list of valid packager types
                 System.out.println("\nAvailable Submission Package (SIP) types:");
-                String pn[] = pluginService
+                String[] pn = pluginService
                         .getAllPluginNames(PackageIngester.class);
                 for (int i = 0; i < pn.length; ++i) {
                     System.out.println("  " + pn[i]);
@@ -310,14 +310,14 @@ public class Packager {
             // process
             pkgParams.setRecursiveModeEnabled(true);
         }
-        String[] sourceFiles = line.getArgs();
+        String[] files = line.getArgs();
         if (line.hasOption('d')) {
             myPackager.submit = false;
         }
         if (line.hasOption('o')) {
-            String popt[] = line.getOptionValues('o');
+            String[] popt = line.getOptionValues('o');
             for (int i = 0; i < popt.length; ++i) {
-                String pair[] = popt[i].split("\\=", 2);
+                String[] pair = popt[i].split("\\=", 2);
                 if (pair.length == 2) {
                     pkgParams.addProperty(pair[0].trim(), pair[1].trim());
                 } else if (pair.length == 1) {
@@ -332,7 +332,7 @@ public class Packager {
 
         // Sanity checks on arg list: required args
         // REQUIRED: sourceFile, ePerson (-e), packageType (-t)
-        if (sourceFiles == null || eperson == null || myPackager.packageType == null) {
+        if (files == null || eperson == null || myPackager.packageType == null) {
             System.err.println("Error - missing a REQUIRED argument or option.\n");
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("PackageManager  [options]  package-file|-\n", options);
@@ -393,7 +393,7 @@ public class Packager {
 
                 try {
                     //replace the object from the source file
-                    dirAndFilePathBuilder(sourceFileIngest, sourceFiles);
+                    dirAndFilePathBuilder(sourceFileIngest, files);
                     if (identifier == null) {
                         String[] itemParts = sourceFileIngest.get(0).split("_ITEM@");
                         if (itemParts.length <= 1) {
@@ -431,7 +431,7 @@ public class Packager {
             }
 
             // validate each parent arg (if any)
-            DSpaceObject parentObjs[] = null;
+            DSpaceObject[] parentObjs = null;
             if (parents != null) {
                 System.out.println("Destination parents:");
 
@@ -453,7 +453,7 @@ public class Packager {
 
             try {
                 //ingest the object from the source file
-                dirAndFilePathBuilder(sourceFileIngest, sourceFiles);
+                dirAndFilePathBuilder(sourceFileIngest, files);
                 myPackager.ingest(context, sip, pkgParams, sourceFileIngest, parentObjs, dryRun, relationalScope);
 
                 //commit all changes & exit successfully
@@ -485,7 +485,7 @@ public class Packager {
             }
 
             //disseminate the requested object
-            for (String sourceFile : sourceFiles) {
+            for (String sourceFile : files) {
                 myPackager.disseminate(context, dip, dso, pkgParams, sourceFile, relationalScope, dryRun);
             }
         }
@@ -512,9 +512,9 @@ public class Packager {
      * @throws PackageException      if packaging error
      */
     protected void ingest(Context context, PackageIngester sip, PackageParameters pkgParams, List<String> sourceFiles,
-                          DSpaceObject parentObjs[], boolean dryRun, @Nullable String scope)
-            throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException,
-            PackageException {
+                          DSpaceObject[] parentObjs, boolean dryRun, @Nullable String scope)
+        throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException,
+        PackageException {
         Map<String, String> pathToNewUUID = new HashMap<>();
         // make sure we have an input file
         PackagerFileService packagerFileService = new PackagerFileService(pkgParams);

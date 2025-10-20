@@ -162,6 +162,9 @@
     <bean class="org.dspace.authorize.ValidatePasswordServiceImpl"/>
     <bean class="org.dspace.authorize.RegexPasswordValidator" />
 
+    <bean id="org.dspace.app.client.DSpaceHttpClientFactory" class="org.dspace.app.client.DSpaceHttpClientFactory"/>
+    <bean class="org.dspace.app.client.DSpaceProxyRoutePlanner"/>
+
     <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
 
     <bean class="org.dspace.content.ItemFilterServiceImpl"/>

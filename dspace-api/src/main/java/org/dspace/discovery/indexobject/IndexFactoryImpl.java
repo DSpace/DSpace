@@ -181,6 +181,11 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
      */
     protected void addFacetIndex(SolrInputDocument document, String field, String sortValue, String authority,
                                  String fvalue) {
+        // If facet value is null/blank, then we cannot index
+        if (StringUtils.isBlank(fvalue)) {
+            return;
+        }
+
         // the separator for the filter can be eventually configured
         String separator = DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getProperty("discovery.solr.facets.split.char");
