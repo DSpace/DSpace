@@ -46,7 +46,6 @@ import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableLDNNotification;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
-import org.dspace.event.EventDetail;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
