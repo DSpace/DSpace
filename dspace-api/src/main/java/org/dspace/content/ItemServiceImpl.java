@@ -690,7 +690,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
             if (item.isMetadataModified()) {
                 context.addEvent(new Event(Event.MODIFY_METADATA, item.getType(), item.getID(),
-                    item.getDetails(), DetailType.DSO_SUMMARY,
+                    item.getMetadataEventDetails(), DetailType.DSO_SUMMARY,
                     getIdentifiers(context, item)));
             }
 
