@@ -199,19 +199,19 @@ public class EmbargoServiceImpl implements EmbargoService {
 
     // return the schema part of "schema.element.qualifier" metadata field spec
     protected String getSchemaOf(String field) {
-        String sa[] = field.split("\\.", 3);
+        String[] sa = field.split("\\.", 3);
         return sa[0];
     }
 
     // return the element part of "schema.element.qualifier" metadata field spec, if any
     protected String getElementOf(String field) {
-        String sa[] = field.split("\\.", 3);
+        String[] sa = field.split("\\.", 3);
         return sa.length > 1 ? sa[1] : null;
     }
 
     // return the qualifier part of "schema.element.qualifier" metadata field spec, if any
     protected String getQualifierOf(String field) {
-        String sa[] = field.split("\\.", 3);
+        String[] sa = field.split("\\.", 3);
         return sa.length > 2 ? sa[2] : null;
     }
 

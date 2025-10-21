@@ -101,6 +101,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -2638,6 +2639,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                (witem, "Workspace Item 1", "2019-01-01", "ExtraEntry"))));
     }
 
+    @Test
     public void patchReplaceMetadataOnItemStillInSubmissionTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -5939,6 +5941,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
     }
 
+    @Test
     public void deleteWorkspaceItemWithMinRelationshipsTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -7981,6 +7984,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
             )));
     }
 
+    @Test
     public void verifyBitstreamPolicyNotDuplicatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -9821,6 +9825,207 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
         } finally {
             WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
         }
+    }
+
+    @Test
+    public void enforceRequiredRelationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+
+        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                "isPublicationOfAuthor", 1, null, 0,
+                null).withCopyToLeft(false).withCopyToRight(true).build();
+
+        isAuthorOfPublication.setTilted(RelationshipType.Tilted.NONE);
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+            .withEntityType("Person").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity, "123456789/enforced-relation")
+            .withName("Collection 2")
+            .withEntityType("Publication").build();
+
+        Item author = ItemBuilder.createItem(context, col1)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withPersonIdentifierLastName("Smith")
+            .withPersonIdentifierFirstName("Donald")
+            .build();
+
+        // two workspace items. Only one of them has the required relationship.
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+
+        RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+
+        Relationship relationship1 = relationshipService.create(
+            context,
+            workspaceItem.getItem(),
+            author,
+            isAuthorOfPublication,
+            0, 0,
+            "isAuthorOfPublication",
+            "isPublicationOfAuthor"
+        );
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        // try to deposit the items. One should fail
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isCreated());
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem2.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void enforceRequiredRelationTiltedRightTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+
+        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                "isPublicationOfAuthor", 1, null, 0,
+                null).withCopyToLeft(false).withCopyToRight(true).build();
+
+        isAuthorOfPublication.setTilted(RelationshipType.Tilted.RIGHT);
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+            .withEntityType("Person").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity, "123456789/enforced-relation")
+            .withName("Collection 2")
+            .withEntityType("Publication").build();
+
+        Item author = ItemBuilder.createItem(context, col1)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withPersonIdentifierLastName("Smith")
+            .withPersonIdentifierFirstName("Donald")
+            .build();
+
+        // two workspace items. Only one of them has the required relationship.
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+
+        RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+
+        Relationship relationship1 = relationshipService.create(
+            context,
+            workspaceItem.getItem(),
+            author,
+            isAuthorOfPublication,
+            0, 0,
+            "isAuthorOfPublication",
+            "isPublicationOfAuthor"
+        );
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        // try to deposit the items. One should fail
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isCreated());
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem2.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void enforceRequiredRelationTiltedLeftTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+
+        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                "isPublicationOfAuthor", 1, null, 0,
+                null).withCopyToLeft(false).withCopyToRight(true).build();
+
+        isAuthorOfPublication.setTilted(RelationshipType.Tilted.LEFT);
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+            .withEntityType("Person").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity, "123456789/enforced-relation")
+            .withName("Collection 2")
+            .withEntityType("Publication").build();
+
+        Item author = ItemBuilder.createItem(context, col1)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withPersonIdentifierLastName("Smith")
+            .withPersonIdentifierFirstName("Donald")
+            .build();
+
+        // two workspace items. Only one of them has the required relationship.
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+
+        RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+
+        Relationship relationship1 = relationshipService.create(
+            context,
+            workspaceItem.getItem(),
+            author,
+            isAuthorOfPublication,
+            0, 0,
+            "isAuthorOfPublication",
+            "isPublicationOfAuthor"
+        );
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        // try to deposit the items. One should fail
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isCreated());
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem2.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isUnprocessableEntity());
     }
 
         @Test

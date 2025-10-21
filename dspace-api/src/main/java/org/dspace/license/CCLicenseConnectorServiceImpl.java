@@ -28,6 +28,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.services.ConfigurationService;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -50,7 +51,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
     private Logger log = org.apache.logging.log4j.LogManager.getLogger(CCLicenseConnectorServiceImpl.class);
 
     private CloseableHttpClient client;
-    protected SAXBuilder parser = new SAXBuilder();
+    protected SAXBuilder parser = XMLUtils.getSAXBuilder();
 
     private String postArgument = "answers";
     private String postAnswerFormat =
