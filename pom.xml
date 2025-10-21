@@ -531,6 +531,45 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>m2e-fix</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>m2e.version</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.eclipse.m2e</groupId>
+                            <artifactId>lifecycle-mapping</artifactId>
+                            <version>1.0.0</version>
+                            <configuration>
+                                <lifecycleMappingMetadata>
+                                    <pluginExecutions>
+                                        <pluginExecution>
+                                            <pluginExecutionFilter>
+                                                <groupId>org.apache.maven.plugins</groupId>
+                                                <artifactId>maven-dependency-plugin</artifactId>
+                                                <versionRange>(3.3.0,)</versionRange>
+                                                <goals>
+                                                    <goal>unpack-dependencies</goal>
+                                                </goals>
+                                            </pluginExecutionFilter>
+                                            <action>
+                                                <ignore />
+                                            </action>
+                                        </pluginExecution>
+                                    </pluginExecutions>
+                                </lifecycleMappingMetadata>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
         <!-- Profile which sets our default system properties for all Unit/Integration tests.
              By default, this sets UTF-8 encoding for all tests and gives tests 1GB of memory max.
              Both m-surefire-p and m-failsafe-p are unable to use MAVEN_OPTS because they fork a new JVM for testing.
