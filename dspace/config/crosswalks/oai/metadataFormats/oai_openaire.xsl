@@ -5,7 +5,7 @@
     detailed in the LICENSE and NOTICE files at the root of the source
     tree and available online at
 
-    Developed by Paulo Graça <paulo.graca@fccn.pt>
+    Developed by paulo-graca
     
     > https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd
 
@@ -303,7 +303,7 @@
     <!-- This template will create a type of identifier exclusive for DSpace
          which is a resolver for that record and, at same time, the REST API end point
      -->
-    <xsl:template match="doc:field[starts-with(@name,'relation.isAuthorOfPublication')]"
+    <xsl:template match="doc:field[starts-with(@name,'relation.isAuthorOfPublication') and not(contains(@name,'latestForDiscovery'))]"
         mode="entity_author">
         <xsl:variable name="url">
             <xsl:call-template name="getDSpaceURL"/>
