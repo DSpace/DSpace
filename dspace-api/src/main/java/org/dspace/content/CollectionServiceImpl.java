@@ -776,7 +776,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             workspaceItemService.deleteAll(context, workspaceItem);
         }
 
-
+        List<CollectionRole> collectionRoles = collectionRoleService.findByCollection(context, collection);
         WorkflowServiceFactory.getInstance().getWorkflowService().deleteCollection(context, collection);
         WorkflowServiceFactory.getInstance().getWorkflowItemService().deleteByCollection(context, collection);
 
@@ -804,6 +804,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             collection.setSubmitters(null);
             groupService.delete(context, g);
         }
+
+        cleanupLegacyWorkflowGroups(context, collection, collectionRoles);
 
         Iterator<Community> owningCommunities = collection.getCommunities().iterator();
         while (owningCommunities.hasNext()) {
@@ -1151,5 +1153,45 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     @Override
     public int countArchivedItems(Context context, Collection collection) {
         return itemCounter.getCount(context, collection);
+    }
+
+    private void cleanupLegacyWorkflowGroups(Context context,
+            Collection collection, List<CollectionRole> collectionRoles)
+            throws SQLException, AuthorizeException, IOException {
+
+        for (CollectionRole collectionRole : collectionRoles) {
+            Group g = collectionRole.getGroup();
+            if (g != null) {
+                String roleId = collectionRole.getRoleId();
+                int stepId = -1;
+                switch (roleId) {
+                    case "reviewer":
+                        stepId = 1;
+                        break;
+                    case "editor":
+                        stepId = 2;
+                        break;
+                    case "finaleditor":
+                        stepId = 3;
+                        break;
+                    default:
+                        stepId = 1;
+                        break;
+                }
+                collection.setWorkflowGroup(context, stepId, null);
+                safeDeleteGroup(context, g);
+            }
+        }
+    }
+
+    private void safeDeleteGroup(Context context, Group g)
+            throws SQLException, AuthorizeException, IOException {
+        try {
+            groupService.delete(context, g);
+        } catch (SQLException ex) {
+            // If constraints exist (e.g. pool task still referencing group), log and continue
+            log.warn("Could not delete workflow group " + g.getName() + " [" + g.getID()
+                    + "]. It may still be referenced elsewhere.", ex);
+        }
     }
 }
