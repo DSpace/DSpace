@@ -165,7 +165,7 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
                                         (resourcePolicyRoot.get(ResourcePolicy_.epersonGroup).in(groups)))
             )
         );
-        return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);
+        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
     }
 
     @Override
