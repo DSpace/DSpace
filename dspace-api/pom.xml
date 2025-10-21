@@ -400,24 +400,6 @@
             <groupId>net.cnri</groupId>
             <artifactId>cnri-servlet-container</artifactId>
             <scope>runtime</scope>
-            <exclusions>
-                <!-- Excluded because this library is incompatible with Jakarta EE. It causes errors in DSpace during
-                     startup & integration testing. Excluding doesn't seem to effect Handle Server startup. -->
-                <exclusion>
-                    <groupId>org.mortbay.jasper</groupId>
-                    <artifactId>apache-jsp</artifactId>
-                </exclusion>
-                <!-- Excluded BouncyCastle dependencies because we use a later version of BouncyCastle.
-                     Having two versions of BouncyCastle in the classpath can cause Handle Server to throw errors. -->
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcpkix-jdk15on</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk15on</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Jetty is needed to run Handle Server ONLY. This is why it is a runtime dependency. -->
@@ -590,17 +572,17 @@
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-icu</artifactId>
+            <artifactId>lucene-analysis-icu</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-smartcn</artifactId>
+            <artifactId>lucene-analysis-smartcn</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-stempel</artifactId>
+            <artifactId>lucene-analysis-stempel</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -739,6 +721,11 @@
                 <exclusion>
                     <groupId>org.yaml</groupId>
                     <artifactId>snakeyaml</artifactId>
+                </exclusion>
+                <!-- Exclude swagger as a newer version is brought in by Solr -->
+                <exclusion>
+                    <groupId>io.swagger.core.v3</groupId>
+                    <artifactId>swagger-annotations-jakarta</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

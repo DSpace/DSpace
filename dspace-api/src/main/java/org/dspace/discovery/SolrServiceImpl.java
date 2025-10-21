@@ -1042,7 +1042,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             for (String facetName : response.getBucketBasedFacetNames()) {
                 BucketBasedJsonFacet facet = response.getBucketBasedFacets(facetName);
                 if (facet != null) {
-                    result.setTotalEntries(facet.getNumBucketsCount());
+                    result.setTotalEntries(facet.getNumBuckets());
                     for (BucketJsonFacet bucket : facet.getBuckets()) {
                         String facetValue = bucket.getVal() != null ? bucket.getVal().toString() : "";
                         String field = facetName + "_filter";

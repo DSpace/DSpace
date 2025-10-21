@@ -53,13 +53,6 @@
             <groupId>org.dspace</groupId>
             <artifactId>xoai</artifactId>
             <version>${xoai.version}</version>
-            <exclusions>
-                <!-- Use version provided by SolrJ -->
-                <exclusion>
-                    <groupId>com.fasterxml.woodstox</groupId>
-                    <artifactId>woodstox-core</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Java Injection -->

@@ -9,11 +9,9 @@ package org.dspace.statistics;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import jakarta.inject.Named;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.dspace.service.impl.HttpConnectionPoolService;
+import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,9 +26,6 @@ public class SolrStatisticsCore {
 
     @Autowired
     protected ConfigurationService configurationService;
-
-    @Autowired @Named("solrHttpConnectionPoolService")
-    protected HttpConnectionPoolService httpConnectionPoolService;
 
     /**
      * Returns the {@link SolrClient} for the Statistics core.
@@ -55,9 +50,7 @@ public class SolrStatisticsCore {
         log.info("usage-statistics.dbfile:  {}", configurationService.getProperty("usage-statistics.dbfile"));
 
         try {
-            solr = new HttpSolrClient.Builder(solrService)
-                    .withHttpClient(httpConnectionPoolService.getClient())
-                    .build();
+            solr = new HttpJdkSolrClient.Builder(solrService).build();
         } catch (Exception e) {
             log.error("Error accessing Solr server configured in 'solr-statistics.server'", e);
         }
