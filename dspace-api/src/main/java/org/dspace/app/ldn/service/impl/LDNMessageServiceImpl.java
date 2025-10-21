@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.LDNRouter;
@@ -221,17 +222,17 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     private DSpaceObject findDspaceObjectByUrl(Context context, String url) throws SQLException {
         String dspaceUrl = configurationService.getProperty("dspace.ui.url") + "/handle/";
 
-        if (StringUtils.startsWith(url, dspaceUrl)) {
+        if (Strings.CS.startsWith(url, dspaceUrl)) {
             return handleService.resolveToObject(context, url.substring(dspaceUrl.length()));
         }
 
         String handleResolver = configurationService.getProperty("handle.canonical.prefix", "https://hdl.handle.net/");
-        if (StringUtils.startsWith(url, handleResolver)) {
+        if (Strings.CS.startsWith(url, handleResolver)) {
             return handleService.resolveToObject(context, url.substring(handleResolver.length()));
         }
 
         dspaceUrl = configurationService.getProperty("dspace.ui.url") + "/items/";
-        if (StringUtils.startsWith(url, dspaceUrl)) {
+        if (Strings.CS.startsWith(url, dspaceUrl)) {
             return itemService.find(context, UUID.fromString(url.substring(dspaceUrl.length())));
         }
 
@@ -319,7 +320,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
 
     private boolean isServiceEnabled(LDNMessageEntity msg) {
         String localInboxUrl = configurationService.getProperty("ldn.notify.inbox");
-        if (msg.getTarget() == null || StringUtils.equals(msg.getTarget().getLdnUrl(), localInboxUrl)) {
+        if (msg.getTarget() == null || Strings.CS.equals(msg.getTarget().getLdnUrl(), localInboxUrl)) {
             return msg.getOrigin().isEnabled();
         }
         return msg.getTarget().isEnabled();
@@ -436,7 +437,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     @Override
     public boolean isTargetCurrent(Notification notification) {
         String localInboxUrl = configurationService.getProperty("ldn.notify.inbox");
-        return StringUtils.equals(notification.getTarget().getInbox(), localInboxUrl);
+        return Strings.CS.equals(notification.getTarget().getInbox(), localInboxUrl);
     }
 
 }

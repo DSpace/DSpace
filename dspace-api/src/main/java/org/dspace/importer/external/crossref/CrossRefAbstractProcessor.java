@@ -18,6 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
@@ -82,12 +83,12 @@ public class CrossRefAbstractProcessor implements JsonPathMetadataProcessor {
         for (int i = 0; i < childElements.getLength(); i++) {
             Node childElement = childElements.item(i);
             String nodeName = childElement.getNodeName();
-            if (StringUtils.equals(nodeName, "jats:title")) {
-                if (! StringUtils.equals(childElement.getTextContent(), "Abstract")) {
+            if (Strings.CS.equals(nodeName, "jats:title")) {
+                if (! Strings.CS.equals(childElement.getTextContent(), "Abstract")) {
                     sb.append(childElement.getTextContent());
                     sb.append("\n");
                 }
-            } else if (StringUtils.equals(nodeName, "jats:sec")) {
+            } else if (Strings.CS.equals(nodeName, "jats:sec")) {
                 NodeList secElements = childElement.getChildNodes();
                 for (int j = 0; j < secElements.getLength(); j++) {
                     Node secChildElement = secElements.item(j);

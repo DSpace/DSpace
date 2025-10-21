@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
@@ -176,7 +177,7 @@ public class DSpaceCSV implements Serializable {
                     headings.add(element);
                 } else if (!"id".equals(element)) {
                     String authorityPrefix = "";
-                    if (StringUtils.startsWith(element, "[authority]")) {
+                    if (Strings.CS.startsWith(element, "[authority]")) {
                         element = StringUtils.substringAfter(element, "[authority]");
                         AuthorityValue authorityValueType = authorityValueService.getAuthorityValueType(element);
                         if (authorityValueType != null) {
@@ -213,7 +214,7 @@ public class DSpaceCSV implements Serializable {
                     }
 
                     // Check that the scheme exists
-                    if (!StringUtils.equals(metadataSchema, MetadataSchemaEnum.RELATION.getName())) {
+                    if (!Strings.CS.equals(metadataSchema, MetadataSchemaEnum.RELATION.getName())) {
                         MetadataSchema foundSchema = metadataSchemaService.find(c, metadataSchema);
                         if (foundSchema == null) {
                             throw new MetadataImportInvalidHeadingException(clean[0],

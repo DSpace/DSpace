@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.util.AuthorizeUtil;
@@ -419,7 +420,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             log.error(LogHelper.getHeader(context, "setWorkflowGroup",
                     "collection_id=" + collection.getID() + " " + e.getMessage()), e);
         }
-        if (!StringUtils.equals(workflowFactory.getDefaultWorkflow().getID(), workflow.getID())) {
+        if (!Strings.CS.equals(workflowFactory.getDefaultWorkflow().getID(), workflow.getID())) {
             throw new IllegalArgumentException(
                     "setWorkflowGroup can be used only on collection with the default basic dspace workflow. "
                     + "Instead, the collection: "

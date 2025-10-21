@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import jakarta.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -392,7 +393,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             List<Bitstream> bitstreams = bundle.getBitstreams();
             for (int j = 0; j < bitstreams.size(); j++) {
                 Bitstream bitstream = bitstreams.get(j);
-                if (StringUtils.equals(bitstream.getName(), bitstreamName)) {
+                if (Strings.CS.equals(bitstream.getName(), bitstreamName)) {
                     return bitstream;
                 }
             }

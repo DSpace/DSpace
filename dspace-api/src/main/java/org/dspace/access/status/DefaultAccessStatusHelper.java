@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -171,7 +171,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
         List<ResourcePolicy> readPolicies = resourcePolicyService.find(context, dso, Constants.READ);
         // Filter the policies with the anonymous group
         List<ResourcePolicy> filteredPolicies = readPolicies.stream()
-            .filter(p -> p.getGroup() != null && StringUtils.equals(p.getGroup().getName(), Group.ANONYMOUS))
+            .filter(p -> p.getGroup() != null && Strings.CS.equals(p.getGroup().getName(), Group.ANONYMOUS))
             .collect(Collectors.toList());
         return filteredPolicies;
     }
@@ -224,7 +224,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      */
     private List<ResourcePolicy> getReadPolicies(Context context, DSpaceObject dso, String type)
             throws SQLException {
-        if (StringUtils.equalsIgnoreCase(type, STATUS_FOR_CURRENT_USER)) {
+        if (Strings.CI.equals(type, STATUS_FOR_CURRENT_USER)) {
             return getCurrentUserReadPolicies(context, dso);
         } else {
             // Only calculate the status for the anonymous group read policies

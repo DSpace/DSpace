@@ -28,7 +28,7 @@ import eu.openaire.oaf.model.base.FunderType;
 import eu.openaire.oaf.model.base.FundingTreeType;
 import eu.openaire.oaf.model.base.FundingType;
 import eu.openaire.oaf.model.base.Project;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.OpenaireRestConnector;
@@ -160,7 +160,7 @@ public class OpenaireFundingDataProvider extends AbstractExternalDataProvider {
 
     @Override
     public boolean supports(String source) {
-        return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
+        return Strings.CI.equals(sourceIdentifier, source);
     }
 
     @Override
