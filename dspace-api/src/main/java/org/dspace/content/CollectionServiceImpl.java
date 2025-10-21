@@ -876,7 +876,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                    .find(context, eperson, directGroups, Constants.ADMIN, Constants.COMMUNITY);
         List<UUID> uuids = resourcePolicies.stream()
             .map(policy -> policy.getdSpaceObject().getID())
-            .toList();
+            .collect(Collectors.toList());
 
         List<Community> communities = uuids.stream()
             .map(uuid -> {
@@ -887,7 +887,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 }
             })
             .filter(Objects::nonNull)
-            .toList();
+            .collect(Collectors.toList());
 
         Set<Community> allCommunities = new HashSet<>(communities);
         Set<Collection> allCommAdminCollections = communities.stream()
