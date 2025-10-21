@@ -10,8 +10,12 @@ package org.dspace.content.dao.impl;
 import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.Query;
@@ -162,6 +166,100 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         return list(persistenceQuery);
 
 
+    }
+
+    /**
+     * Get all authorized collections of the current EPerson
+     *
+     * @param context DSpace context object
+     * @param ePerson the current EPerson
+     * @param actions list of actionsID ADD, READ, etc.
+     * @return the collections the eperson is defined
+     * @throws SQLException if database error
+     */
+    @Override
+    public List<Collection> findAuthorizedByEPerson(Context context, EPerson ePerson, List<Integer> actions)
+        throws SQLException {
+
+        //NOTE steps 1) and 2) removes the need of WITH RECURSIVE and a NativeQuery
+
+        // 1) Get all groups a eperson belongs
+        /*ArrayList<>(ePerson.getGroups()) - This ensures you have a concrete copy and can modify it safely.
+        instead if List<Group> directGroups = ePerson.getGroups();
+        Also - Can be done using this query:
+        List<Group> directGroups = createQuery(context, """
+            SELECT g
+            FROM Group g
+            JOIN g.epeople e
+            WHERE e.id = :epersonId
+        """)
+            .setParameter("epersonId", ePerson.getID())
+            .getResultList();
+         */
+        List<Group> directGroups = new ArrayList<>(ePerson.getGroups()); // direct membership
+
+        // 2) Expand hierarquy of groups in memory (recursively)
+        Set<Group> allGroups = new HashSet<>(directGroups);
+        Queue<Group> queue = new LinkedList<>(directGroups);
+
+        /*
+        * Using the query avoids the change of the getParentGroups visibility in Group
+        * The List<Group> parents = current.getParentGroups() could be achieved using:
+        * List<Group> parents = createQuery(context,"""
+                        SELECT g
+                        FROM Group g
+                        JOIN g.groups child
+                        WHERE child = :child
+                    """)
+         */
+        // //current.getMemberGroups()- Making public getParentGroups in Group Class (why it isn't already public?)
+        while (!queue.isEmpty()) {
+            Group current = queue.poll();
+            List<Group> parents = current.getParentGroups();
+
+            for (Group parent : parents) {
+                if (allGroups.add(parent)) {
+                    queue.add(parent);
+                }
+            }
+        }
+
+        CriteriaBuilder cb = getCriteriaBuilder(context);
+        CriteriaQuery<Collection> cq = getCriteriaQuery(cb, Collection.class);
+        Root<Collection> collectionRoot = cq.from(Collection.class);
+
+        // Join to ResourcePolicy using metamodel
+        Join<Collection, ResourcePolicy> rpJoin = collectionRoot.join("resourcePolicies");
+        // Use metamodel for typesafe access
+        cq.select(collectionRoot).distinct(true);
+
+        List<Predicate> predicates = new ArrayList<>(actions.size());
+        // WHERE rp.resourceTypeId = :resourceType
+        predicates.add(cb.equal(rpJoin.get(ResourcePolicy_.resourceTypeId), Constants.COLLECTION));
+        // AND (:hasActions = false OR rp.actionId IN :actionIds)
+        if (actions != null && !actions.isEmpty()) {
+            predicates.add(rpJoin.get(ResourcePolicy_.actionId).in(actions));
+        }
+
+        // AND (rp.eperson.id = :epersonId OR (:hasGroups = true AND rp.epersonGroup.id IN :groupIds))
+        Predicate epersonPredicate = cb.equal(
+            rpJoin.get(ResourcePolicy_.eperson), ePerson
+        );
+        // Using only groups instead of groupsIDs
+        Predicate groupPredicate = cb.disjunction(); // false by default
+        if (allGroups != null && !allGroups.isEmpty()) {
+            groupPredicate = rpJoin.get(ResourcePolicy_.epersonGroup).in(allGroups);
+        }
+
+        // Combine access condition
+        Predicate accessPredicate = cb.or(epersonPredicate, groupPredicate);
+        predicates.add(accessPredicate);
+
+        // Apply WHERE clause
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
+
+        // Execute
+        return list(context, cq, true, Collection.class, -1, -1);
     }
 
     @Override
