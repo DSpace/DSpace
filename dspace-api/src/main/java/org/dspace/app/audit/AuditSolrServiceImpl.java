@@ -44,6 +44,7 @@ import org.dspace.discovery.SolrDocumentFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.event.EventDetail;
 import org.dspace.services.ConfigurationService;
 import org.dspace.statistics.HttpSolrClientFactory;
 import org.dspace.util.SolrUtils;
@@ -142,9 +143,12 @@ public class AuditSolrServiceImpl implements AuditService {
      * @return true if the event is processable, false otherwise
      */
     private boolean isProcessableEvent(Event event) {
-        return event.getDetail() != null && (DetailType.BITSTREAM_CHECKSUM.equals(event.getDetail().getDetailType())
-            || DetailType.DSO_SUMMARY.equals(event.getDetail().getDetailType())
-            || Event.DELETE == event.getEventType());
+        List<DetailType> detailTypes = event.getDetailList().stream()
+                .map(EventDetail::getDetailType)
+                .toList();
+        return detailTypes.contains(DetailType.BITSTREAM_CHECKSUM)
+            || detailTypes.contains(DetailType.DSO_SUMMARY)
+            || Event.DELETE == event.getEventType();
     }
 
     /**
@@ -319,21 +323,41 @@ public class AuditSolrServiceImpl implements AuditService {
      * @return a non-empty list of audit events wrapping the event without any user details
      */
     public List<AuditEvent> getAuditEventsFromEvent(Context context, Event event) {
-        List<AuditEvent> audits = new ArrayList<>();
-        List<MetadataEvent> metadataEvents = event.getDetail().extractMetadataDetail();
+        ArrayList<AuditEvent> audits = new ArrayList<>();
+        List<MetadataEvent> metadataEvents = event.getDetailList()
+            .stream()
+            .map(EventDetail::extractMetadataDetail)
+            .flatMap(List::stream)
+            .toList();
 
         for (MetadataEvent metadataEvent : metadataEvents) {
-            audits.add(getAuditEvent(context, event, metadataEvent));
+            AuditEvent audit = buildBasicAuditEvent(context, event);
+            audit.setMetadataField(metadataEvent.getMetadataField());
+            audit.setValue(metadataEvent.getValue());
+            audit.setAuthority(metadataEvent.getAuthority());
+            audit.setConfidence(metadataEvent.getConfidence());
+            audit.setPlace(metadataEvent.getPlace());
+            audit.setAction(metadataEvent.getAction());
+            audits.add(audit);
         }
 
-        if (CollectionUtils.isEmpty(audits)) {
-            audits.add(getAuditEvent(context, event, null));
+        AuditEvent audit = buildBasicAuditEvent(context, event);
+
+        String checksum = event.getDetailList().stream()
+            .map(eventDetail -> eventDetail.extractChecksumDetail())
+            .filter(checksumValue -> StringUtils.isNotEmpty(checksumValue))
+            .findFirst()
+            .orElse(null);
+
+        if (StringUtils.isNotBlank(checksum)) {
+            audit.setChecksum(checksum);
         }
+        audits.add(audit);
 
         return audits;
     }
 
-    private AuditEvent getAuditEvent(Context context, Event event, MetadataEvent metadataEvent) {
+    private AuditEvent buildBasicAuditEvent(Context context, Event event) {
         AuditEvent audit = new AuditEvent();
         audit.setDatetime(new Date(event.getTimeStamp()));
         audit.setEventType(event.getEventTypeAsString());
@@ -350,20 +374,6 @@ public class AuditSolrServiceImpl implements AuditService {
 
         audit.setSubjectType(event.getSubjectTypeAsString());
         audit.setSubjectUUID(event.getSubjectID());
-
-        if (metadataEvent != null) {
-            audit.setMetadataField(metadataEvent.getMetadataField());
-            audit.setValue(metadataEvent.getValue());
-            audit.setAuthority(metadataEvent.getAuthority());
-            audit.setConfidence(metadataEvent.getConfidence());
-            audit.setPlace(metadataEvent.getPlace());
-            audit.setAction(metadataEvent.getAction());
-        }
-
-        String checksum = event.getDetail().extractChecksumDetail();
-        if (!checksum.isEmpty()) {
-            audit.setChecksum(checksum);
-        }
 
         return audit;
     }
@@ -465,28 +475,6 @@ public class AuditSolrServiceImpl implements AuditService {
         return rse;
     }
 
-    /**
-     * Return the audit event for the specified uuid if any
-     *
-     * @param uuid    the uuid of the Audit Event
-     * @return the audit event for the specified uuid if any
-     */
-    public AuditEvent getAuditEvent(UUID uuid) {
-        SolrQuery solrQuery = new SolrQuery(UUID_FIELD + ":" + uuid.toString());
-        QueryResponse queryResponse;
-        try {
-            queryResponse = getSolr().query(solrQuery);
-        } catch (SolrServerException | IOException e) {
-            throw new RuntimeException(e);
-        }
-        for (SolrDocument sd : queryResponse.getResults()) {
-            AuditEvent rse = getAuditEventFromSolrDoc(sd);
-            return rse;
-        }
-        return null;
-
-    }
-
     public void deleteEvents(Context context, Date from, Date to) {
         try {
             getSolr().deleteByQuery(buildTimeQuery(from, to));
@@ -534,7 +522,7 @@ public class AuditSolrServiceImpl implements AuditService {
         }
         SolrQuery solrQuery = new SolrQuery("(" + SUBJECT_UUID_FIELD + ":" + q + " OR "
                 + OBJECT_UUID_FIELD + ":" + q + ")  AND " + buildTimeQuery(from, to));
-        solrQuery.setRows(Integer.MAX_VALUE);
+        solrQuery.setRows(0);
         QueryResponse queryResponse;
         try {
             queryResponse = getSolr().query(solrQuery);

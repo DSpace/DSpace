@@ -10,6 +10,7 @@ package org.dspace.content;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +35,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.event.EventDetail;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -280,14 +282,14 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         log.info(LogHelper.getHeader(context, "delete_bitstream",
                                       "bitstream_id=" + bitstream.getID()));
 
-        context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(),
-            String.valueOf(bitstream.getSequenceID()), DetailType.BITSTREAM_SEQUENCE_ID,
-            getIdentifiers(context, bitstream)));
-        // add a new event details with the checksum value of the deleted bitstream
+        ArrayList<EventDetail> detailList = new ArrayList<>();
+        detailList.add(new EventDetail(DetailType.BITSTREAM_SEQUENCE_ID, String.valueOf(bitstream.getSequenceID())));
+        detailList.add(new EventDetail(DetailType.BITSTREAM_CHECKSUM, bitstream.getChecksum()));
+
         UUID itemUUID = getItem(bitstream).stream().findFirst().map(Item::getID).orElse(null);
+
         context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(), Constants.ITEM, itemUUID,
-            bitstream.getChecksum(), DetailType.BITSTREAM_CHECKSUM,
-            getIdentifiers(context, bitstream)));
+            detailList, getIdentifiers(context, bitstream)));
 
         // Remove bitstream itself
         bitstream.setDeleted(true);

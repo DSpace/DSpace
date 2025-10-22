@@ -85,14 +85,6 @@ public interface AuditService {
     AuditEvent findEvent(Context context, UUID id);
 
     /**
-     * Return the audit event for the specified uuid if any
-     *
-     * @param uuid the uuid of the Audit Event
-     * @return the audit event for the specified uuid if any
-     */
-    AuditEvent getAuditEvent(UUID uuid);
-
-    /**
      * Delete events within the specified time range
      *
      * @param context the DSpace context

@@ -191,6 +191,11 @@ public class Event implements Serializable {
     private EventDetail detail;
 
     /**
+     * list of detail element of the event.
+     */
+    private ArrayList<EventDetail> detailList = new ArrayList<>();
+
+    /**
      * Contains all identifiers of the DSpaceObject that was changed (added,
      * modified, deleted, ...).
      *
@@ -264,7 +269,7 @@ public class Event implements Serializable {
         this.subjectType = coreTypeToMask(subjectType);
         this.subjectID = subjectID;
         timeStamp = Instant.now().toEpochMilli();
-        this.detail = new EventDetail(detailType, detailObject);
+        this.detailList.add(new EventDetail(detailType, detailObject));
         this.identifiers = (ArrayList<String>) identifiers.clone();
     }
 
@@ -308,7 +313,30 @@ public class Event implements Serializable {
         this.objectType = coreTypeToMask(objectType);
         this.objectID = objectID;
         timeStamp = Instant.now().toEpochMilli();
-        this.detail = new EventDetail(detailType, detailObject);
+        this.detailList.add(new EventDetail(detailType, detailObject));
+        this.identifiers = (ArrayList<String>) identifiers.clone();
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param eventType   action type, e.g. Event.ADD.
+     * @param subjectType DSpace Object Type of subject e.g. Constants.ITEM.
+     * @param subjectID   database ID of subject instance.
+     * @param objectType  DSpace Object Type of object e.g. Constants.BUNDLE.
+     * @param objectID    database ID of object instance.
+     * @param detailList  array containing all detail of dso modification.
+     * @param identifiers array containing all identifiers of the dso or an empty array
+     */
+    public Event(int eventType, int subjectType, UUID subjectID, int objectType,
+                 UUID objectID, ArrayList<EventDetail> detailList, ArrayList<String> identifiers) {
+        this.eventType = eventType;
+        this.subjectType = coreTypeToMask(subjectType);
+        this.subjectID = subjectID;
+        this.objectType = coreTypeToMask(objectType);
+        this.objectID = objectID;
+        timeStamp = Instant.now().toEpochMilli();
+        this.detailList = (ArrayList<EventDetail>) detailList.clone();
         this.identifiers = (ArrayList<String>) identifiers.clone();
     }
 
@@ -345,7 +373,7 @@ public class Event implements Serializable {
         this.subjectType = coreTypeToMask(subjectType);
         this.subjectID = subjectID;
         timeStamp = Instant.now().toEpochMilli();
-        this.detail = new EventDetail(DetailType.INFO, detail);
+        this.detailList.add(new EventDetail(DetailType.INFO, detail));
         this.identifiers = (ArrayList<String>) identifiers.clone();
     }
 
@@ -620,10 +648,19 @@ public class Event implements Serializable {
     }
 
     /**
+     * @Deprecated use {@link #getDetailList()} instead.
      * @return value of detail element of the event.
      */
+    @Deprecated
     public EventDetail getDetail() {
-        return detail;
+        return detailList.isEmpty() ? null : detailList.get(0);
+    }
+
+    /**
+    * @return list of detail element of the event.
+    */
+    public ArrayList<EventDetail> getDetailList() {
+        return detailList;
     }
 
     /**
