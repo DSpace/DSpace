@@ -145,7 +145,8 @@ public class Related implements VirtualMetadataConfiguration {
      * @throws SQLException If something goes wrong
      */
     @Override
-    public List<String> getValues(Context context, Item item) throws SQLException {
+    public List<ValueResult> getValues(Context context, Item item) throws SQLException {
+        List<ValueResult> values = new LinkedList<>();
         Entity entity = entityService.findByItemId(context, item.getID());
         EntityType entityType = entityService.getType(context, entity);
 
@@ -167,18 +168,23 @@ public class Related implements VirtualMetadataConfiguration {
             if (relationship.getRelationshipType().getLeftType().equals(entityType)) {
                 if (place == null || relationship.getLeftPlace() == place) {
                     Item otherItem = relationship.getRightItem();
-                    return virtualMetadataConfiguration.getValues(context, otherItem);
+                    for (ValueResult valueResult : virtualMetadataConfiguration.getValues(context, otherItem)) {
+                        valueResult.setPlace(relationship.getLeftPlace());
+                        values.add(valueResult);
+                    }
                 }
             } else if (relationship.getRelationshipType().getRightType().equals(entityType)) {
                 if (place == null || relationship.getRightPlace() == place) {
                     Item otherItem = relationship.getLeftItem();
-                    return virtualMetadataConfiguration.getValues(context, otherItem);
+                    for (ValueResult valueResult : virtualMetadataConfiguration.getValues(context, otherItem)) {
+                        valueResult.setPlace(relationship.getRightPlace());
+                        values.add(valueResult);
+                    }
                 }
             }
         }
 
-        //Return an empty list if no relationships were found
-        return new LinkedList<>();
+        return values;
     }
 
 }
