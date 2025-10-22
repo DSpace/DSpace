@@ -113,4 +113,11 @@ public class EventDetail {
         }
         return (String)this.getDetailObject();
     }
+
+    @Override
+    public String toString() {
+        return "org.dspace.event.EventDetail(detailType=" + detailType +
+            ", detailObject=" + detailObject
+            + ')';
+    }
 }

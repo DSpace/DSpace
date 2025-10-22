@@ -15,6 +15,7 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -179,16 +180,6 @@ public class Event implements Serializable {
      * timestamp
      */
     private long timeStamp;
-
-    /** "detail" - arbitrary field for relevant detail, */
-    /** e.g. former handle for DELETE event since obj is no longer available. */
-    /**
-     * FIXME This field is not a complete view of the DSpaceObject that was
-     * modified. Providing these objects to the consumer (e.g. by storing
-     * lifecycle versions of the changed objects in the context) would provide
-     * for more complex consumer abilities that are beyond our purview.
-     */
-    private EventDetail detail;
 
     /**
      * list of detail element of the event.
@@ -430,8 +421,7 @@ public class Event implements Serializable {
     public boolean equals(Object other) {
         if (other instanceof Event) {
             Event otherEvent = (Event) other;
-            return (this.detail == null ? otherEvent.detail == null : this.detail
-                .equals(otherEvent.detail))
+            return (Objects.equals(this.detailList, otherEvent.detailList))
                 && this.eventType == otherEvent.eventType
                 && this.subjectType == otherEvent.subjectType
                 && this.subjectID.equals(otherEvent.subjectID)
@@ -444,7 +434,7 @@ public class Event implements Serializable {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(this.detail)
+        return new HashCodeBuilder().append(this.detailList)
                                     .append(eventType)
                                     .append(subjectType)
                                     .append(subjectID)
@@ -779,8 +769,8 @@ public class Event implements Serializable {
             + String.valueOf(timeStamp)
             + ", dispatcher="
             + String.valueOf(dispatcher)
-            + ", detail="
-            + (detail == null ? "[null]" : "\"" + detail + "\"")
+            + ", detailList="
+            + (detailList == null ? "[null]" : "\"" + detailList + "\"")
             + ", transactionID="
             + (transactionID == null ? "[null]" : "\"" + transactionID
             + "\"") + ")";
