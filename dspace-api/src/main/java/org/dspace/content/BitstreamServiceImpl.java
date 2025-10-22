@@ -10,8 +10,10 @@ package org.dspace.content;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -33,6 +35,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.event.EventDetail;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -132,7 +135,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         setFormat(context, bitstream, null);
 
         context.addEvent(
-            new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, null, getIdentifiers(context, bitstream)));
+            new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID,
+                bitstream.getChecksum(), DetailType.BITSTREAM_CHECKSUM,
+                getIdentifiers(context, bitstream)));
 
         return bitstream;
     }
@@ -145,6 +150,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         Bitstream b = create(context, is);
         bundleService.addBitstream(context, bundle, b);
+        UUID itemUUID = getItem(b).stream().findFirst().map(Item::getID).orElse(null);
+        context.addEvent(
+            new Event(Event.CREATE, Constants.BITSTREAM, b.getID(), Constants.ITEM, itemUUID,
+                b.getChecksum(), DetailType.BITSTREAM_CHECKSUM, getIdentifiers(context, b)));
         return b;
     }
 
@@ -192,8 +201,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         setFormat(context, bitstream, null);
 
         context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM,
-                bitstream.getID(), "REGISTER",
-                DetailType.INFO, getIdentifiers(context, bitstream)));
+                bitstream.getID(), bitstream.getChecksum(), DetailType.BITSTREAM_CHECKSUM,
+                getIdentifiers(context, bitstream)));
 
         return bitstream;
     }
@@ -251,9 +260,11 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             bitstream.setModified();
         }
         if (bitstream.isMetadataModified()) {
+            UUID itemUUID = getItem(bitstream).stream().findFirst().map(Item::getID).orElse(null);
             context.addEvent(
                     new Event(Event.MODIFY_METADATA, Constants.BITSTREAM, bitstream.getID(),
-                            bitstream.getDetails(), DetailType.DSO_SUMMARY,
+                            Constants.ITEM, itemUUID,
+                            bitstream.getMetadataEventDetails(), DetailType.DSO_SUMMARY,
                             getIdentifiers(context, bitstream)));
             bitstream.clearModified();
             bitstream.clearDetails();
@@ -271,9 +282,14 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         log.info(LogHelper.getHeader(context, "delete_bitstream",
                                       "bitstream_id=" + bitstream.getID()));
 
-        context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(),
-            String.valueOf(bitstream.getSequenceID()), DetailType.BITSTREAM_SEQUENCE_ID,
-            getIdentifiers(context, bitstream)));
+        ArrayList<EventDetail> detailList = new ArrayList<>();
+        detailList.add(new EventDetail(DetailType.BITSTREAM_SEQUENCE_ID, String.valueOf(bitstream.getSequenceID())));
+        detailList.add(new EventDetail(DetailType.BITSTREAM_CHECKSUM, bitstream.getChecksum()));
+
+        UUID itemUUID = getItem(bitstream).stream().findFirst().map(Item::getID).orElse(null);
+
+        context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(), Constants.ITEM, itemUUID,
+            detailList, getIdentifiers(context, bitstream)));
 
         // Remove bitstream itself
         bitstream.setDeleted(true);
@@ -511,5 +527,11 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
                      .map(Bundle::getName)
                      .collect(Collectors.toSet());
         return bundleNames.stream().anyMatch(bundles::contains);
+    }
+
+    private Optional<Item> getItem(Bitstream bitstream) throws SQLException {
+        return bitstream.getBundles().stream()
+            .flatMap(bundle -> bundle.getItems().stream())
+            .findFirst();
     }
 }
