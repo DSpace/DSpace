@@ -13,6 +13,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.authenticate.AuthenticationUtility;
+import org.dspace.core.Context;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -78,6 +81,19 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 
         String user = req.getParameter("user");
         String password = req.getParameter("password");
+
+        Context context = ContextUtil.obtainContext(req);
+
+        AuthenticationUtility.updateAuthenticationMethod(context, req);
+
+        try {
+            restAuthenticationService.getAuthenticationService()
+                .getSpecialGroups(context, req)
+                .stream()
+                .forEach(sg -> context.setSpecialGroup(sg.getID()));
+        } catch (SQLException e) {
+
+        }
 
         // Attempt to authenticate by passing user & password (if provided) to AuthenticationProvider class(es)
         // NOTE: This method will check if the user was already authenticated by StatelessAuthenticationFilter,

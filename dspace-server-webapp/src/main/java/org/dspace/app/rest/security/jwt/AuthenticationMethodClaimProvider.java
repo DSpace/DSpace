@@ -12,8 +12,10 @@ import java.text.ParseException;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.authenticate.AuthenticationUtility;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +41,13 @@ public class AuthenticationMethodClaimProvider implements JWTClaimProvider {
 
     @Override
     public Object getValue(final Context context, final HttpServletRequest request) {
-        if (context.getAuthenticationMethod() != null) {
-            return context.getAuthenticationMethod();
-        }
-        return authenticationService.getAuthenticationMethod(context, request);
+        AuthenticationUtility.updateAuthenticationMethod(context, request);
+
+        String authMethod = context.getAuthenticationMethod();
+
+        return StringUtils.isBlank(authMethod)
+            ? authenticationService.getAuthenticationMethod(context, request)
+            : authMethod;
     }
 
     @Override
@@ -54,4 +59,5 @@ public class AuthenticationMethodClaimProvider implements JWTClaimProvider {
             log.error(e::getMessage, e);
         }
     }
+
 }

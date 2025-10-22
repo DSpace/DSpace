@@ -234,6 +234,11 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             // Step 4: Log the user in.
             context.setCurrentUser(eperson);
+
+            getSpecialGroups(context, request)
+                .stream()
+                .forEach(sg -> context.setSpecialGroup(sg.getID()));
+
             request.setAttribute("shib.authenticated", true);
             AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
 
@@ -293,9 +298,11 @@ public class ShibAuthentication implements AuthenticationMethod {
                 return Collections.EMPTY_LIST;
             }
 
-            if (context.getSpecialGroups().size() > 0 ) {
+            List<Group> specialGroups = context.getSpecialGroups();
+
+            if (specialGroups.size() > 0 ) {
                 log.debug("Returning cached special groups.");
-                return context.getSpecialGroups();
+                return specialGroups;
             }
 
             log.debug("Starting to determine special groups");
@@ -1282,4 +1289,3 @@ public class ShibAuthentication implements AuthenticationMethod {
         return false;
     }
 }
-
