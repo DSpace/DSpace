@@ -158,6 +158,27 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed!");
         log.error("Authentication failed (status:{})",
                   HttpServletResponse.SC_UNAUTHORIZED, failed);
+        this.closeOpenContext(request);
+    }
+
+    /**
+     * Manually closes the open {@link Context} if one exists. We need to do this manually because
+     * {@link #continueChainBeforeSuccessfulAuthentication} is {@code false} by default, which prevents the
+     * {@link org.dspace.app.rest.filter.DSpaceRequestContextFilter} from being called. Without this call, the request
+     * would leave an open database connection.
+     *
+     * @param request The current request.
+     */
+    protected void closeOpenContext(HttpServletRequest request) {
+        if (ContextUtil.isContextAvailable(request)) {
+            try (Context context = ContextUtil.obtainContext(request)) {
+                if (context != null && context.isValid()) {
+                    context.complete();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

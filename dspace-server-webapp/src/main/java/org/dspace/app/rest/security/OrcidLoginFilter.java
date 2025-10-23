@@ -121,6 +121,7 @@ public class OrcidLoginFilter extends AbstractAuthenticationProcessingFilter {
         }
 
         response.sendRedirect(redirectUrl); // lgtm [java/unvalidated-url-redirection]
+        this.closeOpenContext(request);
     }
 
     /**

@@ -75,7 +75,7 @@ public class SitemapRestController {
         File sitemapOutputDir = new File(configurationService.getProperty("sitemap.dir"));
         if (sitemapOutputDir.exists() && sitemapOutputDir.isDirectory()) {
             // List of all files and directories inside sitemapOutputDir
-            File sitemapFilesList[] = sitemapOutputDir.listFiles();
+            File[] sitemapFilesList = sitemapOutputDir.listFiles();
             for (File sitemapFile : sitemapFilesList) {
                 if (name.equalsIgnoreCase(sitemapFile.getName())) {
                     if (sitemapFile.isFile()) {

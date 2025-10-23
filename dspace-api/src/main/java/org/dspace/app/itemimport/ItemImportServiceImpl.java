@@ -605,7 +605,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         Item item = null;
 
-        String mf[] = metaKey.split("\\.");
+        String[] mf = metaKey.split("\\.");
         if (mf.length < 2) {
             throw new Exception("Bad metadata field in reference: '" + metaKey +
                 "' (expected syntax is schema.element[.qualifier])");
@@ -913,7 +913,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         // Load any additional metadata schemas
         File folder = new File(path);
-        File file[] = folder.listFiles(metadataFileFilter);
+        File[] file = folder.listFiles(metadataFileFilter);
         for (int i = 0; i < file.length; i++) {
             loadDublinCore(c, myitem, file[i].getAbsolutePath());
         }
@@ -1465,11 +1465,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         if (bundleName == null) {
             // is it license.txt?
-            if ("license.txt".equals(fileName)) {
-                newBundleName = "LICENSE";
+            if (Constants.LICENSE_BITSTREAM_NAME.equals(fileName)) {
+                newBundleName = Constants.LICENSE_BUNDLE_NAME;
             } else {
                 // call it ORIGINAL
-                newBundleName = "ORIGINAL";
+                newBundleName = Constants.CONTENT_BUNDLE_NAME;
             }
         }
 
@@ -1533,11 +1533,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         if (StringUtils.isBlank(bundleName)) {
             // is it license.txt?
-            if (bitstreamPath.endsWith("license.txt")) {
-                newBundleName = "LICENSE";
+            if (bitstreamPath.endsWith(Constants.LICENSE_BITSTREAM_NAME)) {
+                newBundleName = Constants.LICENSE_BUNDLE_NAME;
             } else {
                 // call it ORIGINAL
-                newBundleName = "ORIGINAL";
+                newBundleName = Constants.CONTENT_BUNDLE_NAME;
             }
         }
 

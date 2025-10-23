@@ -58,7 +58,7 @@ public class PubMedToImport {
      */
     private PubMedToImport() { }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         Options options = new Options();
 
         options.addOption(new Option("s", "source", true, "Source xml"));

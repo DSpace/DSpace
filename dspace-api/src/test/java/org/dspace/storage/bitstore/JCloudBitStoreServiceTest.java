@@ -16,6 +16,9 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.common.io.ByteSource;
 import org.dspace.AbstractUnitTest;
@@ -143,7 +146,7 @@ public class JCloudBitStoreServiceTest extends AbstractUnitTest {
         String computedPath = this.jCloudBitStoreService.getIntermediatePath(path.toString());
         int slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
-        assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
+        assertThat(countPathElements(computedPath), Matchers.equalTo(slashes));
 
         path.append("2");
         computedPath = this.jCloudBitStoreService.getIntermediatePath(path.toString());
@@ -168,31 +171,31 @@ public class JCloudBitStoreServiceTest extends AbstractUnitTest {
         String computedPath = this.jCloudBitStoreService.getIntermediatePath(path.toString());
         int slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
-        assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
+        assertThat(countPathElements(computedPath), Matchers.equalTo(slashes));
 
         path.append("2");
         computedPath = this.jCloudBitStoreService.getIntermediatePath(path.toString());
         slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
-        assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
+        assertThat(countPathElements(computedPath), Matchers.equalTo(slashes));
 
         path.append("3");
         computedPath = this.jCloudBitStoreService.getIntermediatePath(path.toString());
         slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
-        assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
+        assertThat(countPathElements(computedPath), Matchers.equalTo(slashes));
 
         path.append("4");
         computedPath = this.jCloudBitStoreService.getIntermediatePath(path.toString());
         slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
-        assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
+        assertThat(countPathElements(computedPath), Matchers.equalTo(slashes));
 
         path.append("56789");
         computedPath = this.jCloudBitStoreService.getIntermediatePath(path.toString());
         slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
-        assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
+        assertThat(countPathElements(computedPath), Matchers.equalTo(slashes));
     }
 
     @Test
@@ -217,6 +220,14 @@ public class JCloudBitStoreServiceTest extends AbstractUnitTest {
         int odd = Math.min(1, minimum % S3BitStoreService.digitsPerLevel);
         int slashes = slashesPerLevel + odd;
         return Math.min(slashes, S3BitStoreService.directoryLevels);
+    }
+
+    // Count the number of elements in a Unix or Windows path.
+    // We use 'Paths' instead of splitting on slashes because these OSes use different path separators.
+    private int countPathElements(String stringPath) {
+        List<String> pathElements = new ArrayList<>();
+        Paths.get(stringPath).forEach(p -> pathElements.add(p.toString()));
+        return pathElements.size();
     }
 
 }
