@@ -85,6 +85,8 @@ jobs:
     # Must run after 'tests' job above
     needs: tests
     runs-on: ubuntu-latest
+    # Do not run on forks since it will fail without the token
+    if: github.repository == 'dspace/dspace'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
