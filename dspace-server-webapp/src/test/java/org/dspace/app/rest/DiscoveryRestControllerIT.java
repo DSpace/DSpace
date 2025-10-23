@@ -102,6 +102,28 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     @Autowired
     private ObjectMapper mapper;
 
+    /**
+     * Original value of the discovery.highlights.escape-html property, saved here to restore it after running the
+     * tests.
+     */
+    boolean escapeHTML;
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        context.turnOffAuthorisationSystem();
+        escapeHTML = configurationService.getBooleanProperty("discovery.highlights.escape-html");
+        context.restoreAuthSystemState();
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("discovery.highlights.escape-html", escapeHTML);
+        context.restoreAuthSystemState();
+        super.destroy();
+    }
+
     @Test
     public void rootDiscoverTest() throws Exception {
 
@@ -6685,4 +6707,59 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
             .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
     }
 
+    @Test
+    public void discoverSearchObjectsFirstEscapeHTMLTagsBeforeApplyingHitHighlights() throws Exception {
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("discovery.highlights.escape-html", true);
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection")
+                                           .build();
+
+        ItemBuilder.createItem(context, col1)
+                                .withTitle("This is a <a>test</a> title")
+                                .build();
+        context.restoreAuthSystemState();
+
+        // This test proves that the HTML tags that are in the original metadata, like <a>test</a>,
+        // are now escaped and should be returned like &lt;a&gt;test&lt;&#x2F;a&gt;
+        // Only after this happens should the hit highlights be applied
+        getClient().perform(get("/api/discover/search/objects")
+                                    .param("query", "title"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath(
+                                     "$._embedded.searchResult._embedded.objects[0].hitHighlights['dc.title']",
+                                     contains("This is a &lt;a&gt;test&lt;&#x2F;a&gt; <em>title</em>")));
+    }
+
+    @Test
+    public void discoverSearchObjectsDontEscapeHTMLTagsBeforeApplyingHitHighlights() throws Exception {
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("discovery.highlights.escape-html", false);
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Collection")
+            .build();
+
+        ItemBuilder.createItem(context, col1)
+            .withTitle("This is a <a>test</a> title")
+            .build();
+        context.restoreAuthSystemState();
+
+        // This test proves that the HTML tags that are in the original metadata, like <a>test</a>,
+        // are not escaped and should be returned like <a>test</a>
+        // Only after this happens should the hit highlights be applied
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("query", "title"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath(
+                "$._embedded.searchResult._embedded.objects[0].hitHighlights['dc.title']",
+                contains("This is a <a>test</a> <em>title</em>")));
+    }
 }
