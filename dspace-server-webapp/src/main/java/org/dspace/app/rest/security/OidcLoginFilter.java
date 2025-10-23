@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.security;
 
+import static org.dspace.authenticate.AuthenticationUtility.Mapping.OIDC;
 import static org.dspace.authenticate.OidcAuthenticationBean.OIDC_AUTH_ATTRIBUTE;
 
 import java.io.IOException;
@@ -22,9 +23,12 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * This class will filter OpenID Connect (OIDC) requests and try and authenticate them.
@@ -33,16 +37,20 @@ import org.springframework.security.core.AuthenticationException;
  *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
-public class OidcLoginFilter extends StatelessLoginFilter {
-
+public class OidcLoginFilter extends AbstractAuthenticationProcessingFilter {
     private static final Logger log = LogManager.getLogger(OidcLoginFilter.class);
+
+    private final AuthenticationManager authenticationManager;
+    private final RestAuthenticationService restAuthenticationService;
 
     private final ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
         .getConfigurationService();
 
-    public OidcLoginFilter(String url, String httpMethod, AuthenticationManager authenticationManager,
-            RestAuthenticationService restAuthenticationService) {
-        super(url, httpMethod, authenticationManager, restAuthenticationService);
+    public OidcLoginFilter(AuthenticationManager authenticationManager,
+                           RestAuthenticationService restAuthenticationService) {
+        super(new AntPathRequestMatcher(OIDC.getMethodUrl(), HttpMethod.POST.name()));
+        this.authenticationManager = authenticationManager;
+        this.restAuthenticationService = restAuthenticationService;
     }
 
     @Override

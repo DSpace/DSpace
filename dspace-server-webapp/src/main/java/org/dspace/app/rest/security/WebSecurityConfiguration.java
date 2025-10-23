@@ -140,32 +140,27 @@ public class WebSecurityConfiguration {
                              StatelessAuthenticationFilter.class)
             // Add a filter before our login endpoints to do the authentication based on the data in the HTTP request.
             // This login endpoint only responds to POST as it is used for PasswordAuthentication
-            .addFilterBefore(new StatelessLoginFilter("/api/authn/login", HttpMethod.POST.name(),
-                                                      authenticationManager, restAuthenticationService),
+            .addFilterBefore(new StatelessLoginFilter(authenticationManager, restAuthenticationService),
                              LogoutFilter.class)
             // Add a filter before our shibboleth endpoints to do the authentication based on the data in the HTTP
             // request. This endpoint only responds to GET as the actual authentication is performed by Shibboleth,
             // which then redirects to this endpoint to forward the authentication data to DSpace.
-            .addFilterBefore(new ShibbolethLoginFilter("/api/authn/shibboleth", HttpMethod.GET.name(),
-                                                       authenticationManager, restAuthenticationService),
+            .addFilterBefore(new ShibbolethLoginFilter(authenticationManager, restAuthenticationService),
                              LogoutFilter.class)
             // Add a filter before our ORCID endpoints to do the authentication based on the data in the HTTP request.
             // This endpoint only responds to GET as the actual authentication is performed by ORCID, which then
             // redirects to this endpoint to forward the authentication data to DSpace.
-            .addFilterBefore(new OrcidLoginFilter("/api/authn/orcid", HttpMethod.GET.name(),
-                                                  authenticationManager, restAuthenticationService),
+            .addFilterBefore(new OrcidLoginFilter(authenticationManager, restAuthenticationService),
                              LogoutFilter.class)
             // Add a filter before our OIDC endpoints to do the authentication based on the data in the HTTP request.
             // This endpoint only responds to GET as the actual authentication is performed by OIDC, which then
             // redirects to this endpoint to forward the authentication data to DSpace.
-            .addFilterBefore(new OidcLoginFilter("/api/authn/oidc", HttpMethod.GET.name(),
-                                                 authenticationManager, restAuthenticationService),
+            .addFilterBefore(new OidcLoginFilter(authenticationManager, restAuthenticationService),
                              LogoutFilter.class)
             // Add a filter before our SAML endpoints to do the authentication based on the data in the HTTP request.
             // This endpoint only responds to GET as the actual authentication is performed by SAML, which then
             // forwards to this endpoint to pass the authentication data to DSpace.
-            .addFilterBefore(new SamlLoginFilter("/api/authn/saml", HttpMethod.GET.name(),
-                                                 authenticationManager, restAuthenticationService),
+            .addFilterBefore(new SamlLoginFilter(authenticationManager, restAuthenticationService),
                              LogoutFilter.class)
             // Add a custom Token based authentication filter based on the token previously given to the client
             // before each URL

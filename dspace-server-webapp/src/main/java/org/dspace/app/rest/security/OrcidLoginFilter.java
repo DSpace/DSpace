@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.security;
 
+import static org.dspace.authenticate.AuthenticationUtility.Mapping.ORCID;
 import static org.dspace.authenticate.OrcidAuthenticationBean.ORCID_AUTH_ATTRIBUTE;
 import static org.dspace.authenticate.OrcidAuthenticationBean.ORCID_DEFAULT_REGISTRATION_URL;
 import static org.dspace.authenticate.OrcidAuthenticationBean.ORCID_REGISTRATION_TOKEN;
@@ -30,10 +31,13 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.dspace.web.ContextUtil;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * This class will filter ORCID requests and try and authenticate them.
@@ -43,9 +47,11 @@ import org.springframework.security.core.AuthenticationException;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
 
-public class OrcidLoginFilter extends StatelessLoginFilter {
-
+public class OrcidLoginFilter extends AbstractAuthenticationProcessingFilter {
     private static final Logger log = LogManager.getLogger(OrcidLoginFilter.class);
+
+    private final AuthenticationManager authenticationManager;
+    private final RestAuthenticationService restAuthenticationService;
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
@@ -53,9 +59,11 @@ public class OrcidLoginFilter extends StatelessLoginFilter {
                                                                       .getServiceByName("orcidAuthentication",
                                                                                         OrcidAuthenticationBean.class);
 
-    public OrcidLoginFilter(String url, String httpMethod, AuthenticationManager authenticationManager,
-                                     RestAuthenticationService restAuthenticationService) {
-        super(url, httpMethod, authenticationManager, restAuthenticationService);
+    public OrcidLoginFilter(AuthenticationManager authenticationManager,
+                            RestAuthenticationService restAuthenticationService) {
+        super(new AntPathRequestMatcher(ORCID.getMethodUrl(), HttpMethod.POST.name()));
+        this.authenticationManager = authenticationManager;
+        this.restAuthenticationService = restAuthenticationService;
     }
 
     @Override

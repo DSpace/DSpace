@@ -53,9 +53,15 @@ public class SpecialGroupClaimProvider implements JWTClaimProvider {
         try {
             AuthenticationUtility.updateAuthenticationMethod(context, request);
 
+            /*******************************************************
+             * GET SPECIAL GROUPS                                  *
+             *******************************************************/
             authenticationService.getSpecialGroups(context, request)
                 .stream()
                 .forEach(sg -> context.setSpecialGroup(sg.getID()));
+            /*******************************************************
+             * END GET SPECIAL GROUPS                              *
+             *******************************************************/
 
             groups = context.getSpecialGroups();
         } catch (SQLException e) {
