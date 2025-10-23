@@ -11,6 +11,7 @@ import static java.lang.String.valueOf;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -80,6 +81,11 @@ public class S3BitStoreService extends BaseBitStoreService {
 
     private boolean enabled = false;
 
+    /**
+     *  Override AWS endpoint if not null
+     */
+    private String endpoint = null;
+
     private String awsAccessKey;
     private String awsSecretKey;
     private String awsRegionName;
@@ -112,6 +118,7 @@ public class S3BitStoreService extends BaseBitStoreService {
      *
      * @param regions wanted regions in client
      * @param awsCredentials credentials of the client
+     * @param endpoint custom AWS endpoint
      * @param targetThroughput target throughput in Gbps
      * @param minPartSize minimum part size in bytes
      * @param maxConcurrency maximum number of concurrent requests
@@ -120,6 +127,7 @@ public class S3BitStoreService extends BaseBitStoreService {
     protected static Supplier<S3AsyncClient> amazonClientBuilderBy(
             Region region,
             AwsCredentialsProvider credentialsProvider,
+            String endpoint,
             double targetThroughput,
             long minPartSize,
             Integer maxConcurrency
@@ -137,6 +145,11 @@ public class S3BitStoreService extends BaseBitStoreService {
 
             if (maxConcurrency != null) {
                 crtBuilder.maxConcurrency(maxConcurrency);
+            }
+
+            if (StringUtils.isNotBlank(endpoint)) {
+                crtBuilder.endpointOverride(URI.create(endpoint));
+                crtBuilder.forcePathStyle(true);
             }
 
             return crtBuilder.targetThroughputInGbps(targetThroughput).minimumPartSizeInBytes(minPartSize).build();
@@ -191,14 +204,16 @@ public class S3BitStoreService extends BaseBitStoreService {
                         amazonClientBuilderBy(
                                 region,
                                 StaticCredentialsProvider.create(AwsBasicCredentials.create(getAwsAccessKey(),
-                                        getAwsSecretKey())), targetThroughputGbps, minPartSizeBytes, maxConcurrency)
+                                        getAwsSecretKey())), endpoint, targetThroughputGbps,
+                                minPartSizeBytes, maxConcurrency)
                         );
                 log.warn("S3 Region set to: " + region.id());
             } else {
                 log.info("Using a IAM role or aws environment credentials");
                 s3AsyncClient = FunctionalUtils.getDefaultOrBuild(
                         this.s3AsyncClient,
-                        amazonClientBuilderBy(null, null , targetThroughputGbps, minPartSizeBytes, maxConcurrency));
+                        amazonClientBuilderBy(null, null , endpoint, targetThroughputGbps,
+                                minPartSizeBytes, maxConcurrency));
             }
 
             // bucket name
@@ -528,6 +543,14 @@ public class S3BitStoreService extends BaseBitStoreService {
 
     public void setMaxConcurrency(Integer maxConcurrency) {
         this.maxConcurrency = maxConcurrency;
+    }
+
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
     }
 
     /**

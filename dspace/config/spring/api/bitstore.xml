@@ -28,6 +28,9 @@
         <!-- S3 bucket name to store assets in. example: longsight-dspace-auk -->
         <property name="bucketName" value="${assetstore.s3.bucketName}"/>
 
+        <!-- S3 endpoint URI if not using Amazon defaults, example: minio.mysite.org -->
+        <property name="endpoint" value="${assetstore.s3.endpoint:}"/>
+
         <!-- AWS S3 Region to use: {us-east-1, us-west-1, eu-west-1, eu-central-1, ap-southeast-1, ... } -->
         <!-- Optional, sdk default is us-east-1 -->
         <property name="awsRegionName" value="${assetstore.s3.awsRegionName}"/>
