@@ -10,10 +10,9 @@ package org.dspace.authenticate;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Utility for authentication.
