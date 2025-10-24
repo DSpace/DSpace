@@ -64,7 +64,6 @@ public class AnonymousAdditionalAuthorizationFilter extends BasicAuthenticationF
         } catch (SQLException e) {
             log.error("Something went wrong trying to fetch groups in IPAuthenticationFilter", e);
         }
-
         chain.doFilter(req, res);
     }
 

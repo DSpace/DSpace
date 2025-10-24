@@ -34,10 +34,8 @@ public class AuthenticationUtility {
             }
         }
 
-        /* must match AuthenticationMethod#getName */
         private final String methodName;
 
-        /* must match AbstractAuthenticationProcessingFilter URL arguments in WebSecurityConfiguration */
         private final String methodUrl;
 
         Mapping(String methodName, String methodUrl) {

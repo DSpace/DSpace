@@ -59,5 +59,4 @@ public class AuthenticationMethodClaimProvider implements JWTClaimProvider {
             log.error(e::getMessage, e);
         }
     }
-
 }
