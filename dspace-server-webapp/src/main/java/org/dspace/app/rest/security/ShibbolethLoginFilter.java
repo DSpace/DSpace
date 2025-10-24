@@ -28,8 +28,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * This class will filter Shibboleth requests to see if the user has been authenticated via Shibboleth.
@@ -56,19 +54,14 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  * @author Tim Donohue
  * @see org.dspace.authenticate.ShibAuthentication
  */
-public class ShibbolethLoginFilter extends AbstractAuthenticationProcessingFilter {
+public class ShibbolethLoginFilter extends StatelessLoginFilter {
     private static final Logger log = LogManager.getLogger(ShibbolethLoginFilter.class);
-
-    private final AuthenticationManager authenticationManager;
-    private final RestAuthenticationService restAuthenticationService;
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     public ShibbolethLoginFilter(AuthenticationManager authenticationManager,
                                  RestAuthenticationService restAuthenticationService) {
-        super(new AntPathRequestMatcher(SHIBBOLETH.getMethodUrl(), HttpMethod.POST.name()));
-        this.authenticationManager = authenticationManager;
-        this.restAuthenticationService = restAuthenticationService;
+        super(SHIBBOLETH.getMethodUrl(), HttpMethod.POST.name(), authenticationManager, restAuthenticationService);
     }
 
     @Override

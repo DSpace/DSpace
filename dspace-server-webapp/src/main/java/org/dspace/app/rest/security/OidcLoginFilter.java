@@ -27,8 +27,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * This class will filter OpenID Connect (OIDC) requests and try and authenticate them.
@@ -37,20 +35,15 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
-public class OidcLoginFilter extends AbstractAuthenticationProcessingFilter {
+public class OidcLoginFilter extends StatelessLoginFilter {
     private static final Logger log = LogManager.getLogger(OidcLoginFilter.class);
-
-    private final AuthenticationManager authenticationManager;
-    private final RestAuthenticationService restAuthenticationService;
 
     private final ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
         .getConfigurationService();
 
     public OidcLoginFilter(AuthenticationManager authenticationManager,
                            RestAuthenticationService restAuthenticationService) {
-        super(new AntPathRequestMatcher(OIDC.getMethodUrl(), HttpMethod.POST.name()));
-        this.authenticationManager = authenticationManager;
-        this.restAuthenticationService = restAuthenticationService;
+        super(OIDC.getMethodUrl(), HttpMethod.POST.name(), authenticationManager, restAuthenticationService);
     }
 
     @Override

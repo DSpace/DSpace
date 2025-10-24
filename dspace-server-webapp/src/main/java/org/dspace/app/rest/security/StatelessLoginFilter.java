@@ -40,27 +40,37 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter {
     private static final Logger log = LogManager.getLogger();
 
-    private final AuthenticationManager authenticationManager;
-    private final RestAuthenticationService restAuthenticationService;
+    protected final AuthenticationManager authenticationManager;
+    protected final RestAuthenticationService restAuthenticationService;
 
     @Override
     public void afterPropertiesSet() {
     }
 
-    /**
+     /**
+     * Initialize a StatelessLoginFilter for password authentication.
+     *
+     * @param authenticationManager Spring Security AuthenticationManager to use for authentication
+     * @param restAuthenticationService DSpace RestAuthenticationService to use for authentication
+     */
+    public StatelessLoginFilter(AuthenticationManager authenticationManager,
+                                RestAuthenticationService restAuthenticationService) {
+        this(PASSWORD.getMethodUrl(), HttpMethod.POST.name(), authenticationManager, restAuthenticationService);
+    }
+
+     /**
      * Initialize a StatelessLoginFilter for the given URL and HTTP method. This login filter will ONLY attempt
-     * authentication for requests that match this URL and method. The URL & method are defined in the configuration
-     * in WebSecurityConfiguration.
+     * authentication for requests that match this URL and method.
      * @see org.dspace.app.rest.security.WebSecurityConfiguration
      * @param url URL path to attempt to authenticate (e.g. "/api/authn/login")
      * @param httpMethod HTTP method to attempt to authentication (e.g. "POST")
      * @param authenticationManager Spring Security AuthenticationManager to use for authentication
      * @param restAuthenticationService DSpace RestAuthenticationService to use for authentication
      */
-    public StatelessLoginFilter(AuthenticationManager authenticationManager,
+    public StatelessLoginFilter(String url, String method, AuthenticationManager authenticationManager,
                                 RestAuthenticationService restAuthenticationService) {
         // NOTE: attemptAuthentication() below will only be triggered by requests that match both this URL and method
-        super(new AntPathRequestMatcher(PASSWORD.getMethodUrl(), HttpMethod.POST.name()));
+        super(new AntPathRequestMatcher(url, method));
         this.authenticationManager = authenticationManager;
         this.restAuthenticationService = restAuthenticationService;
     }
@@ -89,9 +99,6 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 
         AuthenticationUtility.updateAuthenticationMethod(context, req);
 
-        /*******************************************************
-         * GET SPECIAL GROUPS                                  *
-         *******************************************************/
         try {
             restAuthenticationService.getAuthenticationService()
                 .getSpecialGroups(context, req)
@@ -100,9 +107,6 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
         } catch (SQLException e) {
 
         }
-        /*******************************************************
-         * END GET SPECIAL GROUPS                              *
-         *******************************************************/
 
         // Attempt to authenticate by passing user & password (if provided) to AuthenticationProvider class(es)
         // NOTE: This method will check if the user was already authenticated by StatelessAuthenticationFilter,

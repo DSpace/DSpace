@@ -36,8 +36,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * This class will filter ORCID requests and try and authenticate them.
@@ -47,11 +45,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
 
-public class OrcidLoginFilter extends AbstractAuthenticationProcessingFilter {
+public class OrcidLoginFilter extends StatelessLoginFilter {
     private static final Logger log = LogManager.getLogger(OrcidLoginFilter.class);
-
-    private final AuthenticationManager authenticationManager;
-    private final RestAuthenticationService restAuthenticationService;
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
@@ -61,9 +56,7 @@ public class OrcidLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     public OrcidLoginFilter(AuthenticationManager authenticationManager,
                             RestAuthenticationService restAuthenticationService) {
-        super(new AntPathRequestMatcher(ORCID.getMethodUrl(), HttpMethod.POST.name()));
-        this.authenticationManager = authenticationManager;
-        this.restAuthenticationService = restAuthenticationService;
+        super(ORCID.getMethodUrl(), HttpMethod.POST.name(), authenticationManager, restAuthenticationService);
     }
 
     @Override

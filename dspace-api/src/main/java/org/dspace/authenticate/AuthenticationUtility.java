@@ -69,7 +69,7 @@ public class AuthenticationUtility {
     public static void updateAuthenticationMethod(Context context, HttpServletRequest request) {
         String authMethod = context.getAuthenticationMethod();
 
-        if (StringUtils.isBlank(authMethod)) {
+        if (request != null && StringUtils.isBlank(authMethod)) {
             authMethod = Mapping.getMethodName(request.getServletPath());
             context.setAuthenticationMethod(authMethod);
         }

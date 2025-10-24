@@ -56,21 +56,14 @@ public class AnonymousAdditionalAuthorizationFilter extends BasicAuthenticationF
                                     FilterChain chain) throws IOException, ServletException {
 
         Context context = ContextUtil.obtainContext(req);
-        /*******************************************************
-         * GET SPECIAL GROUPS                                  *
-         *******************************************************/
         try {
             List<Group> groups = authenticationService.getSpecialGroups(context, req);
             for (Group group : groups) {
                 context.setSpecialGroup(group.getID());
             }
         } catch (SQLException e) {
-            // huh?
             log.error("Something went wrong trying to fetch groups in IPAuthenticationFilter", e);
         }
-        /*******************************************************
-         * END GET SPECIAL GROUPS                              *
-         *******************************************************/
 
         chain.doFilter(req, res);
     }

@@ -28,7 +28,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
@@ -61,19 +60,14 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  *
  * @author Ray Lee
  */
-public class SamlLoginFilter extends AbstractAuthenticationProcessingFilter {
+public class SamlLoginFilter extends StatelessLoginFilter {
     private static final Logger logger = LogManager.getLogger(SamlLoginFilter.class);
-
-    private final AuthenticationManager authenticationManager;
-    private final RestAuthenticationService restAuthenticationService;
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     public SamlLoginFilter(AuthenticationManager authenticationManager,
                            RestAuthenticationService restAuthenticationService) {
-        super(new AntPathRequestMatcher(SAML.getMethodUrl(), HttpMethod.POST.name()));
-        this.authenticationManager = authenticationManager;
-        this.restAuthenticationService = restAuthenticationService;
+        super(SAML.getMethodUrl(), HttpMethod.POST.name(), authenticationManager, restAuthenticationService);
     }
 
     @Override
