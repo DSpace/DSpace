@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.security;
 
+import static org.dspace.authenticate.AuthenticationUtility.Mapping.SAML;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -21,6 +23,7 @@ import org.dspace.authenticate.SamlAuthentication;
 import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.core.Authentication;
@@ -61,9 +64,9 @@ public class SamlLoginFilter extends StatelessLoginFilter {
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    public SamlLoginFilter(String url, String httpMethod, AuthenticationManager authenticationManager,
-            RestAuthenticationService restAuthenticationService) {
-        super(url, httpMethod, authenticationManager, restAuthenticationService);
+    public SamlLoginFilter(AuthenticationManager authenticationManager,
+                           RestAuthenticationService restAuthenticationService) {
+        super(SAML.getMethodUrl(), HttpMethod.GET.name(), authenticationManager, restAuthenticationService);
     }
 
     @Override
