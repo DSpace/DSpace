@@ -285,13 +285,13 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
             Context context, Item item, Item otherItem, Relationship relationship, int place,
             String key, VirtualMetadataConfiguration virtualBean) throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
-        for (String value : virtualBean.getValues(context, otherItem)) {
+        for (VirtualMetadataConfiguration.ValueResult valueResult : virtualBean.getValues(context, otherItem)) {
             RelationshipMetadataValue relationshipMetadataValue = constructRelationshipMetadataValue(context, item,
-                                                                                                     relationship
-                                                                                                         .getID(),
-                                                                                                     place,
-                                                                                                     key, virtualBean,
-                                                                                                     value);
+                relationship
+                    .getID(),
+                valueResult.getPlace() == null ? place : valueResult.getPlace(),
+                key, virtualBean,
+                valueResult.getValue());
             if (relationshipMetadataValue != null) {
                 resultingMetadataValueList.add(relationshipMetadataValue);
             }
