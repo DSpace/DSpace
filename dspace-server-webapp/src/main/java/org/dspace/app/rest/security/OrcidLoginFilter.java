@@ -56,7 +56,7 @@ public class OrcidLoginFilter extends StatelessLoginFilter {
 
     public OrcidLoginFilter(AuthenticationManager authenticationManager,
                             RestAuthenticationService restAuthenticationService) {
-        super(ORCID.getMethodUrl(), HttpMethod.POST.name(), authenticationManager, restAuthenticationService);
+        super(ORCID.getMethodUrl(), HttpMethod.GET.name(), authenticationManager, restAuthenticationService);
     }
 
     @Override

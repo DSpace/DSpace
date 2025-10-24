@@ -67,7 +67,7 @@ public class SamlLoginFilter extends StatelessLoginFilter {
 
     public SamlLoginFilter(AuthenticationManager authenticationManager,
                            RestAuthenticationService restAuthenticationService) {
-        super(SAML.getMethodUrl(), HttpMethod.POST.name(), authenticationManager, restAuthenticationService);
+        super(SAML.getMethodUrl(), HttpMethod.GET.name(), authenticationManager, restAuthenticationService);
     }
 
     @Override

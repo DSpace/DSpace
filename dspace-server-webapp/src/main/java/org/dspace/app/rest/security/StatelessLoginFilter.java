@@ -67,10 +67,10 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
      * @param authenticationManager Spring Security AuthenticationManager to use for authentication
      * @param restAuthenticationService DSpace RestAuthenticationService to use for authentication
      */
-    public StatelessLoginFilter(String url, String method, AuthenticationManager authenticationManager,
+    public StatelessLoginFilter(String url, String httpMethod, AuthenticationManager authenticationManager,
                                 RestAuthenticationService restAuthenticationService) {
         // NOTE: attemptAuthentication() below will only be triggered by requests that match both this URL and method
-        super(new AntPathRequestMatcher(url, method));
+        super(new AntPathRequestMatcher(url, httpMethod));
         this.authenticationManager = authenticationManager;
         this.restAuthenticationService = restAuthenticationService;
     }

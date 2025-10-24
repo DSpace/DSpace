@@ -61,7 +61,7 @@ public class ShibbolethLoginFilter extends StatelessLoginFilter {
 
     public ShibbolethLoginFilter(AuthenticationManager authenticationManager,
                                  RestAuthenticationService restAuthenticationService) {
-        super(SHIBBOLETH.getMethodUrl(), HttpMethod.POST.name(), authenticationManager, restAuthenticationService);
+        super(SHIBBOLETH.getMethodUrl(), HttpMethod.GET.name(), authenticationManager, restAuthenticationService);
     }
 
     @Override

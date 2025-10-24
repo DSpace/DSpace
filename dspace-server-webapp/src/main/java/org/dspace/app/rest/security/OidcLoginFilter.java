@@ -43,7 +43,7 @@ public class OidcLoginFilter extends StatelessLoginFilter {
 
     public OidcLoginFilter(AuthenticationManager authenticationManager,
                            RestAuthenticationService restAuthenticationService) {
-        super(OIDC.getMethodUrl(), HttpMethod.POST.name(), authenticationManager, restAuthenticationService);
+        super(OIDC.getMethodUrl(), HttpMethod.GET.name(), authenticationManager, restAuthenticationService);
     }
 
     @Override
