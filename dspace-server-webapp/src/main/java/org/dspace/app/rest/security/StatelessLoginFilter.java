@@ -16,11 +16,11 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authenticate.AuthenticationUtility;
 import org.dspace.core.Context;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -105,7 +105,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
                 .stream()
                 .forEach(sg -> context.setSpecialGroup(sg.getID()));
         } catch (SQLException e) {
-
+            log.error("Failed to get special groups during stateless login authentication attempt", e);
         }
 
         // Attempt to authenticate by passing user & password (if provided) to AuthenticationProvider class(es)
