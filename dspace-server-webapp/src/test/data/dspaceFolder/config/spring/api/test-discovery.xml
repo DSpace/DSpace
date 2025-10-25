@@ -31,8 +31,6 @@
                     -->
                 <!-- The default entry, DO NOT REMOVE the system requires this -->
                 <entry key="default" value-ref="defaultConfiguration" />
-                <entry key="123456789/unique-handle-here" value-ref="NOTIFY.outgoing.involvedItems" />
-                <entry key="workspace" value-ref="workspaceConfiguration" />
                 <!-- Same as the "default" configuration, but does NOT filter out older versions of items -->
                 <!-- Used to display related items on single-item pages, because a relationship does not always point to the latest version of the related item -->
                 <entry key="default-relationships" value-ref="defaultRelationshipsConfiguration" />
@@ -104,6 +102,7 @@
                 <entry key="123456789/discovery-sub-community-2-1" value-ref="discovery-sub-community-2-1"/>
                 <entry key="123456789/discovery-collection-2-1-1" value-ref="discovery-collection-2-1-1"/>
                 <entry key="123456789/discovery-collection-2-2-1" value-ref="discovery-collection-2-2-1"/>
+                <entry key="123456789/discovery-configuration-tests" value-ref="discovery-parent-community-1" />
 
                 <!-- Configuration for the minAndMax of sidebar facets test (DiscoveryRestControllerIT) -->
                 <!-- Since these tests can not be made dynamic as the rest of the tests -->

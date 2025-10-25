@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -20,7 +21,6 @@ import java.util.UUID;
 import org.dspace.app.rest.matcher.DiscoveryConfigurationMatcher;
 import org.dspace.app.rest.matcher.SearchFilterMatcher;
 import org.dspace.app.rest.matcher.SortOptionMatcher;
-import org.dspace.app.rest.model.DiscoveryConfigurationRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Community;
@@ -31,275 +31,163 @@ import org.junit.Test;
 
 public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIntegrationTest {
 
-
-    Community community;
+    private Community community;
 
     @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context)
-            .build();
-
-        // add a unique handle to use as scope later in the tests
-        community = CommunityBuilder.createCommunity(context, "123456789/unique-handle-here").build();
-
-        context.commit();
+        community = CommunityBuilder.createCommunity(context, "123456789/discovery-configuration-tests").build();
         context.restoreAuthSystemState();
     }
 
-
-    /**
-     * Test that the endpoint can find different discovery configurations based on their names
-     */
     @Test
-    public void testFindDiscoveryConfigurationByName() throws Exception {
-        String adminToken = getAuthToken(admin.getEmail(), password);
+    public void testFindOneByName() throws Exception {
+        getClient().perform(get("/api/discover/discoveryconfigurations/default"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration("default")));
 
-        String configName = "default";
-        DiscoveryConfiguration defaultConf = SearchUtils.getDiscoveryConfiguration(context, configName, null);
+        getClient().perform(get("/api/discover/discoveryconfigurations/workspace"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration("workspace")));
 
-
-        getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-            DiscoveryConfigurationRest.PLURAL_NAME, configName)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher
-                .matchDiscoveryConfiguration(defaultConf)));
-
-
-
-        configName = "default-relationships";
-
-        DiscoveryConfiguration defaultRelationshipsConf =
-            SearchUtils.getDiscoveryConfiguration(context, configName, null);
-
-
-        getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-            DiscoveryConfigurationRest.PLURAL_NAME, configName)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                DiscoveryConfigurationMatcher.matchDiscoveryConfiguration(defaultRelationshipsConf)));
-
+        getClient().perform(get("/api/discover/discoveryconfigurations/workflow"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration("workflow")));
     }
 
-
-    /**
-     * Test that we can use a scope instead of a name to find a discovery configuration
-     */
     @Test
-    public void testFindDiscoveryConfigurationByUUIDScope() throws Exception {
-
-        String adminToken = getAuthToken(admin.getEmail(), password);
-
-        DiscoveryConfiguration NotifyOutgoingInvolvedItemsConfiguration =
-            SearchUtils.getDiscoveryConfiguration(context, community);
-
-        getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-                DiscoveryConfigurationRest.PLURAL_NAME, "scope"))
-                .queryParam("uuid", community.getID().toString()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher
-                .matchDiscoveryConfiguration(NotifyOutgoingInvolvedItemsConfiguration)));
+    public void testFindOneByScope() throws Exception {
+        getClient().perform(get("/api/discover/discoveryconfigurations/scope")
+                                    .param("uuid", community.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", DiscoveryConfigurationMatcher
+                           .matchDiscoveryConfiguration("discovery-parent-community-1")));
     }
 
-
-    /**
-     * Test that the default configuration is used when a name is provided that doesn't resolve to any configuration
-     */
     @Test
-    public void testNonExistingName() throws Exception {
-
-        String adminToken = getAuthToken(admin.getEmail(), password);
-
-        String configName = "does-not-exist";
-        DiscoveryConfiguration defaultConf = SearchUtils
-            .getDiscoveryConfiguration(context, "default", null);
-
-
-        getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-                DiscoveryConfigurationRest.PLURAL_NAME, configName)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher
-                .matchDiscoveryConfiguration(defaultConf)));
+    public void testFindOneByNameDefaultFallback() throws Exception {
+        getClient().perform(get("/api/discover/discoveryconfigurations/does-not-exist"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration("default")));
     }
 
-
-    /**
-     * Test that the default configuration is used when a scope that doesn't resolve to any configuration is provided
-     */
     @Test
-    public void testNonExistingScope() throws Exception {
+    public void testFindOneByScopeDefaultFallback() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community2 = CommunityBuilder.createCommunity(context).build();
+        context.restoreAuthSystemState();
 
-        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient().perform(get("/api/discover/discoveryconfigurations/scope")
+                                    .param("uuid", community2.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration("default")));
 
-        DiscoveryConfiguration defaultConf = SearchUtils
-            .getDiscoveryConfiguration(context, "default", null);
-
-
-        getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-                DiscoveryConfigurationRest.PLURAL_NAME, "scope"))
-                .queryParam("uuid", UUID.randomUUID().toString())) // random UUID
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher
-                .matchDiscoveryConfiguration(defaultConf)));
+        getClient().perform(get("/api/discover/discoveryconfigurations/scope")
+                                    .param("uuid", UUID.randomUUID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration("default")));
     }
 
-
-    /**
-     * Test the functionality of the searchfilters followlink
-     */
     @Test
-    public void testFollowLinkSearchFilters() throws Exception {
+    public void testLinkSearchFilters() throws Exception {
+        DiscoveryConfiguration config = SearchUtils.getDiscoveryConfiguration(context, "default", null);
 
-        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient().perform(get("/api/discover/discoveryconfigurations/default"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration("default")))
+                   .andExpect(jsonPath("$._links.searchfilters", not(empty())));
 
-        String configName = "default";
-        DiscoveryConfiguration defaultConf = SearchUtils
-            .getDiscoveryConfiguration(context, "default", null);
+        getClient().perform(get("/api/discover/discoveryconfigurations/default/searchfilters"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(config.getSearchFilters().size())))
+                   .andExpect(jsonPath("$._embedded.searchfilters", containsInAnyOrder(
+                           SearchFilterMatcher.createSearchFilterMatchers(config.getSearchFilters())
+                   )));
 
-        getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-                DiscoveryConfigurationRest.PLURAL_NAME, configName)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration(defaultConf)))
-            .andExpect(jsonPath("$._links.searchfilters", not(empty())));
-
-
-
-        String followLink = String.format("/api/%s/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-            DiscoveryConfigurationRest.PLURAL_NAME, configName, "searchfilters");
-
-        getClient(adminToken).perform(get(followLink))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page.totalElements", is(defaultConf.getSearchFilters().size())))
-            .andExpect(jsonPath("$._embedded.searchfilters",
-                containsInAnyOrder(SearchFilterMatcher.createSearchFilterMatchers(defaultConf.getSearchFilters()))));
-
-
-
-        getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-            DiscoveryConfigurationRest.PLURAL_NAME, configName))
-                .queryParam("embed", "searchfilters"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.searchfilters.page.totalElements",
-                is(defaultConf.getSearchFilters().size())))
-            .andExpect(jsonPath("$._embedded.searchfilters._embedded.searchfilters",
-                containsInAnyOrder(SearchFilterMatcher.createSearchFilterMatchers(defaultConf.getSearchFilters()))));
+        getClient().perform(get("/api/discover/discoveryconfigurations/default")
+                                    .param("embed", "searchfilters"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.searchfilters.page.totalElements",
+                                       is(config.getSearchFilters().size())))
+                   .andExpect(jsonPath("$._embedded.searchfilters._embedded.searchfilters", containsInAnyOrder(
+                           SearchFilterMatcher.createSearchFilterMatchers(config.getSearchFilters())
+                   )));
     }
 
-
-
-    /**
-     * Test the functionality of the sortoptions followlink
-     */
     @Test
-    public void testFollowLinkSortOptions() throws Exception {
+    public void testLinkSortOptions() throws Exception {
+        DiscoveryConfiguration config = SearchUtils.getDiscoveryConfiguration(context, "default", null);
 
-        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient().perform(get("/api/discover/discoveryconfigurations/default"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration("default")))
+                   .andExpect(jsonPath("$._links.sortoptions", not(empty())));
 
-        String configName = "default";
-        DiscoveryConfiguration defaultConf = SearchUtils
-            .getDiscoveryConfiguration(context, "default", null);
+        getClient().perform(get("/api/discover/discoveryconfigurations/default/sortoptions"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(config.getSearchSortConfiguration()
+                                                                        .getSortFields().size())))
+                   .andExpect(jsonPath("$._embedded.sortoptions", containsInAnyOrder(
+                       SortOptionMatcher.createSortOptionMatchers(config.getSearchSortConfiguration().getSortFields())
+                   )));
 
-        getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-                DiscoveryConfigurationRest.PLURAL_NAME, configName)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher
-                .matchDiscoveryConfiguration(defaultConf)))
-            .andExpect(jsonPath("$._links.sortoptions", not(empty())));
-
-
-        String followLink = String.format("/api/%s/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-            DiscoveryConfigurationRest.PLURAL_NAME, configName, "sortoptions");
-
-        getClient(adminToken).perform(get(followLink))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page.totalElements", is(defaultConf
-                .getSearchSortConfiguration().getSortFields().size())))
-            .andExpect(jsonPath("$._embedded.sortoptions",
-                containsInAnyOrder(SortOptionMatcher.createSortOptionMatchers(defaultConf
-                    .getSearchSortConfiguration().getSortFields()))));
-
-
-        getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-                DiscoveryConfigurationRest.PLURAL_NAME, configName))
-                .queryParam("embed", "sortoptions"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.sortoptions.page.totalElements",
-                is(defaultConf.getSearchSortConfiguration().getSortFields().size())))
-            .andExpect(jsonPath("$._embedded.sortoptions._embedded.sortoptions",
-                containsInAnyOrder(SortOptionMatcher.createSortOptionMatchers(defaultConf
-                    .getSearchSortConfiguration().getSortFields()))));
+        getClient().perform(get("/api/discover/discoveryconfigurations/default")
+                                    .param("embed", "sortoptions"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.sortoptions.page.totalElements",
+                                       is(config.getSearchSortConfiguration().getSortFields().size())))
+                   .andExpect(jsonPath("$._embedded.sortoptions._embedded.sortoptions", containsInAnyOrder(
+                       SortOptionMatcher.createSortOptionMatchers(config.getSearchSortConfiguration().getSortFields())
+                   )));
     }
 
-
-
-
-    /**
-     * Test the functionality of the defaultSortOption followlink
-     */
     @Test
-    public void testFollowLinkDefaultSortOption() throws Exception {
+    public void testLinkDefaultSortOption() throws Exception {
+        DiscoveryConfiguration config = SearchUtils.getDiscoveryConfiguration(context, "workspace", null);
 
-        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient().perform(get("/api/discover/discoveryconfigurations/workspace"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration("workspace")))
+                   .andExpect(jsonPath("$._links.defaultsortoption", not(empty())));
 
-        String configName = "workspace";
-        DiscoveryConfiguration workspaceConf = SearchUtils.getDiscoveryConfiguration(context, configName, null);
+        getClient().perform(get("/api/discover/discoveryconfigurations/workspace/defaultsortoption"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", SortOptionMatcher.sortOptionMatcher(config.getSearchSortConfiguration()
+                                                                                      .getDefaultSortField())
+                   ));
 
-        getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-                DiscoveryConfigurationRest.PLURAL_NAME, configName)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher
-                .matchDiscoveryConfiguration(workspaceConf)))
-            .andExpect(jsonPath("$._links.defaultsortoption", not(empty())));
+        getClient().perform(get("/api/discover/discoveryconfigurations/workspace")
+                                    .param("embed", "defaultsortoption"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.defaultsortoption",
+                                       SortOptionMatcher.sortOptionMatcher(config.getSearchSortConfiguration()
+                                                                                 .getDefaultSortField())));
 
+        getClient().perform(get("/api/discover/discoveryconfigurations/default"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration("default")))
+                   .andExpect(jsonPath("$._links.defaultsortoption", not(empty())));
 
-        String followLink = String.format("/api/%s/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-            DiscoveryConfigurationRest.PLURAL_NAME, configName, "defaultsortoption");
-
-        getClient(adminToken).perform(get(followLink))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                SortOptionMatcher.matchSortFieldConfiguration(workspaceConf.getSearchSortConfiguration()
-                .getDefaultSortField())));
-
-
-        getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-                DiscoveryConfigurationRest.PLURAL_NAME, configName))
-                .queryParam("embed", "defaultsortoption"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.defaultsortoption",
-                SortOptionMatcher.matchSortFieldConfiguration(workspaceConf.getSearchSortConfiguration()
-                    .getDefaultSortField())));
+        getClient().perform(get("/api/discover/discoveryconfigurations/default/defaultsortoption"))
+                   .andExpect(status().isNoContent());
     }
 
-
-    /**
-     * Test the endpoint still works as expected when projection full is provided as query parameter
-     */
     @Test
     public void testFullProjection() throws Exception {
-        String adminToken = getAuthToken(admin.getEmail(), password);
+        DiscoveryConfiguration config = SearchUtils.getDiscoveryConfiguration(context, "default", null);
 
-        String configName = "workspace";
-        DiscoveryConfiguration workspaceConf =
-            SearchUtils.getDiscoveryConfiguration(context, configName, null);
-
-
-        getClient(adminToken).perform(get(String.format("/api/%s/%s/%s", DiscoveryConfigurationRest.CATEGORY,
-                DiscoveryConfigurationRest.PLURAL_NAME, configName))
-                .param("projection", "full"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", DiscoveryConfigurationMatcher
-                .matchDiscoveryConfiguration(workspaceConf)))
-            .andExpect(jsonPath("$._embedded.searchfilters._embedded.searchfilters",
-                containsInAnyOrder(SearchFilterMatcher.createSearchFilterMatchers(workspaceConf.getSearchFilters()))))
-            .andExpect(jsonPath("$._embedded.sortoptions._embedded.sortoptions",
-                containsInAnyOrder(SortOptionMatcher.createSortOptionMatchers(
-                    workspaceConf.getSearchSortConfiguration().getSortFields()))))
-            .andExpect(jsonPath("$._embedded.defaultsortoption",
-                SortOptionMatcher.matchSortFieldConfiguration(workspaceConf.getSearchSortConfiguration()
-                    .getDefaultSortField())));
-
+        getClient().perform(get("/api/discover/discoveryconfigurations/default")
+                                    .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", DiscoveryConfigurationMatcher.matchDiscoveryConfiguration("default")))
+                   .andExpect(jsonPath("$._embedded.searchfilters._embedded.searchfilters", containsInAnyOrder(
+                           SearchFilterMatcher.createSearchFilterMatchers(config.getSearchFilters())
+                   )))
+                   .andExpect(jsonPath("$._embedded.sortoptions._embedded.sortoptions", containsInAnyOrder(
+                           SortOptionMatcher.createSortOptionMatchers(config.getSearchSortConfiguration()
+                                                                            .getSortFields()))))
+                   .andExpect(jsonPath("$._embedded.defaultsortoption", nullValue()));
     }
 }

@@ -25,7 +25,6 @@ public class SortOptionConverter implements DSpaceConverter<DiscoverySortFieldCo
         sortOptionRest.setName(sortOption.getMetadataField());
         sortOptionRest.setSortOrder(sortOption.getDefaultSortOrder().name());
         sortOptionRest.setProjection(projection);
-        sortOption.setType(sortOptionRest.getType());
 
         return sortOptionRest;
     }

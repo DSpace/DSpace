@@ -25,7 +25,6 @@ public class SearchFilterRest extends RestAddressableModel {
     private boolean isOpenByDefault = false;
     private int pageSize;
     private List<SearchFilterRest.Operator> operators = new LinkedList<>();
-    private String type;
 
     public static final String OPERATOR_EQUALS = "equals";
     public static final String OPERATOR_NOTEQUALS = "notequals";
@@ -100,11 +99,7 @@ public class SearchFilterRest extends RestAddressableModel {
 
     @Override
     public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+        return NAME;
     }
 
     @Override

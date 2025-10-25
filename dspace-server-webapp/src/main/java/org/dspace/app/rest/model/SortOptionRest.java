@@ -22,7 +22,6 @@ public class SortOptionRest extends RestAddressableModel {
     private String actualName;
     private String name;
     private String sortOrder;
-    private String type;
 
     public void setActualName(String name) {
         this.actualName = name;
@@ -48,13 +47,9 @@ public class SortOptionRest extends RestAddressableModel {
         this.sortOrder = sortOrder;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
     @Override
     public String getType() {
-        return this.type;
+        return NAME;
     }
 
     @Override
