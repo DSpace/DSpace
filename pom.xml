@@ -44,7 +44,7 @@
         <rome.version>1.19.0</rome.version>
         <!-- SLF4J is not used, but specified for dependency convergence issues between many dependencies -->
         <slf4j.version>2.0.17</slf4j.version>
-        <tika.version>3.2.2</tika.version>
+        <tika.version>3.2.3</tika.version>
         <!-- Sync BouncyCastle & ASM with whatever version Tika uses -->
         <bouncycastle.version>1.82</bouncycastle.version>
         <asm.version>9.9</asm.version>
