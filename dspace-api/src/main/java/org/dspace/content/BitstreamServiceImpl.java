@@ -21,6 +21,8 @@ import jakarta.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.requestitem.RequestItem;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.BitstreamDAO;
@@ -66,6 +68,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     protected BundleService bundleService;
     @Autowired(required = true)
     protected BitstreamStorageService bitstreamStorageService;
+    @Autowired(required = true)
+    protected RequestItemService requestItemService;
 
     protected BitstreamServiceImpl() {
         super();
@@ -292,6 +296,15 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         //Remove all bundles from the bitstream object, clearing the connection in 2 ways
         bundles.clear();
+
+        // Remove any RequestItem entities associated with this bitstream ensuring there are no requests referencing
+        // a deleted bitstream
+        List<RequestItem> requestItems = requestItemService.findAll(context);
+        for (RequestItem requestItem : requestItems) {
+            if (requestItem.getBitstream().equals(bitstream)) {
+                requestItemService.delete(context, requestItem);
+            }
+        }
 
         // Remove policies only after the bitstream has been updated (otherwise the current user has not WRITE rights)
         authorizeService.removeAllPolicies(context, bitstream);
