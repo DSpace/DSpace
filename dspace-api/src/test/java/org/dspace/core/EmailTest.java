@@ -19,6 +19,7 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -70,8 +71,9 @@ public class EmailTest
     }
 
     @Test
-    public void testCatchAllRecipientWithDisabledServer()
+    public void testCatchAllRecipient()
             throws MessagingException, IOException {
+        config.setProperty("mail.server.disabled", "false");
         config.setProperty("mail.server.catchAll.enabled", "true");
         config.setProperty("mail.server.catchAll.recipient", "fixed@example.com");
 
@@ -84,7 +86,7 @@ public class EmailTest
         MimeMessage message = email.message;
         InternetAddress[] recipients = (InternetAddress[]) message.getRecipients(MimeMessage.RecipientType.TO);
 
-        assertThat("Email should be sent to catchAll recipient", recipients.length, is(1));
+        assertThat("Exactly one 'To:' recipient expected.", recipients.length, is(1));
         assertThat("CatchAll recipient should receive the email", recipients[0].getAddress(), is("fixed@example.com"));
 
         // Check that original recipient is included in the body
@@ -96,9 +98,10 @@ public class EmailTest
     }
 
     @Test
-    public void testMultipleCatchAllRecipients()
+    public void testMultipleCatchAllRecipientsWhenMailServerDisabled()
             throws MessagingException, IOException {
         config.setProperty("mail.server.disabled", "true");
+        config.setProperty("mail.server.catchAll.enabled", "true");
         config.setProperty("mail.server.catchAll.recipient", "fixed1@example.com,fixed2@example.com");
 
         Email email = new Email();
@@ -120,7 +123,8 @@ public class EmailTest
     @Test
     public void testDisabledServerWithoutCatchAllRecipient()
             throws MessagingException, IOException {
-        config.setProperty("mail.server.disabled", "true");
+        config.setProperty("mail.server.disabled", "false");
+        config.setProperty("mail.server.catchAll.enabled", "true");
         config.setProperty("mail.server.catchAll.recipient", "");
 
         Email email = new Email();
@@ -147,6 +151,7 @@ public class EmailTest
     @Test
     public void testNormalEmailSendingWithCatchAllRecipientConfigured()
             throws MessagingException, IOException {
+        config.setProperty("mail.server.disabled", "false");
         config.setProperty("mail.server.catchAll.enabled", "false");
         config.setProperty("mail.server.catchAll.recipient", "fixed@example.com");
 
@@ -159,8 +164,7 @@ public class EmailTest
         MimeMessage message = email.message;
         InternetAddress[] recipients = (InternetAddress[]) message.getRecipients(MimeMessage.RecipientType.TO);
 
-        assertThat("Email should be sent to original recipient when server is enabled",
-                   recipients.length, is(1));
+        assertThat("Message should have exactly one recipient.", recipients.length, is(1));
         assertThat("Original recipient should receive the email",
                    recipients[0].getAddress(), is("original@example.com"));
 
@@ -173,6 +177,7 @@ public class EmailTest
     @Test
     public void testCatchAllRecipientWithCCRecipients()
             throws MessagingException, IOException {
+        config.setProperty("mail.server.disabled", "false");
         config.setProperty("mail.server.catchAll.enabled", "true");
         config.setProperty("mail.server.catchAll.recipient", "fixed@example.com");
 
@@ -188,7 +193,7 @@ public class EmailTest
         InternetAddress[] recipients = (InternetAddress[]) message.getRecipients(MimeMessage.RecipientType.TO);
         InternetAddress[] ccRecipients = (InternetAddress[]) message.getRecipients(MimeMessage.RecipientType.CC);
 
-        assertThat("Email should be sent to catchAll recipient", recipients.length, is(1));
+        assertThat("Message should have exactly one recipient.", recipients.length, is(1));
         assertThat("CatchAll recipient should receive the email", recipients[0].getAddress(), is("fixed@example.com"));
         assertThat("CC field should be null for catchAll recipient", ccRecipients, is((InternetAddress[]) null));
 
@@ -197,6 +202,34 @@ public class EmailTest
         String messageBody = message.getContent().toString();
         assertThat("Original recipient should be included in email body",
                 messageBody, containsString("original@example.com"));
+    }
+
+    @Test
+    public void testCatchAllRecipientWithEmptyRecipient()
+        throws MessagingException, IOException {
+        config.setProperty("mail.server.disabled", "false");
+        config.setProperty("mail.server.catchAll.enabled", "true");
+        config.setProperty("mail.server.catchAll.recipient", "");
+
+        Email email = new Email();
+        email.setContent("Empty recipient test","This is a test email with empty recipient.");
+        email.addRecipient("original@example.com");
+
+        email.build();
+
+        MimeMessage message = email.message;
+        InternetAddress[] recipients = (InternetAddress[]) message.getRecipients(MimeMessage.RecipientType.TO);
+        InternetAddress[] ccRecipients = (InternetAddress[]) message.getRecipients(MimeMessage.RecipientType.CC);
+
+        assertThat("Message should have exactly one recipient.", recipients.length, is(1));
+        assertThat("Original recipient should receive the email", recipients[0].getAddress(), is("original@example.com"));
+        assertThat("CC field should be null for catchAll recipient", ccRecipients, Matchers.nullValue());
+
+        assertThat(
+            "Original recipient should NOT be included in email body for normal disabled behavior",
+            message.getContent().toString(),
+            not(containsString("===REAL RECIPIENT==="))
+        );
     }
 
     @Test
