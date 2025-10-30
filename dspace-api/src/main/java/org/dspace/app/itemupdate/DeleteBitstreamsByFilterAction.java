@@ -19,6 +19,8 @@ import org.dspace.content.Bundle;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Action to delete bitstreams using a specified filter implementing BitstreamFilter
@@ -32,6 +34,8 @@ import org.dspace.core.Context;
 public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
 
     protected BitstreamFilter filter;
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
+                                                                                .getConfigurationService();
 
     /**
      * Set filter
@@ -96,7 +100,8 @@ public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
             }
         }
 
-        if (alterProvenance && !deleted.isEmpty()) {
+        if (alterProvenance && !deleted.isEmpty()
+            && configurationService.getBooleanProperty("bitstream.provenance.enabled", true)) {
             StringBuilder sb = new StringBuilder("  Bitstreams deleted on ");
             sb.append(DCDate.getCurrent()).append(": ");
 
