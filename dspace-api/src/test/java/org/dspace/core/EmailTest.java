@@ -89,7 +89,7 @@ public class EmailTest
         assertThat("Exactly one 'To:' recipient expected.", recipients.length, is(1));
         assertThat("CatchAll recipient should receive the email", recipients[0].getAddress(), is("fixed@example.com"));
 
-        // Check that original recipient is included in the body
+        // Check that original recipient marker is included in the body
         String messageBody = message.getContent().toString();
         assertThat("Original recipient should be included in email body",
                 messageBody, containsString("original@example.com"));
@@ -121,7 +121,7 @@ public class EmailTest
     }
 
     @Test
-    public void testDisabledServerWithoutCatchAllRecipient()
+    public void testEmailWithoutCatchAllRecipient()
             throws MessagingException, IOException {
         config.setProperty("mail.server.disabled", "false");
         config.setProperty("mail.server.catchAll.enabled", "true");
@@ -142,9 +142,9 @@ public class EmailTest
         assertThat("Original recipient should receive the email", recipients[0].getAddress(),
                    is("original@example.com"));
 
-        // Check that original recipient is NOT included in the body (normal behavior)
+        // Check that real recipient marker is NOT included in the body (normal behavior)
         String messageBody = message.getContent().toString();
-        assertThat("Original recipient should NOT be included in email body for normal disabled behavior",
+        assertThat("Real recipient marker should NOT be included in email body for normal disabled behavior",
                 messageBody, not(containsString("===REAL RECIPIENT===")));
     }
 
@@ -168,9 +168,9 @@ public class EmailTest
         assertThat("Original recipient should receive the email",
                    recipients[0].getAddress(), is("original@example.com"));
 
-        // Check that original recipient is NOT included in the body (normal behavior)
+        // Check that real recipient marker is NOT included in the body (normal behavior)
         String messageBody = message.getContent().toString();
-        assertThat("Original recipient should NOT be included in email body for normal sending",
+        assertThat("Real recipient marker should NOT be included in email body for normal sending",
                 messageBody, not(containsString("===REAL RECIPIENT===")));
     }
 
@@ -226,7 +226,7 @@ public class EmailTest
         assertThat("CC field should be null for catchAll recipient", ccRecipients, Matchers.nullValue());
 
         assertThat(
-            "Original recipient should NOT be included in email body for normal disabled behavior",
+            "Real recipient marker should NOT be included in email body",
             message.getContent().toString(),
             not(containsString("===REAL RECIPIENT==="))
         );
