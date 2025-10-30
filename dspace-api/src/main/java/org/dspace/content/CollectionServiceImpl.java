@@ -1165,13 +1165,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 String roleId = collectionRole.getRoleId();
                 int stepId = -1;
                 switch (roleId) {
-                    case "reviewer":
+                    case CollectionRoleService.LEGACY_WORKFLOW_STEP1_NAME:
                         stepId = 1;
                         break;
-                    case "editor":
+                    case CollectionRoleService.LEGACY_WORKFLOW_STEP2_NAME:
                         stepId = 2;
                         break;
-                    case "finaleditor":
+                    case CollectionRoleService.LEGACY_WORKFLOW_STEP3_NAME:
                         stepId = 3;
                         break;
                     default:
