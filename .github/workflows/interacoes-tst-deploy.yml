@@ -1,4 +1,4 @@
-name: Deploy Backend (DSpace) - Branch tst
+name: Deploy Backend (DSpace) - Branch tst.
 
 on:
   workflow_dispatch:
