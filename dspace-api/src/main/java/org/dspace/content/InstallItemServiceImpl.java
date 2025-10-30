@@ -178,8 +178,12 @@ public class InstallItemServiceImpl implements InstallItemService {
             }
         }
 
-        String provDescription = "Made available in DSpace on " + now
-            + " (GMT). " + getBitstreamProvenanceMessage(c, item);
+        String provDescription = "Made available in DSpace on " + now + " (GMT). ";
+        
+        // Add bitstream provenance if enabled
+        if (configurationService.getBooleanProperty("bitstream.provenance.enabled", true)) {
+            provDescription = provDescription + getBitstreamProvenanceMessage(c, item);
+        }
 
         // If an issue date was passed in and it wasn't set to "today" (literal string)
         // then note this previous issue date in provenance message

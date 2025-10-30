@@ -35,9 +35,11 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -65,6 +67,8 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     protected AuthorizeService authorizeService;
     @Autowired(required = true)
     protected ResourcePolicyService resourcePolicyService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     protected BundleServiceImpl() {
         super();
@@ -232,6 +236,11 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         if (owningItem != null) {
             itemService.updateLastModified(context, owningItem);
             itemService.update(context, owningItem);
+        }
+
+        // Add provenance for bitstream deletion (only if it's going to be deleted, not just unlinked)
+        if (bitstream.getBundles().size() <= 1) {
+            addBitstreamDeletionProvenance(context, bitstream, bundle, owningItem);
         }
 
         // In the event that the bitstream to remove is actually
@@ -586,5 +595,87 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     @Override
     public int countTotal(Context context) throws SQLException {
         return bundleDAO.countRows(context);
+    }
+
+    /**
+     * Check if provenance tracking should be enabled for the given bundle.
+     * Checks both the global enable flag and the bundle blacklist.
+     *
+     * @param bundle the bundle to check
+     * @return true if provenance should be tracked, false otherwise
+     */
+    private boolean shouldTrackProvenance(Bundle bundle) {
+        if (!configurationService.getBooleanProperty("bitstream.provenance.enabled", true)) {
+            return false;
+        }
+        
+        if (bundle == null) {
+            return false;
+        }
+        
+        String[] excludedBundles = configurationService.getArrayProperty("bitstream.provenance.bundles.exclude");
+        if (excludedBundles != null) {
+            String bundleName = bundle.getName();
+            for (String excluded : excludedBundles) {
+                if (excluded.trim().equals(bundleName)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+
+    /**
+     * Add provenance metadata to the item for bitstream deletion.
+     *
+     * @param context   the DSpace context
+     * @param bitstream the bitstream that was deleted
+     * @param bundle    the bundle that contained the bitstream
+     * @param item      the item that contains the bundle
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     */
+    private void addBitstreamDeletionProvenance(Context context, Bitstream bitstream, Bundle bundle, Item item)
+        throws SQLException, AuthorizeException {
+        
+        if (!shouldTrackProvenance(bundle) || item == null) {
+            return;
+        }
+
+        // Build provenance message
+        StringBuilder provMessage = new StringBuilder();
+        provMessage.append("Bitstream ");
+        provMessage.append(bitstream.getName() != null ? bitstream.getName() : "unnamed");
+        provMessage.append(" deleted from bundle ");
+        provMessage.append(bundle.getName());
+        provMessage.append(" on ");
+        provMessage.append(DCDate.getCurrent().toString());
+        provMessage.append(" by ");
+
+        // Check privacy setting
+        boolean isProvenancePrivacyActive = configurationService.getBooleanProperty(
+            "metadata.privacy.dc.description.provenance", false);
+
+        EPerson currentUser = context.getCurrentUser();
+        if (currentUser != null && !isProvenancePrivacyActive) {
+            provMessage.append(currentUser.getFullName());
+            provMessage.append(" (");
+            provMessage.append(currentUser.getEmail());
+            provMessage.append(")");
+        } else if (currentUser != null) {
+            provMessage.append("automated process or privacy hidden");
+        } else {
+            provMessage.append("System");
+        }
+
+        provMessage.append(". Size: ");
+        provMessage.append(bitstream.getSizeBytes());
+        provMessage.append(" bytes.");
+
+        // Add provenance metadata to item
+        itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                               "description", "provenance", "en", provMessage.toString());
+        itemService.update(context, item);
     }
 }
