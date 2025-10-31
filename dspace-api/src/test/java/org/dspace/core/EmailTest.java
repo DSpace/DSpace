@@ -222,7 +222,8 @@ public class EmailTest
         InternetAddress[] ccRecipients = (InternetAddress[]) message.getRecipients(MimeMessage.RecipientType.CC);
 
         assertThat("Message should have exactly one recipient.", recipients.length, is(1));
-        assertThat("Original recipient should receive the email", recipients[0].getAddress(), is("original@example.com"));
+        assertThat("Original recipient should receive the email", recipients[0].getAddress(),
+                   is("original@example.com"));
         assertThat("CC field should be null for catchAll recipient", ccRecipients, Matchers.nullValue());
 
         assertThat(
