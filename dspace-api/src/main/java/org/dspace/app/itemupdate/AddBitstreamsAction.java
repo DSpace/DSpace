@@ -107,7 +107,7 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
         }
 
         if (alterProvenance && bitstream_bundles_updated > 0
-            && configurationService.getBooleanProperty("bitstream.provenance.enabled", true)) {
+            && configurationService.getBooleanProperty("provenance.bitstream.enabled", true)) {
             DtoMetadata dtom = DtoMetadata.create("dc.description.provenance", "en", "");
 
             String append = ". Added " + Integer.toString(bitstream_bundles_updated)

@@ -17,7 +17,6 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -37,6 +36,8 @@ import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import jakarta.annotation.Nullable;
 
 /**
  * Service implementation for the Bitstream object.
@@ -533,7 +534,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
      * @return true if provenance should be tracked, false otherwise
      */
     private boolean shouldTrackProvenance(Bundle bundle) {
-        if (!configurationService.getBooleanProperty("bitstream.provenance.enabled", true)) {
+        if (!configurationService.getBooleanProperty("provenance.bitstream.enabled", true)) {
             return false;
         }
         
@@ -541,7 +542,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             return false;
         }
         
-        String[] excludedBundles = configurationService.getArrayProperty("bitstream.provenance.bundles.exclude");
+        String[] excludedBundles = configurationService.getArrayProperty("provenance.bitstream.bundles.exclude");
         if (excludedBundles != null) {
             String bundleName = bundle.getName();
             for (String excluded : excludedBundles) {

@@ -181,7 +181,7 @@ public class InstallItemServiceImpl implements InstallItemService {
         String provDescription = "Made available in DSpace on " + now + " (GMT). ";
         
         // Add bitstream provenance if enabled
-        if (configurationService.getBooleanProperty("bitstream.provenance.enabled", true)) {
+        if (configurationService.getBooleanProperty("provenance.bitstream.enabled", true)) {
             provDescription = provDescription + getBitstreamProvenanceMessage(c, item);
         }
 
