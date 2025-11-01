@@ -101,7 +101,7 @@ public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
         }
 
         if (alterProvenance && !deleted.isEmpty()
-            && configurationService.getBooleanProperty("bitstream.provenance.enabled", true)) {
+            && configurationService.getBooleanProperty("provenance.bitstream.enabled", true)) {
             StringBuilder sb = new StringBuilder("  Bitstreams deleted on ");
             sb.append(DCDate.getCurrent()).append(": ");
 

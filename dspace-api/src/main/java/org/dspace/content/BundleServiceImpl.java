@@ -643,7 +643,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
      * @return true if provenance should be tracked, false otherwise
      */
     private boolean shouldTrackProvenance(Bundle bundle) {
-        if (!configurationService.getBooleanProperty("bitstream.provenance.enabled", true)) {
+        if (!configurationService.getBooleanProperty("provenance.bitstream.enabled", true)) {
             return false;
         }
         
@@ -651,7 +651,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             return false;
         }
         
-        String[] excludedBundles = configurationService.getArrayProperty("bitstream.provenance.bundles.exclude");
+        String[] excludedBundles = configurationService.getArrayProperty("provenance.bitstream.bundles.exclude");
         if (excludedBundles != null) {
             String bundleName = bundle.getName();
             for (String excluded : excludedBundles) {
