@@ -9,6 +9,7 @@ package org.dspace.sword2;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -618,31 +619,33 @@ public class SwordAuthenticator {
 
             // short cut by obtaining the collections to which the authenticated user can submit
             List<Collection> cols = collectionService.findAuthorized(
-                authContext, community, Constants.ADD);
+                authContext, community, Arrays.asList(Constants.ADD, Constants.ADMIN));
+
             List<org.dspace.content.Collection> allowed = new ArrayList<>();
 
             // now find out if the obo user is allowed to submit to any of these collections
-            for (Collection col : cols) {
-                boolean oboAllowed = false;
+            if (swordContext.getOnBehalfOf() != null) {
+                for (Collection col : cols) {
+                    boolean oboAllowed = false;
 
-                // check for obo null
-                if (swordContext.getOnBehalfOf() == null) {
-                    oboAllowed = true;
-                }
+                    //if we have not already determined that the obo user is ok to submit,
+                    //look up the READ policy on the
+                    // community.  THis will include determining if the user is an administrator.
+                    if (!oboAllowed) {
+                        oboAllowed = authorizeService.authorizeActionBoolean(
+                            swordContext.getOnBehalfOfContext(), col,
+                            Constants.ADD);
+                    }
 
-                // if we have not already determined that the obo user is ok to submit, look up the READ policy on the
-                // community.  THis will include determining if the user is an administrator.
-                if (!oboAllowed) {
-                    oboAllowed = authorizeService.authorizeActionBoolean(
-                        swordContext.getOnBehalfOfContext(), col,
-                        Constants.ADD);
+                    // final check to see if we are allowed to READ
+                    if (oboAllowed) {
+                        allowed.add(col);
+                    }
                 }
-
-                // final check to see if we are allowed to READ
-                if (oboAllowed) {
-                    allowed.add(col);
-                }
+            } else {
+                return cols;
             }
+
             return allowed;
 
         } catch (SQLException e) {
