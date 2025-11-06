@@ -17,8 +17,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -53,8 +51,7 @@ public class DuplicateDetectionIT extends AbstractIntegrationTestWithDatabase {
     private final String item1Title = "Public item I";
     private final String item1Author = "Smith, Donald";
 
-    private static final Logger log = LogManager.getLogger();
-
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         // Temporarily enable duplicate detection and set comparison distance to 1
