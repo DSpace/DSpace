@@ -1335,14 +1335,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public Iterator<Item> findArchivedByMetadataField(Context context,
                                                       String schema, String element, String qualifier, String value)
         throws SQLException, AuthorizeException, IOException {
-        MetadataSchema mds = metadataSchemaService.find(context, schema);
-        if (mds == null) {
-            throw new IllegalArgumentException("No such metadata schema: " + schema);
-        }
-        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        MetadataField mdf = metadataFieldService.findByElement(context, schema, element, qualifier);
         if (mdf == null) {
             throw new IllegalArgumentException(
-                    "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+                "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
 
         if (Item.ANY.equals(value)) {
