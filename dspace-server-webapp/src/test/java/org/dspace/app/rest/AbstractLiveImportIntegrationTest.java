@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -49,10 +49,10 @@ public class AbstractLiveImportIntegrationTest extends AbstractControllerIntegra
     }
 
     private boolean sameMetadatum(MetadatumDTO metadatum, MetadatumDTO metadatum2) {
-        if (StringUtils.equals(metadatum.getSchema(), metadatum2.getSchema()) &&
-            StringUtils.equals(metadatum.getElement(), metadatum2.getElement()) &&
-            StringUtils.equals(metadatum.getQualifier(), metadatum2.getQualifier()) &&
-            StringUtils.equals(metadatum.getValue(), metadatum2.getValue())) {
+        if (Strings.CS.equals(metadatum.getSchema(), metadatum2.getSchema()) &&
+            Strings.CS.equals(metadatum.getElement(), metadatum2.getElement()) &&
+            Strings.CS.equals(metadatum.getQualifier(), metadatum2.getQualifier()) &&
+            Strings.CS.equals(metadatum.getValue(), metadatum2.getValue())) {
             return true;
         }
         return false;

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
@@ -57,7 +58,7 @@ public class WosIdentifierRidContributor extends SimpleXpathMetadatumContributor
     }
 
     private void setIdentyfier(String type, Element el, List<MetadatumDTO> values) {
-        if (StringUtils.equals("researcher_id", type)) {
+        if (Strings.CS.equals("researcher_id", type)) {
             String value = el.getAttributeValue("r_id");
             if (StringUtils.isNotBlank(value)) {
                 values.add(metadataFieldMapping.toDCValue(this.field, value));
