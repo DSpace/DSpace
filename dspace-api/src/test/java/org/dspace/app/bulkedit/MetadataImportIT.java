@@ -264,7 +264,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
     private Item findItemByName(String name) throws Exception {
         List<Item> items =
-            IteratorUtils.toList(itemService.findByMetadataField(context, "dc", "title", null, name));
+            IteratorUtils.toList(itemService.findArchivedByMetadataField(context, "dc", "title", null, name));
 
         if (items != null && !items.isEmpty()) {
             // Just return first matching Item. Tests should ensure name/title is unique.
