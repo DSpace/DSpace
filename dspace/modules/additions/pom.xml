@@ -260,17 +260,17 @@
       </dependency>
       <dependency>
          <groupId>org.apache.lucene</groupId>
-         <artifactId>lucene-analyzers-icu</artifactId>
+         <artifactId>lucene-analysis-icu</artifactId>
          <scope>test</scope>
       </dependency>
       <dependency>
          <groupId>org.apache.lucene</groupId>
-         <artifactId>lucene-analyzers-smartcn</artifactId>
+         <artifactId>lucene-analysis-smartcn</artifactId>
          <scope>test</scope>
       </dependency>
       <dependency>
          <groupId>org.apache.lucene</groupId>
-         <artifactId>lucene-analyzers-stempel</artifactId>
+         <artifactId>lucene-analysis-stempel</artifactId>
          <scope>test</scope>
       </dependency>
       <dependency>

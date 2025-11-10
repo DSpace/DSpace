@@ -74,13 +74,6 @@
 
     <bean class="org.dspace.handle.hdlresolver.HdlResolverServiceImpl"/>
 
-    <bean class='org.dspace.service.impl.HttpConnectionPoolService'
-          id='solrHttpConnectionPoolService'
-          scope='singleton'
-          autowire-candidate='true'>
-        <constructor-arg name='configPrefix' value='solr'/>
-    </bean>
-
     <bean class="org.dspace.contentreport.ContentReportServiceImpl"/>
 
     <!-- Ensure PluginService is initialized properly via init() method -->
