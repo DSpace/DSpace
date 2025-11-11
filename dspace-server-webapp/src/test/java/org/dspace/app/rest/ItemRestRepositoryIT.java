@@ -4758,28 +4758,28 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void findAccessStatusWithEmbargoDateForItemTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
+                                          .withName("Parent Community")
+                                          .build();
         Collection owningCollection = CollectionBuilder.createCollection(context, parentCommunity)
-                .withName("Owning Collection")
-                .build();
+                                                       .withName("Owning Collection")
+                                                       .build();
         Item item = ItemBuilder.createItem(context, owningCollection)
-                .withTitle("Test item")
-                .build();
+                               .withTitle("Test item")
+                               .build();
         Bundle originalBundle = BundleBuilder.createBundle(context, item)
-                .withName(Constants.DEFAULT_BUNDLE_NAME)
-                .build();
+                                             .withName(Constants.DEFAULT_BUNDLE_NAME)
+                                             .build();
         InputStream is = IOUtils.toInputStream("dummy", "utf-8");
         Bitstream bitstream = BitstreamBuilder.createBitstream(context, originalBundle, is)
-                .withName("test.pdf")
-                .withMimeType("application/pdf")
-                .withEmbargoPeriod(Period.ofMonths(6))
-                .build();
+                                              .withName("test.pdf")
+                                              .withMimeType("application/pdf")
+                                              .withEmbargoPeriod(Period.ofMonths(6))
+                                              .build();
         context.restoreAuthSystemState();
         getClient().perform(get("/api/core/items/{uuid}/accessStatus", item.getID()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", notNullValue()))
-                .andExpect(jsonPath("$.embargoDate", notNullValue()));
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.status", notNullValue()))
+                   .andExpect(jsonPath("$.embargoDate", notNullValue()));
     }
 
     @Test

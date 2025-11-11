@@ -98,9 +98,9 @@ public class DSpaceObjectMetadataRemoveOperation<R extends DSpaceObject> extends
             throw new IllegalArgumentException("This index (" + index + ") is not valid number.", e);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new UnprocessableEntityException("There is no metadata of this type at that index");
-        } catch (SQLException ex) {
-            throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataRemoveOperation.remove" +
-                    " trying to remove metadata from dso.", ex);
+        } catch (SQLException e) {
+            throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataRemoveOperation.remove " +
+                    "trying to remove metadata from dso.", e);
         }
     }
 
