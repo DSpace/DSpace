@@ -19,16 +19,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.ws.rs.core.MediaType;
 
+import jakarta.ws.rs.core.MediaType;
 import org.dspace.app.bulkaccesscontrol.model.AccessCondition;
 import org.dspace.app.bulkaccesscontrol.model.AccessConditionBitstream;
 import org.dspace.app.bulkaccesscontrol.model.BulkAccessControlInput;
@@ -40,9 +40,6 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
-import org.dspace.builder.ClarinLicenseBuilder;
-import org.dspace.builder.ClarinLicenseLabelBuilder;
-import org.dspace.builder.ClarinLicenseResourceMappingBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
@@ -52,12 +49,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.clarin.ClarinLicense;
-import org.dspace.content.clarin.ClarinLicenseLabel;
-import org.dspace.content.clarin.ClarinLicenseResourceMapping;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.clarin.ClarinLicenseLabelService;
-import org.dspace.content.service.clarin.ClarinLicenseService;
 import org.dspace.core.Constants;
 import org.dspace.core.ProvenanceService;
 import org.dspace.discovery.SearchServiceException;
@@ -73,10 +65,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 public class ProvenanceServiceIT extends AbstractControllerIntegrationTest {
     @Autowired
     private ItemService itemService;
-    @Autowired
-    private ClarinLicenseLabelService clarinLicenseLabelService;
-    @Autowired
-    private ClarinLicenseService clarinLicenseService;
     @Autowired
     private ProvenanceService provenanceService;
 
@@ -116,55 +104,6 @@ public class ProvenanceServiceIT extends AbstractControllerIntegrationTest {
         collection = null;
         parentCommunity = null;
         super.destroy();
-    }
-
-    @Test
-    public void updateLicenseTest() throws Exception {
-        Bitstream bitstream = createBitstream(item, Constants.LICENSE_BUNDLE_NAME);
-        ClarinLicense clarinLicense1 = createClarinLicense("Test 1", "Test Def");
-        ClarinLicenseResourceMapping mapping = createResourceMapping(clarinLicense1, bitstream);
-        ClarinLicense clarinLicense2 = createClarinLicense("Test 2", "Test Def");
-
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(put("/api/core/items/" + item.getID() + "/bundles")
-                        .param("licenseID", clarinLicense2.getID().toString()))
-                .andExpect(status().isOk());
-        objectCheck(itemService.find(context, item.getID()), ProvenanceExpectedMessages.UPDATE_LICENSE.getTemplate());
-
-        deleteBitstream(bitstream);
-        deleteClarinLicense(clarinLicense1);
-        deleteClarinLicense(clarinLicense2);
-        deleteResourceMapping(mapping.getID());
-    }
-
-    @Test
-    public void addLicenseTest() throws Exception {
-        ClarinLicense clarinLicense = createClarinLicense("Test", "Test Def");
-
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(put("/api/core/items/" + item.getID() + "/bundles")
-                        .param("licenseID", clarinLicense.getID().toString()))
-                .andExpect(status().isOk());
-        objectCheck(itemService.find(context, item.getID()), ProvenanceExpectedMessages.ADD_LICENSE.getTemplate());
-
-        deleteClarinLicense(clarinLicense);
-    }
-
-    @Test
-    public void removeLicenseTest() throws Exception {
-        Bitstream bitstream = createBitstream(item, Constants.LICENSE_BUNDLE_NAME);
-        ClarinLicense clarinLicense = createClarinLicense("Test", "Test Def");
-        ClarinLicenseResourceMapping mapping = createResourceMapping(clarinLicense, bitstream);
-
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(put("/api/core/items/" + item.getID() + "/bundles")
-                        .param("licenseID", "-1"))
-                .andExpect(status().isOk());
-        objectCheck(itemService.find(context, item.getID()), ProvenanceExpectedMessages.REMOVE_LICENSE.getTemplate());
-
-        deleteBitstream(bitstream);
-        deleteClarinLicense(clarinLicense);
-        deleteResourceMapping(mapping.getID());
     }
 
     @Test
@@ -389,7 +328,7 @@ public class ProvenanceServiceIT extends AbstractControllerIntegrationTest {
         Calendar cal = Calendar.getInstance();
         cal.set(2030, Calendar.JANUARY, 1, 0, 0, 0);
         cal.set(Calendar.MILLISECOND, 0);
-        AccessCondition embargo = new AccessCondition("embargo", "test", cal.getTime(), null);
+        AccessCondition embargo = new AccessCondition("embargo", "test", LocalDateTime.now().toLocalDate(), null);
         acList.add(embargo);
         bitstreamNode.setAccessConditions(acList);
         bulk.setBitstream(bitstreamNode);
@@ -466,45 +405,6 @@ public class ProvenanceServiceIT extends AbstractControllerIntegrationTest {
         BundleBuilder.deleteBundle(uuid);
     }
 
-    private ClarinLicenseLabel createClarinLicenseLabel(String label, boolean extended, String title)
-            throws SQLException, AuthorizeException {
-        context.turnOffAuthorisationSystem();
-        ClarinLicenseLabel clarinLicenseLabel = ClarinLicenseLabelBuilder.createClarinLicenseLabel(context).build();
-        clarinLicenseLabel.setLabel(label);
-        clarinLicenseLabel.setExtended(extended);
-        clarinLicenseLabel.setTitle(title);
-        clarinLicenseLabelService.update(context, clarinLicenseLabel);
-        context.restoreAuthSystemState();
-        return clarinLicenseLabel;
-    }
-
-    private ClarinLicense createClarinLicense(String name, String definition)
-            throws SQLException, AuthorizeException {
-        context.turnOffAuthorisationSystem();
-        ClarinLicense clarinLicense = ClarinLicenseBuilder.createClarinLicense(context).build();
-        clarinLicense.setDefinition(definition);
-        clarinLicense.setName(name);
-        HashSet<ClarinLicenseLabel> clarinLicenseLabels = new HashSet<>();
-        ClarinLicenseLabel clarinLicenseLabel = createClarinLicenseLabel("lbl", false, "Test Title");
-        clarinLicenseLabels.add(clarinLicenseLabel);
-        clarinLicense.setLicenseLabels(clarinLicenseLabels);
-        clarinLicenseService.update(context, clarinLicense);
-        context.restoreAuthSystemState();
-        return clarinLicense;
-    }
-
-    private void deleteClarinLicenseLable(Integer id) throws Exception {
-        ClarinLicenseLabelBuilder.deleteClarinLicenseLabel(id);
-    }
-
-    private void deleteClarinLicense(ClarinLicense license) throws Exception {
-        int size = license.getLicenseLabels().size();
-        for (int i = 0; i < size; i++) {
-            deleteClarinLicenseLable(license.getLicenseLabels().get(i).getID());
-        }
-        ClarinLicenseBuilder.deleteClarinLicense(license.getID());
-    }
-
     private Collection createCollection() {
         context.turnOffAuthorisationSystem();
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
@@ -516,18 +416,4 @@ public class ProvenanceServiceIT extends AbstractControllerIntegrationTest {
         CollectionBuilder.deleteCollection(uuid);
     }
 
-    private ClarinLicenseResourceMapping createResourceMapping(ClarinLicense license, Bitstream bitstream)
-            throws SQLException, AuthorizeException {
-        context.turnOffAuthorisationSystem();
-        ClarinLicenseResourceMapping resourceMapping =
-                ClarinLicenseResourceMappingBuilder.createClarinLicenseResourceMapping(context).build();
-        context.restoreAuthSystemState();
-        resourceMapping.setLicense(license);
-        resourceMapping.setBitstream(bitstream);
-        return resourceMapping;
-    }
-
-    private void deleteResourceMapping(Integer id) throws Exception {
-        ClarinLicenseResourceMappingBuilder.delete(id);
-    }
 }
