@@ -24,7 +24,10 @@ public enum ProvenanceMessageTemplates {
     ITEM_METADATA("Item metadata (%s) was %s"),
     BITSTREAM_METADATA("Item metadata (%s) was %s bitstream (%s)"),
     ITEM_REPLACE_SINGLE_METADATA("Item bitstream (%s) metadata (%s) was updated"),
-    DISCOVERABLE("Item was made %sdiscoverable");
+    DISCOVERABLE("Item was made %sdiscoverable"),
+    RESOURCE_POLICY_CREATED("Resource policy created: %s for %s (%s)"),
+    RESOURCE_POLICY_UPDATED("Resource policy updated: %s for %s (%s)"),
+    RESOURCE_POLICY_DELETED("Resource policy deleted: %s for %s (%s)");
 
     private final String template;
 

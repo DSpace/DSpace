@@ -180,6 +180,30 @@ public interface ProvenanceService {
     void uploadBitstream(Context context, Bundle bundle);
 
     /**
+     * Add a provenance message to the item when a resource policy is created
+     *
+     * @param context DSpace context object
+     * @param resourcePolicy the resource policy that was created
+     */
+    void createResourcePolicy(Context context, ResourcePolicy resourcePolicy);
+
+    /**
+     * Add a provenance message to the item when a resource policy is updated
+     *
+     * @param context DSpace context object
+     * @param resourcePolicy the resource policy that was updated
+     */
+    void updateResourcePolicy(Context context, ResourcePolicy resourcePolicy);
+
+    /**
+     * Add a provenance message to the item when a resource policy is deleted
+     *
+     * @param context DSpace context object
+     * @param resourcePolicy the resource policy that was deleted
+     */
+    void deleteResourcePolicy(Context context, ResourcePolicy resourcePolicy);
+
+    /**
      * Fetch an Item object using a service and return the first Item object from the list.
      * Log an error if the list is empty or if there is an SQL error
      *

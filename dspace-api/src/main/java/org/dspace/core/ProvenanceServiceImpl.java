@@ -350,6 +350,101 @@ public class ProvenanceServiceImpl implements ProvenanceService {
         return items.get(0);
     }
 
+    @Override
+    public void createResourcePolicy(Context context, ResourcePolicy resourcePolicy) {
+        if (Objects.isNull(resourcePolicy.getdSpaceObject())) {
+            return;
+        }
+
+        DSpaceObject dso = resourcePolicy.getdSpaceObject();
+        String resourcePolicyStr = messageProvider.getMessage(resourcePolicy);
+        String dsoType = getDSpaceObjectType(dso.getType());
+
+        try {
+            if (dso.getType() != Constants.ITEM) {
+                log.warn("Provenance message for resource policy creation is supported only for items." +
+                        " DSpace object type: " + dsoType);
+                return;
+            }
+            Item item = (Item) dso;
+            String msg = messageProvider.getMessage(context,
+                    ProvenanceMessageTemplates.RESOURCE_POLICY_CREATED.getTemplate(),
+                    resourcePolicyStr, dsoType, item.getID());
+            addProvenanceMetadata(context, item, msg);
+        } catch (SQLException | AuthorizeException e) {
+            log.error("Unable to add new provenance metadata when creating resource policy.", e);
+        }
+    }
+
+    @Override
+    public void updateResourcePolicy(Context context, ResourcePolicy resourcePolicy) {
+        if (Objects.isNull(resourcePolicy.getdSpaceObject())) {
+            return;
+        }
+
+        DSpaceObject dso = resourcePolicy.getdSpaceObject();
+        String resourcePolicyStr = messageProvider.getMessage(resourcePolicy);
+        String dsoType = getDSpaceObjectType(dso.getType());
+
+        try {
+            if (dso.getType() != Constants.ITEM) {
+                log.warn("Provenance message for resource policy update is supported only for items. " +
+                        "Current DSpace object type: " + dsoType);
+                return;
+            }
+            Item item = (Item) dso;
+            String msg = messageProvider.getMessage(context,
+                    ProvenanceMessageTemplates.RESOURCE_POLICY_UPDATED.getTemplate(),
+                    resourcePolicyStr, dsoType, item.getID());
+            addProvenanceMetadata(context, item, msg);
+        } catch (SQLException | AuthorizeException e) {
+            log.error("Unable to add new provenance metadata when updating resource policy.", e);
+        }
+    }
+
+    @Override
+    public void deleteResourcePolicy(Context context, ResourcePolicy resourcePolicy) {
+        if (Objects.isNull(resourcePolicy.getdSpaceObject())) {
+            return;
+        }
+
+        DSpaceObject dso = resourcePolicy.getdSpaceObject();
+        String resourcePolicyStr = messageProvider.getMessage(resourcePolicy);
+        String dsoType = getDSpaceObjectType(dso.getType());
+
+        try {
+            if (dso.getType() != Constants.ITEM) {
+                log.warn("Provenance message for resource policy deletion is supported only for items. " +
+                        "The current DSpace object type is: " + dsoType);
+                return;
+            }
+            Item item = (Item) dso;
+            String msg = messageProvider.getMessage(context,
+                    ProvenanceMessageTemplates.RESOURCE_POLICY_DELETED.getTemplate(),
+                    resourcePolicyStr, dsoType, item.getID());
+            addProvenanceMetadata(context, item, msg);
+        } catch (SQLException | AuthorizeException e) {
+            log.error("Unable to add new provenance metadata when deleting resource policy.", e);
+        }
+    }
+
+    private String getDSpaceObjectType(int type) {
+        switch (type) {
+            case Constants.ITEM:
+                return "item";
+            case Constants.BITSTREAM:
+                return "bitstream";
+            case Constants.COLLECTION:
+                return "collection";
+            case Constants.COMMUNITY:
+                return "community";
+            case Constants.BUNDLE:
+                return "bundle";
+            default:
+                return "object";
+        }
+    }
+
     private String findLicenseInBundles(Item item, String bundleName, String currentLicense, Context context)
             throws SQLException {
         List<Bundle> bundles = item.getBundles(bundleName);
