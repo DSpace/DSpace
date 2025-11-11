@@ -245,7 +245,6 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
 
     /**
      * Delete the Test bitstream referred to by the given uuid.
-     * Implemented for Clarin Dspace.
      * @param uuid UUID of Test Bitstream to delete
      * @throws SQLException
      * @throws IOException
