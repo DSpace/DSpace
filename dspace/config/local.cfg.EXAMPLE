@@ -134,17 +134,6 @@ db.password = dspace
 # Recipient for new user registration emails (defaults to unspecified)
 #registration.notify =
 
-# An option is added to disable the mailserver. By default, this property is set to false
-# By setting mail.server.disabled = true, DSpace will not send out emails.
-# It will instead log the subject of the email which should have been sent
-# This is especially useful for development and test environments where production data is used when testing functionality.
-#mail.server.disabled = false
-# Enables the catchAll system
-#mail.server.catchAll.enabled = true
-# If the mail.server.catchAll.recipient is set and has been enabled with mail.server.catchAll.enabled all the emails will
-# be sent to these recipients ( comma separated list ), instead of original ones.
-#mail.server.catchAll.recipient =
-
 
 ########################
 # HANDLE CONFIGURATION #
