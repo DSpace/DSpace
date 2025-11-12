@@ -481,6 +481,13 @@
         </dependency>
 
         <!-- DSpace dependencies -->
+
+        <!-- Moved here from optional modules list to ensure that iiif-apis mime.types resource is first in classpath -->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-iiif</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
@@ -500,10 +507,6 @@
 
         <!-- DSpace modules to deploy (these modules are all optional, but add features/endpoints to webapp) -->
         <!-- You may choose to comment out any of these modules if you do not want/need its features -->
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-iiif</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
@@ -556,7 +559,7 @@
         <dependency>
             <groupId>net.minidev</groupId>
             <artifactId>json-smart</artifactId>
-            <version>2.5.2</version>
+            <version>2.6.0</version>
         </dependency>
 
         <dependency>
@@ -594,7 +597,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.5</version>
+            <version>5.5.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>

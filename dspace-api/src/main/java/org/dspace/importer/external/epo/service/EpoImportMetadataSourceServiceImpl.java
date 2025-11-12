@@ -27,11 +27,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.HttpException;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.jena.ext.xerces.impl.dv.util.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.xerces.impl.dv.util.Base64;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
@@ -317,7 +318,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                         .filter(r -> r.getValue(dateFiled.getSchema(), dateFiled.getElement(),
                                     dateFiled.getQualifier())
                                 .stream()
-                                .anyMatch(m -> StringUtils.equals(m.getValue(),
+                                .anyMatch(m -> Strings.CS.equals(m.getValue(),
                                         id.split(APP_NO_DATE_SEPARATOR_REGEX)[1])
                         ))
                         .limit(1).collect(Collectors.toList());

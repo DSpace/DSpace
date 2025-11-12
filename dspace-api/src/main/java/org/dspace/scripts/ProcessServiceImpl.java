@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -227,7 +228,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public Bitstream getBitstreamByName(Context context, Process process, String bitstreamName) {
         for (Bitstream bitstream : getBitstreams(context, process)) {
-            if (StringUtils.equals(bitstream.getName(), bitstreamName)) {
+            if (Strings.CS.equals(bitstream.getName(), bitstreamName)) {
                 return bitstream;
             }
         }
@@ -244,7 +245,7 @@ public class ProcessServiceImpl implements ProcessService {
         } else {
             if (allBitstreams != null) {
                 for (Bitstream bitstream : allBitstreams) {
-                    if (StringUtils.equals(bitstreamService.getMetadata(bitstream,
+                    if (Strings.CS.equals(bitstreamService.getMetadata(bitstream,
                                                                         Process.BITSTREAM_TYPE_METADATAFIELD), type)) {
                         return bitstream;
                     }

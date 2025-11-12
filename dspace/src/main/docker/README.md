@@ -75,47 +75,30 @@ Admins to our DockerHub repo can publish with the following command.
 docker push dspace/dspace-cli:latest
 ```
 
-## ./dspace-postgres-pgcrypto/Dockerfile
+## ./dspace-postgres-loadsql/Dockerfile
 
-This is a PostgreSQL Docker image containing the `pgcrypto` extension required by DSpace 6+.
+This is a PostgreSQL Docker image (based off the Official Postgres image) which also contains `curl`.
+The image is pre-configured to load a Postgres database dump on initialization. Therefore, its primarily usage is for
+database restoration from a SQL file dump / backup. It is not necessary to use this image for a DSpace Docker
+installation.
+
 This image is built *automatically* after each commit is made to the `main` branch.
 
 How to build manually:
 ```
-cd dspace/src/main/docker/dspace-postgres-pgcrypto
-docker build -t dspace/dspace-postgres-pgcrypto:latest .
+cd dspace/src/main/docker/dspace-postgres-loadsql
+docker build -t dspace/dspace-postgres-loadsql:latest .
 ```
 
 It is also possible to change the version of PostgreSQL or the PostgreSQL user's password during the build:
 ```
-cd dspace/src/main/docker/dspace-postgres-pgcrypto
-docker build -t dspace/dspace-postgres-pgcrypto:latest --build-arg POSTGRES_VERSION=11 --build-arg POSTGRES_PASSWORD=mypass .
+cd dspace/src/main/docker/dspace-postgres-loadsql
+docker build -t dspace/dspace-postgres-loadsql:latest --build-arg POSTGRES_VERSION=17 --build-arg POSTGRES_PASSWORD=mypass .
 ```
 
 Admins to our DockerHub repo can (manually) publish with the following command.
 ```
-docker push dspace/dspace-postgres-pgcrypto:latest
-```
-
-## ./dspace-postgres-pgcrypto-curl/Dockerfile
-
-This is a PostgreSQL Docker image containing the `pgcrypto` extension required by DSpace 6+.
-This image also contains `curl`.  The image is pre-configured to load a Postgres database dump on initialization.
-
-This image is built *automatically* after each commit is made to the `main` branch.
-
-How to build manually:
-```
-cd dspace/src/main/docker/dspace-postgres-pgcrypto-curl
-docker build -t dspace/dspace-postgres-pgcrypto:latest-loadsql .
-```
-
-Similar to `dspace-postgres-pgcrypto` above, you can also modify the version of PostgreSQL or the PostgreSQL user's password.
-See examples above.
-
-Admins to our DockerHub repo can (manually) publish with the following command.
-```
-docker push dspace/dspace-postgres-pgcrypto:latest-loadsql
+docker push dspace/dspace-postgres-loadsql:latest
 ```
 
 ## ./dspace-shibboleth/Dockerfile

@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.commons.configuration2.MapConfiguration;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,7 +45,7 @@ public class DSpaceEnvironmentConfiguration extends MapConfiguration {
         for (String key : System.getenv().keySet()) {
             // ignore all properties that do not contain __ as those will be loaded
             // by apache commons config environment lookup.
-            if (!StringUtils.contains(key, "__")) {
+            if (!Strings.CS.contains(key, "__")) {
                 continue;
             }
 

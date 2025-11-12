@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -70,7 +70,7 @@ public class METSRightsCrosswalk
     private String schemaLocation =
         METSRights_NS.getURI() + " http://cosimo.stanford.edu/sdr/metsrights.xsd";
 
-    private static final Namespace namespaces[] = {METSRights_NS};
+    private static final Namespace[] namespaces = {METSRights_NS};
 
     private static final Map<Integer, String> otherTypesMapping = new HashMap<Integer, String>();
 
@@ -203,10 +203,10 @@ public class METSRightsCrosswalk
                 //Default all DSpace groups to have "MANAGED GRP" as the type
                 String contextClass = GROUP_CONTEXTCLASS;
 
-                if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
+                if (Strings.CS.equals(group.getName(), Group.ANONYMOUS)) {
                     //DSpace Anonymous Group = 'GENERAL PUBLIC' type
                     contextClass = ANONYMOUS_CONTEXTCLASS;
-                } else if (StringUtils.equals(group.getName(), Group.ADMIN)) {
+                } else if (Strings.CS.equals(group.getName(), Group.ADMIN)) {
                     //DSpace Administrator Group = 'REPOSITORY MGR' type
                     contextClass = ADMIN_CONTEXTCLASS;
                 }
