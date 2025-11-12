@@ -130,7 +130,7 @@ public class DOIOrganiser {
 
         Option filterDoi = Option.builder().optionalArg(true).longOpt("filter").hasArg().argName("filterName")
                 .desc("Use the specified filter name instead of the provider's filter. Defaults to a special " +
-                "'always true' filter to force operations").build();
+                "'always true' filter to force operations").get();
         options.addOption(filterDoi);
 
         Option registerDoi = Option.builder()
@@ -140,7 +140,7 @@ public class DOIOrganiser {
                 .desc("Register a specified identifier. "
                         + "You can specify the identifier by ItemID, Handle or"
                         + " DOI.")
-                .build();
+                .get();
 
         options.addOption(registerDoi);
 
@@ -151,7 +151,7 @@ public class DOIOrganiser {
                 .desc("Reserve a specified identifier online. "
                         + "You can specify the identifier by ItemID, Handle or "
                         + "DOI.")
-                .build();
+                .get();
 
         options.addOption(reserveDoi);
 
@@ -162,7 +162,7 @@ public class DOIOrganiser {
                 .desc("Update online an object for a given DOI identifier"
                         + " or ItemID or Handle. A DOI identifier or an ItemID or a"
                         + " Handle is needed.")
-                .build();
+                .get();
 
         options.addOption(update);
 
@@ -171,7 +171,7 @@ public class DOIOrganiser {
                 .longOpt("delete-doi")
                 .hasArg()
                 .desc("Delete a specified identifier.")
-                .build();
+                .get();
 
         options.addOption(delete);
 
