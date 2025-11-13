@@ -99,7 +99,7 @@ public class EZIDIdentifierProvider
     // XXX move these to MetadataSchema or some such
     public static final String MD_SCHEMA = "dc";
     public static final String DOI_ELEMENT = "identifier";
-    public static final String DOI_QUALIFIER = null;
+    public static final String DOI_QUALIFIER = "doi";
 
     private static final String DOI_SCHEME = "doi:";
 
