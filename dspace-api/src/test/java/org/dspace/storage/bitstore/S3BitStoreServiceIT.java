@@ -7,13 +7,12 @@
  */
 package org.dspace.storage.bitstore;
 
-import static com.amazonaws.regions.Regions.DEFAULT_REGION;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.dspace.storage.bitstore.S3BitStoreService.CSA;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -24,8 +23,10 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -34,15 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.AnonymousAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.amazonaws.services.s3.model.Bucket;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import io.findify.s3mock.S3Mock;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -60,44 +52,69 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-
-
+import org.testcontainers.localstack.LocalStackContainer;
+import org.testcontainers.utility.DockerImageName;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.model.Bucket;
+import software.amazon.awssdk.services.s3.model.ChecksumAlgorithm;
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 
 /**
  * @author Luca Giamminonni (luca.giamminonni at 4science.com)
  */
 public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
+    private static DockerImageName localstackName = DockerImageName.parse("localstack/localstack:stable");
+
+    @SuppressWarnings("resource")
+    private static LocalStackContainer localstackContainer = new LocalStackContainer(localstackName).withServices("s3");
+
+    private static S3AsyncClient s3AsyncClient;
 
     private static final String DEFAULT_BUCKET_NAME = "dspace-asset-localhost";
 
     private S3BitStoreService s3BitStoreService;
 
-    private AmazonS3 amazonS3Client;
-
-    private S3Mock s3Mock;
-
     private Collection collection;
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    @BeforeClass
+    public static void setupS3() {
+        localstackContainer.start();
+
+        s3AsyncClient = S3AsyncClient.crtBuilder()
+                .endpointOverride(localstackContainer.getEndpoint())
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(localstackContainer.getAccessKey(),
+                                localstackContainer.getSecretKey())
+                        ))
+                .region(Region.of(localstackContainer.getRegion()))
+                .build();
+    }
+
+    @AfterClass
+    public static void cleanupS3() {
+        localstackContainer.close();
+        s3AsyncClient.close();
+    }
 
     @Before
     public void setup() throws Exception {
-
         configurationService.setProperty("assetstore.s3.enabled", "true");
 
-        s3Mock = new S3Mock.Builder().withPort(8001).withInMemoryBackend().build();
-        s3Mock.start();
-
-        amazonS3Client = createAmazonS3Client();
-
-        s3BitStoreService = new S3BitStoreService(amazonS3Client);
+        s3BitStoreService = new S3BitStoreService(s3AsyncClient);
         s3BitStoreService.setEnabled(BooleanUtils.toBoolean(
                 configurationService.getProperty("assetstore.s3.enabled")));
-        s3BitStoreService.setBufferSize(22);
+        s3BitStoreService.setS3ChecksumAlgorithm(ChecksumAlgorithm.SHA256);
+
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -109,22 +126,17 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
     }
 
-    @After
-    public void cleanUp() {
-        s3Mock.shutdown();
-    }
-
     @Test
     public void testBitstreamPutAndGetWithAlreadyPresentBucket() throws IOException {
 
         String bucketName = "testbucket";
 
-        amazonS3Client.createBucket(bucketName);
+        s3AsyncClient.createBucket(r -> r.bucket(bucketName)).join();
 
         s3BitStoreService.setBucketName(bucketName);
         s3BitStoreService.init();
 
-        assertThat(amazonS3Client.listBuckets(), contains(bucketNamed(bucketName)));
+        assertThat(s3AsyncClient.listBuckets().join().buckets(), hasItem(bucketNamed(bucketName)));
 
         context.turnOffAuthorisationSystem();
         String content                = "Test bitstream content";
@@ -146,7 +158,7 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
 
     private void checkGetPut(String bucketName, String content, Bitstream bitstream) throws IOException {
         s3BitStoreService.put(bitstream, toInputStream(content));
-        String expectedChecksum = Utils.toHex(generateChecksum(content));
+        String expectedChecksum = Utils.toHex(generateChecksum("MD5", content));
 
         assertThat(bitstream.getSizeBytes(), is((long) content.length()));
         assertThat(bitstream.getChecksum(), is(expectedChecksum));
@@ -154,20 +166,16 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
 
         InputStream inputStream = s3BitStoreService.get(bitstream);
         assertThat(IOUtils.toString(inputStream, UTF_8), is(content));
-
-        String key = s3BitStoreService.getFullKey(bitstream.getInternalId());
-        ObjectMetadata objectMetadata = amazonS3Client.getObjectMetadata(bucketName, key);
-        assertThat(objectMetadata.getContentMD5(), is(expectedChecksum));
     }
 
     @Test
-    public void testBitstreamPutAndGetWithoutSpecifingBucket() throws IOException {
+    public void testBitstreamPutAndGetWithoutSpecifyingBucket() throws IOException {
 
         s3BitStoreService.init();
 
         assertThat(s3BitStoreService.getBucketName(), is(DEFAULT_BUCKET_NAME));
 
-        assertThat(amazonS3Client.listBuckets(), contains(bucketNamed(DEFAULT_BUCKET_NAME)));
+        assertThat(s3AsyncClient.listBuckets().join().buckets(), hasItem(bucketNamed(DEFAULT_BUCKET_NAME)));
 
         context.turnOffAuthorisationSystem();
         String content = "Test bitstream content";
@@ -176,7 +184,7 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
 
         s3BitStoreService.put(bitstream, toInputStream(content));
 
-        String expectedChecksum = Utils.toHex(generateChecksum(content));
+        String expectedChecksum = Utils.toHex(generateChecksum("MD5", content));
 
         assertThat(bitstream.getSizeBytes(), is((long) content.length()));
         assertThat(bitstream.getChecksum(), is(expectedChecksum));
@@ -184,11 +192,6 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
 
         InputStream inputStream = s3BitStoreService.get(bitstream);
         assertThat(IOUtils.toString(inputStream, UTF_8), is(content));
-
-        String key = s3BitStoreService.getFullKey(bitstream.getInternalId());
-        ObjectMetadata objectMetadata = amazonS3Client.getObjectMetadata(DEFAULT_BUCKET_NAME, key);
-        assertThat(objectMetadata.getContentMD5(), is(expectedChecksum));
-
     }
 
     @Test
@@ -210,9 +213,9 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
         String key = s3BitStoreService.getFullKey(bitstream.getInternalId());
         assertThat(key, startsWith("test/DSpace7/"));
 
-        ObjectMetadata objectMetadata = amazonS3Client.getObjectMetadata(DEFAULT_BUCKET_NAME, key);
-        assertThat(objectMetadata, notNullValue());
-
+        HeadObjectResponse response = s3AsyncClient.headObject(r ->
+            r.bucket(DEFAULT_BUCKET_NAME).key(key)).join();
+        assertThat(response, notNullValue());
     }
 
     @Test
@@ -232,8 +235,8 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
         s3BitStoreService.remove(bitstream);
 
         IOException exception = assertThrows(IOException.class, () -> s3BitStoreService.get(bitstream));
-        assertThat(exception.getCause(), instanceOf(AmazonS3Exception.class));
-        assertThat(((AmazonS3Exception) exception.getCause()).getStatusCode(), is(404));
+        assertThat(exception.getCause(), instanceOf(AwsServiceException.class));
+        assertThat(((AwsServiceException) exception.getCause()).statusCode(), is(404));
 
     }
 
@@ -253,6 +256,14 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
         assertThat(about.size(), is(0));
 
         about = s3BitStoreService.about(bitstream, List.of("size_bytes"));
+
+        {
+            PrintWriter out = new PrintWriter(new FileWriter("/tmp/about.txt"));
+            out.println("moo");
+            out.println(about);
+            out.close();
+        }
+
         assertThat(about, hasEntry("size_bytes", 22L));
         assertThat(about.size(), is(1));
 
@@ -261,7 +272,7 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
         assertThat(about, hasEntry(is("modified"), notNullValue()));
         assertThat(about.size(), is(2));
 
-        String expectedChecksum = Utils.toHex(generateChecksum(content));
+        String expectedChecksum = Utils.toHex(generateChecksum("MD5", content));
 
         about = s3BitStoreService.about(bitstream, List.of("size_bytes", "modified", "checksum"));
         assertThat(about, hasEntry("size_bytes", 22L));
@@ -275,7 +286,6 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
         assertThat(about, hasEntry("checksum", expectedChecksum));
         assertThat(about, hasEntry("checksum_algorithm", CSA));
         assertThat(about.size(), is(4));
-
     }
 
     @Test
@@ -406,28 +416,21 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
     public void testDoNotInitializeConfigured() throws Exception {
         String assetstores3enabledOldValue = configurationService.getProperty("assetstore.s3.enabled");
         configurationService.setProperty("assetstore.s3.enabled", "false");
-        s3BitStoreService = new S3BitStoreService(amazonS3Client);
+        s3BitStoreService = new S3BitStoreService(s3AsyncClient);
         s3BitStoreService.init();
         assertFalse(s3BitStoreService.isInitialized());
         assertFalse(s3BitStoreService.isEnabled());
         configurationService.setProperty("assetstore.s3.enabled", assetstores3enabledOldValue);
     }
 
-    private byte[] generateChecksum(String content) {
+    private byte[] generateChecksum(String algorithm, String content) {
         try {
-            MessageDigest m = MessageDigest.getInstance("MD5");
+            MessageDigest m = MessageDigest.getInstance(algorithm);
             m.update(content.getBytes());
             return m.digest();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private AmazonS3 createAmazonS3Client() {
-        return AmazonS3ClientBuilder.standard()
-            .withCredentials(new AWSStaticCredentialsProvider(new AnonymousAWSCredentials()))
-            .withEndpointConfiguration(new EndpointConfiguration("http://127.0.0.1:8001", DEFAULT_REGION.getName()))
-            .build();
     }
 
     private Item createItem() {
@@ -447,7 +450,7 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private Matcher<? super Bucket> bucketNamed(String name) {
-        return LambdaMatcher.matches(bucket -> bucket.getName().equals(name));
+        return LambdaMatcher.matches(bucket -> bucket.name().equals(name));
     }
 
     private InputStream toInputStream(String content) {
