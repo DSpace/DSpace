@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
@@ -221,7 +222,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                     List<MetadataValue> metadataValueList = new LinkedList<>();
                     boolean shouldExposeMinMax = false;
                     DiscoverySearchFilter discoverySearchFilter = discoveryConfiguration.getSearchFilters().get(i);
-                    if (StringUtils.equalsIgnoreCase(discoverySearchFilter.getFilterType(), "facet")) {
+                    if (Strings.CI.equals(discoverySearchFilter.getFilterType(), "facet")) {
                         if (((DiscoverySearchFilterFacet) discoverySearchFilter).exposeMinAndMaxValue()) {
                             shouldExposeMinMax = true;
                         }

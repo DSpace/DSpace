@@ -5,7 +5,7 @@
     detailed in the LICENSE and NOTICE files at the root of the source
     tree and available online at
 
-    Developed by Paulo Graça <paulo.graca@fccn.pt>
+    Developed by paulo-graca
     
     > https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd
 
@@ -101,7 +101,7 @@
 
 
    <!-- datacite.titles -->
-   <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_title.html -->
+   <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_title.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='title']" mode="datacite">
         <datacite:titles>
             <xsl:apply-templates select="." mode="title"/>
@@ -137,7 +137,7 @@
 
 
     <!-- datacite.creators -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_creator.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_creator.html -->
     <xsl:template
         match="doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name='author']" mode="datacite">
         <datacite:creators>
@@ -206,7 +206,7 @@
 
 
     <!-- datacite:contributors -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_contributor.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_contributor.html -->
     <xsl:template
         match="doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name!='author']" mode="datacite">
         <xsl:for-each select="./doc:element/doc:field[@name='value']">
@@ -303,7 +303,7 @@
     <!-- This template will create a type of identifier exclusive for DSpace
          which is a resolver for that record and, at same time, the REST API end point
      -->
-    <xsl:template match="doc:field[starts-with(@name,'relation.isAuthorOfPublication')]"
+    <xsl:template match="doc:field[starts-with(@name,'relation.isAuthorOfPublication') and not(contains(@name,'latestForDiscovery'))]"
         mode="entity_author">
         <xsl:variable name="url">
             <xsl:call-template name="getDSpaceURL"/>
@@ -406,7 +406,7 @@
 
 
     <!-- oaire:fundingReferences -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_projectid.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_projectid.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='relation']" mode="oaire">
         <oaire:fundingReferences>
             <xsl:for-each select="./doc:element/doc:field[@name='value']">
@@ -489,7 +489,7 @@
     </xsl:template>
 
     <!-- datacite:relatedIdentifiers -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_relatedidentifier.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_relatedidentifier.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='identifier']" mode="datacite">
         <datacite:relatedIdentifiers>
             <xsl:apply-templates select="./doc:element" mode="datacite_ids"/>
@@ -599,7 +599,7 @@
 
    <!--  datacite:identifier  -->
    <!-- In the repository context Resource Identifier will be the Handle or the generated DOI that is present in dc.identifier.uri. -->
-   <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_resourceidentifier.html -->
+   <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_resourceidentifier.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']"
         mode="datacite">
         <xsl:variable name="identifierType">
@@ -618,7 +618,7 @@
     </xsl:template>
 
     <!--  datacite:alternateIdentifier dc.identifier.uri  -->
-    <!--  https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_alternativeidentifier.html -->
+    <!--  https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_alternativeidentifier.html -->
     <xsl:template match="doc:element[@name='uri']" mode="datacite_altid">
         <xsl:for-each select="./doc:element/doc:field[@name='value']">
         <!-- don't process the first element -->
@@ -640,7 +640,7 @@
     </xsl:template>
 
    <!-- datacite:rights -->
-   <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_accessrights.html -->
+   <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_accessrights.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']" mode="datacite">
         <xsl:variable name="rightsValue" select="text()"/>
         <xsl:variable name="rightsURI">
@@ -670,7 +670,7 @@
 
     <!--  from Access Status mechanism  -->
     <!-- datacite:rights -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_accessrights.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_accessrights.html -->
     <xsl:template match="doc:element[@name='others']/doc:element[@name='access-status']/doc:field[@name='value']" mode="datacite">
         <xsl:variable name="rightsValue">
             <xsl:call-template name="resolveRightsName">
@@ -704,7 +704,7 @@
 
 
    <!-- datacite:subjects -->
-   <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_subject.html -->
+   <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_subject.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='subject']" mode="datacite">
         <datacite:subjects>
             <xsl:for-each select="./doc:element">
@@ -724,8 +724,8 @@
 
 
     <!-- datacite.dates -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_embargoenddate.html -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationdate.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_embargoenddate.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_publicationdate.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='date']" mode="datacite">
         <datacite:dates>
         <!-- datacite:date (embargo) -->
@@ -736,7 +736,7 @@
     </xsl:template>
 
     <!-- datacite.date @name=issued or @name=accepted -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationdate.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_publicationdate.html -->
     <xsl:template
         match="doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']"
         mode="datacite">
@@ -746,7 +746,7 @@
         </datacite:date>
         <!-- 
             datacite.date issued is different from dc.date.issued
-            please check - https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationdate.html
+            please check - https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_publicationdate.html
          -->
         <datacite:date dateType="Issued">
             <xsl:value-of select="$dc_date_value"/>
@@ -779,7 +779,7 @@
 
 
     <!-- dc:language -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_language.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_language.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']"
         mode="dc">
         <xsl:for-each select="./doc:element/doc:field[@name='value']">
@@ -791,7 +791,7 @@
 
 
     <!-- dc:publisher -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publisher.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_publisher.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='publisher']" mode="dc">
     	<xsl:for-each select="./doc:element/doc:field[@name='value']">
 	       <dc:publisher>
@@ -802,7 +802,7 @@
 
 
     <!-- oaire:resourceType -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationtype.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_publicationtype.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='type']/doc:element" mode="oaire">
         <xsl:variable name="resourceTypeGeneral">
             <xsl:call-template name="resolveResourceTypeGeneral">
@@ -827,7 +827,7 @@
 
 
     <!-- dc:description -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_description.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_description.html -->
     <xsl:template
         match="doc:element[@name='dc']/doc:element[@name='description']/doc:element[@name='abstract']/doc:element"
         mode="dc">
@@ -840,7 +840,7 @@
     </xsl:template>
 
     <!-- dc:format -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_size.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_size.html -->
     <xsl:template match="doc:element[@name='bundles']/doc:element[@name='bundle']" mode="dc">
         <xsl:if test="doc:field[@name='name' and text()='ORIGINAL']">
             <xsl:for-each select="doc:element[@name='bitstreams']/doc:element[@name='bitstream']">
@@ -856,7 +856,7 @@
 
 
     <!-- datacite:sizes -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_size.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_size.html -->
     <xsl:template match="doc:element[@name='bundles']/doc:element[@name='bundle']" mode="datacite">
         <datacite:sizes>
             <xsl:if test="doc:field[@name='name' and text()='ORIGINAL']">
@@ -875,7 +875,7 @@
     </xsl:template>
 
    <!-- oaire:file -->
-   <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_filelocation.html -->
+   <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_filelocation.html -->
     <xsl:template match="doc:element[@name='bundles']/doc:element[@name='bundle']" mode="oaire">
        <!-- only consider ORIGINAL bundle -->
         <xsl:if test="doc:field[@name='name' and text()='ORIGINAL']">
@@ -945,7 +945,7 @@
     </xsl:template>
 
 
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_citationtitle.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_citationtitle.html -->
     <xsl:template
         match="doc:element[@name='oaire']/doc:element[@name='citation']/doc:element[@name='title']" mode="oaire">
       <!-- citationTitle -->
@@ -954,7 +954,7 @@
         </oaire:citationTitle>
     </xsl:template>
 
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_citationedition.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_citationedition.html -->
     <xsl:template
         match="doc:element[@name='oaire']/doc:element[@name='citation']/doc:element[@name='edition']" mode="oaire">
       <!-- citationEdition -->
@@ -963,7 +963,7 @@
         </oaire:citationEdition>
     </xsl:template>
 
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_citationvolume.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_citationvolume.html -->
     <xsl:template
         match="doc:element[@name='oaire']/doc:element[@name='citation']/doc:element[@name='volume']" mode="oaire">
       <!-- citationVolume -->
@@ -972,7 +972,7 @@
         </oaire:citationVolume>
     </xsl:template>
 
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_citationissue.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_citationissue.html -->
     <xsl:template
         match="doc:element[@name='oaire']/doc:element[@name='citation']/doc:element[@name='issue']" mode="oaire">
       <!-- citationVolume -->
@@ -981,7 +981,7 @@
         </oaire:citationIssue>
     </xsl:template>
 
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_citationstartpage.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_citationstartpage.html -->
     <xsl:template
         match="doc:element[@name='oaire']/doc:element[@name='citation']/doc:element[@name='startPage']" mode="oaire">
       <!-- citationStartPage -->
@@ -990,7 +990,7 @@
         </oaire:citationStartPage>
     </xsl:template>
 
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_citationendpage.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_citationendpage.html -->
     <xsl:template
         match="doc:element[@name='oaire']/doc:element[@name='citation']/doc:element[@name='endPage']" mode="oaire">
       <!-- citationEndPage -->
@@ -999,7 +999,7 @@
         </oaire:citationEndPage>
     </xsl:template>
 
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_citationconferenceplace.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_citationconferenceplace.html -->
     <xsl:template
         match="doc:element[@name='oaire']/doc:element[@name='citation']/doc:element[@name='conferencePlace']"
         mode="oaire">
@@ -1009,7 +1009,7 @@
         </oaire:citationConferencePlace>
     </xsl:template>
 
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_citationconferencedate.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_citationconferencedate.html -->
     <xsl:template
         match="doc:element[@name='oaire']/doc:element[@name='citation']/doc:element[@name='conferenceDate']"
         mode="oaire">
@@ -1071,7 +1071,7 @@
     </xsl:template>
 
     <!-- This template will retrieve the type of a date based on the element name -->
-    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/vocab_datetype.html -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/vocab_datetype.html -->
     <!-- Accepted and Issued date types are handled separately above. -->
     <xsl:template name="getDateType">
         <xsl:param name="elementName"/>
@@ -1083,7 +1083,7 @@
         <xsl:choose>
             <xsl:when test="$lc_dc_date_type = 'embargo'">
                 <!-- Indicates the end of the embargo period. -->
-                <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_embargoenddate.html -->
+                <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_embargoenddate.html -->
                 <xsl:text>Available</xsl:text>
             </xsl:when>
         </xsl:choose>
@@ -1108,6 +1108,11 @@
         </xsl:variable>
         <xsl:variable name="isDOI">
             <xsl:call-template name="isDOI">
+                <xsl:with-param name="field" select="$element/doc:field"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="isURN">
+            <xsl:call-template name="isURN">
                 <xsl:with-param name="field" select="$element/doc:field"/>
             </xsl:call-template>
         </xsl:variable>
@@ -1168,8 +1173,11 @@
             <xsl:when test="$isURL = 'true' or $lc_identifier_type = 'url'">
                 <xsl:text>URL</xsl:text>
             </xsl:when>
-            <xsl:otherwise>
+            <xsl:when test="$isURN = 'true'">
                 <xsl:text>URN</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text>N/A</xsl:text>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -1356,6 +1364,19 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- it will verify if a given field is an URN -->
+    <xsl:template name="isURN">
+        <xsl:param name="field"/>
+        <xsl:choose>
+            <xsl:when test="$field[starts-with(text(),'urn:')]">
+                <xsl:value-of select="true()"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="false()"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <!-- it will verify if a given field is an ORCID -->
     <xsl:template name="isORCID">
         <xsl:param name="field"/>
@@ -1406,12 +1427,20 @@
                 <xsl:with-param name="field" select="$field"/>
             </xsl:call-template>
         </xsl:variable>
+        <xsl:variable name="isURN">
+            <xsl:call-template name="isURN">
+                <xsl:with-param name="field" select="$field"/>
+            </xsl:call-template>
+        </xsl:variable>
         <xsl:choose>
             <xsl:when test="$isHandle = 'true'">
                 <xsl:text>Handle</xsl:text>
             </xsl:when>
             <xsl:when test="$isDOI = 'true'">
                 <xsl:text>DOI</xsl:text>
+            </xsl:when>
+            <xsl:when test="$isURN = 'true'">
+                <xsl:text>URN</xsl:text>
             </xsl:when>
             <xsl:when test="$isURL = 'true' and $isHandle = 'false' and $isDOI = 'false'">
                 <xsl:text>URL</xsl:text>
@@ -1425,7 +1454,7 @@
     <!--
         This template will return the general type of the resource
         based on a valued text like 'article'
-        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationtype.html#attribute-resourcetypegeneral-m 
+        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_publicationtype.html#attribute-resourcetypegeneral-m
      -->
     <xsl:template name="resolveResourceTypeGeneral">
         <xsl:param name="field"/>
@@ -1478,7 +1507,7 @@
         This template will return the COAR Resource Type Vocabulary URI
         like http://purl.org/coar/resource_type/c_6501
         based on a valued text like 'article'
-        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationtype.html#attribute-uri-m
+        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_publicationtype.html#attribute-uri-m
      -->
     <xsl:template name="resolveResourceTypeURI">
         <xsl:param name="field"/>
@@ -1674,7 +1703,7 @@
         like "open access"
         based on the values from DSpace Access Status mechanism like String 'open.access'
         please check class org.dspace.access.status.DefaultAccessStatusHelper for more information
-        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_accessrights.html#definition-and-usage-instruction
+        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_accessrights.html#definition-and-usage-instruction
      -->
     <xsl:template name="resolveRightsName">
         <xsl:param name="field"/>
@@ -1704,7 +1733,7 @@
         This template will return the COAR Access Right Vocabulary URI
         like http://purl.org/coar/access_right/c_abf2
         based on a value text like 'open access'
-        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_accessrights.html#definition-and-usage-instruction
+        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_accessrights.html#definition-and-usage-instruction
      -->
     <xsl:template name="resolveRightsURI">
         <xsl:param name="field"/>

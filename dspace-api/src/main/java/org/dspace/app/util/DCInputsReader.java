@@ -15,10 +15,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.content.Collection;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Utils;
@@ -118,15 +118,17 @@ public class DCInputsReader {
         formDefns = new HashMap<String, List<List<Map<String, String>>>>();
         valuePairs = new HashMap<String, List<String>>();
 
-        String uri = "file:" + new File(fileName).getAbsolutePath();
+        File inputFile = new File(fileName);
+        String inputFileDir = inputFile.toPath().normalize().getParent().toString();
+
+        String uri = "file:" + inputFile.getAbsolutePath();
 
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setValidating(false);
-            factory.setIgnoringComments(true);
-            factory.setIgnoringElementContentWhitespace(true);
-
-            DocumentBuilder db = factory.newDocumentBuilder();
+            // This document builder will *not* disable external
+            // entities as they can be useful in managing large forms, but
+            // it will restrict them to be within the directory that the
+            // current input form XML file exists (or a sub-directory)
+            DocumentBuilder db = XMLUtils.getTrustedDocumentBuilder(inputFileDir);
             Document doc = db.parse(uri);
             doNodes(doc);
             checkValues();
@@ -370,7 +372,7 @@ public class DCInputsReader {
                 // we omit the duplicate validation, allowing multiple
                 // fields definition for
                 // the same metadata and different visibility/type-bind
-            } else if (StringUtils.equalsIgnoreCase(npg.getNodeName(), "relation-field")) {
+            } else if (Strings.CI.equals(npg.getNodeName(), "relation-field")) {
                 Map<String, String> relationField = new HashMap<>();
                 processField(formName, npg, relationField);
                 fields.add(relationField);
@@ -417,7 +419,7 @@ public class DCInputsReader {
                             field.put(PAIR_TYPE_NAME, pairTypeName);
                         }
                     }
-                } else if (StringUtils.equalsIgnoreCase(tagName, "linked-metadata-field")) {
+                } else if (Strings.CI.equals(tagName, "linked-metadata-field")) {
                     for (int j = 0; j < nd.getChildNodes().getLength(); j ++) {
                         Node nestedNode = nd.getChildNodes().item(j);
                         String nestedTagName = nestedNode.getNodeName();

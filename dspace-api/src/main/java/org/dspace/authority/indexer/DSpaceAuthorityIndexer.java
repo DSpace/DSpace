@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.service.AuthorityValueService;
@@ -95,7 +96,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                  // We only want to update our item IF our UUID is not present
                 // or if we need to generate one.
                 boolean requiresItemUpdate = StringUtils.isBlank(authorityKey) ||
-                        StringUtils.startsWith(authorityKey, AuthorityValueService.GENERATE);
+                        Strings.CS.startsWith(authorityKey, AuthorityValueService.GENERATE);
                 AuthorityValue value = null;
                 if (StringUtils.isBlank(authorityKey) && cache != null) {
                     // This is a value currently without an authority. So query
@@ -148,12 +149,12 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                 !metadataAuthorityKey.startsWith(AuthorityValueService.GENERATE)) {
             // !uid.startsWith(AuthorityValueGenerator.GENERATE) is not strictly
             // necessary here but it prevents exceptions in solr
-            AuthorityValue value = authorityValueService.findByUID(context, metadataAuthorityKey);
+            AuthorityValue value = authorityValueService.findByUID(metadataAuthorityKey);
             if (value != null) {
                 return value;
             }
         }
-        return authorityValueService.generate(context, metadataAuthorityKey,
+        return authorityValueService.generate(metadataAuthorityKey,
                 metadataContent, metadataField.replaceAll("\\.", "_"));
     }
 

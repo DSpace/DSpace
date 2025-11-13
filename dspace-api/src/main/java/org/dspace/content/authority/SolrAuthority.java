@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -82,9 +83,9 @@ public class SolrAuthority implements ChoiceAuthority {
                 localSearchField = searchField + "_" + locale;
             }
 
-            String query = "(" + toQuery(searchField, text) + ") ";
+            String query = "(" + toQuery(searchField, text) + ")";
             if (!localSearchField.equals("")) {
-                query += " or (" + toQuery(localSearchField, text) + ")";
+                query += " OR (" + toQuery(localSearchField, text) + ")";
             }
             queryArgs.setQuery(query);
         }
@@ -200,7 +201,7 @@ public class SolrAuthority implements ChoiceAuthority {
     }
 
     private String toQuery(String searchField, String text) {
-        return searchField + ":(" + text.toLowerCase().replaceAll(":", "\\\\:") + "*) or " + searchField + ":(" + text
+        return searchField + ":(" + text.toLowerCase().replaceAll(":", "\\\\:") + "*) OR " + searchField + ":(" + text
             .toLowerCase().replaceAll(":", "\\\\:") + ")";
     }
 
@@ -289,8 +290,8 @@ public class SolrAuthority implements ChoiceAuthority {
     public void setPluginInstanceName(String name) {
         authorityName = name;
         for (Entry conf : configurationService.getProperties().entrySet()) {
-            if (StringUtils.startsWith((String) conf.getKey(), ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX)
-                    && StringUtils.equals((String) conf.getValue(), authorityName)) {
+            if (Strings.CS.startsWith((String) conf.getKey(), ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX)
+                    && Strings.CS.equals((String) conf.getValue(), authorityName)) {
                 field = ((String) conf.getKey()).substring(ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX.length())
                         .replace(".", "_");
                 // exit the look immediately as we have found it
