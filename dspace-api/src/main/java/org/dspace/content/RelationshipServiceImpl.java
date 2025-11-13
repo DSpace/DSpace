@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -598,7 +598,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             return false;
         }
         String leftEntityType = list.get(0).getValue();
-        return StringUtils.equals(leftEntityType, entityTypeToProcess.getLabel());
+        return Strings.CS.equals(leftEntityType, entityTypeToProcess.getLabel());
     }
 
     @Override

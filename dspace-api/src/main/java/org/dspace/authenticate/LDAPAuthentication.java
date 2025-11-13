@@ -34,6 +34,7 @@ import javax.naming.ldap.StartTlsResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
@@ -748,7 +749,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
                 String dspaceGroupName = t[1];
 
                 if (group == null) {
-                    cmp = StringUtils.containsIgnoreCase(dn, ldapSearchString + ",");
+                    cmp = Strings.CI.contains(dn, ldapSearchString + ",");
 
                     if (cmp) {
                         assignGroup(context, groupmapIndex, dspaceGroupName);
@@ -764,9 +765,9 @@ public class LDAPAuthentication implements AuthenticationMethod {
 
                         // very much the old code from DSpace <= 7.5
                         if (currentGroup == null) {
-                            cmp = StringUtils.containsIgnoreCase(dn, ldapSearchString + ",");
+                            cmp = Strings.CI.contains(dn, ldapSearchString + ",");
                         } else {
-                            cmp = StringUtils.equalsIgnoreCase(currentGroup, ldapSearchString);
+                            cmp = Strings.CI.equals(currentGroup, ldapSearchString);
                         }
 
                         if (cmp) {

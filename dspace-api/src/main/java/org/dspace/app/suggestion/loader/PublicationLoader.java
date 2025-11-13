@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.suggestion.SolrSuggestionProvider;
 import org.dspace.app.suggestion.Suggestion;
@@ -248,12 +248,12 @@ public class PublicationLoader extends SolrSuggestionProvider {
 
     @Override
     protected boolean isExternalDataObjectPotentiallySuggested(Context context, ExternalDataObject externalDataObject) {
-        if (StringUtils.equals(externalDataObject.getSource(), primaryProvider.getSourceIdentifier())) {
+        if (Strings.CS.equals(externalDataObject.getSource(), primaryProvider.getSourceIdentifier())) {
             return true;
         } else if (otherProviders != null) {
             return otherProviders.stream()
                                  .anyMatch(
-                                     x -> StringUtils.equals(externalDataObject.getSource(), x.getSourceIdentifier()));
+                                     x -> Strings.CS.equals(externalDataObject.getSource(), x.getSourceIdentifier()));
         } else {
             return false;
         }

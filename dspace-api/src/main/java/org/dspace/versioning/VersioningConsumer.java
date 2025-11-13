@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.EntityType;
@@ -350,7 +350,7 @@ public class VersioningConsumer implements Consumer {
         }
 
         // check if the entity types are equal
-        if (!StringUtils.equals(latestItemEntityType, previousItemEntityType)) {
+        if (!Strings.CS.equals(latestItemEntityType, previousItemEntityType)) {
             log.warn(
                 "Inconsistency: Item with uuid {}, handle {} has entity type {}, " +
                 "but the previous version of that item with uuid {}, handle {} has entity type {}",
