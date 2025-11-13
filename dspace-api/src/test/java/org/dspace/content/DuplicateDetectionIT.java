@@ -17,8 +17,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -31,7 +29,6 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -40,7 +37,7 @@ import org.junit.Test;
  *
  * @author Kim Shepherd
  */
-public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase {
+public class DuplicateDetectionIT extends AbstractIntegrationTestWithDatabase {
     private DuplicateDetectionService duplicateDetectionService = ContentServiceFactory.getInstance()
             .getDuplicateDetectionService();
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -54,9 +51,7 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
     private final String item1Title = "Public item I";
     private final String item1Author = "Smith, Donald";
 
-    private static final Logger log = LogManager.getLogger();
-
-    @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         // Temporarily enable duplicate detection and set comparison distance to 1
@@ -100,7 +95,7 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
                 .withAuthor("Smith, Donald Y.")
                 .withSubject("ExtraEntry 3")
                 .build();
-
+        context.restoreAuthSystemState();
 
     }
 
@@ -210,7 +205,7 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
     public void testSearchDuplicatesWithReservedSolrCharacters() throws Exception {
 
 
-
+        context.turnOffAuthorisationSystem();
         Item item4 = ItemBuilder.createItem(context, col)
                 .withTitle("Testing: An Important Development Step")
                 .withIssueDate(item1IssueDate)
@@ -223,6 +218,7 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
                 .withAuthor("Smith, Donald X.")
                 .withSubject("ExtraEntry 2")
                 .build();
+        context.restoreAuthSystemState();
 
         // Get potential duplicates of item 4 and make sure no exceptions are thrown
         List<PotentialDuplicate> potentialDuplicates = new ArrayList<>();
@@ -254,6 +250,7 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
     @Test
     public void testSearchDuplicatesWithVeryLongTitle() throws Exception {
 
+        context.turnOffAuthorisationSystem();
         Item item6 = ItemBuilder.createItem(context, col)
                 .withTitle("Testing: This title is over 200 characters long and should behave just the same as a " +
                         "shorter title, with or without reserved characters. This integration test will prove that " +
@@ -271,6 +268,8 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
                 .withAuthor("Smith, Donald X.")
                 .withSubject("ExtraEntry 2")
                 .build();
+
+        context.restoreAuthSystemState();
 
         // Get potential duplicates of item 4 and make sure no exceptions are thrown
         List<PotentialDuplicate> potentialDuplicates = new ArrayList<>();
@@ -303,6 +302,8 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         // Set distance to 0 manually
         configurationService.setProperty("duplicate.comparison.distance", 0);
 
+        context.turnOffAuthorisationSystem();
+
         Item item8 = ItemBuilder.createItem(context, col)
                 .withTitle("This integration test will prove that the edit distance of 0 results in an exact match")
                 .withIssueDate(item1IssueDate)
@@ -323,7 +324,7 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
                 .withAuthor("Smith, Donald X.")
                 .withSubject("ExtraEntry")
                 .build();
-
+        context.restoreAuthSystemState();
         // Get potential duplicates of item 4 and make sure no exceptions are thrown
         List<PotentialDuplicate> potentialDuplicates = new ArrayList<>();
         try {
@@ -387,6 +388,8 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         configurationService.setProperty("duplicate.comparison.metadata.field",
                 new String[]{"dc.title", "dc.contributor.author"});
 
+        context.turnOffAuthorisationSystem();
+
         Item item10 = ItemBuilder.createItem(context, col)
                 .withTitle("Compare both title and author")
                 .withIssueDate(item1IssueDate)
@@ -406,6 +409,8 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
                 .withAuthor("Lastname, First.")
                 .withSubject("ExtraEntry 2")
                 .build();
+
+        context.restoreAuthSystemState();
 
         // Get potential duplicates of item 10 and make sure no exceptions are thrown
         List<PotentialDuplicate> potentialDuplicates = new ArrayList<>();
