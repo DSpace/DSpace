@@ -411,6 +411,7 @@ public class Email {
         VelocityContext vctx = new VelocityContext();
         vctx.put("config", new UnmodifiableConfigurationService(config));
         vctx.put("params", Collections.unmodifiableList(arguments));
+        vctx.put("global", vctx);   
 
         StringWriter writer = new StringWriter();
         try {
