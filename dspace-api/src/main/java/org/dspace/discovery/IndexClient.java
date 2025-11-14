@@ -140,6 +140,17 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                     checkRebuildSpellCheck(commandLine, indexer);
                 }
                 break;
+            case INDEXBYQUERY:
+                final String query = commandLine.getOptionValue('q');
+                if (query == null || query.isEmpty()) {
+                    throw new IllegalArgumentException("Solr query cannot be empty!");
+                }
+                handler.logInfo(
+                        (commandLine.hasOption("f") ? "Forcefully i" : "I") + "ndexing by solr query: " + query
+                );
+                final long indexedCount = indexByQuery(indexer, context, query, commandLine.hasOption("f"));
+                handler.logInfo("Indexed " + indexedCount + " object(s).");
+                break;
             default:
                 handler.handleException("Invalid index client option.");
                 break;
@@ -250,6 +261,50 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             }
             indexingService.commit();
         }
+
+        return count;
+    }
+
+    /**
+     * Indexes object that match given Solr query.
+     * @param indexingService The indexing service.
+     * @param context The relevant DSpace Context.
+     * @param query Solr query.
+     * @param force Whether to force the indexing or not.
+     * @return The count of indexed objects.
+     * @throws SearchServiceException If a search service error occurs.
+     * @throws SQLException If database error occurs.
+     */
+    private long indexByQuery(final IndexingService indexingService, final Context context,
+            final String query, final boolean force) throws SearchServiceException, SQLException {
+        SearchService searchService = SearchUtils.getSearchService();
+        int count = 0;
+        int start = 0;
+        final int limit = 20;
+        long totalResults = 0;
+
+        do {
+            // Search for items using the Solr query
+            DiscoverQuery discoverQuery = new DiscoverQuery();
+            discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
+            discoverQuery.setQuery(query);
+            discoverQuery.setStart(start);
+            discoverQuery.setMaxResults(limit);
+
+            DiscoverResult discoverResult = searchService.search(context, discoverQuery);
+            if (totalResults == 0) {
+                totalResults = discoverResult.getTotalSearchResults();
+            }
+
+            // Index every object in the search result
+            for (IndexableObject item : discoverResult.getIndexableObjects()) {
+                handler.logInfo("Indexing object: " + item.getID() + " [" + (count + 1) + " / " + totalResults + "]");
+                indexingService.indexContent(context, item, force, true);
+                count++;
+            }
+
+            start += limit;
+        } while (count < totalResults);
 
         return count;
     }
