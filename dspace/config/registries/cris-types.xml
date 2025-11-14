@@ -1,0 +1,26 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Cris Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>cris</name>
+        <namespace>https://www.4science.it/dspace-cris/</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>customurl</element>
+        <qualifier></qualifier>
+        <scope_note>Custom URL for CRIS entities (e.g., researcher profiles, projects, org units).</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>customurl</element>
+        <qualifier>old</qualifier>
+        <scope_note>Previous custom URLs for CRIS entities, used for redirects and legacy support.</scope_note>
+    </dc-type>
+
+</dspace-dc-types>
