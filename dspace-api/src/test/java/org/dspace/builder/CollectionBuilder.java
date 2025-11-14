@@ -81,12 +81,12 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     private CollectionBuilder create(final Community parent, final String handle) {
         try {
-            for (Collection collection : this.collectionService.findAll(context)) {
+            for (Collection collection : collectionService.findAll(context)) {
                 if (collection.getHandle().equalsIgnoreCase(handle)) {
                     this.collection = collection;
                 }
             }
-            this.collection = this.collectionService.create(context, parent, handle);
+            this.collection = collectionService.create(context, parent, handle);
         } catch (Exception e) {
             return handleException(e);
         }
@@ -118,6 +118,9 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return addMetadataValue(collection, MetadataSchemaEnum.DC.getName(), "title", null, language, name);
     }
 
+    public CollectionBuilder withSubmissionDefinition(final String name) {
+        return addMetadataValue(collection, "cris", "submission", "definition", null, name);
+    }
     /**
      * Set the Collection's logo.
      * <em>To a String.  Should this not be the bytes of an image of some sort?</em>

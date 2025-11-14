@@ -9,6 +9,7 @@ package org.dspace.app.rest.converter;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.AInprogressSubmissionRest;
@@ -19,14 +20,19 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.submit.DataProcessingStep;
 import org.dspace.app.rest.submit.RestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.RequestService;
+import org.dspace.services.model.Request;
 import org.dspace.submit.factory.SubmissionServiceFactory;
 import org.dspace.submit.service.SubmissionConfigService;
+import org.dspace.validation.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
@@ -59,6 +65,13 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
     @Autowired
     SubmissionService submissionService;
 
+    @Autowired
+    RequestService requestService;
+
+    @Autowired
+    private ValidationService validationService;
+
+
     public AInprogressItemConverter() throws SubmissionConfigReaderException {
         submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
     }
@@ -76,6 +89,8 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         // info
 
         if (collection != null) {
+            addValidationErrorsToItem(obj, witem);
+
             SubmissionDefinitionRest def = converter.toRest(
                     submissionConfigService.getSubmissionConfigByCollection(collection), projection);
             witem.setSubmissionDefinition(def);
@@ -99,11 +114,7 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
 
                     if (stepInstance instanceof DataProcessingStep) {
                         // load the interface for this step
-                        DataProcessingStep stepProcessing =
-                            (DataProcessingStep) stepClass.newInstance();
-                        for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
-                            addError(witem.getErrors(), error);
-                        }
+                        DataProcessingStep stepProcessing = (DataProcessingStep) stepClass.newInstance();
                         witem.getSections()
                             .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
                     } else if (!(stepInstance instanceof RestProcessingStep)) {
@@ -122,7 +133,17 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         }
     }
 
-    private void addError(List<ErrorRest> errors, ErrorRest toAdd) {
+    @SuppressWarnings("unchecked")
+    private void addValidationErrorsToItem(T obj, R witem) {
+        Request currentRequest = requestService.getCurrentRequest();
+        Context context = ContextUtil.obtainContext((HttpServletRequest) currentRequest.getServletRequest());
+
+        validationService.validate(context, obj).stream()
+                         .map(ErrorRest::fromValidationError)
+                         .forEach(error -> addError(witem.getErrors(), error));
+    }
+
+    protected void addError(List<ErrorRest> errors, ErrorRest toAdd) {
 
         boolean found = false;
         String i18nKey = toAdd.getMessage();

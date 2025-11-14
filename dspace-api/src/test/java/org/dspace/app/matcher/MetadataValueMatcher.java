@@ -22,17 +22,17 @@ import org.hamcrest.TypeSafeMatcher;
  */
 public class MetadataValueMatcher extends TypeSafeMatcher<MetadataValue> {
 
-    private String field;
+    private final String field;
 
-    private String value;
+    private final String value;
 
-    private String language;
+    private final String language;
 
-    private String authority;
+    private final String authority;
 
-    private Integer place;
+    private final Integer place;
 
-    private Integer confidence;
+    private final Integer confidence;
 
     private MetadataValueMatcher(String field, String value, String language, String authority, Integer place,
                                  Integer confidence) {

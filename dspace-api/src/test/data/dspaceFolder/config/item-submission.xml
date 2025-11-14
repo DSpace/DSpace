@@ -208,6 +208,12 @@
             <type>submission-form</type>
         </step-definition>
 
+        <step-definition id="custom-url">
+            <heading>submit.progressbar.CustomUrlStep</heading>
+            <processing-class>org.dspace.app.rest.submit.step.CustomUrlStep</processing-class>
+            <type>custom-url</type>
+        </step-definition>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -253,6 +259,20 @@
             <!--Step will be to Sign off on the License -->
             <step id="license"/>
             <step id="cclicense"/>
+        </submission-process>
+
+        <submission-process name="ttraditional-with-custom-url">
+            <step id="collection"/>
+            <step id="identifiers"/>
+            <step id="traditionalpageone"/>
+            <step id="traditionalpagetwo"/>
+            <step id="coarnotify"/>
+            <step id="upload"/>
+            <step id="defaultAC"/>
+            <step id="sherpaPolicies"/>
+            <step id="license"/>
+            <step id="cclicense"/>
+            <step id="custom-url"/>
         </submission-process>
 
         <submission-process name="languagetestprocess">

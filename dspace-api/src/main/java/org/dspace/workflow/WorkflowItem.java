@@ -14,6 +14,6 @@ import org.dspace.content.InProgressSubmission;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface WorkflowItem extends InProgressSubmission {
+public interface WorkflowItem extends InProgressSubmission<Integer> {
 
 }
