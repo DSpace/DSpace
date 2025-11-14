@@ -1347,7 +1347,7 @@
             <dependency>
                 <groupId>com.healthmarketscience.jackcess</groupId>
                 <artifactId>jackcess</artifactId>
-                <version>4.0.8</version>
+                <version>4.0.10</version>
             </dependency>
             <!-- Tika and axiom-api (in dspace-swordv2) disagree on versions -->
             <dependency>
