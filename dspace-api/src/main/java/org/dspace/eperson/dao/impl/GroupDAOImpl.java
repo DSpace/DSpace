@@ -92,7 +92,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     @Override
     public List<Group> findByEPerson(Context context, EPerson ePerson) throws SQLException {
         Query query = createQuery(context,
-                                  "from Group where (from EPerson e where e.id = :eperson_id) in elements(epeople)");
+            "select distinct g from Group g join g.epeople ep where ep.id = :eperson_id");
         query.setParameter("eperson_id", ePerson.getID());
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
