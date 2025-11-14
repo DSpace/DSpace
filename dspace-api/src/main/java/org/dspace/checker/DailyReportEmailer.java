@@ -191,7 +191,7 @@ public class DailyReportEmailer {
                 numBitstreams += reporter.getBitstreamNotFoundReport(context, yesterday, tomorrow, writer);
                 writer.write("\n--------------------------------- Report Spacer ---------------------------\n\n");
                 // not to be processed report includes deleted and not found bitstreams so it is not necessary to
-                // incude the sum in the counter
+                // include the sum in the counter
                 reporter.getNotToBeProcessedReport(context, yesterday, tomorrow, writer);
                 writer.write("\n--------------------------------- Report Spacer ---------------------------\n\n");
                 numBitstreams += reporter.getUncheckedBitstreamsReport(context, writer);
