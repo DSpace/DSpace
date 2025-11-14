@@ -12,6 +12,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -23,6 +24,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +59,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -79,6 +84,9 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Autowired
     private XmlWorkflowFactory xmlWorkflowFactory;
+
+    @Autowired
+    private ItemService itemService;
 
     @Before
     @Override
@@ -1031,6 +1039,79 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
                             "New Title", "2017-10-17", "ExtraEntry"))))
         ;
+    }
+
+    @Test
+    public void patchEmbargoTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withWorkflowGroup(2, eperson).build();
+
+        //2. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword("dspace")
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. a claimed task with workflow item in edit step
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, eperson)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        claimedTask.setStepID("editstep");
+        claimedTask.setActionID("editaction");
+
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+
+        String bitstreamContent = "0123456789";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, Charset.defaultCharset())) {
+
+            Bitstream bitstream = BitstreamBuilder.createBitstream(context, witem.getItem(), is)
+                    .withName("Test bitstream")
+                    .withDescription("This is a bitstream to test range requests")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        List<Operation> operations = new ArrayList<Operation>();
+        Map<String, String> embargoValue = new HashMap<String, String>();
+        embargoValue.put("name", "embargo");
+        ZonedDateTime embargoDate = ZonedDateTime.now(ZoneOffset.UTC).plusDays(1);
+        String formattedDate = embargoDate.format(DateTimeFormatter.ISO_INSTANT);
+        embargoValue.put("startDate", formattedDate);
+        List<Map<String, String>> embargoArray = new ArrayList<>();
+        embargoArray.add(embargoValue);
+        operations.add(new AddOperation("/sections/upload/files/0/accessConditions", embargoArray));
+
+        String patchBody = getPatchContent(operations);
+
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+        Item item = itemService.find(context, witem.getItem().getID());
+        boolean hasEmbargoProvenance = item.getMetadata().stream()
+                .anyMatch(metadataValue ->
+                        "dc.description.provenance".equals(metadataValue.getMetadataField().toString('.')) &&
+                                metadataValue.getValue() != null &&
+                                metadataValue.getValue().toLowerCase().contains("embargo")
+                );
+        assertTrue("The item should have provenance metadata containing 'embargo'.", hasEmbargoProvenance);
     }
 
     @Test

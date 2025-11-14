@@ -55,6 +55,7 @@ import org.dspace.contentreport.QueryPredicate;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.dspace.core.ProvenanceService;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchService;
@@ -184,6 +185,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired
     private VersionHistoryService versionHistoryService;
+
+    @Autowired(required = true)
+    private ProvenanceService provenanceService;
+
 
     protected ItemServiceImpl() {
     }
@@ -1202,6 +1207,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(),
                                        null, getIdentifiers(context, item)));
         }
+        provenanceService.moveItem(context, item, from);
     }
 
     @Override

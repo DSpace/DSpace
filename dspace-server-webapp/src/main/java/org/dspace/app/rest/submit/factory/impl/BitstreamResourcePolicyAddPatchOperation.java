@@ -23,6 +23,7 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.ProvenanceService;
 import org.dspace.submit.model.UploadConfiguration;
 import org.dspace.submit.model.UploadConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
 
     @Autowired
     ItemService itemService;
+
+    @Autowired
+    ProvenanceService provenanceService;
 
     @Autowired
     private ResourcePolicyService resourcePolicyService;
@@ -73,6 +77,11 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
                     if (CollectionUtils.isNotEmpty(newAccessConditions)) {
                         BitstreamResourcePolicyUtils.findApplyResourcePolicy(context, uploadConfig, bitstream,
                                                                              newAccessConditions);
+                        String name;
+                        for (AccessConditionDTO newAccessCondition : newAccessConditions) {
+                            name = newAccessCondition.getName();
+                            provenanceService.setBitstreamPolicies(context, bitstream, item, name);
+                        }
                     }
                 }
                 idx++;
