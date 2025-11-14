@@ -17,7 +17,6 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -32,10 +31,14 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.dspace.eperson.EPerson;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.services.ConfigurationService;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import jakarta.annotation.Nullable;
 
 /**
  * Service implementation for the Bitstream object.
@@ -67,6 +70,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     protected BundleService bundleService;
     @Autowired(required = true)
     protected BitstreamStorageService bitstreamStorageService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     protected BitstreamServiceImpl() {
         super();
@@ -146,6 +151,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         Bitstream b = create(context, is);
         bundleService.addBitstream(context, bundle, b);
+        
+        // Add provenance for bitstream creation
+        addBitstreamCreationProvenance(context, b, bundle);
+        
         return b;
     }
 
@@ -158,6 +167,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         Bitstream bitstream = register(context, assetstore, bitstreamPath);
 
         bundleService.addBitstream(context, bundle, bitstream);
+        
+        // Add provenance for bitstream registration
+        addBitstreamCreationProvenance(context, bitstream, bundle);
+        
         return bitstream;
     }
 
@@ -512,5 +525,92 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
                      .map(Bundle::getName)
                      .collect(Collectors.toSet());
         return bundleNames.stream().anyMatch(bundles::contains);
+    }
+
+    /**
+     * Check if provenance tracking should be enabled for the given bundle.
+     * Checks both the global enable flag and the bundle blacklist.
+     *
+     * @param bundle the bundle to check
+     * @return true if provenance should be tracked, false otherwise
+     */
+    private boolean shouldTrackProvenance(Bundle bundle) {
+        if (!configurationService.getBooleanProperty("provenance.bitstream.enabled", true)) {
+            return false;
+        }
+        
+        if (bundle == null) {
+            return false;
+        }
+        
+        String[] excludedBundles = configurationService.getArrayProperty("provenance.bitstream.bundles.exclude");
+        if (excludedBundles != null) {
+            String bundleName = bundle.getName();
+            for (String excluded : excludedBundles) {
+                if (excluded.trim().equals(bundleName)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+
+    /**
+     * Add provenance metadata to the item for bitstream creation.
+     *
+     * @param context   the DSpace context
+     * @param bitstream the bitstream that was created
+     * @param bundle    the bundle containing the bitstream
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     */
+    private void addBitstreamCreationProvenance(Context context, Bitstream bitstream, Bundle bundle)
+        throws SQLException, AuthorizeException {
+        
+        if (!shouldTrackProvenance(bundle)) {
+            return;
+        }
+
+        // Get the parent item from the bundle
+        Item item = (Item) bundleService.getParentObject(context, bundle);
+        if (item == null) {
+            return;
+        }
+
+        // Build provenance message
+        StringBuilder provMessage = new StringBuilder();
+        provMessage.append("Bitstream ");
+        provMessage.append(bitstream.getName() != null ? bitstream.getName() : "unnamed");
+        provMessage.append(" added to bundle ");
+        provMessage.append(bundle.getName());
+        provMessage.append(" on ");
+        provMessage.append(DCDate.getCurrent().toString());
+        provMessage.append(" by ");
+
+        // Check privacy setting
+        boolean isProvenancePrivacyActive = configurationService.getBooleanProperty(
+            "metadata.privacy.dc.description.provenance", false);
+
+        EPerson currentUser = context.getCurrentUser();
+        if (currentUser != null && !isProvenancePrivacyActive) {
+            provMessage.append(currentUser.getFullName());
+            provMessage.append(" (");
+            provMessage.append(currentUser.getEmail());
+            provMessage.append(")");
+        } else if (currentUser != null) {
+            provMessage.append("automated process or privacy hidden");
+        } else {
+            provMessage.append("System");
+        }
+
+        provMessage.append(". Size: ");
+        provMessage.append(bitstream.getSizeBytes());
+        provMessage.append(" bytes.");
+
+        // Add provenance metadata to item
+        itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                               "description", "provenance", "en", provMessage.toString());
+        itemService.update(context, item);
     }
 }

@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.UUID;
 
-import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -73,6 +71,9 @@ import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * When an item is submitted and is somewhere in a workflow, it has a row in the
@@ -1212,8 +1213,10 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             provmessage.append("\n");
         }
 
-        // add sizes and checksums of bitstreams
-        provmessage.append(installItemService.getBitstreamProvenanceMessage(context, myitem));
+        // add sizes and checksums of bitstreams if enabled
+        if (configurationService.getBooleanProperty("provenance.bitstream.enabled", true)) {
+            provmessage.append(installItemService.getBitstreamProvenanceMessage(context, myitem));
+        }
 
         // Add message to the DC
         itemService
