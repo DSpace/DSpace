@@ -441,6 +441,8 @@ public class DuplicateDetectionIT extends AbstractIntegrationTestWithDatabase {
         configurationService.setProperty("duplicate.comparison.metadata.field.1",
             new String[]{"dc.identifier:0"});
 
+        context.turnOffAuthorisationSystem();
+
         Item item1 = ItemBuilder.createItem(context, col)
             .withTitle("Compare both title and author")
             .withIssueDate(item1IssueDate)
@@ -472,6 +474,8 @@ public class DuplicateDetectionIT extends AbstractIntegrationTestWithDatabase {
             .withIdentifier("I3")
             .withSubject("ExtraEntry 2")
             .build();
+
+        context.restoreAuthSystemState();
 
         // Get potential duplicates of item 10 and make sure no exceptions are thrown
         List<PotentialDuplicate> potentialDuplicates = new ArrayList<>();
