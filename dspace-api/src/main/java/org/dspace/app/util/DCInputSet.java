@@ -133,32 +133,6 @@ public class DCInputSet {
         return false;
     }
 
-    /**
-     * Does the current input set define the named field?
-     * and is valid for the specified document type
-     * Scan through every field in every page of the input set
-     *
-     * @param fieldName    field name
-     * @param documentType doc type
-     * @return true if the current set has the named field
-     */
-    public boolean isFieldPresent(String fieldName, String documentType) {
-        if (documentType == null) {
-            documentType = "";
-        }
-        for (int i = 0; i < inputs.length; i++) {
-            for (int j = 0; j < inputs[i].length; j++) {
-                DCInput field = inputs[i][j];
-                String fullName = field.getFieldName();
-                if (fullName.equals(fieldName)) {
-                    if (field.isAllowedFor(documentType)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
 
     protected boolean doField(DCInput dcf, boolean addTitleAlternative,
                               boolean addPublishedBefore) {
@@ -204,19 +178,17 @@ public class DCInputSet {
                     // values are also in the list and before the stored values.
                     for (int i = 1; i < inputPairs.size(); i += 2) {
                         String fullFieldname = input.getFieldName() + "." + inputPairs.get(i);
-                        if (input.isAllowedFor(documentTypeValue)) {
-                            if (!allowedFieldNames.contains(fullFieldname)) {
-                                allowedFieldNames.add(fullFieldname);
-                            }
-                            // For the purposes of qualdrop, we have to add the field name without the qualifier
-                            // too, or a required qualdrop will get confused and incorrectly reject a value
-                            if (!allowedFieldNames.contains(input.getFieldName())) {
-                                allowedFieldNames.add(input.getFieldName());
-                            }
+                        if (!allowedFieldNames.contains(fullFieldname)) {
+                            allowedFieldNames.add(fullFieldname);
+                        }
+                        // For the purposes of qualdrop, we have to add the field name without the qualifier
+                        // too, or a required qualdrop will get confused and incorrectly reject a value
+                        if (!allowedFieldNames.contains(input.getFieldName())) {
+                            allowedFieldNames.add(input.getFieldName());
                         }
                     }
                 } else {
-                    if (input.isAllowedFor(documentTypeValue) && !allowedFieldNames.contains(input.getFieldName())) {
+                    if (!allowedFieldNames.contains(input.getFieldName())) {
                         allowedFieldNames.add(input.getFieldName());
                     }
                 }
