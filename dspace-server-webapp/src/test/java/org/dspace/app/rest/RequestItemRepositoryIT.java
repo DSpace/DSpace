@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -57,6 +58,7 @@ import org.dspace.builder.RequestItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.exparity.hamcrest.date.LocalDateTimeMatchers;
 import org.hamcrest.Matchers;
@@ -626,5 +628,37 @@ public class RequestItemRepositoryIT
         assertEquals("Wrong domain class", RequestItemRest.class, instanceClass);
     }
 
+    /**
+     * Test that deleting a bitstream also removes any {@link RequestItem} entities associated with it.
+     */
+    @Test
+    public void testDeleteBitstreamRemovesRequestItem() throws Exception {
+        // Fake up a request in REST form.
+        RequestItemRest rir = new RequestItemRest();
+        rir.setAllfiles(false);
+        rir.setItemId(item.getID().toString());
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setRequestEmail(eperson.getEmail());
+        rir.setRequestName(eperson.getFullName());
+        rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
 
+        // Create it and see if it was created correctly.
+        ObjectMapper mapper = new ObjectMapper();
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(authToken)
+            .perform(post(URI_ROOT)
+                         .content(mapper.writeValueAsBytes(rir))
+                         .contentType(contentType))
+            .andExpect(status().isCreated())
+            // verify the body is empty
+            .andExpect(jsonPath("$").doesNotExist());
+
+        // Delete associated Bitstream
+        ContentServiceFactory.getInstance().getBitstreamService().delete(context, bitstream);
+
+        // Verify that all RequestItems related to this bitstream have been removed
+        Iterator<RequestItem> itemRequests = requestItemService.findByItem(context, item);
+        assertFalse(itemRequests.hasNext());
+    }
 }
