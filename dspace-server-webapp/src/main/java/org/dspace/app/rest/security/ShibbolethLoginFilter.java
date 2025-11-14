@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.security;
 
+import static org.dspace.authenticate.AuthenticationUtility.Mapping.SHIBBOLETH;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -22,6 +24,7 @@ import org.dspace.authenticate.ShibAuthentication;
 import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.core.Authentication;
@@ -57,9 +60,9 @@ public class ShibbolethLoginFilter extends StatelessLoginFilter {
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    public ShibbolethLoginFilter(String url, String httpMethod, AuthenticationManager authenticationManager,
+    public ShibbolethLoginFilter(AuthenticationManager authenticationManager,
                                  RestAuthenticationService restAuthenticationService) {
-        super(url, httpMethod, authenticationManager, restAuthenticationService);
+        super(SHIBBOLETH.getMethodUrl(), HttpMethod.GET.name(), authenticationManager, restAuthenticationService);
     }
 
     @Override

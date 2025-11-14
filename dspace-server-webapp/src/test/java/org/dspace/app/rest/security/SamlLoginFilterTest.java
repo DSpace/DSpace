@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.security;
 
+import static org.dspace.authenticate.AuthenticationUtility.Mapping.SAML;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -55,8 +56,8 @@ public class SamlLoginFilterTest extends AbstractDSpaceTest {
         authManager = createAuthenticationManager();
         restAuthService = createRestAuthenticationService();
         filterChain = Mockito.mock(FilterChain.class);
-        filter = new SamlLoginFilter("/api/authn/saml", HttpMethod.GET.name(), authManager, restAuthService);
-        request = createRequest("/api/authn/saml");
+        filter = new SamlLoginFilter(authManager, restAuthService);
+        request = createRequest(SAML.getMethodUrl());
         response = createResponse();
     }
 
