@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -116,18 +117,18 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
 
     private List<String> getAllValues(Suggestion suggestion, String schema, String element, String qualifier) {
         return suggestion.getMetadata().stream()
-                .filter(st -> StringUtils.isNotBlank(st.getValue()) && StringUtils.equals(st.getSchema(), schema)
-                        && StringUtils.equals(st.getElement(), element)
-                        && StringUtils.equals(st.getQualifier(), qualifier))
+                .filter(st -> StringUtils.isNotBlank(st.getValue()) && Strings.CS.equals(st.getSchema(), schema)
+                        && Strings.CS.equals(st.getElement(), element)
+                        && Strings.CS.equals(st.getQualifier(), qualifier))
                 .map(st -> st.getValue()).collect(Collectors.toList());
     }
 
     private String getFirstValue(Suggestion suggestion, String schema, String element, String qualifier) {
         return suggestion.getMetadata().stream()
             .filter(st -> StringUtils.isNotBlank(st.getValue())
-                && StringUtils.equals(st.getSchema(), schema)
-                        && StringUtils.equals(st.getElement(), element)
-                        && StringUtils.equals(st.getQualifier(), qualifier))
+                && Strings.CS.equals(st.getSchema(), schema)
+                        && Strings.CS.equals(st.getElement(), element)
+                        && Strings.CS.equals(st.getQualifier(), qualifier))
                 .map(st -> st.getValue()).findFirst().orElse(null);
     }
 

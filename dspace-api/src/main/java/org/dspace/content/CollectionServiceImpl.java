@@ -13,16 +13,21 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.util.AuthorizeUtil;
@@ -54,6 +59,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.service.HarvestedCollectionService;
@@ -182,7 +188,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
         context.addEvent(new Event(Event.CREATE, Constants.COLLECTION,
-                newCollection.getID(), newCollection.getHandle(),
+                newCollection.getID(), newCollection.getHandle(), DetailType.HANDLE,
                 getIdentifiers(context, newCollection)));
 
         log.info(LogHelper.getHeader(context, "create_collection",
@@ -414,7 +420,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             log.error(LogHelper.getHeader(context, "setWorkflowGroup",
                     "collection_id=" + collection.getID() + " " + e.getMessage()), e);
         }
-        if (!StringUtils.equals(workflowFactory.getDefaultWorkflow().getID(), workflow.getID())) {
+        if (!Strings.CS.equals(workflowFactory.getDefaultWorkflow().getID(), workflow.getID())) {
             throw new IllegalArgumentException(
                     "setWorkflowGroup can be used only on collection with the default basic dspace workflow. "
                     + "Instead, the collection: "
@@ -618,7 +624,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
         context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION,
-                                   collection.getID(), "remove_template_item", getIdentifiers(context, collection)));
+            collection.getID(), "remove_template_item", DetailType.ACTION,
+            getIdentifiers(context, collection)));
     }
 
     @Override
@@ -637,8 +644,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
         context.addEvent(new Event(Event.ADD, Constants.COLLECTION, collection.getID(),
-                                   Constants.ITEM, item.getID(), item.getHandle(),
-                                   getIdentifiers(context, collection)));
+                Constants.ITEM, item.getID(), item.getHandle(), DetailType.HANDLE,
+                getIdentifiers(context, collection)));
     }
 
     @Override
@@ -658,8 +665,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
         context.addEvent(new Event(Event.REMOVE, Constants.COLLECTION,
-                                   collection.getID(), Constants.ITEM, item.getID(), item.getHandle(),
-                                   getIdentifiers(context, collection)));
+            collection.getID(), Constants.ITEM, item.getID(),
+            item.getHandle(), DetailType.HANDLE,
+            getIdentifiers(context, collection)));
     }
 
     @Override
@@ -680,7 +688,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
         if (collection.isMetadataModified()) {
             context.addEvent(new Event(Event.MODIFY_METADATA, Constants.COLLECTION, collection.getID(),
-                                         collection.getDetails(),getIdentifiers(context, collection)));
+                collection.getDetails(), DetailType.DSO_SUMMARY,
+                getIdentifiers(context, collection)));
             collection.clearModified();
         }
         collection.clearDetails();
@@ -737,7 +746,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
         context.addEvent(new Event(Event.DELETE, Constants.COLLECTION,
-                                   collection.getID(), collection.getHandle(), getIdentifiers(context, collection)));
+            collection.getID(), collection.getHandle(), DetailType.HANDLE,
+            getIdentifiers(context, collection)));
 
         // remove subscriptions - hmm, should this be in Subscription.java?
         subscribeService.deleteByDspaceObject(context, collection);
@@ -836,6 +846,86 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             }
         }
         return myResults;
+    }
+
+    @Override
+    public List<Collection> findAuthorized(Context context, Community community, List<Integer> actions)
+        throws SQLException {
+
+        List<Collection> myCollections = new ArrayList<>();
+        EPerson eperson = context.getCurrentUser();
+
+        //If eperson is Administrator return all colls or if a community is not null only the community's collections
+        if (authorizeService.isAdmin(context, eperson)) {
+            if (community != null) {
+                return community.getCollections();
+            }
+            myCollections = this.findAll(context);
+            return myCollections;
+        }
+
+        //Get the collections of the eperson where is is admin of a community
+        List<Group> directGroups = new ArrayList<>(eperson.getGroups()); // direct membership
+        Queue<Group> queue = new LinkedList<>(directGroups);
+        while (!queue.isEmpty()) {
+            Group current = queue.poll();
+            List<Group> parents = current.getParentGroups();
+
+            for (Group parent : parents) {
+                if (directGroups.add(parent)) {
+                    queue.add(parent);
+                }
+            }
+        }
+
+        List<ResourcePolicy> resourcePolicies = resourcePolicyService
+                   .find(context, eperson, directGroups, Constants.ADMIN, Constants.COMMUNITY);
+        List<UUID> uuids = resourcePolicies.stream()
+            .map(policy -> policy.getdSpaceObject().getID())
+            .toList();
+
+        List<Community> communities = uuids.stream()
+            .map(uuid -> {
+                try {
+                    return communityService.find(context, uuid);
+                } catch (SQLException e) {
+                    return null;  //ignore that uuid
+                }
+            })
+            .filter(Objects::nonNull)
+            .toList();
+
+        Set<Community> allCommunities = new HashSet<>(communities);
+        Set<Collection> allCommAdminCollections = communities.stream()
+            .flatMap(cm -> cm.getCollections().stream())
+            .collect(Collectors.toSet());
+        Queue<Community> queueComm = new LinkedList<>(communities);
+
+        while (!queueComm.isEmpty()) {
+            Community com = queueComm.poll();
+            List<Community> childrenComms = com.getSubcommunities();
+            for (Community childComm : childrenComms) {
+                if (allCommunities.add(childComm)) {
+                    queueComm.add(childComm);
+                    allCommAdminCollections.addAll(childComm.getCollections());
+                }
+            }
+        }
+
+        //Now get the collection when the eperson can deposit or is admin or is in a group with those privileges
+        myCollections = collectionDAO.findAuthorizedByEPerson(context, eperson, actions);
+        Set<Collection> allCollections = new HashSet<>(myCollections);
+        //Join EPerson Community Admin Collections with Collection Admins
+        allCollections.addAll(allCommAdminCollections);
+
+        List<Collection> collsAllowed = new ArrayList<>(allCollections);
+
+        //A community is passed, only the community's collections will be used and existing in eperson Authorizations
+        if (community != null) {
+            collsAllowed.retainAll(community.getCollections());
+        }
+
+        return collsAllowed;
     }
 
     @Override
