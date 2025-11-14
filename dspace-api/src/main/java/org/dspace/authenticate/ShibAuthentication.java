@@ -870,7 +870,7 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             String[] nameParts = MetadataFieldName.parse(field);
             ePersonService.setMetadataSingleValue(context, eperson,
-                    nameParts[0], nameParts[1], nameParts[2], value, null);
+                    nameParts[0], nameParts[1], nameParts[2], null, value);
             log.debug("Updated the eperson's '{}' metadata using header: '{}' = '{}'.",
                     field, header, value);
         }
