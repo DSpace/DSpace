@@ -51,12 +51,12 @@ public class CustomUrlServiceImpl implements CustomUrlService {
 
     @Override
     public Optional<String> getCustomUrl(Item item) {
-        return ofNullable(itemService.getMetadataFirstValue(item, "cris", "customurl", null, Item.ANY));
+        return ofNullable(itemService.getMetadataFirstValue(item, "dspace", "customurl", null, Item.ANY));
     }
 
     @Override
     public List<String> getOldCustomUrls(Item item) {
-        return itemService.getMetadataByMetadataString(item, "cris.customurl.old").stream()
+        return itemService.getMetadataByMetadataString(item, "dspace.customurl.old").stream()
                           .map(MetadataValue::getValue)
                           .collect(Collectors.toList());
     }
@@ -70,8 +70,8 @@ public class CustomUrlServiceImpl implements CustomUrlService {
     @Override
     public void replaceCustomUrl(Context context, Item item, String newUrl) {
         try {
-            itemService.clearMetadata(context, item, "cris", "customurl", null, ANY);
-            itemService.addMetadata(context, item, "cris", "customurl", null, null, newUrl);
+            itemService.clearMetadata(context, item, "dspace", "customurl", null, ANY);
+            itemService.addMetadata(context, item, "dspace", "customurl", null, null, newUrl);
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
         }
@@ -90,7 +90,7 @@ public class CustomUrlServiceImpl implements CustomUrlService {
     @Override
     public void addOldCustomUrl(Context context, Item item, String url) {
         try {
-            itemService.addMetadata(context, item, "cris", "customurl", "old", null, url);
+            itemService.addMetadata(context, item, "dspace", "customurl", "old", null, url);
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
         }
@@ -99,7 +99,7 @@ public class CustomUrlServiceImpl implements CustomUrlService {
     @Override
     public void deleteCustomUrl(Context context, Item item) {
         try {
-            itemService.clearMetadata(context, item, "cris", "customurl", null, ANY);
+            itemService.clearMetadata(context, item, "dspace", "customurl", null, ANY);
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
         }
@@ -108,7 +108,7 @@ public class CustomUrlServiceImpl implements CustomUrlService {
     @Override
     public void deleteAllOldCustomUrls(Context context, Item item) {
         try {
-            itemService.clearMetadata(context, item, "cris", "customurl", "old", ANY);
+            itemService.clearMetadata(context, item, "dspace", "customurl", "old", ANY);
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
         }
@@ -117,7 +117,7 @@ public class CustomUrlServiceImpl implements CustomUrlService {
     @Override
     public void deleteOldCustomUrlByIndex(Context context, Item item, int index) {
 
-        List<MetadataValue> redirectedUrls = itemService.getMetadata(item, "cris", "customurl", "old", ANY);
+        List<MetadataValue> redirectedUrls = itemService.getMetadata(item, "dspace", "customurl", "old", ANY);
 
         if (index >= redirectedUrls.size()) {
             throw new IllegalArgumentException(
@@ -172,7 +172,7 @@ public class CustomUrlServiceImpl implements CustomUrlService {
     }
 
     private List<MetadataValue> getRedirectedUrlMetadataValuesWithValue(Item item, String value) {
-        return itemService.getMetadataByMetadataString(item, "cris.customurl.old").stream()
+        return itemService.getMetadataByMetadataString(item, "dspace.customurl.old").stream()
                           .filter(metadataValue -> value.equals(metadataValue.getValue()))
                           .collect(Collectors.toList());
     }

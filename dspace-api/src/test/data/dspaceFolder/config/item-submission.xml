@@ -18,6 +18,8 @@
     <!-- for handle "default". -->
     <submission-map>
         <name-map collection-handle="default" submission-name="traditional"/>
+        <name-map collection-handle="123456789/traditional-with-custom-url"
+                  submission-name="traditional-with-custom-url"/>
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
         <name-map collection-handle="123456789/extraction-test" submission-name="extractiontestprocess"/>
         <name-map collection-handle="123456789/qualdrop-test" submission-name="qualdroptest"/>
@@ -83,6 +85,12 @@
             <processing-class>org.dspace.app.rest.submit.step.LicenseStep</processing-class>
             <type>license</type>
             <scope visibilityOutside="read-only">submission</scope>
+        </step-definition>
+        <step-definition id="extraction">
+            <heading/>
+            <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
+            <type>utils</type>
+            <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
         </step-definition>
 
         <step-definition id="qualdroptest">
@@ -261,17 +269,11 @@
             <step id="cclicense"/>
         </submission-process>
 
-        <submission-process name="ttraditional-with-custom-url">
+        <submission-process name="traditional-with-custom-url">
             <step id="collection"/>
-            <step id="identifiers"/>
+            <step id="extraction"/>
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
-            <step id="coarnotify"/>
-            <step id="upload"/>
-            <step id="defaultAC"/>
-            <step id="sherpaPolicies"/>
-            <step id="license"/>
-            <step id="cclicense"/>
             <step id="custom-url"/>
         </submission-process>
 

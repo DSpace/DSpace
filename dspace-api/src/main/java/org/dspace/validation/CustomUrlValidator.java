@@ -91,8 +91,8 @@ public class CustomUrlValidator implements SubmissionStepValidator {
 
     private Iterator<Item> findItemsByCustomUrl(Context context, String customUrl) {
         return new IteratorChain<Item>(
-            findArchivedByMetadataField(context, "cris", "customurl", null, customUrl),
-            findArchivedByMetadataField(context, "cris", "customurl", "old", customUrl));
+            findArchivedByMetadataField(context, "dspace", "customurl", null, customUrl),
+            findArchivedByMetadataField(context, "dspace", "customurl", "old", customUrl));
     }
 
     private Iterator<Item> findArchivedByMetadataField(Context context, String schema, String element,

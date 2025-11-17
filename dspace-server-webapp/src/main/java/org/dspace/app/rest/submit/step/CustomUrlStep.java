@@ -28,7 +28,7 @@ import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
 
 /**
- * Implementation of {@link DataProcessingStep} that expose and allow patching
+ * Implementation of {@link org.dspace.app.rest.submit.DataProcessingStep} that expose and allow patching
  * the custom defined url.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)

@@ -258,11 +258,11 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     }
 
     public WorkspaceItemBuilder withCustomUrl(String url) {
-        return setMetadataSingleValue("cris", "customurl", null, url);
+        return setMetadataSingleValue("dspace", "customurl", null, url);
     }
 
     public WorkspaceItemBuilder withOldCustomUrl(String url) {
-        return addMetadataValue("cris", "customurl", "old", url);
+        return addMetadataValue("dspace", "customurl", "old", url);
     }
 
 }

@@ -58,7 +58,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
                                       .withEntityType("Person")
                                       .build();
 
-        configurationService.setProperty("cris.custom-url.consumer.supported-entities", "Person");
+        configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Person");
 
         context.restoreAuthSystemState();
     }
@@ -77,7 +77,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         item = context.reloadEntity(item);
 
-        assertThat(item.getMetadata(), hasItem(with("cris.customurl", "giamminonni-luca")));
+        assertThat(item.getMetadata(), hasItem(with("dspace.customurl", "giamminonni-luca")));
 
     }
 
@@ -95,7 +95,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item item = context.reloadEntity(workspaceItem.getItem());
 
-        assertThat(itemService.getMetadataByMetadataString(item, "cris.customurl"), empty());
+        assertThat(itemService.getMetadataByMetadataString(item, "dspace.customurl"), empty());
 
     }
 
@@ -114,8 +114,8 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         item = context.reloadEntity(item);
 
-        assertThat(itemService.getMetadataByMetadataString(item, "cris.customurl"), hasSize(1));
-        assertThat(item.getMetadata(), hasItem(with("cris.customurl", "my-custom-url")));
+        assertThat(itemService.getMetadataByMetadataString(item, "dspace.customurl"), hasSize(1));
+        assertThat(item.getMetadata(), hasItem(with("dspace.customurl", "my-custom-url")));
 
     }
 
@@ -132,7 +132,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         item = context.reloadEntity(item);
 
-        assertThat(itemService.getMetadataByMetadataString(item, "cris.customurl"), empty());
+        assertThat(itemService.getMetadataByMetadataString(item, "dspace.customurl"), empty());
 
     }
 
@@ -150,7 +150,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         item = context.reloadEntity(item);
 
-        assertThat(itemService.getMetadataByMetadataString(item, "cris.customurl"), empty());
+        assertThat(itemService.getMetadataByMetadataString(item, "dspace.customurl"), empty());
 
     }
 
@@ -173,7 +173,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         item = context.reloadEntity(item);
 
-        assertThat(itemService.getMetadataByMetadataString(item, "cris.customurl"), empty());
+        assertThat(itemService.getMetadataByMetadataString(item, "dspace.customurl"), empty());
 
     }
 
@@ -195,7 +195,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         item = context.reloadEntity(item);
 
-        assertThat(itemService.getMetadataByMetadataString(item, "cris.customurl"), empty());
+        assertThat(itemService.getMetadataByMetadataString(item, "dspace.customurl"), empty());
 
     }
 }

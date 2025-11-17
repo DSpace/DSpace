@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Integration tests for {@link CustomUrlStep}.
+ * Integration tests for {@link org.dspace.app.rest.submit.step.CustomUrlStep}.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
@@ -51,10 +51,10 @@ public class CustomUrlStepIT extends AbstractControllerIntegrationTest {
                                           .withName("Parent Community")
                                           .build();
 
-        collection = CollectionBuilder.createCollection(context, parentCommunity)
+        collection =
+            CollectionBuilder.createCollection(context, parentCommunity, "123456789/traditional-with-custom-url")
                                       .withName("Collection 1")
                                       .withEntityType("Publication")
-                                      .withSubmissionDefinition("traditional-with-custom-url")
                                       .build();
 
         context.restoreAuthSystemState();

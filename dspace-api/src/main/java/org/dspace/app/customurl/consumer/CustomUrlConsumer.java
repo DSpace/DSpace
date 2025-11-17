@@ -113,7 +113,7 @@ public class CustomUrlConsumer implements Consumer {
     }
 
     private String[] getSupportedEntities() {
-        return configurationService.getArrayProperty("cris.custom-url.consumer.supported-entities", new String[] {});
+        return configurationService.getArrayProperty("dspace.custom-url.consumer.supported-entities", new String[] {});
     }
 
     @Override
