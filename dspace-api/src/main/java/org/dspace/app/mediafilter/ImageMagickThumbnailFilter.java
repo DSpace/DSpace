@@ -105,7 +105,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         ConvertCmd cmd = new ConvertCmd();
         IMOperation op = new IMOperation();
         op.autoOrient();
-        op.addImage(f.getAbsolutePath());
+        op.addImage(f.getAbsolutePath() + "[0]");
         op.thumbnail(configurationService.getIntProperty("thumbnail.maxwidth", DEFAULT_WIDTH),
                         configurationService.getIntProperty("thumbnail.maxheight", DEFAULT_HEIGHT));
         op.addImage(f2.getAbsolutePath());
