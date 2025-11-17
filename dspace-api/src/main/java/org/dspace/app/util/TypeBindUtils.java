@@ -47,9 +47,10 @@ public class TypeBindUtils {
     }
 
     /**
-     * This method gets the value of the type-bind field from the current item.
+     * Gets the value of the type-bind field from the current item in the submission.
      *
-     * @return the value of the type-bind field from the current item.
+     * @param obj the in-progress submission
+     * @return the value of the type-bind field, or null if not set
      */
     public static String getTypeBindValue(InProgressSubmission<?> obj) {
         List<MetadataValue> documentType = itemService.getMetadataByMetadataString(

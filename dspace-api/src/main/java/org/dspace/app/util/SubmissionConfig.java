@@ -138,6 +138,11 @@ public class SubmissionConfig implements Serializable, Iterable<SubmissionStepCo
         return (getStep(stepNum + 1) != null);
     }
 
+    /**
+     * Returns an iterator over the submission steps in this configuration.
+     *
+     * @return an Iterator of SubmissionStepConfig
+     */
     @Override
     public Iterator<SubmissionStepConfig> iterator() {
         return new SubmissionStepConfigIterator(this);

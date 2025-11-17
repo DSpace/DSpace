@@ -22,11 +22,21 @@ public abstract class IndexableInProgressSubmission<T extends InProgressSubmissi
         this.inProgressSubmission = inProgressSubmission;
     }
 
+    /**
+     * Returns the indexed in-progress submission object.
+     *
+     * @return the indexed in-progress submission
+     */
     @Override
     public T getIndexedObject() {
         return inProgressSubmission;
     }
 
+    /**
+     * Sets the indexed in-progress submission object.
+     *
+     * @param inProgressSubmission the in-progress submission to set
+     */
     @Override
     public void setIndexedObject(T inProgressSubmission) {
         this.inProgressSubmission = inProgressSubmission;
