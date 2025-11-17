@@ -27,8 +27,12 @@ import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
 import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.services.ConfigurationService;
@@ -63,6 +67,12 @@ public class MetadataValidator implements SubmissionStepValidator {
     private MetadataAuthorityService metadataAuthorityService;
 
     private String name;
+
+    private final RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance()
+                                                                                         .getRelationshipTypeService();
+
+    private final RelationshipService relationshipService = ContentServiceFactory.getInstance()
+                                                                                 .getRelationshipService();
 
     @Override
     public List<ValidationError> validate(Context context, InProgressSubmission<?> obj, SubmissionStepConfig config) {
@@ -154,9 +164,45 @@ public class MetadataValidator implements SubmissionStepValidator {
                         }
                     }
                 }
+                relationshipRequiredFieldCheck(context, obj.getItem(), input, errors,
+                                               config);
             }
         }
         return errors;
+    }
+
+    /**
+     * Checks if the relation type exists on the item. If not, sets the error state.
+     *
+     * @param context the current context
+     * @param item    item in the submission
+     * @param input   input field
+     * @param errors  List holding all errors
+     * @param config  submission step config
+     * @throws SQLException
+     */
+    private void relationshipRequiredFieldCheck(Context context, Item item, DCInput input, List<ValidationError> errors,
+                                                SubmissionStepConfig config) {
+        if (input.isRelationshipField() && input.isRequired()) {
+            String relationshipType = input.getRelationshipType();
+            if (itemService.getMetadataByMetadataString(item, "relation." + relationshipType).isEmpty()) {
+                try {
+                    List<RelationshipType> relationTypes =
+                        relationshipTypeService.findByLeftwardOrRightwardTypeName(context, relationshipType);
+                    for (RelationshipType relationType : relationTypes) {
+                        if (!relationshipService.findByItemAndRelationshipType(context, item, relationType).isEmpty()) {
+                            return;
+                        }
+                    }
+                } catch (SQLException e) {
+                    throw new SQLRuntimeException(e);
+                }
+
+                addError(errors, ERROR_VALIDATION_REQUIRED,
+                         "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                             input.getFieldName());
+            }
+        }
     }
 
     private DCInputSet getDCInputSet(SubmissionStepConfig config) {
