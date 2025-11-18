@@ -356,10 +356,14 @@
 
     <!-- DataCite (2) :: Creator -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']">
+        <xsl:variable name="authority" select="@authority"/>
         <creator>
             <creatorName>
                 <xsl:value-of select="." />
             </creatorName>
+            <xsl:call-template name="personOrcid">
+                <xsl:with-param name="authority_value" select="$authority"/>
+            </xsl:call-template>
         </creator>
     </xsl:template>
 
@@ -640,6 +644,21 @@
             </xsl:attribute>
             <xsl:value-of select="." />
         </xsl:element>
+    </xsl:template>
+
+    <!--
+        This template will return ORCiD nameIdentifier information based on a given authority value, if a person entity
+        is related with the publication and contains a value for the metadata field dc.identifier.orcid.
+    -->
+    <xsl:template name="personOrcid">
+        <xsl:param name="authority_value"/>
+        <xsl:if test="starts-with($authority_value, 'virtual::') and //dspace:field[@mdschema='person' and @element='identifier' and @qualifier='orcid' and @authority=$authority_value]">
+            <xsl:element name="nameIdentifier">
+                <xsl:attribute name="schemeURI">https://orcid.org/</xsl:attribute>
+                <xsl:attribute name="nameIdentifierScheme">ORCID</xsl:attribute>
+                <xsl:value-of select="//dspace:field[@mdschema='person' and @element='identifier' and @qualifier='orcid' and @authority=$authority_value]/text()"/>
+            </xsl:element>
+        </xsl:if>
     </xsl:template>
 
 </xsl:stylesheet>

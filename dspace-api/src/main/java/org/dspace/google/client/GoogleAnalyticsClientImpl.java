@@ -12,7 +12,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -47,7 +47,7 @@ public class GoogleAnalyticsClientImpl implements GoogleAnalyticsClient {
 
     @Override
     public boolean isAnalyticsKeySupported(String analyticsKey) {
-        return StringUtils.startsWith(analyticsKey, keyPrefix);
+        return Strings.CS.startsWith(analyticsKey, keyPrefix);
     }
 
     @Override
