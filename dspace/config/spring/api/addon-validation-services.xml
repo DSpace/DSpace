@@ -20,8 +20,8 @@
 
     <bean name="metadataValidation" class="org.dspace.validation.MetadataValidator">
         <property name="name" value="submission-form"/>
-        <property name="itemService" ref="org.dspace.content.ItemServiceImpl"/>
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+        <property name="itemService" ref="org.dspace.content.ItemServiceImpl"/>
         <property name="metadataAuthorityService" ref="org.dspace.content.authority.MetadataAuthorityServiceImpl"/>
     </bean>
 
@@ -38,6 +38,13 @@
 
     <bean name="licenseValidation" class="org.dspace.validation.LicenseValidator">
         <property name="name" value="license"/>
+    </bean>
+
+    <bean name="COARNotifyValidation" class="org.dspace.validation.NotifyValidation" scope="prototype">
+        <property name="name" value="coarnotify"/>
+        <property name="coarNotifyConfigurationService" ref="org.dspace.coarnotify.NotifyConfigurationService"/>
+        <property name="notifyPatternToTriggerService"
+                  ref="org.dspace.app.ldn.service.impl.NotifyPatternToTriggerImpl"/>
     </bean>
 
     <bean name="customUrlValidation" class="org.dspace.validation.CustomUrlValidator">
