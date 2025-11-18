@@ -50,7 +50,7 @@ public class EPersonCLITool {
     private static final Option OPT_PHONE = new Option("t", "telephone", true, "telephone number, empty for none");
     private static final Option OPT_LANGUAGE = new Option("l", "language", true, "the person's preferred language");
     private static final Option OPT_REQUIRE_CERTIFICATE = new Option("c", "requireCertificate", true,
-                                                                     "if 'true', an X.509 certificate will be " +
+                                                                     "if 'true', a certificate will be " +
                                                                          "required for login");
     private static final Option OPT_CAN_LOGIN = new Option("C", "canLogIn", true, "'true' if the user can log in");
 
