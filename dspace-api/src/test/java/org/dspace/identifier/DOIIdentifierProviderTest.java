@@ -204,11 +204,13 @@ public class DOIIdentifierProviderTest
                                   DOIIdentifierProvider.DOI_ELEMENT,
                                   DOIIdentifierProvider.DOI_QUALIFIER,
                                   null);
-        itemService.addMetadata(context, item, DOIIdentifierProvider.MD_SCHEMA,
-                                DOIIdentifierProvider.DOI_ELEMENT,
-                                DOIIdentifierProvider.DOI_QUALIFIER,
-                                null,
-                                remainder);
+        if (!remainder.isEmpty()) {
+            itemService.addMetadata(context, item, DOIIdentifierProvider.MD_SCHEMA,
+                                    DOIIdentifierProvider.DOI_ELEMENT,
+                                    DOIIdentifierProvider.DOI_QUALIFIER,
+                                    null,
+                                    remainder);
+        }
 
         itemService.update(context, item);
         //we need to commit the changes so we don't block the table for testing
