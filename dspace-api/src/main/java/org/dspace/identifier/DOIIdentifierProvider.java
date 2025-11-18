@@ -1106,8 +1106,10 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
 
         itemService.clearMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
-                remainder);
+        if (!remainder.isEmpty()) {
+            itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+                    remainder);
+        }
         itemService.update(context, item);
     }
 
