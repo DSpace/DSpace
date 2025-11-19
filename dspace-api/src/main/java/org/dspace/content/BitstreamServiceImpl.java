@@ -295,7 +295,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         // a deleted bitstream
         List<RequestItem> requestItems = requestItemService.findAll(context);
         for (RequestItem requestItem : requestItems) {
-            if (requestItem.getBitstream().equals(bitstream)) {
+            if (bitstream.equals(requestItem.getBitstream())) {
                 requestItemService.delete(context, requestItem);
             }
         }
