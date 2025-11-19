@@ -68,10 +68,12 @@ public class AuditConsumer implements Consumer {
         return relatedObjectId != null;
     }
 
+    @Override
     public void end(Context ctx) throws Exception {
         // no-op
     }
 
+    @Override
     public void finish(Context ctx) throws Exception {
         // No-op
     }

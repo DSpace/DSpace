@@ -62,19 +62,26 @@
   </updateHandler>
 
   <query>
-    <maxBooleanClauses>1024</maxBooleanClauses>
+    <maxBooleanClauses>${solr.max.booleanClauses:1024}</maxBooleanClauses>
 
-    <filterCache class="solr.FastLRUCache"
+    <!-- Cache used by SolrIndexSearcher for filters (DocSets) for
+         unordered sets of *all* documents that match a query. Caches results of 'fq' search param. -->
+    <filterCache class="solr.search.CaffeineCache"
                  size="512"
                  initialSize="512"
                  autowarmCount="0"/>
 
-    <queryResultCache class="solr.LRUCache"
-                     size="512"
-                     initialSize="512"
-                     autowarmCount="0"/>
-   
-    <documentCache class="solr.LRUCache"
+    <!-- Caches results of previous searches - ordered lists of document ids
+        (DocList) based on a query, a sort, and the range of documents requested. -->
+    <queryResultCache class="solr.search.CaffeineCache"
+                      size="512"
+                      initialSize="512"
+                      autowarmCount="0"/>
+
+    <!-- Caches Lucene Document objects (the stored fields for each
+       document).  Since Lucene internal document ids are transient,
+       this cache will not be autowarmed. -->
+    <documentCache class="solr.search.CaffeineCache"
                    size="512"
                    initialSize="512"
                    autowarmCount="0"/>
@@ -84,19 +91,6 @@
     <queryResultWindowSize>20</queryResultWindowSize>
 
     <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
-
-    <listener event="newSearcher" class="solr.QuerySenderListener">
-      <arr name="queries">
-      </arr>
-    </listener>
-
-    <listener event="firstSearcher" class="solr.QuerySenderListener">
-      <arr name="queries">
-        <lst>
-          <str name="q">static firstSearcher warming in solrconfig.xml</str>
-        </lst>
-      </arr>
-    </listener>
 
     <useColdSearcher>false</useColdSearcher>
 
@@ -113,123 +107,57 @@
     <httpCaching never304="true" />
   </requestDispatcher>
 
-  <requestHandler name="/select" class="solr.SearchHandler">
-     <lst name="defaults">
-       <str name="echoParams">explicit</str>
-       <int name="rows">10</int>
-       <str name="df">object_uuid</str>
-       <str name="q.op">AND</str>
-     </lst>
+    <!-- Process requests to /select path -->
+    <requestHandler name="/select" class="solr.SearchHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <int name="rows">10</int>
+            <str name="df">search_text</str>
+            <str name="q.op">AND</str>
+        </lst>
+        <arr name="last-components">
+            <str>spellcheck</str>
+        </arr>
     </requestHandler>
 
-  <requestHandler name="/query" class="solr.SearchHandler">
-     <lst name="defaults">
-       <str name="echoParams">explicit</str>
-       <str name="wt">json</str>
-       <str name="indent">true</str>
-       <str name="df">object_uuid</str>
-     </lst>
-  </requestHandler>
+    <!-- Processes updates to the index -->
+    <requestHandler name="/update" class="solr.UpdateRequestHandler"/>
 
-  <requestHandler name="/get" class="solr.RealTimeGetHandler">
-     <lst name="defaults">
-       <str name="omitHeader">true</str>
-       <str name="wt">json</str>
-       <str name="indent">true</str>
-     </lst>
-  </requestHandler>
-
-  <requestHandler name="/update" class="solr.UpdateRequestHandler">
-    <!-- Update chain processor required by DSpace to auto generate the UUID field in solr -->
-    <lst name="defaults">
-        <str name="update.chain">uuid</str>
-    </lst>
-  </requestHandler>
-
-  <requestHandler name="/update/json" class="solr.UpdateRequestHandler">
+    <requestHandler name="/update/json" class="solr.UpdateRequestHandler">
         <lst name="defaults">
-         <str name="stream.contentType">application/json</str>
-         <str name="update.chain">uuid</str>
-       </lst>
-  </requestHandler>
+            <str name="stream.contentType">application/json</str>
+        </lst>
+    </requestHandler>
 
-  <requestHandler name="/update/extract" 
-                  startup="lazy"
-                  class="solr.extraction.ExtractingRequestHandler" >
-    <lst name="defaults">
-      <str name="lowernames">true</str>
-      <str name="uprefix">ignored_</str>
+    <requestHandler name="/spell" class="solr.SearchHandler" lazy="true">
+        <lst name="defaults">
+            <str name="spellcheck.onlyMorePopular">false</str>
+            <str name="spellcheck.extendedResults">false</str>
+            <str name="spellcheck.count">1</str>
+        </lst>
+        <arr name="last-components">
+            <str>spellcheck</str>
+        </arr>
+    </requestHandler>
 
-      <!-- capture link hrefs but ignore div attributes -->
-      <str name="captureAttr">true</str>
-      <str name="fmap.a">links</str>
-      <str name="fmap.div">ignored_</str>
-    </lst>
-  </requestHandler>
-
-  <requestHandler name="/analysis/field" 
-                  startup="lazy"
-                  class="solr.FieldAnalysisRequestHandler" />
-
-  <requestHandler name="/analysis/document" 
-                  class="solr.DocumentAnalysisRequestHandler" 
-                  startup="lazy" />
-
-  <!-- Admin Handlers -->
-  <requestHandler name="/admin/luke"
-                  class="solr.admin.LukeRequestHandler" />
-  <requestHandler name="/admin/system"
-                  class="solr.admin.SystemInfoHandler" />
-  <requestHandler name="/admin/plugins"
-                  class="solr.admin.PluginInfoHandler" />
-  <requestHandler name="/admin/threads"
-                  class="solr.admin.ThreadDumpHandler" />
-  <requestHandler name="/admin/properties"
-                  class="solr.admin.PropertiesRequestHandler" />
-  <requestHandler name="/admin/file"
-                  class="solr.admin.ShowFileRequestHandler" />
-
-  <requestHandler name="/admin/ping" class="solr.PingRequestHandler">
-    <lst name="invariants">
-      <str name="q">solrpingquery</str>
-    </lst>
-    <lst name="defaults">
-      <str name="echoParams">all</str>
-    </lst>
-  </requestHandler>
-
-  <requestHandler name="/debug/dump" class="solr.DumpRequestHandler" >
-    <lst name="defaults">
-     <str name="echoParams">explicit</str> 
-     <str name="echoHandler">true</str>
-    </lst>
-  </requestHandler>
-  
-  <requestHandler name="/replication" class="solr.ReplicationHandler"/>
 
   <searchComponent name="tvComponent" class="solr.TermVectorComponent"/>
 
-  <requestHandler name="/tvrh" class="solr.SearchHandler" startup="lazy">
-    <lst name="defaults">
-      <str name="df">id</str>
-      <bool name="tv">true</bool>
-    </lst>
-    <arr name="last-components">
-      <str>tvComponent</str>
-    </arr>
-  </requestHandler>
-
   <searchComponent name="terms" class="solr.TermsComponent"/>
 
-  <requestHandler name="/terms" class="solr.SearchHandler" startup="lazy">
-     <lst name="defaults">
-      <bool name="terms">true</bool>
-      <bool name="distrib">false</bool>
-    </lst>     
-    <arr name="components">
-      <str>terms</str>
-    </arr>
-  </requestHandler>
+  <!-- IndexBasedSpellChecker uses Solr index as basis for a parallel index used for spell checking -->
+  <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
+      <str name="queryAnalyzerFieldType">textSpell</str>
+
+      <lst name="spellchecker">
+          <str name="classname">solr.IndexBasedSpellChecker</str>
+          <str name="name">default</str>
+          <str name="field">a_spell</str>
+          <str name="spellcheckIndexDir">./spellchecker</str>
+          <str name="buildOnOptimize">true</str>
+          <str name="spellcheck.onlyMorePopular">false</str>
+      </lst>
+  </searchComponent>
 
   <!-- Required for DSpace to ensure that unique identifiers are added to each solr document -->
   <updateRequestProcessorChain name="uuid">    
@@ -239,13 +167,4 @@
     <processor class="solr.RunUpdateProcessorFactory" />
   </updateRequestProcessorChain>
 
-  <queryResponseWriter name="json" class="solr.JSONResponseWriter">
-    <str name="content-type">text/plain; charset=UTF-8</str>
-  </queryResponseWriter>
-
-  <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" startup="lazy"/>
-
-  <admin>
-    <defaultQuery>*:*</defaultQuery>
-  </admin>
 </config>

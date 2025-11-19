@@ -35,6 +35,9 @@ public class AuditEvent {
 
     private final static String LOG_FIELD_SEPARATOR = " || ";
 
+    /**
+     * @return the uuid of the audit event
+    **/
     public UUID getUuid() {
         return uuid;
     }
@@ -43,6 +46,9 @@ public class AuditEvent {
         this.uuid = uuid;
     }
 
+    /**
+     * @return the uuid of the eperson who generates event
+     */
     public UUID getEpersonUUID() {
         return epersonUUID;
     }
@@ -51,6 +57,9 @@ public class AuditEvent {
         this.epersonUUID = epersonUUID;
     }
 
+    /**
+     * @return the uuid of the object involved in the event
+     */
     public UUID getObjectUUID() {
         return objectUUID;
     }
@@ -59,6 +68,9 @@ public class AuditEvent {
         this.objectUUID = objectUUID;
     }
 
+    /**
+     * @return the type of the object involved in the event
+     */
     public String getObjectType() {
         return objectType;
     }
@@ -67,6 +79,9 @@ public class AuditEvent {
         this.objectType = objectType;
     }
 
+    /**
+     * @return the uuid of the subject involved in the event
+     */
     public UUID getSubjectUUID() {
         return subjectUUID;
     }
@@ -75,6 +90,9 @@ public class AuditEvent {
         this.subjectUUID = subjectUUID;
     }
 
+    /**
+    * @return the type of the subject involved in the event e.g. ITEM, COLLECTION, COMMUNITY
+    */
     public String getSubjectType() {
         return subjectType;
     }
@@ -83,6 +101,9 @@ public class AuditEvent {
         this.subjectType = subjectType;
     }
 
+    /**
+     * @return the type of event e.g. CREATE, MODIFY_METADATA, DELETE
+     */
     public String getEventType() {
         return eventType;
     }
@@ -91,6 +112,9 @@ public class AuditEvent {
         this.eventType = changetype;
     }
 
+    /**
+     * @return the date and time of the event
+     */
     public Date getDatetime() {
         return timeStamp;
     }
@@ -99,6 +123,9 @@ public class AuditEvent {
         this.timeStamp = datetime;
     }
 
+    /**
+     * @return additional detail about the event
+     */
     public String getDetail() {
         return detail;
     }
@@ -107,6 +134,9 @@ public class AuditEvent {
         this.detail = detail;
     }
 
+    /**
+     * @return the metadata field involved in the event e.g. dc.contributor.author
+     */
     public String getMetadataField() {
         return metadataField;
     }
@@ -115,6 +145,9 @@ public class AuditEvent {
         this.metadataField = metadataField;
     }
 
+    /**
+     * @return the metadata value involved in the event e.g. "Smith, John"
+     */
     public String getValue() {
         return value;
     }
@@ -123,6 +156,9 @@ public class AuditEvent {
         this.value = value;
     }
 
+    /**
+     * @return the authority key of the metadata value involved in the event
+     */
     public String getAuthority() {
         return authority;
     }
@@ -131,6 +167,9 @@ public class AuditEvent {
         this.authority = authority;
     }
 
+    /**
+     * @return the confidence level of the metadata value involved in the event
+     */
     public Integer getConfidence() {
         return confidence;
     }
@@ -139,6 +178,9 @@ public class AuditEvent {
         this.confidence = confidence;
     }
 
+    /**
+     * @return the place of the metadata value involved in the event e.g. 0
+     */
     public Integer getPlace() {
         return place;
     }
@@ -147,6 +189,9 @@ public class AuditEvent {
         this.place = place;
     }
 
+    /**
+     * @return the action performed on the metadata value involved in the event e.g. ADD, REMOVE ...
+     */
     public String getAction() {
         return action;
     }
@@ -155,6 +200,9 @@ public class AuditEvent {
         this.action = action;
     }
 
+    /**
+     * @return the checksum of the bitstream involved in the event
+     */
     public String getChecksum() {
         return checksum;
     }
@@ -167,6 +215,7 @@ public class AuditEvent {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("AUDIT_EVENT")
+                .append(LOG_FIELD_SEPARATOR).append("uuid=").append(nullSafe(getUuid()))
                 .append(LOG_FIELD_SEPARATOR).append("eventType=").append(nullSafe(getEventType()))
                 .append(LOG_FIELD_SEPARATOR).append("subjectUUID=").append(nullSafe(getSubjectUUID()))
                 .append(LOG_FIELD_SEPARATOR).append("subjectType=").append(nullSafe(getSubjectType()))
@@ -179,6 +228,7 @@ public class AuditEvent {
                 .append(LOG_FIELD_SEPARATOR).append("place=").append(nullSafe(getPlace()))
                 .append(LOG_FIELD_SEPARATOR).append("action=").append(nullSafe(getAction()))
                 .append(LOG_FIELD_SEPARATOR).append("checksum=").append(nullSafe(getChecksum()))
+                .append(LOG_FIELD_SEPARATOR).append("detail=").append(nullSafe(getDetail()))
                 .append(LOG_FIELD_SEPARATOR).append("datetime=").append(getDatetime() == null ?
                         "null" : String.valueOf(getDatetime().getTime()))
                 .append(LOG_FIELD_SEPARATOR).append("epersonUUID=").append(nullSafe(getEpersonUUID()));

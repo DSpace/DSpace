@@ -102,7 +102,7 @@ public class AuditSolrServiceImpl implements AuditService {
 
     protected SolrClient getSolr() throws MalformedURLException, SolrServerException, IOException {
         if (solr == null) {
-            String solrService = configurationService.getProperty("solr.audit.server");
+            String solrService = configurationService.getProperty("audit.solr.server");
             log.debug("Solr audit URL: " + solrService);
             SolrClient solrServer = httpSolrClientFactory.getClient(solrService);
             SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
