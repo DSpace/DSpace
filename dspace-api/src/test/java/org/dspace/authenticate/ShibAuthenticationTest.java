@@ -20,7 +20,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.MetadataField;
 import org.dspace.content.service.MetadataFieldService;
