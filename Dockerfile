@@ -69,5 +69,10 @@ RUN apt-get update \
 EXPOSE 8080 8000
 # Give java extra memory (2GB)
 ENV JAVA_OPTS=-Xmx2000m
+
+# For security reason (requirement on some cloud platforms) we want to run dspace as non-root user.
+RUN chown -R ubuntu:ubuntu /dspace
+USER ubuntu
+
 # On startup, run DSpace Runnable JAR
 ENTRYPOINT ["java", "-jar", "webapps/server-boot.jar", "--dspace.dir=$DSPACE_INSTALL"]
