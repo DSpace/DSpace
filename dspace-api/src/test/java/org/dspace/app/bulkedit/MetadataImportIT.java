@@ -12,6 +12,9 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -19,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.collections4.IteratorUtils;
@@ -416,6 +420,86 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         assertTrue(context.reloadEntity(item).isWithdrawn());
 
         String[] csv = {"id,action", item.getID().toString() + ",reinstate"};
+        performImportScript(csv);
+        item = findItemByName("title", true);
+        assertFalse(item.isWithdrawn());
+    }
+
+    @Test
+    public void metadataImportCollectionMappingTest() throws Exception {
+        String collectionHandle = collection.getHandle();
+        String personCollectionHandle = personCollection.getHandle();
+        String publicationCollectionHandle = publicationCollection.getHandle();
+
+        String[] csv = {
+            "id,collection,dc.title",
+            "+,"
+                + String.join("||", collectionHandle, personCollectionHandle)
+                + ",title"
+        };
+        performImportScript(csv);
+
+        Item item = context.reloadEntity(findItemByName("title", true));
+
+        assertThat(
+            "Owning Collection must be set to the first Collection",
+            item.getOwningCollection().getHandle(),
+            equalTo(collectionHandle)
+        );
+        assertThat(
+            "Mapped Collections must match",
+            item.getCollections().stream().map(Collection::getHandle).collect(Collectors.toList()),
+            containsInAnyOrder(collectionHandle, personCollectionHandle)
+        );
+
+        String[] csv2 = {
+            "id,collection",
+            item.getID() + ","
+                + String.join("||", collectionHandle, publicationCollectionHandle)
+        };
+        performImportScript(csv2);
+        item = context.reloadEntity(item);
+
+        assertThat(
+            "Owning Collection must remain unchanged",
+            item.getOwningCollection().getHandle(),
+            equalTo(collectionHandle)
+        );
+        assertThat(
+            "Mapped Collections must match",
+            item.getCollections().stream().map(Collection::getHandle).collect(Collectors.toList()),
+            containsInAnyOrder(collectionHandle, publicationCollectionHandle)
+        );
+
+        String[] csv3 = {
+            "id,collection",
+            item.getID() + ","
+                + String.join("||", personCollectionHandle, publicationCollectionHandle, collectionHandle)
+        };
+        performImportScript(csv3);
+        item = context.reloadEntity(item);
+
+        assertThat(
+            "Owning Collection must be changed",
+            item.getOwningCollection().getHandle(),
+            equalTo(personCollectionHandle)
+        );
+        assertThat(
+            "Mapped Collections must match",
+            item.getCollections().stream().map(Collection::getHandle).collect(Collectors.toList()),
+            containsInAnyOrder(personCollectionHandle, publicationCollectionHandle, collectionHandle)
+        );
+
+
+    }
+
+    @Test
+    public void metadataEditCollectionMappingTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context,publicationCollection).withTitle("title").build();
+        context.commit();
+        context.restoreAuthSystemState();
+        String[] csv = {"id,collection", item.getID().toString() + ","};
         performImportScript(csv);
         item = findItemByName("title", true);
         assertFalse(item.isWithdrawn());
