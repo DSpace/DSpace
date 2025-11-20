@@ -7,7 +7,6 @@
  */
 package org.dspace.app.bulkedit.service;
 
-import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -15,7 +14,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class BulkEditServiceFactoryImpl extends BulkEditServiceFactory {
     @Override
-    public BulkEditParsingService<DSpaceCSV> getCSVBulkEditParsingService() {
+    public BulkEditParsingService getCSVBulkEditParsingService() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
             .getServiceByName("csvBulkEditParsingService", CSVBulkEditParsingServiceImpl.class);
     }
@@ -23,6 +22,6 @@ public class BulkEditServiceFactoryImpl extends BulkEditServiceFactory {
     @Override
     public BulkEditService getBulkEditService() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
-            .getServiceByName("bulkEditService", BulkEditService.class);
+                                    .getServiceByName("bulkEditService", BulkEditService.class);
     }
 }

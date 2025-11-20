@@ -356,7 +356,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
         context.commit();
 
-        String[] csv = {"id,collection,dc.title,dc.contributor.author[*]",
+        String[] csv = {"id,collection,dc.title,dc.contributor.author",
             item.getID().toString() + "," + publicationCollection.getHandle() + "," + item.getName() + ","};
         performImportScript(csv);
         item = findItemByName("title");

@@ -8,35 +8,26 @@
 package org.dspace.app.bulkedit.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.bulkedit.BulkEditChange;
 import org.dspace.app.bulkedit.MetadataImportException;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
 /**
- * Service for parsing bulk-edit changes from a given source object to a list of {@link BulkEditChange}s
- *
- * Warning: This service and its implementation are stateful, in that a new instance will be created every time it is
- *          requested. This is by design because the service will keep information about multiple related changes until
- *          it is done parsing them all and this ensures none of the information leaks between other calls/processes.
- *          This means the service should never be Autowired and should instead be requested through the
- *          {@link BulkEditServiceFactory} wherever the call is made to parse and/or apply the changes.
- *
- * @param <T> The type of source object containing information about a batch-edit to parse into {@link BulkEditChange}s
+ * Service for parsing bulk-edit changes from a given input stream to a list of {@link BulkEditChange}s
  */
-public interface BulkEditParsingService<T> {
+public interface BulkEditParsingService {
     /**
-     * Read the source object and parse it into a list of {@link BulkEditChange}s
-     * No actual changes will persist throughout the parsing, this happens in {@link BulkEditService} instead
-     * @param context   DSpace context
-     * @param source    Source object to parse
+     * Read the input stream and parse it into a list of {@link BulkEditChange}s
+     * No actual changes will be persisted throughout the parsing, this happens in {@link BulkEditService} instead
+     * @param c     DSpace context
+     * @param is    The import source to parse
      */
-    List<BulkEditChange> parse(Context context, T source)
-        throws MetadataImportException, SQLException, AuthorizeException, IOException;
+    List<BulkEditChange> parse(Context c, InputStream is) throws SQLException, MetadataImportException, IOException;
 
     /**
      * Optionally set a {@link DSpaceRunnableHandler} to log the parsing process

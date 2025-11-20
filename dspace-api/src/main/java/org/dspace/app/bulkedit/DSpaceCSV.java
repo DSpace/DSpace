@@ -8,10 +8,12 @@
 package org.dspace.app.bulkedit;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -142,7 +144,7 @@ public class DSpaceCSV implements Serializable {
      * @param c The DSpace Context
      * @throws Exception thrown if there is an error reading or processing the file
      */
-    public DSpaceCSV(InputStream inputStream, Context c) throws Exception {
+    public DSpaceCSV(InputStream inputStream, Context c) throws IOException, SQLException, MetadataImportException {
         // Initialise the class
         init();
 
@@ -153,6 +155,9 @@ public class DSpaceCSV implements Serializable {
 
             // Read the heading line
             String head = input.readLine();
+            if (head == null) {
+                throw new MetadataImportException("Cannot parse empty file as CSV");
+            }
             String[] headingElements = head.split(escapedFieldSeparator);
             int columnCounter = 0;
             for (String element : headingElements) {
@@ -487,7 +492,7 @@ public class DSpaceCSV implements Serializable {
      * @param line The line of elements
      * @throws Exception Thrown if an error occurs when adding the item
      */
-    public final void addItem(String line) throws Exception {
+    public final void addItem(String line) throws MetadataImportException {
         // Check to see if the last character is a field separator, which hides the last empty column
         boolean last = false;
         if (line.endsWith(fieldSeparator)) {
