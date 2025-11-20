@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
@@ -298,7 +299,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         Optional<MetadataValue> templateItemEntityType = getDSpaceEntityType(templateItem);
 
         if (template && colEntityType.isPresent() && templateItemEntityType.isPresent() &&
-            !StringUtils.equals(colEntityType.get().getValue(), templateItemEntityType.get().getValue())) {
+            !Strings.CS.equals(colEntityType.get().getValue(), templateItemEntityType.get().getValue())) {
             throw new IllegalStateException("The template item has entity type : (" +
                 templateItemEntityType.get().getValue() + ") different than collection entity type : " +
                 colEntityType.get().getValue());

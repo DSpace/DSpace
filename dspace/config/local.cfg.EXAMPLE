@@ -200,9 +200,6 @@ db.password = dspace
 # ORCID certificate authentication.
 # plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.OrcidAuthentication
 
-# X.509 certificate authentication. See authentication-x509.cfg for default configuration.
-#plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.X509Authentication
-
 # SAML authentication/authorization. See authenication-saml.cfg for default configuration.
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.SamlAuthentication
 
