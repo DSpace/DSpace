@@ -10,6 +10,7 @@ package org.dspace.event;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.audit.MetadataEvent;
 
 /**
@@ -93,6 +94,7 @@ public class EventDetail {
 
             return details.stream().filter(obj -> obj instanceof MetadataEvent)
                 .map(obj -> (MetadataEvent) obj)
+                .filter(metadataEvent -> StringUtils.isNotBlank(metadataEvent.getValue()))
                 .toList();
         } catch (Exception e) {
             return List.of();
