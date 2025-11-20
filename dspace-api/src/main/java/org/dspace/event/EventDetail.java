@@ -7,12 +7,8 @@
  */
 package org.dspace.event;
 
-
-import static org.dspace.core.Constants.ADD;
-
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.dspace.app.audit.MetadataEvent;
 
