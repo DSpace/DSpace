@@ -111,7 +111,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     }
 
     /**
-     * Deprecated: Use dedicated metadata event detail methods instead.
+     * Deprecated: Use {@link #addMetadataEventDetails(MetadataEvent event)} instead.
      * Add a string to the cache of event details.  Automatically
      * separates entries with a comma.
      * Subclass can just start calling addDetails, since it creates
@@ -128,7 +128,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     }
 
     /**
-     * Deprecated: Use dedicated metadata event detail methods instead.
+     * Deprecated: Use {@link #getMetadataEventDetails()} instead.
      *
      * @return summary of event details, or null if there are none.
      */
@@ -224,7 +224,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     protected void addMetadata(MetadataValue metadataValue) {
         setMetadataModified();
         getMetadata().add(metadataValue);
-        addMetadataEventDetails(new MetadataEvent(metadataValue, MetadataEvent.INITIAL_ADD));
+        addMetadataEventDetails(new MetadataEvent(metadataValue, MetadataEvent.ADD));
     }
 
     public List<ResourcePolicy> getResourcePolicies() {

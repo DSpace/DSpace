@@ -48,7 +48,8 @@ public class AuditEventSubjectLinkRepository extends AbstractDSpaceRestRepositor
             Context context = obtainContext();
             AuditEvent audit = getAuditEvent(context, auditId);
             UUID subjectUUID = audit.getSubjectUUID();
-            DSpaceObject dso = getDSpaceObject(context, subjectUUID);
+            String subjectType = audit.getSubjectType();
+            DSpaceObject dso = getDSpaceObject(context, subjectUUID, subjectType);
             if (dso != null) {
                 return (DSpaceObjectRest) converter.toRest(dso, utils.obtainProjection());
             } else {
@@ -67,7 +68,7 @@ public class AuditEventSubjectLinkRepository extends AbstractDSpaceRestRepositor
         return audit;
     }
 
-    private DSpaceObject getDSpaceObject(Context context, UUID subjectUUID) throws SQLException {
-        return subjectUUID != null ? dspaceObjectUtil.findDSpaceObject(context, subjectUUID) : null;
+    private DSpaceObject getDSpaceObject(Context context, UUID subjectUUID, String subjectType) throws SQLException {
+        return subjectUUID != null ? dspaceObjectUtil.findDSpaceObject(context, subjectUUID, subjectType) : null;
     }
 }

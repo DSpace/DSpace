@@ -113,6 +113,7 @@ public class AuditSolrServiceImpl implements AuditService {
         return solr;
     }
 
+    @Override
     public void store(Context context, Event event) throws SQLException {
         if (!isProcessableEvent(event)) {
             return;
@@ -256,8 +257,8 @@ public class AuditSolrServiceImpl implements AuditService {
                 }
             }
         } catch (ClassCastException cce) {
-            log.warn("Subject cannot be cast to expected type for subjectType {}: {}",
-                    subjectType, subject.getClass(), cce);
+            log.warn("transactionId:{}, Subject cannot be cast to expected type for subjectType {}: {}",
+                event.getTransactionID(), subjectType, subject.getClass(), cce);
             return null;
         }
     }
@@ -478,6 +479,14 @@ public class AuditSolrServiceImpl implements AuditService {
     public void deleteEvents(Context context, Date from, Date to) {
         try {
             getSolr().deleteByQuery(buildTimeQuery(from, to));
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public void deleteEventById(String uuid) {
+        try {
+            getSolr().deleteByQuery(UUID_FIELD + ":" + uuid);
         } catch (SolrServerException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

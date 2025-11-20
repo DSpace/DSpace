@@ -7,7 +7,8 @@
  */
 package org.dspace.event;
 
-import static org.dspace.app.audit.MetadataEvent.INITIAL_ADD;
+
+import static org.dspace.core.Constants.ADD;
 
 import java.util.List;
 import java.util.Objects;
@@ -83,7 +84,7 @@ public class EventDetail {
      * Extracts a list of {@link MetadataEvent} objects from the detail object if the detail type is {@code DSO_SUMMARY}.
      * Returns an empty list if the detail object is null if the type is not {@code DSO_SUMMARY}.
      *
-     * @return a list of {@link MetadataEvent} excluding those with action {@code INITIAL_ADD}
+     * @return a list of {@link MetadataEvent}
      */
     public List<MetadataEvent> extractMetadataDetail() {
         try {
@@ -93,14 +94,10 @@ public class EventDetail {
             }
 
             List<Object> details = (List<Object>)this.getDetailObject();
-            List<MetadataEvent> metadataEvents = details.stream().filter(obj -> obj instanceof MetadataEvent)
+
+            return details.stream().filter(obj -> obj instanceof MetadataEvent)
                 .map(obj -> (MetadataEvent) obj)
                 .toList();
-
-            return metadataEvents.stream()
-                .filter(metadataEvent ->
-                    !metadataEvent.getAction().equals(INITIAL_ADD))
-                .collect(Collectors.toList());
         } catch (Exception e) {
             return List.of();
         }

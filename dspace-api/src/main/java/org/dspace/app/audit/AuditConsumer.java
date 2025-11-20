@@ -43,6 +43,7 @@ public class AuditConsumer implements Consumer {
      * @param ctx   DSpace context
      * @param event Content event
      */
+    @Override
     public void consume(Context ctx, Event event) throws Exception {
         if (configurationService.getBooleanProperty("audit.enabled", false)
             && isEventMeaningful(event)) {

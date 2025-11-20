@@ -23,7 +23,7 @@
     this file, see http://wiki.apache.org/solr/SolrConfigXml. 
 -->
 <config>
-  <luceneMatchVersion>7.2.1</luceneMatchVersion>
+  <luceneMatchVersion>8.8.1</luceneMatchVersion>
 
   <dataDir>${solr.data.dir:}</dataDir>
 
@@ -38,10 +38,10 @@
     <ramBufferSizeMB>32</ramBufferSizeMB>
     <maxBufferedDocs>1000</maxBufferedDocs>
     <lockType>${solr.lock.type:native}</lockType>
-    <infoStream>true</infoStream>
+    <!-- Set to true to "write detailed debug information from the
+             indexing process as Solr log messages" -->
+    <infoStream>false</infoStream>
   </indexConfig>
-
-  <jmx />
 
   <updateHandler class="solr.DirectUpdateHandler2">
 
@@ -121,11 +121,16 @@
     </requestHandler>
 
     <!-- Processes updates to the index -->
-    <requestHandler name="/update" class="solr.UpdateRequestHandler"/>
+    <requestHandler name="/update" class="solr.UpdateRequestHandler">
+        <lst name="defaults">
+            <str name="update.chain">uuid</str>
+        </lst>
+    </requestHandler>
 
     <requestHandler name="/update/json" class="solr.UpdateRequestHandler">
         <lst name="defaults">
             <str name="stream.contentType">application/json</str>
+            <str name="update.chain">uuid</str>
         </lst>
     </requestHandler>
 

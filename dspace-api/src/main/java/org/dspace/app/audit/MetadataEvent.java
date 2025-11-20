@@ -19,9 +19,17 @@ import org.dspace.content.MetadataValue;
  */
 public class MetadataEvent {
 
-    public static final String INITIAL_ADD = "INITIAL_ADD";
+    /**
+     * Action constant representing the addition of a metadata value.
+     */
     public static final String ADD = "ADD";
+    /**
+     * Action constant representing the modification of a metadata value.
+     */
     public static final String MODIFY = "MODIFY";
+    /**
+     * Action constant representing the removal of a metadata value.
+     */
     public static final String REMOVE = "REMOVE";
 
     private String metadataField;
