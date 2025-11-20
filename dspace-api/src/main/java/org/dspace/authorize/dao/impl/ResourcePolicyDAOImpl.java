@@ -182,7 +182,7 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
                                 compareEpersonOrGroups
             )
         );
-        return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);
+        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
     }
 
     @Override

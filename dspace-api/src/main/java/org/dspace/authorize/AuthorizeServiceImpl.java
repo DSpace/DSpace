@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.service.AuthorizeService;
@@ -529,8 +530,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         // (for example, item.addBundle() will inherit custom policies to enforce access conditions)
         List<ResourcePolicy> nonAdminPolicies = new ArrayList<>();
         for (ResourcePolicy rp : policies) {
-            if (rp.getAction() != Constants.ADMIN && (!StringUtils.equals(rp.getRpType(), ResourcePolicy.TYPE_CUSTOM)
-                        || (includeCustom && StringUtils.equals(rp.getRpType(), ResourcePolicy.TYPE_CUSTOM)
+            if (rp.getAction() != Constants.ADMIN && (!Strings.CS.equals(rp.getRpType(), ResourcePolicy.TYPE_CUSTOM)
+                        || (includeCustom && Strings.CS.equals(rp.getRpType(), ResourcePolicy.TYPE_CUSTOM)
                             && isNotAlreadyACustomRPOfThisTypeOnDSO(c, dest)))) {
                 nonAdminPolicies.add(rp);
             }
@@ -1046,7 +1047,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                                                        .isPresent();
 
         boolean isAnonymousGroup = Objects.nonNull(defaultPolicy.getGroup())
-                && StringUtils.equals(defaultPolicy.getGroup().getName(), Group.ANONYMOUS);
+                && Strings.CS.equals(defaultPolicy.getGroup().getName(), Group.ANONYMOUS);
 
         boolean datesAreNull = Objects.isNull(defaultPolicy.getStartDate())
                 && Objects.isNull(defaultPolicy.getEndDate());

@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -94,7 +94,6 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
             if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn
                 .equals(CreativeCommonsServiceImpl.CC_BUNDLE_NAME))) {
                 //AuthorizeManager.removePoliciesActionFilter(context, bn, Constants.READ);
-                generatePolicies(context, liftDate.toDate().toLocalDate(), null, bn, item.getOwningCollection());
                 for (Bitstream bs : bn.getBitstreams()) {
                     //AuthorizeManager.removePoliciesActionFilter(context, bs, Constants.READ);
                     generatePolicies(context, liftDate.toDate().toLocalDate(), null, bs, item.getOwningCollection());
@@ -116,7 +115,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
             // look for anonymous
             boolean isAnonymousInPlace = false;
             for (Group g : authorizedGroups) {
-                if (StringUtils.equals(g.getName(), Group.ANONYMOUS)) {
+                if (Strings.CS.equals(g.getName(), Group.ANONYMOUS)) {
                     isAnonymousInPlace = true;
                 }
             }

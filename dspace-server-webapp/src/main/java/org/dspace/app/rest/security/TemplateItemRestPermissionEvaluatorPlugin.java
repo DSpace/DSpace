@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.TemplateItemRest;
@@ -55,7 +55,7 @@ public class TemplateItemRestPermissionEvaluatorPlugin extends RestObjectPermiss
                 !DSpaceRestPermission.DELETE.equals(restPermission)) {
             return false;
         }
-        if (!StringUtils.equalsIgnoreCase(targetType, TemplateItemRest.NAME)) {
+        if (!Strings.CI.equals(targetType, TemplateItemRest.NAME)) {
             return false;
         }
 
