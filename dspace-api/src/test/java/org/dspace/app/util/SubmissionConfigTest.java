@@ -87,12 +87,19 @@ public class SubmissionConfigTest extends AbstractUnitTest {
         List<String> allowedFieldsForBook = inputConfig.populateAllowedFieldNames("Book");
         List<String> allowedFieldsForBookChapter = inputConfig.populateAllowedFieldNames("Book chapter");
         List<String> allowedFieldsForArticle = inputConfig.populateAllowedFieldNames("Article");
-        List<String> allowedFieldsForNoType = inputConfig.populateAllowedFieldNames(null);
+        List<String> allowedFieldsForArticleAndBook = inputConfig.populateAllowedFieldNames(List.of("Article", "Book"));
+        List<String> allowedFieldsForBookAndArticle = inputConfig.populateAllowedFieldNames(List.of("Book", "Article"));
+        String nullValue = null;
+        List<String> allowedFieldsForNoType = inputConfig.populateAllowedFieldNames(nullValue);
+        List<String> allowedFieldsForWrongTypes = inputConfig.populateAllowedFieldNames(List.of("foo", "bar"));
         // Book and book chapter should be allowed all 5 fields (each is bound to dc.identifier.isbn)
         assertEquals(allConfiguredFields, allowedFieldsForBook);
         assertEquals(allConfiguredFields, allowedFieldsForBookChapter);
+        assertEquals(allConfiguredFields, allowedFieldsForArticleAndBook);
+        assertEquals(allConfiguredFields, allowedFieldsForBookAndArticle);
         // Article and type should match a subset of the fields without ISBN
         assertEquals(unboundFields, allowedFieldsForArticle);
         assertEquals(unboundFields, allowedFieldsForNoType);
+        assertEquals(unboundFields, allowedFieldsForWrongTypes);
     }
 }
