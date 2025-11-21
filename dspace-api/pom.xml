@@ -553,19 +553,19 @@
         <dependency>
             <groupId>de.undercouch</groupId>
             <artifactId>citeproc-java</artifactId>
-            <version>3.3.0</version>
+            <version>3.4.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.citationstyles</groupId>
             <artifactId>styles</artifactId>
-            <version>25.4</version>
+            <version>25.11</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.citationstyles</groupId>
             <artifactId>locales</artifactId>
-            <version>25.4</version>
+            <version>25.11</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
