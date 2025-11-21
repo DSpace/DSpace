@@ -534,7 +534,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         if (bundle.isModified() || bundle.isMetadataModified()) {
             if (bundle.isMetadataModified()) {
                 context.addEvent(new Event(Event.MODIFY_METADATA, bundle.getType(), bundle.getID(),
-                        bundle.getDetails(), DetailType.DSO_SUMMARY,
+                        bundle.getMetadataEventDetails(), DetailType.DSO_SUMMARY,
                         getIdentifiers(context, bundle)));
             }
             context.addEvent(new Event(Event.MODIFY, Constants.BUNDLE, bundle.getID(),
