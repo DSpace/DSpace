@@ -73,7 +73,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     // TODO: move these to MetadataSchema or some such?
     public static final String MD_SCHEMA = "dc";
     public static final String DOI_ELEMENT = "identifier";
-    public static final String DOI_QUALIFIER = "uri";
+    public static final String DOI_QUALIFIER = "doi";
     // The DOI is queued for registered with the service provider
     public static final Integer TO_BE_REGISTERED = 1;
     // The DOI is queued for reservation with the service provider
@@ -1106,8 +1106,10 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
 
         itemService.clearMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
-                remainder);
+        if (!remainder.isEmpty()) {
+            itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+                    remainder);
+        }
         itemService.update(context, item);
     }
 
