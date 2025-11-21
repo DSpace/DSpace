@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -324,5 +325,30 @@ public class OidcAuthenticationRestControllerIT extends AbstractControllerIntegr
         Cookie authorizationCookie = mvcResult.getResponse().getCookie("Authorization-cookie");
         SignedJWT jwt = SignedJWT.parse(authorizationCookie.getValue());
         return (String) jwt.getJWTClaimsSet().getClaim(EPersonClaimProvider.EPERSON_ID);
+    }
+
+    @Test
+    public void testOidcLoginUpdatesExistingUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson eperson = EPersonBuilder.createEPerson(context)
+            .withEmail("test@email.it")
+            .withNameInMetadata("Initial", "User")
+            .build();
+        context.restoreAuthSystemState();
+
+        String updatedFirstName = "Updated";
+        String updatedLastName = "Usr";
+        when(oidcClientMock.getAccessToken(CODE))
+            .thenReturn(buildOidcTokenResponse(ACCESS_TOKEN));
+        when(oidcClientMock.getUserInfo(ACCESS_TOKEN))
+            .thenReturn(buildUserInfo("test@email.it", updatedFirstName, updatedLastName));
+
+        getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/oidc")
+            .param("code", CODE))
+            .andExpect(status().is3xxRedirection());
+
+        EPerson updatedEPerson = ePersonService.findByEmail(context, "test@email.it");
+        assertEquals(updatedFirstName, updatedEPerson.getFirstName());
+        assertEquals(updatedLastName, updatedEPerson.getLastName());
     }
 }

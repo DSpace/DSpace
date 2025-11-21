@@ -28,6 +28,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.oidc.OidcClient;
 import org.dspace.authenticate.oidc.model.OidcTokenResponseDTO;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -112,10 +113,17 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
             return NO_SUCH_USER;
         }
 
-        return authenticateWithOidc(context, code, request);
+        try {
+            return authenticateWithOidc(context, code, request);
+        } catch (AuthorizeException e) {
+            LOGGER.error("An authorization error occurred while trying to " +
+                "update EPerson profile during OIDC login.", e);
+            return BAD_ARGS;
+        }
     }
 
-    private int authenticateWithOidc(Context context, String code, HttpServletRequest request) throws SQLException {
+    private int authenticateWithOidc(Context context, String code, HttpServletRequest request)
+        throws SQLException, AuthorizeException {
 
         OidcTokenResponseDTO accessToken = getOidcAccessToken(code);
         if (accessToken == null) {
@@ -133,8 +141,15 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
 
         EPerson ePerson = ePersonService.findByEmail(context, email);
         if (ePerson != null) {
-            request.setAttribute(OIDC_AUTHENTICATED, true);
-            return ePerson.canLogIn() ? logInEPerson(context, ePerson) : BAD_ARGS;
+            try {
+                context.turnOffAuthorisationSystem();
+                updateEPersonWithOidcUserInfo(context, ePerson, userInfo);
+                ePersonService.update(context, ePerson);
+            } finally {
+                context.restoreAuthSystemState();
+            }
+        request.setAttribute(OIDC_AUTHENTICATED, true);
+        return ePerson.canLogIn() ? logInEPerson(context, ePerson) : BAD_ARGS;
         }
 
         // if self registration is disabled, warn about this failure to find a matching eperson
@@ -194,7 +209,8 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
         return SUCCESS;
     }
 
-    private int registerNewEPerson(Context context, Map<String, Object> userInfo, String email) throws SQLException {
+    private int registerNewEPerson(Context context, Map<String, Object> userInfo, String email)
+        throws SQLException {
         try {
 
             context.turnOffAuthorisationSystem();
@@ -204,15 +220,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
             eperson.setNetid(email);
             eperson.setEmail(email);
 
-            String firstName = getAttributeAsString(userInfo, getFirstNameAttribute());
-            if (firstName != null) {
-                eperson.setFirstName(context, firstName);
-            }
-
-            String lastName = getAttributeAsString(userInfo, getLastNameAttribute());
-            if (lastName != null) {
-                eperson.setLastName(context, lastName);
-            }
+            updateEPersonWithOidcUserInfo(context, eperson, userInfo);
 
             eperson.setCanLogIn(true);
             eperson.setSelfRegistered(true);
@@ -299,4 +307,16 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
         return false;
     }
 
+    private void updateEPersonWithOidcUserInfo(Context context, EPerson eperson, Map<String, Object> userInfo)
+        throws SQLException  {
+
+        String firstName = getAttributeAsString(userInfo, getFirstNameAttribute());
+        if (firstName != null) {
+            eperson.setFirstName(context, firstName);
+        }
+        String lastName = getAttributeAsString(userInfo, getLastNameAttribute());
+        if (lastName != null) {
+            eperson.setLastName(context, lastName);
+        }
+    }
 }
