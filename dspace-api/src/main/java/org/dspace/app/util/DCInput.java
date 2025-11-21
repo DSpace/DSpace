@@ -516,20 +516,6 @@ public class DCInput {
         return closedVocabulary;
     }
 
-    /**
-     * Decides if this field is valid for the document type
-     *
-     * @param typeName Document type name
-     * @return true when there is no type restriction or typeName is allowed
-     */
-    public boolean isAllowedFor(String typeName) {
-        if (typeBind.isEmpty()) {
-            return true;
-        }
-
-        return typeBind.contains(typeName);
-    }
-
     public String getScope() {
         return visibility;
     }

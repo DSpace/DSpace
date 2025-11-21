@@ -61,7 +61,7 @@ public class MetadataValidation extends AbstractValidation {
     private ConfigurationService configurationService;
 
     private RelationshipTypeService relationshipTypeService =
-        ContentServiceFactory.getInstance().getRelationshipTypeService();
+            ContentServiceFactory.getInstance().getRelationshipTypeService();
 
     private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
 
@@ -85,7 +85,8 @@ public class MetadataValidation extends AbstractValidation {
         for (DCInput[] row : inputConfig.getFields()) {
             for (DCInput input : row) {
                 String fieldKey =
-                    metadataAuthorityService.makeFieldKey(input.getSchema(), input.getElement(), input.getQualifier());
+                        metadataAuthorityService.makeFieldKey(input.getSchema(), input.getElement(),
+                                input.getQualifier());
                 boolean isAuthorityControlled = metadataAuthorityService.isAuthorityControlled(fieldKey);
 
                 List<String> fieldsName = new ArrayList<String>();
@@ -101,10 +102,10 @@ public class MetadataValidation extends AbstractValidation {
 
                         // Check the lookup list. If no other inputs of the same field name allow this type,
                         // then remove. This includes field name without qualifier.
-                        if (!input.isAllowedFor(documentTypeValue) &&  (!allowedFieldNames.contains(fullFieldname)
+                        if ((!allowedFieldNames.contains(fullFieldname)
                                 && !allowedFieldNames.contains(input.getFieldName()))) {
                             itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
-                                        obj.getItem(), mdv);
+                                    obj.getItem(), mdv);
                         } else {
                             validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
                             if (mdv.size() > 0 && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
@@ -128,38 +129,34 @@ public class MetadataValidation extends AbstractValidation {
                 for (String fieldName : fieldsName) {
                     boolean valuesRemoved = false;
                     List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fieldName);
-                    if (!input.isAllowedFor(documentTypeValue)) {
-                        // Check the lookup list. If no other inputs of the same field name allow this type,
-                        // then remove. Otherwise, do not
-                        if (!(allowedFieldNames.contains(fieldName))) {
-                            itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
-                                    obj.getItem(), mdv);
-                            valuesRemoved = true;
-                            log.debug("Stripping metadata values for " + input.getFieldName() + " on type "
-                                    + documentTypeValue + " as it is allowed by another input of the same field " +
-                                    "name");
-                        } else {
-                            log.debug("Not removing unallowed metadata values for " + input.getFieldName() + " on type "
-                                    + documentTypeValue + " as it is allowed by another input of the same field " +
-                                    "name");
-                        }
+                    // Check the lookup list. If no other inputs of the same field name allow this type,
+                    // then remove. Otherwise, do not
+                    if (!(allowedFieldNames.contains(fieldName))) {
+                        itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
+                                obj.getItem(), mdv);
+                        valuesRemoved = true;
+                        log.debug("Stripping metadata values for " + input.getFieldName() + " on type "
+                                + documentTypeValue + " as it is allowed by another input of the same field " +
+                                "name");
+                    } else {
+                        log.debug("Not removing unallowed metadata values for " + input.getFieldName() + " on type "
+                                + documentTypeValue + " as it is allowed by another input of the same field " +
+                                "name");
                     }
                     validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
                     if ((input.isRequired() && mdv.size() == 0) && input.isVisible(DCInput.SUBMISSION_SCOPE)
-                                                                && !valuesRemoved) {
+                            && !valuesRemoved) {
                         // Is the input required for *this* type? In other words, are we looking at a required
                         // input that is also allowed for this document type
-                        if (input.isAllowedFor(documentTypeValue)) {
-                            // since this field is missing add to list of error
-                            // fields
-                            addError(errors, ERROR_VALIDATION_REQUIRED, "/"
-                                    + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                                            input.getFieldName());
-                        }
+                        // since this field is missing add to list of error
+                        // fields
+                        addError(errors, ERROR_VALIDATION_REQUIRED, "/"
+                                + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                                input.getFieldName());
                     }
                 }
                 relationshipRequiredFieldCheck(ContextUtil.obtainCurrentRequestContext(), obj.getItem(), input, errors,
-                    config);
+                        config);
             }
         }
         return errors;
@@ -176,20 +173,20 @@ public class MetadataValidation extends AbstractValidation {
      * @throws SQLException
      */
     private void relationshipRequiredFieldCheck(Context context, Item item, DCInput input, List<ErrorRest> errors,
-                                        SubmissionStepConfig config) throws SQLException {
+                                                SubmissionStepConfig config) throws SQLException {
         if (input.isRelationshipField() && input.isRequired()) {
             String relationshipType = input.getRelationshipType();
             if (itemService.getMetadataByMetadataString(item, "relation." + relationshipType).isEmpty()) {
                 List<RelationshipType> relationTypes =
-                    relationshipTypeService.findByLeftwardOrRightwardTypeName(context, relationshipType);
+                        relationshipTypeService.findByLeftwardOrRightwardTypeName(context, relationshipType);
                 for (RelationshipType relationType : relationTypes) {
                     if (!relationshipService.findByItemAndRelationshipType(context, item, relationType).isEmpty()) {
                         return;
                     }
                 }
                 addError(errors, ERROR_VALIDATION_REQUIRED,
-                    "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                        input.getFieldName());
+                        "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                                input.getFieldName());
             }
         }
     }
@@ -199,18 +196,18 @@ public class MetadataValidation extends AbstractValidation {
                                         boolean isAuthorityControlled, String fieldKey,
                                         List<ErrorRest> errors) {
         for (MetadataValue md : mdv) {
-            if (! (input.validate(md.getValue()))) {
+            if (!(input.validate(md.getValue()))) {
                 addError(errors, ERROR_VALIDATION_REGEX,
-                    "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                        input.getFieldName() + "/" + md.getPlace());
+                        "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                                input.getFieldName() + "/" + md.getPlace());
             }
             if (isAuthorityControlled) {
                 String authKey = md.getAuthority();
                 if (metadataAuthorityService.isAuthorityRequired(fieldKey) &&
-                    StringUtils.isBlank(authKey)) {
+                        StringUtils.isBlank(authKey)) {
                     addError(errors, ERROR_VALIDATION_AUTHORITY_REQUIRED,
-                        "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() +
-                            "/" + input.getFieldName() + "/" + md.getPlace());
+                            "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() +
+                                    "/" + input.getFieldName() + "/" + md.getPlace());
                 }
             }
         }

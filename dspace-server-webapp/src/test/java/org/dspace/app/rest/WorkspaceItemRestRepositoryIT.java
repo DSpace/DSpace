@@ -2306,12 +2306,14 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
+        var testSeries =  "New Series";
+
         // Try to add isPartOfSeries (type bound to technical report) - this should not work and instead we'll get
         // no JSON path for that field
         List<Operation> updateSeries = new ArrayList<Operation>();
         List<Map<String, String>> seriesValues = new ArrayList<>();
         Map<String, String> value = new HashMap<String, String>();
-        value.put("value", "New Series");
+        value.put("value", testSeries);
         seriesValues.add(value);
         updateSeries.add(new AddOperation("/sections/traditionalpageone/dc.relation.ispartofseries", seriesValues));
 
@@ -2323,16 +2325,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
-                        // Check this - we should match an item with no series or type
-                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, null, null))));
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, null, testSeries))));
 
-        // Verify that the metadata isn't in the workspace item
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
-                        // Check this - we should match an item with no series or type
-                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, null, null))));
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, null, testSeries))));
 
         // Set the type to Technical Report confirm it worked
         List<Operation> updateType = new ArrayList<>();
@@ -2349,16 +2348,15 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
-                        // Check this - we should now match an item with the expected type and series
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, "Technical Report",
-                                null))));
+                                testSeries))));
 
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, "Technical Report",
-                                null))));
+                                testSeries))));
 
         // Another test, this time adding the series value should be successful and we'll see the value
         patchBody = getPatchContent(updateSeries);
@@ -2369,18 +2367,15 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
-                        // Check this - we should match an item with the expected series and type
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem,
-                                "Technical Report", "New Series"))));
+                                "Technical Report", testSeries))));
 
-        // Verify that the metadata isn't in the workspace item
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
-                        // Check this - we should match an item with the expected series and type
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem,
-                                "Technical Report", "New Series"))));
+                                "Technical Report", testSeries))));
 
         // One final update, to a different type, this should lose the series as we're back to a non-matching type
         updateType = new ArrayList<>();
@@ -2397,16 +2392,15 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
-                        // Check this - we should NOT match an item with the series "New Series"
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, "Article",
-                                null))));
+                                testSeries))));
 
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, "Article",
-                                null))));
+                                testSeries))));
 
         // Submit the workspace item to complete the deposit (as there is no workflow configured) and ensure a
         // successful result with no validation errors
@@ -2455,12 +2449,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        // Try to add ISBN (type bound to book and book chapter) - this should not work and instead we'll get
-        // no JSON path for that field, because this item has no type yet
+        // Try to add ISBN (type bound to book and book chapter)
         List<Operation> updateOperations = new ArrayList<Operation>();
         List<Map<String, String>> updateValues = new ArrayList<>();
         Map<String, String> value = new HashMap<String, String>();
-        value.put("value", "978-3-16-148410-0");
+        value.put("value", testIsbnString);
         updateValues.add(value);
         updateOperations.add(new AddOperation("/sections/typebindtest/dc.identifier.isbn", updateValues));
 
@@ -2472,17 +2465,15 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
-                        // Check this - we should match an item with no series or ISBN
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeFieldAndValue
-                                (witem, "typebindtest",null, "dc.identifier.isbn", null))));
+                                (witem, "typebindtest",null, "dc.identifier.isbn", testIsbnString))));
 
-        // Verify that the metadata isn't in the workspace item
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeFieldAndValue
-                                (witem, "typebindtest", null, "dc.identifier.isbn", null))));
+                                (witem, "typebindtest", null, "dc.identifier.isbn", testIsbnString))));
 
         // Set the type to Book (which ISBN is bound to, in one of the two configurations)
         List<Operation> updateType = new ArrayList<>();
@@ -2499,9 +2490,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isOk())
 //                .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
-                        // Check this - we should now match an item with the expected type and no ISBN
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeFieldAndValue(witem,
-                                "typebindtest","Book", "dc.identifier.isbn", null))));
+                                "typebindtest","Book", "dc.identifier.isbn", testIsbnString))));
 
         // Fetch workspace item and confirm type has persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -2509,10 +2499,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 //                .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeFieldAndValue(witem,
-                                "typebindtest", "Book", "dc.identifier.isbn", null))));
+                                "typebindtest", "Book", "dc.identifier.isbn", testIsbnString))));
 
         // Now we test that the validate process does NOT strip out ISBN metadata while it's analysing the
-        // Book Chapter input config, even though that <type-bind> won't match the current item type (Book)
+        // Book Chapter input config, even though that <type-bind> match the current item type (Book)
         patchBody = getPatchContent(updateOperations);
 
         getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
@@ -2521,11 +2511,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
-                        // Check this - we should now match an item with the expected type and the test ISBN
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeFieldAndValue(witem, "typebindtest",
                                 "Book", "dc.identifier.isbn", testIsbnString))));
 
-        // Verify that the metadata is persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
@@ -2549,7 +2537,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
-                        // Check this - we should now match an item with the expected type and no ISBN
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeFieldAndValue(witem,"typebindtest",
                                 "Book chapter", "dc.identifier.isbn", testIsbnString))));
 
