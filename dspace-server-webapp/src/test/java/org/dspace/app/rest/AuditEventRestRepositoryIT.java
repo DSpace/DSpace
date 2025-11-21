@@ -179,7 +179,8 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
                                 Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.last.href",
                         Matchers.allOf(Matchers.containsString("/api/system/auditevents?"),
-                                Matchers.containsString("page=" + (TOTAL_ELEMENT - 1)), Matchers.containsString("size=1"))))
+                                Matchers.containsString("page=" + (TOTAL_ELEMENT - 1)),
+                                Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.allOf(Matchers.containsString("/api/system/auditevents?"),
                                 Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
@@ -195,7 +196,8 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
                                 Matchers.containsString("page=2"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.last.href",
                         Matchers.allOf(Matchers.containsString("/api/system/auditevents?"),
-                                Matchers.containsString("page=" + (TOTAL_ELEMENT - 1)), Matchers.containsString("size=1"))))
+                                Matchers.containsString("page=" + (TOTAL_ELEMENT - 1)),
+                                Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.allOf(Matchers.containsString("/api/system/auditevents?"),
                                 Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
