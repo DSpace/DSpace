@@ -119,6 +119,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
      *
      * @param d detail string to add.
      */
+    @Deprecated
     protected void addDetails(String d) {
         if (eventDetails == null) {
             eventDetails = new StringBuffer(d);
