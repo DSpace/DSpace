@@ -23,7 +23,8 @@ ENV SOLR_OPTS="-Dsolr.config.lib.enabled=true" \
     SEARCH_CONFIGSET_PATH=/opt/solr/server/solr/configsets/search/conf \
     STATISTICS_CONFIGSET_PATH=/opt/solr/server/solr/configsets/statistics/conf \
     QAEVENT_CONFIGSET_PATH=/opt/solr/server/solr/configsets/qaevent/conf  \
-    SUGGESTION_CONFIGSET_PATH=/opt/solr/server/solr/configsets/suggestion/conf
+    SUGGESTION_CONFIGSET_PATH=/opt/solr/server/solr/configsets/suggestion/conf \
+    AUDIT_CONFIGSET_PATH=/opt/solr/server/solr/configsets/audit/conf
     
 USER root
 
@@ -32,7 +33,8 @@ RUN mkdir -p $AUTHORITY_CONFIGSET_PATH && \
     mkdir -p $SEARCH_CONFIGSET_PATH && \
     mkdir -p $STATISTICS_CONFIGSET_PATH && \
     mkdir -p $QAEVENT_CONFIGSET_PATH && \
-    mkdir -p $SUGGESTION_CONFIGSET_PATH
+    mkdir -p $SUGGESTION_CONFIGSET_PATH && \
+    mkdir -p $AUDIT_CONFIGSET_PATH
 
 # NOTE: "solrconfigs" MUST be passed in by docker-compose via "additional_contexts"
 # OR via "docker build --build-context solrconfigs=[path-to-dspace/solr]"
@@ -42,6 +44,7 @@ COPY --from=solrconfigs search/conf/* $SEARCH_CONFIGSET_PATH/
 COPY --from=solrconfigs statistics/conf/* $STATISTICS_CONFIGSET_PATH/
 COPY --from=solrconfigs qaevent/conf/* $QAEVENT_CONFIGSET_PATH/
 COPY --from=solrconfigs suggestion/conf/* $SUGGESTION_CONFIGSET_PATH/
+COPY --from=solrconfigs audit/conf/* $AUDIT_CONFIGSET_PATH/
 
 RUN chown -R solr:solr /opt/solr/server/solr/configsets
 

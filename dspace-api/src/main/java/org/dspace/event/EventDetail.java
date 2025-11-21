@@ -7,7 +7,11 @@
  */
 package org.dspace.event;
 
+import java.util.List;
 import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.audit.MetadataEvent;
 
 /**
  * Represents the details of an event, including a key and an associated object.
@@ -71,5 +75,44 @@ public class EventDetail {
     @Override
     public int hashCode() {
         return Objects.hash(detailType, detailObject);
+    }
+
+    /**
+     * Extracts a list of {@link MetadataEvent} objects from the detail object if the detail type is {@code DSO_SUMMARY}.
+     * Returns an empty list if the detail object is null if the type is not {@code DSO_SUMMARY}.
+     *
+     * @return a list of {@link MetadataEvent}
+     */
+    public List<MetadataEvent> extractMetadataDetail() {
+        try {
+            if (this.getDetailObject() == null ||
+                !this.getDetailType().equals(DetailType.DSO_SUMMARY)) {
+                return List.of();
+            }
+
+            List<Object> details = (List<Object>)this.getDetailObject();
+
+            return details.stream().filter(obj -> obj instanceof MetadataEvent)
+                .map(obj -> (MetadataEvent) obj)
+                .filter(metadataEvent -> StringUtils.isNotBlank(metadataEvent.getValue()))
+                .toList();
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
+    public String extractChecksumDetail() {
+        if (this.getDetailObject() == null ||
+            !this.getDetailType().equals(DetailType.BITSTREAM_CHECKSUM)) {
+            return "";
+        }
+        return (String)this.getDetailObject();
+    }
+
+    @Override
+    public String toString() {
+        return "org.dspace.event.EventDetail(detailType=" + detailType +
+            ", detailObject=" + detailObject
+            + ')';
     }
 }
