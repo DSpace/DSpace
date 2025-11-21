@@ -28,9 +28,11 @@ public abstract class AbstractResourceService {
     protected String IIIF_ENDPOINT;
     protected String IMAGE_SERVICE;
     protected String SEARCH_URL;
+    protected String SLASH_SUBSTITUTE;
     protected String CLIENT_URL;
     protected String IIIF_LOGO_IMAGE;
     protected String BITSTREAM_PATH_PREFIX;
+    protected String BITSTREAM_PATH_SUFFIX;
     protected int DEFAULT_CANVAS_WIDTH;
     protected int DEFAULT_CANVAS_HEIGHT;
     /**
@@ -71,6 +73,26 @@ public abstract class AbstractResourceService {
         DOCUMENT_VIEWING_HINT = configurationService.getProperty("iiif.document.viewing.hint");
         CLIENT_URL = configurationService.getProperty("dspace.ui.url");
         IIIF_LOGO_IMAGE = configurationService.getProperty("iiif.logo.image");
+        BITSTREAM_PATH_SUFFIX = configurationService.getProperty("iiif.http.suffix");
+        SLASH_SUBSTITUTE = configurationService.getProperty("iiif.server.slash_substitute");
+
+        // Set BITSTREAM_PATH_SUFFIX to default empty string, if not set.
+        BITSTREAM_PATH_SUFFIX = BITSTREAM_PATH_SUFFIX != null ? BITSTREAM_PATH_SUFFIX : "";
+        /*
+           If the variable SLASH_SUBSTITUTE is not empty, replace all occurrences of "/" in BITSTREAM_PATH_PREFIX and
+           add it to the IMAGE_SERVICE url.
+         */
+        if (SLASH_SUBSTITUTE != null) {
+            IMAGE_SERVICE = IMAGE_SERVICE.concat(BITSTREAM_PATH_PREFIX.replace("/",
+                    SLASH_SUBSTITUTE)).concat(SLASH_SUBSTITUTE);
+            /*
+                If BITSTREAM_PATH_SUFFIX is not null, replace slashes there as well.
+             */
+            if (BITSTREAM_PATH_SUFFIX != null) {
+                BITSTREAM_PATH_SUFFIX = BITSTREAM_PATH_SUFFIX.replace("/", SLASH_SUBSTITUTE);
+            }
+        }
+
     }
 
     protected void setDefaultCanvasDimensions() {
