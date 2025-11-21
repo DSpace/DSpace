@@ -36,7 +36,9 @@ import org.dspace.discovery.indexobject.IndexablePoolTask;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.RequestService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.services.model.Request;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +55,11 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
 
     private static final Logger log =
             org.apache.logging.log4j.LogManager.getLogger(SolrServiceResourceRestrictionPlugin.class);
+
+    /**
+     * Cache key for storing administrable items location query per HTTP request
+     */
+    private static final String ADMIN_LOCATION_CACHE_KEY = "dspace.discovery.adminScopeLocations";
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -161,15 +168,38 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
 
                 resourceQuery.append(")");
 
-                String locations = DSpaceServicesFactory.getInstance()
+                // Only compute administrable items scope if the user is a collection or community admin
+                // This avoids expensive DB queries for regular users (issue #10084, #9471)
+                if (authorizeService.isCommunityAdmin(context) || authorizeService.isCollectionAdmin(context)) {
+                    // Use per-request memoization to avoid redundant DB calls within the same HTTP request
+                    String locations = null;
+                    RequestService requestService = DSpaceServicesFactory.getInstance().getRequestService();
+                    Request currentRequest = requestService.getCurrentRequest();
+                    
+                    if (currentRequest != null) {
+                        // Check if we already computed this for the current request
+                        locations = (String) currentRequest.getAttribute(ADMIN_LOCATION_CACHE_KEY);
+                    }
+                    
+                    if (locations == null) {
+                        // Compute the administrable items location query
+                        locations = DSpaceServicesFactory.getInstance()
                                                           .getServiceManager()
                                                           .getServiceByName(SearchService.class.getName(),
                                                                             SearchService.class)
                                                           .createLocationQueryForAdministrableItems(context);
-
-                if (StringUtils.isNotBlank(locations)) {
-                    resourceQuery.append(" OR ");
-                    resourceQuery.append(locations);
+                        
+                        // Cache the result for the current request
+                        if (currentRequest != null) {
+                            currentRequest.setAttribute(ADMIN_LOCATION_CACHE_KEY, 
+                                                       locations != null ? locations : "");
+                        }
+                    }
+                    
+                    if (StringUtils.isNotBlank(locations)) {
+                        resourceQuery.append(" OR ");
+                        resourceQuery.append(locations);
+                    }
                 }
 
                 solrQuery.addFilterQuery(resourceQuery.toString());
