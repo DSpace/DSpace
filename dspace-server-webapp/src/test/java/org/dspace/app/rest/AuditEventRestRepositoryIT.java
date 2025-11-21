@@ -47,7 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Integration Tests against the /api/system/auditevents endpoint
  */
 public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTest {
-    private final int TOTAL_ELEMENT = 59;
+    private final int TOTAL_ELEMENT = 71;
     private Collection collection;
 
     private Item item;
@@ -179,7 +179,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
                                 Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.last.href",
                         Matchers.allOf(Matchers.containsString("/api/system/auditevents?"),
-                                Matchers.containsString("page=58"), Matchers.containsString("size=1"))))
+                                Matchers.containsString("page=" + (TOTAL_ELEMENT - 1)), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.allOf(Matchers.containsString("/api/system/auditevents?"),
                                 Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
@@ -195,7 +195,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
                                 Matchers.containsString("page=2"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.last.href",
                         Matchers.allOf(Matchers.containsString("/api/system/auditevents?"),
-                                Matchers.containsString("page=58"), Matchers.containsString("size=1"))))
+                                Matchers.containsString("page=" + (TOTAL_ELEMENT - 1)), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.allOf(Matchers.containsString("/api/system/auditevents?"),
                                 Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
@@ -218,7 +218,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(jsonPath("$._links.prev.href",
                         Matchers.allOf(Matchers.containsString("/api/system/auditevents?"),
                                 Matchers.containsString("page=1"), Matchers.containsString("size=50"))))
-                .andExpect(jsonPath("$.page.size", is(TOTAL_ELEMENT - 9)))
+                .andExpect(jsonPath("$.page.size", is(50)))
                 .andExpect(jsonPath("$.page.totalElements", is(TOTAL_ELEMENT)));
     }
 
@@ -411,7 +411,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
                             Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
             .andExpect(jsonPath("$._links.prev.href").doesNotExist())
             .andExpect(jsonPath("$.page.size", is(1)))
-            .andExpect(jsonPath("$.page.totalElements", is(TOTAL_ELEMENT - 1)));
+            .andExpect(jsonPath("$.page.totalElements", is(58)));
 
         getClient(adminToken).perform(get("/api/system/auditevents/search/findByObject")
                 .param("object", item.getID().toString())
@@ -441,7 +441,7 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
                             Matchers.containsString("/api/system/auditevents/search/findByObject?"),
                             Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
             .andExpect(jsonPath("$.page.size", is(1)))
-            .andExpect(jsonPath("$.page.totalElements", is(TOTAL_ELEMENT - 1)));
+            .andExpect(jsonPath("$.page.totalElements", is(58)));
     }
 
     @Test
