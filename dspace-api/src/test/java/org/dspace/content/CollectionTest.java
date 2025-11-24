@@ -14,6 +14,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -1376,6 +1378,51 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         assertThat("testGetParentObject 1", collectionService.getParentObject(context, collection), notNullValue());
         assertThat("testGetParentObject 2", (Community) collectionService.getParentObject(context, collection),
                    equalTo(owningCommunity));
+    }
+
+    /**
+     * Test that deleting a Collection also deletes its associated groups
+     * (e.g. administrators, submitters, workflow groups).
+     */
+    @Test
+    public void testDeleteCollectionCleansUpGroups() throws Exception {
+        // Turn off auth to create groups directly
+        context.turnOffAuthorisationSystem();
+
+        Collection collection1 = collectionService.create(context, owningCommunity);
+
+        // Create some groups related to this collection
+        Group adminGroup = collectionService.createAdministrators(context, collection1);
+        Group submitterGroup = collectionService.createSubmitters(context, collection1);
+        Group wfGroup1 = collectionService.createWorkflowGroup(context, collection1, 1);
+        Group wfGroup2 = collectionService.createWorkflowGroup(context, collection1, 2);
+
+        UUID adminGroupId = adminGroup.getID();
+        UUID submitterGroupId = submitterGroup.getID();
+        UUID wfGroup1Id = wfGroup1.getID();
+        UUID wfGroup2Id = wfGroup2.getID();
+
+        context.restoreAuthSystemState();
+
+        // Ensure groups actually exist before deletion
+        assertNotNull(groupService.find(context, adminGroupId));
+        assertNotNull(groupService.find(context, submitterGroupId));
+        assertNotNull(groupService.find(context, wfGroup1Id));
+        assertNotNull(groupService.find(context, wfGroup2Id));
+
+        // Disable auth again for deletion
+        context.turnOffAuthorisationSystem();
+
+        // Delete the collection
+        collectionService.delete(context, collection1);
+
+        context.restoreAuthSystemState();
+
+        // Verify the collection's groups are gone
+        assertNull("Admin group should be deleted", groupService.find(context, adminGroupId));
+        assertNull("Submitter group should be deleted", groupService.find(context, submitterGroupId));
+        assertNull("Workflow step 1 group should be deleted", groupService.find(context, wfGroup1Id));
+        assertNull("Workflow step 2 group should be deleted", groupService.find(context, wfGroup2Id));
     }
 
 }
