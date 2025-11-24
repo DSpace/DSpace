@@ -15,6 +15,10 @@ updates:
     schedule:
       interval: "monthly"
       time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
     # Allow up to 10 open PRs for dependencies
     open-pull-requests-limit: 10
     # Group together some upgrades in a single PR
@@ -136,6 +140,10 @@ updates:
     schedule:
       interval: "monthly"
       time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
     # Allow up to 10 open PRs for dependencies
     open-pull-requests-limit: 10
     # Group together some upgrades in a single PR
@@ -257,6 +265,10 @@ updates:
     schedule:
       interval: "monthly"
       time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
     # Allow up to 10 open PRs for dependencies
     open-pull-requests-limit: 10
     # Group together some upgrades in a single PR
@@ -378,6 +390,10 @@ updates:
     schedule:
       interval: "monthly"
       time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
     # Allow up to 10 open PRs for dependencies
     open-pull-requests-limit: 10
     # Group together some upgrades in a single PR
