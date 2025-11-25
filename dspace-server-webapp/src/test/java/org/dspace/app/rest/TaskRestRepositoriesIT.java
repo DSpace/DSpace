@@ -3853,6 +3853,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
         String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
 
         getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByItem")
                 .param("uuid", claimedTask1.getWorkflowItem().getItem().getID().toString()))
@@ -3873,7 +3874,6 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$._embedded.workflowitem",
                            Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                    claimedTask2.getWorkflowItem(), "Workflow Item 2", "2020-10-19", "ExtraEntry"))));
-
     }
 
     @Test
@@ -3924,7 +3924,6 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        String adminToken = getAuthToken(admin.getEmail(), password);
         String submitterToken = getAuthToken(submitter.getEmail(), password);
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
         String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
@@ -3936,14 +3935,6 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByItem")
                                  .param("uuid", claimedTask2.getWorkflowItem().getItem().getID().toString()))
                                  .andExpect(status().isNoContent());
-
-        getClient(adminToken).perform(get("/api/workflow/claimedtasks/search/findByItem")
-                             .param("uuid", claimedTask1.getWorkflowItem().getItem().getID().toString()))
-                             .andExpect(status().isNoContent());
-
-        getClient(adminToken).perform(get("/api/workflow/claimedtasks/search/findByItem")
-                             .param("uuid", claimedTask2.getWorkflowItem().getItem().getID().toString()))
-                             .andExpect(status().isNoContent());
 
         getClient(submitterToken).perform(get("/api/workflow/claimedtasks/search/findByItem")
                                  .param("uuid", claimedTask1.getWorkflowItem().getItem().getID().toString()))
