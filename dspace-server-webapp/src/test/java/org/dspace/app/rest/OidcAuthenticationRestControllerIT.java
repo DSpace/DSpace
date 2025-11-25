@@ -333,6 +333,7 @@ public class OidcAuthenticationRestControllerIT extends AbstractControllerIntegr
         EPerson eperson = EPersonBuilder.createEPerson(context)
             .withEmail("test@email.it")
             .withNameInMetadata("Initial", "User")
+            .withCanLogin(true)
             .build();
         context.restoreAuthSystemState();
 
