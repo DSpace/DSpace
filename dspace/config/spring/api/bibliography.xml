@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<beans xmlns='http://www.springframework.org/schema/beans'
+       xmlns:util='http://www.springframework.org/schema/util'
+       xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+       xsi:schemaLocation='http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util
+            http://www.springframework.org/schema/util/spring-util.xsd'>
+
+    <bean id='org.dspace.disseminate.CSLBibliographyGenerator'
+          class='org.dspace.disseminate.CSLBibliographyGenerator'
+          scope='prototype'>
+        <description>Accumulates DSpace Item IDs and formats a bibliography.</description>
+        <constructor-arg index='0'
+                         ref='csl-types'> <!-- name='documentTypes' -->
+            <description>
+                Values of the 'type' field mapped to CSL document types.
+                Differing types may have different entry formats in some styles.
+                https://github.com/citation-style-language/schema/blob/master/schemas/styles/csl-types.rnc
+            </description>
+        </constructor-arg>
+        <constructor-arg index='1'
+                         ref='csl-fields'> <!-- name='metadataFields' -->
+            <description>
+                Map DSpace metadata fields to CSL fields.
+                https://github.com/citation-style-language/schema/blob/master/schemas/styles/csl-variables.rnc
+            </description>
+        </constructor-arg>
+        <constructor-arg index='2'
+                         ref='csl-styles'> <!-- name='bibliographyStyles' -->
+            <description>
+                CSL Styles.
+                https://github.com/citation-style-language/styles
+            </description>
+        </constructor-arg>
+        <constructor-arg index='3'
+                         value='article'> <!-- name='defaultType' -->
+            <description>Default document type.</description>
+        </constructor-arg>
+    </bean>
+
+    <util:map id='csl-types'
+              map-class='java.util.HashMap'
+              key-type='java.lang.String'
+              value-type='java.lang.String'>
+        <entry key='Animation' value='motion_picture'/> <!-- XXX -->
+        <entry key='Article' value='article'/>
+        <entry key='Book' value='book'/>
+        <entry key='Book chapter' value='chapter'/>
+        <entry key='Dataset' value='dataset'/>
+        <entry key='Image' value='graphic'/>
+        <entry key='Image, 3-D' value='graphic'/>
+        <entry key='Learning Object' value='software'/> <!-- XXX -->
+        <entry key='Map' value='map'/>
+        <entry key='Musical Score' value='musical_score'/>
+        <entry key='Plan or blueprint' value='graphic'/>
+        <entry key='Preprint' value='report'/>
+        <entry key='Presentation' value='performance'/> <!-- XXX -->
+        <entry key='Recording, acoustical' value='song'/> <!-- XXX -->
+        <entry key='Recording, musical' value='song'/>
+        <entry key='Recording, oral' value='speech'/>
+        <entry key='Software' value='software'/>
+        <entry key='Technical Report' value='report'/>
+        <entry key='Thesis' value='thesis'/>
+        <entry key='Video' value='motion_picture'/>
+        <entry key='Working Paper' value='report'/> <!-- XXX -->
+        <entry key='Other' value='document'/>
+    </util:map>
+
+    <util:map id='csl-fields'
+              map-class='java.util.HashMap'
+              key-type='java.lang.String'
+              value-type='java.lang.String'>
+        <entry key='${bibliography.author}' value='author'/>
+        <entry key='bibliography.editor' value='editor'/>
+        <entry key='${bibliography.issued}' value='issued'/>
+        <entry key='${bibliography.accessed}' value='accessed'/>
+        <entry key='${bibliography.submitted}' value='submitted'/>
+        <entry key='${bibliography.ISBN}' value='ISBN'/>
+        <entry key='${bibliography.abstract}' value='abstract'/>
+        <entry key='${bibliography.medium}' value='medium'/>
+        <entry key='${bibliography.publisher}' value='publisher'/>
+        <entry key='${bibliography.title}' value='title'/>
+        <entry key='${bibliography.doi}' value='DOI'/>
+        <entry key='${bibliography.title.alternative' value='container-title'/> <!-- XXX -->
+        <entry key='${bibliography.type}' value='type'/> <!-- see csl-types -->
+        <entry key='${bibliography.journal.name}' value='container-title'/>
+        <entry key='${bibliography.volume}' value='volume'/>
+        <entry key='${bibliography.journal.issue}' value='issue'/>
+        <entry key='${bibliography.page}' value='page'/>
+        <entry key='${bibliography.journal.editor}' value='editor'/>
+    </util:map>
+
+    <bean id="csl-styles" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList" value="#{'${bibliography.styles}'.split(',')}"/>
+    </bean>
+</beans>
