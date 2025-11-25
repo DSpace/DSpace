@@ -9,7 +9,9 @@ package org.dspace.content;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
@@ -53,7 +55,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     // accumulate information to be stored in the Audit system
     // data is stored in a structured way, so no need to concatenate
     @Transient
-    private ArrayList<MetadataEvent> metadataEventDetails;
+    private Set<MetadataEvent> metadataEventDetails;
 
     /**
      * The same order should be applied inside this comparator
@@ -146,7 +148,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
      */
     public void addMetadataEventDetails(MetadataEvent event) {
         if (metadataEventDetails == null) {
-            metadataEventDetails = new ArrayList<>();
+            metadataEventDetails = new HashSet<>();
         }
         metadataEventDetails.add(event);
     }
@@ -155,7 +157,16 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
      * @return list of metadata event details, or empty list if there is none.
      */
     public List<MetadataEvent> getMetadataEventDetails() {
-        return metadataEventDetails == null ? List.of() : metadataEventDetails;
+        return metadataEventDetails == null ? List.of() : metadataEventDetails.stream().toList();
+    }
+
+    /**
+     * Clear the list of metadata event details to avoid duplication in audit logs.
+     */
+    public void clearMetadataEventDetails() {
+        if (metadataEventDetails != null) {
+            metadataEventDetails.clear();
+        }
     }
 
     /**

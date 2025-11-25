@@ -175,8 +175,8 @@ public class AuditSolrServiceImpl implements AuditService {
      * @throws SQLException if a database access error occurs
      */
     private boolean isAuditableItem(Context context, Event event) throws SQLException {
-        if (event.getSubjectType() != Constants.ITEM && event.getSubjectType() != Constants.BITSTREAM
-                && event.getSubjectType() != Constants.BUNDLE) {
+        if ((event.getSubjectType() != Constants.ITEM && event.getSubjectType() != Constants.BITSTREAM
+                && event.getSubjectType() != Constants.BUNDLE) || event.getEventType() == Event.CREATE) {
             return true;
         }
 
@@ -333,6 +333,10 @@ public class AuditSolrServiceImpl implements AuditService {
 
         for (MetadataEvent metadataEvent : metadataEvents) {
             AuditEvent audit = buildBasicAuditEvent(context, event);
+            if (event.getEventType() == Event.CREATE ) {
+                audit.setEventType("MODIFY_METADATA");
+            }
+
             audit.setMetadataField(metadataEvent.getMetadataField());
             audit.setValue(metadataEvent.getValue());
             audit.setAuthority(metadataEvent.getAuthority());

@@ -47,7 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Integration Tests against the /api/system/auditevents endpoint
  */
 public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTest {
-    private final int TOTAL_ELEMENT = 71;
+    private final int TOTAL_ELEMENT = 18;
     private Collection collection;
 
     private Item item;
@@ -206,21 +206,21 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
                                 Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$.page.size", is(1)))
                 .andExpect(jsonPath("$.page.totalElements", is(TOTAL_ELEMENT)));
-        getClient(adminToken).perform(get("/api/system/auditevents").param("size", "50").param("page", "2"))
+        getClient(adminToken).perform(get("/api/system/auditevents").param("size", "10").param("page", "2"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(
                         jsonPath("$._links.self.href", Matchers.containsString("/api/system/auditevents")))
                 .andExpect(jsonPath("$._links.next.href").doesNotExist())
                 .andExpect(jsonPath("$._links.last.href",
                         Matchers.allOf(Matchers.containsString("/api/system/auditevents?"),
-                                Matchers.containsString("page=1"), Matchers.containsString("size=50"))))
+                                Matchers.containsString("page=1"), Matchers.containsString("size=10"))))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.allOf(Matchers.containsString("/api/system/auditevents?"),
-                                Matchers.containsString("page=0"), Matchers.containsString("size=50"))))
+                                Matchers.containsString("page=0"), Matchers.containsString("size=10"))))
                 .andExpect(jsonPath("$._links.prev.href",
                         Matchers.allOf(Matchers.containsString("/api/system/auditevents?"),
-                                Matchers.containsString("page=1"), Matchers.containsString("size=50"))))
-                .andExpect(jsonPath("$.page.size", is(50)))
+                                Matchers.containsString("page=1"), Matchers.containsString("size=10"))))
+                .andExpect(jsonPath("$.page.size", is(10)))
                 .andExpect(jsonPath("$.page.totalElements", is(TOTAL_ELEMENT)));
     }
 
@@ -406,14 +406,14 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
             .andExpect(jsonPath("$._links.last.href",
                     Matchers.allOf(
                             Matchers.containsString("/api/system/auditevents/search/findByObject?"),
-                            Matchers.containsString("page=57"), Matchers.containsString("size=1"))))
+                            Matchers.containsString("page=8"), Matchers.containsString("size=1"))))
             .andExpect(jsonPath("$._links.first.href",
                     Matchers.allOf(
                             Matchers.containsString("/api/system/auditevents/search/findByObject?"),
                             Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
             .andExpect(jsonPath("$._links.prev.href").doesNotExist())
             .andExpect(jsonPath("$.page.size", is(1)))
-            .andExpect(jsonPath("$.page.totalElements", is(58)));
+            .andExpect(jsonPath("$.page.totalElements", is(9)));
 
         getClient(adminToken).perform(get("/api/system/auditevents/search/findByObject")
                 .param("object", item.getID().toString())
@@ -437,13 +437,13 @@ public class AuditEventRestRepositoryIT extends AbstractControllerIntegrationTes
             .andExpect(jsonPath("$._links.last.href",
                     Matchers.allOf(
                             Matchers.containsString("/api/system/auditevents/search/findByObject?"),
-                            Matchers.containsString("page=57"), Matchers.containsString("size=1"))))
+                            Matchers.containsString("page=8"), Matchers.containsString("size=1"))))
             .andExpect(jsonPath("$._links.first.href",
                     Matchers.allOf(
                             Matchers.containsString("/api/system/auditevents/search/findByObject?"),
                             Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
             .andExpect(jsonPath("$.page.size", is(1)))
-            .andExpect(jsonPath("$.page.totalElements", is(58)));
+            .andExpect(jsonPath("$.page.totalElements", is(9)));
     }
 
     @Test

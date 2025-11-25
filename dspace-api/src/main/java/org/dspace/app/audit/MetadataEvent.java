@@ -7,6 +7,8 @@
  */
 package org.dspace.app.audit;
 
+import java.util.Objects;
+
 import org.dspace.content.MetadataValue;
 
 /**
@@ -99,4 +101,19 @@ public class MetadataEvent {
         this.action = action;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        MetadataEvent that = (MetadataEvent) o;
+        return place == that.place && Objects.equals(metadataField, that.metadataField) &&
+            Objects.equals(value, that.value) && Objects.equals(authority, that.authority) &&
+            Objects.equals(confidence, that.confidence) && Objects.equals(action, that.action);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(metadataField, value, authority, confidence, place, action);
+    }
 }
