@@ -135,6 +135,10 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Last version of errorprone to support JDK 17 is 2.42.0
+      # TODO: Remove this after this ticket is resolved https://github.com/DSpace/DSpace/issues/11621
+      - dependency-name: "com.google.errorprone:*"
+        versions: [ ">=2.43.0" ]
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
@@ -270,6 +274,9 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Last version of errorprone to support JDK 17 is 2.42.0
+      - dependency-name: "com.google.errorprone:*"
+        versions: [ ">=2.43.0" ]
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
@@ -405,6 +412,9 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Last version of errorprone to support JDK 17 is 2.42.0
+      - dependency-name: "com.google.errorprone:*"
+        versions: [ ">=2.43.0" ]
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
