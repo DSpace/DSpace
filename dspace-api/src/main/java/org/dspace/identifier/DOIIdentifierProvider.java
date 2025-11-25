@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import jakarta.annotation.PostConstruct;
 
+import jakarta.annotation.PostConstruct;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -172,7 +172,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
     @PostConstruct
     protected void setDOIMetadata() {
-        this.doiMetadataFieldName = new MetadataFieldName(this.configurationService.getProperty(CFG_DOI_METADATA, "dc.identifier.doi"));
+        this.doiMetadataFieldName =
+            new MetadataFieldName(this.configurationService.getProperty(CFG_DOI_METADATA, "dc.identifier.doi"));
     }
 
     /**
@@ -1044,7 +1045,11 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         Item item = (Item) dso;
 
-        List<MetadataValue> metadata = itemService.getMetadata(item, doiMetadataFieldName.schema, doiMetadataFieldName.element, doiMetadataFieldName.qualifier, null);
+        List<MetadataValue> metadata = itemService.getMetadata(item,
+                                                               doiMetadataFieldName.schema,
+                                                               doiMetadataFieldName.element,
+                                                               doiMetadataFieldName.qualifier,
+                                                               null);
         String leftPart = doiService.getResolver() + SLASH + getPrefix() + SLASH + getNamespaceSeparator();
         for (MetadataValue id : metadata) {
             if (id.getValue().startsWith(leftPart)) {
@@ -1105,7 +1110,11 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         Item item = (Item) dso;
 
-        List<MetadataValue> metadata = itemService.getMetadata(item, doiMetadataFieldName.schema, doiMetadataFieldName.element, doiMetadataFieldName.qualifier, null);
+        List<MetadataValue> metadata = itemService.getMetadata(item,
+                                                               doiMetadataFieldName.schema,
+                                                               doiMetadataFieldName.element,
+                                                               doiMetadataFieldName.qualifier,
+                                                               null);
         List<String> remainder = new ArrayList<>();
 
         for (MetadataValue id : metadata) {
@@ -1114,10 +1123,18 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             }
         }
 
-        itemService.clearMetadata(context, item, doiMetadataFieldName.schema, doiMetadataFieldName.element, doiMetadataFieldName.qualifier, null);
+        itemService.clearMetadata(context, item,
+                                  doiMetadataFieldName.schema,
+                                  doiMetadataFieldName.element,
+                                  doiMetadataFieldName.qualifier,
+                                  null);
         if (!remainder.isEmpty()) {
-            itemService.addMetadata(context, item, doiMetadataFieldName.schema, doiMetadataFieldName.element, doiMetadataFieldName.qualifier, null,
-                    remainder);
+            itemService.addMetadata(context, item,
+                                    doiMetadataFieldName.schema,
+                                    doiMetadataFieldName.element,
+                                    doiMetadataFieldName.qualifier,
+                                    null,
+                                    remainder);
         }
         itemService.update(context, item);
     }
