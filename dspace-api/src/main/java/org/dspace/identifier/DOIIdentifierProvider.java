@@ -68,7 +68,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
     static final String CFG_PREFIX = "identifier.doi.prefix";
     static final String CFG_NAMESPACE_SEPARATOR = "identifier.doi.namespaceseparator";
-    static final String DOI_METADATA = "identifier.doi.metadata";
+    public static final String DOI_METADATA = "identifier.doi.metadata";
     static final char SLASH = '/';
 
     // Metadata field name elements
@@ -181,6 +181,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             this.DOI_ELEMENT = parts[1];
             if (parts.length > 2) {
                 this.DOI_QUALIFIER = parts[2];
+            } else {
+                this.DOI_QUALIFIER = null;
             }
         }
     }
