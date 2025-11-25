@@ -358,23 +358,10 @@ public class DOIIdentifierProviderTest
 
     @Test
     public void testGet_DOI_Belongs_To_Thesis() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        community = communityService.create(null, context, "123456789/9");
-        communityService.setMetadataSingleValue(context, community,
-            CommunityService.MD_NAME, null, "A Test Community");
-        communityService.update(context, community);
-
-        collection = collectionService.create(context, community);
-        collectionService.setMetadataSingleValue(context, collection,
-            CollectionService.MD_NAME, null, "A Test Collection");
-        collectionService.update(context, collection);
-
-        context.restoreAuthSystemState();
-
         Item item = newItem();
-        String doi = DOI.SCHEME + PREFIX + "/" + "units/custom/" +
-            Long.toHexString(new Date().getTime());
+        String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR
+            + "units/custom/"
+            + Long.toHexString(new Date().getTime());
 
         context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, item,
@@ -392,20 +379,6 @@ public class DOIIdentifierProviderTest
 
     @Test
     public void testGet_DOI_Belongs_To_EUT() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        community = communityService.create(null, context, "123456789/7520");
-        communityService.setMetadataSingleValue(context, community,
-            CommunityService.MD_NAME, null, "A Test Community");
-        communityService.update(context, community);
-
-        collection = collectionService.create(context, community);
-        collectionService.setMetadataSingleValue(context, collection,
-            CollectionService.MD_NAME, null, "A Test Collection");
-        collectionService.update(context, collection);
-
-        context.restoreAuthSystemState();
-
         Item item = newItem();
 
         context.turnOffAuthorisationSystem();
@@ -413,9 +386,9 @@ public class DOIIdentifierProviderTest
         itemService.update(context, item);
         context.restoreAuthSystemState();
 
-        String doi = DOI.SCHEME + PREFIX + "/" +
-            itemService.getMetadata(item, "dc.identifier.issn") + "/" +
-            Long.toHexString(new Date().getTime());
+        String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR
+            + itemService.getMetadata(item, "dc.identifier.issn") + "/"
+            + Long.toHexString(new Date().getTime());
 
         context.turnOffAuthorisationSystem();
 
