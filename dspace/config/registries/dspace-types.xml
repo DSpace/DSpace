@@ -32,6 +32,13 @@
 
     <dc-type>
         <schema>dspace</schema>
+        <element>collection</element>
+        <qualifier>css</qualifier>
+        <scope_note>Custom CSS for this collection to display on the collection home page, browse page and collection item pages.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
         <element>entity</element>
         <qualifier>type</qualifier>
         <scope_note>Stores the type of Entity that a specific Item represents</scope_note>
