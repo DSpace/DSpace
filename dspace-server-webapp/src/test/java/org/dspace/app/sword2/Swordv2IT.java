@@ -191,6 +191,48 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
     }
 
     /**
+     * There should not be any Internal Server/Authorization error when uploading a new Item with embargo
+     * The embargo is defined in the `mets.xml` of the `example-embargo.zip` file
+     */
+    @Test
+    public void depositItemWithEmbargo() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create a top level community and one Collection
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        // Make sure our Collection allows the "eperson" user to submit into it
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Test SWORDv2 Collection")
+                .withSubmitterGroup(eperson)
+                .build();
+        // Above changes MUST be committed to the database for SWORDv2 to see them.
+        context.commit();
+        context.restoreAuthSystemState();
+
+        // Add file
+        LinkedMultiValueMap<Object, Object> multipart = new LinkedMultiValueMap<>();
+        multipart.add("file", new FileSystemResource(Path.of("src", "test", "resources",
+                "org", "dspace", "app", "sword2", "example-embargo.zip")));
+        // Add required headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.setContentDisposition(ContentDisposition.attachment().filename("example-embargo.zip").build());
+        headers.set("Packaging", "http://purl.org/net/sword/package/METSDSpaceSIP");
+        headers.setAccept(List.of(MediaType.APPLICATION_ATOM_XML));
+
+
+        // Send POST to upload Zip file via SWORD
+        ResponseEntity<String> response = postResponseAsString(COLLECTION_PATH + "/" + collection.getHandle(),
+                eperson.getEmail(), password,
+                new HttpEntity<>(multipart, headers));
+
+        // Expect a 201 CREATED response with ATOM "entry" content returned
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(ATOM_ENTRY_CONTENT_TYPE, response.getHeaders().getContentType().toString());
+    }
+
+    /**
      * This tests four different SWORDv2 actions, as these all require starting with a new deposit.
      * 1. Depositing a new item via SWORD (via POST /collections/[collection-uuid])
      * 2. Reading the deposited item (via GET /edit/[item-uuid])
