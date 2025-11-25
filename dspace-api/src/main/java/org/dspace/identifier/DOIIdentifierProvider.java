@@ -171,7 +171,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     }
 
     @PostConstruct
-    protected void setDoiMetadata() {
+    protected void setDOIMetadata() {
         this.doiMetadataFieldName = new MetadataFieldName(this.configurationService.getProperty(CFG_DOI_METADATA, "dc.identifier.doi"));
     }
 
