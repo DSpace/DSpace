@@ -32,6 +32,7 @@ public enum IndexClientOptions {
     FORCEUPDATE,
     UPDATEANDSPELLCHECK,
     FORCEUPDATEANDSPELLCHECK,
+    INDEXBYQUERY,
     HELP;
 
     public static final String TYPE_OPTION = "t";
@@ -63,6 +64,8 @@ public enum IndexClientOptions {
             return IndexClientOptions.SPELLCHECK;
         } else if (commandLine.hasOption("i")) {
             return IndexClientOptions.INDEX;
+        } else if (commandLine.hasOption("q")) {
+            return IndexClientOptions.INDEXBYQUERY;
         } else {
             if (commandLine.hasOption("f") && commandLine.hasOption("s")) {
                 return IndexClientOptions.FORCEUPDATEANDSPELLCHECK;
@@ -95,6 +98,8 @@ public enum IndexClientOptions {
         options.addOption("s", "spellchecker", false, "Rebuild the spellchecker, can be combined with -b and -f.");
         options.addOption("f", "force", false,
                           "if updating existing index, force each handle to be reindexed even if up-to-date");
+        options.addOption("q", "query", true,
+                "reindex by query, reindexing all objects matching the provided solr query");
         options.addOption("h", "help", false, "print this help message");
         return options;
     }
