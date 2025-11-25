@@ -126,7 +126,10 @@ public class DOIIdentifierProviderTest
 
             connector = mock(DOIConnector.class);
 
-            provider = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(DOIIdentifierProvider.class).get(0);
+            provider = DSpaceServicesFactory.getInstance()
+                .getServiceManager()
+                .getServicesByType(DOIIdentifierProvider.class)
+                .get(0);
             provider.doiService = doiService;
             provider.contentServiceFactory = ContentServiceFactory.getInstance();
             provider.itemService = itemService;
