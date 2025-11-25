@@ -45,6 +45,7 @@ updates:
         applies-to: version-updates
         patterns:
         - "junit:*"
+        - "com.adobe.testing:*"
         - "com.github.stefanbirker:system-rules"
         - "com.h2database:*"
         - "io.findify:s3mock*"
@@ -53,10 +54,19 @@ updates:
         - "org.hamcrest:*"
         - "org.mock-server:*"
         - "org.mockito:*"
+        - "org.testcontainers:*"
         - "org.xmlunit:*"
         update-types:
         - "minor"
         - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
+        update-types:
+          - "minor"
+          - "patch"
       # Group together all Apache Commons deps in a single PR
       apache-commons:
         applies-to: version-updates
@@ -170,6 +180,7 @@ updates:
         applies-to: version-updates
         patterns:
           - "junit:*"
+          - "com.adobe.testing:*"
           - "com.github.stefanbirker:system-rules"
           - "com.h2database:*"
           - "io.findify:s3mock*"
@@ -178,7 +189,16 @@ updates:
           - "org.hamcrest:*"
           - "org.mock-server:*"
           - "org.mockito:*"
+          - "org.testcontainers:*"
           - "org.xmlunit:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
         update-types:
           - "minor"
           - "patch"
@@ -295,6 +315,7 @@ updates:
         applies-to: version-updates
         patterns:
           - "junit:*"
+          - "com.adobe.testing:*"
           - "com.github.stefanbirker:system-rules"
           - "com.h2database:*"
           - "io.findify:s3mock*"
@@ -303,7 +324,16 @@ updates:
           - "org.hamcrest:*"
           - "org.mock-server:*"
           - "org.mockito:*"
+          - "org.testcontainers:*"
           - "org.xmlunit:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
         update-types:
           - "minor"
           - "patch"
@@ -420,6 +450,7 @@ updates:
         applies-to: version-updates
         patterns:
           - "junit:*"
+          - "com.adobe.testing:*"
           - "com.github.stefanbirker:system-rules"
           - "com.h2database:*"
           - "io.findify:s3mock*"
@@ -427,7 +458,16 @@ updates:
           - "org.hamcrest:*"
           - "org.mock-server:*"
           - "org.mockito:*"
+          - "org.testcontainers:*"
           - "org.xmlunit:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
         update-types:
           - "minor"
           - "patch"
