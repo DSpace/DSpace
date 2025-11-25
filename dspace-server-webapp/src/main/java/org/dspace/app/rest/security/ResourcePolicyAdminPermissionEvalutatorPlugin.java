@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ResourcePolicyRest;
@@ -60,7 +60,7 @@ public class ResourcePolicyAdminPermissionEvalutatorPlugin extends RestObjectPer
 
         if (!DSpaceRestPermission.ADMIN.equals(restPermission) &&
             !DSpaceRestPermission.WRITE.equals(restPermission) ||
-            !StringUtils.equalsIgnoreCase(targetType, RESOURCE_POLICY_TYPE)) {
+            !Strings.CI.equals(targetType, RESOURCE_POLICY_TYPE)) {
             return false;
         }
 

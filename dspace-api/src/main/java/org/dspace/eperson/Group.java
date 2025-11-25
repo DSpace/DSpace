@@ -19,7 +19,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.content.CacheableDSpaceObject;
 import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.core.Constants;
@@ -199,7 +199,7 @@ public class Group extends CacheableDSpaceObject implements DSpaceObjectLegacySu
      * Change the name of this Group.
      */
     void setName(String name) throws SQLException {
-        if (!StringUtils.equals(this.name, name) && !isPermanent()) {
+        if (!Strings.CS.equals(this.name, name) && !isPermanent()) {
             this.name = name;
             setMetadataModified();
         }

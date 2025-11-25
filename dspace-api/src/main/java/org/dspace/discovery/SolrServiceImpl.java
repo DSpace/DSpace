@@ -17,6 +17,7 @@ import java.io.StringWriter;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,6 +33,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -343,7 +345,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 getIndexFactories();
             int indexObject = 0;
             for (IndexFactory indexableObjectService : indexableObjectServices) {
-                if (type == null || StringUtils.equals(indexableObjectService.getType(), type)) {
+                if (type == null || Strings.CS.equals(indexableObjectService.getType(), type)) {
                     final Iterator<IndexableObject> indexableObjects = indexableObjectService.findAll(context);
                     while (indexableObjects.hasNext()) {
                         final IndexableObject indexableObject = indexableObjects.next();
@@ -900,8 +902,20 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         if (0 < discoveryQuery.getHitHighlightingFields().size()) {
             solrQuery.setHighlight(true);
             solrQuery.add(HighlightParams.USE_PHRASE_HIGHLIGHTER, Boolean.TRUE.toString());
+            boolean escapeHTML = configurationService.getBooleanProperty("discovery.highlights.escape-html", true);
+            String[] renderHTMLForFields =
+                configurationService.getArrayProperty("discovery.highlights.html-allowed-fields");
             for (DiscoverHitHighlightingField highlightingField : discoveryQuery.getHitHighlightingFields()) {
                 solrQuery.addHighlightField(highlightingField.getField() + "_hl");
+                boolean allowHTMLInField = Arrays.stream(renderHTMLForFields)
+                    .anyMatch(field -> highlightingField.getField().matches(field));
+                if (!escapeHTML || allowHTMLInField) {
+                    solrQuery.add("f." + highlightingField.getField() + "_hl." + HighlightParams.METHOD, "original");
+                } else {
+                    solrQuery.add("f." + highlightingField.getField() + "_hl." + HighlightParams.METHOD, "unified");
+                    solrQuery.add("f." + highlightingField.getField() + "_hl." + HighlightParams.ENCODER, "html");
+                }
+
                 solrQuery.add("f." + highlightingField.getField() + "_hl." + HighlightParams.FRAGSIZE,
                               String.valueOf(highlightingField.getMaxChars()));
                 solrQuery.add("f." + highlightingField.getField() + "_hl." + HighlightParams.SNIPPETS,
@@ -1327,9 +1341,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     @Override
     public String toSortFieldIndex(String metadataField, String type) {
-        if (StringUtils.equalsIgnoreCase(DiscoverySortConfiguration.SCORE, metadataField)) {
+        if (Strings.CI.equals(DiscoverySortConfiguration.SCORE, metadataField)) {
             return DiscoverySortConfiguration.SCORE;
-        } else if (StringUtils.equals(type, DiscoveryConfigurationParameters.TYPE_DATE)) {
+        } else if (Strings.CS.equals(type, DiscoveryConfigurationParameters.TYPE_DATE)) {
             return metadataField + "_dt";
         } else {
             return metadataField + "_sort";

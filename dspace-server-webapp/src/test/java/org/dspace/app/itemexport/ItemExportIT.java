@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.file.PathUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
@@ -350,11 +350,11 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
         assertEquals(2, process.getBitstreams().size());
         assertEquals(1,
                 process.getBitstreams().stream()
-                .filter(b -> StringUtils.contains(b.getName(), ".log"))
+                .filter(b -> Strings.CS.contains(b.getName(), ".log"))
                 .count());
         assertEquals(1,
                 process.getBitstreams().stream()
-                .filter(b -> StringUtils.contains(b.getName(), ".zip"))
+                .filter(b -> Strings.CS.contains(b.getName(), ".zip"))
                 .count());
     }
 }

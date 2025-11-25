@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
@@ -703,7 +703,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
 
     boolean checkIfInfoTextLoggedByHandler(TestDSpaceRunnableHandler handler, String text) {
         for (String message: handler.getInfoMessages()) {
-            if (StringUtils.containsIgnoreCase(message, text)) {
+            if (Strings.CI.contains(message, text)) {
                 return true;
             }
         }

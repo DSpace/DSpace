@@ -17,7 +17,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
@@ -1472,7 +1472,7 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
     private void addUserToWorkflowGroup(EPerson ePerson, Collection collection, String roleName) throws SQLException {
         List<CollectionRole> roles = collectionRoleService.findByCollection(context, collection);
         for (CollectionRole role : roles) {
-            if (StringUtils.equals(role.getRoleId(), roleName)) {
+            if (Strings.CS.equals(role.getRoleId(), roleName)) {
                 Group group = role.getGroup();
                 groupService.addMember(context, group, ePerson);
             }
@@ -1497,7 +1497,7 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         try {
             List<CollectionRole> roles = collectionRoleService.findByCollection(context, collection);
             for (CollectionRole role : roles) {
-                if (StringUtils.equals(role.getRoleId(), roleName)) {
+                if (Strings.CS.equals(role.getRoleId(), roleName)) {
                     Group group = role.getGroup();
                     groupService.removeMember(context, group, ePerson);
                     deleteSuccess = true;

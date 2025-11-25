@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
 import com.ibm.icu.text.Normalizer;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.suggestion.SuggestionEvidence;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -98,7 +98,7 @@ public class AuthorNamesScorer implements EvidenceScorer {
         int idx = 0;
         for (String nMetadataAuthor : normalizedMetadataAuthors) {
             Optional<String[]> found = names.stream()
-                    .filter(a -> StringUtils.equalsIgnoreCase(a[0], nMetadataAuthor)).findFirst();
+                    .filter(a -> Strings.CI.equals(a[0], nMetadataAuthor)).findFirst();
             if (found.isPresent()) {
                 return new SuggestionEvidence(this.getClass().getSimpleName(),
                         100 * ((double) nMetadataAuthor.length() / (double) maxNameLenght),
