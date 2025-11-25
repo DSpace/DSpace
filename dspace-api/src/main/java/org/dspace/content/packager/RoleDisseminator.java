@@ -200,8 +200,8 @@ public class RoleDisseminator implements PackageDisseminator {
             List<EPerson> people = findAssociatedPeople(context, object);
 
             //Only continue if we've found Groups or People which we need to disseminate
-            if ((groups != null && groups.size() > 0) ||
-                (people != null && people.size() > 0)) {
+            if ((groups.size() > 0) ||
+                (people.size() > 0)) {
                 XMLOutputFactory factory = XMLOutputFactory.newInstance();
                 XMLStreamWriter writer;
 
@@ -211,7 +211,7 @@ public class RoleDisseminator implements PackageDisseminator {
                 writer.writeStartElement(DSPACE_ROLES);
 
                 //Only disseminate a <Groups> element if some groups exist
-                if (groups != null) {
+                if (groups.size() > 0) {
                     writer.writeStartElement(GROUPS);
 
                     for (Group group : groups) {
@@ -222,7 +222,7 @@ public class RoleDisseminator implements PackageDisseminator {
                 }
 
                 //Only disseminate an <People> element if some people exist
-                if (people != null) {
+                if (people.size() > 0) {
                     writer.writeStartElement(EPERSONS);
 
                     for (EPerson eperson : people) {
@@ -481,14 +481,13 @@ public class RoleDisseminator implements PackageDisseminator {
      */
     protected List<Group> findAssociatedGroups(Context context, DSpaceObject object)
         throws SQLException {
+        List<Group> list = new ArrayList<Group>();
         if (object.getType() == Constants.SITE) {
             // TODO FIXME -- if there was a way to ONLY export Groups which are NOT
             // associated with a Community or Collection, we should be doing that instead!
             return groupService.findAll(context, null);
         } else if (object.getType() == Constants.COMMUNITY) {
             Community community = (Community) object;
-
-            ArrayList<Group> list = new ArrayList<Group>();
 
             //check for admin group
             if (community.getAdministrators() != null) {
@@ -503,14 +502,8 @@ public class RoleDisseminator implements PackageDisseminator {
                     list.add(g);
                 }
             }
-
-            if (list.size() > 0) {
-                return list;
-            }
         } else if (object.getType() == Constants.COLLECTION) {
             Collection collection = (Collection) object;
-
-            ArrayList<Group> list = new ArrayList<Group>();
 
             //check for admin group
             if (collection.getAdministrators() != null) {
@@ -541,14 +534,25 @@ public class RoleDisseminator implements PackageDisseminator {
                     list.add(g);
                 }
             }
-
-            if (list.size() > 0) {
-                return list;
-            }
         }
 
-        //by default, return nothing
-        return null;
+        // Add any memberGroups associated with discovered groups
+        if (list.size() > 0) {
+            List<Group> memberList = new ArrayList<Group>();
+            for (Group group : list) {
+                for (Group memberGroup : group.getMemberGroups()) {
+                    if (!memberList.contains(memberGroup)) {
+                        memberList.add(memberGroup);
+                    }
+                }
+            }
+            for (Group memberGroup : memberList) {
+                if (!list.contains(memberGroup)) {
+                    list.add(memberGroup);
+                }
+            }
+        }
+        return list;
     }
 
 
@@ -557,7 +561,7 @@ public class RoleDisseminator implements PackageDisseminator {
      * <P>
      * If object is SITE, all people are returned.
      * <P>
-     * For all other objects, null is returned.
+     * For all other objects, people associated with the object's groups are returned.
      *
      * @param context The DSpace context
      * @param object  the DSpace object
@@ -566,12 +570,20 @@ public class RoleDisseminator implements PackageDisseminator {
      */
     protected List<EPerson> findAssociatedPeople(Context context, DSpaceObject object)
         throws SQLException {
+        List<EPerson> personList = new ArrayList<EPerson>();
         if (object.getType() == Constants.SITE) {
-            return ePersonService.findAll(context, EPerson.EMAIL);
+            personList = ePersonService.findAll(context, EPerson.EMAIL);
+        } else {
+            List<Group> groups = findAssociatedGroups(context, object);
+            for (Group group : groups) {
+                for (EPerson person : group.getMembers()) {
+                    if (!personList.contains(person)) {
+                        personList.add(person);
+                    }
+                }
+            }
         }
-
-        //by default, return nothing
-        return null;
+        return personList;
     }
 
     /**
