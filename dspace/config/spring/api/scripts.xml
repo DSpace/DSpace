@@ -111,6 +111,7 @@
     <bean id="solr-core-management" class="org.dspace.app.solr.SolrCoreExportImportCliScriptConfiguration" primary="true">
         <property name="description" value="Export and import complete SOLR cores with multithreading support"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.solr.SolrCoreExportImportCli"/>
+        <property name="isVisibleFromUI" value="false"/>
     </bean>
 
 </beans>
