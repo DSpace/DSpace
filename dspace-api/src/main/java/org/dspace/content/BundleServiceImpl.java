@@ -114,7 +114,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         // if we ever use the identifier service for bundles, we should
         // create the bundle before we create the Event and should add all
         // identifiers to it.
-        context.addEvent(new Event(Event.CREATE, Constants.BUNDLE, bundle.getID(), null));
+        context.addEvent(new Event(Event.CREATE, Constants.BUNDLE,
+            bundle.getID(), Constants.ITEM, item.getID(),
+            bundle.getMetadataEventDetails(), DetailType.DSO_SUMMARY,
+            getIdentifiers(context, bundle)));
 
         return bundle;
     }
@@ -158,6 +161,11 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         if (owningItem != null) {
             itemService.updateLastModified(context, owningItem);
             itemService.update(context, owningItem);
+            context.addEvent(new Event(Event.ADD, Constants.BUNDLE, bundle.getID(),
+                Constants.ITEM, owningItem.getID(),
+                String.valueOf(bitstream.getSequenceID()), DetailType.BITSTREAM_SEQUENCE_ID,
+                getIdentifiers(context, bundle)));
+
         }
 
         bundle.addBitstream(bitstream);
@@ -232,6 +240,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         if (owningItem != null) {
             itemService.updateLastModified(context, owningItem);
             itemService.update(context, owningItem);
+            context.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, bundle.getID(),
+                Constants.ITEM, owningItem.getID(),
+                String.valueOf(bitstream.getSequenceID()), DetailType.BITSTREAM_SEQUENCE_ID,
+                getIdentifiers(context, bundle)));
         }
 
         // In the event that the bitstream to remove is actually
@@ -522,7 +534,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         if (bundle.isModified() || bundle.isMetadataModified()) {
             if (bundle.isMetadataModified()) {
                 context.addEvent(new Event(Event.MODIFY_METADATA, bundle.getType(), bundle.getID(),
-                        bundle.getDetails(), DetailType.DSO_SUMMARY,
+                        bundle.getMetadataEventDetails(), DetailType.DSO_SUMMARY,
                         getIdentifiers(context, bundle)));
             }
             context.addEvent(new Event(Event.MODIFY, Constants.BUNDLE, bundle.getID(),
