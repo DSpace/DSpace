@@ -7,9 +7,7 @@
  */
 package org.dspace.identifier.doi;
 
-import static org.dspace.identifier.DOIIdentifierProvider.DOI_ELEMENT;
-import static org.dspace.identifier.DOIIdentifierProvider.DOI_QUALIFIER;
-import static org.dspace.identifier.DOIIdentifierProvider.MD_SCHEMA;
+import static org.dspace.identifier.DOIIdentifierProvider.DOI_METADATA;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -387,12 +385,29 @@ public class DataCiteConnector
         }
         if (configurationService.hasProperty(CFG_HOSTINGINSTITUTION)) {
             parameters.put("hostinginstitution",
-                           configurationService.getProperty(CFG_HOSTINGINSTITUTION));
+                    configurationService.getProperty(CFG_HOSTINGINSTITUTION));
         }
-        parameters.put("mdSchema", MD_SCHEMA);
-        parameters.put("mdElement", DOI_ELEMENT);
+
+        String doiSchema = "dc";
+        String doiElement = "identifier";
+        String doiQualifier = "doi";
+
+        String doiMetadata = this.configurationService.getProperty(DOI_METADATA);
+        if (doiMetadata != null) {
+            String[] parts = doiMetadata.split("\\.");
+            doiSchema = parts[0];
+            doiElement = parts[1];
+            if (parts.length > 2) {
+                doiQualifier = parts[2];
+            } else {
+                doiQualifier = null;
+            }
+        }
+
+        parameters.put("mdSchema", doiSchema);
+        parameters.put("mdElement", doiElement);
         // Pass an empty string for qualifier if the metadata field doesn't have any
-        parameters.put("mdQualifier", DOI_QUALIFIER);
+        parameters.put("mdQualifier", doiQualifier);
 
         Element root = null;
         try {
