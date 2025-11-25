@@ -148,8 +148,8 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
             } finally {
                 context.restoreAuthSystemState();
             }
-        request.setAttribute(OIDC_AUTHENTICATED, true);
-        return ePerson.canLogIn() ? logInEPerson(context, ePerson) : BAD_ARGS;
+            request.setAttribute(OIDC_AUTHENTICATED, true);
+            return ePerson.canLogIn() ? logInEPerson(context, ePerson) : BAD_ARGS;
         }
 
         // if self registration is disabled, warn about this failure to find a matching eperson
