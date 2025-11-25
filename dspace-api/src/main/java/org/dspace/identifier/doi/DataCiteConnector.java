@@ -389,7 +389,8 @@ public class DataCiteConnector
                     configurationService.getProperty(CFG_HOSTINGINSTITUTION));
         }
 
-        MetadataFieldName doiMetadataFieldName = new MetadataFieldName(this.configurationService.getProperty(CFG_DOI_METADATA, "dc.identifier.doi"));
+        MetadataFieldName doiMetadataFieldName =
+            new MetadataFieldName(this.configurationService.getProperty(CFG_DOI_METADATA, "dc.identifier.doi"));
 
         parameters.put("mdSchema", doiMetadataFieldName.schema);
         parameters.put("mdElement", doiMetadataFieldName.element);
