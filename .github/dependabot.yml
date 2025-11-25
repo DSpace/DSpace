@@ -45,6 +45,7 @@ updates:
         applies-to: version-updates
         patterns:
         - "junit:*"
+        - "com.adobe.testing:*"
         - "com.github.stefanbirker:system-rules"
         - "com.h2database:*"
         - "io.findify:s3mock*"
@@ -53,6 +54,7 @@ updates:
         - "org.hamcrest:*"
         - "org.mock-server:*"
         - "org.mockito:*"
+        - "org.testcontainers:*"
         - "org.xmlunit:*"
         update-types:
         - "minor"
@@ -178,6 +180,7 @@ updates:
         applies-to: version-updates
         patterns:
           - "junit:*"
+          - "com.adobe.testing:*"
           - "com.github.stefanbirker:system-rules"
           - "com.h2database:*"
           - "io.findify:s3mock*"
@@ -186,6 +189,7 @@ updates:
           - "org.hamcrest:*"
           - "org.mock-server:*"
           - "org.mockito:*"
+          - "org.testcontainers:*"
           - "org.xmlunit:*"
         update-types:
           - "minor"
@@ -311,6 +315,7 @@ updates:
         applies-to: version-updates
         patterns:
           - "junit:*"
+          - "com.adobe.testing:*"
           - "com.github.stefanbirker:system-rules"
           - "com.h2database:*"
           - "io.findify:s3mock*"
@@ -319,6 +324,7 @@ updates:
           - "org.hamcrest:*"
           - "org.mock-server:*"
           - "org.mockito:*"
+          - "org.testcontainers:*"
           - "org.xmlunit:*"
         update-types:
           - "minor"
@@ -444,6 +450,7 @@ updates:
         applies-to: version-updates
         patterns:
           - "junit:*"
+          - "com.adobe.testing:*"
           - "com.github.stefanbirker:system-rules"
           - "com.h2database:*"
           - "io.findify:s3mock*"
@@ -451,6 +458,7 @@ updates:
           - "org.hamcrest:*"
           - "org.mock-server:*"
           - "org.mockito:*"
+          - "org.testcontainers:*"
           - "org.xmlunit:*"
         update-types:
           - "minor"
