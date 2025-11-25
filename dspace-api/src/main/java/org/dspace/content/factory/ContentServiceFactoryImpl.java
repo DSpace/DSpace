@@ -30,6 +30,7 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.ProvenanceService;
 import org.dspace.eperson.service.SubscribeService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -84,6 +85,9 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     private EntityService entityService;
     @Autowired(required = true)
     private DuplicateDetectionService duplicateDetectionService;
+
+    @Autowired(required = true)
+    private ProvenanceService provenanceService;
 
     @Override
     public List<DSpaceObjectService<? extends DSpaceObject>> getDSpaceObjectServices() {
@@ -158,6 +162,11 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     @Override
     public SubscribeService getSubscribeService() {
         return subscribeService ;
+    }
+
+    @Override
+    public ProvenanceService getProvenanceService() {
+        return provenanceService;
     }
 
     @Override
