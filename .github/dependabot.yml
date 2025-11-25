@@ -57,6 +57,14 @@ updates:
         update-types:
         - "minor"
         - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
+        update-types:
+          - "minor"
+          - "patch"
       # Group together all Apache Commons deps in a single PR
       apache-commons:
         applies-to: version-updates
@@ -179,6 +187,14 @@ updates:
           - "org.mock-server:*"
           - "org.mockito:*"
           - "org.xmlunit:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
         update-types:
           - "minor"
           - "patch"
@@ -307,6 +323,14 @@ updates:
         update-types:
           - "minor"
           - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
+        update-types:
+          - "minor"
+          - "patch"
       # Group together all Apache Commons deps in a single PR
       apache-commons:
         applies-to: version-updates
@@ -428,6 +452,14 @@ updates:
           - "org.mock-server:*"
           - "org.mockito:*"
           - "org.xmlunit:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
         update-types:
           - "minor"
           - "patch"
