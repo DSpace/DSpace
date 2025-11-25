@@ -20,10 +20,13 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * This class represents an Abstract class that a ScriptConfiguration can inherit to further implement this
- * and represent a script's configuration.
- * By default script are available only to repository administrators script that have a broader audience
- * must override the {@link #isAllowedToExecute(Context, List)} method.
+ * Represent a script's configuration.
+ * By default scripts are available only to repository administrators.
+ * Scripts that have a broader audience must override the
+ * {@link #isAllowedToExecute(Context, List)} method.
+ *
+ * @param <T> The concrete class represents the configuration of this sub-type
+ * of DSpaceRunnable.
  */
 public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements BeanNameAware {
 
@@ -31,7 +34,7 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
     protected AuthorizeService authorizeService;
 
     /**
-     * The possible options for this script
+     * The possible options for this script.
      */
     protected Options options;
 
@@ -40,7 +43,7 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
     private String name;
 
     /**
-     * Generic getter for the description
+     * Generic getter for the description.
      * @return the description value of this ScriptConfiguration
      */
     public String getDescription() {
@@ -48,7 +51,7 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
     }
 
     /**
-     * Generic setter for the description
+     * Generic setter for the description.
      * @param description   The description to be set on this ScriptConfiguration
      */
     public void setDescription(String description) {
@@ -56,7 +59,7 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
     }
 
     /**
-     * Generic getter for the name
+     * Generic getter for the name.
      * @return the name value of this ScriptConfiguration
      */
     public String getName() {
@@ -64,7 +67,7 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
     }
 
     /**
-     * Generic setter for the name
+     * Generic setter for the name.
      * @param name   The name to be set on this ScriptConfiguration
      */
     public void setName(String name) {
@@ -72,25 +75,25 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
     }
 
     /**
-     * Generic getter for the dspaceRunnableClass
+     * Generic getter for the dspaceRunnableClass.
      * @return the dspaceRunnableClass value of this ScriptConfiguration
      */
     public abstract Class<T> getDspaceRunnableClass();
 
     /**
-     * Generic setter for the dspaceRunnableClass
-     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this IndexDiscoveryScriptConfiguration
+     * Generic setter for the dspaceRunnableClass.
+     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this ScriptConfiguration
      */
     public abstract void setDspaceRunnableClass(Class<T> dspaceRunnableClass);
 
     /**
-     * This method will return if the script is allowed to execute in the given context. This is by default set
-     * to the currentUser in the context being an admin, however this can be overwritten by each script individually
-     * if different rules apply
+     * This method will return true if the script is allowed to execute in the
+     * given context. This is typically determined by the currentUser in the
+     * context being an administrator, but you can implement any useful rule.
      * @param context   The relevant DSpace context
-     * @param commandLineParameters the parameters that will be used to start the process if known,
-     *        <code>null</code> otherwise
-     * @return          A boolean indicating whether the script is allowed to execute or not
+     * @param commandLineParameters the parameters that will be used to start
+     *        the process if known, {@code null} otherwise
+     * @return          Whether the script is allowed to execute or not.
      */
     public boolean isAllowedToExecute(Context context, List<DSpaceCommandLineParameter> commandLineParameters) {
         try {
@@ -101,7 +104,7 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
     }
 
     /**
-     * The getter for the options of the Script
+     * The getter for the options of the Script.
      * @return the options value of this ScriptConfiguration
      */
     public abstract Options getOptions();
