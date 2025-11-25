@@ -7,15 +7,6 @@
  */
 package org.dspace.discovery;
 
-import static org.dspace.discovery.SolrServiceWorkspaceWorkflowRestrictionPlugin.DISCOVER_WORKSPACE_CONFIGURATION_NAME;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -52,6 +42,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import static org.dspace.discovery.SolrServiceWorkspaceWorkflowRestrictionPlugin.DISCOVER_WORKSPACE_CONFIGURATION_NAME;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.indexobject.IndexableClaimedTask;
@@ -75,9 +66,18 @@ import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * This class will aim to test Discovery related use cases
@@ -1017,5 +1017,124 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
         indexer.commit();
         context.setCurrentUser(previousUser);
+    }
+
+    /**
+     * Integration test for issue #10084: verify that admin scope queries are only performed
+     * for collection/community admins, not for regular users.
+     * This test ensures the fix prevents unnecessary database queries.
+     */
+    @Test
+    public void testAdminScopeOnlyAppliedForCollectionCommunityAdmins() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create a regular user (non-admin)
+        EPerson regularUser = EPersonBuilder.createEPerson(context)
+                                            .withEmail("regular@example.com")
+                                            .withPassword("password")
+                                            .build();
+
+        // Create a collection admin
+        EPerson collectionAdmin = EPersonBuilder.createEPerson(context)
+                                                .withEmail("colladmin@example.com")
+                                                .withPassword("password")
+                                                .build();
+
+        // Create a community admin
+        EPerson communityAdmin = EPersonBuilder.createEPerson(context)
+                                               .withEmail("commadmin@example.com")
+                                               .withPassword("password")
+                                               .build();
+
+        // Create test structure: community with a collection
+        // Make communityAdmin an admin of the community
+        Community parentCommunity = CommunityBuilder.createCommunity(context)
+                                                    .withName("Parent Community")
+                                                    .withAdminGroup(communityAdmin)
+                                                    .build();
+        
+        // Make collectionAdmin an admin of the collection
+        Collection collection1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                                  .withName("Collection 1")
+                                                  .withAdminGroup(collectionAdmin)
+                                                  .build();
+
+        // Create a withdrawn item (only visible to admins with proper scope)
+        ItemBuilder.createItem(context, collection1)
+                   .withTitle("Withdrawn Item")
+                   .withSubject("test")
+                   .withdrawn()
+                   .build();
+
+        // Create a public item (visible to everyone)
+        ItemBuilder.createItem(context, collection1)
+                   .withTitle("Public Item")
+                   .withSubject("test")
+                   .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+        indexer.commit();
+
+        // Test 1: Regular user search - should only see public items
+        context.setCurrentUser(regularUser);
+        DiscoverQuery queryRegular = new DiscoverQuery();
+        queryRegular.setQuery("*:*");
+        queryRegular.setDSpaceObjectFilter(IndexableItem.TYPE);
+        DiscoverResult resultRegular = searchService.search(context, queryRegular);
+
+        // Regular user should see the public item but NOT the withdrawn item
+        List<String> regularTitles = resultRegular.getIndexableObjects().stream()
+            .map(io -> ((IndexableItem) io).getIndexedObject().getName())
+            .collect(Collectors.toList());
+        assertThat("Regular user should see public item", regularTitles, hasItem("Public Item"));
+        assertThat("Regular user should NOT see withdrawn item", regularTitles, not(hasItem("Withdrawn Item")));
+
+        // Test 2: Collection admin search - should see items in their administered collection
+        context.setCurrentUser(collectionAdmin);
+        DiscoverQuery queryColAdmin = new DiscoverQuery();
+        queryColAdmin.setQuery("*:*");
+        queryColAdmin.setDSpaceObjectFilter(IndexableItem.TYPE);
+        DiscoverResult resultColAdmin = searchService.search(context, queryColAdmin);
+
+        // Collection admin should see both public and withdrawn items in their collection
+        List<String> colAdminTitles = resultColAdmin.getIndexableObjects().stream()
+            .map(io -> ((IndexableItem) io).getIndexedObject().getName())
+            .collect(Collectors.toList());
+        assertThat("Collection admin should see public item", colAdminTitles, hasItem("Public Item"));
+        assertThat("Collection admin should see withdrawn item in their collection", 
+                   colAdminTitles, hasItem("Withdrawn Item"));
+
+        // Test 3: Community admin search - should see items in their administered community
+        context.setCurrentUser(communityAdmin);
+        DiscoverQuery queryCommunityAdmin = new DiscoverQuery();
+        queryCommunityAdmin.setQuery("*:*");
+        queryCommunityAdmin.setDSpaceObjectFilter(IndexableItem.TYPE);
+        DiscoverResult resultCommunityAdmin = searchService.search(context, queryCommunityAdmin);
+
+        // Community admin should see both items (community contains the collection)
+        List<String> commAdminTitles = resultCommunityAdmin.getIndexableObjects().stream()
+            .map(io -> ((IndexableItem) io).getIndexedObject().getName())
+            .collect(Collectors.toList());
+        assertThat("Community admin should see public item", commAdminTitles, hasItem("Public Item"));
+        assertThat("Community admin should see withdrawn item in their community", 
+                   commAdminTitles, hasItem("Withdrawn Item"));
+
+        // Test 4: Site admin (already exists as 'admin' field) - should see everything
+        context.setCurrentUser(admin);
+        DiscoverQuery querySiteAdmin = new DiscoverQuery();
+        querySiteAdmin.setQuery("*:*");
+        querySiteAdmin.setDSpaceObjectFilter(IndexableItem.TYPE);
+        DiscoverResult resultSiteAdmin = searchService.search(context, querySiteAdmin);
+
+        // Site admin should see both items
+        List<String> siteAdminTitles = resultSiteAdmin.getIndexableObjects().stream()
+            .map(io -> ((IndexableItem) io).getIndexedObject().getName())
+            .collect(Collectors.toList());
+        assertThat("Site admin should see public item", siteAdminTitles, hasItem("Public Item"));
+        assertThat("Site admin should see withdrawn item", siteAdminTitles, hasItem("Withdrawn Item"));
+
+        // Reset context user
+        context.setCurrentUser(null);
     }
 }
