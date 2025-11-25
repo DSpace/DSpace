@@ -20,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.logic.Filter;
@@ -68,14 +69,11 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
     static final String CFG_PREFIX = "identifier.doi.prefix";
     static final String CFG_NAMESPACE_SEPARATOR = "identifier.doi.namespaceseparator";
-    public static final String DOI_METADATA = "identifier.doi.metadata";
+    public static final String CFG_DOI_METADATA = "identifier.doi.metadata";
     static final char SLASH = '/';
 
-    // Metadata field name elements
-    // TODO: move these to MetadataSchema or some such?
-    public String MD_SCHEMA = "dc";
-    public String DOI_ELEMENT = "identifier";
-    public String DOI_QUALIFIER = "doi";
+    // Metadata field name
+    public MetadataFieldName doiMetadataFieldName;
     // The DOI is queued for registered with the service provider
     public static final Integer TO_BE_REGISTERED = 1;
     // The DOI is queued for reservation with the service provider
@@ -174,17 +172,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
     @PostConstruct
     protected void setDoiMetadata() {
-        String doiMetadata = this.configurationService.getProperty(DOI_METADATA);
-        if (doiMetadata != null) {
-            String[] parts = doiMetadata.split("\\.");
-            this.MD_SCHEMA = parts[0];
-            this.DOI_ELEMENT = parts[1];
-            if (parts.length > 2) {
-                this.DOI_QUALIFIER = parts[2];
-            } else {
-                this.DOI_QUALIFIER = null;
-            }
-        }
+        this.doiMetadataFieldName = new MetadataFieldName(this.configurationService.getProperty(CFG_DOI_METADATA, "dc.identifier.doi"));
     }
 
     /**
@@ -1056,7 +1044,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         Item item = (Item) dso;
 
-        List<MetadataValue> metadata = itemService.getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<MetadataValue> metadata = itemService.getMetadata(item, doiMetadataFieldName.schema, doiMetadataFieldName.element, doiMetadataFieldName.qualifier, null);
         String leftPart = doiService.getResolver() + SLASH + getPrefix() + SLASH + getNamespaceSeparator();
         for (MetadataValue id : metadata) {
             if (id.getValue().startsWith(leftPart)) {
@@ -1085,8 +1073,12 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         Item item = (Item) dso;
 
-        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
-            doiService.DOIToExternalForm(doi));
+        itemService.addMetadata(context, item,
+                                doiMetadataFieldName.schema,
+                                doiMetadataFieldName.element,
+                                doiMetadataFieldName.qualifier,
+                                null,
+                                doiService.DOIToExternalForm(doi));
         try {
             itemService.update(context, item);
         } catch (SQLException | AuthorizeException ex) {
@@ -1113,7 +1105,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         Item item = (Item) dso;
 
-        List<MetadataValue> metadata = itemService.getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<MetadataValue> metadata = itemService.getMetadata(item, doiMetadataFieldName.schema, doiMetadataFieldName.element, doiMetadataFieldName.qualifier, null);
         List<String> remainder = new ArrayList<>();
 
         for (MetadataValue id : metadata) {
@@ -1122,9 +1114,9 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             }
         }
 
-        itemService.clearMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        itemService.clearMetadata(context, item, doiMetadataFieldName.schema, doiMetadataFieldName.element, doiMetadataFieldName.qualifier, null);
         if (!remainder.isEmpty()) {
-            itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+            itemService.addMetadata(context, item, doiMetadataFieldName.schema, doiMetadataFieldName.element, doiMetadataFieldName.qualifier, null,
                     remainder);
         }
         itemService.update(context, item);

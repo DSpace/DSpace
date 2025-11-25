@@ -7,7 +7,7 @@
  */
 package org.dspace.identifier.doi;
 
-import static org.dspace.identifier.DOIIdentifierProvider.DOI_METADATA;
+import static org.dspace.identifier.DOIIdentifierProvider.CFG_DOI_METADATA;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -41,6 +41,7 @@ import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.crosswalk.ParameterizedDisseminationCrosswalk;
@@ -388,26 +389,12 @@ public class DataCiteConnector
                     configurationService.getProperty(CFG_HOSTINGINSTITUTION));
         }
 
-        String doiSchema = "dc";
-        String doiElement = "identifier";
-        String doiQualifier = "doi";
+        MetadataFieldName doiMetadataFieldName = new MetadataFieldName(this.configurationService.getProperty(CFG_DOI_METADATA, "dc.identifier.doi"));
 
-        String doiMetadata = this.configurationService.getProperty(DOI_METADATA);
-        if (doiMetadata != null) {
-            String[] parts = doiMetadata.split("\\.");
-            doiSchema = parts[0];
-            doiElement = parts[1];
-            if (parts.length > 2) {
-                doiQualifier = parts[2];
-            } else {
-                doiQualifier = null;
-            }
-        }
-
-        parameters.put("mdSchema", doiSchema);
-        parameters.put("mdElement", doiElement);
+        parameters.put("mdSchema", doiMetadataFieldName.schema);
+        parameters.put("mdElement", doiMetadataFieldName.element);
         // Pass an empty string for qualifier if the metadata field doesn't have any
-        parameters.put("mdQualifier", doiQualifier);
+        parameters.put("mdQualifier", doiMetadataFieldName.qualifier);
 
         Element root = null;
         try {
