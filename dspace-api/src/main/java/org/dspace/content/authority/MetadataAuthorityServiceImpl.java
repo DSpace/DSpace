@@ -86,7 +86,7 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
 
     }
 
-    public void init() {
+    protected void init() {
         if (initialized) {
             return;
         }
@@ -101,7 +101,7 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
             Map<String, Boolean> controlledLocal = new HashMap<>();
             Map<String, Boolean> isAuthorityRequiredLocal = new HashMap<>();
             Map<String, Integer> minConfidenceLocal = new HashMap<>();
-            int defaultMinConfidenceLocal = this.defaultMinConfidence;
+            int defaultMinConfidenceLocal = defaultMinConfidence;
 
             List<String> keys = configurationService.getPropertyKeys(AUTH_PREFIX);
             Context context = new Context();
@@ -154,13 +154,13 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
                 }
 
                 // At this point initialization succeeded -> atomically replace the fields
-                this.controlled = controlledLocal;
-                this.isAuthorityRequired = isAuthorityRequiredLocal;
-                this.minConfidence = minConfidenceLocal;
-                this.defaultMinConfidence = defaultMinConfidenceLocal;
+                controlled = controlledLocal;
+                isAuthorityRequired = isAuthorityRequiredLocal;
+                minConfidence = minConfidenceLocal;
+                defaultMinConfidence = defaultMinConfidenceLocal;
 
                 // mark initialized so future calls skip init
-                this.initialized = true;
+                initialized = true;
             } catch (SQLException e) {
                 log.error("Error reading authority config", e);
                 // do NOT set initialized to true; leave as false so retry is possible
