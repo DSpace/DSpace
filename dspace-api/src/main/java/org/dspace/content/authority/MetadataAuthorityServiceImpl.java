@@ -66,7 +66,7 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
     protected Map<String, Boolean> controlled = new HashMap<>();
 
     // map of field key to answer of whether field is required to be controlled
-    protected Map<String, Boolean> isAuthorityRequired = null;
+    protected Map<String, Boolean> isAuthorityRequired = new HashMap<>();
 
     /**
      * map of field key to answer of which is the min acceptable confidence
@@ -79,14 +79,30 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
      */
     protected int defaultMinConfidence = Choices.CF_ACCEPTED;
 
+    // Synchronization aid to make init() threadsafe and avoid partial initialization
+    private final Object initLock = new Object();
+    private volatile boolean initialized = false;
     protected MetadataAuthorityServiceImpl() {
 
     }
 
-    public void init() {
+    protected void init() {
+        if (initialized) {
+            return;
+        }
 
-        if (isAuthorityRequired == null) {
-            isAuthorityRequired = new HashMap<>();
+        synchronized (initLock) {
+            // double-check
+            if (initialized) {
+                return;
+            }
+
+            // build everything in local temporaries
+            Map<String, Boolean> controlledLocal = new HashMap<>();
+            Map<String, Boolean> isAuthorityRequiredLocal = new HashMap<>();
+            Map<String, Integer> minConfidenceLocal = new HashMap<>();
+            int defaultMinConfidenceLocal = defaultMinConfidence;
+
             List<String> keys = configurationService.getPropertyKeys(AUTH_PREFIX);
             Context context = new Context();
             try {
@@ -109,7 +125,6 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
                         element = element.substring(0, dot);
                     }
 
-
                     MetadataField metadataField = metadataFieldService
                         .findByElement(context, schema, element, qualifier);
                     if (metadataField == null) {
@@ -119,26 +134,36 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
                     }
                     boolean ctl = configurationService.getBooleanProperty(key, true);
                     boolean req = configurationService.getBooleanProperty("authority.required." + field, false);
-                    controlled.put(metadataField.toString(), ctl);
-                    isAuthorityRequired.put(metadataField.toString(), req);
+                    controlledLocal.put(metadataField.toString(), ctl);
+                    isAuthorityRequiredLocal.put(metadataField.toString(), req);
 
                     // get minConfidence level for this field if any
                     int mci = readConfidence("authority.minconfidence." + field);
                     if (mci >= Choices.CF_UNSET) {
-                        minConfidence.put(metadataField.toString(), mci);
+                        minConfidenceLocal.put(metadataField.toString(), mci);
                     }
                     log.debug(
                         "Authority Control: For schema=" + schema + ", elt=" + element + ", qual=" + qualifier +
                             ", controlled=" + ctl + ", required=" + req);
                 }
+
+                // get default min confidence if any:
+                int dmc = readConfidence("authority.minconfidence");
+                if (dmc >= Choices.CF_UNSET) {
+                    defaultMinConfidenceLocal = dmc;
+                }
+
+                // At this point initialization succeeded -> atomically replace the fields
+                controlled = controlledLocal;
+                isAuthorityRequired = isAuthorityRequiredLocal;
+                minConfidence = minConfidenceLocal;
+                defaultMinConfidence = defaultMinConfidenceLocal;
+
+                // mark initialized so future calls skip init
+                initialized = true;
             } catch (SQLException e) {
                 log.error("Error reading authority config", e);
-            }
-
-            // get default min confidence if any:
-            int dmc = readConfidence("authority.minconfidence");
-            if (dmc >= Choices.CF_UNSET) {
-                defaultMinConfidence = dmc;
+                // do NOT set initialized to true; leave as false so retry is possible
             }
         }
     }
@@ -225,9 +250,12 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
 
     @Override
     public void clearCache() {
-        controlled.clear();
-        minConfidence.clear();
-
-        isAuthorityRequired = null;
+        synchronized (initLock) {
+            // reset state atomically
+            controlled.clear();
+            isAuthorityRequired.clear();
+            minConfidence.clear();
+            initialized = false;
+        }
     }
 }
