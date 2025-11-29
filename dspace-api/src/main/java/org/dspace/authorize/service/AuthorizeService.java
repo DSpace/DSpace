@@ -561,6 +561,20 @@ public interface AuthorizeService {
         throws SearchServiceException, SQLException;
 
     /**
+     *  Finds communities for which the logged in user has the rights specified by the action parameter.
+     *
+     * @param context   the context whose user is checked against
+     * @param query     the optional extra query
+     * @param action    the action to check for
+     * @param offset    the offset for pagination
+     * @param limit     the amount of dso's to return
+     * @return          a list of communities for which the logged in user has the rights specified by the action
+     * @throws SearchServiceException
+     */
+    List<Community> findAuthorizedCommunityByAction(Context context, String query, int action, int offset, int limit)
+        throws SearchServiceException, SQLException;
+
+    /**
      * Counts communities for which the current user is admin, AND which match the query.
      *
      * @param context   context with the current user
@@ -573,6 +587,18 @@ public interface AuthorizeService {
         throws SearchServiceException, SQLException;
 
     /**
+     * Counts communities for which the current user has the rights specified by the action parameter.
+     *
+     * @param context   context with the current user
+     * @param query     the query for which to filter the results more
+     * @param action    the action to check for
+     * @return          the matching communities
+     * @throws SearchServiceException
+     */
+    long countAuthorizedCommunityByAction(Context context, String query, int action)
+        throws SearchServiceException;
+
+    /**
      * Finds collections for which the current user is admin, AND which match the query.
      *
      * @param context   context with the current user
@@ -581,10 +607,24 @@ public interface AuthorizeService {
      * @param limit     used for pagination of the results
      * @return          the matching collections
      * @throws SearchServiceException
-     * @throws SQLException
      */
     List<Collection> findAdminAuthorizedCollection(Context context, String query, int offset, int limit)
-        throws SearchServiceException, SQLException;
+        throws SearchServiceException;
+
+    /**
+     * Finds collections for which the current user has the rights specified by the action parameter.
+     *
+     * @param context   context with the current user
+     * @param query     the query for which to filter the results more
+     * @param action    the action to check for
+     * @param offset    used for pagination of the results
+     * @param limit     used for pagination of the results
+     * @return          the matching collections
+     * @throws SearchServiceException
+     */
+    List<Collection> findAuthorizedCollectionByAction(Context context, String query, int action, int offset,
+                                                      int limit)
+        throws SearchServiceException;
 
     /**
      * Counts collections for which the current user is admin, AND which match the query.
@@ -596,7 +636,19 @@ public interface AuthorizeService {
      * @throws SQLException
      */
     long countAdminAuthorizedCollection(Context context, String query)
-        throws SearchServiceException, SQLException;
+        throws SearchServiceException;
+
+    /**
+     * Counts collections for which the current user has the rights specified by the action parameter.
+     *
+     * @param context   context with the current user
+     * @param query     the query for which to filter the results more
+     * @param action   the action to check for
+     * @return          the number of matching collections
+     * @throws SearchServiceException
+     */
+    long countAuthorizedCollectionByAction(Context context, String query, int action)
+        throws SearchServiceException;
 
     /**
      * Returns true if the current user can manage accounts.

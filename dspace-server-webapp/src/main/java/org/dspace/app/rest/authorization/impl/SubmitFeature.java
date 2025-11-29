@@ -43,7 +43,7 @@ public class SubmitFeature implements AuthorizationFeature {
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException, SearchServiceException {
         if (object instanceof SiteRest) {
             // Check whether the user has permission to add to any collection
-            return collectionService.countCollectionsWithSubmit("", context, null) > 0;
+            return collectionService.countCollectionsWithSubmit(context, "", null) > 0;
         } else if (object instanceof CollectionRest) {
             // Check whether the user has permission to add to the given collection
             Collection collection = (Collection) utils.getDSpaceAPIObjectFromRest(context, object);
