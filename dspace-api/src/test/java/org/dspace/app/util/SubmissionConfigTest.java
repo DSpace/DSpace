@@ -91,8 +91,8 @@ public class SubmissionConfigTest extends AbstractUnitTest {
         // Book and book chapter should be allowed all 5 fields (each is bound to dc.identifier.isbn)
         assertEquals(allConfiguredFields, allowedFieldsForBook);
         assertEquals(allConfiguredFields, allowedFieldsForBookChapter);
-        // Article and type should match a subset of the fields without ISBN
+        assertEquals(allConfiguredFields, allowedFieldsForNoType);
+        // Article should match a subset of the fields without ISBN
         assertEquals(unboundFields, allowedFieldsForArticle);
-        assertEquals(unboundFields, allowedFieldsForNoType);
     }
 }
