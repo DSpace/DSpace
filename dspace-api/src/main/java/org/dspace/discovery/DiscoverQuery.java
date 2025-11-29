@@ -72,6 +72,14 @@ public class DiscoverQuery {
 
     private String discoveryConfigurationName;
 
+    /**
+     * The required authorizations user should have for the objects returned by the query.
+     * The READ authorization (Constants.READ) is always required and does not need to be added here.
+     */
+    private List<Integer> requiredAuthorization;
+
+    private boolean inheritAuthorizations = true;
+
     public DiscoverQuery() {
         //Initialize all our lists
         this.filterQueries = new ArrayList<>();
@@ -83,6 +91,7 @@ public class DiscoverQuery {
         this.hitHighlighting = new HashMap<>();
         //Use a linked hashmap since sometimes insertion order might matter
         this.properties = new LinkedHashMap<>();
+        this.requiredAuthorization = new ArrayList<>();
     }
 
 
@@ -411,4 +420,54 @@ public class DiscoverQuery {
     public void setDiscoveryConfigurationName(String discoveryConfigurationName) {
         this.discoveryConfigurationName = discoveryConfigurationName;
     }
+
+    /**
+     * Return the required authorization user should have for the objects returned by this query
+     *
+     * @return the required authorizations
+     */
+    public List<Integer> getRequiredAuthorizations() {
+        return requiredAuthorization;
+    }
+
+    /**
+     * Add a required authorization user should have for the objects returned by this query.
+     * The READ authorization (Constants.READ) is always required and does not need to be added here.
+     *
+     * @param action
+     *            the required action
+     */
+    public void addRequiredAuthorization(int action) {
+        this.requiredAuthorization.add(action);
+    }
+
+    /**
+     * Remove a required authorization user should have for the objects returned by this query
+     *
+     * @param authorizationAction
+     *            the required action
+     */
+    public void removeRequiredAuthorization(int authorizationAction) {
+        this.requiredAuthorization.removeIf(action -> action == authorizationAction);
+    }
+
+    /**
+     * Return whether authorizations should be inherited from parent objects
+     *
+     * @return true if authorizations should be inherited, false otherwise
+     */
+    public boolean isInheritAuthorizationsEnabled() {
+        return inheritAuthorizations;
+    }
+
+    /**
+     * Set whether authorizations should be inherited from parent objects
+     *
+     * @param inheritAuthorizations
+     *            true if authorizations should be inherited, false otherwise
+     */
+    public void setInheritAuthorizations(boolean inheritAuthorizations) {
+        this.inheritAuthorizations = inheritAuthorizations;
+    }
+
 }
