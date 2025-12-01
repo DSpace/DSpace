@@ -24,6 +24,7 @@ import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -56,6 +57,9 @@ public class ItemCountDAOSolr implements ItemCountDAO {
      */
     @Autowired
     protected SearchService searchService;
+
+    @Autowired
+    protected ConfigurationService configurationService;
 
     /**
      * Get the count of the items in the given container.
@@ -114,11 +118,24 @@ public class ItemCountDAOSolr implements ItemCountDAO {
             sResponse = searchService.search(context, query);
             List<FacetResult> commCount = sResponse.getFacetResult("location.comm");
             List<FacetResult> collCount = sResponse.getFacetResult("location.coll");
+            boolean showCommunityStrengths = configurationService.getBooleanProperty("webui.community.strengths.show", false);
+            boolean showCollectionStrengths = configurationService.getBooleanProperty("webui.collection.strengths.show", false);
+
             for (FacetResult c : commCount) {
-                communitiesCount.put(c.getAsFilterQuery(), (int) c.getCount());
+                if(showCommunityStrengths) {
+                    communitiesCount.put(c.getAsFilterQuery(), (int) c.getCount());
+                }
+                else{
+                    communitiesCount.put(c.getAsFilterQuery(), -1);
+                }
             }
             for (FacetResult c : collCount) {
-                collectionsCount.put(c.getAsFilterQuery(), (int) c.getCount());
+                if(showCollectionStrengths) {
+                    collectionsCount.put(c.getAsFilterQuery(), (int) c.getCount());
+                }
+                else{
+                    collectionsCount.put(c.getAsFilterQuery(), -1);
+                }
             }
         } catch (SearchServiceException e) {
             log.error("Could not initialize Community/Collection Item Counts from Solr: ", e);
