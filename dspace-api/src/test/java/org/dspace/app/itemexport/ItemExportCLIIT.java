@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.file.PathUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
@@ -335,7 +335,7 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
     private void checkZip(String zipFileName) throws Exception {
         assertEquals(1,
                 Files.list(tempDir)
-                .filter(b -> StringUtils.equals(b.getFileName().toString(), zipFileName))
+                .filter(b -> Strings.CS.equals(b.getFileName().toString(), zipFileName))
                 .count());
     }
 

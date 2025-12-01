@@ -22,7 +22,10 @@ import jakarta.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.requestitem.RequestItem;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -72,6 +75,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     protected BitstreamStorageService bitstreamStorageService;
     @Autowired(required = true)
     protected BitstreamLinkingService bitstreamLinkingService;
+    @Autowired(required = true)
+    protected RequestItemService requestItemService;
 
     protected BitstreamServiceImpl() {
         super();
@@ -382,6 +387,15 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         //Remove all bundles from the bitstream object, clearing the connection in 2 ways
         bundles.clear();
 
+        // Remove any RequestItem entities associated with this bitstream ensuring there are no requests referencing
+        // a deleted bitstream
+        List<RequestItem> requestItems = requestItemService.findAll(context);
+        for (RequestItem requestItem : requestItems) {
+            if (bitstream.equals(requestItem.getBitstream())) {
+                requestItemService.delete(context, requestItem);
+            }
+        }
+
         // Remove policies only after the bitstream has been updated (otherwise the current user has not WRITE rights)
         authorizeService.removeAllPolicies(context, bitstream);
     }
@@ -481,7 +495,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             List<Bitstream> bitstreams = bundle.getBitstreams();
             for (int j = 0; j < bitstreams.size(); j++) {
                 Bitstream bitstream = bitstreams.get(j);
-                if (StringUtils.equals(bitstream.getName(), bitstreamName)) {
+                if (Strings.CS.equals(bitstream.getName(), bitstreamName)) {
                     return bitstream;
                 }
             }

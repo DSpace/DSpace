@@ -22,6 +22,7 @@ import java.util.UUID;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -185,7 +186,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 Step stepByName = workflowFactory.getStepByName(claimedTask.getStepID());
                 Role role = stepByName.getRole();
                 for (CollectionRole collectionRole : collectionRoles) {
-                    if (StringUtils.equals(collectionRole.getRoleId(), role.getId())
+                    if (Strings.CS.equals(collectionRole.getRoleId(), role.getId())
                             && claimedTask.getWorkflowItem().getCollection().equals(collectionRole.getCollection())) {
                         // Count number of EPersons who are *direct* members of this group
                         int totalDirectEPersons = ePersonService.countByGroups(context, Set.of(group));
@@ -259,7 +260,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     @Override
     public boolean isDirectMember(Group group, EPerson ePerson) {
         // special, group 0 is anonymous
-        return StringUtils.equals(group.getName(), Group.ANONYMOUS) || group.contains(ePerson);
+        return Strings.CS.equals(group.getName(), Group.ANONYMOUS) || group.contains(ePerson);
     }
 
     @Override
@@ -284,7 +285,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             return false;
 
             // special, everyone is member of group 0 (anonymous)
-        } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS) ||
+        } else if (Strings.CS.equals(group.getName(), Group.ANONYMOUS) ||
                    isParentOf(context, group, findByName(context, Group.ANONYMOUS))) {
             return true;
 
@@ -818,7 +819,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                             List<ResourcePolicy> policies = resourcePolicyService.find(context, null, groups,
                                                             Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);
 
-                            Optional<ResourcePolicy> defaultPolicy = policies.stream().filter(p -> StringUtils.equals(
+                            Optional<ResourcePolicy> defaultPolicy = policies.stream().filter(p -> Strings.CS.equals(
                                     collectionService.getDefaultReadGroupName((Collection) p.getdSpaceObject(), "ITEM"),
                                     group.getName())).findFirst();
 
@@ -829,7 +830,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                                                              Constants.DEFAULT_BITSTREAM_READ, Constants.COLLECTION);
 
                             defaultPolicy = policies.stream()
-                                    .filter(p -> StringUtils.equals(collectionService.getDefaultReadGroupName(
+                                    .filter(p -> Strings.CS.equals(collectionService.getDefaultReadGroupName(
                                             (Collection) p.getdSpaceObject(), "BITSTREAM"), group.getName()))
                                     .findFirst();
 

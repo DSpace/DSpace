@@ -13,6 +13,7 @@ import java.util.List;
 import jakarta.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -49,14 +50,14 @@ public class DiscoverySortConfiguration {
             return null;
         }
 
-        if (StringUtils.equalsIgnoreCase(SCORE, sortField)) {
+        if (Strings.CI.equals(SCORE, sortField)) {
             DiscoverySortFieldConfiguration configuration = new DiscoverySortFieldConfiguration();
             configuration.setMetadataField(SCORE);
             return configuration;
         }
 
         for (DiscoverySortFieldConfiguration sortFieldConfiguration : CollectionUtils.emptyIfNull(sortFields)) {
-            if (StringUtils.equals(sortFieldConfiguration.getMetadataField(), sortField)) {
+            if (Strings.CS.equals(sortFieldConfiguration.getMetadataField(), sortField)) {
                 return sortFieldConfiguration;
             }
         }

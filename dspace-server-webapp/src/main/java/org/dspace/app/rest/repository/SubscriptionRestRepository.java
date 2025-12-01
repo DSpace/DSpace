@@ -27,6 +27,7 @@ import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -211,7 +212,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
             var name = subscriptionParameterRest.getName();
             var value = subscriptionParameterRest.getValue();
-            if (!StringUtils.equals("frequency", name) || !FrequencyType.isSupportedFrequencyType(value)) {
+            if (!Strings.CS.equals("frequency", name) || !FrequencyType.isSupportedFrequencyType(value)) {
                 throw new UnprocessableEntityException("Provided SubscriptionParameter name:" + name +
                                                        " or value: " + value + " is not supported!");
             }
