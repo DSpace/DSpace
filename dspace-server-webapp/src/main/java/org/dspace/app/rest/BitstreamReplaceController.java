@@ -42,15 +42,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Controller to replace bitstreams in a bundle.
- * Endpoint: /api/core/bitstreams/{uuid}/replace
+ * Endpoint: /api/core/bitstreams/{uuid}/content
  * This controller can:
- * - replace bitstreams in bundles (POST /api/core/bitstreams/{uuid}/replace (multipart/form-data))
+ * - replace bitstreams in bundles (POST /api/core/bitstreams/{uuid}/content (multipart/form-data))
  * - the old bitstream will be replaced by the new one with its new file
  * - all old metadata will be copied over
  */
 @RestController
 @RequestMapping(value = "/api/" + BitstreamRest.CATEGORY + "/" + BitstreamRest.PLURAL_NAME
-    + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/replace")
+    + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/content")
 public class BitstreamReplaceController {
     @Autowired
     BitstreamService bitstreamService;
@@ -69,7 +69,7 @@ public class BitstreamReplaceController {
      * - 201 Created with the new bitstream if the old bitstream was replaced successfully
      */
     @PreAuthorize("hasPermission(#uuid, 'BITSTREAM','WRITE')")
-    @RequestMapping(method = RequestMethod.POST, consumes = MULTIPART_FORM_DATA_VALUE)
+    @RequestMapping(method = RequestMethod.PUT, consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<RepresentationModel<?>> replaceBitstream(
                 HttpServletRequest request,
                 @PathVariable UUID uuid,

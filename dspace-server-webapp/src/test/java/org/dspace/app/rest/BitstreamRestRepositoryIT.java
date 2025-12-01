@@ -2959,8 +2959,12 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
         getClient(token)
             .perform(MockMvcRequestBuilders
-                .multipart("/api/core/bitstreams/{id}/replace", bitstream2.getID())
-                .file(newFile))
+                .multipart("/api/core/bitstreams/{id}/content", bitstream2.getID())
+                .file(newFile)
+                .with(request -> {
+                    request.setMethod("PUT");
+                    return request;
+                }))
             .andExpect(status().isCreated())
             .andDo(result -> idRefNoEmbeds
                 .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
@@ -3046,8 +3050,12 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 org.springframework.http.MediaType.TEXT_PLAIN_VALUE, input.getBytes());
         getClient(token)
             .perform(MockMvcRequestBuilders
-                .multipart("/api/core/bitstreams/{id}/replace", bitstream.getID())
-                .file(newFile))
+                .multipart("/api/core/bitstreams/{id}/content", bitstream.getID())
+                .file(newFile)
+                .with(request -> {
+                    request.setMethod("PUT");
+                    return request;
+                }))
             .andExpect(status().isNotFound());
     }
 
@@ -3074,8 +3082,12 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 org.springframework.http.MediaType.TEXT_PLAIN_VALUE, input.getBytes());
         getClient()
             .perform(MockMvcRequestBuilders
-                .multipart("/api/core/bitstreams/{id}/replace", bitstream.getID())
-                .file(newFile))
+                .multipart("/api/core/bitstreams/{id}/content", bitstream.getID())
+                .file(newFile)
+                .with(request -> {
+                    request.setMethod("PUT");
+                    return request;
+                }))
             .andExpect(status().isUnauthorized());
     }
 
@@ -3103,8 +3115,12 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 org.springframework.http.MediaType.TEXT_PLAIN_VALUE, input.getBytes());
         getClient(token)
             .perform(MockMvcRequestBuilders
-                .multipart("/api/core/bitstreams/{id}/replace", bitstream.getID())
-                .file(newFile))
+                .multipart("/api/core/bitstreams/{id}/content", bitstream.getID())
+                .file(newFile)
+                .with(request -> {
+                    request.setMethod("PUT");
+                    return request;
+                }))
             .andExpect(status().isForbidden());
     }
 
@@ -3133,8 +3149,12 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 org.springframework.http.MediaType.TEXT_PLAIN_VALUE, input.getBytes());
         getClient(token)
             .perform(MockMvcRequestBuilders
-                .multipart("/api/core/bitstreams/{id}/replace", bitstream.getID())
-                .file(newFile))
+                .multipart("/api/core/bitstreams/{id}/content", bitstream.getID())
+                .file(newFile)
+                .with(request -> {
+                    request.setMethod("PUT");
+                    return request;
+                }))
             .andExpect(status().isNotFound());
     }
 
@@ -3169,9 +3189,13 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         AtomicReference<UUID> idRefNoEmbeds1 = new AtomicReference<>();
         getClient(token)
             .perform(MockMvcRequestBuilders
-                .multipart("/api/core/bitstreams/{id}/replace", bitstream1.getID())
+                .multipart("/api/core/bitstreams/{id}/content", bitstream1.getID())
                 .file(newFile)
-                .param("replaceName", "false"))
+                .param("replaceName", "false")
+                .with(request -> {
+                    request.setMethod("PUT");
+                    return request;
+                }))
             .andExpect(status().isCreated())
             .andDo(result -> idRefNoEmbeds1
                 .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));;
@@ -3186,9 +3210,13 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         AtomicReference<UUID> idRefNoEmbeds2 = new AtomicReference<>();
         getClient(token)
             .perform(MockMvcRequestBuilders
-                .multipart("/api/core/bitstreams/{id}/replace", bitstream2.getID())
+                .multipart("/api/core/bitstreams/{id}/content", bitstream2.getID())
                 .file(newFile)
-                .param("replaceName", "true"))
+                .param("replaceName", "true")
+                .with(request -> {
+                    request.setMethod("PUT");
+                    return request;
+                }))
             .andExpect(status().isCreated())
             .andDo(result -> idRefNoEmbeds2
                 .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
