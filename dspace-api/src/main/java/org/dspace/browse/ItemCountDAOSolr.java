@@ -118,22 +118,22 @@ public class ItemCountDAOSolr implements ItemCountDAO {
             sResponse = searchService.search(context, query);
             List<FacetResult> commCount = sResponse.getFacetResult("location.comm");
             List<FacetResult> collCount = sResponse.getFacetResult("location.coll");
-            boolean showCommunityStrengths = configurationService.getBooleanProperty("webui.community.strengths.show", false);
-            boolean showCollectionStrengths = configurationService.getBooleanProperty("webui.collection.strengths.show", false);
+            boolean showCommunityStrengths = configurationService
+                .getBooleanProperty("webui.community.strengths.show", false);
+            boolean showCollectionStrengths = configurationService
+                .getBooleanProperty("webui.collection.strengths.show", false);
 
             for (FacetResult c : commCount) {
-                if(showCommunityStrengths) {
+                if (showCommunityStrengths) {
                     communitiesCount.put(c.getAsFilterQuery(), (int) c.getCount());
-                }
-                else{
+                } else {
                     communitiesCount.put(c.getAsFilterQuery(), -1);
                 }
             }
             for (FacetResult c : collCount) {
-                if(showCollectionStrengths) {
+                if (showCollectionStrengths) {
                     collectionsCount.put(c.getAsFilterQuery(), (int) c.getCount());
-                }
-                else{
+                } else {
                     collectionsCount.put(c.getAsFilterQuery(), -1);
                 }
             }
