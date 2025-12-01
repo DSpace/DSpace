@@ -23,7 +23,7 @@ import java.util.List;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
@@ -357,7 +357,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         performImportScript(csv);
         Item importedItem = findItemByName("Test Import 2");
         assertTrue(
-            StringUtils.equals(
+            Strings.CS.equals(
                 itemService.getMetadata(importedItem, "person", "birthDate", null, Item.ANY)
                            .get(0).getValue(), "2000"));
         context.turnOffAuthorisationSystem();
@@ -486,7 +486,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         for (MetadataValue mdValue : mdValues) {
             String mdValueValue = mdValue.getValue();
             String mdValueAuthority = mdValue.getAuthority();
-            if (StringUtils.equals(mdValueValue, value) && StringUtils.equals(mdValueAuthority, authority)) {
+            if (Strings.CS.equals(mdValueValue, value) && Strings.CS.equals(mdValueAuthority, authority)) {
                 return true;
             }
         }

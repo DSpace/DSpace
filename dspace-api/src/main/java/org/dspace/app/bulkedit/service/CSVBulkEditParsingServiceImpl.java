@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.bulkedit.BulkEditChange;
 import org.dspace.app.bulkedit.BulkEditMetadataField;
@@ -523,7 +524,7 @@ public class CSVBulkEditParsingServiceImpl implements BulkEditParsingService<DSp
         if (fromAuthority == null) {
             List<MetadataValue> current = itemService.getMetadata(item, metadataField.getSchema(),
                 metadataField.getElement(), metadataField.getQualifier(), metadataField.getLanguage(),
-                StringUtils.equals(metadataField.getSchema(), MetadataSchemaEnum.RELATION.getName()));
+                Strings.CS.equals(metadataField.getSchema(), MetadataSchemaEnum.RELATION.getName()));
             for (MetadataValue dcv : current) {
                 if (dcv.getAuthority() == null || !isAuthorityControlledField(md)) {
                     dcvalues.add(dcv.getValue());
@@ -722,7 +723,7 @@ public class CSVBulkEditParsingServiceImpl implements BulkEditParsingService<DSp
      */
     protected boolean contains(String needle, List<String> haystack) {
         // Look for the needle in the haystack
-        return haystack.stream().anyMatch((examine) -> StringUtils.equals(clean(examine), clean(needle)));
+        return haystack.stream().anyMatch((examine) -> Strings.CS.equals(clean(examine), clean(needle)));
     }
 
     /**

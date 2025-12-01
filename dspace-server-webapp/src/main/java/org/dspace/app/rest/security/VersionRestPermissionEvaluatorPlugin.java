@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.VersionRest;
@@ -54,7 +54,7 @@ public class VersionRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
                                        DSpaceRestPermission restPermission) {
 
 
-        if (!StringUtils.equalsIgnoreCase(targetType, VersionRest.NAME) || Objects.isNull(targetId)) {
+        if (!Strings.CI.equals(targetType, VersionRest.NAME) || Objects.isNull(targetId)) {
             return false;
         }
 

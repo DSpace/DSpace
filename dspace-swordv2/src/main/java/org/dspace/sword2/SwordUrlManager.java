@@ -107,7 +107,7 @@ public class SwordUrlManager {
                     "Unable to construct service document urls, due to missing/invalid " +
                         "config in sword2.url and/or dspace.server.url");
             }
-            sUrl = buildSWORDUrl("swordv2");
+            sUrl = dspaceUrl + "/" + swordPath;
         }
         return sUrl;
     }

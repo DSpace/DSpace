@@ -164,7 +164,7 @@ jobs:
           # Use GitHub cache to load cached Docker images and cache the results of this build
           # This decreases the number of images we need to fetch from DockerHub
           cache-from: type=gha,scope=${{ inputs.build_id }}
-          cache-to: type=gha,scope=${{ inputs.build_id }},mode=max
+          cache-to: type=gha,scope=${{ inputs.build_id }},mode=min
 
       # Export the digest of Docker build locally
       - name: Export Docker build digest
@@ -216,7 +216,7 @@ jobs:
           # Use GitHub cache to load cached Docker images and cache the results of this build
           # This decreases the number of images we need to fetch from DockerHub
           cache-from: type=gha,scope=${{ inputs.build_id }}
-          cache-to: type=gha,scope=${{ inputs.build_id }},mode=max
+          cache-to: type=gha,scope=${{ inputs.build_id }},mode=min
           # Export image to a local TAR file
           outputs: type=docker,dest=/tmp/${{ inputs.build_id }}.tar
 
@@ -298,9 +298,12 @@ jobs:
       # 'regctl' is used to more easily copy the image to DockerHub and obtain the digest from DockerHub
       # See https://github.com/regclient/regclient/blob/main/docs/regctl.md
       - name: Install regctl for Docker registry tools
-        uses: regclient/actions/regctl-installer@main
-        with:
-          release: 'v0.8.0'
+        run: |
+          export REGCTL_VERSION=v0.9.2
+          mkdir -p bin
+          curl -sSLo bin/regctl https://github.com/regclient/regclient/releases/download/${REGCTL_VERSION}/regctl-linux-amd64
+          chmod a+x bin/regctl
+          echo "$(pwd)/bin" >> $GITHUB_PATH
 
       # This recreates Docker tags for DockerHub
       - name: Add Docker metadata for image

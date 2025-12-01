@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.bulkedit.BulkEditChange;
 import org.dspace.app.bulkedit.BulkEditMetadataValue;
 import org.dspace.app.bulkedit.MetadataImportException;
@@ -305,7 +305,7 @@ public class BulkEditServiceImpl implements BulkEditService {
     protected void clearMetadataAndRelationships(Context c, Item item, String schema, String element, String qualifier,
                                                  String language) throws SQLException, AuthorizeException {
         itemService.clearMetadata(c, item, schema, element, qualifier, language);
-        if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
+        if (Strings.CS.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
             List<RelationshipType> relationshipTypeList = relationshipTypeService
                 .findByLeftwardOrRightwardTypeName(c, element);
             for (RelationshipType relationshipType : relationshipTypeList) {
@@ -330,7 +330,7 @@ public class BulkEditServiceImpl implements BulkEditService {
     }
 
     protected boolean isRelationship(BulkEditMetadataValue dcv) {
-        return StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName());
+        return Strings.CS.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName());
     }
 
     protected Map<String, List<BulkEditMetadataValue>> getMetadataByField(List<BulkEditMetadataValue> allMetadata) {

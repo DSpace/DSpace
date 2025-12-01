@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -59,7 +60,7 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
                 } else {
                     authorityKey = UUID.randomUUID().toString();
                 }
-            } else if (StringUtils.startsWith(authorityKey, GENERATE)) {
+            } else if (Strings.CS.startsWith(authorityKey, GENERATE)) {
                 authorityKey = UUID.randomUUID().toString();
             }
 
@@ -194,7 +195,7 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
     public AuthorityValue getAuthorityValueType(String metadataString) {
         AuthorityValue fromAuthority = null;
         for (AuthorityValue type : authorityTypes.getTypes()) {
-            if (StringUtils.startsWithIgnoreCase(metadataString, type.getAuthorityType())) {
+            if (Strings.CI.startsWith(metadataString, type.getAuthorityType())) {
                 fromAuthority = type;
             }
         }

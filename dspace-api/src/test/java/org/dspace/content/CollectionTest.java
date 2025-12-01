@@ -1160,6 +1160,184 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     }
 
     /**
+     * Test of findAuthorizedEpersonAndGroups method, of class Collection.
+     * We create some collections and a user and groups and subgroups and add the user to one subgroup
+     * and one collection
+     * The parent group will be added to the other collection.
+     */
+    @Test
+    public void testFindAuthorizedByEPerson() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community com = communityService.create(null, context);
+        Collection collectionA = collectionService.create(context, com);
+        Collection collectionB = collectionService.create(context, com);
+        Collection collectionC = collectionService.create(context, com);
+
+        com.addCollection(collectionA);
+        com.addCollection(collectionB);
+        com.addCollection(collectionC);
+
+        Group groupParent = groupService.create(context);
+        Group groupChild = groupService.create(context);
+
+        groupService.addMember(context, groupParent, groupChild);
+
+        EPerson epersonA = ePersonService.create(context);
+
+        //Add  epersonA to the child group
+        groupService.addMember(context, groupChild, epersonA);
+
+        //personA can submit to collectionA and collectionC
+        authorizeService.addPolicy(context, collectionA, Constants.ADD, epersonA);
+        authorizeService.addPolicy(context, collectionB, Constants.ADD, groupParent);
+
+        context.restoreAuthSystemState();
+
+        context.setCurrentUser(epersonA);
+        List<Collection> personACollections =
+            collectionService.findAuthorized(context, null, List.of(Constants.ADD, Constants.ADMIN));
+        assertTrue("testFindAuthorizedByEPerson A", personACollections.size() == 2);
+        assertTrue("testFindAuthorizedByEPerson A.A", personACollections.contains(collectionA));
+        assertTrue("testFindAuthorizedByEPerson A.B", personACollections.contains(collectionB));
+        assertFalse("testFindAuthorizedByEPerson A.C", personACollections.contains(collectionC));
+    }
+
+    /**
+     * Test of testFindAuthorizedEPersonCommunityAdmin method, of class Collection.
+     * This will test what collections care retrieved if a user is a Com Administrator
+     * eperson A is Top of B (and by the caso of B,C and D) but not of E
+     * eperson E is Top of E nad of D so it can get THE E and D Collections
+     * 
+     */
+    @Test
+    public void testFindAuthorizedEPersonCommunityAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community comA = communityService.create(null, context);
+        Community comB = communityService.create(null, context);
+        Community comC = communityService.create(null, context);
+        Community comD = communityService.create(null, context);
+        Community comE = communityService.create(null, context);
+
+        Collection collectionA1 = collectionService.create(context, comA);
+        Collection collectionC1 = collectionService.create(context, comC);
+        Collection collectionC2 = collectionService.create(context, comC);
+        Collection collectionD1 = collectionService.create(context, comD);
+        Collection collectionE1 = collectionService.create(context, comE);
+        Collection collectionE2 = collectionService.create(context, comE);
+
+        //Create Com hierarchies
+        comA.addSubCommunity(comB);
+        comA.addSubCommunity(comC);
+        comB.addSubCommunity(comD);
+
+        comA.addCollection(collectionA1);
+        comC.addCollection(collectionC1);
+        comC.addCollection(collectionC2);
+        comD.addCollection(collectionD1);
+        comE.addCollection(collectionE1);
+        comE.addCollection(collectionE2);
+
+
+        Group groupA = groupService.create(context);
+        Group groupB = groupService.create(context);
+        Group groupC = groupService.create(context);
+        Group groupD = groupService.create(context);
+        Group groupE = groupService.create(context);
+
+        EPerson epersonA = ePersonService.create(context);
+        EPerson epersonB = ePersonService.create(context);
+
+        //Add  epersonA to the child group
+        groupService.addMember(context, groupA, epersonA);
+        //Add  epersonB to the child group
+        groupService.addMember(context, groupE, epersonB);
+        groupService.addMember(context, groupD, epersonB);
+
+        //personA can submit to collectionA and collectionB
+        authorizeService.addPolicy(context, comA, Constants.ADMIN, groupA);
+        authorizeService.addPolicy(context, comD, Constants.ADMIN, groupD);
+        authorizeService.addPolicy(context, comE, Constants.ADMIN, groupE);
+
+        context.restoreAuthSystemState();
+
+        //PersonA Can get AllCollection From Top to Bottom com ComA, but not from ComE
+        context.setCurrentUser(epersonA);
+        List<Collection> personACollectionsAdminCommA =
+            collectionService.findAuthorized(context, null, List.of(Constants.ADD, Constants.ADMIN));
+        assertTrue("testFindAuthorizedEPersonCommunityAdmin A", personACollectionsAdminCommA.size() == 4);
+        assertTrue("testFindAuthorizedEPersonCommunityAdmin A.A", personACollectionsAdminCommA
+            .containsAll(List.of(collectionA1, collectionD1, collectionC1, collectionC2)));
+        assertFalse("testFindAuthorizedEPersonCommunityAdmin A.B", personACollectionsAdminCommA
+            .containsAll(List.of(collectionE1, collectionE2)));
+
+        //PersonB Can get AllCollection From Top to Bottom com ComE, but not from ComA
+        context.setCurrentUser(epersonB);
+        List<Collection> personACollectionsAdminCommE =
+            collectionService.findAuthorized(context, null, List.of(Constants.ADD, Constants.ADMIN));
+        assertTrue("testFindAuthorizedEPersonCommunityAdmin B", personACollectionsAdminCommE.size() == 3);
+        assertFalse("testFindAuthorizedEPersonCommunityAdmin B.A", personACollectionsAdminCommE
+            .containsAll(List.of(collectionA1, collectionC1, collectionC2)));
+        assertTrue("testFindAuthorizedEPersonCommunityAdmin B.B", personACollectionsAdminCommE
+            .containsAll(List.of(collectionD1, collectionE1, collectionE2)));
+    }
+
+    /**
+     * Test of testFindNotAuthorizedEPersonDifferentActions method, of class Collection.
+     * We create some collections and a user and a group add the user as ADMIN by adding ti
+     * toa group and that group to a Collection and add the user as submitter to another
+     * we pass actions that shouldn't return collections if only those actions are passed
+     * And we test if only on collection is retrieved if we pass the Corresponding action
+     */
+    @Test
+    public void testFindAuthorizedEPersonDifferentActions() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community com = communityService.create(null, context);
+        Collection collectionA = collectionService.create(context, com);
+        Collection collectionB = collectionService.create(context, com);
+
+        com.addCollection(collectionA);
+        com.addCollection(collectionB);
+
+        Group group = groupService.create(context);
+
+        EPerson epersonA = ePersonService.create(context);
+
+        //Add  epersonA to the child group
+        groupService.addMember(context, group, epersonA);
+
+        //personA can submit to collectionA and collectionB
+        authorizeService.addPolicy(context, collectionA, Constants.ADD, epersonA);
+        authorizeService.addPolicy(context, collectionB, Constants.ADMIN, group);
+
+        context.restoreAuthSystemState();
+
+        //Person does not Have other permission than ADD - So should not return a Colelction if we pass other
+        //Actions. In this case WRITE OR DELETE
+        context.setCurrentUser(epersonA);
+        List<Collection> personACollectionsRD =
+            collectionService.findAuthorized(context, null, List.of(Constants.WRITE, Constants.DELETE));
+        assertTrue("testFindAuthorizedEPersonDifferentActions A", personACollectionsRD.isEmpty());
+        assertFalse("testFindAuthorizedEPersonDifferentActions A.A", personACollectionsRD.contains(collectionA));
+        assertFalse("testFindAuthorizedEPersonDifferentActions A.B", personACollectionsRD.contains(collectionB));
+
+        //But It Should get Collection B if we pass the ADMIN Action too
+        List<Collection>  personACollectionsADD =
+            collectionService.findAuthorized(context, null,
+                List.of(Constants.WRITE, Constants.DELETE, Constants.ADD));
+        assertTrue("testFindAuthorizedEPersonDifferentActions B", personACollectionsADD.size() == 1);
+        assertTrue("testFindAuthorizedEPersonDifferentActions B.A", personACollectionsADD.contains(collectionA));
+        assertFalse("testFindAuthorizedEPersonDifferentActions B.B", personACollectionsADD.contains(collectionB));
+
+        //But It Should get Collection A  if we pass the ADD Action too
+        List<Collection>  personACollections =
+            collectionService.findAuthorized(context, null,
+                List.of(Constants.WRITE, Constants.DELETE, Constants.ADMIN));
+        assertTrue("testFindAuthorizedEPersonDifferentActions C", personACollections.size() == 1);
+        assertFalse("testFindAuthorizedEPersonDifferentActions C.A", personACollections.contains(collectionA));
+        assertTrue("testFindAuthorizedEPersonDifferentActions C.B", personACollections.contains(collectionB));
+    }
+
+    /**
      * Test of countItems method, of class Collection.
      */
     @Test

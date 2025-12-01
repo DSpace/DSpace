@@ -468,6 +468,9 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         for (Map.Entry<String, Object> entry : equals.entrySet()) {
             criteria.where(criteriaBuilder.equal(root.get(entry.getKey()), entry.getValue()));
         }
+
+        criteria.orderBy(criteriaBuilder.asc(root.get("id")));
+
         return executeCriteriaQuery(context, criteria, cacheable, maxResults, offset);
     }
 

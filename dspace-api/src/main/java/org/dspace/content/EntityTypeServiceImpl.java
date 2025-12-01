@@ -124,13 +124,11 @@ public class EntityTypeServiceImpl implements EntityTypeService {
     @Override
     public List<String> getSubmitAuthorizedTypes(Context context)
             throws SQLException, SolrServerException, IOException {
-        List<String> types = new ArrayList<>();
         StringBuilder query = null;
-        EPerson currentUser = context.getCurrentUser();
         if (!authorizeService.isAdmin(context)) {
-            String userId = "";
+            EPerson currentUser = context.getCurrentUser();
             if (currentUser != null) {
-                userId = currentUser.getID().toString();
+                String userId = currentUser.getID().toString();
                 query = new StringBuilder();
                 query.append("submit:(e").append(userId);
             }
@@ -145,7 +143,10 @@ public class EntityTypeServiceImpl implements EntityTypeService {
                 }
                 query.append(group.getID());
             }
-            query.append(")");
+
+            if (query != null) {
+                query.append(")");
+            }
         }
 
         SolrQuery sQuery = new SolrQuery("*:*");
@@ -160,6 +161,8 @@ public class EntityTypeServiceImpl implements EntityTypeService {
         sQuery.setFacetSort(FacetParams.FACET_SORT_INDEX);
         QueryResponse qResp = solrSearchCore.getSolr().query(sQuery, solrSearchCore.REQUEST_METHOD);
         FacetField facetField = qResp.getFacetField("search.entitytype");
+
+        List<String> types = new ArrayList<>();
         if (Objects.nonNull(facetField)) {
             for (Count c : facetField.getValues()) {
                 types.add(c.getName());
