@@ -445,6 +445,7 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
         * Spring Expression Language (SpEL) (org.springframework:spring-expression:6.2.7 - https://github.com/spring-projects/spring-framework)
         * Spring Commons Logging Bridge (org.springframework:spring-jcl:6.2.7 - https://github.com/spring-projects/spring-framework)
         * Spring JDBC (org.springframework:spring-jdbc:6.2.7 - https://github.com/spring-projects/spring-framework)
+        * Spring LDAP Core (org.springframework.ldap:spring-ldap-core:3.2.15 - https://github.com/spring-projects/spring-ldap)
         * Spring Object/Relational Mapping (org.springframework:spring-orm:6.2.7 - https://github.com/spring-projects/spring-framework)
         * Spring TestContext Framework (org.springframework:spring-test:6.2.7 - https://github.com/spring-projects/spring-framework)
         * Spring Transaction (org.springframework:spring-tx:6.2.7 - https://github.com/spring-projects/spring-framework)
