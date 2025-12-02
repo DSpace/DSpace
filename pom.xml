@@ -1224,6 +1224,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.springframework.ldap</groupId>
+                <artifactId>spring-ldap-core</artifactId>
+                <version>${spring-ldap.version}</version>
+            </dependency>
+
+            <dependency>
                 <artifactId>spring-tx</artifactId>
                 <groupId>org.springframework</groupId>
                 <version>${spring.version}</version>
