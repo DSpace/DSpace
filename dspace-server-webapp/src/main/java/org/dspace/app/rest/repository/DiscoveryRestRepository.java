@@ -13,8 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.DiscoverFacetConfigurationConverter;
 import org.dspace.app.rest.converter.DiscoverFacetResultsConverter;
-import org.dspace.app.rest.converter.DiscoverFacetsConverter;
 import org.dspace.app.rest.converter.DiscoverResultConverter;
+import org.dspace.app.rest.model.DiscoveryResultsRest;
 import org.dspace.app.rest.model.FacetConfigurationRest;
 import org.dspace.app.rest.model.FacetResultsRest;
 import org.dspace.app.rest.model.SearchResultsRest;
@@ -31,7 +31,6 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +39,7 @@ import org.springframework.stereotype.Component;
  * information lookup
  * that has to be done for the endpoint
  */
-@Component(SearchResultsRest.CATEGORY + "." + SearchResultsRest.PLURAL_NAME)
+@Component(SearchResultsRest.CATEGORY + "." + DiscoveryResultsRest.PLURAL_NAME)
 public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
 
     private static final Logger log = LogManager.getLogger();
@@ -67,9 +66,6 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired
     private DiscoverFacetResultsConverter discoverFacetResultsConverter;
-
-    @Autowired
-    private DiscoverFacetsConverter discoverFacetsConverter;
 
 
     public SearchResultsRest getSearchObjects(final String query, final List<String> dsoTypes, final String dsoScope,
@@ -127,34 +123,5 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
                 dsoTypes, dsoScope, searchFilters, searchResult, discoveryConfiguration, page,
                 utils.obtainProjection());
         return facetResultsRest;
-    }
-
-    public SearchResultsRest getAllFacets(String query, List<String> dsoTypes, String dsoScope, String configuration,
-                                          List<SearchFilter> searchFilters) {
-
-        Context context = obtainContext();
-        Pageable page = PageRequest.of(1, 1);
-        IndexableObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
-        DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
-            .getDiscoveryConfigurationByNameOrIndexableObject(context, configuration, scopeObject);
-
-        DiscoverResult searchResult = null;
-        DiscoverQuery discoverQuery = null;
-
-        try {
-            discoverQuery = queryBuilder
-                .buildQuery(context, scopeObject, discoveryConfiguration, query, searchFilters, dsoTypes, page);
-            searchResult = searchService.search(context, scopeObject, discoverQuery);
-
-        } catch (SearchServiceException e) {
-            log.error("Error while searching with Discovery", e);
-        }
-
-        SearchResultsRest searchResultsRest = discoverFacetsConverter.convert(context, query, dsoTypes,
-                configuration, dsoScope, searchFilters, page, discoveryConfiguration, searchResult,
-                utils.obtainProjection());
-
-        return searchResultsRest;
-
     }
 }

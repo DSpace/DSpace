@@ -24,7 +24,6 @@ import org.dspace.app.rest.model.FacetResultsRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.model.hateoas.FacetConfigurationResource;
 import org.dspace.app.rest.model.hateoas.FacetResultsResource;
-import org.dspace.app.rest.model.hateoas.FacetsResource;
 import org.dspace.app.rest.model.hateoas.SearchResultsResource;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.repository.DiscoveryRestRepository;
@@ -72,33 +71,6 @@ public class DiscoveryRestController implements InitializingBean {
             .register(this, Arrays.asList(Link.of("/api/" + SearchResultsRest.CATEGORY, SearchResultsRest.CATEGORY)));
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/search/facets")
-    public FacetsResource getFacets(@RequestParam(name = "query", required = false) String query,
-                                    @RequestParam(name = "dsoType", required = false) List<String> dsoTypes,
-                                    @RequestParam(name = "scope", required = false) String dsoScope,
-                                    @RequestParam(name = "configuration", required = false) String configuration,
-                                    List<SearchFilter> searchFilters,
-                                    Pageable page) throws Exception {
-
-        dsoTypes = emptyIfNull(dsoTypes);
-
-        if (log.isTraceEnabled()) {
-            log.trace("Searching with scope: " + StringUtils.trimToEmpty(dsoScope)
-                    + ", configuration name: " + StringUtils.trimToEmpty(configuration)
-                    + ", dsoTypes: " + String.join(", ", dsoTypes)
-                    + ", query: " + StringUtils.trimToEmpty(query)
-                    + ", filters: " + Objects.toString(searchFilters));
-        }
-
-        SearchResultsRest searchResultsRest = discoveryRestRepository
-            .getAllFacets(query, dsoTypes, dsoScope, configuration, searchFilters);
-
-        FacetsResource facetsResource = new FacetsResource(searchResultsRest, page);
-        halLinkService.addLinks(facetsResource, page);
-
-        return facetsResource;
-    }
-
     @RequestMapping(method = RequestMethod.GET, value = "/search/objects")
     public SearchResultsResource getSearchObjects(@RequestParam(name = "query", required = false) String query,
                                                   @RequestParam(name = "dsoType", required = false)
@@ -126,7 +98,7 @@ public class DiscoveryRestController implements InitializingBean {
                 configuration, searchFilters, page, utils.obtainProjection());
 
             //Convert the Search JSON results to paginated HAL resources
-            SearchResultsResource searchResultsResource = new SearchResultsResource(searchResultsRest, utils, page);
+            SearchResultsResource searchResultsResource = new SearchResultsResource(searchResultsRest, utils);
             halLinkService.addLinks(searchResultsResource, page);
             return searchResultsResource;
         } catch (IllegalArgumentException e) {
