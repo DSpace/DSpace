@@ -108,8 +108,8 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.runnable.PublicationLoaderRunnableCli"/>
     </bean>
 
-    <bean id="dspace-object-deletion" class="org.dspace.deletion.process.DSpaceObjectDeletionProcessScriptConfiguration" primary="true">
-        <property name="description" value="DSpace object deletion process"/>
+    <bean id="object-deletion" class="org.dspace.deletion.process.DSpaceObjectDeletionProcessScriptConfiguration" primary="true">
+        <property name="description" value="Permanently delete the given object along with all child objects. WARNING: This action cannot be undone." />
         <property name="dspaceRunnableClass" value="org.dspace.deletion.process.DSpaceObjectDeletionProcess"/>
     </bean>
 

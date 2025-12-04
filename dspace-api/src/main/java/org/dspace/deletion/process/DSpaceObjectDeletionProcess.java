@@ -25,6 +25,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.deletion.process.strategies.DSpaceObjectDeletionStrategy;
 import org.dspace.eperson.EPerson;
@@ -44,6 +45,8 @@ import org.dspace.utils.DSpace;
  */
 public class DSpaceObjectDeletionProcess
         extends DSpaceRunnable<DSpaceObjectDeletionProcessScriptConfiguration<DSpaceObjectDeletionProcess>> {
+
+    public static final String OBJECT_DELETION_SCRIPT = "object-deletion";
 
     private ItemService itemService;
     private HandleService handleService;
@@ -98,19 +101,21 @@ public class DSpaceObjectDeletionProcess
         DSpaceObject dso = dSpaceObjectOptional.get();
 
         if (!authorizeService.isAdmin(context, dso)) {
-            throw new AuthorizeException("Current user is not eligible to execute script 'dspace-object-deletion'");
+            throw new AuthorizeException("Current user is not eligible to execute script: " + OBJECT_DELETION_SCRIPT);
         }
 
-        handler.logInfo("Performing deletion of DSpaceObject id:" + dso.getID());
+        var info = "Performing deletion of DSpaceObject (and all child objects) for type=%s and uuid=%s";
+        handler.logInfo(String.format(info, Constants.typeText[dso.getType()], dso.getID().toString()));
         getStrategy(dso).delete(this.context, dso, this.copyVirtualMetadata);
         handler.logInfo("Deletion completed!");
     }
 
     private DSpaceObjectDeletionStrategy getStrategy(DSpaceObject dso) {
+        var error = "No strategy for type:" + dso.getType();
         return deletionStrategies.stream()
-                              .filter(s -> s.supports(dso))
-                              .findFirst()
-                              .orElseThrow(() -> new IllegalArgumentException("No strategy for type:" + dso.getType()));
+                                 .filter(s -> s.supports(dso))
+                                 .findFirst()
+                                 .orElseThrow(() -> new IllegalArgumentException(error));
     }
 
     private void assignCurrentUserInContext() throws SQLException {
@@ -158,7 +163,7 @@ public class DSpaceObjectDeletionProcess
     @Override
     public DSpaceObjectDeletionProcessScriptConfiguration<DSpaceObjectDeletionProcess> getScriptConfiguration() {
         ServiceManager sm = new DSpace().getServiceManager();
-        return sm.getServiceByName("dspace-object-deletion", DSpaceObjectDeletionProcessScriptConfiguration.class);
+        return sm.getServiceByName(OBJECT_DELETION_SCRIPT, DSpaceObjectDeletionProcessScriptConfiguration.class);
     }
 
 }
