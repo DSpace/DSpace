@@ -28,11 +28,20 @@ public class DSpaceObjectDeletionProcessScriptConfiguration<T extends DSpaceObje
     public Options getOptions() {
         if (options == null) {
             Options options = new Options();
-            options.addOption("i", "identifier", true,"UUID or handle of Community, Collection or Item");
+            options.addOption("i", "identifier", true,
+                "UUID or handle of the DSpace object to delete (Item, Collection, or Community). " +
+                "Example: -i 123e4567-e89b-12d3-a456-426614174000 or -i 123456789/123");
             options.getOption("i").setType(String.class);
             options.getOption("i").setRequired(true);
 
-            options.addOption("c", "copyVirtualMetadata", true,"Optionaly, only for Item");
+            options.addOption("c", "copyVirtualMetadata", true,
+                "Optional parameter for Items with relationships. Controls whether virtual metadata " +
+                "from relationships should be copied as physical metadata to related items before deletion. " +
+                "Accepts three formats: " +
+                "'all' - copies all virtual metadata from all relationships; " +
+                "'configured' - copies metadata only for relationships with copyToLeft/copyToRight=true; " +
+                "'<id1>,<id2>' - copies metadata only for specified RelationshipType IDs (comma-separated). " +
+                "Example: -c all, -c configured, or -c 1,3,5");
             options.getOption("c").setType(String.class);
             options.getOption("c").setRequired(false);
 
