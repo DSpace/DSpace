@@ -57,6 +57,7 @@ public class ItemMatcher {
                 "owningCollection",
                 "version",
                 "relationships[]",
+                "bibliography",
                 "templateItemOf",
                 "thumbnail",
                 "submitter"
@@ -74,6 +75,7 @@ public class ItemMatcher {
                 "mappedCollections",
                 "owningCollection",
                 "relationships",
+                "bibliography",
                 "self",
                 "version",
                 "templateItemOf",
