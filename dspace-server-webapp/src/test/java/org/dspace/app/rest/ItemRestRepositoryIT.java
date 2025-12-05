@@ -26,6 +26,8 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
+import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -55,6 +57,7 @@ import org.dspace.app.rest.matcher.BundleMatcher;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
+import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -64,6 +67,7 @@ import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.repository.ItemRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
@@ -4900,6 +4904,410 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/core/items/" + publicItem.getID() + "/submitter"))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void findEditAuthorizedUnauthorizedTest() throws Exception {
+        getClient().perform(get("/api/core/items/search/findEditAuthorized"))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findEditAuthorizedResourcePolicyTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community comm1 = CommunityBuilder.createCommunity(context).withName("Community 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, comm1).withName("Collection 1").build();
+
+        EPerson hasDirectEditRights = EPersonBuilder.createEPerson(context)
+            .withEmail("has@editrights.com").withPassword(password)
+            .build();
+        EPerson hasDirectAdminRights = EPersonBuilder.createEPerson(context)
+            .withEmail("has@adminrights.com").withPassword(password)
+            .build();
+        Item byResourcePolicy = ItemBuilder.createItem(context, col1)
+            .withTitle("direct edit rights for eperson")
+            .build();
+        Item uneditable = ItemBuilder.createItem(context, col1)
+            .withTitle("uneditable item")
+            .build();
+        ResourcePolicy policy = ResourcePolicyBuilder.createResourcePolicy(context, hasDirectEditRights, null)
+            .withDspaceObject(byResourcePolicy).withAction(WRITE)
+            .build();
+        policy = ResourcePolicyBuilder.createResourcePolicy(context, hasDirectAdminRights, null)
+            .withDspaceObject(byResourcePolicy).withAction(Constants.ADMIN)
+            .build();
+        context.restoreAuthSystemState();
+
+        String tokenHasDirectEditRightsToken = getAuthToken(hasDirectEditRights.getEmail(), password);
+        String tokenHasDirectAdminRightsToken = getAuthToken(hasDirectAdminRights.getEmail(), password);
+
+        getClient(tokenHasDirectEditRightsToken).perform(get("/api/core/items/search/findEditAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.contains(ItemMatcher.matchItemProperties(byResourcePolicy))))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+        getClient(tokenHasDirectAdminRightsToken).perform(get("/api/core/items/search/findEditAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.contains(ItemMatcher.matchItemProperties(byResourcePolicy))))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findEditAuthorizedAdminPropagationTest() throws Exception {
+        /*
+        Cases:
+          - items in collection with admin rights
+          - items in collection in community with admin rights
+         */
+
+        context.turnOffAuthorisationSystem();
+
+        /*
+        DSO structure:
+        root
+        ├── subcomm1
+            ├── subcomm1collA
+                ├── subcomm1collAitemX
+                ├── subcomm1collAitemY
+            ├── subcomm1collB
+                └── subcomm1collBitem
+        └── subcomm2
+            └── subcomm2coll
+                └── subcomm2collitem
+         */
+        EPerson rootAdmin = EPersonBuilder.createEPerson(context)
+            .withEmail("root@admin.com").withPassword(password).build();
+        EPerson subcomm1Admin = EPersonBuilder.createEPerson(context)
+            .withEmail("subcomm1@admin.com").withPassword(password).build();
+        EPerson subcomm2Admin = EPersonBuilder.createEPerson(context)
+            .withEmail("subcomm2@admin.com").withPassword(password).build();
+        EPerson subcomm1collA_Admin = EPersonBuilder.createEPerson(context)
+            .withEmail("subcomm1collA@admin.com").withPassword(password).build();
+        EPerson subcomm1collB_Admin = EPersonBuilder.createEPerson(context)
+            .withEmail("subcomm1collB@admin.com").withPassword(password).build();
+        EPerson subcomm2collAdmin = EPersonBuilder.createEPerson(context)
+            .withEmail("subcomm2coll@admin.com").withPassword(password).build();
+
+        Community root = CommunityBuilder.createCommunity(context)
+            .withAdminGroup(rootAdmin)
+            .withName("root")
+            .build();
+        Community subcomm1 = CommunityBuilder.createSubCommunity(context, root)
+            .withAdminGroup(subcomm1Admin)
+            .withName("subcomm1")
+            .build();
+        Community subcomm2 = CommunityBuilder.createSubCommunity(context, root)
+            .withAdminGroup(subcomm2Admin)
+            .withName("subcomm2")
+            .build();
+        Collection subcomm1collA = CollectionBuilder.createCollection(context, subcomm1)
+            .withAdminGroup(subcomm1collA_Admin)
+            .withName("subcomm1collA")
+            .build();
+        Collection subcomm1collB = CollectionBuilder.createCollection(context, subcomm1)
+            .withAdminGroup(subcomm1collB_Admin)
+            .withName("subcomm1collB")
+            .build();
+        Collection subcomm2coll = CollectionBuilder.createCollection(context, subcomm2)
+            .withAdminGroup(subcomm2collAdmin)
+            .withName("subcomm2coll")
+            .build();
+        Item subcomm1collAitemX = ItemBuilder.createItem(context, subcomm1collA).withTitle("subcomm1collAitemX")
+            .build();
+        Item subcomm1collAitemY = ItemBuilder.createItem(context, subcomm1collA).withTitle("subcomm1collAitemY")
+            .build();
+        Item subcomm1collBitem = ItemBuilder.createItem(context, subcomm1collB).withTitle("subcomm1collBitem")
+            .build();
+        Item subcomm2collitem = ItemBuilder.createItem(context, subcomm2coll).withTitle("subcomm2collitem")
+            .build();
+        context.restoreAuthSystemState();
+
+        String siteAdminToken = getAuthToken(admin.getEmail(), password);
+        String rootAdminToken = getAuthToken(rootAdmin.getEmail(), password);
+        String subcomm1AdminToken = getAuthToken(subcomm1Admin.getEmail(), password);
+        String subcomm2AdminToken = getAuthToken(subcomm2Admin.getEmail(), password);
+        String subcomm1collA_AdminToken = getAuthToken(subcomm1collA_Admin.getEmail(), password);
+        String subcomm1collB_AdminToken = getAuthToken(subcomm1collB_Admin.getEmail(), password);
+        String subcomm2collAdminToken = getAuthToken(subcomm2collAdmin.getEmail(), password);
+
+        getClient(siteAdminToken).perform(get("/api/core/items/search/findEditAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.containsInAnyOrder(
+                    ItemMatcher.matchItemProperties(subcomm1collAitemX),
+                    ItemMatcher.matchItemProperties(subcomm1collAitemY),
+                    ItemMatcher.matchItemProperties(subcomm1collBitem),
+                    ItemMatcher.matchItemProperties(subcomm2collitem)
+                )))
+            .andExpect(jsonPath("$.page.totalElements", is(4)));
+
+        getClient(rootAdminToken).perform(get("/api/core/items/search/findEditAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.containsInAnyOrder(
+                    ItemMatcher.matchItemProperties(subcomm1collAitemX),
+                    ItemMatcher.matchItemProperties(subcomm1collAitemY),
+                    ItemMatcher.matchItemProperties(subcomm1collBitem),
+                    ItemMatcher.matchItemProperties(subcomm2collitem)
+                )))
+            .andExpect(jsonPath("$.page.totalElements", is(4)));
+
+        getClient(subcomm1AdminToken).perform(get("/api/core/items/search/findEditAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.containsInAnyOrder(
+                    ItemMatcher.matchItemProperties(subcomm1collAitemX),
+                    ItemMatcher.matchItemProperties(subcomm1collAitemY),
+                    ItemMatcher.matchItemProperties(subcomm1collBitem)
+                )))
+            .andExpect(jsonPath("$.page.totalElements", is(3)));
+
+        getClient(subcomm2AdminToken).perform(get("/api/core/items/search/findEditAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.containsInAnyOrder(
+                    ItemMatcher.matchItemProperties(subcomm2collitem)
+                )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        getClient(subcomm1collA_AdminToken).perform(get("/api/core/items/search/findEditAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.containsInAnyOrder(
+                    ItemMatcher.matchItemProperties(subcomm1collAitemX),
+                    ItemMatcher.matchItemProperties(subcomm1collAitemY)
+                )))
+            .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        getClient(subcomm1collB_AdminToken).perform(get("/api/core/items/search/findEditAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.containsInAnyOrder(
+                    ItemMatcher.matchItemProperties(subcomm1collBitem)
+                )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        getClient(subcomm2collAdminToken).perform(get("/api/core/items/search/findEditAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.containsInAnyOrder(
+                    ItemMatcher.matchItemProperties(subcomm2collitem)
+                )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void addParentComAdminGroupToCheckReindexingTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("col1")
+            .build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+            .withTitle("MyTest")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(epersonToken).perform(get("/api/core/items/search/findEditAuthorized")
+                .param("query", "MyTest"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded").doesNotExist())
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/communities/" + parentCommunity.getID() + "/adminGroup")
+                .content(mapper.writeValueAsBytes(groupRest))
+                .contentType(contentType))
+            .andExpect(status().isCreated())
+            .andDo(result -> idRef.set(
+                UUID.fromString(read(result.getResponse().getContentAsString(), "$.id")))
+            );
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(post("/api/eperson/groups/" + idRef.get() + "/epersons")
+            .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+            .content(REST_SERVER_URL + "eperson/groups/" + eperson.getID()
+            ));
+
+        getClient(epersonToken).perform(get("/api/core/items/search/findEditAuthorized")
+                .param("query", "MyTest"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.items", Matchers.contains(ItemMatcher
+                .matchItemProperties(item)
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void removeParentComAdminPolicyToCheckEditPropagationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        ResourcePolicy policy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
+            .withDspaceObject(parentCommunity).withAction(Constants.ADMIN)
+            .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("col1")
+            .build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+            .withTitle("MyTest")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(epersonToken).perform(get("/api/core/items/search/findEditAuthorized")
+                .param("query", "MyTest"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.items", Matchers.contains(ItemMatcher
+                .matchItemProperties(item)
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(delete("/api/authz/resourcepolicies/" + policy.getID()))
+            .andExpect(status().is(204));
+
+        getClient(epersonToken).perform(get("/api/core/items/search/findEditAuthorized")
+                .param("query", "MyTest"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded").doesNotExist())
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    @Test
+    public void findEditAuthorizedItemsWithQueryTest() throws Exception {
+        findGenericAuthorizedItemsWithQueryTest("findEditAuthorized");
+    }
+
+    public void findGenericAuthorizedItemsWithQueryTest(String method) throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson2 = EPersonBuilder.createEPerson(context)
+            .withEmail("eperson2@mail.com")
+            .withPassword(password)
+            .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community Two")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Sample collection")
+            .withAdminGroup(eperson)
+            .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+            .withName("col2")
+            .build();
+        Collection col3 = CollectionBuilder.createCollection(context, child2)
+            .withName("col3")
+            .withAdminGroup(eperson)
+            .build();
+        Item item1 = ItemBuilder.createItem(context, col1)
+            .withTitle("Sample item")
+            .build();
+        Item item2 = ItemBuilder.createItem(context, col2)
+            .withTitle("Test item")
+            .build();
+        Item item3 = ItemBuilder.createItem(context, col3)
+            .withTitle("Item of sample bitstreams")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        // Test simple query
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(get("/api/core/items/search/" + method)
+                .param("query", "item"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
+                ItemMatcher.matchItemProperties(item1),
+                ItemMatcher.matchItemProperties(item3)
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        // Test case insensitive
+        getClient(tokenEPerson).perform(get("/api/core/items/search/" + method)
+                .param("query", "ITEM"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
+                ItemMatcher.matchItemProperties(item1),
+                ItemMatcher.matchItemProperties(item3)
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        // Test word for unauthorized item
+        getClient(tokenEPerson).perform(get("/api/core/items/search/" + method)
+                .param("query", "test"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // Test eperson with no authorized items
+        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), password);
+        getClient(tokenEPerson2).perform(get("/api/core/items/search/" + method)
+                .param("query", "community"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // Test query as admin
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/items/search/" + method)
+                .param("query", "sample"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
+                ItemMatcher.matchItemProperties(item1),
+                ItemMatcher.matchItemProperties(item3)
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        // Test unsorted query words
+        getClient(tokenAdmin).perform(get("/api/core/items/search/" + method)
+                .param("query", "bitstreams sample"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.items", Matchers.contains(
+                ItemMatcher.matchItemProperties(item3)
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // Test item not authorized for eperson is returned for admin
+        getClient(tokenAdmin).perform(get("/api/core/items/search/" + method)
+                .param("query", "test"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
+                ItemMatcher.matchItemProperties(item2)
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
     }
 
 }
