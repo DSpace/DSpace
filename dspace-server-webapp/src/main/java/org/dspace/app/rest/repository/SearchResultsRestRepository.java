@@ -15,6 +15,7 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.DiscoverResultConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.DiscoveryConfigurationRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
@@ -41,6 +42,8 @@ import org.springframework.stereotype.Component;
 @Component(DiscoveryConfigurationRest.CATEGORY + "." + SearchResultsRest.PLURAL_NAME)
 public class SearchResultsRestRepository extends DSpaceRestRepository<SearchResultsRest, String> {
     private static final Logger log = LogManager.getLogger();
+
+    private static final String SOLR_PARSE_ERROR_CLASS = "org.apache.solr.search.SyntaxError";
 
     @Autowired
     protected Utils utils;
@@ -89,6 +92,13 @@ public class SearchResultsRestRepository extends DSpaceRestRepository<SearchResu
         } catch (SearchServiceException e) {
             log.error("Error while searching with Discovery", e);
             throw new IllegalArgumentException("Error while searching with Discovery: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            boolean isParsingException = e.getMessage().contains(SOLR_PARSE_ERROR_CLASS);
+            if (isParsingException) {
+                throw new UnprocessableEntityException(e.getMessage());
+            } else {
+                throw e;
+            }
         }
 
         return discoverResultConverter

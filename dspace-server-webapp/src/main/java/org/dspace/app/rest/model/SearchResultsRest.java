@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.dspace.app.rest.RestResourceController;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
@@ -61,6 +62,21 @@ public class SearchResultsRest extends DiscoveryResultsRest {
 
     public void setPage(Pageable page) {
         this.page = page;
+    }
+
+    @Override
+    public String getType() {
+        return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
+    @Override
+    public Class getController() {
+        return RestResourceController.class;
     }
 
     public static class AppliedFilter {
