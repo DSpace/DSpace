@@ -688,7 +688,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
         if (collection.isMetadataModified()) {
             context.addEvent(new Event(Event.MODIFY_METADATA, Constants.COLLECTION, collection.getID(),
-                collection.getDetails(), DetailType.DSO_SUMMARY,
+                collection.getMetadataEventDetails(), DetailType.DSO_SUMMARY,
                 getIdentifiers(context, collection)));
             collection.clearModified();
         }
