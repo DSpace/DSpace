@@ -34,6 +34,7 @@ import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.ProvenanceService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
@@ -84,6 +85,9 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired
+    private ProvenanceService provenanceService;
 
     @Override
     @PreAuthorize("hasPermission(#id, 'resourcepolicy', 'READ')")
@@ -302,6 +306,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             resourcePolicy.setStartDate(resourcePolicyRest.getStartDate());
             resourcePolicy.setEndDate(resourcePolicyRest.getEndDate());
             resourcePolicyService.update(context, resourcePolicy);
+            provenanceService.createResourcePolicy(context, resourcePolicy);
             return converter.toRest(resourcePolicy, utils.obtainProjection());
         } else {
             throw new UnprocessableEntityException("A resource policy must contain a valid eperson or group");
@@ -319,6 +324,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
                 throw new ResourceNotFoundException(
                     ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.NAME + " with id: " + id + " not found");
             }
+            provenanceService.deleteResourcePolicy(context, resourcePolicy);
             resourcePolicyService.delete(context, resourcePolicy);
         } catch (SQLException e) {
             throw new RuntimeException("Unable to delete ResourcePolicy with id = " + id, e);
@@ -336,6 +342,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         }
         resourcePatch.patch(obtainContext(), resourcePolicy, patch.getOperations());
         resourcePolicyService.update(context, resourcePolicy);
+        provenanceService.updateResourcePolicy(context, resourcePolicy);
     }
 
     @Override
