@@ -91,13 +91,11 @@ public class SearchResultsRestRepository extends DSpaceRestRepository<SearchResu
 
         } catch (SearchServiceException e) {
             log.error("Error while searching with Discovery", e);
-            throw new IllegalArgumentException("Error while searching with Discovery: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
             boolean isParsingException = e.getMessage().contains(SOLR_PARSE_ERROR_CLASS);
             if (isParsingException) {
                 throw new UnprocessableEntityException(e.getMessage());
             } else {
-                throw e;
+                throw new IllegalArgumentException("Error while searching with Discovery: " + e.getMessage());
             }
         }
 

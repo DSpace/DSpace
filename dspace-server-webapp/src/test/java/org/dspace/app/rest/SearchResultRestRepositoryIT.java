@@ -1307,7 +1307,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
         //With a query stating 'public'
         getClient().perform(get("/api/discover/searchresults/search/objects")
                 .param("query", query)
-                .param("hitHightlights", "false"))
+                .param("hitHighlighting", "false"))
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
@@ -1320,9 +1320,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The search results has to contain the item with the query in the title and the hithighlight has
             // to be filled in with a string containing the query
             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                SearchResultMatcher
-                    .matchOnItemName("item", "items", "Public item 2"),
-                hasJsonPath("$.hitHighlights", nullValue())
+                Matchers.allOf(
+                    SearchResultMatcher
+                        .matchOnItemName("item", "items", "Public item 2"),
+                    hasJsonPath("$.hitHighlights", nullValue())
+                )
             )))
             //There always needs to be a self link available
             .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/searchresults/search/objects")))
