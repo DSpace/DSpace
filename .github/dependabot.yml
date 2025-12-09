@@ -15,6 +15,10 @@ updates:
     schedule:
       interval: "monthly"
       time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
     # Allow up to 10 open PRs for dependencies
     open-pull-requests-limit: 10
     # Group together some upgrades in a single PR
@@ -41,6 +45,7 @@ updates:
         applies-to: version-updates
         patterns:
         - "junit:*"
+        - "com.adobe.testing:*"
         - "com.github.stefanbirker:system-rules"
         - "com.h2database:*"
         - "io.findify:s3mock*"
@@ -49,10 +54,19 @@ updates:
         - "org.hamcrest:*"
         - "org.mock-server:*"
         - "org.mockito:*"
+        - "org.testcontainers:*"
         - "org.xmlunit:*"
         update-types:
         - "minor"
         - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
+        update-types:
+          - "minor"
+          - "patch"
       # Group together all Apache Commons deps in a single PR
       apache-commons:
         applies-to: version-updates
@@ -121,6 +135,10 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Last version of errorprone to support JDK 17 is 2.42.0
+      # TODO: Remove this after this ticket is resolved https://github.com/DSpace/DSpace/issues/11621
+      - dependency-name: "com.google.errorprone:*"
+        versions: [ ">=2.43.0" ]
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
@@ -136,6 +154,10 @@ updates:
     schedule:
       interval: "monthly"
       time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
     # Allow up to 10 open PRs for dependencies
     open-pull-requests-limit: 10
     # Group together some upgrades in a single PR
@@ -162,6 +184,7 @@ updates:
         applies-to: version-updates
         patterns:
           - "junit:*"
+          - "com.adobe.testing:*"
           - "com.github.stefanbirker:system-rules"
           - "com.h2database:*"
           - "io.findify:s3mock*"
@@ -170,7 +193,16 @@ updates:
           - "org.hamcrest:*"
           - "org.mock-server:*"
           - "org.mockito:*"
+          - "org.testcontainers:*"
           - "org.xmlunit:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
         update-types:
           - "minor"
           - "patch"
@@ -242,6 +274,9 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Last version of errorprone to support JDK 17 is 2.42.0
+      - dependency-name: "com.google.errorprone:*"
+        versions: [ ">=2.43.0" ]
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
@@ -257,6 +292,10 @@ updates:
     schedule:
       interval: "monthly"
       time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
     # Allow up to 10 open PRs for dependencies
     open-pull-requests-limit: 10
     # Group together some upgrades in a single PR
@@ -283,6 +322,7 @@ updates:
         applies-to: version-updates
         patterns:
           - "junit:*"
+          - "com.adobe.testing:*"
           - "com.github.stefanbirker:system-rules"
           - "com.h2database:*"
           - "io.findify:s3mock*"
@@ -291,7 +331,16 @@ updates:
           - "org.hamcrest:*"
           - "org.mock-server:*"
           - "org.mockito:*"
+          - "org.testcontainers:*"
           - "org.xmlunit:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
         update-types:
           - "minor"
           - "patch"
@@ -363,6 +412,9 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Last version of errorprone to support JDK 17 is 2.42.0
+      - dependency-name: "com.google.errorprone:*"
+        versions: [ ">=2.43.0" ]
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
@@ -378,6 +430,10 @@ updates:
     schedule:
       interval: "monthly"
       time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
     # Allow up to 10 open PRs for dependencies
     open-pull-requests-limit: 10
     # Group together some upgrades in a single PR
@@ -404,6 +460,7 @@ updates:
         applies-to: version-updates
         patterns:
           - "junit:*"
+          - "com.adobe.testing:*"
           - "com.github.stefanbirker:system-rules"
           - "com.h2database:*"
           - "io.findify:s3mock*"
@@ -411,7 +468,16 @@ updates:
           - "org.hamcrest:*"
           - "org.mock-server:*"
           - "org.mockito:*"
+          - "org.testcontainers:*"
           - "org.xmlunit:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
         update-types:
           - "minor"
           - "patch"
