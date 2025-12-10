@@ -15,7 +15,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
@@ -36,7 +35,7 @@ public class OrcidRestConnector {
         this.url = url;
     }
 
-    public InputStream get(String path, String accessToken) {
+    public InputStream get(String path, String accessToken) throws OrcidConnectionException {
         String fullPath = url + '/' + trimSlashes(path);
         HttpGet httpGet = new HttpGet(fullPath);
         if (StringUtils.isNotBlank(accessToken)) {
@@ -44,23 +43,24 @@ public class OrcidRestConnector {
             httpGet.addHeader("Authorization","Bearer " + accessToken);
         }
         try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
-            CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
-            if (!isSuccessful(httpResponse)) {
-                // Consume entity to avoid memory leak
-                EntityUtils.consumeQuietly(httpResponse.getEntity());
-                var statusCode = getStatusCode(httpResponse);
-                var reason = httpResponse.getStatusLine().getReasonPhrase();
-                var error = String.format("The request failed with:%d code, reason:%s ", statusCode, reason);
-                throw new RuntimeException(error);
+            try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
+                if (!isSuccessful(httpResponse)) {
+                    var statusCode = getStatusCode(httpResponse);
+                    var reason = httpResponse.getStatusLine().getReasonPhrase();
+                    var error = String.format("The request failed with:%d code, reason:%s ", statusCode, reason);
+                    throw new OrcidConnectionException(error, statusCode);
+                }
+                try (InputStream responseStream = httpResponse.getEntity().getContent()) {
+                    // Read all the content of the response stream into a byte array to prevent TruncatedChunkException
+                    byte[] content = responseStream.readAllBytes();
+                    return new ByteArrayInputStream(content);
+                }
             }
-            try (InputStream responseStream = httpResponse.getEntity().getContent()) {
-                // Read all the content of the response stream into a byte array to prevent TruncatedChunkException
-                byte[] content = responseStream.readAllBytes();
-                return new ByteArrayInputStream(content);
-            }
+        } catch (OrcidConnectionException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Error in rest connector for path: " + fullPath, e);
-            throw new RuntimeException("Failed to execute ORCID request: " + fullPath, e);
+            throw new OrcidConnectionException("Failed to execute ORCID request: " + fullPath, 0, e);
         }
     }
 
