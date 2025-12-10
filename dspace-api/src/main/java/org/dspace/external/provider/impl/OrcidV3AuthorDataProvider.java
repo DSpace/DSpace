@@ -90,6 +90,9 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
     public void initializeAccessToken() {
         // If we have reaches max retries or the access token is already set, return immediately
         if (maxClientRetries <= 0 || StringUtils.isNotBlank(accessToken)) {
+            if (maxClientRetries <= 0) {
+                log.warn("Maximum retry attempts reached for ORCID token retrieval");
+            }
             return;
         }
         try {
