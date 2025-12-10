@@ -96,7 +96,7 @@ public interface ChoiceAuthorityService {
      * @param locale        explicit localization key if available, or null
      * @return a Choices object (never null).
      * @see org.dspace.content.authority.ChoiceAuthority#getChoicesByParent(java.lang.String, java.lang.String,
-     * int, int, java.lang.String)
+     *  int, int, java.lang.String)
      */
     Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale);
 
@@ -141,7 +141,7 @@ public interface ChoiceAuthorityService {
      * given metadata field?
      *
      * @param fieldKey single string identifying metadata field
-     * @param dsoType  the dspace object type as defined in the {@link Constants}
+     * @param dsoType   the dspace object type as defined in the {@link Constants}
      * @param formname the formname used by the collection
      * @return true if choices are configured for this field.
      */
@@ -221,8 +221,8 @@ public interface ChoiceAuthorityService {
      * Returns all the configured metadata field that are authority controlled
      * related to the given entity type.
      *
-     * @param entityType the entity type
-     * @return the metadata fields
+     * @param  entityType the entity type
+     * @return            the metadata fields
      */
     List<String> getAuthorityControlledFieldsByEntityType(String entityType);
 

@@ -67,51 +67,42 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @see ChoiceAuthority
  */
 public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService {
-    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(ChoiceAuthorityServiceImpl.class);
-
     // map of field key to authority plugin
     private Map<String, ChoiceAuthority> controller = new HashMap<String, ChoiceAuthority>();
-
     // map of field key, dsoType, form definition to authority plugin
     private Map<String, Map<Integer, Map<String, ChoiceAuthority>>> controllerFormDefinitions =
         new HashMap<String, Map<Integer, Map<String, ChoiceAuthority>>>();
-
     // map of field key to presentation type
     private Map<String, String> presentation = new HashMap<String, String>();
-
     // map of field key to closed value
     private Map<String, Boolean> closed = new HashMap<String, Boolean>();
-
-    // flag to track the initialization status of the service
-    private boolean initialized = false;
-
     // map of authority name to field keys (the same authority can be configured over multiple metadata)
     // the keys used by this cache are unique across all the dso type so there is
     // no need to add a dsoType (int key) level
     private Map<String, List<String>> authorities = new HashMap<String, List<String>>();
-
     // map of authority name to form definition and field keys
     // the keys used by this cache are unique across all the dso type so there is
     // no need to add a dsoType (int key) level
     private Map<String, Map<String, List<String>>> authoritiesFormDefinitions =
             new HashMap<String, Map<String, List<String>>>();
-
     // Map of vocabulary authorities to and their index info equivalent
     private Map<String, DSpaceControlledVocabularyIndex> vocabularyIndexMap = new HashMap<>();
-
-    // the item submission reader
-    private SubmissionConfigService submissionConfigService;
-
     @Autowired(required = true)
     private ConfigurationService configurationService;
     @Autowired(required = true)
     private PluginService pluginService;
+
+    // the item submission reader
+    private SubmissionConfigService submissionConfigService;
     @Autowired(required = true)
     private UploadConfigurationService uploadConfigurationService;
     @Autowired(required = true)
     private AuthorityServiceUtils authorityServiceUtils;
     @Autowired(required = true)
     private ItemService itemService;
+    // flag to track the initialization status of the service
+    private boolean initialized = false;
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(ChoiceAuthorityServiceImpl.class);
     @Autowired
     private DiscoveryConfigurationService searchConfigurationService;
 

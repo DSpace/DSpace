@@ -28,11 +28,11 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authority.service.AuthorityValueService;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -45,6 +45,7 @@ import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.discovery.FullTextContentStreams;
@@ -68,7 +69,6 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.MultiFormatDateParser;
 import org.dspace.util.SolrUtils;
-import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,8 +105,6 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     protected WorkflowItemIndexFactory workflowItemIndexFactory;
     @Autowired
     protected WorkspaceItemIndexFactory workspaceItemIndexFactory;
-    @Autowired
-    protected VersionHistoryService versionHistoryService;
 
 
     @Override
@@ -152,6 +150,9 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
         doc.addField("lastModified", SolrUtils.getDateFormatter().format(item.getLastModified()));
         doc.addField("latestVersion", itemService.isLatestVersion(context, item));
 
+        for (Bundle bnd : item.getBundles()) {
+            doc.addField("bundleName_s", bnd.getName());
+        }
         EPerson submitter = item.getSubmitter();
         if (submitter != null && !(DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(
             "discovery.index.item.submitter.enabled", false))) {
@@ -222,7 +223,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                     List<MetadataValue> metadataValueList = new LinkedList<>();
                     boolean shouldExposeMinMax = false;
                     DiscoverySearchFilter discoverySearchFilter = discoveryConfiguration.getSearchFilters().get(i);
-                    if (Strings.CI.equals(discoverySearchFilter.getFilterType(), "facet")) {
+                    if (StringUtils.equalsIgnoreCase(discoverySearchFilter.getFilterType(), "facet")) {
                         if (((DiscoverySearchFilterFacet) discoverySearchFilter).exposeMinAndMaxValue()) {
                             shouldExposeMinMax = true;
                         }
@@ -340,8 +341,9 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                 String preferedLabel = null;
                 List<String> variants = null;
                 boolean isAuthorityControlled = metadataAuthorityService
-                        .isAuthorityControlled(metadataField);
-
+                    .isAuthorityAllowed(metadataField, item.getType(), collection);
+                boolean hasChoiceAuthority = choiceAuthorityService.isChoicesConfigured(metadataField.toString(),
+                                                                                        item.getType(), collection);
                 int minConfidence = isAuthorityControlled ? metadataAuthorityService
                         .getMinConfidence(metadataField) : Choices.CF_ACCEPTED;
 
@@ -366,18 +368,23 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                 DSpaceServicesFactory
                                         .getInstance()
                                         .getConfigurationService()
-                                        .getPropertyAsType("discovery.index.authority.ignore-prefered." + field,
+                                        .getPropertyAsType("discovery.index.authority.ignore-preferred." + field,
                                                 DSpaceServicesFactory
                                                         .getInstance()
                                                         .getConfigurationService()
                                                         .getPropertyAsType(
-                                                                "discovery.index.authority.ignore-prefered",
+                                                            "discovery.index.authority.ignore-preferred",
                                                                 Boolean.FALSE),
                                                 true);
 
-                        if (!ignorePrefered && !authority.startsWith(AuthorityValueService.GENERATE)) {
+                        if (
+                            !ignorePrefered &&
+                                hasChoiceAuthority &&
+                                !authority.startsWith(AuthorityValueService.GENERATE)
+                        ) {
                             try {
-                                preferedLabel = choiceAuthorityService.getLabel(meta, collection, meta.getLanguage());
+                                preferedLabel = choiceAuthorityService.getLabel(meta, Constants.ITEM, collection,
+                                                                                meta.getLanguage());
                             } catch (Exception e) {
                                 log.warn("Failed to get preferred label for " + field, e);
                             }
@@ -394,10 +401,10 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                                         .getPropertyAsType("discovery.index.authority.ignore-variants",
                                                                 Boolean.FALSE),
                                                 true);
-                        if (!ignoreVariants) {
+                        if (!ignoreVariants && hasChoiceAuthority) {
                             try {
                                 variants = choiceAuthorityService
-                                    .getVariants(meta, collection);
+                                    .getVariants(meta, Constants.ITEM, collection);
                             } catch (Exception e) {
                                 log.warn("Failed to get variants for " + field, e);
                             }
@@ -534,6 +541,11 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                 if (authority != null) {
                     doc.addField(field + "_authority", authority);
                 }
+
+                if (meta.getAuthority() != null) {
+                    doc.addField(field + "_allauthority", meta.getAuthority());
+                }
+
                 if (toProjectionFields.contains(field) || toProjectionFields
                         .contains(unqualifiedField + "." + Item.ANY)) {
                     StringBuffer variantsToStore = new StringBuffer();
@@ -689,7 +701,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
      * @param doc the solr document
      * @param searchFilter the discoverySearchFilter
      * @param value the metadata value
-     * @param date ZonedDateTime object
+     * @param date Date object
      * @param authority the authority key
      * @param preferedLabel the preferred label for metadata field
      * @param separator the separator being used to separate lowercase and regular case
@@ -756,7 +768,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             if (hierarchicalSidebarFacetConfiguration
                 .isSkipFirstNodeLevel() && 1 < subValues.length) {
                 //Remove the first element of our array
-                subValues = (String[]) ArrayUtils.subarray(subValues, 1, subValues.length);
+                subValues = ArrayUtils.subarray(subValues, 1, subValues.length);
             }
             for (int i = 0; i < subValues.length; i++) {
                 StringBuilder valueBuilder = new StringBuilder();

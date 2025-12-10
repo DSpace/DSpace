@@ -54,15 +54,18 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolver {
 
+    @Autowired
+    private SearchService searchService;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private ChoiceAuthorityService choiceAuthorityService;
+
     private static final Logger log = LogManager.getLogger(ItemSearcherByMetadata.class);
     private final String metadata;
     private final String authorityPrefix;
-    @Autowired
-    private SearchService searchService;
-    @Autowired
-    private ItemService itemService;
-    @Autowired
-    private ChoiceAuthorityService choiceAuthorityService;
     private final ThreadLocal<Map<String, UUID>> valuesToItemIds = ThreadLocal.withInitial(() -> new HashMap<>());
     private final ThreadLocal<MultiValuedMap<String, UUID>> referenceResolutionAttempts =
         ThreadLocal.withInitial(() -> new ArrayListValuedHashMap<>());
