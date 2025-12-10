@@ -74,8 +74,7 @@
     <bean class="org.dspace.profile.OrcidProfileEnricher"/>
     <bean class="org.dspace.profile.OrcidMetadataCopyingAction"/>
 
-    <bean id="org.dspace.profile.service.ResearcherProfileService"
-          class="org.dspace.profile.ResearcherProfileServiceImpl"/>
+    <bean id="org.dspace.profile.service.ResearcherProfileService" class="org.dspace.profile.ResearcherProfileServiceImpl"/>
 
     <bean class="org.dspace.handle.hdlresolver.HdlResolverServiceImpl"/>
 
@@ -196,9 +195,9 @@
 
     <bean id="org.dspace.app.customurl.CustomUrlService" class="org.dspace.app.customurl.service.CustomUrlServiceImpl"/>
 
-    <bean class="org.dspace.statistics.LoginStatisticsServiceImpl"/>
+    <bean class="org.dspace.statistics.LoginStatisticsServiceImpl" />
 
-    <bean class="org.dspace.statistics.WorkflowStatisticsServiceImpl"/>
+    <bean class="org.dspace.statistics.WorkflowStatisticsServiceImpl" />
 
     <!-- OIDC Authentication -->
     <bean class="org.dspace.authenticate.OidcAuthenticationBean" id="oidcAuthentication"/>
@@ -219,8 +218,8 @@
 
     <bean class="org.dspace.correctiontype.service.impl.CorrectionTypeServiceImpl"/>
 
-    <bean class="org.dspace.app.policy.PolicyUpdaterServiceImpl"/>
-    <bean class="org.dspace.app.policy.MediaFilterRelatedPolicyUpdater"/>
+    <bean class="org.dspace.app.policy.PolicyUpdaterServiceImpl" />
+    <bean class="org.dspace.app.policy.MediaFilterRelatedPolicyUpdater" />
 
 </beans>
 

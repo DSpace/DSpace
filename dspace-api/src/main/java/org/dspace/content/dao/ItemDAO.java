@@ -8,6 +8,7 @@
 package org.dspace.content.dao;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -56,7 +57,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return iterator over items
      * @throws SQLException if database error
      */
-    Iterator<Item> findByLastModifiedSince(Context context, Date since)
+    Iterator<Item> findByLastModifiedSince(Context context, Instant since)
         throws SQLException;
 
     Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException;

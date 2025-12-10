@@ -7,6 +7,8 @@
  */
 package org.dspace.content;
 
+import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +16,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Supplier;
@@ -23,18 +26,20 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.utils.DSpace;
@@ -122,10 +127,12 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         // Build up list of matching values
         List<MetadataValue> values = new ArrayList<>();
         for (MetadataValue dcv : dso.getMetadata()) {
-            if (match(schema, element, qualifier, lang, dcv)) {
+            if (match(schema, element, qualifier, dcv)) {
                 values.add(dcv);
             }
         }
+
+        values = getFilteredMetadataValuesByLanguage(values, lang);
 
         // Sort the metadataValues if they have been modified,
         // is used to preserve the default order.
@@ -192,7 +199,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             Iterator<MetadataValue> iterator = result.iterator();
             while (iterator.hasNext()) {
                 MetadataValue metadataValue = iterator.next();
-                if (!Strings.CS.equals(authority, metadataValue.getAuthority())) {
+                if (!StringUtils.equals(authority, metadataValue.getAuthority())) {
                     iterator.remove();
                 }
             }
@@ -231,13 +238,13 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
                                            List<String> values, List<String> authorities, List<Integer> confidences)
-        throws SQLException {
+            throws SQLException {
 
         //Set place to list length of all metadatavalues for the given schema.element.qualifier combination.
         // Subtract one to adhere to the 0 as first element rule
         final Supplier<Integer> placeSupplier =  () ->
-            this.getMetadata(dso, metadataField.getMetadataSchema().getName(), metadataField.getElement(),
-                metadataField.getQualifier(), Item.ANY).size() - 1;
+                this.getMetadata(dso, metadataField.getMetadataSchema().getName(), metadataField.getElement(),
+                        metadataField.getQualifier(), Item.ANY).size() - 1;
 
         return addMetadata(context, dso, metadataField, lang, values, authorities, confidences, placeSupplier);
 
@@ -261,6 +268,13 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             List<String> values, List<String> authorities, List<Integer> confidences, Supplier<Integer> placeSupplier)
                     throws SQLException {
 
+        return addMetadata(context, dso, metadataField, lang, values, authorities, confidences, placeSupplier, null);
+    }
+
+    public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
+        List<String> values, List<String> authorities, List<Integer> confidences, Supplier<Integer> placeSupplier,
+        Integer securityLevel) throws SQLException {
+
         // Throw an error if we are attempting to add empty values
         if (values == null || values.isEmpty()) {
             throw new IllegalArgumentException("Cannot add empty values to a new metadata field " +
@@ -268,15 +282,34 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                                                    dso.getID().toString() + " and type = " + getTypeText(dso));
         }
 
-        boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
-        boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
+        Collection collection = getCollection(context, dso);
+        boolean authorityControlled = metadataAuthorityService.isAuthorityAllowed(metadataField,
+                dso.getType(), collection);
+
+        boolean nonValidAuthority = isNonValidAuthority(authorityControlled, authorities);
+        if (nonValidAuthority) {
+            throw new IllegalArgumentException("The metadata field \"" +
+                    metadataField.toString()
+                    + "\"" + " is not authority controlled but authorities were provided. Values:\""
+                    + authorities + "\"");
+        }
+
+        boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField, dso.getType(),
+                collection);
+        // Throw an error if we are attempting to add empty values
+        if (values == null || values.isEmpty()) {
+            throw new IllegalArgumentException("Cannot add empty values to a new metadata field " +
+                                                   metadataField.toString() + " on object with uuid = " +
+                                                   dso.getID().toString() + " and type = " + getTypeText(dso));
+        }
+
         List<MetadataValue> newMetadata = new ArrayList<>();
         // We will not verify that they are valid entries in the registry
         // until update() is called.
         for (int i = 0; i < values.size(); i++) {
             if (values.get(i) != null) {
                 if (authorities != null && authorities.size() >= i) {
-                    if (Strings.CS.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+                    if (StringUtils.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
                         continue;
                     }
                 }
@@ -284,6 +317,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 newMetadata.add(metadataValue);
 
                 metadataValue.setPlace(placeSupplier.get());
+                metadataValue.setSecurityLevel(securityLevel);
 
                 metadataValue.setLanguage(lang == null ? null : lang.trim());
 
@@ -305,8 +339,10 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     // authority sanity check: if authority is required, was it supplied?
                     // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so
                     // use a runtime exception
-                    if (authorityRequired && (metadataValue.getAuthority() == null || metadataValue.getAuthority()
-                                                                                                   .length() == 0)) {
+                    if (authorityRequired &&
+                        (metadataValue.getAuthority() == null || metadataValue.getAuthority().length() == 0) &&
+                        isNotPlaceholderMetadataValue(values.get(i).trim())
+                    ) {
                         throw new IllegalArgumentException("The metadata field \"" + metadataField
                                 .toString() + "\" requires an authority key but none was provided. Value=\"" + values
                                 .get(i) + "\"");
@@ -324,13 +360,101 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     }
                 }
                 metadataValue.setValue(String.valueOf(dcvalue));
-                //An update here isn't needed, this is persisted upon the merge of the owning object
+                //An update here isn't needed, this is persited upon the merge of the owning object
 //            metadataValueService.update(context, metadataValue);
                 dso.addDetails(metadataField.toString());
             }
         }
         setMetadataModified(dso);
         return newMetadata;
+    }
+
+    private Collection getCollection(Context context, T dso) throws SQLException {
+        Collection col = null;
+        switch (dso.getType()) {
+            case Constants.ITEM:
+                Item item = (Item) dso;
+                col = (Collection) item.getItemService().getParentObject(context, item);
+                break;
+            case Constants.BITSTREAM:
+                Bitstream bit = (Bitstream) dso;
+                BitstreamService bitService = ContentServiceFactory.getInstance().getBitstreamService();
+                DSpaceObject pDSO = bitService.getParentObject(context, bit);
+                if (pDSO != null && pDSO.getType() == Constants.ITEM) {
+                    Item pItem = (Item) pDSO;
+                    col = (Collection) pItem.getItemService().getParentObject(context, pItem);
+                }
+                return null;
+            default:
+                break;
+        }
+        return col;
+    }
+
+    private boolean isNotPlaceholderMetadataValue(String metadataValue) {
+        return !StringUtils.equals(metadataValue, PLACEHOLDER_PARENT_METADATA_VALUE);
+    }
+
+    @Override
+    public MetadataValue addSecuredMetadata(Context context, T dso, String schema, String element,
+        String qualifier, String lang, String value, String authority, int confidence, Integer securityLevel)
+        throws SQLException {
+
+        MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
+        if (metadataField == null) {
+            throw new SQLException(
+                "bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not " +
+                    "exist!");
+        }
+
+        return addSecuredMetadata(context, dso, metadataField, lang, value, authority, confidence, securityLevel);
+
+    }
+
+    @Override
+    public MetadataValue addSecuredMetadata(Context context, T dso, MetadataField metadataField, String lang,
+        String value, String authority, int confidence, Integer securityLevel) throws SQLException {
+
+        // Set place to list length of all metadatavalues for the given
+        // schema.element.qualifier combination.
+        // Subtract one to adhere to the 0 as first element rule
+        final Supplier<Integer> placeSupplier = () -> this
+            .getMetadata(dso, metadataField.getMetadataSchema().getName(), metadataField.getElement(),
+                metadataField.getQualifier(), Item.ANY)
+            .size() - 1;
+
+        return addMetadata(context, dso, metadataField, lang, Arrays.asList(value), Arrays.asList(authority),
+            Arrays.asList(confidence), placeSupplier, securityLevel).stream().findFirst().orElse(null);
+
+    }
+
+    @Override
+    public void addAndShiftRightSecuredMetadata(Context context, T dso, String schema, String element, String qualifier,
+        String lang, String value, String authority, int confidence, int index, Integer securitylevel)
+        throws SQLException {
+        List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
+
+        int idx = 0;
+        int place = 0;
+        boolean last = true;
+        for (MetadataValue rr : list) {
+            if (idx == index) {
+                MetadataValue newMetadata = addMetadata(context, dso, schema, element, qualifier,
+                        lang, value, authority, confidence);
+
+                moveSingleMetadataValue(context, dso, place, newMetadata);
+                place++;
+                last = false;
+            }
+            moveSingleMetadataValue(context, dso, place, rr);
+            place++;
+            idx++;
+        }
+        if (last) {
+            addSecuredMetadata(context, dso, schema, element, qualifier,
+                    lang, value, authority, confidence, securitylevel);
+
+        }
     }
 
     @Override
@@ -366,16 +490,14 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             String fieldKey = metadataAuthorityService
                 .makeFieldKey(metadataField.getMetadataSchema().getName(), metadataField.getElement(),
                               metadataField.getQualifier());
-            if (metadataAuthorityService.isAuthorityControlled(fieldKey)) {
+            Collection collection = getCollection(context, dso);
+            if (metadataAuthorityService.isAuthorityAllowed(metadataField, dso.getType(), collection)
+                    && choiceAuthorityService.isChoicesConfigured(fieldKey, dso.getType(), collection)) {
                 List<String> authorities = new ArrayList<>();
                 List<Integer> confidences = new ArrayList<>();
                 for (int i = 0; i < values.size(); ++i) {
-                    if (dso instanceof Item) {
-                        getAuthoritiesAndConfidences(fieldKey, ((Item) dso).getOwningCollection(), values, authorities,
-                                                     confidences, i);
-                    } else {
-                        getAuthoritiesAndConfidences(fieldKey, null, values, authorities, confidences, i);
-                    }
+                    getAuthoritiesAndConfidences(fieldKey, dso.getType(), collection,
+                            values, authorities, confidences, i);
                 }
                 return addMetadata(context, dso, metadataField, language, values, authorities, confidences);
             } else {
@@ -510,7 +632,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         MetadataField metadataField = metadataValue.getMetadataField();
         MetadataSchema metadataSchema = metadataField.getMetadataSchema();
         // We will attempt to disprove a match - if we can't we have a match
-        if (!Item.ANY.equals(element) && !Strings.CS.equals(element, metadataField.getElement())) {
+        if (!Item.ANY.equals(element) && !StringUtils.equals(element, metadataField.getElement())) {
             // Elements do not match, no wildcard
             return false;
         }
@@ -523,7 +645,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             }
         } else if (!Item.ANY.equals(qualifier)) {
             // Not a wildcard, so qualifier must match exactly
-            if (!Strings.CS.equals(qualifier, metadataField.getQualifier())) {
+            if (!StringUtils.equals(qualifier, metadataField.getQualifier())) {
                 return false;
             }
         }
@@ -536,13 +658,13 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             }
         } else if (!Item.ANY.equals(language)) {
             // Not a wildcard, so language must match exactly
-            if (!Strings.CS.equals(language, metadataValue.getLanguage())) {
+            if (!StringUtils.equals(language, metadataValue.getLanguage())) {
                 return false;
             }
         }
 
         if (!Item.ANY.equals(schema)) {
-            if (!Strings.CS.equals(schema, metadataSchema.getName())) {
+            if (!StringUtils.equals(schema, metadataSchema.getName())) {
                 // The namespace doesn't match
                 return false;
             }
@@ -552,11 +674,66 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         return true;
     }
 
-    protected void getAuthoritiesAndConfidences(String fieldKey, Collection collection, List<String> values,
-                                                List<String> authorities, List<Integer> confidences, int i) {
-        Choices c = choiceAuthorityService.getBestMatch(fieldKey, values.get(i), collection, null);
-        authorities.add(c.values.length > 0 ? c.values[0].authority : null);
-        confidences.add(c.confidence);
+    /**
+     * Utility method for pattern-matching metadata elements.  This
+     * method will return <code>true</code> if the given schema,
+     * element and qualifier match the schema, element,
+     * and qualifier of the <code>DCValue</code> object passed
+     * in.  Any or all of the element and qualifier passed
+     * in can be the <code>Item.ANY</code> wildcard.
+     *
+     * @param schema        the schema for the metadata field. <em>Must</em> match
+     *                      the <code>name</code> of an existing metadata schema.
+     * @param element       the element to match, or <code>Item.ANY</code>
+     * @param qualifier     the qualifier to match, or <code>Item.ANY</code>
+     * @param metadataValue the Dublin Core value
+     * @return <code>true</code> if there is a match
+     */
+    protected boolean match(String schema, String element, String qualifier, MetadataValue metadataValue) {
+
+        MetadataField metadataField = metadataValue.getMetadataField();
+        MetadataSchema metadataSchema = metadataField.getMetadataSchema();
+        // We will attempt to disprove a match - if we can't we have a match
+        if (!element.equals(Item.ANY) && !element.equals(metadataField.getElement())) {
+            // Elements do not match, no wildcard
+            return false;
+        }
+
+        if (StringUtils.isBlank(qualifier)) {
+            // Value must be unqualified
+            if (metadataField.getQualifier() != null) {
+                // Value is qualified, so no match
+                return false;
+            }
+        } else if (!qualifier.equals(Item.ANY)) {
+            // Not a wildcard, so qualifier must match exactly
+            if (!qualifier.equals(metadataField.getQualifier())) {
+                return false;
+            }
+        }
+
+        if (!schema.equals(Item.ANY)) {
+            if (metadataSchema != null && !metadataSchema.getName().equals(schema)) {
+                // The namespace doesn't match
+                return false;
+            }
+        }
+
+        // If we get this far, we have a match
+        return true;
+    }
+
+    protected void getAuthoritiesAndConfidences(String fieldKey, int dsoType, Collection collection,
+            List<String> values, List<String> authorities, List<Integer> confidences, int i) {
+        String locale = I18nUtil.getDefaultLocale().getLanguage();
+        if (dsoType == Constants.ITEM) {
+            Choices c = choiceAuthorityService.getBestMatch(fieldKey, values.get(i), dsoType, collection, locale);
+            authorities.add(c.values.length > 0 ? c.values[0].authority : null);
+            confidences.add(c.confidence);
+        } else {
+            authorities.add(null);
+            confidences.add(Choices.CF_UNSET);
+        }
     }
 
 
@@ -656,7 +833,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     // update both the place of the metadatum and the place of the Relationship.
                     // E.g. for an Author relationship,
                     //   the place should be updated using the same principle as dc.contributor.author.
-                    Strings.CS.startsWith(metadataValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)
+                    StringUtils.startsWith(metadataValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)
                         && metadataValue instanceof RelationshipMetadataValue
                         && ((RelationshipMetadataValue) metadataValue).isUseForPlace()
                 ) {
@@ -665,12 +842,15 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     String authority = metadataValue.getAuthority();
                     String relationshipId = StringUtils.split(authority, "::")[1];
                     Relationship relationship = relationshipService.find(context, Integer.parseInt(relationshipId));
-                    if (relationship.getLeftItem().equals(dso)) {
-                        relationship.setLeftPlace(mvPlace);
-                    } else {
-                        relationship.setRightPlace(mvPlace);
+
+                    if (relationship != null) {
+                        if (relationship.getLeftItem() == (Item) dso) {
+                            relationship.setLeftPlace(mvPlace);
+                        } else {
+                            relationship.setRightPlace(mvPlace);
+                        }
+                        relationshipService.update(context, relationship);
                     }
-                    relationshipService.update(context, relationship);
 
                 } else if (
                     // Otherwise, just set the place of the metadatum
@@ -678,7 +858,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     // This case is a leftover from when a Relationship is removed and copied to metadata.
                     // If we let its place change the order of any remaining Relationships will be affected.
                     // todo: this makes it so these leftover MDVs can't be reordered later on
-                    !Strings.CS.equals(
+                    !StringUtils.equals(
                         metadataValue.getMetadataField().getMetadataSchema().getName(), "relation"
                     )
                 ) {
@@ -727,6 +907,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 return new String[] {MetadataSchemaEnum.DC.getName(), "format", null};
             case "source":
                 return new String[] {MetadataSchemaEnum.DC.getName(), "source", null};
+            case "relationship":
+                return new String[] {"dspace", "entity", "type"};
             case "firstname":
                 return new String[] {"eperson", "firstname", null};
             case "lastname":
@@ -735,6 +917,14 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 return new String[] {"eperson", "phone", null};
             case "language":
                 return new String[] {"eperson", "language", null};
+            case "entity-type":
+                return new String[] { "dspace", "entity", "type" };
+            case "submission-type":
+                return new String[] { MetadataSchemaEnum.CRIS.getName(), "submission", "definition" };
+            case "workflow-name":
+                return new String[] { MetadataSchemaEnum.CRIS.getName(), "workflow", "name" };
+            case "shared-workspace":
+                return new String[] { MetadataSchemaEnum.CRIS.getName(), "workspace", "shared" };
             default:
                 return new String[] {null, null, null};
         }
@@ -848,6 +1038,16 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     }
 
     @Override
+    public void replaceSecuredMetadata(Context context, T dso, String schema, String element, String qualifier,
+        String lang, String value, String authority, int confidence, int index, Integer securityLevel)
+        throws SQLException {
+        List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
+        removeMetadataValues(context, dso, Arrays.asList(list.get(index)));
+        addAndShiftRightSecuredMetadata(context, dso, schema, element, qualifier, lang, value, authority, confidence,
+            index, securityLevel);
+    }
+
+    @Override
     public void setMetadataModified(T dso) {
         dso.setMetadataModified();
     }
@@ -858,6 +1058,108 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
         throw new NotImplementedException();
 
+    }
+
+    private boolean isNonValidAuthority(boolean authorityControlled, List<String> authorities) {
+        return !authorityControlled && authorities != null && authorities.size() > 0 && authorities.get(0) != null;
+    }
+
+    /**
+     * Returns all the metadata values filtered by the input language.
+     *
+     * @param metadataValues list of metadata values.
+     * @param language the language that must metadataValues filtered by.
+     *
+     * @return the metadata values
+     */
+    protected List<MetadataValue> getFilteredMetadataValuesByLanguage(List<MetadataValue> metadataValues,
+                                                                   String language) {
+        List<MetadataValue> matchedValues = new ArrayList<>();
+
+        if (language == null) {
+            for (MetadataValue value : metadataValues) {
+                if (value.getLanguage() == null) {
+                    matchedValues.add(value);
+                }
+            }
+        } else if (!language.equals(Item.ANY)) {
+            Locale[] locales = I18nUtil.getSupportedLocales();
+            Map<String, List<MetadataValue>> metadataMap =
+                metadataValues.stream().collect(Collectors.groupingBy(v -> v.getMetadataField().toString()));
+
+            for (Map.Entry<String, List<MetadataValue>> metadata : metadataMap.entrySet()) {
+                matchedValues.addAll(filterMetadataValuesByLanguage(language, locales, metadata.getValue()));
+            }
+        } else if (language.equals(Item.ANY)) {
+            matchedValues = metadataValues;
+        }
+        return matchedValues;
+    }
+
+    private List<MetadataValue> filterMetadataValuesByLanguage(String language, Locale [] locales,
+                                                               List<MetadataValue> metadataValues) {
+
+        List<MetadataValue> matchedValues;
+
+//        search for input language in supported locales
+//        then get metadata values contains language equal to input language
+        matchedValues = filterByLanguageInSupportedLocales(metadataValues, locales, language);
+
+        if (matchedValues.isEmpty()) {
+//            here input language not found in supported locales.
+//            so, check that input language contains '_' like 'en_US' , and search for first part 'en'
+            matchedValues = filterByLanguageInSupportedLocales(metadataValues, locales, language.split("_")[0]);
+        }
+
+        if (matchedValues.isEmpty()) {
+//            here input language not found in supported locales.
+//            so, search for metadata value has language equal to any supported locales language
+            for (Locale locale : locales) {
+                matchedValues = filterByLanguage(metadataValues, locale.getLanguage());
+                if (!matchedValues.isEmpty()) {
+                    break;
+                }
+            }
+        }
+
+        if (matchedValues.isEmpty()) {
+//            here input language not found in supported locales.
+//            and no metadata value has language equal to any supported locales language was found
+//            so, will search for metadata value with language equal to input language
+            matchedValues = filterByLanguage(metadataValues, language);
+        }
+
+        if (matchedValues.isEmpty()) {
+//            here no matching found so, will return all metadata values
+            return metadataValues;
+        }
+
+        return matchedValues;
+    }
+
+    private List<MetadataValue> filterByLanguageInSupportedLocales(List<MetadataValue> metadataValues,
+                                                                   Locale[] locales, String language) {
+
+        List<MetadataValue> matchedValues = new ArrayList<>();
+
+        for (Locale locale : locales) {
+            if (locale.getLanguage().equals(language)) {
+                matchedValues = filterByLanguage(metadataValues, language);
+            }
+        }
+        return matchedValues;
+    }
+
+    private List<MetadataValue> filterByLanguage(List<MetadataValue> metadataValues, String language) {
+
+        List<MetadataValue> matchedValues = new ArrayList<>();
+
+        for (MetadataValue value : metadataValues) {
+            if (value.getLanguage() != null && value.getLanguage().equals(language)) {
+                matchedValues.add(value);
+            }
+        }
+        return matchedValues;
     }
 
 }

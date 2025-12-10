@@ -27,12 +27,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.RelationshipType;
 import org.dspace.content.authority.service.MetadataAuthorityService;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.RelationshipService;
-import org.dspace.content.service.RelationshipTypeService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.services.ConfigurationService;
@@ -68,12 +65,6 @@ public class MetadataValidator implements SubmissionStepValidator {
 
     private String name;
 
-    private final RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance()
-                                                                                         .getRelationshipTypeService();
-
-    private final RelationshipService relationshipService = ContentServiceFactory.getInstance()
-                                                                                 .getRelationshipService();
-
     @Override
     public List<ValidationError> validate(Context context, InProgressSubmission<?> obj, SubmissionStepConfig config) {
 
@@ -88,8 +79,9 @@ public class MetadataValidator implements SubmissionStepValidator {
         for (DCInput[] row : inputConfig.getFields()) {
             for (DCInput input : row) {
                 String fieldKey = metadataAuthorityService.makeFieldKey(input.getSchema(), input.getElement(),
-                                                                        input.getQualifier());
-                boolean isAuthorityControlled = metadataAuthorityService.isAuthorityControlled(fieldKey);
+                        input.getQualifier());
+                boolean isAuthorityControlled = metadataAuthorityService.isAuthorityAllowed(fieldKey, Constants.ITEM,
+                        obj.getCollection());
 
                 List<String> fieldsName = new ArrayList<String>();
                 if (input.isQualdropValue()) {
@@ -98,19 +90,19 @@ public class MetadataValidator implements SubmissionStepValidator {
                     //starting from the second element of the list and skipping one every time because the display
                     // values are also in the list and before the stored values.
                     for (int i = 1; i < inputPairs.size(); i += 2) {
-                        String fullFieldname = input.getFieldName() + "." + inputPairs.get(i);
+                        String fullFieldname = input.getFieldName() + "." + (String) inputPairs.get(i);
                         List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fullFieldname);
 
                         // Check the lookup list. If no other inputs of the same field name allow this type,
                         // then remove. This includes field name without qualifier.
-                        if (!input.isAllowedFor(documentType) && (!allowedFieldNames.contains(fullFieldname)
-                            && !allowedFieldNames.contains(input.getFieldName()))) {
+                        if (!input.isAllowedFor(documentType) &&  (!allowedFieldNames.contains(fullFieldname)
+                                && !allowedFieldNames.contains(input.getFieldName()))) {
                             removeMetadataValues(context, obj.getItem(), mdv);
                         } else {
                             validateMetadataValues(obj.getCollection(), mdv, input, config, isAuthorityControlled,
-                                                   fieldKey, errors);
+                                fieldKey, errors);
                             if (mdv.size() > 0 && (input.isVisible(DCInput.SUBMISSION_SCOPE) ||
-                                input.isVisible(DCInput.WORKFLOW_SCOPE))) {
+                                    input.isVisible(DCInput.WORKFLOW_SCOPE))) {
                                 foundResult = true;
                             }
                         }
@@ -118,8 +110,8 @@ public class MetadataValidator implements SubmissionStepValidator {
                     if (input.isRequired() && !foundResult) {
                         // for this required qualdrop no value was found, add to the list of error fields
                         addError(errors, ERROR_VALIDATION_REQUIRED,
-                                 "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                                     input.getFieldName());
+                            "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                                input.getFieldName());
                     }
 
                 } else {
@@ -139,70 +131,34 @@ public class MetadataValidator implements SubmissionStepValidator {
                             removeMetadataValues(context, obj.getItem(), mdv);
                             valuesRemoved = true;
                             log.debug("Stripping metadata values for " + input.getFieldName() + " on type "
-                                          + documentType + " as it is allowed by another input of the same field " +
-                                          "name");
+                                    + documentType + " as it is allowed by another input of the same field " +
+                                    "name");
                         } else {
                             log.debug("Not removing unallowed metadata values for " + input.getFieldName() + " on type "
-                                          + documentType + " as it is allowed by another input of the same field " +
-                                          "name");
+                                    + documentType + " as it is allowed by another input of the same field " +
+                                    "name");
                         }
                     }
                     validateMetadataValues(obj.getCollection(), mdv, input, config,
-                                           isAuthorityControlled, fieldKey, errors);
+                        isAuthorityControlled, fieldKey, errors);
                     if ((input.isRequired() && mdv.size() == 0)
-                        && (input.isVisible(DCInput.SUBMISSION_SCOPE)
-                        || (obj instanceof WorkflowItem && input.isVisible(DCInput.WORKFLOW_SCOPE)))
-                        && !valuesRemoved) {
+                            && (input.isVisible(DCInput.SUBMISSION_SCOPE)
+                            || (obj instanceof WorkflowItem && input.isVisible(DCInput.WORKFLOW_SCOPE)))
+                            && !valuesRemoved) {
                         // Is the input required for *this* type? In other words, are we looking at a required
                         // input that is also allowed for this document type
                         if (input.isAllowedFor(documentType)) {
                             // since this field is missing add to list of error
                             // fields
                             addError(errors, ERROR_VALIDATION_REQUIRED,
-                                     "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                                         input.getFieldName());
+                                "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                                    input.getFieldName());
                         }
                     }
                 }
-                relationshipRequiredFieldCheck(context, obj.getItem(), input, errors,
-                                               config);
             }
         }
         return errors;
-    }
-
-    /**
-     * Checks if the relation type exists on the item. If not, sets the error state.
-     *
-     * @param context the current context
-     * @param item    item in the submission
-     * @param input   input field
-     * @param errors  List holding all errors
-     * @param config  submission step config
-     * @throws SQLException
-     */
-    private void relationshipRequiredFieldCheck(Context context, Item item, DCInput input, List<ValidationError> errors,
-                                                SubmissionStepConfig config) {
-        if (input.isRelationshipField() && input.isRequired()) {
-            String relationshipType = input.getRelationshipType();
-            if (itemService.getMetadataByMetadataString(item, "relation." + relationshipType).isEmpty()) {
-                try {
-                    List<RelationshipType> relationTypes =
-                        relationshipTypeService.findByLeftwardOrRightwardTypeName(context, relationshipType);
-                    for (RelationshipType relationType : relationTypes) {
-                        if (!relationshipService.findByItemAndRelationshipType(context, item, relationType).isEmpty()) {
-                            return;
-                        }
-                    }
-                } catch (SQLException e) {
-                    throw new SQLRuntimeException(e);
-                }
-
-                addError(errors, ERROR_VALIDATION_REQUIRED,
-                         "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                             input.getFieldName());
-            }
-        }
     }
 
     private DCInputSet getDCInputSet(SubmissionStepConfig config) {
@@ -214,29 +170,28 @@ public class MetadataValidator implements SubmissionStepValidator {
     }
 
     private void validateMetadataValues(Collection collection, List<MetadataValue> metadataValues, DCInput input,
-                                        SubmissionStepConfig config, boolean isAuthorityControlled, String fieldKey,
-                                        List<ValidationError> errors) {
+        SubmissionStepConfig config, boolean isAuthorityControlled, String fieldKey, List<ValidationError> errors) {
         // if the filed is not repeatable, it should have only one value
         if (!input.isRepeatable() && metadataValues.size() > 1) {
             for (int i = 0; i < metadataValues.size(); i++) {
                 addError(errors, ERROR_VALIDATION_NOT_REPEATABLE,
-                         "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" + input.getFieldName() + "/" + i);
+                        "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" + input.getFieldName() + "/" + i);
             }
         }
 
         for (MetadataValue md : metadataValues) {
-            if (!(input.validate(md.getValue()))) {
+            if (! (input.validate(md.getValue()))) {
                 addError(errors, ERROR_VALIDATION_REGEX,
-                         "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                             input.getFieldName() + "/" + md.getPlace());
+                    "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                        input.getFieldName() + "/" + md.getPlace());
             }
             if (isAuthorityControlled) {
                 String authKey = md.getAuthority();
-                if (metadataAuthorityService.isAuthorityRequired(fieldKey) &&
+                if (metadataAuthorityService.isAuthorityRequired(md.getMetadataField(), Constants.ITEM, collection) &&
                     StringUtils.isBlank(authKey)) {
                     addError(errors, ERROR_VALIDATION_AUTHORITY_REQUIRED,
-                             "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() +
-                                 "/" + input.getFieldName() + "/" + md.getPlace());
+                        "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() +
+                            "/" + input.getFieldName() + "/" + md.getPlace());
                 }
             }
         }

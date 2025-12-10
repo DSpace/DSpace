@@ -69,13 +69,13 @@ public class CrisConsumer implements Consumer {
     private final static String ITEM_CREATION_MSG = "Creation of item with dspace.entity.type = {} related to item {}";
 
     private final static String NO_COLLECTION_FOUND_MSG = "No collection found with dspace.entity.type = {} "
-        + "for item = {}. No related item will be created.";
+            + "for item = {}. No related item will be created.";
 
     private final static String NO_ITEM_FOUND_BY_AUTHORITY_MSG = "No related item found by authority {}";
 
-    private static final Logger log = LogManager.getLogger(CrisConsumer.class);
+    private static Logger log = LogManager.getLogger(CrisConsumer.class);
 
-    private final Set<Item> itemsAlreadyProcessed = new HashSet<Item>();
+    private Set<Item> itemsAlreadyProcessed = new HashSet<Item>();
 
     private ChoiceAuthorityService choiceAuthorityService;
 
@@ -208,7 +208,11 @@ public class CrisConsumer implements Consumer {
             return true;
         }
 
-        return isBlank(authority) && (isBlank(metadata.getValue()) || isMetadataWithEmptyAuthoritySkippable(metadata));
+        if (isBlank(authority) && (isBlank(metadata.getValue()) || isMetadataWithEmptyAuthoritySkippable(metadata))) {
+            return true;
+        }
+
+        return false;
 
     }
 
@@ -264,15 +268,15 @@ public class CrisConsumer implements Consumer {
     }
 
     private Item buildRelatedItem(Context context, Item item, Collection collection, MetadataValue metadata,
-                                  String entityType, String crisSourceId) throws Exception {
+        String entityType, String crisSourceId) throws Exception {
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, useOfTemplate(metadata));
         Item relatedItem = workspaceItem.getItem();
         itemService.addMetadata(context, relatedItem, CRIS.getName(), "sourceId", null, null, crisSourceId);
         if (!hasEntityType(relatedItem, entityType)) {
             log.error("Inconstent configuration the related item " + relatedItem.getID().toString() + ", created from "
-                          + item.getID().toString() + " (" + metadata.getMetadataField().toString('.') + ")"
-                          + " hasn't the expected [" + entityType + "] entityType");
+                + item.getID().toString() + " (" + metadata.getMetadataField().toString('.') + ")"
+                + " hasn't the expected [" + entityType + "] entityType");
         }
 
         if (isSubmissionEnabled(metadata)) {
@@ -313,7 +317,7 @@ public class CrisConsumer implements Consumer {
     private boolean useOfTemplate(MetadataValue value) {
 
         String useOfTemplateByMetadata = "cris.import.submission.enabled.entity."
-            + getFieldKey(value) + ".use-template";
+                + getFieldKey(value) + ".use-template";
         if (configurationService.hasProperty(useOfTemplateByMetadata)) {
             return configurationService.getBooleanProperty(useOfTemplateByMetadata);
         }
