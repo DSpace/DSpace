@@ -1,0 +1,319 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Cris Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>cris</name>
+        <namespace>https://www.4science.it/dspace-cris/</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>sourceId</element>
+        <qualifier></qualifier>
+        <scope_note>Used by the cris consumer to store the source that has originated the item</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>policy</element>
+        <qualifier>eperson</qualifier>
+        <scope_note>Default metadata for custom policies rule</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>policy</element>
+        <qualifier>group</qualifier>
+        <scope_note>Default metadata for custom policies rule</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>submission</element>
+        <qualifier>definition</qualifier>
+        <scope_note>Metadata to link a collection with a submission type</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>submission</element>
+        <qualifier>definition-correction</qualifier>
+        <scope_note>Metadata to link a collection with a correction submission type</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>workflow</element>
+        <qualifier>name</qualifier>
+        <scope_note>Metadata to link a collection with a workflow type</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>email</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>preTransform</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>postTransform</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>itemValidationEnabled</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>recordValidationEnabled</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>forceSynchronization</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>ccAddress</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>identifier</element>
+        <qualifier>gscholar</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>workspace</element>
+        <qualifier>shared</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>author</element>
+        <qualifier>scopus-author-id</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>author</element>
+        <qualifier>orcid</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>author</element>
+        <qualifier>rid</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>legacyId</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>virtual</element>
+        <qualifier>department</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>virtual</element>
+        <qualifier>orcid</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>virtualsource</element>
+        <qualifier>department</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>virtualsource</element>
+        <qualifier>orcid</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>cms</element>
+        <qualifier>home-header</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>cms</element>
+        <qualifier>home-news</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>cms</element>
+        <qualifier>footer</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>customurl</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>customurl</element>
+        <qualifier>old</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>lastimport</element>
+        <qualifier>ads</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>lastimport</element>
+        <qualifier>loader-ads</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>lastimport</element>
+        <qualifier>scopus</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>lastimport</element>
+        <qualifier>scopus-person</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>lastimport</element>
+        <qualifier>scopus-publication</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>lastimport</element>
+        <qualifier>wos</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>lastimport</element>
+        <qualifier>wos-person</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>lastimport</element>
+        <qualifier>wos-publication</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>lastimport</element>
+        <qualifier>loader-pubmed</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>lastimport</element>
+        <qualifier>loader-pubmedeu</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>lastimport</element>
+        <qualifier>loader-scopus</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>entity</element>
+        <qualifier>style</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>virtual</element>
+        <qualifier>journalance</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>virtualsource</element>
+        <qualifier>journalance</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>curation</element>
+        <qualifier>process</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>curation</element>
+        <qualifier>history</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+</dspace-dc-types>

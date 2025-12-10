@@ -56,6 +56,7 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     public static final String DEFAULT = "local";
     final static String CHOICES_EXTERNALSOURCE_PREFIX = "choises.externalsource.";
     private static final Logger log = LogManager.getLogger(ItemAuthority.class);
+
     protected DSpace dspace = new DSpace();
 
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
@@ -210,13 +211,13 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
         return configurationService.getProperty("cris.ItemAuthority." + authorityName + ".entityType");
     }
 
+    public void setPluginInstanceName(String name) {
+        authorityName = name;
+    }
+
     @Override
     public String getPluginInstanceName() {
         return authorityName;
-    }
-
-    public void setPluginInstanceName(String name) {
-        authorityName = name;
     }
 
     /**

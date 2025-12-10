@@ -20,18 +20,23 @@ public interface EventService {
 
     // The name of the default dispatcher assigned to every new context unless
     // overridden
-    public static final String DEFAULT_DISPATCHER = "default";
+    String DEFAULT_DISPATCHER = "default";
 
     /**
      * Get dispatcher for configuration named by "name". Returns cached instance
      * if one exists.
      *
      * @param name dispatcher name
-     * @return cached instance of dispatcher
+     * @return chached instance of dispatcher
      */
-    public Dispatcher getDispatcher(String name);
+    Dispatcher getDispatcher(String name);
 
-    public void returnDispatcher(String key, Dispatcher disp);
+    void returnDispatcher(String key, Dispatcher disp);
 
-    public int getConsumerIndex(String consumerClass);
+    int getConsumerIndex(String consumerClass);
+
+    /**
+     * Reload the dispatcher configuration.
+     */
+    void reloadConfiguration();
 }

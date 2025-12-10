@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dspace.core.NameAwarePlugin;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Plugin interface that supplies an authority control mechanism for
@@ -21,6 +23,17 @@ import org.dspace.core.NameAwarePlugin;
  * @see MetadataAuthorityServiceImpl
  */
 public interface ChoiceAuthority extends NameAwarePlugin {
+
+    /**
+     *
+     * @return
+     */
+    default boolean isPublic() {
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String authorityName = getPluginInstanceName();
+        return configurationService.getBooleanProperty("authority." + authorityName + ".public");
+    }
+
     /**
      * Get all values from the authority that match the preferred value.
      * Note that the offering was entered by the user and may contain
@@ -41,7 +54,7 @@ public interface ChoiceAuthority extends NameAwarePlugin {
      * @param locale     explicit localization key if available, or null
      * @return a Choices object (never null).
      */
-    public Choices getMatches(String text, int start, int limit, String locale);
+    Choices getMatches(String text, int start, int limit, String locale);
 
     /**
      * Get the single "best" match (if any) of a value in the authority
@@ -56,7 +69,7 @@ public interface ChoiceAuthority extends NameAwarePlugin {
      * @param locale     explicit localization key if available, or null
      * @return a Choices object (never null) with 1 or 0 values.
      */
-    public Choices getBestMatch(String text, String locale);
+    Choices getBestMatch(String text, String locale);
 
     /**
      * Get the canonical user-visible "label" (i.e. short descriptive text)
@@ -70,7 +83,7 @@ public interface ChoiceAuthority extends NameAwarePlugin {
      * @param locale explicit localization key if available, or null
      * @return descriptive label - should always return something, never null.
      */
-    public String getLabel(String key, String locale);
+    String getLabel(String key, String locale);
 
     /**
      * Get the canonical value to store for a key in the authority. Can be localized
@@ -131,14 +144,14 @@ public interface ChoiceAuthority extends NameAwarePlugin {
      * Build the preferred choice associated with the authKey. The default
      * implementation delegate the creato to the {@link #getLabel(String, String)}
      * {@link #getValue(String, String)} and {@link #getExtra(String, String)}
-     * methods but can be directly overridden for better efficiency or special
+     * methods but can be directly overriden for better efficiency or special
      * scenario
      * 
      * @param authKey authority key known to this authority.
      * @param locale  explicit localization key if available, or null
      * @return the preferred choice for this authKey and locale
      */
-    default public Choice getChoice(String authKey, String locale) {
+    default Choice getChoice(String authKey, String locale) {
         Choice result = new Choice();
         result.authority = authKey;
         result.label = getLabel(authKey, locale);
@@ -156,7 +169,7 @@ public interface ChoiceAuthority extends NameAwarePlugin {
      * @return <code>true</code> if the authority provided in any choice of this
      *         authority should be stored in the metadata value
      */
-    default public boolean storeAuthorityInMetadata() {
+    default boolean storeAuthorityInMetadata() {
         return true;
     }
 }
