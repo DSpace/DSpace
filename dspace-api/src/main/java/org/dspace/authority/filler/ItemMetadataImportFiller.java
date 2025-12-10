@@ -41,17 +41,19 @@ public class ItemMetadataImportFiller implements AuthorityImportFiller {
     private final static String MISSING_METADATA_FOR_POSITION_MSG = "Missing metadata {} for position {} in item {}";
 
     private static final Logger log = LogManager.getLogger(ItemMetadataImportFiller.class);
-    private boolean allowsUpdateByDefault = false;
-    private Map<String, MetadataConfiguration> configurations;
-    private ItemService itemService;
 
     public static final boolean isPlaceholderMetadataValue(String metadataValue) {
         return StringUtils.equals(metadataValue, CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE);
     }
-
     private static final boolean isNotPlaceholder(MetadataValue metadataValue) {
         return !isPlaceholderMetadataValue(metadataValue.getValue());
     }
+
+    private boolean allowsUpdateByDefault = false;
+
+    private Map<String, MetadataConfiguration> configurations;
+
+    private ItemService itemService;
 
     @Override
     public boolean allowsUpdate(Context context, MetadataValue metadata, Item itemToFill) {

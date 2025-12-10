@@ -48,9 +48,9 @@ public interface AuthorityImportFiller {
     /**
      * Return a list of metadata using the given metadata of a source item.
      *
-     * @param context     the context
-     * @param relatedItem the source metadata
-     * @param metadata    the source metadata related to the list to return
+     * @param context        the context
+     * @param relatedItem    the source metadata
+     * @param metadata       the source metadata related to the list to return
      * @throws SQLException if an error occurs during the metadata addition
      */
     List<MetadataValueDTO> getMetadataListByRelatedItemAndMetadata(Context context, Item relatedItem,
