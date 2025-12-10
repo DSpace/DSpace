@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -25,9 +26,11 @@ import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.orcid.MockOrcid;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.authority.DCInputAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -45,7 +48,10 @@ import org.springframework.context.ApplicationContext;
 public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    ConfigurationService configurationService;
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private MetadataAuthorityService metadataAuthorityService;
 
     @Autowired
     private SubmissionFormRestRepository submissionFormRestRepository;
@@ -489,4 +495,51 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                         .param("entryID", "VR131402"))
                         .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void shouldReturnPrefixedAuthorityForHierarchicalSuggestions() throws Exception {
+
+        String vocabularyName = "srsc";
+
+        configurationService.setProperty("authority.controlled.dc.subject", true);
+
+        configurationService.setProperty("vocabulary.plugin.authority.store", true);
+        configurationService.setProperty("vocabulary.plugin." + vocabularyName + ".hierarchy.store", true);
+        configurationService.setProperty("vocabulary.plugin." + vocabularyName + ".hierarchy.suggest", true);
+        configurationService.setProperty("vocabulary.plugin." + vocabularyName + ".delimiter", "::");
+
+        pluginService.clearNamedPluginClasses();
+        cas.clearCache();
+        metadataAuthorityService.clearCache();
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Test collection")
+                                           .withEntityType("Publication")
+                                           .build();
+
+        ItemBuilder.createItem(context, col1)
+                   .withTitle("Publication title 2")
+                   .withSubject("committed relationships")
+                   .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+
+        getClient(tokenAdmin).perform(get("/api/submission/vocabularies/" + vocabularyName + "/entries")
+                .param("metadata", "dc.subject")
+                .param("collection", col1.getID().toString())
+                .param("filter", "human"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.entries[2]", Matchers.allOf(
+                        hasJsonPath("$.authority", is(vocabularyName + ":SCB119")),
+                        // now the display value with suggestions
+                        hasJsonPath("$.display", is("HUMANITIES and RELIGION::Other humanities and religion")),
+                        hasJsonPath("$.value", is("HUMANITIES and RELIGION::Other humanities and religion"))
+                        )));
+    }
+
 }
