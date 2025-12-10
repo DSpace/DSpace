@@ -1632,8 +1632,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Collection collection = CollectionBuilder.createCollection(context, community)
             .withName("Collection")
-            // collection has dspace.entity.type = Person
-            .withEntityType("Person")
+            .withEntityType("Publication")
             .build();
 
         Item v1 = ItemBuilder.createItem(context, collection)

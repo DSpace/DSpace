@@ -26,6 +26,20 @@
     <bean id="solrServiceResourceIndexPlugin" class="org.dspace.discovery.SolrServiceResourceRestrictionPlugin" scope="prototype"/>
     <alias name="solrServiceResourceIndexPlugin" alias="org.dspace.discovery.SolrServiceResourceRestrictionPlugin"/>
 
+    <bean id="itemAuthorityLookupIndexPlugin" class="org.dspace.discovery.ItemAuthorityLookupIndexPlugin">
+        <property name="additionalFields">
+            <list>
+                <value>crisrp.name</value>
+                <value>person.name.variant</value>
+                <value>person.name.translated</value>
+                <value>person.givenName</value>
+                <value>person.familyName</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="solrServiceBestMatchIndexingPlugin" class="org.dspace.discovery.SolrServiceBestMatchIndexingPlugin"/>
+    <bean id="solrServiceBestMatchStrictIndexingPlugin"
+          class="org.dspace.discovery.SolrServiceStrictBestMatchIndexingPlugin"/>
     <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
     <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">
         <property name="map">

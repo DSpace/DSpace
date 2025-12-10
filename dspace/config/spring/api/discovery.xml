@@ -33,6 +33,36 @@
     <bean id="SolrServiceIndexCollectionSubmittersPlugin" class="org.dspace.discovery.SolrServiceIndexCollectionSubmittersPlugin" scope="prototype"/>
     <bean id="SolrServiceIndexItemEditorsPlugin" class="org.dspace.discovery.SolrServiceIndexItemEditorsPlugin" scope="prototype"/>
     <bean id="solrServiceCustomUrlIndexPlugin" class="org.dspace.discovery.SolrServiceCustomUrlIndexPlugin"/>
+    <bean id="itemAuthorityLookupIndexPlugin" class="org.dspace.discovery.ItemAuthorityLookupIndexPlugin">
+        <property name="additionalFields">
+            <list>
+                <value>crisrp.name</value>
+                <value>person.name.variant</value>
+                <value>person.name.translated</value>
+                <value>person.givenName</value>
+                <value>person.familyName</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="objectNameIndexPlugin" class="org.dspace.discovery.ObjectNameIndexPlugin">
+        <property name="fields">
+            <list>
+                <value>dc.title</value>
+                <value>crisrp.name</value>
+                <value>person.name.variant</value>
+                <value>person.name.translated</value>
+                <value>crisrp.fullName</value>
+                <value>crisproject.title</value>
+                <value>crisou.name</value>
+                <value>unibe.document.title</value>
+                <value>crisdo.name</value>
+                <value>crisfunding.fundingname</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="solrServiceBestMatchIndexingPlugin" class="org.dspace.discovery.SolrServiceBestMatchIndexingPlugin"/>
+    <bean id="solrServiceBestMatchStrictIndexingPlugin"
+          class="org.dspace.discovery.SolrServiceStrictBestMatchIndexingPlugin"/>
 
     <alias name="solrServiceResourceIndexPlugin" alias="org.dspace.discovery.SolrServiceResourceRestrictionPlugin"/>
 
@@ -2317,7 +2347,7 @@
             </list>
         </property>
     </bean>
-    
+
     <bean id="NOTIFY.incoming" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
         <property name="id" value="NOTIFY.incoming"/>
         <property name="defaultFilterQueries">
@@ -2328,7 +2358,7 @@
             </list>
         </property>
     </bean>
-    
+
     <bean id="NOTIFY.incoming.accepted" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.incoming">
         <property name="id" value="NOTIFY.incoming.accepted"/>
         <property name="defaultFilterQueries">
@@ -2342,7 +2372,7 @@
             </list>
         </property>
     </bean>
-    
+
     <bean id="NOTIFY.incoming.processed" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.incoming">
         <property name="id" value="NOTIFY.incoming.processed"/>
         <property name="defaultFilterQueries">
@@ -2354,7 +2384,7 @@
             </list>
         </property>
     </bean>
-    
+
     <bean id="NOTIFY.incoming.failure" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.incoming">
         <property name="id" value="NOTIFY.incoming.failure"/>
         <property name="defaultFilterQueries">
@@ -2366,7 +2396,7 @@
             </list>
         </property>
     </bean>
-    
+
     <bean id="NOTIFY.incoming.untrusted" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.incoming">
         <property name="id" value="NOTIFY.incoming.untrusted"/>
         <property name="defaultFilterQueries">
@@ -2378,7 +2408,7 @@
             </list>
         </property>
     </bean>
-    
+
     <bean id="NOTIFY.incoming.involvedItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="administrativeView">
         <property name="id" value="NOTIFY.incoming.involvedItems"/>
         <property name="defaultFilterQueries">
@@ -2390,7 +2420,7 @@
             </list>
         </property>
     </bean>
-    
+
     <bean id="NOTIFY.outgoing" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
         <property name="id" value="NOTIFY.outgoing"/>
         <property name="defaultFilterQueries">
@@ -2401,7 +2431,7 @@
             </list>
         </property>
     </bean>
-    
+
     <bean id="NOTIFY.outgoing.delivered" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.outgoing">
         <property name="id" value="NOTIFY.outgoing.delivered"/>
         <property name="defaultFilterQueries">
@@ -2413,7 +2443,7 @@
             </list>
         </property>
     </bean>
-    
+
     <bean id="NOTIFY.outgoing.queued" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.outgoing">
         <property name="id" value="NOTIFY.outgoing.queued"/>
         <property name="defaultFilterQueries">
@@ -2425,7 +2455,7 @@
             </list>
         </property>
     </bean>
-    
+
     <bean id="NOTIFY.outgoing.queued_for_retry" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.outgoing">
         <property name="id" value="NOTIFY.outgoing.queued_for_retry"/>
         <property name="defaultFilterQueries">
@@ -2437,7 +2467,7 @@
             </list>
         </property>
     </bean>
-    
+
     <bean id="NOTIFY.outgoing.failure" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.outgoing">
         <property name="id" value="NOTIFY.outgoing.failure"/>
         <property name="defaultFilterQueries">
@@ -2449,7 +2479,7 @@
             </list>
         </property>
     </bean>
-    
+
     <bean id="NOTIFY.outgoing.involvedItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="administrativeView">
         <property name="id" value="NOTIFY.outgoing.involvedItems"/>
         <property name="defaultFilterQueries">
@@ -3367,7 +3397,7 @@
         <property name="isOpenByDefault" value="true"/>
         <property name="pageSize" value="10"/>
     </bean>
-    
+
     <bean id="searchFilterNotifyLastStartTime" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="queue_last_start_time"/>
         <property name="metadataFields">
