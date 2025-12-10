@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -30,6 +32,7 @@ import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -304,7 +307,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             Item item = (Item) bitstreamService.getParentObject(context, bitstream);
             final InputStream inputStream = bitstreamService.retrieve(context, bitstream);
             try {
-                sourceDocument = sourceDocument.load(inputStream);
+                sourceDocument = Loader.loadPDF(new RandomAccessReadBuffer(inputStream));
             } finally {
                 inputStream.close();
             }
@@ -335,9 +338,10 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             int xwidth = 550;
             int ygap = 20;
 
-            PDFont fontHelvetica = PDType1Font.HELVETICA;
-            PDFont fontHelveticaBold = PDType1Font.HELVETICA_BOLD;
-            PDFont fontHelveticaOblique = PDType1Font.HELVETICA_OBLIQUE;
+            PDFont fontHelvetica = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+            PDFont fontHelveticaBold = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
+            PDFont fontHelveticaOblique = new PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE);
+
             contentStream.setNonStrokingColor(Color.BLACK);
 
             String[][] content = {header1};
