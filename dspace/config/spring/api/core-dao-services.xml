@@ -34,6 +34,7 @@
 
     <bean class="org.dspace.content.dao.impl.ProcessDAOImpl"/>
 
+    <bean class="org.dspace.deduplication.dao.impl.DeduplicationDAOImpl"/>
     <bean class="org.dspace.alerts.dao.impl.SystemWideAlertDAOImpl"/>
 
     <bean class="org.dspace.eperson.dao.impl.EPersonDAOImpl"/>
@@ -64,12 +65,29 @@
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.WorkflowItemRoleDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.XmlWorkflowItemDAOImpl"/>
     <bean class="org.dspace.statistics.export.dao.impl.OpenURLTrackerDAOImpl"/>
- 	
+
+    <bean class="org.dspace.batch.dao.impl.ImpBitstreamDAOImpl"/>
+    <bean class="org.dspace.batch.dao.impl.ImpMetadatavalueDAOImpl"/>
+    <bean class="org.dspace.batch.dao.impl.ImpRecordDAOImpl"/>
+    <bean class="org.dspace.batch.dao.impl.ImpBitstreamMetadatavalueDAOImpl"/>
+    <bean class="org.dspace.batch.dao.impl.ImpWorkflowNStateDAOImpl"/>
+
+    <!-- Configurable layout DAO -->
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutTabDAOImpl"/>
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutBoxDAOImpl"/>
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutFieldDAOImpl"/>
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutMetadataGroupDAOImpl"/>
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutMetric2BoxDAOImpl"/>
+
+    <bean class="org.dspace.app.metrics.dao.CrisMetricsDAOImpl"/>
+
     <bean class="org.dspace.orcid.dao.impl.OrcidQueueDAOImpl" />
     <bean class="org.dspace.orcid.dao.impl.OrcidHistoryDAOImpl" />
+    <bean class="org.dspace.orcid.dao.impl.OrcidTokenDAOImpl"/>
 
     <bean class="org.dspace.supervision.dao.impl.SupervisionOrderDaoImpl"/>
 
+    <bean class="org.dspace.content.dao.impl.ItemForMetadataEnhancementUpdateDAOImpl"/>
     <bean class="org.dspace.app.ldn.dao.impl.NotifyServiceDaoImpl"/>
     <bean class="org.dspace.app.ldn.dao.impl.NotifyServiceInboundPatternDaoImpl"/>
     <bean class="org.dspace.app.ldn.dao.impl.LDNMessageDaoImpl"/>

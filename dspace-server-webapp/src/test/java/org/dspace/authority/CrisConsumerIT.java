@@ -7,6 +7,7 @@
  */
 package org.dspace.authority;
 
+import static java.util.Arrays.asList;
 import static java.util.UUID.fromString;
 import static org.dspace.app.matcher.MetadataValueMatcher.with;
 import static org.dspace.content.authority.Choices.CF_ACCEPTED;
