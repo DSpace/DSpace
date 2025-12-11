@@ -11,8 +11,13 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.factory.UtilServiceFactory;
+import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -42,6 +47,8 @@ public abstract class AbstractCurationTask implements CurationTask {
     protected ItemService itemService;
     protected HandleService handleService;
     protected ConfigurationService configurationService;
+    protected DSpaceObjectUtils dspaceObjectUtils;
+    private static final Logger log = LogManager.getLogger();
 
     @Override
     public void init(Curator curator, String taskId) throws IOException {
@@ -51,6 +58,7 @@ public abstract class AbstractCurationTask implements CurationTask {
         itemService = ContentServiceFactory.getInstance().getItemService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        dspaceObjectUtils = UtilServiceFactory.getInstance().getDSpaceObjectUtils();
     }
 
     @Override
@@ -167,8 +175,24 @@ public abstract class AbstractCurationTask implements CurationTask {
      * @throws IOException if IO error
      */
     protected DSpaceObject dereference(Context ctx, String id) throws IOException {
+        // the identifier can be a handle or uuid. Try handle first
         try {
-            return handleService.resolveToObject(ctx, id);
+            DSpaceObject dso = handleService.resolveToObject(ctx, id);
+            // if the id did not resolve to a handle, check if it is a uuid
+            if (dso == null) {
+                UUID uuid = null;
+                try {
+                    uuid = UUID.fromString(id);
+                } catch (IllegalArgumentException iae) {
+                    // no uuid, nothing to do here.
+                    log.debug("ID {} is not a valid UUID", id);
+                }
+                if (uuid != null) {
+                    dso = dspaceObjectUtils.findDSpaceObject(ctx, uuid);
+                }
+            }
+            // dso is either null or a DSpaceObject
+            return dso;
         } catch (SQLException sqlE) {
             throw new IOException(sqlE.getMessage(), sqlE);
         }
