@@ -273,6 +273,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
                             getIdentifiers(context, bitstream)));
             bitstream.clearModified();
             bitstream.clearDetails();
+            bitstream.clearMetadataEventDetails();
         }
 
         bitstreamDAO.save(context, bitstream);
