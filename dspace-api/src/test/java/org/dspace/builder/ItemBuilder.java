@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.time.Period;
-import java.util.Date;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
@@ -162,8 +161,12 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
                                 CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE);
     }
 
-    public ItemBuilder withEditor(final String editorName, final String authority) {
-        return addMetadataValue(item, DC.getName(), "contributor", "editor", null, editorName, authority, 600);
+    public ItemBuilder withISSN(String issn) {
+        return addMetadataValue(item, "dc", "identifier", "issn", issn);
+    }
+
+    public ItemBuilder withISBN(String isbn) {
+        return addMetadataValue(item, "dc", "identifier", "isbn", isbn);
     }
 
     public ItemBuilder withEditorAffiliation(String affiliation) {
@@ -252,17 +255,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
                                     final String authority,
                                     final int confidence) {
         return addMetadataValue(item, schema, element, qualifier, language, value, authority, confidence);
-    }
-
-    public ItemBuilder withSecuredMetadata(String schema, String element, String qualifier,
-                                           String value, Integer securityLevel) {
-        return addSecuredMetadataValue(item, schema, element, qualifier, value, securityLevel);
-    }
-
-    public ItemBuilder withSecuredMetadata(String schema, String element, String qualifier, String language,
-                                           String value, String authority, int confidence, Integer securityLevel) {
-        return addSecuredMetadataValue(item, schema, element, qualifier, language, value,
-                                       authority, confidence, securityLevel);
     }
 
     public ItemBuilder withCrisPolicyEPerson(String value, String authority) {
@@ -892,6 +884,14 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", null, description);
     }
 
+    public ItemBuilder withProjectAmount(String amount) {
+        return addMetadataValue(item, "project", "amount", null, amount);
+    }
+
+    public ItemBuilder withProjectAmountCurrency(String currency) {
+        return addMetadataValue(item, "project", "amount", "currency", currency);
+    }
+
     public ItemBuilder withUriIdentifier(String uri) {
         return addMetadataValue(item, "dc", "identifier", "uri", uri);
     }
@@ -980,29 +980,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         }
     }
 
-
-    public Item buildWithLastModifiedDate(Date lastModifiedDate) {
-        try {
-            installItemService.installItem(context, workspaceItem, this.handle);
-            itemService.updateLastModifiedDate(context, item, lastModifiedDate);
-            //Check if we need to make this item private. This has to be done after item install.
-            if (readerGroup != null) {
-                setOnlyReadPermission(workspaceItem.getItem(), readerGroup, null);
-            }
-
-            if (withdrawn) {
-                itemService.withdraw(context, item);
-            }
-            if (inArchive) {
-                item.setArchived(inArchive);
-            }
-            context.dispatchEvents();
-            indexingService.commit();
-            return item;
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
     @Override
     public void cleanup() throws Exception {
        try (Context c = new Context()) {

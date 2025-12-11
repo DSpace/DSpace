@@ -10,7 +10,7 @@ package org.dspace.content.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -21,7 +21,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -247,7 +246,7 @@ public interface ItemService
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
+    Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Instant since)
         throws SQLException;
 
     /**
@@ -257,7 +256,7 @@ public interface ItemService
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
+    Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Instant since)
         throws SQLException;
 
     /**
@@ -857,7 +856,7 @@ public interface ItemService
      * @return iterator over items
      * @throws SQLException if database error
      */
-    Iterator<Item> findByLastModifiedSince(Context context, Date last)
+    Iterator<Item> findByLastModifiedSince(Context context, Instant last)
         throws SQLException;
 
     /**
@@ -1001,8 +1000,8 @@ public interface ItemService
     /**
      * Returns the item's entity type, if any.
      *
-     * @param item the item
-     * @return the entity type as string, if any
+     * @param  item    the item
+     * @return         the entity type as string, if any
      */
     String getEntityType(Item item);
 
@@ -1017,32 +1016,21 @@ public interface ItemService
     /**
      * Find all the items in the archive or not with a given authority key value in LIKE format.
      *
-     * @param context       DSpace context object
-     * @param likeAuthority value that will be used with operator LIKE on field
-     *                      authority, it's possible to enter '%' to improve
-     *                      searching
-     * @param inArchive     true for archived items, null for all items (archived and not)
+     * @param context         DSpace context object
+     * @param likeAuthority   value that will be used with operator LIKE on field
+     *                        authority, it's possible to enter '%' to improve
+     *                        searching
+     * @param inArchive       true for archived items, null for all items (archived and not)
      * @return
-     * @throws SQLException if database error
+     * @throws SQLException   if database error
      */
     Iterator<Item> findByLikeAuthorityValue(Context context, String likeAuthority,
                                             Boolean inArchive) throws SQLException;
 
     /**
-     * Find all the items matching the given list of ids.
-     *
-     * @param context DSpace context object
-     * @param ids     ids list that will be used with operator IN on field uuid
-     * @return
-     * @throws SQLException if database error
-     */
-    Iterator<Item> findByIds(Context context, List<String> ids) throws SQLException;
-
-    /**
      * Retrieve the label of the entity type of the given item.
-     * @param  item the item.
-     * @return      the label of the entity type, taken from the item metadata, or
-     *              null if not found.
+     * @param item the item.
+     * @return the label of the entity type, taken from the item metadata, or null if not found.
      */
     String getEntityTypeLabel(Item item);
 
@@ -1054,39 +1042,8 @@ public interface ItemService
      */
     EntityType getEntityType(Context context, Item item) throws SQLException;
 
-    /**
-     * Add the default policies, which have not been already added to the given
-     * DSpace object
-     *
-     * @param  context                   The relevant DSpace Context.
-     * @param  dso                       The DSpace Object to add policies to
-     * @param  defaultCollectionPolicies list of policies
-     * @throws SQLException              An exception that provides information on a
-     *                                   database access error or other errors.
-     * @throws AuthorizeException        Exception indicating the current user of
-     *                                   the context does not have permission to
-     *                                   perform a particular action.
-     */
-    void addDefaultPoliciesNotInPlace(Context context, DSpaceObject dso, List<ResourcePolicy> defaultCollectionPolicies)
-        throws SQLException, AuthorizeException;
-
     Iterator<Item> findRelatedItemsByAuthorityControlledFields(Context context,
                                                                Item item, List<String> authorities);
-
-    /**
-     * Adds a resource policy to the specified item for the given action and EPerson.
-     *
-     * @param context  the DSpace context
-     * @param item     the item to add the policy to
-     * @param actionID the ID of the action to add the policy for
-     * @param eperson  the EPerson to add the policy for
-     * @throws SQLException       if a database error occurs
-     * @throws AuthorizeException if the current user is not authorized to perform this action
-     */
-    void addResourcePolicy(Context context, Item item, int actionID, EPerson eperson)
-        throws SQLException, AuthorizeException;
-
-
     /**
      * Check whether the given item is the latest version. If the latest item cannot
      * be determined, because either the version history or the latest version is

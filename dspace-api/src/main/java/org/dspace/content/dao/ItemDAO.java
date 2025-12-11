@@ -9,7 +9,6 @@ package org.dspace.content.dao;
 
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -195,7 +194,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @throws SQLException if database error
      */
     Iterator<Item> findAll(Context context, boolean archived,
-                           boolean withdrawn, boolean discoverable, Date lastModified)
+                           boolean withdrawn, boolean discoverable, Instant lastModified)
         throws SQLException;
 
     /**

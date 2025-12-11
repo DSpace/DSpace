@@ -45,7 +45,7 @@ public interface ChoiceAuthorityService {
     /**
      * @return the names of all the defined choice authorities
      */
-    Set<String> getChoiceAuthoritiesNames();
+    public Set<String> getChoiceAuthoritiesNames();
 
     /**
      * @param schema    schema of metadata field
@@ -56,8 +56,8 @@ public interface ChoiceAuthorityService {
      * metadata. Throw IllegalArgumentException if the supplied metadata
      * is not associated with an authority choice
      */
-    String getChoiceAuthorityName(String schema, String element, String qualifier, int dsoType,
-                                  Collection collection);
+    public String getChoiceAuthorityName(String schema, String element, String qualifier, int dsoType,
+            Collection collection);
 
     /**
      * @param schema    schema of metadata field
@@ -68,7 +68,7 @@ public interface ChoiceAuthorityService {
      * metadata. Throw IllegalArgumentException if the supplied metadata
      * is not associated with an authority choice
      */
-    String getChoiceAuthorityName(String schema, String element, String qualifier, String formName);
+    public String getChoiceAuthorityName(String schema, String element, String qualifier, String formName);
 
     /**
      * Wrapper that calls getBestMatch method of the plugin corresponding to
@@ -83,8 +83,8 @@ public interface ChoiceAuthorityService {
      * @see org.dspace.content.authority.ChoiceAuthority#getBestMatch(java.lang.String, java.lang.String, org.dspace
      * .content.Collection, java.lang.String)
      */
-    Choices getBestMatch(String fieldKey, String query, int dsoType, Collection collection,
-                         String locale);
+    public Choices getBestMatch(String fieldKey, String query, int dsoType, Collection collection,
+                                String locale);
 
     /**
      * Wrapper that calls getChoicesByParent method of the plugin.
@@ -98,7 +98,7 @@ public interface ChoiceAuthorityService {
      * @see org.dspace.content.authority.ChoiceAuthority#getChoicesByParent(java.lang.String, java.lang.String,
      *  int, int, java.lang.String)
      */
-    Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale);
+    public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale);
 
     /**
      * Wrapper that calls getLabel method of the plugin corresponding to
@@ -110,7 +110,7 @@ public interface ChoiceAuthorityService {
      * @param locale        explicit localization key if available
      * @return label
      */
-    String getLabel(MetadataValue metadataValue, int dsoType, Collection collection, String locale);
+    public String getLabel(MetadataValue metadataValue, int dsoType, Collection collection, String locale);
 
     /**
      * Wrapper that calls getLabel method of the plugin corresponding to
@@ -123,7 +123,7 @@ public interface ChoiceAuthorityService {
      * @param authKey  authority key
      * @return label
      */
-    String getLabel(String fieldKey, int dsoType, Collection collection, String authKey, String locale);
+    public String getLabel(String fieldKey, int dsoType, Collection collection, String authKey, String locale);
 
     /**
      * Predicate, is there a Choices configuration of any kind for the
@@ -134,7 +134,7 @@ public interface ChoiceAuthorityService {
      * @param collection Collection owner of Item
      * @return true if choices are configured for this field.
      */
-    boolean isChoicesConfigured(String fieldKey, int dsoType, Collection collection);
+    public boolean isChoicesConfigured(String fieldKey, int dsoType, Collection collection);
 
     /**
      * Predicate, is there a Choices configuration of any kind for the
@@ -145,7 +145,7 @@ public interface ChoiceAuthorityService {
      * @param formname the formname used by the collection
      * @return true if choices are configured for this field.
      */
-    boolean isChoicesConfigured(String fieldKey, int dsoType, String formname);
+    public boolean isChoicesConfigured(String fieldKey, int dsoType, String formname);
 
     /**
      * Get the presentation keyword (should be "lookup", "select" or "suggest", but this
@@ -154,7 +154,7 @@ public interface ChoiceAuthorityService {
      * @param fieldKey field key
      * @return configured presentation type for this field, or null if none found
      */
-    String getPresentation(String fieldKey);
+    public String getPresentation(String fieldKey);
 
     /**
      * Get the configured "closed" value for this field.
@@ -162,7 +162,7 @@ public interface ChoiceAuthorityService {
      * @param fieldKey single string identifying metadata field
      * @return true if choices are closed for this field.
      */
-    boolean isClosed(String fieldKey);
+    public boolean isClosed(String fieldKey);
 
     /**
      * Wrapper to call plugin's getVariants().
@@ -172,7 +172,7 @@ public interface ChoiceAuthorityService {
      * @param collection Collection owner of Item
      * @return List of variants
      */
-    List<String> getVariants(MetadataValue metadataValue, int dsoType, Collection collection);
+    public List<String> getVariants(MetadataValue metadataValue, int dsoType, Collection collection);
 
     /**
      * Return the ChoiceAuthority instance identified by the specified name
@@ -180,12 +180,12 @@ public interface ChoiceAuthorityService {
      * @param authorityName the ChoiceAuthority instance name
      * @return the ChoiceAuthority identified by the specified name
      */
-    ChoiceAuthority getChoiceAuthorityByAuthorityName(String authorityName);
+    public ChoiceAuthority getChoiceAuthorityByAuthorityName(String authorityName);
 
     /**
      * This method has been created to have a way of clearing the cache kept inside the service
      */
-    void clearCache() throws SubmissionConfigReaderException;
+    public void clearCache() throws SubmissionConfigReaderException;
 
     /**
      * Get the entity type starting from the metadata field.
@@ -204,7 +204,7 @@ public interface ChoiceAuthorityService {
      * @return a Choices object (never null).
      * @see org.dspace.content.authority.ChoiceAuthority#getTopChoices(java.lang.String, int, int, java.lang.String)
      */
-    Choices getTopChoices(String authorityName, int start, int limit, String locale);
+    public Choices getTopChoices(String authorityName, int start, int limit, String locale);
 
     /**
      * Return the direct parent of an entry identified by its id in an hierarchical
@@ -215,7 +215,7 @@ public interface ChoiceAuthorityService {
      * @param locale        explicit localization key if available, or null
      * @return the parent Choice object if any
      */
-    Choice getParentChoice(String authorityName, String vocabularyId, String locale);
+    public Choice getParentChoice(String authorityName, String vocabularyId, String locale);
 
     /**
      * Returns all the configured metadata field that are authority controlled
@@ -224,7 +224,7 @@ public interface ChoiceAuthorityService {
      * @param  entityType the entity type
      * @return            the metadata fields
      */
-    List<String> getAuthorityControlledFieldsByEntityType(String entityType);
+    public List<String> getAuthorityControlledFieldsByEntityType(String entityType);
 
     /**
      * Return the ChoiceAuthority instance identified by the specified params
@@ -234,7 +234,7 @@ public interface ChoiceAuthorityService {
      * @param collection
      * @return the ChoiceAuthority identified by the specified params
      */
-    ChoiceAuthority getAuthorityByFieldKeyCollection(String fieldKey, int dsoType, Collection collection);
+    public ChoiceAuthority getAuthorityByFieldKeyCollection(String fieldKey, int dsoType, Collection collection);
 
     /**
      * Set the reference between the given metadata value and the item using the
@@ -245,6 +245,6 @@ public interface ChoiceAuthorityService {
      */
     void setReferenceWithAuthority(MetadataValue metadataValue, Item item);
 
-    DSpaceControlledVocabularyIndex getVocabularyIndex(String nameVocab);
+    public DSpaceControlledVocabularyIndex getVocabularyIndex(String nameVocab);
 
 }

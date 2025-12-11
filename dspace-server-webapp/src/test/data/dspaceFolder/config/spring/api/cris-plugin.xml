@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <util:constant id="CrisConsumer-SOURCE_INTERNAL" static-field="org.dspace.authority.filler.AuthorityImportFillerService.SOURCE_INTERNAL" />
+
+    <bean class="org.dspace.authority.filler.AuthorityImportFillerServiceImpl"/>
+
+    <bean id="org.dspace.authority.filler.AuthorityImportFillerHolder" class="org.dspace.authority.filler.AuthorityImportFillerHolder">
+        <property name="fillers">
+            <map>
+                <entry key-ref="CrisConsumer-SOURCE_INTERNAL">
+                    <bean class="org.dspace.authority.filler.ItemMetadataImportFiller" parent="fullItemMetadataConfiguration" />
+                </entry>
+                <entry key="ORCID" value-ref="orcidImportFiller" />
+                <entry key="ISSN" value-ref="sherpaImportFiller" />
+                <entry key="OPENAIRE-PROJECT-ID" value-ref="openaireProjectImportFiller" />
+            </map>
+        </property>
+    </bean>
+
+    <bean class="org.dspace.authority.filler.ItemMetadataImportFiller" id="fullItemMetadataConfiguration" abstract="true">
+        <property name="itemService" ref="org.dspace.content.ItemServiceImpl" />
+        <property name="configurations">
+            <map>
+                <entry key="dc.contributor.author">
+                    <bean class="org.dspace.authority.filler.MetadataConfiguration">
+                        <property name="updateEnabled" value="false" />
+                        <property name="mapping">
+                            <map>
+                                <entry key="oairecerif.author.affiliation">
+                                    <bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
+                                        <property name="visibility" value="1" />
+                                        <property name="targetMetadata" value="person.affiliation.name" />
+                                    </bean>
+                                </entry>
+                                <entry key="constant.person.jobTitle">
+                                    <bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
+                                        <property name="visibility" value="1" />
+                                        <property name="targetMetadata" value="person.jobTitle" />
+                                        <property name="constantValue" value="Worker" />
+                                    </bean>
+                                </entry>
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+                <entry key="dc.contributor.editor">
+                    <bean class="org.dspace.authority.filler.MetadataConfiguration">
+                        <property name="updateEnabled" value="false" />
+                        <property name="mapping">
+                            <map>
+                                <entry key="oairecerif.editor.affiliation">
+                                    <bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
+                                        <property name="visibility" value="1" />
+                                        <property name="targetMetadata" value="person.affiliation.name" />
+                                    </bean>
+                                </entry>
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+                <entry key="dc.relation.ispartof">
+                    <bean class="org.dspace.authority.filler.MetadataConfiguration">
+                        <property name="updateEnabled" value="false" />
+                        <property name="mapping">
+                            <map>
+                                <entry key="dc.relation.issn">
+                                    <bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
+                                        <property name="visibility" value="1" />
+                                    </bean>
+                                </entry>
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+                <entry key="dc.relation">
+                    <bean class="org.dspace.authority.filler.MetadataConfiguration">
+                        <property name="updateEnabled" value="false" />
+                        <property name="mapping">
+                            <map>
+                                <entry key="oaire.awardNumber">
+                                    <bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
+                                        <property name="visibility" value="1" />
+                                    </bean>
+                                </entry>
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+                <entry key="dc.relation.funding">
+                    <bean class="org.dspace.authority.filler.MetadataConfiguration">
+                        <property name="updateEnabled" value="false" />
+                        <property name="mapping">
+                            <map>
+                                <entry key="dc.relation.grantno">
+                                    <bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
+                                        <property name="visibility" value="1" />
+                                        <property name="targetMetadata" value="oairecerif.funding.identifier" />
+                                    </bean>
+                                </entry>
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean class="org.dspace.authority.filler.ExternalDataProviderImportFiller" id="orcidImportFiller" >
+       <constructor-arg name="externalDataProvider" ref="org.dspace.external.provider.impl.OrcidV3AuthorDataProvider"/>
+       <constructor-arg name="authorityIdentifier" value="ORCID"/>
+    </bean>
+
+    <bean class="org.dspace.authority.filler.ExternalDataProviderImportFiller" id="sherpaImportFiller" >
+       <constructor-arg name="externalDataProvider" ref="org.dspace.external.provider.impl.SHERPAv2JournalISSNDataProvider"/>
+       <constructor-arg name="authorityIdentifier" value="ISSN"/>
+    </bean>
+
+
+    <bean class="org.dspace.authority.filler.ExternalDataProviderImportFiller" id="openaireProjectImportFiller" >
+       <constructor-arg name="externalDataProvider" ref="openaireLiveImportDataProvider"/>
+       <constructor-arg name="authorityIdentifier" value="OPENAIRE-PROJECT-ID"/>
+    </bean>
+
+    <bean class="org.dspace.authority.service.ItemSearcherMapper" name="org.dspace.authority.service.ItemSearcherMapper">
+        <constructor-arg index="0">
+            <map>
+                <entry key="UUID">
+                    <bean class="org.dspace.authority.service.impl.ItemSearcherById"></bean>
+                </entry>
+                <entry key="ORCID" value-ref="itemSearcherByORCID"/>
+                <entry key="RID" value-ref="itemSearcherByRID"/>
+                <entry key="ISNI" value-ref="itemSearcherByISNI"/>
+                <entry key="DOI" value-ref="itemSearcherByDOI"/>
+                <entry key="URL" value-ref="itemSearcherByURL"/>
+                <entry key="ISSN" value-ref="itemSearcherByISSN"/>
+                <entry key="OPENAIRE-PROJECT-ID" value-ref="itemSearcherByOpenaireProjectId"/>
+                <entry key="LEGACY-ID" value-ref="itemSearcherByLegacyId"/>
+                <entry key="SCOPUS-AUTHOR-ID" value-ref="itemSearcherByScopusAuthorId"/>
+            </map>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <bean class="org.dspace.authority.service.impl.ItemSearcherById"></bean>
+        </constructor-arg>
+    </bean>
+
+    <bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByORCID">
+        <constructor-arg value="person.identifier.orcid"></constructor-arg>
+        <constructor-arg value="ORCID"></constructor-arg>
+    </bean>
+
+    <bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByRID">
+        <constructor-arg value="person.identifier.rid"></constructor-arg>
+        <constructor-arg value="RID"></constructor-arg>
+    </bean>
+
+    <bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByDOI">
+        <constructor-arg value="dc.identifier.doi"></constructor-arg>
+        <constructor-arg value="DOI"></constructor-arg>
+    </bean>
+
+    <bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByURL">
+        <constructor-arg value="oairecerif.identifier.url"></constructor-arg>
+        <constructor-arg value="URL"></constructor-arg>
+    </bean>
+
+    <bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByISNI">
+        <constructor-arg value="person.identifier.isni"></constructor-arg>
+        <constructor-arg value="ISNI"></constructor-arg>
+    </bean>
+
+    <bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByISSN">
+        <constructor-arg value="dc.identifier.issn"></constructor-arg>
+        <constructor-arg value="ISSN"></constructor-arg>
+    </bean>
+
+    <bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByOpenaireProjectId">
+        <constructor-arg value="oairecerif.funding.identifier"></constructor-arg>
+        <constructor-arg value="OPENAIRE-PROJECT-ID"></constructor-arg>
+    </bean>
+
+    <bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByLegacyId">
+        <constructor-arg value="cris.legacyId"></constructor-arg>
+        <constructor-arg value="LEGACY-ID"></constructor-arg>
+    </bean>
+
+    <bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByScopusAuthorId">
+        <constructor-arg value="person.identifier.scopus-author-id"></constructor-arg>
+        <constructor-arg value="SCOPUS-AUTHOR-ID"></constructor-arg>
+    </bean>
+
+    <bean class="org.dspace.authority.service.impl.ItemSearchServiceImpl" name="org.dspace.authority.service.ItemSearchService"/>
+    <bean class="org.dspace.authority.service.impl.ItemReferenceResolverServiceImpl" name="org.dspace.authority.service.ItemReferenceResolverService"/>
+
+</beans>

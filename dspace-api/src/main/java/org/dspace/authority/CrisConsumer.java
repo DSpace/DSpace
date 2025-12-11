@@ -29,6 +29,7 @@ import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authority.service.ItemSearchService;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
@@ -188,8 +189,8 @@ public class CrisConsumer implements Consumer {
     }
 
     private void addEntityTypeIfNotExist(Context context, Item item) throws SQLException {
-        String entityType = itemService.getEntityType(item);
-        if (StringUtils.isBlank(entityType)) {
+        EntityType entityType = itemService.getEntityType(context, item);
+        if (entityType == null) {
             Collection collection = item.getOwningCollection();
             if (collection != null) {
                 String collectionEntityType = collectionService.getEntityType(collection);

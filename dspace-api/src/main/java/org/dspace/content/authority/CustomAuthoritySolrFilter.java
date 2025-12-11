@@ -5,28 +5,18 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.authority.service;
-
-import org.dspace.content.authority.Choice;
+package org.dspace.content.authority;
 
 /**
  *
- * @author Giuseppe Digilio (giuseppe dot digilio at 4science dot it)
  * @author Stefano Maffei 4Science.com
  */
-public interface ItemAuthorityService {
+public interface CustomAuthoritySolrFilter {
 
     /**
-     * Get solr query
-     * @param  searchTerm The search term string
-     * @return            solr query
-     */
-    public String getSolrQueryExactMatch(String searchTerm);
-
-    /**
-     * Get solr query
-     * @param  searchTerm The search term string
-     * @return            solr query
+     * Returns the solr query to be used for a specified authority
+     *
+     * @return String the solr query
      */
     public String getSolrQuery(String searchTerm);
 

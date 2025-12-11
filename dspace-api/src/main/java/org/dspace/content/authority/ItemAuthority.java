@@ -53,27 +53,33 @@ import org.dspace.web.ContextUtil;
  * @version $Revision $
  */
 public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
-    public static final String DEFAULT = "local";
+    private static Logger log = LogManager.getLogger(ItemAuthority.class);
     final static String CHOICES_EXTERNALSOURCE_PREFIX = "choises.externalsource.";
-    private static final Logger log = LogManager.getLogger(ItemAuthority.class);
+
+    /** the name assigned to the specific instance by the PluginService, @see {@link NameAwarePlugin} **/
+    private String authorityName;
 
     protected DSpace dspace = new DSpace();
 
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
+    private SearchService searchService = dspace.getServiceManager().getServiceByName(
+        "org.dspace.discovery.SearchService", SearchService.class);
+
+    private ItemAuthorityServiceFactory itemAuthorityServiceFactory = dspace.getServiceManager().getServiceByName(
+            "itemAuthorityServiceFactory", ItemAuthorityServiceFactory.class);
+
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private List<CustomAuthorityFilter> customAuthorityFilters = dspace.getServiceManager()
+        .getServicesByType(CustomAuthorityFilter.class);
+
+    private ExternalDataService externalDataService = ExternalServiceFactory.getInstance().getExternalDataService();
+
     // map of field key to presentation type
     protected Map<String, String> externalSource = new HashMap<String, String>();
-    /**
-     * the name assigned to the specific instance by the PluginService, @see {@link NameAwarePlugin}
-     **/
-    private String authorityName;
-    private final SearchService searchService = dspace.getServiceManager().getServiceByName(
-        "org.dspace.discovery.SearchService", SearchService.class);
-    private final ItemAuthorityServiceFactory itemAuthorityServiceFactory = dspace.getServiceManager().getServiceByName(
-        "itemAuthorityServiceFactory", ItemAuthorityServiceFactory.class);
-    private final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-    private final List<CustomAuthorityFilter> customAuthorityFilters = dspace.getServiceManager()
-                                                                             .getServicesByType(CustomAuthorityFilter.class);
-    private final ExternalDataService externalDataService = ExternalServiceFactory.getInstance().getExternalDataService();
+
+    public static final String DEFAULT = "local";
 
     // punt!  this is a poor implementation..
     @Override
@@ -84,10 +90,10 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     private boolean isForceInternalTitle() {
         boolean defaultBehaviour = configurationService
             .getBooleanProperty("cris.ItemAuthority.forceInternalName",
-                                true);
+                true);
         return configurationService
             .getBooleanProperty("cris.ItemAuthority." + authorityName + ".forceInternalName",
-                                defaultBehaviour);
+                defaultBehaviour);
     }
 
     /**
@@ -134,13 +140,13 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
         }
 
         customAuthorityFilters.stream()
-                              .flatMap(caf -> caf.getFilterQueries(this).stream())
-                              .forEach(solrQuery::addFilterQuery);
+            .flatMap(caf -> caf.getFilterQueries(this).stream())
+            .forEach(solrQuery::addFilterQuery);
 
         try {
             QueryResponse queryResponse = solr.query(solrQuery);
             List<Choice> choiceList = getChoiceListFromQueryResults(queryResponse.getResults(), text,
-                                                                    onlyExactMatches);
+                onlyExactMatches);
             Choice[] results = new Choice[choiceList.size()];
             results = choiceList.toArray(results);
             long numFound = queryResponse.getResults().getNumFound();
@@ -157,13 +163,13 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     }
 
     private List<Choice> getChoiceListFromQueryResults(SolrDocumentList results, String searchTitle,
-                                                       boolean onlyExactMatches) {
+        boolean onlyExactMatches) {
         return results
             .stream()
             .map(doc -> {
                 String title = searchTitle;
                 List<String> objectNames = List.of();
-                if (!onlyExactMatches || isForceInternalTitle()) {
+                if (onlyExactMatches && isForceInternalTitle() || !onlyExactMatches) {
                     Object fieldValue = doc.getFieldValue("objectname");
                     if (fieldValue != null) {
                         if (fieldValue instanceof String) {
@@ -181,10 +187,10 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
                 }
                 String uuid = (String) doc.getFieldValue("search.resourceid");
                 Map<String, String> extras = ItemAuthorityUtils.buildExtra(getPluginInstanceName(),
-                                                                           doc, objectNames, uuid);
+                    doc, objectNames, uuid);
                 return new Choice(uuid,
-                                  title,
-                                  title, extras);
+                    title,
+                    title, extras);
             }).collect(Collectors.toList());
     }
 
@@ -238,7 +244,7 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
                 String metadata = key.substring(CHOICES_EXTERNALSOURCE_PREFIX.length());
                 if (metadata == null) {
                     log.warn("Skipping invalid external source authority configuration property: " + key +
-                                 ": does not have schema.element.qualifier");
+                        ": does not have schema.element.qualifier");
                     continue;
                 }
                 String sourceIdentifier = configurationService.getProperty(key);
@@ -246,7 +252,7 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
                     externalSource.put(metadata, sourceIdentifier);
                 } else {
                     log.warn("Skipping invalid external source authority configuration property: " + sourceIdentifier +
-                                 " does not exist");
+                            " does not exist");
                     continue;
                 }
             }
@@ -270,8 +276,8 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
         solrQuery.addFilterQuery("search.resourceid:" + key);
 
         customAuthorityFilters.stream()
-                              .flatMap(caf -> caf.getFilterQueries(this).stream())
-                              .forEach(solrQuery::addFilterQuery);
+            .flatMap(caf -> caf.getFilterQueries(this).stream())
+            .forEach(solrQuery::addFilterQuery);
 
         try {
             QueryResponse queryResponse = solr.query(solrQuery);

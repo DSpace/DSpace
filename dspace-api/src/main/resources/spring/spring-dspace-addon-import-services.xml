@@ -245,6 +245,15 @@
         <constructor-arg value="dc.identifier.other"/>
     </bean>
 
+    <bean id="OpenAIREService"
+          class="org.dspace.importer.external.openaire.service.OpenAireProjectImportMetadataSourceServiceImpl"
+          scope="singleton">
+        <property name="metadataFieldMapping" ref="openaireProjectMetadataFieldMapping"/>
+    </bean>
+    <bean id="openaireProjectMetadataFieldMapping"
+          class="org.dspace.importer.external.openaire.metadatamapping.OpenAIREProjectFieldMapping">
+    </bean>
+
     <bean id="openalexImportPublicationService"
           class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
         <property name="metadataFieldMapping" ref="openalexPublicationMetadataFieldMapping"/>

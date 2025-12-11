@@ -1066,6 +1066,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         return (int)resp.getTotalSearchResults();
     }
 
+    @Override
+    public String getEntityType(Collection collection) {
+        return getMetadataFirstValue(collection, new MetadataFieldName("dspace.entity.type"), Item.ANY);
+    }
+
     /**
      * Finds all Indexed Collections where the current user has submit rights. If the user is an Admin,
      * this is all Indexed Collections. Otherwise, it includes those collections where
@@ -1202,6 +1207,76 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         return (int) resp.getTotalSearchResults();
     }
 
+
+    @Override
+    public Collection retrieveCollectionByEntityType(Context context, Item item, String entityType)
+        throws SQLException {
+        Collection ownCollection = item.getOwningCollection();
+        return retrieveCollectionByEntityType(context, ownCollection.getCommunities(), entityType);
+    }
+
+    private Collection retrieveCollectionByEntityType(Context context, List<Community> communities, String entityType) {
+
+        for (Community community : communities) {
+            Collection collection = retriveCollectionByEntityType(context, community, entityType);
+            if (collection != null) {
+                return collection;
+            }
+        }
+
+        for (Community community : communities) {
+            List<Community> parentCommunities = community.getParentCommunities();
+            Collection collection = retrieveCollectionByEntityType(context, parentCommunities, entityType);
+            if (collection != null) {
+                return collection;
+            }
+        }
+
+        return retriveCollectionByEntityType(context, null, entityType);
+    }
+
+    public Collection retriveCollectionByEntityType(Context context, Community community, String entityType) {
+        context.turnOffAuthorisationSystem();
+        List<Collection> collections;
+        try {
+            collections = findCollectionsWithSubmit(null, context, community, entityType, 0, 1);
+        } catch (SQLException | SearchServiceException e) {
+            throw new RuntimeException(e);
+        }
+        context.restoreAuthSystemState();
+        if (collections != null && collections.size() > 0) {
+            return collections.get(0);
+        }
+        if (community != null) {
+            for (Community subCommunity : community.getSubcommunities()) {
+                Collection collection = retriveCollectionByEntityType(context, subCommunity, entityType);
+                if (collection != null) {
+                    return collection;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public List<Collection> findAllCollectionsByEntityType(Context context, String entityType)
+        throws SearchServiceException {
+        List<Collection> collectionList = new ArrayList<>();
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        discoverQuery.addFilterQueries("dspace.entity.type:" + entityType);
+
+        DiscoverResult discoverResult = searchService.search(context, discoverQuery);
+        List<IndexableObject> solrIndexableObjects = discoverResult.getIndexableObjects();
+
+        for (IndexableObject solrCollection : solrIndexableObjects) {
+            Collection c = ((IndexableCollection) solrCollection).getIndexedObject();
+            collectionList.add(c);
+        }
+        return collectionList;
+    }
     /**
      * Returns total collection archived items
      *

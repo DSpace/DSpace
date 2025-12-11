@@ -32,20 +32,17 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.ItemAuthorityUtils;
 import org.dspace.util.UUIDUtils;
 import org.dspace.utils.DSpace;
-
 /**
  * Authority to aggregate "extra" value to single choice
  *
  * @author Mykhaylo Boychuk (4Science.it)
  */
 public class ItemMultiAuthority implements LinkableEntityAuthority {
-    private static final Logger log = LogManager.getLogger(ItemAuthority.class);
+    private static Logger log = LogManager.getLogger(ItemAuthority.class);
 
-    private final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
-    /**
-     * the name assigned to the specific instance by the PluginService, @see {@link NameAwarePlugin}
-     **/
+    /** the name assigned to the specific instance by the PluginService, @see {@link NameAwarePlugin} **/
     private String authorityName;
 
     /**
@@ -54,18 +51,18 @@ public class ItemMultiAuthority implements LinkableEntityAuthority {
      */
     private String field;
 
-    private final DSpace dspace = new DSpace();
+    private DSpace dspace = new DSpace();
 
-    private final SearchService searchService = dspace.getServiceManager().getServiceByName(
+    private SearchService searchService = dspace.getServiceManager().getServiceByName(
         "org.dspace.discovery.SearchService", SearchService.class);
 
-    private final ItemAuthorityServiceFactory itemAuthorityServiceFactory = dspace.getServiceManager().getServiceByName(
-        "itemAuthorityServiceFactory", ItemAuthorityServiceFactory.class);
+    private ItemAuthorityServiceFactory itemAuthorityServiceFactory = dspace.getServiceManager().getServiceByName(
+            "itemAuthorityServiceFactory", ItemAuthorityServiceFactory.class);
 
-    private final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    private final List<CustomAuthorityFilter> customAuthorityFilters = dspace.getServiceManager()
-                                                                             .getServicesByType(CustomAuthorityFilter.class);
+    private List<CustomAuthorityFilter> customAuthorityFilters = dspace.getServiceManager()
+        .getServicesByType(CustomAuthorityFilter.class);
 
     // punt!  this is a poor implementation..
     @Override
@@ -103,24 +100,23 @@ public class ItemMultiAuthority implements LinkableEntityAuthority {
         }
 
         customAuthorityFilters.stream()
-                              .flatMap(caf -> caf.getFilterQueries(this).stream())
-                              .forEach(solrQuery::addFilterQuery);
+            .flatMap(caf -> caf.getFilterQueries(this).stream())
+            .forEach(solrQuery::addFilterQuery);
 
         try {
             QueryResponse queryResponse = solr.query(solrQuery);
             List<Choice> choiceList = queryResponse.getResults()
-                                                   .stream()
-                                                   .map(doc -> ItemAuthorityUtils.buildAggregateByExtra(
-                                                       getPluginInstanceName(), doc))
-                                                   .flatMap(l -> l.stream())
-                                                   .collect(Collectors.toList());
+                .stream()
+                .map(doc -> ItemAuthorityUtils.buildAggregateByExtra(getPluginInstanceName(), doc))
+                .flatMap(l -> l.stream())
+                .collect(Collectors.toList());
 
             Choice[] results = new Choice[choiceList.size()];
             results = choiceList.toArray(results);
             long numFound = queryResponse.getResults().getNumFound();
 
             return new Choices(results, start, (int) numFound, Choices.CF_AMBIGUOUS,
-                               numFound > (start + limit), 0);
+                numFound > (start + limit), 0);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -148,22 +144,22 @@ public class ItemMultiAuthority implements LinkableEntityAuthority {
     }
 
     @Override
-    public String getPluginInstanceName() {
-        return authorityName;
-    }
-
-    @Override
     public void setPluginInstanceName(String name) {
         authorityName = name;
         for (Entry conf : configurationService.getProperties().entrySet()) {
             if (StringUtils.startsWith((String) conf.getKey(), ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX)
-                && StringUtils.equals((String) conf.getValue(), authorityName)) {
+                    && StringUtils.equals((String) conf.getValue(), authorityName)) {
                 field = ((String) conf.getKey()).substring(ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX.length())
-                                                .replace(".", "_");
+                        .replace(".", "_");
                 // exit the look immediately as we have found it
                 break;
             }
         }
+    }
+
+    @Override
+    public String getPluginInstanceName() {
+        return authorityName;
     }
 
     @Override

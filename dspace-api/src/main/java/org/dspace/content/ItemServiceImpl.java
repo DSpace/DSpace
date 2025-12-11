@@ -21,7 +21,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -1451,111 +1450,23 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     */
 
-    /**
-     * Add the default policies, which have not been already added to the given DSpace object
-     *
-     * @param context                   The relevant DSpace Context.
-     * @param dso                       The DSpace Object to add policies to
-     * @param defaultCollectionPolicies list of policies
-     * @throws SQLException       An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
-     */
-    public void addDefaultPoliciesNotInPlace(Context context, DSpaceObject dso,
-                                             List<ResourcePolicy> defaultCollectionPolicies)
-        throws SQLException, AuthorizeException {
-        boolean appendMode = configurationService
-            .getBooleanProperty("core.authorization.installitem.inheritance-read.append-mode", false);
-        for (ResourcePolicy defaultPolicy : defaultCollectionPolicies) {
-            if (!authorizeService
-                .isAnIdenticalPolicyAlreadyInPlace(context, dso, defaultPolicy.getGroup(), Constants.READ,
-                                                   defaultPolicy.getID()) &&
-                (!appendMode && isNotAlreadyACustomRPOfThisTypeOnDSO(context, dso) ||
-                    appendMode && shouldBeAppended(context, dso, defaultPolicy))) {
-                ResourcePolicy newPolicy = resourcePolicyService.clone(context, defaultPolicy);
-                newPolicy.setdSpaceObject(dso);
-                newPolicy.setAction(Constants.READ);
-                newPolicy.setRpType(ResourcePolicy.TYPE_INHERITED);
-                resourcePolicyService.update(context, newPolicy);
-            }
-        }
-    }
 
-    private void addCustomPoliciesNotInPlace(Context context, DSpaceObject dso, List<ResourcePolicy> customPolicies)
-        throws SQLException, AuthorizeException {
-        boolean customPoliciesAlreadyInPlace = authorizeService
-            .findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM).size() > 0;
-        if (!customPoliciesAlreadyInPlace) {
-            authorizeService.addPolicies(context, customPolicies, dso);
-        }
-    }
-
-    /**
-     * Check whether or not there is already an RP on the given dso, which has actionId={@link Constants#READ} and
-     * resourceTypeId={@link ResourcePolicy#TYPE_CUSTOM}
-     *
-     * @param context DSpace context
-     * @param dso     DSpace object to check for custom read RP
-     * @return True if there is no RP on the item with custom read RP, otherwise false
-     * @throws SQLException If something goes wrong retrieving the RP on the DSO
-     */
-    private boolean isNotAlreadyACustomRPOfThisTypeOnDSO(Context context, DSpaceObject dso) throws SQLException {
-        List<ResourcePolicy> readRPs = resourcePolicyService.find(context, dso, Constants.READ);
-        for (ResourcePolicy readRP : readRPs) {
-            if (readRP.getRpType() != null && readRP.getRpType().equals(ResourcePolicy.TYPE_CUSTOM)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Check if the provided default policy should be appended or not to the final
-     * item. If an item has at least one custom READ policy any anonymous READ
-     * policy with empty start/end date should be skipped
-     *
-     * @param context       DSpace context
-     * @param dso           DSpace object to check for custom read RP
-     * @param defaultPolicy The policy to check
-     * @return
-     * @throws SQLException If something goes wrong retrieving the RP on the DSO
-     */
-    private boolean shouldBeAppended(Context context, DSpaceObject dso, ResourcePolicy defaultPolicy)
-        throws SQLException {
-        boolean hasCustomPolicy = resourcePolicyService.find(context, dso, Constants.READ)
-                                                       .stream()
-                                                       .filter(rp -> (Objects.nonNull(rp.getRpType()) &&
-                                                           Objects.equals(rp.getRpType(), ResourcePolicy.TYPE_CUSTOM)))
-                                                       .findFirst()
-                                                       .isPresent();
-
-        boolean isAnonimousGroup = Objects.nonNull(defaultPolicy.getGroup())
-            && StringUtils.equals(defaultPolicy.getGroup().getName(), Group.ANONYMOUS);
-
-        boolean datesAreNull = Objects.isNull(defaultPolicy.getStartDate())
-            && Objects.isNull(defaultPolicy.getEndDate());
-
-        return !(hasCustomPolicy && isAnonimousGroup && datesAreNull);
-    }
 
     /**
      * Returns an iterator of Items possessing the passed metadata field, or only
      * those matching the passed value, if value is not Item.ANY
      *
-     * @param  context            DSpace context object
-     * @param  schema             metadata field schema
-     * @param  element            metadata field element
-     * @param  qualifier          metadata field qualifier
-     * @param  value              field value or Item.ANY to match any value
-     * @return                    an iterator over the items matching that authority
-     *                            value
-     * @throws SQLException       if database error An exception that provides
-     *                            information on a database access error or other
-     *                            errors.
-     * @throws AuthorizeException if authorization error Exception indicating the
-     *                            current user of the context does not have
-     *                            permission
-     *
+     * @param context   DSpace context object
+     * @param schema    metadata field schema
+     * @param element   metadata field element
+     * @param qualifier metadata field qualifier
+     * @param value     field value or Item.ANY to match any value
+     * @return an iterator over the items matching that authority value
+     * @throws SQLException       if database error
+     *                            An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException if authorization error
+     *                            Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
      */
     @Override
     public Iterator<Item> findArchivedByMetadataField(Context context,
@@ -1649,6 +1560,7 @@ prevent the generation of resource policy entry values with null dspace_object a
         return itemDAO.findByMetadataQuery(context, queryPredicates, collectionUuids, "value ~ ?",
                 offset, limit);
     }
+
 
     @Override
     public long countForMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
@@ -1796,13 +1708,6 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public Iterator<Item> findByIds(Context context, List<String> ids) throws SQLException {
-        return itemDAO.findByIds(context,
-                                 ids.stream().map(uuid -> UUID.fromString(uuid)).distinct()
-                                    .collect(Collectors.toList()));
-    }
-
-    @Override
     public int countItems(Context context, Collection collection) throws SQLException {
         return itemDAO.countItems(context, collection, true, false, true);
     }
@@ -1860,7 +1765,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public Iterator<Item> findByLastModifiedSince(Context context, Date last)
+    public Iterator<Item> findByLastModifiedSince(Context context, Instant last)
         throws SQLException {
         return itemDAO.findByLastModifiedSince(context, last);
     }
@@ -1928,21 +1833,20 @@ prevent the generation of resource policy entry values with null dspace_object a
      * metadata of the item passed along in the parameters as well as all the virtual metadata
      * which will be generated and processed together with the {@link VirtualMetadataPopulator}
      * by processing the item's relationships
-     *
-     * @param item      the Item to be processed
-     * @param schema    the schema for the metadata field. <em>Must</em> match
-     *                  the <code>name</code> of an existing metadata schema.
-     * @param element   the element name. <code>DSpaceObject.ANY</code> matches any
-     *                  element. <code>null</code> doesn't really make sense as all
-     *                  metadata must have an element.
-     * @param qualifier the qualifier. <code>null</code> means unqualified, and
-     *                  <code>DSpaceObject.ANY</code> means any qualifier (including
-     *                  unqualified.)
-     * @param lang      the ISO639 language code, optionally followed by an underscore
-     *                  and the ISO3166 country code. <code>null</code> means only
-     *                  values with no language are returned, and
-     *                  <code>DSpaceObject.ANY</code> means values with any country code or
-     *                  no country code are returned.
+     * @param item         the Item to be processed
+     * @param schema       the schema for the metadata field. <em>Must</em> match
+     *                     the <code>name</code> of an existing metadata schema.
+     * @param element      the element name. <code>DSpaceObject.ANY</code> matches any
+     *                     element. <code>null</code> doesn't really make sense as all
+     *                     metadata must have an element.
+     * @param qualifier    the qualifier. <code>null</code> means unqualified, and
+     *                     <code>DSpaceObject.ANY</code> means any qualifier (including
+     *                     unqualified.)
+     * @param lang         the ISO639 language code, optionally followed by an underscore
+     *                     and the ISO3166 country code. <code>null</code> means only
+     *                     values with no language are returned, and
+     *                     <code>DSpaceObject.ANY</code> means values with any country code or
+     *                     no country code are returned.
      * @return
      */
     @Override

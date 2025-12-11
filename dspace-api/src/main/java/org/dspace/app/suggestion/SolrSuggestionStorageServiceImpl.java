@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -44,10 +43,10 @@ import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-
 
 /**
  * Service to deal with the local suggestion solr core used by the
@@ -70,7 +69,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
      * 
      * @return solr client
      */
-    protected SolrClient getSolr() {
+    public SolrClient getSolr() {
         if (solrSuggestionClient == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
                     .getProperty("suggestion.solr.server", "http://localhost:8983/solr/suggestion");
@@ -82,31 +81,35 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
     @Override
     public void addSuggestion(Suggestion suggestion, boolean force, boolean commit)
             throws SolrServerException, IOException {
-        if (force || !exist(suggestion)) {
-            ObjectMapper jsonMapper = new JsonMapper();
-            jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            SolrInputDocument document = new SolrInputDocument();
-            document.addField(SOURCE, suggestion.getSource());
-            // suggestion id is written as concatenation of
-            // source + ":" + targetID + ":" + idPart (of externalDataObj)
-            String suggestionFullID = suggestion.getID();
-            document.addField(SUGGESTION_FULLID, suggestionFullID);
-            document.addField(SUGGESTION_ID, suggestionFullID.split(":", 3)[2]);
-            document.addField(TARGET_ID, suggestion.getTarget().getID().toString());
-            document.addField(DISPLAY, suggestion.getDisplay());
-            document.addField(TITLE, getFirstValue(suggestion, "dc", "title", null));
-            document.addField(DATE, getFirstValue(suggestion, "dc", "date", "issued"));
-            document.addField(CONTRIBUTORS, getAllValues(suggestion, "dc", "contributor", "author"));
-            document.addField(ABSTRACT, getFirstValue(suggestion, "dc", "description", "abstract"));
-            document.addField(CATEGORY, getAllValues(suggestion, "dc", "source", null));
-            document.addField(EXTERNAL_URI, suggestion.getExternalSourceUri());
-            document.addField(SCORE, suggestion.getScore());
-            document.addField(PROCESSED, false);
-            document.addField(EVIDENCES, jsonMapper.writeValueAsString(suggestion.getEvidences()));
-            getSolr().add(document);
-            if (commit) {
-                getSolr().commit();
+        try {
+            if (force || !exist(suggestion)) {
+                ObjectMapper jsonMapper = new JsonMapper();
+                jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                SolrInputDocument document = new SolrInputDocument();
+                document.addField(SOURCE, suggestion.getSource());
+                // suggestion id is written as concatenation of
+                // source + ":" + targetID + ":" + idPart (of externalDataObj)
+                String suggestionFullID = suggestion.getID();
+                document.addField(SUGGESTION_FULLID, suggestionFullID);
+                document.addField(SUGGESTION_ID, suggestionFullID.split(":", 3)[2]);
+                document.addField(TARGET_ID, suggestion.getTarget().getID().toString());
+                document.addField(DISPLAY, suggestion.getDisplay());
+                document.addField(TITLE, getFirstValue(suggestion, "dc", "title", null));
+                document.addField(DATE, getFirstValue(suggestion, "dc", "date", "issued"));
+                document.addField(CONTRIBUTORS, getAllValues(suggestion, "dc", "contributor", "author"));
+                document.addField(ABSTRACT, getFirstValue(suggestion, "dc", "description", "abstract"));
+                document.addField(CATEGORY, getAllValues(suggestion, "dc", "source", null));
+                document.addField(EXTERNAL_URI, suggestion.getExternalSourceUri());
+                document.addField(SCORE, suggestion.getScore());
+                document.addField(PROCESSED, false);
+                document.addField(EVIDENCES, jsonMapper.writeValueAsString(suggestion.getEvidences()));
+                getSolr().add(document);
+                if (commit) {
+                    getSolr().commit();
+                }
             }
+        } catch (Exception e) {
+            log.error(e);
         }
     }
 
@@ -117,18 +120,19 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
 
     private List<String> getAllValues(Suggestion suggestion, String schema, String element, String qualifier) {
         return suggestion.getMetadata().stream()
-                .filter(st -> StringUtils.isNotBlank(st.getValue()) && Strings.CS.equals(st.getSchema(), schema)
-                        && Strings.CS.equals(st.getElement(), element)
-                        && Strings.CS.equals(st.getQualifier(), qualifier))
+                         .filter(
+                             st -> StringUtils.isNotBlank(st.getValue()) && StringUtils.equals(st.getSchema(), schema)
+                                 && StringUtils.equals(st.getElement(), element)
+                                 && StringUtils.equals(st.getQualifier(), qualifier))
                 .map(st -> st.getValue()).collect(Collectors.toList());
     }
 
     private String getFirstValue(Suggestion suggestion, String schema, String element, String qualifier) {
         return suggestion.getMetadata().stream()
             .filter(st -> StringUtils.isNotBlank(st.getValue())
-                && Strings.CS.equals(st.getSchema(), schema)
-                        && Strings.CS.equals(st.getElement(), element)
-                        && Strings.CS.equals(st.getQualifier(), qualifier))
+                && StringUtils.equals(st.getSchema(), schema)
+                && StringUtils.equals(st.getElement(), element)
+                && StringUtils.equals(st.getQualifier(), qualifier))
                 .map(st -> st.getValue()).findFirst().orElse(null);
     }
 
@@ -315,12 +319,18 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
 
         Suggestion suggestion = new Suggestion(sourceName, target, (String) solrDoc.getFieldValue(SUGGESTION_ID));
         suggestion.setDisplay((String) solrDoc.getFieldValue(DISPLAY));
-        suggestion.getMetadata()
-            .add(new MetadataValueDTO("dc", "title", null, null, (String) solrDoc.getFieldValue(TITLE)));
-        suggestion.getMetadata()
-            .add(new MetadataValueDTO("dc", "date", "issued", null, (String) solrDoc.getFieldValue(DATE)));
-        suggestion.getMetadata().add(
-            new MetadataValueDTO("dc", "description", "abstract", null, (String) solrDoc.getFieldValue(ABSTRACT)));
+        if (StringUtils.isNotBlank((String) solrDoc.getFieldValue(TITLE))) {
+            suggestion.getMetadata()
+                      .add(new MetadataValueDTO("dc", "title", null, null, (String) solrDoc.getFieldValue(TITLE)));
+        }
+        if (StringUtils.isNotBlank((String) solrDoc.getFieldValue(DATE))) {
+            suggestion.getMetadata()
+                      .add(new MetadataValueDTO("dc", "date", "issued", null, (String) solrDoc.getFieldValue(DATE)));
+        }
+        if (StringUtils.isNotBlank((String) solrDoc.getFieldValue(ABSTRACT))) {
+            suggestion.getMetadata().add(
+                new MetadataValueDTO("dc", "description", "abstract", null, (String) solrDoc.getFieldValue(ABSTRACT)));
+        }
 
         suggestion.setExternalSourceUri((String) solrDoc.getFieldValue(EXTERNAL_URI));
         if (solrDoc.containsKey(CATEGORY)) {
@@ -352,7 +362,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
         try {
             return itemService.find(context, itemId);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLRuntimeException(e);
         }
     }
 

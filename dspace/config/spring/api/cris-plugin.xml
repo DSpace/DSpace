@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xmlns="http://www.springframework.org/schema/beans"
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xmlns:util="http://www.springframework.org/schema/util"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
@@ -20,7 +20,6 @@
 				<entry key="ORCID" value-ref="orcidImportFiller"/>
 				<entry key="ISSN" value-ref="sherpaImportFiller"/>
 				<entry key="OPENAIRE-PROJECT-ID" value-ref="openaireProjectImportFiller"/>
-				<entry key="ROR-ID" value-ref="rorOrgUnitImportFiller"/>
 			</map>
 		</property>
 	</bean>
@@ -39,6 +38,13 @@
 									<bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
 										<property name="visibility" value="1"/>
 										<property name="targetMetadata" value="person.affiliation.name"/>
+									</bean>
+								</entry>
+								<entry key="constant.person.jobTitle">
+									<bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
+										<property name="visibility" value="1"/>
+										<property name="targetMetadata" value="person.jobTitle"/>
+										<property name="constantValue" value="Worker"/>
 									</bean>
 								</entry>
 							</map>
@@ -116,18 +122,13 @@
 		<constructor-arg name="externalDataProvider"
 						 ref="org.dspace.external.provider.impl.SHERPAv2JournalISSNDataProvider"/>
 		<constructor-arg name="authorityIdentifier" value="ISSN"/>
-    </bean>
+	</bean>
 
 
 	<bean class="org.dspace.authority.filler.ExternalDataProviderImportFiller" id="openaireProjectImportFiller">
 		<constructor-arg name="externalDataProvider" ref="openaireLiveImportDataProvider"/>
 		<constructor-arg name="authorityIdentifier" value="OPENAIRE-PROJECT-ID"/>
-    </bean>
-
-	<bean class="org.dspace.authority.filler.ExternalDataProviderImportFiller" id="rorOrgUnitImportFiller">
-		<constructor-arg name="externalDataProvider" ref="rorDataProvider"/>
-		<constructor-arg name="authorityIdentifier" value="ROR-ID"/>
-    </bean>
+	</bean>
 
 	<bean class="org.dspace.authority.service.ItemSearcherMapper"
 		  name="org.dspace.authority.service.ItemSearcherMapper">
@@ -141,11 +142,10 @@
 				<entry key="ISNI" value-ref="itemSearcherByISNI"/>
 				<entry key="DOI" value-ref="itemSearcherByDOI"/>
 				<entry key="URL" value-ref="itemSearcherByURL"/>
-                <entry key="ISSN" value-ref="itemSearcherByISSN"/>
-                <entry key="OPENAIRE-PROJECT-ID" value-ref="itemSearcherByOpenaireProjectId"/>
+				<entry key="ISSN" value-ref="itemSearcherByISSN"/>
+				<entry key="OPENAIRE-PROJECT-ID" value-ref="itemSearcherByOpenaireProjectId"/>
 				<entry key="LEGACY-ID" value-ref="itemSearcherByLegacyId"/>
 				<entry key="SCOPUS-AUTHOR-ID" value-ref="itemSearcherByScopusAuthorId"/>
-				<entry key="ROR-ID" value-ref="itemSearcherByRorId"></entry>
 			</map>
 		</constructor-arg>
 		<constructor-arg index="1">
@@ -178,15 +178,15 @@
 		<constructor-arg value="ISNI"></constructor-arg>
 	</bean>
 
-    <bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByISSN">
-        <constructor-arg value="dc.identifier.issn"></constructor-arg>
-        <constructor-arg value="ISSN"></constructor-arg>
-    </bean>
+	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByISSN">
+		<constructor-arg value="dc.identifier.issn"></constructor-arg>
+		<constructor-arg value="ISSN"></constructor-arg>
+	</bean>
 
-    <bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByOpenaireProjectId">
-        <constructor-arg value="oairecerif.funding.identifier"></constructor-arg>
-        <constructor-arg value="OPENAIRE-PROJECT-ID"></constructor-arg>
-    </bean>
+	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByOpenaireProjectId">
+		<constructor-arg value="oairecerif.funding.identifier"></constructor-arg>
+		<constructor-arg value="OPENAIRE-PROJECT-ID"></constructor-arg>
+	</bean>
 
 	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByLegacyId">
 		<constructor-arg value="cris.legacyId"></constructor-arg>
@@ -194,14 +194,9 @@
 	</bean>
 
 	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByScopusAuthorId">
-        <constructor-arg value="person.identifier.scopus-author-id"></constructor-arg>
-        <constructor-arg value="SCOPUS-AUTHOR-ID"></constructor-arg>
-    </bean>
-
-    <bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByRorId">
-        <constructor-arg value="organization.identifier.ror"></constructor-arg>
-        <constructor-arg value="ROR-ID"></constructor-arg>
-    </bean>
+		<constructor-arg value="person.identifier.scopus-author-id"></constructor-arg>
+		<constructor-arg value="SCOPUS-AUTHOR-ID"></constructor-arg>
+	</bean>
 
 	<bean class="org.dspace.authority.service.impl.ItemSearchServiceImpl"
 		  name="org.dspace.authority.service.ItemSearchService"/>

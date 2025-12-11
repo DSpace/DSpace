@@ -23,7 +23,9 @@ import java.util.UUID;
 
 import jakarta.annotation.Nullable;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.RelationshipUtils;
 import org.dspace.authority.AuthorityValue;
@@ -91,7 +93,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     /**
      * The authority controlled fields
      */
-    protected static Set<String> authorityControlled;
+    protected Set<String> authorityControlled;
 
     /**
      * The prefix of the authority controlled field
@@ -188,10 +190,10 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         // Create a context
         Context c = null;
         c = new Context();
+        c.turnOffAuthorisationSystem();
 
         // Find the EPerson, assign to context
         assignCurrentUserInContext(c);
-        assignSpecialGroupsInContext(c);
 
         if (authorityControlled == null) {
             setAuthorizedMetadataFields();
@@ -216,7 +218,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         initMetadataImport(csv);
         List<BulkEditChange> changes;
 
-        handleAuthorizationSystem(c);
         if (!commandLine.hasOption('s') || validateOnly) {
             // See what has changed
             try {
@@ -259,8 +260,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 displayChanges(changes, true);
             }
 
-            // Finsh off and tidy up
-            handleAuthorizationSystem(c);
+            // Finish off and tidy up
+            c.restoreAuthSystemState();
             c.complete();
         } catch (Exception e) {
             c.abort();
@@ -279,12 +280,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             } catch (SQLException e) {
                 log.error("Something went wrong trying to fetch the eperson for uuid: " + uuid, e);
             }
-        }
-    }
-
-    private void assignSpecialGroupsInContext(Context context) throws SQLException {
-        for (UUID uuid : handler.getSpecialGroups()) {
-            context.setSpecialGroup(uuid);
         }
     }
 
@@ -506,7 +501,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                 // Check it has an owning collection
                 List<String> collections = line.get("collection");
-                if (collections == null) {
+                if (collections == null || collections.isEmpty()) {
                     throw new MetadataImportException(
                         "New items must have a 'collection' assigned in the form of a handle");
                 }
@@ -563,7 +558,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                     // Add the metadata to the item
                     for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                        if (!StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
+                        if (!Strings.CS.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
                             itemService.addMetadata(c, item, dcv.getSchema(),
                                                     dcv.getElement(),
                                                     dcv.getQualifier(),
@@ -575,7 +570,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                     }
                     //Add relations after all metadata has been processed
                     for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                        if (StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
+                        if (Strings.CS.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
                             addRelationship(c, item, dcv.getElement(), dcv.getValue());
                         }
                     }
@@ -754,10 +749,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             if (value == null || !value.contains(csv.getAuthoritySeparator())) {
                 simplyCopyValue(value, dcv);
             } else {
-                String[] parts = value.split(csv.getAuthoritySeparator());
-                dcv.setValue(parts[0]);
-                dcv.setAuthority(parts[1]);
-                dcv.setConfidence((parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED));
+                resolveValueAndAuthority(value, dcv);
             }
 
             // fromAuthority==null: with the current implementation metadata values from external authority sources
@@ -1168,12 +1160,12 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             }
 
             // look up the value and authority in solr
-            List<AuthorityValue> byValue = authorityValueService.findByValue(c, schema, element, qualifier, value);
+            List<AuthorityValue> byValue = authorityValueService.findByValue(schema, element, qualifier, value);
             AuthorityValue authorityValue = null;
             if (byValue.isEmpty()) {
                 String toGenerate = fromAuthority.generateString() + value;
                 String field = schema + "_" + element + (StringUtils.isNotBlank(qualifier) ? "_" + qualifier : "");
-                authorityValue = authorityValueService.generate(c, toGenerate, value, field);
+                authorityValue = authorityValueService.generate(toGenerate, value, field);
                 dcv.setAuthority(toGenerate);
             } else {
                 authorityValue = byValue.get(0);
@@ -1185,10 +1177,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         } else if (value == null || !value.contains(csv.getAuthoritySeparator())) {
             simplyCopyValue(value, dcv);
         } else {
-            String[] parts = value.split(csv.getEscapedAuthoritySeparator());
-            dcv.setValue(parts[0]);
-            dcv.setAuthority(parts[1]);
-            dcv.setConfidence((parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED));
+            resolveValueAndAuthority(value, dcv);
         }
         return dcv;
     }
@@ -1197,6 +1186,35 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         dcv.setValue(value);
         dcv.setAuthority(null);
         dcv.setConfidence(Choices.CF_UNSET);
+    }
+
+    private void resolveValueAndAuthority(String value, BulkEditMetadataValue dcv) {
+        // Cells with valid authority are composed of three parts ~ <value>, <authority>, <confidence>
+        // The value itself may also include the authority separator though
+        String[] parts = value.split(csv.getEscapedAuthoritySeparator());
+
+        // If we don't have enough parts, assume the whole string is the value
+        if (parts.length < 3) {
+            simplyCopyValue(value, dcv);
+            return;
+        }
+
+        try {
+            // The last part of the cell must be a confidence value (integer)
+            int confidence = Integer.parseInt(parts[parts.length - 1]);
+            String authority = parts[parts.length - 2];
+            String plainValue = String.join(
+                csv.getAuthoritySeparator(),
+                ArrayUtils.subarray(parts, 0, parts.length - 2)
+            );
+
+            dcv.setValue(plainValue);
+            dcv.setAuthority(authority);
+            dcv.setConfidence(confidence);
+        } catch (NumberFormatException e) {
+            // Otherwise assume the whole string is the value
+            simplyCopyValue(value, dcv);
+        }
     }
 
     /**
@@ -1391,10 +1409,10 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     /**
      * is the field is defined as authority controlled
      */
-    private static boolean isAuthorityControlledField(String md) {
+    private boolean isAuthorityControlledField(String md) {
         String mdf = md.contains(":") ? StringUtils.substringAfter(md, ":") : md;
         mdf = StringUtils.substringBefore(mdf, "[");
-        return authorityControlled.contains(mdf);
+        return authorityControlled.contains(mdf) || authorityControlled.contains(md);
     }
 
     /**

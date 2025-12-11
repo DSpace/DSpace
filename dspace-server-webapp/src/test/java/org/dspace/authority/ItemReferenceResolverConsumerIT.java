@@ -699,7 +699,6 @@ public class ItemReferenceResolverConsumerIT extends AbstractControllerIntegrati
                                 .withName(name)
                                 .withEntityType(entityType)
                                 .withSubmitterGroup(submitter)
-                                .withSubmissionDefinition(submissionDefinition)
                                 .build();
     }
 

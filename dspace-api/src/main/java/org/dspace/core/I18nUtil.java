@@ -225,6 +225,15 @@ public class I18nUtil {
         return fileName;
     }
 
+    public static String getControlledVocabularyFileName(Locale locale, String vocabularyName) {
+        String fileName = "";
+        final String FILE_TYPE = ".xml";
+        String defsFilename = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
+            + File.separator + "config/controlled-vocabularies/" + File.separator + vocabularyName;
+        fileName = getFilename(locale, defsFilename, FILE_TYPE);
+        return fileName;
+    }
+
     /**
      * Get the i18n message string for a given key and use the default Locale.
      *

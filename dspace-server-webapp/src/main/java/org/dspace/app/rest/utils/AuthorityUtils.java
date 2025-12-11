@@ -57,7 +57,7 @@ public class AuthorityUtils {
      */
     public boolean isChoice(String schema, String element, String qualifier, String formname) {
         return cas.isChoicesConfigured(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"),
-                                       Constants.ITEM, formname);
+                Constants.ITEM, formname);
     }
 
     public String getAuthorityName(String schema, String element, String qualifier, String formName) {
@@ -94,8 +94,7 @@ public class AuthorityUtils {
      * @return
      */
     public VocabularyEntryDetailsRest convertEntryDetails(boolean fix, Choice choice, String authorityName,
-                                                          boolean isHierarchical, boolean storeAuthority,
-                                                          Projection projection) {
+            boolean isHierarchical, boolean storeAuthority, Projection projection) {
         if (choice == null) {
             return null;
         }

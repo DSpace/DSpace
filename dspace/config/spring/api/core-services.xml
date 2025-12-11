@@ -43,7 +43,6 @@
     <bean class="org.dspace.content.BitstreamFormatServiceImpl"/>
     <bean class="org.dspace.content.BitstreamServiceImpl"/>
     <bean class="org.dspace.content.BundleServiceImpl"/>
-    <bean class="org.dspace.content.integration.crosswalks.virtualfields.ItemDOIService"/>
     <bean class="org.dspace.content.CommunityServiceImpl"/>
     <bean class="org.dspace.content.InstallItemServiceImpl"/>
     <bean class="org.dspace.content.ItemServiceImpl"/>
@@ -54,7 +53,6 @@
     <bean class="org.dspace.content.SiteServiceImpl"/>
     <bean class="org.dspace.content.WorkspaceItemServiceImpl"/>
     <bean class="org.dspace.content.RelationshipServiceImpl"/>
-    <bean class="org.dspace.content.RelationshipPlacesIndexingServiceImpl"/>
     <bean class="org.dspace.content.EntityTypeServiceImpl"/>
     <bean class="org.dspace.content.EntityServiceImpl"/>
     <bean class="org.dspace.content.RelationshipTypeServiceImpl"/>
@@ -71,10 +69,9 @@
     <bean class="org.dspace.content.authority.AuthorityServiceUtils"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
 
-    <bean class="org.dspace.profile.OrcidProfileEnricher"/>
-    <bean class="org.dspace.profile.OrcidMetadataCopyingAction"/>
+    <bean class="org.dspace.profile.ResearcherProfileServiceImpl"/>
 
-    <bean id="org.dspace.profile.service.ResearcherProfileService" class="org.dspace.profile.ResearcherProfileServiceImpl"/>
+    <bean class="org.dspace.profile.OrcidMetadataCopyingAction"/>
 
     <bean class="org.dspace.handle.hdlresolver.HdlResolverServiceImpl"/>
 
@@ -102,12 +99,11 @@
     <bean class='org.dspace.curate.XmlWorkflowCuratorServiceImpl'/>
 
     <bean class="org.dspace.disseminate.CitationDocumentServiceImpl"/>
+    <bean class="org.dspace.disseminate.CoverPageService"/>
 
     <!-- Ensure EmbargoService and AccessStatusService are initialized properly via init() method -->
     <bean class="org.dspace.embargo.EmbargoServiceImpl" init-method="init"/>
     <bean class="org.dspace.access.status.AccessStatusServiceImpl" init-method="init"/>
-
-    <bean class="org.dspace.deduplication.DeduplicationServiceImpl"/>
 
     <bean class="org.dspace.eperson.AccountServiceImpl"/>
     <bean class="org.dspace.eperson.EPersonServiceImpl"/>
@@ -115,10 +111,10 @@
     <bean class="org.dspace.eperson.RegistrationDataServiceImpl"/>
     <bean class="org.dspace.eperson.RegistrationDataMetadataServiceImpl"/>
     <bean class="org.dspace.eperson.SubscribeServiceImpl"/>
-
-    <bean class="org.dspace.eperson.SubscribeParameterServiceImpl"/>
-
-    <bean class="org.dspace.eperson.CaptchaServiceImpl"/>
+    <!-- Use CaptchaServiceImpl for Google ReCaptcha -->
+    <bean class="org.dspace.eperson.CaptchaServiceImpl" id="googleCaptchaService"/>
+    <!-- Use AltchaCaptchaServiceImpl for ALTCHA captcha -->
+    <bean class="org.dspace.eperson.AltchaCaptchaServiceImpl" id="altchaCaptchaService"/>
     <bean class="org.dspace.event.EventServiceImpl"/>
 
     <bean class="org.dspace.handle.HandleServiceImpl"/>
@@ -126,11 +122,6 @@
     <bean class="org.dspace.harvest.HarvestedCollectionServiceImpl"/>
     <bean class="org.dspace.harvest.HarvestedItemServiceImpl"/>
     <bean class="org.dspace.harvest.HarvestSchedulingServiceImpl"/>
-    <bean class="org.dspace.harvest.OAIHarvester"/>
-    <bean class="org.dspace.harvest.OAIHarvesterClientImpl"/>
-    <bean class="org.dspace.harvest.OAIHarvesterValidatorImpl"/>
-    <bean class="org.dspace.harvest.OAIHarvesterEmailSenderImpl"/>
-    <bean class="org.dspace.harvest.OAIHarvesterXlsReportGeneratorImpl"/>
 
     <bean class="org.dspace.identifier.DOIServiceImpl"/>
 
@@ -143,9 +134,6 @@
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 
     <bean class="org.dspace.util.FrontendUrlService"/>
-
-    <bean class="org.dspace.content.security.MetadataSecurityServiceImpl"/>
-    <bean class="org.dspace.metricsSecurity.BoxMetricsLayoutConfigurationService"/>
 
     <!-- Configurable workflow services -->
     <bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
@@ -168,37 +156,6 @@
     <bean class="org.dspace.discovery.indexobject.MetadataFieldIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.LDNMessageEntityIndexFactoryImpl" autowire-candidate="true"/>
 
-    <!-- Imp beans -->
-    <bean class="org.dspace.batch.ImpBitstreamServiceImpl"/>
-    <bean class="org.dspace.batch.ImpMetadatavalueServiceImpl"/>
-    <bean class="org.dspace.batch.ImpRecordServiceImpl"/>
-    <bean class="org.dspace.batch.ImpBitstreamMetadatavalueServiceImpl"/>
-    <bean class="org.dspace.batch.ImpWorkflowNStateServiceImpl"/>
-
-    <!-- Configurable layout services -->
-    <bean class="org.dspace.layout.service.impl.CrisLayoutTabServiceImpl"/>
-    <bean class="org.dspace.layout.service.impl.CrisLayoutBoxServiceImpl"/>
-    <bean class="org.dspace.layout.service.impl.CrisLayoutFieldServiceImpl"/>
-    <bean class="org.dspace.layout.service.impl.CrisLayoutMetadataGroupServiceImpl"/>
-    <bean class="org.dspace.layout.service.impl.CrisLayoutMetric2BoxServiceImpl"/>
-
-    <bean class="org.dspace.layout.service.impl.LayoutSecurityServiceImpl"/>
-    <bean class="org.dspace.layout.service.impl.CrisLayoutBoxAccessServiceImpl"/>
-    <bean class="org.dspace.layout.service.impl.CrisLayoutTabAccessServiceImpl"/>
-    <bean class="org.dspace.content.security.CrisSecurityServiceImpl"/>
-    <bean class="org.dspace.app.metrics.service.CrisMetricsServiceImpl"/>
-
-    <bean class="org.dspace.layout.script.service.impl.CrisLayoutToolValidatorImpl"/>
-    <bean class="org.dspace.layout.script.service.impl.CrisLayoutToolParserImpl"/>
-    <bean class="org.dspace.layout.script.service.impl.CrisLayoutToolConverterImpl"/>
-
-
-    <bean id="org.dspace.app.customurl.CustomUrlService" class="org.dspace.app.customurl.service.CustomUrlServiceImpl"/>
-
-    <bean class="org.dspace.statistics.LoginStatisticsServiceImpl" />
-
-    <bean class="org.dspace.statistics.WorkflowStatisticsServiceImpl" />
-
     <!-- OIDC Authentication -->
     <bean class="org.dspace.authenticate.OidcAuthenticationBean" id="oidcAuthentication"/>
     <bean class="org.dspace.authenticate.oidc.impl.OidcClientImpl" />
@@ -218,8 +175,7 @@
 
     <bean class="org.dspace.correctiontype.service.impl.CorrectionTypeServiceImpl"/>
 
-    <bean class="org.dspace.app.policy.PolicyUpdaterServiceImpl" />
-    <bean class="org.dspace.app.policy.MediaFilterRelatedPolicyUpdater" />
+    <bean id="org.dspace.app.customurl.CustomUrlService" class="org.dspace.app.customurl.service.CustomUrlServiceImpl"/>
 
 </beans>
 

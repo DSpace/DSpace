@@ -37,27 +37,30 @@ import org.xml.sax.InputSource;
  * from {@code ${dspace.dir}/config/controlled-vocabularies/*.xml} and turns
  * them into autocompleting authorities.
  *
- * Configuration: This MUST be configured as a self-named plugin, e.g.: {@code
- * plugin.selfnamed.org.dspace.content.authority.ChoiceAuthority = \
+ * <p>Configuration: This MUST be configured as a self-named plugin, e.g.: {@code
+ * plugin.selfnamed.org.dspace.content.authority.ChoiceAuthority =
  * org.dspace.content.authority.DSpaceControlledVocabulary
  * }
  *
- * It AUTOMATICALLY configures a plugin instance for each XML file in the
+ * <p>It AUTOMATICALLY configures a plugin instance for each XML file in the
  * controlled vocabularies directory. The name of the plugin is the basename of
  * the file; e.g., {@code ${dspace.dir}/config/controlled-vocabularies/nsi.xml}
  * would generate a plugin called "nsi".
  *
- * Each configured plugin comes with three configuration options: {@code
- * vocabulary.plugin._plugin_.hierarchy.store = <true|false>
- * # Store entire hierarchy along with selected value. Default: TRUE
- * vocabulary.plugin._plugin_.hierarchy.suggest =
- * <true|false>  # Display entire hierarchy in the suggestion list.  Default: TRUE
- * vocabulary.plugin._plugin_.delimiter = "<string>"
- * # Delimiter to use when building hierarchy strings. Default: "::"
+ * <p>Each configured plugin comes with three configuration options:
+ * <ul>
+ *  <li>{@code vocabulary.plugin._plugin_.hierarchy.store = <true|false>
+ * # Store entire hierarchy along with selected value. Default: TRUE}</li>
+ *  <li>{@code vocabulary.plugin._plugin_.hierarchy.suggest =
+ * <true|false>  # Display entire hierarchy in the suggestion list.  Default: TRUE}</li>
+ *  <li>{@code vocabulary.plugin._plugin_.delimiter = "<string>"
+ * # Delimiter to use when building hierarchy strings. Default: "::"}</li>
+ * </ul>
  * }
  *
  * @author Michael B. Klein
  */
+
 public class DSpaceControlledVocabulary extends SelfNamedPlugin implements HierarchicalAuthority {
 
     private static Logger log = LogManager.getLogger(DSpaceControlledVocabulary.class);
@@ -101,7 +104,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         if (pluginNames == null) {
             initPluginNames();
         }
-        return (String[]) ArrayUtils.clone(pluginNames);
+        return ArrayUtils.clone(pluginNames);
     }
 
     private static synchronized void initPluginNames() {
@@ -117,7 +120,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
                                                            File.separator + "config" +
                                                            File.separator + "controlled-vocabularies";
             String[] xmlFiles = (new File(vocabulariesPath)).list(new xmlFilter());
-            List<String> names = new ArrayList<String>();
+            List<String> names = new ArrayList<>();
             for (String filename : xmlFiles) {
                 if (!filename.matches("(.*)_[a-z]{2}\\.xml")) {
                     names.add((new File(filename)).getName().replace(".xml", ""));

@@ -119,6 +119,18 @@
     </bean>
 
     <!-- OpenAIRE importers -->
+    <bean id="openaireLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="OpenAIREService"/>
+        <property name="sourceIdentifier" value="openaireProject"/>
+        <property name="recordIdMetadata" value="oairecerif.funding.identifier"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Funding</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- OpenAIRE importers -->
     <bean id="openaireLiveImportDataProviderByAuthor" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="openaireImportServiceByAuthor"/>
         <property name="sourceIdentifier" value="openaire"/>

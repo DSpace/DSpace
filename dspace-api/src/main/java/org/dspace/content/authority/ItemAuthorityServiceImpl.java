@@ -11,7 +11,6 @@ package org.dspace.content.authority;
 import org.dspace.content.authority.service.ItemAuthorityService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-
 /**
  *
  * @author Stefano Maffei 4Science.com
@@ -28,9 +27,8 @@ public class ItemAuthorityServiceImpl implements ItemAuthorityService {
      * Get the solr query to be executed Priority is given to the
      * itemauthoritylookup field which contains exact names The best match term is
      * lower priority since it generates permutations of the names
-     *
-     * @param searchTerm the term to be searched
-     * @return solr query to be executed
+     * @param  searchTerm the term to be searched
+     * @return            solr query to be executed
      */
     @Override
     public String getSolrQueryExactMatch(String searchTerm) {

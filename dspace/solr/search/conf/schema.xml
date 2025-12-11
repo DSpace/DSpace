@@ -80,7 +80,7 @@
                 catenateAll="0"
                 splitOnCaseChange="1"/>
         <filter class="org.apache.lucene.analysis.icu.ICUFoldingFilterFactory"/>
-          <filter class="solr.KeywordRepeatFilterFactory"/>
+        <filter class="solr.KeywordRepeatFilterFactory"/>
         <filter class="solr.SnowballPorterFilterFactory" language="English" protected="protwords.txt"/>
         <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
@@ -191,23 +191,22 @@
         </analyzer>
     </fieldType>
 
-      <!--This field is used for ItemAuthority lookup -->
-      <fieldType name="itemLookup" class="solr.TextField" sortMissingLast="true" omitNorms="true">
-          <analyzer>
-              <tokenizer class="solr.KeywordTokenizerFactory"/>
+    <!--This field is used for ItemAuthority lookup -->
+    <fieldType name="itemLookup" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+        <analyzer>
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
 
-              <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1"
-                      catenateWords="1" catenateNumbers="1" catenateAll="0" splitOnCaseChange="1"/>
-              <!--Lower cases our values-->
-              <filter class="solr.LowerCaseFilterFactory"/>
-              <!--Deal with special char like ò à ù ... -->
-              <filter class="solr.ICUFoldingFilterFactory"/>
-              <!-- The TrimFilter removes any leading or trailing whitespace -->
-              <filter class="solr.TrimFilterFactory"/>
-          </analyzer>
-      </fieldType>
+	    <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0" splitOnCaseChange="1"/>
+            <!--Lower cases our values-->
+            <filter class="solr.LowerCaseFilterFactory" />
+            <!--Deal with special char like ò à ù ... -->
+            <filter class="solr.ICUFoldingFilterFactory"/>
+            <!-- The TrimFilter removes any leading or trailing whitespace -->
+            <filter class="solr.TrimFilterFactory" />
+        </analyzer>
+    </fieldType>
 
-      <fieldType name="keywordFilter" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+    <fieldType name="keywordFilter" class="solr.TextField" sortMissingLast="true" omitNorms="true">
         <analyzer>
             <!--Treats the entire field as a single token, regardless of its content-->
             <tokenizer class="solr.KeywordTokenizerFactory"/>
@@ -246,7 +245,7 @@
 
  <fields>
 
-     <field name="_version_" type="long" indexed="true" stored="true" docValues="true" multiValued="false"/>
+	<field name="_version_" type="long" indexed="true" stored="true" docValues="true" multiValued="false"/>
 
     <!-- catchall field, containing all other searchable text fields (implemented
         via copyField further on in this schema  -->
@@ -255,8 +254,7 @@
     <field name="fulltext" type="text" indexed="true" stored="true" multiValued="true"/>
 
     <!-- Internal DSpace Object ID -->
-     <field name="search.resourceid" type="string" indexed="true" stored="true" required="true" omitNorms="true"
-            docValues="true"/>
+    <field name="search.resourceid" type="string" indexed="true" stored="true" required="true" omitNorms="true" docValues="true"/>
 
     <!-- Internal DSpaceObject Type ID -->
     <field name="search.resourcetype" type="string" indexed="true" stored="true" required="true" omitNorms="true" />
@@ -302,8 +300,7 @@
     <!-- used by the DSpace Discovery Solr Indexer to track the last time a document was indexed -->
     <field name="SolrIndexer.lastIndexed" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
     <field name="lastModified" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
-     <field name="lastModified_dt" type="date" indexed="true" stored="true" default="NOW" multiValued="false"
-            omitNorms="true" docValues="true"/>
+    <field name="lastModified_dt" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" docValues="true"/>
 
     <!-- used to filter out items that are older versions of another item -->
     <field name="latestVersion" type="boolean" indexed="true" stored="true" default="true" multiValued="false" omitNorms="true"/>
@@ -328,8 +325,7 @@
     <dynamicField name="*_prefix" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
     <dynamicField name="*_authority" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
     <dynamicField name="*_keyword" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
-     <dynamicField name="*_statfilter" type="string" indexed="true" stored="true" multiValued="true" required="false"
-                   omitNorms="true"/>
+    <dynamicField name="*_statfilter" type="string" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
 
 	<!--Dynamic field used for SOLR browse by partial value -->
     <dynamicField name="*_partial" type="text" indexed="true" stored="true" multiValued="true" omitNorms="true" />
@@ -345,24 +341,24 @@
     <dynamicField name="*_mlt" type="text" indexed="true" stored="true" multiValued="true" omitNorms="true" termVectors="true" termPositions="true" termOffsets="true"/>
 
     <!--Date matching-->
-     <dynamicField name="*.year" type="sint" indexed="true" stored="true" multiValued="true" omitNorms="true"/>
+    <dynamicField name="*.year" type="sint" indexed="true" stored="true" multiValued="true" omitNorms="true" />
     <dynamicField name="*_dt" type="date" indexed="true" stored="true" multiValued="false" omitNorms="true"  docValues="true"/>
 
-     <!--Dynamic field used for update metrics in Solr doc-->
-     <dynamicField name="metric.*" type="double" indexed="true" stored="true" multiValued="false" docValues="true"/>
-     <dynamicField name="metric.acquisitionDate.*" type="date" indexed="true" stored="true" multiValued="false"/>
-     <dynamicField name="metric.id.*" type="int" indexed="true" stored="true" multiValued="false"/>
-     <dynamicField name="metric.remark.*" type="string" indexed="true" stored="true" multiValued="false"/>
-     <dynamicField name="metric.deltaPeriod1.*" type="double" indexed="true" stored="true" multiValued="false"/>
-     <dynamicField name="metric.deltaPeriod2.*" type="double" indexed="true" stored="true" multiValued="false"/>
-     <dynamicField name="metric.rank.*" type="double" indexed="true" stored="true" multiValued="false"/>
+    <!--Dynamic field used for update metrics in Solr doc-->
+    <dynamicField name="metric.*" type="double" indexed="true" stored="true" multiValued="false" docValues="true"/>
+    <dynamicField name="metric.acquisitionDate.*" type="date" indexed="true" stored="true" multiValued="false"/>
+    <dynamicField name="metric.id.*" type="int" indexed="true" stored="true" multiValued="false"/>
+    <dynamicField name="metric.remark.*" type="string" indexed="true" stored="true" multiValued="false"/>
+    <dynamicField name="metric.deltaPeriod1.*" type="double" indexed="true" stored="true" multiValued="false"/>
+    <dynamicField name="metric.deltaPeriod2.*" type="double" indexed="true" stored="true" multiValued="false"/>
+    <dynamicField name="metric.rank.*" type="double" indexed="true" stored="true" multiValued="false"/>
 
-     <!--Used for matching on all other fields -->
+    <!--Used for matching on all other fields -->
     <dynamicField name="*" type="text" multiValued="true"/>
 
     <!-- Leftovers from sample schema.  Are these used? -->
     <dynamicField name="*_i"   type="int"     indexed="true" stored="true" docValues="true"/>
-     <dynamicField name="*_s" type="string" indexed="true" stored="true" docValues="true" multiValued="true"/>
+    <dynamicField name="*_s"   type="string"  indexed="true" stored="true" docValues="true" multiValued="true"/>
     <dynamicField name="*_l"   type="long"    indexed="true" stored="true" docValues="true"/>
     <dynamicField name="*_t"   type="text"    indexed="true" stored="true" />
     <dynamicField name="*_b"   type="boolean" indexed="true" stored="true" />
@@ -381,11 +377,11 @@
 
     <dynamicField name="random_*" type="random" />
 
-     <!-- Item authority lookup -->
+    <!-- Item authority lookup -->
      <field name="itemauthoritylookup" type="itemLookup" indexed="true" stored="true" multiValued="true"/>
      <field name="itemauthoritylookupexactmatch" type="text" indexed="true" stored="true" multiValued="true"/>
 
-     <field name="customurl" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
+    <field name="customurl" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
 
  </fields>
 
@@ -396,9 +392,9 @@
         or to add multiple fields to the same field for easier/faster searching.  -->
 
  <copyField source="*" dest="search_text"/>
-    <copyField source="lastModified" dest="lastModified_dt"/>
-    <copyField source="title" dest="itemauthoritylookup"/>
-    <copyField source="title" dest="itemauthoritylookupexactmatch"/>
+ <copyField source="lastModified" dest="lastModified_dt"/>
+ <copyField source="title" dest="itemauthoritylookup"/>
+ <copyField source="title" dest="itemauthoritylookupexactmatch"/>
  <copyField source="dspace.entity.type" dest="search.entitytype"/>
 
 </schema>
