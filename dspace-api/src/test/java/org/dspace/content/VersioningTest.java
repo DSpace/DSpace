@@ -188,7 +188,8 @@ public class VersioningTest extends AbstractUnitTest {
             assertThat("getVersion should return null for item without version", result, nullValue());
         } catch (NullPointerException npe) {
             fail("NullPointerException should not be thrown. Method should return null: " + npe.getMessage());
+        } finally {
+            context.restoreAuthSystemState();
         }
-        context.restoreAuthSystemState();
     }
 }
