@@ -174,15 +174,12 @@ public class VersioningTest extends AbstractUnitTest {
     @Test
     public void testGetVersionWithNullPointerException() throws Exception {
         context.turnOffAuthorisationSystem();
-        
         // Create item without version
         Community community = communityService.create(null, context);
         Collection col = collectionService.create(context, community);
         WorkspaceItem is = workspaceItemService.create(context, col, false);
         Item itemWithoutVersion = installItemService.installItem(context, is);
-        
         VersionHistory versionHistory = versionHistoryService.findByItem(context, originalItem);
-        
         try {
             Version result = versionHistoryService.getVersion(context, versionHistory, itemWithoutVersion);
             assertThat("getVersion should return null for item without version", result, nullValue());
