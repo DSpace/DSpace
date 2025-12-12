@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.authenticate.AuthenticationUtility;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -124,6 +125,9 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
 
         if (restAuthenticationService.hasAuthenticationData(request)) {
             Context context = ContextUtil.obtainContext(request);
+
+            AuthenticationUtility.updateAuthenticationMethod(context, request);
+
             // parse the token.
             EPerson eperson = restAuthenticationService.getAuthenticatedEPerson(request, res, context);
             if (eperson != null) {

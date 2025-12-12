@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.security;
 
+import static org.dspace.authenticate.AuthenticationUtility.Mapping.PASSWORD;
+
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -17,7 +19,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.authenticate.AuthenticationUtility;
 import org.dspace.core.Context;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -36,18 +40,27 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter {
     private static final Logger log = LogManager.getLogger();
 
-    protected AuthenticationManager authenticationManager;
-
-    protected RestAuthenticationService restAuthenticationService;
+    protected final AuthenticationManager authenticationManager;
+    protected final RestAuthenticationService restAuthenticationService;
 
     @Override
     public void afterPropertiesSet() {
     }
 
-    /**
+     /**
+     * Initialize a StatelessLoginFilter for password authentication.
+     *
+     * @param authenticationManager Spring Security AuthenticationManager to use for authentication
+     * @param restAuthenticationService DSpace RestAuthenticationService to use for authentication
+     */
+    public StatelessLoginFilter(AuthenticationManager authenticationManager,
+                                RestAuthenticationService restAuthenticationService) {
+        this(PASSWORD.getMethodUrl(), HttpMethod.POST.name(), authenticationManager, restAuthenticationService);
+    }
+
+     /**
      * Initialize a StatelessLoginFilter for the given URL and HTTP method. This login filter will ONLY attempt
-     * authentication for requests that match this URL and method. The URL & method are defined in the configuration
-     * in WebSecurityConfiguration.
+     * authentication for requests that match this URL and method.
      * @see org.dspace.app.rest.security.WebSecurityConfiguration
      * @param url URL path to attempt to authenticate (e.g. "/api/authn/login")
      * @param httpMethod HTTP method to attempt to authentication (e.g. "POST")
@@ -81,6 +94,19 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 
         String user = req.getParameter("user");
         String password = req.getParameter("password");
+
+        Context context = ContextUtil.obtainContext(req);
+
+        AuthenticationUtility.updateAuthenticationMethod(context, req);
+
+        try {
+            restAuthenticationService.getAuthenticationService()
+                .getSpecialGroups(context, req)
+                .stream()
+                .forEach(sg -> context.setSpecialGroup(sg.getID()));
+        } catch (SQLException e) {
+            log.error("Failed to get special groups during stateless login authentication attempt", e);
+        }
 
         // Attempt to authenticate by passing user & password (if provided) to AuthenticationProvider class(es)
         // NOTE: This method will check if the user was already authenticated by StatelessAuthenticationFilter,
