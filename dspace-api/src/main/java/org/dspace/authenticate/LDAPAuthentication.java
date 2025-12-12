@@ -39,7 +39,9 @@ import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.EqualsFilter;
+import org.springframework.ldap.filter.PresentFilter;
 import org.springframework.ldap.query.LdapQueryBuilder;
+import org.springframework.ldap.support.LdapNameBuilder;
 import org.springframework.ldap.support.LdapUtils;
 
 
@@ -233,12 +235,18 @@ public class LDAPAuthentication implements AuthenticationMethod {
         String idField = configurationService.getProperty("authentication-ldap.id_field");
         String dn = "";
 
-        // If adminUser is blank and anonymous search is not allowed, then we can't search so construct the DN
-        // instead of searching it
         if ((StringUtils.isBlank(adminUser) || StringUtils.isBlank(adminPassword)) && !anonymousSearch) {
-            dn = idField + "=" + netid + "," + objectContext;
+            try {
+                dn = LdapNameBuilder.newInstance(objectContext)
+                        .add(idField, netid)
+                        .build()
+                        .toString();
+            } catch (Exception e) {
+                log.warn("Failed to build DN for user " + netid, e);
+                return BAD_ARGS;
+            }
         } else {
-            dn = ldap.getDNOfUser(adminUser, adminPassword, context, netid);
+            dn = ldap.getDNOfUser(context, netid);
         }
 
         // Check a DN was found
@@ -447,6 +455,9 @@ public class LDAPAuthentication implements AuthenticationMethod {
 
         private void setupSpringLdap(ConfigurationService cfg) {
             LdapContextSource contextSource = new LdapContextSource();
+            if (StringUtils.isBlank(ldap_provider_url)) {
+                log.error("LDAP provider URL is empty! Check authentication-ldap.provider_url");
+            }
             contextSource.setUrl(ldap_provider_url);
 
             String adminUser = cfg.getProperty("authentication-ldap.search.user");
@@ -465,7 +476,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
             this.ldapTemplate.setIgnorePartialResultException(true);
         }
 
-        protected String getDNOfUser(String adminUser, String adminPassword, Context context, String netid) {
+        protected String getDNOfUser(Context context, String netid) {
             try {
                 EqualsFilter filter = new EqualsFilter(ldap_id_field, netid);
 
@@ -495,11 +506,9 @@ public class LDAPAuthentication implements AuthenticationMethod {
                         if (ldap_group_field != null) {
                             String[] groups = ctx.getStringAttributes(ldap_group_field);
                             if (groups != null) {
-
                                 this.ldapGroup = new ArrayList<>(Arrays.asList(groups));
                             }
                         }
-
                         return ctx.getNameInNamespace();
                     }
                 );
@@ -531,35 +540,15 @@ public class LDAPAuthentication implements AuthenticationMethod {
             try {
                 boolean authenticated = ldapTemplate.authenticate(
                     LdapUtils.newLdapName(dn),
-                    new EqualsFilter(ldap_id_field, "*").toString(),
+                    new PresentFilter(ldap_id_field).toString(),
                     password
                 );
-                if (authenticated) {
-                    return true;
-                }
-                // Fallback para tentativa direta (útil em alguns cenários de AD)
-                return verifyPassword(dn, password);
+                return authenticated;
 
             } catch (Exception e) {
                 log.warn(LogHelper.getHeader(context, "ldap_authentication", "type=failed_auth " + e));
                 return false;
             }
-        }
-
-        private boolean verifyPassword(String userDn, String password) {
-            try {
-                javax.naming.directory.DirContext ctx = contextSource().getContext(userDn, password);
-                if (ctx != null) {
-                    LdapUtils.closeContext(ctx);
-                }
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
-        }
-
-        private LdapContextSource contextSource () {
-            return (LdapContextSource) ldapTemplate.getContextSource();
         }
     }
 
