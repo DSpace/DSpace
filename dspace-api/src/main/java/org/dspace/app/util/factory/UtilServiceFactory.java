@@ -20,8 +20,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @author kevinvandevelde at atmire.com
  */
 public abstract class UtilServiceFactory {
-    public abstract WebAppService getWebAppService();
-
     public abstract OpenSearchService getOpenSearchService();
 
     public abstract MetadataExposureService getMetadataExposureService();
