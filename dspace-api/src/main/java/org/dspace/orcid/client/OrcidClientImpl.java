@@ -183,6 +183,13 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     @Override
+    public ExpandedSearch expandedSearch(String accessToken, String query, int start, int rows) {
+        String queryParams = formatExpandedSearchParameters(query, start, rows);
+        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/expanded-search" + queryParams);
+        return executeAndUnmarshall(httpUriRequest, false, ExpandedSearch.class);
+    }
+
+    @Override
     public ExpandedSearch expandedSearch(String query, int start, int rows) {
         String queryParams = formatExpandedSearchParameters(query, start, rows);
         HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/expanded-search" + queryParams);

@@ -163,6 +163,17 @@ public interface OrcidClient {
      */
     OrcidResponse deleteByPutCode(String accessToken, String orcid, String putCode, String path);
 
+    /**
+     * Perform an expanded search with the given query and pagination using the api
+     * endpoint.
+     *
+     * @param accessToken the access token
+     * @param query       the query
+     * @param start       the start index
+     * @param rows        the number of rows to retrieve
+     * @return the expanded search result
+     */
+    ExpandedSearch expandedSearch(String accessToken, String query, int start, int rows);
 
     /**
      * Perform an expanded search with the given query and pagination using the
