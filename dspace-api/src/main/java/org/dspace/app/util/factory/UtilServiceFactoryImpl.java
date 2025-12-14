@@ -26,14 +26,7 @@ public class UtilServiceFactoryImpl extends UtilServiceFactory {
     @Autowired(required = true)
     private OpenSearchService openSearchService;
     @Autowired(required = true)
-    private WebAppService webAppService;
-    @Autowired(required = true)
     private DSpaceObjectUtils dSpaceObjectUtils;
-
-    @Override
-    public WebAppService getWebAppService() {
-        return webAppService;
-    }
 
     @Override
     public OpenSearchService getOpenSearchService() {
