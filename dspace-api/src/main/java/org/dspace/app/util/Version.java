@@ -9,10 +9,8 @@ package org.dspace.app.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
 
-import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
