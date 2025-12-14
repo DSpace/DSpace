@@ -38,28 +38,11 @@ public class Version {
         System.out.printf("DSpace version:  %s\n",
                           Util.getSourceVersion());
 
-        // SCM revision
-        Properties scm = new Properties();
-        propStream = Version.class.getResourceAsStream("/scm.properties");
-        if (null != propStream) {
-            scm.load(propStream);
-        }
-        System.out.printf("  SCM revision:  %s\n", scm.get("revision"));
-        System.out.printf("    SCM branch:  %s\n", scm.get("branch"));
-
         // OS version
         System.out.printf("            OS:  %s(%s) version %s\n",
                           sys.get("os.name"),
                           sys.get("os.arch"),
                           sys.get("os.version"));
-
-        // UIs used
-        List<WebApp> apps = UtilServiceFactory.getInstance().getWebAppService().getApps();
-        System.out.println("  Applications:");
-        for (WebApp app : apps) {
-            System.out.printf("                %s at %s\n",
-                              app.getAppName(), app.getUrl());
-        }
 
         // Is Discovery available?
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -77,15 +60,6 @@ public class Version {
         System.out.printf("           JRE:  %s version %s\n",
                           sys.get("java.vendor"),
                           sys.get("java.version"));
-
-        // ant version
-        Properties ant = new Properties();
-        propStream = Version.class.getResourceAsStream("/ant.properties");
-        if (null != propStream) {
-            ant.load(propStream);
-        }
-        System.out.printf("   Ant version:  %s\n",
-                          ant.get("ant.version"));
 
         // maven version
         Properties maven = new Properties();
