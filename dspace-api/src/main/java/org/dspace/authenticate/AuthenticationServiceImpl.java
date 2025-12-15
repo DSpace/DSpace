@@ -111,6 +111,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 }
                 if (ret == AuthenticationMethod.SUCCESS) {
                     updateLastActiveDate(context);
+                    context.setAuthenticationMethod(aMethodStack.getName());
                     return ret;
                 }
                 if (ret < bestRet) {
