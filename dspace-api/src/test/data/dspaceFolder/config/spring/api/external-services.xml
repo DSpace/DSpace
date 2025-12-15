@@ -57,6 +57,17 @@
         <constructor-arg value="${orcid.api-url}"/>
     </bean>
 
+    <bean id="authorityProjectDataProvider" class="org.dspace.external.provider.impl.AuthorityImportDataProvider">
+        <property name="supportedAuthority" value="AuthorAuthority"/>
+        <property name="authorityMetadata" value="dc.contributor.author"/>
+        <property name="sourceIdentifier" value="authorAuthority"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
     <bean id="orcidPublicationDataProvider" class="org.dspace.external.provider.impl.OrcidPublicationDataProvider">
         <property name="sourceIdentifier" value="orcidWorks"/>
         <property name="fieldMapping" ref="orcidPublicationDataProviderFieldMapping"/>

@@ -68,6 +68,7 @@ public class ItemAuthorityIT extends AbstractControllerIntegrationTest {
 
     @Before
     public void setup() {
+        choiceAuthorityService.getChoiceAuthoritiesNames(); // initialize the ChoiceAuthorityService
         ((OrcidServiceFactoryImpl) OrcidServiceFactory.getInstance()).setOrcidClient(orcidClientMock);
         when(orcidClientMock.expandedSearch(any(), anyInt(), anyInt())).thenReturn(new ExpandedSearch());
     }
