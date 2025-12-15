@@ -56,6 +56,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.ProvenanceService;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
@@ -111,6 +112,8 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
     private boolean help = false;
 
     protected String eperson = null;
+
+    protected ProvenanceService provenanceService = ContentServiceFactory.getInstance().getProvenanceService();
 
     @Override
     @SuppressWarnings("unchecked")
@@ -466,6 +469,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
                 itemAccessConditions.get(accessCondition.getName())));
 
         itemService.adjustItemPolicies(context, item, item.getOwningCollection(), false);
+        provenanceService.setItemPolicies(context, item, accessControl);
     }
 
     /**
@@ -581,6 +585,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
 
         itemService.adjustBitstreamPolicies(context, item, item.getOwningCollection(), bitstream);
         mediaFilterService.updatePoliciesOfDerivativeBitstreams(context, item, bitstream);
+        provenanceService.setBitstreamPolicies(context, bitstream, item, accessControl);
     }
 
     /**

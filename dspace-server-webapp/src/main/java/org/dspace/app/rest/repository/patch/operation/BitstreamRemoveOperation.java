@@ -16,9 +16,11 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.ProvenanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -43,6 +45,8 @@ public class BitstreamRemoveOperation extends PatchOperation<Bitstream> {
     BitstreamService bitstreamService;
     @Autowired
     AuthorizeService authorizeService;
+    @Autowired
+    ProvenanceService provenanceService;
     public static final String OPERATION_PATH_BITSTREAM_REMOVE = "/bitstreams/";
 
     @Override
@@ -53,9 +57,14 @@ public class BitstreamRemoveOperation extends PatchOperation<Bitstream> {
             throw new RESTBitstreamNotFoundException(bitstreamIDtoDelete);
         }
         authorizeBitstreamRemoveAction(context, bitstreamToDelete, Constants.DELETE);
-
         try {
+            // Find the item to which the bitstream belongs before deleting the bitstream,
+            // because after deletion, the item will no longer be connected to the bitstream.
+            Item item = provenanceService.findItemByBitstream(context, bitstreamToDelete);
+            // Delete the bitstream
             bitstreamService.delete(context, bitstreamToDelete);
+            // Update the provenance metadata after the bitstream has been successfully deleted
+            provenanceService.deleteBitstream(context, bitstreamToDelete, item);
         } catch (AuthorizeException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

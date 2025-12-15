@@ -25,6 +25,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.ProvenanceService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
@@ -54,6 +55,12 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
 
     @Autowired
     private AuthorizeService authorizeService;
+
+    @Autowired
+    ProvenanceService provenanceService;
+
+    @Autowired
+    ResourcePolicyService resourcePolicyService;
 
     protected ResourcePolicyServiceImpl() {
     }
@@ -243,12 +250,17 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     }
 
     @Override
-    public void removePolicies(Context c, DSpaceObject o, String type, int action)
-        throws SQLException, AuthorizeException {
+        public void removePolicies(Context c, DSpaceObject o, String type, int action)
+            throws SQLException, AuthorizeException {
+        // Get all read policies of the dso before removing them
+        List<ResourcePolicy> resPolicies = resourcePolicyService.find(c, o, type);
+
         resourcePolicyDAO.deleteByDsoAndTypeAndAction(c, o, type, action);
         c.turnOffAuthorisationSystem();
         contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
         c.restoreAuthSystemState();
+
+        provenanceService.removeReadPolicies(c, o, resPolicies);
     }
 
     @Override
