@@ -21,6 +21,18 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
+    <bean id="itemAuthorityLookupIndexPlugin" class="org.dspace.discovery.ItemAuthorityLookupIndexPlugin">
+        <property name="additionalFields">
+            <list>
+                <value>crisrp.name</value>
+                <value>crisrp.name.variant</value>
+                <value>crisrp.name.translated</value>
+                <value>person.givenName</value>
+                <value>person.familyName</value>
+            </list>
+        </property>
+    </bean>
+
     <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
     <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">
         <property name="map">
