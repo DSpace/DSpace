@@ -149,7 +149,6 @@ public class ScieloImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO ispartof = createMetadatumDTO("dc", "relation", "ispartof", "Nova tellus");
         MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2021");
         MetadatumDTO citation = createMetadatumDTO("oaire", "citation", "issue", "2");
-        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", "doi", "10.19130/iifl.nt.2021.39.2.901");
         MetadatumDTO endPage = createMetadatumDTO("oaire", "citation", "endPage", "236");
         MetadatumDTO subject = createMetadatumDTO("dc", "subject", null, "Roma");
         MetadatumDTO subject2 = createMetadatumDTO("dc", "subject", null, "Historia");
@@ -164,11 +163,11 @@ public class ScieloImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO issn = createMetadatumDTO("dc", "identifier", "issn", "0185-3058");
         MetadatumDTO other = createMetadatumDTO("dc", "identifier", "other", "S0185-30582021000200231-mex");
         MetadatumDTO startPage = createMetadatumDTO("oaire", "citation", "startPage", "231");
+        MetadatumDTO doi = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.19130/iifl.nt.2021.39.2.901");
 
         metadatums.add(ispartof);
         metadatums.add(date);
         metadatums.add(citation);
-        metadatums.add(doi);
         metadatums.add(endPage);
         metadatums.add(subject);
         metadatums.add(subject2);
@@ -181,6 +180,7 @@ public class ScieloImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         metadatums.add(issn);
         metadatums.add(other);
         metadatums.add(startPage);
+        metadatums.add(doi);
 
         ImportRecord firstrRecord = new ImportRecord(metadatums);
 
@@ -189,7 +189,6 @@ public class ScieloImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof", "Revista de Derecho Privado");
         MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2021");
         MetadatumDTO citation2 = createMetadatumDTO("oaire", "citation", "issue", "41");
-        MetadatumDTO doi2 = createMetadatumDTO("dc", "identifier", "doi", "10.18601/01234366.n41.14");
         MetadatumDTO endPage2 = createMetadatumDTO("oaire", "citation", "endPage", "418");
         MetadatumDTO subject6 = createMetadatumDTO("dc", "subject", null, "sopravvenienza contrattuale");
         MetadatumDTO subject7 = createMetadatumDTO("dc", "subject", null, "covro");
@@ -202,6 +201,7 @@ public class ScieloImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO issn2 = createMetadatumDTO("dc", "identifier", "issn", "0123-4366");
         MetadatumDTO other2 = createMetadatumDTO("dc", "identifier", "other", "S0123-43662021000200397-col");
         MetadatumDTO startPage2 = createMetadatumDTO("oaire", "citation", "startPage", "397");
+        MetadatumDTO doi2 = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.18601/01234366.n41.14");
         MetadatumDTO description = createMetadatumDTO("dc", "description", "abstract",
                 "ABSTRACT: The Tribunal of Rome imposes an obligation to renegotiate long-term contracts,"
               + " the balance of which has been modified by the covro pandemic. The decision establishes a"
@@ -212,7 +212,6 @@ public class ScieloImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         metadatums2.add(ispartof2);
         metadatums2.add(date2);
         metadatums2.add(citation2);
-        metadatums2.add(doi2);
         metadatums2.add(endPage2);
         metadatums2.add(subject6);
         metadatums2.add(subject7);
@@ -224,6 +223,7 @@ public class ScieloImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         metadatums2.add(issn2);
         metadatums2.add(other2);
         metadatums2.add(startPage2);
+        metadatums2.add(doi2);
         metadatums2.add(description);
 
         ImportRecord secondRecord = new ImportRecord(metadatums2);

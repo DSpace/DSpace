@@ -79,16 +79,10 @@
 
     <bean id="openalexDoiContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="openalex.doi"/>
-        <property name="metadataProcessor" ref="openalexDoiMetadataProcessor"/>
-    </bean>
-    <bean name="openalexDoiMetadataProcessor"
-          class="org.dspace.importer.external.metadatamapping.contributor.RegexReplacingJsonPathMetadataProcessor">
-        <property name="path" value="/ids/doi"/>
-        <property name="regexPattern" value="https://doi.org/"/>
-        <property name="replacement" value=""/>
+        <property name="query" value="/ids/doi"/>
     </bean>
     <bean id="openalex.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.doi"/>
+        <constructor-arg value="dc.relation.hasversion"/>
     </bean>
 
     <bean id="dc.identifier.other" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
