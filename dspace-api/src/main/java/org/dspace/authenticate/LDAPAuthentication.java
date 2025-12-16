@@ -456,7 +456,9 @@ public class LDAPAuthentication implements AuthenticationMethod {
         private void setupSpringLdap(ConfigurationService cfg) {
             LdapContextSource contextSource = new LdapContextSource();
             if (StringUtils.isBlank(ldap_provider_url)) {
-                log.error("LDAP provider URL is empty! Check authentication-ldap.provider_url");
+                throw new IllegalStateException(
+                    "LDAP provider URL is empty! Please check 'authentication-ldap.provider_url' in your configuration."
+                );
             }
             contextSource.setUrl(ldap_provider_url);
 
