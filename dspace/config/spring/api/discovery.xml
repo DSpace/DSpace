@@ -44,6 +44,7 @@
             </list>
         </property>
     </bean>
+    <bean id="solrServiceBestMatchIndexingPlugin" class="org.dspace.discovery.SolrServiceBestMatchIndexingPlugin"/>
     <alias name="solrServiceResourceIndexPlugin" alias="org.dspace.discovery.SolrServiceResourceRestrictionPlugin"/>
 
     <!-- Additional indexing plugin make filtering by has content in original bundle (like pdf's, images) posible via SOLR -->
