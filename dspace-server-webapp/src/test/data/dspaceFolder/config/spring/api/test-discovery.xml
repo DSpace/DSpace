@@ -33,6 +33,8 @@
         </property>
     </bean>
     <bean id="solrServiceBestMatchIndexingPlugin" class="org.dspace.discovery.SolrServiceBestMatchIndexingPlugin"/>
+    <bean id="solrServiceBestMatchStrictIndexingPlugin"
+          class="org.dspace.discovery.SolrServiceStrictBestMatchIndexingPlugin"/>
 
     <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
     <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">
