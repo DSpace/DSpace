@@ -54,7 +54,7 @@
     </util:map>
 
     <bean id="scielo.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.doi"/>
+        <constructor-arg value="dc.relation.hasversion"/>
     </bean>
 
     <bean id="scielo.author" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
