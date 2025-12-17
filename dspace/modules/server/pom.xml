@@ -7,7 +7,7 @@
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>8.3</version>
+        <version>8.4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -340,9 +340,4 @@
         </dependency>
 
     </dependencies>
-
-
-  <scm>
-    <tag>dspace-8.3</tag>
-  </scm>
 </project>
