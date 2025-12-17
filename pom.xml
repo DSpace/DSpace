@@ -48,7 +48,7 @@
         <!-- Sync BouncyCastle & ASM with whatever version Tika uses -->
         <!-- WARNING: BouncyCastle is also required by the maven-gpg-plugin to sign code during release. Do not update
              unless the new BouncyCastle version is compatible both with tika-parsers and maven-gpg-plugin. -->
-        <bouncycastle.version>1.81</bouncycastle.version>
+        <bouncycastle.version>1.83</bouncycastle.version>
         <asm.version>8.0.1</asm.version>
         <!-- Jersey is used to integrate with external sources/services -->
         <jersey.version>3.1.11</jersey.version>
