@@ -46,7 +46,7 @@
         <!-- Sync with whatever version Tika uses -->
         <!-- WARNING: BouncyCastle is also required by the maven-gpg-plugin to sign code during release. Do not update
              unless the new BouncyCastle version is compatible both with tika-parsers and maven-gpg-plugin. -->
-        <bouncycastle.version>1.81</bouncycastle.version>
+        <bouncycastle.version>1.83</bouncycastle.version>
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
         <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath (used by Server webapp) -->
         <json-path.version>2.10.0</json-path.version>
