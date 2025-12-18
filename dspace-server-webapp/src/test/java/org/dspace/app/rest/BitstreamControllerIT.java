@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -243,7 +241,7 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
-                        .andExpect(status().isNoContent());
+                        .andExpect(status().isNotFound());
 
     }
 
@@ -532,6 +530,11 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
 
     }
 
+    /**
+     *
+     * This test doesn’t make sense because BitstreamDaoImpl.find no longer returns deleted bitstreams,
+     * it only returns those with deleted = false.
+     * Therefore, it’s not possible to restore a deleted bitstream by reattaching it to a bundle.
     @Test
     public void putOnBitstreamInNoBundle() throws Exception {
 
@@ -652,6 +655,7 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
 
 
     }
+    */
 
     @Test
     public void putOnBitstreamInOneBundleWithNoRemoveRights() throws Exception {

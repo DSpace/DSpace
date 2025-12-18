@@ -62,6 +62,12 @@ public class BitstreamMetadataReadPermissionEvaluatorPlugin extends RestObjectPe
             try {
                 UUID dsoUuid = UUID.fromString(targetId.toString());
                 DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, dsoUuid);
+
+                //If the dso is null then we give permission so we can throw another status code instead
+                if (dso == null) {
+                    return true;
+                }
+
                 if (dso instanceof Bitstream) {
                     return this.metadataReadPermissionOnBitstream(context, (Bitstream) dso);
                 }

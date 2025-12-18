@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -199,5 +200,16 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
         Map<String, Object> map = new HashMap<>();
         return findByX(context, Bitstream.class, map, true, limit, offset).iterator();
 
+    }
+
+    @Override
+    public Bitstream findByID(Context context, Class clazz, UUID id) throws SQLException {
+        Query query = createQuery(context,"SELECT b FROM Bitstream b WHERE b.id = :id AND b.deleted <> true");
+        query.setParameter("id", id);
+        try {
+            return uniqueResult(query);
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 }
