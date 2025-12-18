@@ -1577,7 +1577,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 ContentServiceFactory.getInstance().getMetadataFieldService();
             int i = reference.indexOf(":");
             String mfValue = reference.substring(i + 1);
-            String mf[] = reference.substring(0, i).split("\\.");
+            String[] mf = reference.substring(0, i).split("\\.");
             if (mf.length < 2) {
                 throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
                                                       "Bad metadata field in reference: '" + reference
