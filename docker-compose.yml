@@ -130,6 +130,8 @@ services:
       cp -r /opt/solr/server/solr/configsets/qaevent/* qaevent
       precreate-core suggestion /opt/solr/server/solr/configsets/suggestion
       cp -r /opt/solr/server/solr/configsets/suggestion/* suggestion
+      precreate-core audit /opt/solr/server/solr/configsets/audit
+      cp -r /opt/solr/server/solr/configsets/audit/* audit
       chown -R solr:solr /var/solr
       runuser -u solr -- solr-foreground
 volumes:

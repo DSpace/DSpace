@@ -79,4 +79,10 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkaccesscontrol.BulkAccessControl"/>
     </bean>
 
+    <bean id="solr-core-management" class="org.dspace.app.solr.SolrCoreExportImportScriptConfiguration" primary="true">
+        <property name="description" value="Export and import complete SOLR cores with multithreading support"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.solr.SolrCoreExportImport"/>
+        <property name="isVisibleFromUI" value="false"/>
+    </bean>
+
 </beans>
