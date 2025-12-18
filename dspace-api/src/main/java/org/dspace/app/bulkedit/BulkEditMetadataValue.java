@@ -25,6 +25,13 @@ public class BulkEditMetadataValue {
     public BulkEditMetadataValue() {
     }
 
+    public void setFromField(BulkEditMetadataField metadataField) {
+        setSchema(metadataField.getSchema());
+        setElement(metadataField.getElement());
+        setQualifier(metadataField.getQualifier());
+        setLanguage(metadataField.getLanguage());
+    }
+
     public void setSchema(String schema) {
         this.schema = schema;
     }
