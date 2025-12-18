@@ -21,14 +21,14 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class CustomUrlRemoveOperation extends ReplacePatchOperation<CustomUrl> {
+public class CustomUrlRemoveOperation extends RemovePatchOperation<CustomUrl> {
 
     @Autowired
     private CustomUrlService customUrlService;
 
     @Override
     @SuppressWarnings("rawtypes")
-    void replace(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
+    void remove(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
                  Object value) throws Exception {
 
         Item item = source.getItem();
