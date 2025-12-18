@@ -221,6 +221,8 @@ public class BitstreamRestController {
             if ((dispositionThreshold >= 0 && filesize > dispositionThreshold)
                     || checkFormatForContentDisposition(format)) {
                 httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_ATTACHMENT);
+            } else {
+                httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_INLINE);
             }
 
             // Send the data
