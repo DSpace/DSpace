@@ -55,9 +55,19 @@
         <property name="key" value="title" />
     </bean>
 
-    <bean id="bibtexTypeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
-        <property name="field" ref="dcType"/>
-        <property name="key" value="type" />
+    <bean id="bibtexTypeContrib" class="org.dspace.importer.external.metadatamapping.contributor.FirstProductiveContributorMetadataContributor">
+        <constructor-arg name="contributors">
+            <util:list>
+                <bean class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+                    <property name="field" ref="dcType"/>
+                    <property name="key" value="type"/>
+                </bean>
+                <bean class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+                    <property name="field" ref="dcType"/>
+                    <property name="key" value="@type"/>
+                </bean>
+            </util:list>
+        </constructor-arg>
     </bean>
 
 </beans>
