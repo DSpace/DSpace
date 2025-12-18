@@ -801,7 +801,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     public ItemBuilder withCustomUrl(String url) {
-        return setMetadataSingleValue(item, "cris", "customurl", null, url);
+        return setMetadataSingleValue(item, "dspace", "customurl", null, url);
     }
 
     public ItemBuilder withOldCustomUrl(String url) {
