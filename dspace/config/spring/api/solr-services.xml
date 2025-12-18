@@ -15,7 +15,7 @@
            http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context.xsd"
-       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource,*Factory">
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
@@ -46,10 +46,16 @@
     
     <!-- quality assurance broker service -->
     <bean id="org.dspace.qaevent.service.QAEventService" class="org.dspace.qaevent.service.impl.QAEventServiceImpl" />
-    
+
+    <!-- audit -->
+    <bean class="org.dspace.app.audit.AuditSolrServiceImpl"  autowire-candidate="true">
+        <property name="solrDocumentFactory" ref="defaultSolrDocumentFactory"/>
+        <property name="httpSolrClientFactory" ref="HttpSolrClientFactory"/>
+    </bean>
+
     <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
     
     <!-- suggestion service for solr providers -->     
     <bean id="org.dspace.app.suggestion.SolrSuggestionStorageService" class="org.dspace.app.suggestion.SolrSuggestionStorageServiceImpl" />
-   
+
 </beans>

@@ -665,7 +665,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
         if (group.isMetadataModified()) {
             context.addEvent(new Event(Event.MODIFY_METADATA, Constants.GROUP, group.getID(),
-                group.getDetails(), DetailType.DSO_SUMMARY,
+                group.getMetadataEventDetails(), DetailType.DSO_SUMMARY,
                 getIdentifiers(context, group)));
             group.clearDetails();
         }

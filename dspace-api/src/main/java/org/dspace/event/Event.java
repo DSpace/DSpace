@@ -15,6 +15,7 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -180,15 +181,10 @@ public class Event implements Serializable {
      */
     private long timeStamp;
 
-    /** "detail" - arbitrary field for relevant detail, */
-    /** e.g. former handle for DELETE event since obj is no longer available. */
     /**
-     * FIXME This field is not a complete view of the DSpaceObject that was
-     * modified. Providing these objects to the consumer (e.g. by storing
-     * lifecycle versions of the changed objects in the context) would provide
-     * for more complex consumer abilities that are beyond our purview.
+     * list of detail element of the event.
      */
-    private EventDetail detail;
+    private ArrayList<EventDetail> detailList = new ArrayList<>();
 
     /**
      * Contains all identifiers of the DSpaceObject that was changed (added,
@@ -264,7 +260,7 @@ public class Event implements Serializable {
         this.subjectType = coreTypeToMask(subjectType);
         this.subjectID = subjectID;
         timeStamp = Instant.now().toEpochMilli();
-        this.detail = new EventDetail(detailType, detailObject);
+        this.detailList.add(new EventDetail(detailType, detailObject));
         this.identifiers = (ArrayList<String>) identifiers.clone();
     }
 
@@ -308,7 +304,30 @@ public class Event implements Serializable {
         this.objectType = coreTypeToMask(objectType);
         this.objectID = objectID;
         timeStamp = Instant.now().toEpochMilli();
-        this.detail = new EventDetail(detailType, detailObject);
+        this.detailList.add(new EventDetail(detailType, detailObject));
+        this.identifiers = (ArrayList<String>) identifiers.clone();
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param eventType   action type, e.g. Event.ADD.
+     * @param subjectType DSpace Object Type of subject e.g. Constants.ITEM.
+     * @param subjectID   database ID of subject instance.
+     * @param objectType  DSpace Object Type of object e.g. Constants.BUNDLE.
+     * @param objectID    database ID of object instance.
+     * @param detailList  array containing all detail of dso modification.
+     * @param identifiers array containing all identifiers of the dso or an empty array
+     */
+    public Event(int eventType, int subjectType, UUID subjectID, int objectType,
+                 UUID objectID, ArrayList<EventDetail> detailList, ArrayList<String> identifiers) {
+        this.eventType = eventType;
+        this.subjectType = coreTypeToMask(subjectType);
+        this.subjectID = subjectID;
+        this.objectType = coreTypeToMask(objectType);
+        this.objectID = objectID;
+        timeStamp = Instant.now().toEpochMilli();
+        this.detailList = (ArrayList<EventDetail>) detailList.clone();
         this.identifiers = (ArrayList<String>) identifiers.clone();
     }
 
@@ -345,7 +364,7 @@ public class Event implements Serializable {
         this.subjectType = coreTypeToMask(subjectType);
         this.subjectID = subjectID;
         timeStamp = Instant.now().toEpochMilli();
-        this.detail = new EventDetail(DetailType.INFO, detail);
+        this.detailList.add(new EventDetail(DetailType.INFO, detail));
         this.identifiers = (ArrayList<String>) identifiers.clone();
     }
 
@@ -402,8 +421,7 @@ public class Event implements Serializable {
     public boolean equals(Object other) {
         if (other instanceof Event) {
             Event otherEvent = (Event) other;
-            return (this.detail == null ? otherEvent.detail == null : this.detail
-                .equals(otherEvent.detail))
+            return (Objects.equals(this.detailList, otherEvent.detailList))
                 && this.eventType == otherEvent.eventType
                 && this.subjectType == otherEvent.subjectType
                 && this.subjectID.equals(otherEvent.subjectID)
@@ -416,7 +434,7 @@ public class Event implements Serializable {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(this.detail)
+        return new HashCodeBuilder().append(this.detailList)
                                     .append(eventType)
                                     .append(subjectType)
                                     .append(subjectID)
@@ -620,10 +638,19 @@ public class Event implements Serializable {
     }
 
     /**
+     * @Deprecated use {@link #getDetailList()} instead.
      * @return value of detail element of the event.
      */
+    @Deprecated
     public EventDetail getDetail() {
-        return detail;
+        return detailList.isEmpty() ? null : detailList.get(0);
+    }
+
+    /**
+    * @return list of detail element of the event.
+    */
+    public ArrayList<EventDetail> getDetailList() {
+        return detailList;
     }
 
     /**
@@ -742,8 +769,8 @@ public class Event implements Serializable {
             + String.valueOf(timeStamp)
             + ", dispatcher="
             + String.valueOf(dispatcher)
-            + ", detail="
-            + (detail == null ? "[null]" : "\"" + detail + "\"")
+            + ", detailList="
+            + (detailList == null ? "[null]" : "\"" + detailList + "\"")
             + ", transactionID="
             + (transactionID == null ? "[null]" : "\"" + transactionID
             + "\"") + ")";
