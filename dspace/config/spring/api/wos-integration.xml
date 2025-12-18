@@ -119,7 +119,7 @@
     </util:map>
 
     <bean id="wos.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier"/>
+        <constructor-arg value="dc.relation.hasversion"/>
     </bean>
     <bean id="wos.issn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.issn"/>
