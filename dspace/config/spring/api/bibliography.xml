@@ -72,7 +72,7 @@
               key-type='java.lang.String'
               value-type='java.lang.String'>
         <entry key='${bibliography.author}' value='author'/>
-        <entry key='bibliography.editor' value='editor'/>
+        <entry key='${bibliography.editor}' value='editor'/>
         <entry key='${bibliography.issued}' value='issued'/>
         <entry key='${bibliography.accessed}' value='accessed'/>
         <entry key='${bibliography.submitted}' value='submitted'/>
