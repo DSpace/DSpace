@@ -145,8 +145,9 @@ public class CustomUrlServiceImpl implements CustomUrlService {
         }
 
         if (indexableObjects.size() > 1) {
-            LOGGER.error("Found many item with the same custom url {} - Ids: {}", customUrl, getIds(indexableObjects));
-            throw new IllegalStateException("Found many item with the same custom url: " + customUrl);
+            LOGGER.error("Found multiple item with the same custom URL {} - Ids: {}", customUrl,
+                         getIds(indexableObjects));
+            throw new IllegalStateException("Found multiple item with the same custom URL: " + customUrl);
         }
 
         return Optional.of(indexableObjects.get(0))
