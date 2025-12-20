@@ -12,7 +12,7 @@ import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
 /**
- * Boilerplate hateos resource for IdentifiersRest
+ * Boilerplate hateoas resource for BibliographyRest
  *
  * @author Jesiel Viana
  */
