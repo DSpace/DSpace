@@ -112,4 +112,26 @@ public interface CustomUrlService {
      */
     Optional<Item> findItemByCustomUrl(Context context, String customUrl);
 
+    /**
+     * Find the latest custom URL that matches the given base pattern.
+     * This method searches for custom URLs that start with the base pattern
+     * and may have a numeric suffix (e.g., "base-pattern-1", "base-pattern-2").
+     *
+     * @param context     the DSpace context.
+     * @param basePattern the base pattern to search for (e.g., "base-pattern")
+     * @return the latest custom URL matching the pattern, or empty if no matches found
+     */
+    Optional<String> findLatestCustomUrlByPattern(Context context, String basePattern);
+
+    /**
+     * Generates a unique custom URL based on a given pattern.
+     * If the base URL already exists, it will generate a new URL with a numeric suffix
+     * (e.g., "base-url-1", "base-url-2").
+     *
+     * @param context the DSpace context
+     * @param baseUrl the base URL pattern
+     * @return a unique custom URL that doesn't conflict with existing ones
+     */
+    String generateUniqueCustomUrl(Context context, String baseUrl);
+
 }

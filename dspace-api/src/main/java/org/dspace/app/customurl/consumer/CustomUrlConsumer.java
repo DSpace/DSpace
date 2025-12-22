@@ -182,7 +182,7 @@ public class CustomUrlConsumer implements Consumer {
             return;
         }
 
-        generateCustomUrlForItem(item)
+        generateCustomUrlForItem(context, item)
             .ifPresent(customUrl -> assignCustomUrlToItem(context, item, customUrl));
     }
 
@@ -220,11 +220,13 @@ public class CustomUrlConsumer implements Consumer {
     /**
      * Generates a custom URL for an item based on its entity type and configured metadata fields.
      * Concatenates values from all configured metadata fields and normalizes the result.
+     * If the generated URL already exists, creates a progressive version (e.g., "base-url-2").
      *
-     * @param item the item to generate a custom URL for
+     * @param context the DSpace context
+     * @param item    the item to generate a custom URL for
      * @return an Optional containing the generated custom URL, or empty if generation fails
      */
-    private Optional<String> generateCustomUrlForItem(Item item) {
+    private Optional<String> generateCustomUrlForItem(Context context, Item item) {
         String entityType = getItemEntityType(item);
         if (entityType == null) {
             log.debug("Cannot generate custom URL for item {} - no entity type found", item.getID());
@@ -248,12 +250,19 @@ public class CustomUrlConsumer implements Consumer {
         String normalizedUrl = normalizeForUrl(concatenatedValues);
         if (isBlank(normalizedUrl)) {
             log.debug("Cannot generate custom URL for item {} - normalized URL is empty after removing "
-                     + "invalid characters", item.getID());
+                          + "invalid characters", item.getID());
             return Optional.empty();
         }
 
-        log.debug("Generated custom URL '{}' for item {}", normalizedUrl, item.getID());
-        return Optional.of(normalizedUrl);
+        // Check if the generated URL already exists and generate a progressive version if needed
+        String finalUrl = generateUniqueCustomUrl(context, normalizedUrl);
+
+        log.debug("Generated custom URL '{}' for item {}", finalUrl, item.getID());
+        return Optional.of(finalUrl);
+    }
+
+    private String generateUniqueCustomUrl(Context context, String baseUrl) {
+        return customUrlService.generateUniqueCustomUrl(context, baseUrl);
     }
 
     /**

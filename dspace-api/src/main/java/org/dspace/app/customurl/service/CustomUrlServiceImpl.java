@@ -13,6 +13,8 @@ import static org.dspace.content.Item.ANY;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,6 +44,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class CustomUrlServiceImpl implements CustomUrlService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomUrlServiceImpl.class);
+
+    // Pre-compiled regex pattern for performance
+    private static final String NUMERIC_SUFFIX_PATTERN = "-(\\d+)$";
 
     @Autowired
     private ItemService itemService;
@@ -153,6 +158,172 @@ public class CustomUrlServiceImpl implements CustomUrlService {
         return Optional.of(indexableObjects.get(0))
                        .map(indexableObject -> (Item) indexableObject.getIndexedObject());
 
+    }
+
+    @Override
+    public Optional<String> findLatestCustomUrlByPattern(Context context, String basePattern) {
+        if (StringUtils.isBlank(basePattern)) {
+            return Optional.empty();
+        }
+
+        List<String> matchingUrls = findCustomUrlsWithPattern(context, basePattern);
+        if (matchingUrls.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return findUrlWithHighestNumericSuffix(matchingUrls, basePattern);
+    }
+
+    @Override
+    public String generateUniqueCustomUrl(Context context, String baseUrl) {
+        if (StringUtils.isBlank(baseUrl)) {
+            throw new IllegalArgumentException("Base URL cannot be null or empty");
+        }
+
+        // Check if the base URL is available
+        if (!customUrlExists(context, baseUrl)) {
+            return baseUrl;
+        }
+
+        // Find the next available URL with numeric suffix
+        return findNextAvailableUrl(context, baseUrl);
+    }
+
+    /**
+     * Searches for all custom URLs that start with the given base pattern.
+     * This method is optimized to fetch only the URLs from Solr without retrieving full Item objects.
+     *
+     * @param context     DSpace context
+     * @param basePattern the base pattern to search for
+     * @return list of matching custom URLs
+     */
+    private List<String> findCustomUrlsWithPattern(Context context, String basePattern) {
+        try {
+            DiscoverQuery discoverQuery = new DiscoverQuery();
+            discoverQuery.addDSpaceObjectFilter(IndexableItem.TYPE);
+            discoverQuery.addFilterQueries("customurl:" + searchService.escapeQueryChars(basePattern) + "*");
+            discoverQuery.setIncludeNotDiscoverableOrWithdrawn(true);
+
+            List<IndexableObject> indexableObjects = searchService.search(context, discoverQuery)
+                                                                  .getIndexableObjects();
+
+            return indexableObjects.stream()
+                                   .map(indexableObject -> (Item) indexableObject.getIndexedObject())
+                                   .flatMap(item -> getAllCustomUrls(item).stream())
+                                   .filter(url -> url.startsWith(basePattern))
+                                   .distinct()
+                                   .collect(Collectors.toList());
+
+        } catch (SearchServiceException e) {
+            LOGGER.error("Error searching for custom URLs with pattern: {}", basePattern, e);
+            throw new RuntimeException("Failed to search for custom URLs", e);
+        }
+    }
+
+    /**
+     * Finds the URL with the highest numeric suffix from a list of URLs.
+     * Efficiently processes URLs to identify numeric suffixes and return the latest.
+     *
+     * @param matchingUrls list of URLs that match the base pattern
+     * @param basePattern  the base pattern
+     * @return the URL with the highest numeric suffix, or empty if none found
+     */
+    private Optional<String> findUrlWithHighestNumericSuffix(List<String> matchingUrls, String basePattern) {
+        Pattern pattern = Pattern.compile(Pattern.quote(basePattern) + NUMERIC_SUFFIX_PATTERN);
+
+        return matchingUrls.stream()
+                           .filter(url -> pattern.matcher(url).matches())
+                           .max((url1, url2) -> {
+                               int num1 = extractNumericSuffix(url1, pattern);
+                               int num2 = extractNumericSuffix(url2, pattern);
+                               return Integer.compare(num1, num2);
+                           })
+                           .or(() -> matchingUrls.contains(basePattern)
+                               ? Optional.of(basePattern)
+                               : Optional.empty());
+    }
+
+    /**
+     * Extracts numeric suffix from a URL using the provided pattern.
+     *
+     * @param url     the URL to extract from
+     * @param pattern the compiled pattern
+     * @return the numeric suffix, or 0 if extraction fails
+     */
+    private int extractNumericSuffix(String url, Pattern pattern) {
+        Matcher matcher = pattern.matcher(url);
+        if (matcher.matches()) {
+            try {
+                return Integer.parseInt(matcher.group(1));
+            } catch (NumberFormatException e) {
+                LOGGER.debug("Invalid numeric suffix in URL: {}", url);
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Checks if a custom URL already exists without retrieving the full item.
+     *
+     * @param context   DSpace context
+     * @param customUrl the custom URL to check
+     * @return true if the URL exists, false otherwise
+     */
+    private boolean customUrlExists(Context context, String customUrl) {
+        try {
+            DiscoverQuery discoverQuery = new DiscoverQuery();
+            discoverQuery.addDSpaceObjectFilter(IndexableItem.TYPE);
+            discoverQuery.addFilterQueries("customurl:" + searchService.escapeQueryChars(customUrl));
+            discoverQuery.setIncludeNotDiscoverableOrWithdrawn(true);
+            discoverQuery.setMaxResults(1); // We only need to know if any exist
+
+            return !searchService.search(context, discoverQuery).getIndexableObjects().isEmpty();
+
+        } catch (SearchServiceException e) {
+            LOGGER.error("Error checking if custom URL exists: {}", customUrl, e);
+            // Conservative approach: assume it exists to avoid conflicts
+            return true;
+        }
+    }
+
+    /**
+     * Finds the next available URL with a numeric suffix.
+     * Uses the existing findLatestCustomUrlByPattern method to get the current highest,
+     * then increments to find the next available.
+     *
+     * @param context DSpace context
+     * @param baseUrl the base URL pattern
+     * @return the next available URL with numeric suffix
+     */
+    private String findNextAvailableUrl(Context context, String baseUrl) {
+        Optional<String> latestUrl = findLatestCustomUrlByPattern(context, baseUrl);
+
+        if (latestUrl.isEmpty()) {
+            return baseUrl + "-1";
+        }
+
+        String latest = latestUrl.get();
+
+        // If the latest is the base URL itself, start with -1
+        if (latest.equals(baseUrl)) {
+            return baseUrl + "-1";
+        }
+
+        // Extract and increment the numeric suffix
+        Pattern pattern = Pattern.compile(Pattern.quote(baseUrl) + NUMERIC_SUFFIX_PATTERN);
+        Matcher matcher = pattern.matcher(latest);
+
+        if (matcher.matches()) {
+            try {
+                int currentNumber = Integer.parseInt(matcher.group(1));
+                return baseUrl + "-" + (currentNumber + 1);
+            } catch (NumberFormatException e) {
+                LOGGER.warn("Invalid numeric suffix in URL: {}", latest);
+            }
+        }
+
+        // Fallback: append -1 to base URL
+        return baseUrl + "-1";
     }
 
     @SuppressWarnings("rawtypes")
