@@ -5,25 +5,27 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.submit.step.validation;
+package org.dspace.validation;
 
-import static org.dspace.app.rest.repository.WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS;
+import static org.dspace.validation.service.ValidationService.OPERATION_PATH_SECTIONS;
+import static org.dspace.validation.util.ValidationUtils.addError;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.inject.Inject;
-import org.dspace.app.rest.model.ErrorRest;
-import org.dspace.app.rest.submit.SubmissionService;
-import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.license.CreativeCommonsServiceImpl;
 import org.dspace.services.ConfigurationService;
+import org.dspace.validation.model.ValidationError;
 import org.springframework.beans.factory.annotation.Autowired;
+
 
 /**
  * This class validates that the Creative Commons License has been granted for the
@@ -31,17 +33,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Mattia Vianelli (Mattia.Vianelli@4science.com)
  */
-public class CclicenseValidator extends AbstractValidation {
+public class CclicenseValidator implements SubmissionStepValidator {
 
-    /**
-     * Construct a Creative Commons License configuration.
-     * @param configurationService DSpace configuration provided by the DI container.
-     */
-    @Inject
-    public CclicenseValidator(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-
+    public static final String ERROR_VALIDATION_CCLICENSEREQUIRED = "error.validation.cclicense.required";
     private final ConfigurationService configurationService;
 
     @Autowired
@@ -49,19 +43,52 @@ public class CclicenseValidator extends AbstractValidation {
 
     @Autowired
     private CreativeCommonsServiceImpl creativeCommonsService;
-
-    public static final String ERROR_VALIDATION_CCLICENSEREQUIRED = "error.validation.cclicense.required";
-
     private String name;
 
     /**
+     * Construct a Creative Commons License configuration.
+     *
+     * @param configurationService DSpace configuration provided by the DI container.
+     */
+    @Inject
+    public CclicenseValidator(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
+
+    @Override
+    public List<ValidationError> validate(Context context, InProgressSubmission<?> obj, SubmissionStepConfig config) {
+        try {
+            return performValidation(obj.getItem(), config);
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
+
+    /**
+     * Perform validation on the item and config(ccLicense).
+     *
+     * @param item   The item to be validated.
+     * @param config The configuration for the submission step for cclicense.
+     * @return A list of validation errors.
+     * @throws SQLException If there is a problem accessing the database.
+     */
+    private List<ValidationError> performValidation(Item item, SubmissionStepConfig config) throws SQLException {
+        if (this.isRequired()) {
+            return validateLicense(item, config);
+        } else {
+            return List.of();
+        }
+    }
+
+    /**
      * Validate the license of the item.
-     * @param item The item whose cclicense is to be validated.
+     *
+     * @param item   The item whose cclicense is to be validated.
      * @param config The configuration for the submission step for cclicense.
      * @return A list of validation errors.
      */
-    private List<ErrorRest> validateLicense(Item item, SubmissionStepConfig config) {
-        List<ErrorRest> errors = new ArrayList<>(1);
+    private List<ValidationError> validateLicense(Item item, SubmissionStepConfig config) {
+        List<ValidationError> errors = new ArrayList<>(1);
 
         String licenseURI = creativeCommonsService.getLicenseURI(item);
         if (licenseURI == null || licenseURI.isBlank()) {
@@ -81,6 +108,7 @@ public class CclicenseValidator extends AbstractValidation {
 
     /**
      * Check if at least one Creative Commons License is required when submitting a new Item.
+     *
      * @return true if a Creative Commons License is required setting true for the property cc.license.required.
      */
     public Boolean isRequired() {
@@ -90,27 +118,6 @@ public class CclicenseValidator extends AbstractValidation {
     @Override
     public String getName() {
         return name;
-    }
-
-    /**
-     * Perform validation on the item and config(ccLicense).
-     * @param obj The submission to be validated.
-     * @param config The configuration for the submission step for cclicense.
-     * @return A list of validation errors.
-     * @throws SQLException If there is a problem accessing the database.
-     */
-
-    @Override
-    public List<? extends ErrorRest> validate(SubmissionService submissionService,
-                                              InProgressSubmission obj,
-                                              SubmissionStepConfig config)
-            throws DCInputsReaderException, SQLException {
-
-        if (this.isRequired() && obj != null && obj.getItem() != null) {
-            return validateLicense(obj.getItem(), config);
-        } else {
-            return List.of();
-        }
     }
 
     public void setName(String name) {
