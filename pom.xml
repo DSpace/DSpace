@@ -19,8 +19,8 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>17</java.version>
-        <spring.version>6.2.14</spring.version>
-        <spring-boot.version>3.5.8</spring-boot.version>
+        <spring.version>6.2.15</spring.version>
+        <spring-boot.version>3.5.9</spring-boot.version>
         <spring-security.version>6.5.7</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>6.4.10.Final</hibernate.version>
         <hibernate-validator.version>8.0.3.Final</hibernate-validator.version>
