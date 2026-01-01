@@ -422,7 +422,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.1</version>
                 <configuration>
                     <!-- During release:prepare and release:perform, pass the "release" property to enable the
                      "release" profile (and enable/disable other profiles based on whether they need releasing) -->
