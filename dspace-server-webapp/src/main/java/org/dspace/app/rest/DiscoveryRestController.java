@@ -19,11 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.link.HalLinkService;
-import org.dspace.app.rest.model.FacetConfigurationRest;
-import org.dspace.app.rest.model.FacetResultsRest;
 import org.dspace.app.rest.model.SearchResultsRest;
-import org.dspace.app.rest.model.hateoas.FacetConfigurationResource;
-import org.dspace.app.rest.model.hateoas.FacetResultsResource;
 import org.dspace.app.rest.model.hateoas.SearchResultsResource;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.repository.DiscoveryRestRepository;
@@ -32,8 +28,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.RepresentationModel;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -103,69 +97,6 @@ public class DiscoveryRestController implements InitializingBean {
             return searchResultsResource;
         } catch (IllegalArgumentException e) {
             boolean isParsingException = e.getMessage().contains(SOLR_PARSE_ERROR_CLASS);
-            if (isParsingException) {
-                throw new UnprocessableEntityException(e.getMessage());
-            } else {
-                throw e;
-            }
-        }
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/facets")
-    public FacetConfigurationResource getFacetsConfiguration(
-        @RequestParam(name = "scope", required = false) String dsoScope,
-        @RequestParam(name = "configuration", required = false) String configuration,
-        Pageable pageable) throws Exception {
-        if (log.isTraceEnabled()) {
-            log.trace("Retrieving facet configuration for scope " + StringUtils.trimToEmpty(dsoScope)
-                          + " and configuration name " + StringUtils.trimToEmpty(configuration));
-        }
-
-        FacetConfigurationRest facetConfigurationRest = discoveryRestRepository
-            .getFacetsConfiguration(dsoScope, configuration);
-        FacetConfigurationResource facetConfigurationResource = converter.toResource(facetConfigurationRest);
-
-        halLinkService.addLinks(facetConfigurationResource, pageable);
-        return facetConfigurationResource;
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/facets/{name}")
-    public RepresentationModel getFacetValues(@PathVariable("name") String facetName,
-                                              @RequestParam(name = "prefix", required = false) String prefix,
-                                              @RequestParam(name = "query", required = false) String query,
-                                              @RequestParam(name = "dsoType", required = false) List<String> dsoTypes,
-                                              @RequestParam(name = "scope", required = false) String dsoScope,
-                                              @RequestParam(name = "configuration", required = false) String
-                                                      configuration,
-                                              List<SearchFilter> searchFilters,
-                                              Pageable page) throws Exception {
-
-        dsoTypes = emptyIfNull(dsoTypes);
-
-        if (log.isTraceEnabled()) {
-            log.trace("Facetting on facet " + facetName + " with scope: " + StringUtils.trimToEmpty(dsoScope)
-                          + ", dsoTypes: " + String.join(", ", dsoTypes)
-                          + ", prefix: " + StringUtils.trimToEmpty(prefix)
-                          + ", query: " + StringUtils.trimToEmpty(query)
-                          + ", filters: " + Objects.toString(searchFilters)
-                          + ", page: " + Objects.toString(page));
-        }
-
-        try {
-            FacetResultsRest facetResultsRest = discoveryRestRepository
-                .getFacetObjects(facetName, prefix, query, dsoTypes, dsoScope, configuration, searchFilters, page);
-
-            FacetResultsResource facetResultsResource = converter.toResource(facetResultsRest);
-
-            halLinkService.addLinks(facetResultsResource, page);
-            return facetResultsResource;
-        } catch (Exception e) {
-            boolean isParsingException = e.getMessage().contains(SOLR_PARSE_ERROR_CLASS);
-            /*
-             * We unfortunately have to do a string comparison to locate the source of the error, as Solr only sends
-             * back a generic exception, and the org.apache.solr.search.SyntaxError is only available as plain text
-             * in the error message.
-             */
             if (isParsingException) {
                 throw new UnprocessableEntityException(e.getMessage());
             } else {

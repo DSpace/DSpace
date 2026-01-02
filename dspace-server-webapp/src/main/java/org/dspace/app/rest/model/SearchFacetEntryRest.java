@@ -12,18 +12,22 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.app.rest.RestResourceController;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
 /**
  * This class' purpose is to create a container for the information used in the SearchFacetEntryResource
  */
-public class SearchFacetEntryRest extends RestAddressableModel {
+@LinksRest(links = {
+    @LinkRest(name = SearchFacetEntryRest.VALUES, method = "getValues"),
+})
+public class SearchFacetEntryRest extends BaseObjectRest<String> {
 
-    public static final String NAME = "discover";
-    public static final String PLURAL_NAME = NAME;
+    public static final String NAME = "facet";
+    public static final String PLURAL_NAME = "facets";
     public static final String CATEGORY = RestModel.DISCOVER;
+    public static final String VALUES = "values";
 
     private String name;
     private String facetType;
@@ -48,6 +52,7 @@ public class SearchFacetEntryRest extends RestAddressableModel {
 
     public SearchFacetEntryRest(final String name) {
         this.name = name;
+        setId(name);
     }
 
     public String getCategory() {
@@ -68,7 +73,7 @@ public class SearchFacetEntryRest extends RestAddressableModel {
     }
 
     public Class getController() {
-        return DiscoveryRestController.class;
+        return RestResourceController.class;
     }
 
     public String getName() {

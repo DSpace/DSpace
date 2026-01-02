@@ -39,19 +39,6 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
         }
     }
 
-    protected UriComponentsBuilder buildFacetBaseLink(final FacetResultsRest data) {
-        try {
-            UriComponentsBuilder uriBuilder = uriBuilder(
-                    getMethodOn().getFacetValues(data.getFacetEntry().getName(), data.getPrefix(), data.getQuery(),
-                            data.getDsoTypes(), data.getScope(), data.getConfiguration(), null, null));
-
-            return addFilterParams(uriBuilder, data);
-        } catch (Exception ex) {
-            //The method throwing the exception is never really executed, so this exception can never occur
-            return null;
-        }
-    }
-
     protected UriComponentsBuilder addFilterParams(UriComponentsBuilder uriComponentsBuilder,
                                                    DiscoveryResultsRest data) {
         if (uriComponentsBuilder != null && data != null && data.getAppliedFilters() != null) {

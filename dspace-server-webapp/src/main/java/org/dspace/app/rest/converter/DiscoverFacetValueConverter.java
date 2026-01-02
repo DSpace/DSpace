@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * This class' purpose is to convert a DiscoverResult.FacetResult object into a SearchFacetValueRest object
  */
 @Component
-public class DiscoverFacetValueConverter {
+public class DiscoverFacetValueConverter implements DSpaceConverter<DiscoverResult.FacetResult, SearchFacetValueRest> {
 
     public SearchFacetValueRest convert(final DiscoverResult.FacetResult value, final Projection projection) {
         SearchFacetValueRest valueRest = new SearchFacetValueRest();
@@ -29,5 +29,10 @@ public class DiscoverFacetValueConverter {
         valueRest.setCount(value.getCount());
 
         return valueRest;
+    }
+
+    @Override
+    public Class<DiscoverResult.FacetResult> getModelClass() {
+        return DiscoverResult.FacetResult.class;
     }
 }

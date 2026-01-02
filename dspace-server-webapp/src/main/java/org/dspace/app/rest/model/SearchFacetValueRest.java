@@ -8,7 +8,7 @@
 package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * This class' purpose is to create a container for the information used in the SearchFacetValueResource
@@ -46,7 +46,7 @@ public class SearchFacetValueRest extends RestAddressableModel {
     }
 
     public Class getController() {
-        return DiscoveryRestController.class;
+        return RestResourceController.class;
     }
 
     public String getLabel() {
