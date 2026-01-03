@@ -19,12 +19,12 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
@@ -114,7 +114,7 @@ public final class OrcidFactoryUtils {
 
         try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
             log.debug("Sending ORCID token request to {}", oauthUrl);
-            HttpResponse response = httpClient.execute(httpPost);
+            ClassicHttpResponse response = httpClient.execute(httpPost);
             if (!isSuccessful(response)) {
                 log.error("Failed to retrieve ORCID access token");
                 return Optional.empty();
@@ -140,15 +140,15 @@ public final class OrcidFactoryUtils {
         httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
     }
 
-    private static boolean isSuccessful(HttpResponse response) {
+    private static boolean isSuccessful(ClassicHttpResponse response) {
         if (response == null) {
             log.error("ORCID API request failed: null response received");
             return false;
         }
-        int statusCode = response.getStatusLine().getStatusCode();
+        int statusCode = response.getCode();
         if (statusCode != 200) {
             var errorMsg = "ORCID API request failed with status code {}: {}";
-            log.error(errorMsg, statusCode, response.getStatusLine().getReasonPhrase());
+            log.error(errorMsg, statusCode, response.getReasonPhrase());
             return false;
         }
         return true;

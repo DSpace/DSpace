@@ -8,12 +8,9 @@
 package org.dspace.app.rest;
 
 import static java.util.regex.Pattern.compile;
-import static org.apache.http.HttpStatus.SC_NO_CONTENT;
-import static org.apache.http.HttpStatus.SC_UNPROCESSABLE_ENTITY;
+import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_UUID;
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -39,7 +36,9 @@ import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -68,7 +67,7 @@ public class GroupRestController {
      * @param uuid the uuid of the group to add the subgroups to
      */
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    @RequestMapping(method = POST, path = "/{uuid}/subgroups", consumes = {"text/uri-list"})
+    @PostMapping( path = "/{uuid}/subgroups", consumes = {"text/uri-list"})
     public void addChildGroups(@PathVariable UUID uuid, HttpServletResponse response, HttpServletRequest request)
             throws SQLException, AuthorizeException {
 
@@ -86,7 +85,7 @@ public class GroupRestController {
         List<Group> childGroups = new ArrayList<>();
         for (String groupLink : groupLinks) {
             Optional<Group> childGroup = findGroup(context, groupLink);
-            if (!childGroup.isPresent() || !canAddGroup(context, parentGroup, childGroup.get())) {
+            if (childGroup.isEmpty() || !canAddGroup(context, parentGroup, childGroup.get())) {
                 throw new UnprocessableEntityException("cannot add child group: " + groupLink);
             }
             childGroups.add(childGroup.get());
@@ -129,7 +128,7 @@ public class GroupRestController {
      * @param uuid the uuid of the group to add the members to
      */
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    @RequestMapping(method = POST, path = "/{uuid}/epersons", consumes = {"text/uri-list"})
+    @PostMapping( path = "/{uuid}/epersons", consumes = {"text/uri-list"})
     public void addMembers(@PathVariable UUID uuid, HttpServletResponse response, HttpServletRequest request)
             throws SQLException, AuthorizeException {
 
@@ -147,7 +146,7 @@ public class GroupRestController {
         List<EPerson> members = new ArrayList<>();
         for (String memberLink : memberLinks) {
             Optional<EPerson> member = findEPerson(context, memberLink);
-            if (!member.isPresent()) {
+            if (member.isEmpty()) {
                 throw new UnprocessableEntityException("cannot add child group: " + memberLink);
             }
             members.add(member.get());
@@ -184,7 +183,7 @@ public class GroupRestController {
      * @param childUUID  the uuid of the subgroup which has to be removed
      */
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    @RequestMapping(method = DELETE, path = "/{parentUUID}/subgroups/{childUUID}")
+    @DeleteMapping("/{parentUUID}/subgroups/{childUUID}")
     public void removeChildGroup(@PathVariable UUID parentUUID, @PathVariable UUID childUUID,
                                  HttpServletResponse response, HttpServletRequest request)
             throws IOException, SQLException, AuthorizeException {
@@ -200,7 +199,7 @@ public class GroupRestController {
 
         Group childGroup = groupService.find(context, childUUID);
         if (childGroup == null) {
-            response.sendError(SC_UNPROCESSABLE_ENTITY);
+            response.sendError(422 /* Unprocessable Entity */);
         }
 
         groupService.removeMember(context, parentGroup, childGroup);
@@ -220,7 +219,7 @@ public class GroupRestController {
      * @param memberUUID the uuid of the member which has to be removed
      */
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    @RequestMapping(method = DELETE, path = "/{parentUUID}/epersons/{memberUUID}")
+    @DeleteMapping("/{parentUUID}/epersons/{memberUUID}")
     public void removeMember(@PathVariable UUID parentUUID, @PathVariable UUID memberUUID,
                              HttpServletResponse response, HttpServletRequest request)
             throws IOException, SQLException, AuthorizeException {
@@ -236,7 +235,7 @@ public class GroupRestController {
 
         EPerson childGroup = ePersonService.find(context, memberUUID);
         if (childGroup == null) {
-            response.sendError(SC_UNPROCESSABLE_ENTITY);
+            response.sendError(422 /* Unprocessable Entity */);
         }
 
         groupService.removeMember(context, parentGroup, childGroup);

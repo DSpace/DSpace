@@ -41,9 +41,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -81,7 +83,7 @@ public class CollectionGroupRestController {
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/adminGroup")
+    @PostMapping("/adminGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<RepresentationModel<?>> postAdminGroup(@PathVariable UUID uuid, HttpServletResponse response,
                                                           HttpServletRequest request)
@@ -115,7 +117,7 @@ public class CollectionGroupRestController {
      * @throws AuthorizeException   If something goes wrong
      * @throws IOException          If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.DELETE, value = "/adminGroup")
+    @DeleteMapping("/adminGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<RepresentationModel<?>> deleteAdminGroup(@PathVariable UUID uuid,
                                                                    HttpServletResponse response,
@@ -148,7 +150,7 @@ public class CollectionGroupRestController {
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/submittersGroup")
+    @PostMapping("/submittersGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<RepresentationModel<?>> postSubmittersGroup(@PathVariable UUID uuid,
                                                                       HttpServletResponse response,
@@ -183,7 +185,7 @@ public class CollectionGroupRestController {
      * @throws AuthorizeException   If something goes wrong
      * @throws IOException          If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.DELETE, value = "/submittersGroup")
+    @DeleteMapping("/submittersGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<RepresentationModel<?>> deleteSubmittersGroup(@PathVariable UUID uuid,
                                                                         HttpServletResponse response,
@@ -215,7 +217,7 @@ public class CollectionGroupRestController {
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/itemReadGroup")
+    @PostMapping("/itemReadGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<RepresentationModel<?>> postItemReadGroup(@PathVariable UUID uuid,
                                                                     HttpServletResponse response,
@@ -257,7 +259,7 @@ public class CollectionGroupRestController {
      * @throws AuthorizeException   If something goes wrong
      * @throws IOException          If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.DELETE, value = "/itemReadGroup")
+    @DeleteMapping("/itemReadGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<RepresentationModel<?>> deleteItemReadGroup(@PathVariable UUID uuid,
                                                                       HttpServletResponse response,
@@ -297,7 +299,7 @@ public class CollectionGroupRestController {
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/bitstreamReadGroup")
+    @PostMapping("/bitstreamReadGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<RepresentationModel<?>> postBitstreamReadGroup(@PathVariable UUID uuid,
                                                                          HttpServletResponse response,
@@ -340,7 +342,7 @@ public class CollectionGroupRestController {
      * @throws AuthorizeException   If something goes wrong
      * @throws IOException          If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.DELETE, value = "/bitstreamReadGroup")
+    @DeleteMapping("/bitstreamReadGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<RepresentationModel<?>> deleteBitstreamReadGroup(@PathVariable UUID uuid,
                                                                            HttpServletResponse response,
@@ -381,7 +383,7 @@ public class CollectionGroupRestController {
      * @return The workflowGroup for the given collection and workflowrole
      * @throws Exception    If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/workflowGroups/{workflowRole}")
+    @GetMapping("/workflowGroups/{workflowRole}")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
     public ResponseEntity<RepresentationModel<?>> getWorkflowGroupForRole(@PathVariable UUID uuid,
                                                                           HttpServletResponse response,
@@ -411,7 +413,7 @@ public class CollectionGroupRestController {
      * @return The workflowGroup for the given collection and workflowrole
      * @throws Exception    If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/workflowGroups/{workflowRole}")
+    @PostMapping("/workflowGroups/{workflowRole}")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
     public ResponseEntity<RepresentationModel<?>> postWorkflowGroupForRole(@PathVariable UUID uuid,
                                                                            HttpServletResponse response,
@@ -450,7 +452,7 @@ public class CollectionGroupRestController {
      * @return
      * @throws Exception    If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.DELETE, value = "/workflowGroups/{workflowRole}")
+    @DeleteMapping("/workflowGroups/{workflowRole}")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
     public ResponseEntity<RepresentationModel<?>> deleteWorkflowGroupForRole(@PathVariable UUID uuid,
                                                                              HttpServletResponse response,

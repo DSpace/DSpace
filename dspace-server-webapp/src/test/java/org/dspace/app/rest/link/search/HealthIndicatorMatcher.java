@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.is;
 import java.util.Map;
 
 import org.hamcrest.Matcher;
-import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.health.contributor.Status;
 
 /**
  * Matcher for the health indicators.

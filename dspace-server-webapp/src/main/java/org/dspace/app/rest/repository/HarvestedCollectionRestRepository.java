@@ -8,13 +8,14 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.converter.HarvestedCollectionConverter;
@@ -118,7 +119,7 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
         try {
             ServletInputStream input = request.getInputStream();
             harvestedCollectionRest = mapper.readValue(input, HarvestedCollectionRest.class);
-        } catch (IOException e) {
+        } catch (IOException | JacksonException e) {
             throw new UnprocessableEntityException("Error parsing request body: " + e.toString(), e);
         }
 

@@ -7,6 +7,8 @@
  */
 package org.dspace.google.client;
 
+import java.io.Serial;
+
 /**
  * Exception thrown by {@link GoogleAnalyticsClient} during the events sending.
  *
@@ -15,6 +17,7 @@ package org.dspace.google.client;
  */
 public class GoogleAnalyticsClientException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = -2248100136404696572L;
 
     public GoogleAnalyticsClientException(String message, Throwable cause) {

@@ -19,13 +19,13 @@ import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.util.XMLUtils;
@@ -90,7 +90,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
         List<String> licenses;
         try (CloseableHttpResponse response = client.execute(httpGet)) {
             licenses = retrieveLicenses(response);
-        } catch (JDOMException | IOException e) {
+        } catch (JDOMException | IOException | org.apache.hc.core5.http.ParseException e) {
             log.error("Error while retrieving the license details using url: " + uri, e);
             licenses = Collections.emptyList();
         }
@@ -104,7 +104,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
             try (CloseableHttpResponse response = client.execute(licenseHttpGet)) {
                 CCLicense ccLicense = retrieveLicenseObject(license, response);
                 ccLicenses.put(ccLicense.getLicenseId(), ccLicense);
-            } catch (JDOMException | IOException e) {
+            } catch (JDOMException | IOException | org.apache.hc.core5.http.ParseException e) {
                 log.error("Error while retrieving the license details using url: " + licenseUri, e);
             }
         }
@@ -122,7 +122,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      * @throws JDOMException
      */
     private List<String> retrieveLicenses(CloseableHttpResponse response)
-            throws IOException, JDOMException {
+            throws IOException, JDOMException, org.apache.hc.core5.http.ParseException {
 
         List<String> domains = new LinkedList<>();
         String[] excludedLicenses = configurationService.getArrayProperty("cc.license.classfilter");
@@ -158,7 +158,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      * @throws JDOMException
      */
     private CCLicense retrieveLicenseObject(final String licenseId, CloseableHttpResponse response)
-            throws IOException, JDOMException {
+            throws IOException, JDOMException, org.apache.hc.core5.http.ParseException {
 
         String responseString = EntityUtils.toString(response.getEntity());
 
@@ -217,12 +217,12 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
 
 
     private String getNodeValue(final Object el) {
-        if (el instanceof Element) {
-            return ((Element) el).getValue();
-        } else if (el instanceof Attribute) {
-            return ((Attribute) el).getValue();
-        } else if (el instanceof String) {
-            return (String) el;
+        if (el instanceof Element element) {
+            return element.getValue();
+        } else if (el instanceof Attribute attribute) {
+            return attribute.getValue();
+        } else if (el instanceof String string) {
+            return string;
         } else {
             return null;
         }
@@ -266,7 +266,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
 
         try (CloseableHttpResponse response = client.execute(httpPost)) {
             return retrieveLicenseUri(response);
-        } catch (JDOMException | IOException e) {
+        } catch (JDOMException | IOException | org.apache.hc.core5.http.ParseException e) {
             log.error("Error while retrieving the license uri for license : " + licenseId + " with answers "
                               + answerMap.toString(), e);
         }
@@ -282,7 +282,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      * @throws JDOMException
      */
     private String retrieveLicenseUri(final CloseableHttpResponse response)
-            throws IOException, JDOMException {
+            throws IOException, JDOMException, org.apache.hc.core5.http.ParseException {
 
         String responseString = EntityUtils.toString(response.getEntity());
         XPathExpression<Object> licenseClassXpath =

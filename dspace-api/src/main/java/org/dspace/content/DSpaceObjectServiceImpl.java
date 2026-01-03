@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -371,8 +371,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 List<String> authorities = new ArrayList<>();
                 List<Integer> confidences = new ArrayList<>();
                 for (int i = 0; i < values.size(); ++i) {
-                    if (dso instanceof Item) {
-                        getAuthoritiesAndConfidences(fieldKey, ((Item) dso).getOwningCollection(), values, authorities,
+                    if (dso instanceof Item item) {
+                        getAuthoritiesAndConfidences(fieldKey, item.getOwningCollection(), values, authorities,
                                                      confidences, i);
                     } else {
                         getAuthoritiesAndConfidences(fieldKey, null, values, authorities, confidences, i);
@@ -660,8 +660,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     // E.g. for an Author relationship,
                     //   the place should be updated using the same principle as dc.contributor.author.
                     Strings.CS.startsWith(metadataValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)
-                        && metadataValue instanceof RelationshipMetadataValue
-                        && ((RelationshipMetadataValue) metadataValue).isUseForPlace()
+                        && metadataValue instanceof RelationshipMetadataValue value
+                        && value.isUseForPlace()
                 ) {
                     int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
                     metadataValue.setPlace(mvPlace);

@@ -81,8 +81,9 @@ public class SolrSearchCore {
                 .getBooleanProperty("discovery.solr.url.validation.enabled", true)) {
                 try {
                     log.debug("Solr URL: {}", solrService);
+                    // Note: Cannot use custom HttpClient with Solr 8.x as it requires HttpClient 4
+                    // and we've upgraded to HttpClient 5. Solr will manage its own connections.
                     HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService)
-                            .withHttpClient(httpConnectionPoolService.getClient())
                             .build();
 
                     solrServer.setBaseURL(solrService);

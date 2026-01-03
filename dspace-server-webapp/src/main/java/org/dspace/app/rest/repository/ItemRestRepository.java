@@ -11,13 +11,15 @@ import static org.dspace.content.service.RelationshipService.REQUESTPARAMETER_CO
 
 import java.io.IOException;
 import java.sql.SQLException;
+
+import tools.jackson.core.JacksonException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.Strings;
@@ -176,7 +178,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         try {
             ServletInputStream input = req.getInputStream();
             itemRest = mapper.readValue(input, ItemRest.class);
-        } catch (IOException e1) {
+        } catch (IOException | JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
@@ -211,7 +213,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         ItemRest itemRest = null;
         try {
             itemRest = mapper.readValue(jsonNode.toString(), ItemRest.class);
-        } catch (IOException e1) {
+        } catch (JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 

@@ -11,8 +11,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.SQLException;
 
@@ -32,9 +32,9 @@ import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -72,7 +72,7 @@ public class VersioningTest extends AbstractUnitTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -107,7 +107,7 @@ public class VersioningTest extends AbstractUnitTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         context.abort();
@@ -142,7 +142,7 @@ public class VersioningTest extends AbstractUnitTest {
          */
         assertThat("Test_version_handle 1", versionedItem.getHandle(), notNullValue());
         assertThat("Test_version_handle 2", originalItem.getHandle(), notNullValue());
-        assertTrue("Test_version_handle 3 ", originalItem.getHandles().size() == 1);
+        assertTrue(originalItem.getHandles().size() == 1, "Test_version_handle 3 ");
 
         /* The following assertments are specific to the VersionHandleIdentifier
          * that use "canonical" handles that are moved from version to version.

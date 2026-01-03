@@ -7,8 +7,6 @@
  */
 package org.dspace.app.ldn;
 
-import static java.lang.String.format;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -20,8 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.ldn.factory.NotifyServiceFactory;
@@ -52,6 +49,7 @@ import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.web.ContextUtil;
+import tools.jackson.core.JacksonException;
 
 /**
  * class for creating a new LDN Messages of installed item
@@ -96,7 +94,7 @@ public class LDNMessageConsumer implements Consumer {
         createAutomaticLDNMessages(context, item);
     }
 
-    private void createManualLDNMessages(Context context, Item item) throws SQLException, JsonProcessingException {
+    private void createManualLDNMessages(Context context, Item item) throws SQLException, JacksonException {
         List<NotifyPatternToTrigger> patternsToTrigger =
             notifyPatternToTriggerService.findByItem(context, item);
         // Note that multiple patterns can be submitted and not all support resubmission
@@ -120,7 +118,7 @@ public class LDNMessageConsumer implements Consumer {
         }
     }
 
-    private void createAutomaticLDNMessages(Context context, Item item) throws SQLException, JsonProcessingException {
+    private void createAutomaticLDNMessages(Context context, Item item) throws SQLException, JacksonException {
 
         List<NotifyServiceInboundPattern> inboundPatterns = inboundPatternService.findAutomaticPatterns(context);
 
@@ -163,14 +161,14 @@ public class LDNMessageConsumer implements Consumer {
 
     private void createLDNMessage(Context context, Item item, NotifyServiceEntity service, String pattern,
                                   String resubmissionID)
-            throws SQLException, JsonProcessingException {
+            throws SQLException, JacksonException {
         // Amend current pattern name to trigger
         // Endorsement or Review offer resubmissions: append '-resubmission' to pattern name to choose the correct
         // LDN message template: e.g. request-endorsement-resubmission or request-review-resubmission
         LDN ldn = (resubmissionID != null)
                 ? getLDNMessage(pattern + RESUBMISSION_SUFFIX) : getLDNMessage(pattern);
         LDNMessageEntity ldnMessage =
-                ldnMessageService.create(context, format("urn:uuid:%s", UUID.randomUUID()));
+                ldnMessageService.create(context, "urn:uuid:%s".formatted(UUID.randomUUID()));
 
         ldnMessage.setObject(item);
         ldnMessage.setTarget(service);
@@ -237,7 +235,7 @@ public class LDNMessageConsumer implements Consumer {
         ldn.addArgument(ldnMessage.getID());
         ldn.addArgument(getRelationUri(item));
         ldn.addArgument("http://purl.org/vocab/frbr/core#supplement");
-        ldn.addArgument(format("urn:uuid:%s", UUID.randomUUID()));
+        ldn.addArgument("urn:uuid:%s".formatted(UUID.randomUUID()));
         if (actorID != null) {
             ldn.addArgument("Person");
         } else {
@@ -247,7 +245,7 @@ public class LDNMessageConsumer implements Consumer {
         ldn.addArgument(getUiUrl());
         // Param 15: inReplyTo ID, used in endorsement resubmission notifications
         if (resubmissionId != null) {
-            ldn.addArgument(String.format("\"inReplyTo\": \"%s\",", resubmissionId));
+            ldn.addArgument("\"inReplyTo\": \"%s\",".formatted(resubmissionId));
         }
 
         ldnMessage.setMessage(ldn.generateLDNMessage());

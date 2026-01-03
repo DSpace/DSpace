@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.model.patch;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nonnull;
 import org.springframework.data.rest.webmvc.json.patch.PatchException;
 
@@ -37,9 +37,9 @@ public class JsonValueEvaluator implements LateObjectEvaluator {
     public <T> Object evaluate(Class<T> type) {
 
         try {
-            return mapper.readValue(valueNode.traverse(), type);
+            return mapper.treeToValue(valueNode, type);
         } catch (Exception e) {
-            throw new PatchException(String.format("Could not read %s into %s!", valueNode, type), e);
+            throw new PatchException("Could not read %s into %s!".formatted(valueNode, type), e);
         }
     }
 

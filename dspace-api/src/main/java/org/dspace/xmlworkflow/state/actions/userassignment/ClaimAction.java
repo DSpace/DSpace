@@ -139,8 +139,8 @@ public class ClaimAction extends UserSelectionAction {
 
                 ArrayList<EPerson> epersons = roleMembers.getAllUniqueMembers(context);
                 if (epersons.isEmpty() || step.getRequiredUsers() > epersons.size()) {
-                    log.warn(String.format("There must be at least %s ePerson(s) in the group",
-                                           step.getRequiredUsers()));
+                    log.warn("There must be at least %s ePerson(s) in the group".formatted(
+                        step.getRequiredUsers()));
                 }
                 return !(epersons.isEmpty() || step.getRequiredUsers() > epersons.size());
             } else {

@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +23,8 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.layout.PatternLayout;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test basic log4j logging functionality, extending AbstractControllerIntegrationTest
@@ -81,7 +81,7 @@ public class WebappLoggingIT extends AbstractControllerIntegrationTest {
         assertTrue(messages.stream().anyMatch(msg -> msg.contains("DSPACE TEST LOG ENTRY")));
     }
 
-    @After
+    @AfterEach
     public void cleanupAppender() {
         LoggerContext context = (LoggerContext) LogManager.getContext(false);
         Configuration config = context.getConfiguration();

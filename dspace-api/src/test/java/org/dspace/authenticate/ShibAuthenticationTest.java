@@ -7,10 +7,10 @@
  */
 package org.dspace.authenticate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -28,8 +28,8 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
@@ -41,7 +41,7 @@ public class ShibAuthenticationTest extends AbstractUnitTest {
     private EPersonService ePersonService;
     private ConfigurationService configurationService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         shibAuthentication = new ShibAuthentication();
         ePersonService = mock(EPersonService.class);
@@ -75,9 +75,9 @@ public class ShibAuthenticationTest extends AbstractUnitTest {
         String phoneValue = "555-1234";
         when(request.getAttribute("SHIB-telephone")).thenReturn(phoneValue);
         shibAuthentication.initialize(context);
-        assertNotNull("metadataHeaderMap should be initialized", shibAuthentication.metadataHeaderMap);
-        assertTrue("metadataHeaderMap should contain SHIB-telephone", shibAuthentication.metadataHeaderMap
-            .containsKey("SHIB-telephone"));
+        assertNotNull(shibAuthentication.metadataHeaderMap, "metadataHeaderMap should be initialized");
+        assertTrue(shibAuthentication.metadataHeaderMap
+            .containsKey("SHIB-telephone"), "metadataHeaderMap should contain SHIB-telephone");
         shibAuthentication.updateEPerson(context, request, eperson);
         ArgumentCaptor<String> languageCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> valueCaptor = ArgumentCaptor.forClass(String.class);
@@ -92,8 +92,8 @@ public class ShibAuthenticationTest extends AbstractUnitTest {
             valueCaptor.capture()
         );
 
-        assertNull("The language argument should be NULL.", languageCaptor.getValue());
-        assertEquals("The value argument should be the phone number.", phoneValue, valueCaptor.getValue());
+        assertNull(languageCaptor.getValue(), "The language argument should be NULL.");
+        assertEquals(phoneValue, valueCaptor.getValue(), "The value argument should be the phone number.");
     }
 
     @Test
@@ -106,11 +106,11 @@ public class ShibAuthenticationTest extends AbstractUnitTest {
             });
         shibAuthentication.initialize(context);
 
-        assertNotNull("metadataHeaderMap should be initialized", shibAuthentication.metadataHeaderMap);
-        assertTrue("metadataHeaderMap should contain SHIB-telephone", shibAuthentication.metadataHeaderMap
-            .containsKey("SHIB-telephone"));
-        assertTrue("metadataHeaderMap should contain SHIB-dept", shibAuthentication.metadataHeaderMap
-            .containsKey("SHIB-dept"));
+        assertNotNull(shibAuthentication.metadataHeaderMap, "metadataHeaderMap should be initialized");
+        assertTrue(shibAuthentication.metadataHeaderMap
+            .containsKey("SHIB-telephone"), "metadataHeaderMap should contain SHIB-telephone");
+        assertTrue(shibAuthentication.metadataHeaderMap
+            .containsKey("SHIB-dept"), "metadataHeaderMap should contain SHIB-dept");
     }
 
     @Test

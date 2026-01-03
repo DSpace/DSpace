@@ -11,7 +11,7 @@ import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.repository.BitstreamRestRepository;
@@ -20,9 +20,9 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -50,7 +50,7 @@ public class BitstreamCategoryRestController {
      * @throws SQLException if an error occurs while accessing the database.
      * @throws AuthorizeException if the user is not authorized to perform the requested operation.
      */
-    @RequestMapping(method = RequestMethod.PATCH)
+    @PatchMapping
     public ResponseEntity<RepresentationModel<?>> patch(HttpServletRequest request,
                                                         @RequestBody(required = true) JsonNode jsonNode)
         throws SQLException, AuthorizeException {

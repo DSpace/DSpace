@@ -34,18 +34,16 @@ public class MarkerTask
     @Override
     public int perform(DSpaceObject dso)
             throws IOException {
-        if (dso instanceof Item) {
+        if (dso instanceof Item item) {
             Context context;
             try {
                 context = Curator.curationContext();
             } catch (SQLException ex) {
                 throw new IOException("Failed to get a Context:", ex);
             }
-
-            Item item = (Item) dso;
-            String marker = String.format("Marked by %s on %s",
-                    MarkerTask.class.getCanonicalName(),
-                    DCDate.getCurrent().toString());
+            String marker = "Marked by %s on %s".formatted(
+                MarkerTask.class.getCanonicalName(),
+                DCDate.getCurrent().toString());
 
             context.turnOffAuthorisationSystem();
             try {
@@ -58,7 +56,7 @@ public class MarkerTask
                 context.restoreAuthSystemState();
             }
 
-            String result = String.format("Item %s marked.", item.getID().toString());
+            String result = "Item %s marked.".formatted(item.getID().toString());
             setResult(result);
             report(result);
 

@@ -28,8 +28,8 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.orcid.service.impl.PlainMetadataSignatureGeneratorImpl;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link PlainMetadataSignatureGeneratorImpl}.
@@ -45,7 +45,7 @@ public class PlainMetadataSignatureGeneratorIT extends AbstractIntegrationTestWi
 
     private MetadataSignatureGenerator generator = new PlainMetadataSignatureGeneratorImpl();
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         context.turnOffAuthorisationSystem();

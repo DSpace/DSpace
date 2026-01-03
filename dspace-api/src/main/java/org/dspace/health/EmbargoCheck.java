@@ -48,8 +48,8 @@ public class EmbargoCheck extends Check {
                 } catch (Exception e) {
                     error(e);
                 }
-                ret += String.format("%s embargoed till [%s]\n", handle,
-                                     date != null ? date.toString() : "null");
+                ret += "%s embargoed till [%s]\n".formatted(handle,
+                    date != null ? date.toString() : "null");
             }
             context.complete();
         } catch (SQLException e) {

@@ -33,8 +33,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by pbecker to write a test against DS-3572.
@@ -95,9 +95,9 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
 
         try {
             // eperson1 should be able to write as it is a member of a group that has write permissions
-            Assert.assertTrue(authorizeService.authorizeActionBoolean(context, eperson1, dso, Constants.WRITE, true));
+            Assertions.assertTrue(authorizeService.authorizeActionBoolean(context, eperson1, dso, Constants.WRITE, true));
             // person2 shouldn't have write access
-            Assert.assertFalse(authorizeService.authorizeActionBoolean(context, eperson2, dso, Constants.WRITE, true));
+            Assertions.assertFalse(authorizeService.authorizeActionBoolean(context, eperson2, dso, Constants.WRITE, true));
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
@@ -136,7 +136,7 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
         }
 
         try {
-            Assert.assertTrue(authorizeService.authorizeActionBoolean(context, eperson, dso, Constants.ADD, true));
+            Assertions.assertTrue(authorizeService.authorizeActionBoolean(context, eperson, dso, Constants.ADD, true));
         } catch (SQLException ex) {
             throw new AssertionError(ex);
         }
@@ -171,9 +171,9 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
             Bundle bundle = bundleService.create(context, item, "THUMBNAIL");
             List<ResourcePolicy> newPolicies = authorizeService
                 .findPoliciesByDSOAndType(context, bundle, ResourcePolicy.TYPE_CUSTOM);
-            Assert.assertEquals("Bundle should inherit custom policy from item", 1, newPolicies.size());
-            Assert.assertNotEquals("Bundle should ONLY inherit non-admin custom policy from item",
-                    Constants.ADMIN, newPolicies.get(0).getAction());
+            Assertions.assertEquals(1, newPolicies.size(), "Bundle should inherit custom policy from item");
+            Assertions.assertNotEquals(Constants.ADMIN,
+                    newPolicies.get(0).getAction(), "Bundle should ONLY inherit non-admin custom policy from item");
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -213,10 +213,10 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
                 .findPoliciesByDSOAndType(context, bundle, ResourcePolicy.TYPE_CUSTOM);
             List<ResourcePolicy> newInheritedPolicies = authorizeService
                 .findPoliciesByDSOAndType(context, bundle, ResourcePolicy.TYPE_INHERITED);
-            Assert.assertEquals("Bundle should not inherit custom policy from item, if false passed",
-                    0, newCustomPolicies.size());
-            Assert.assertEquals("Bundle should inherit non-custom, non-admin policies as usual",
-                    ResourcePolicy.TYPE_INHERITED, newInheritedPolicies.get(0).getRpType());
+            Assertions.assertEquals(0,
+                    newCustomPolicies.size(), "Bundle should not inherit custom policy from item, if false passed");
+            Assertions.assertEquals(ResourcePolicy.TYPE_INHERITED,
+                    newInheritedPolicies.get(0).getRpType(), "Bundle should inherit non-custom, non-admin policies as usual");
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {

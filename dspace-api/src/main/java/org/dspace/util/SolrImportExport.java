@@ -497,8 +497,8 @@ public class SolrImportExport {
     public static void exportIndex(String indexName, File toDir, String solrUrl, String timeField, String fromWhen,
                                    boolean overwrite)
         throws SolrServerException, IOException, SolrImportExportException {
-        log.info(String.format("Export Index [%s] to [%s] using [%s] Time Field[%s] FromWhen[%s]", indexName, toDir,
-                               solrUrl, timeField, fromWhen));
+        log.info("Export Index [%s] to [%s] using [%s] Time Field[%s] FromWhen[%s]".formatted(indexName, toDir,
+            solrUrl, timeField, fromWhen));
         if (StringUtils.isBlank(solrUrl)) {
             throw new SolrImportExportException(
                 "Could not construct solr URL for index" + indexName + ", aborting export.");
@@ -578,8 +578,7 @@ public class SolrImportExport {
                                      makeExportFilename(indexName, monthStartDate, docsThisMonth, i));
                 if (file.createNewFile() || overwrite) {
                     FileUtils.copyURLToFile(url, file);
-                    String message = String.format(
-                        "Solr export to file [%s] complete.  Export for Index [%s] Month [%s] Batch [%d] Num Docs [%d]",
+                    String message = "Solr export to file [%s] complete.  Export for Index [%s] Month [%s] Batch [%d] Num Docs [%d]".formatted(
                         file.getCanonicalPath(), indexName, monthStart, i, docsThisMonth);
                     log.info(message);
                 } else if (file.exists()) {

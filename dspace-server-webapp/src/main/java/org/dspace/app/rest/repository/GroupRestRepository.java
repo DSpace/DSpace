@@ -10,11 +10,12 @@ package org.dspace.app.rest.repository;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -50,7 +51,6 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     @Autowired
     private ObjectMapper mapper;
 
-    @Autowired
     GroupRestRepository(GroupService dsoService) {
         super(dsoService);
         this.gs = dsoService;

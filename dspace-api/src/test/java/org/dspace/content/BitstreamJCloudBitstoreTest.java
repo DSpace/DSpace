@@ -7,7 +7,8 @@
  */
 package org.dspace.content;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
@@ -15,9 +16,9 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit Tests for class Bitstream
@@ -43,7 +44,7 @@ public class BitstreamJCloudBitstoreTest extends BitstreamTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         bitstreamService.setIncomingExternal(2);
@@ -57,7 +58,7 @@ public class BitstreamJCloudBitstoreTest extends BitstreamTest {
     @Override
     public void testGetStoreNumber() {
         //stored in store 2 by default
-        assertTrue("testGetStoreNumber 2", bs.getStoreNumber() == 2);
+        assertTrue(bs.getStoreNumber() == 2, "testGetStoreNumber 2");
     }
 
     /**
@@ -67,7 +68,7 @@ public class BitstreamJCloudBitstoreTest extends BitstreamTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         bitstreamService.setIncomingExternal(0);

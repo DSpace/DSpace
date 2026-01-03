@@ -55,8 +55,10 @@ public class LoadLastLogin {
 
     public static void main(String[] argv)
         throws IOException, SQLException, AuthorizeException {
-        final String USAGE = "LoadLastLogin [options] path...path\n\n"
-            + "'path's are paths to DSpace log files";
+        final String USAGE = """
+            LoadLastLogin [options] path...path
+            
+            'path's are paths to DSpace log files""";
 
         final String loginRE =
             "([0-9-]+) ([0-9:]+)[^@]+@ " // Date(1), time(2), goop

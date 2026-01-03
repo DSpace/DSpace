@@ -54,7 +54,7 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
             <version>${spring-boot.version}</version>
             <exclusions>
                 <!-- Later version provided by dspace-api -->
@@ -64,6 +64,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+  <dependency>
+   <groupId>org.hamcrest</groupId>
+   <artifactId>hamcrest-junit</artifactId>
+   <version>2.0.0.0</version>
+   <scope>test</scope>
+  </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-rest</artifactId>
@@ -104,10 +110,14 @@
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <version>${ehcache.version}</version>
+   <classifier>jakarta</classifier>
         </dependency>
 
 
-        <!-- iiif models. -->
+        <!-- iiif models.
+             Note: iiif-apis 0.3.11 requires Jackson 2.x and is not compatible with Jackson 3.
+             We use Jackson 2 internally for IIIF serialization and Spring Boot 4 provides
+             compatibility at the REST boundary. -->
         <dependency>
             <groupId>de.digitalcollections.iiif</groupId>
             <artifactId>iiif-apis</artifactId>
@@ -133,9 +143,28 @@
                     <groupId>com.fasterxml.jackson.module</groupId>
                     <artifactId>jackson-module-parameter-names</artifactId>
                 </exclusion>
+                <!-- Exclude geojson-jackson which brings old Jackson 2.10 - we manage Jackson 2.17 below -->
                 <exclusion>
-                    <groupId>com.fasterxml.jackson.datatype</groupId>
-                    <artifactId>jackson-datatype-jsr310</artifactId>
+                    <groupId>de.grundid.opendatalab</groupId>
+                    <artifactId>geojson-jackson</artifactId>
+                </exclusion>
+                <!-- Exclude byte-buddy - managed by Hibernate 7 -->
+                <exclusion>
+                    <groupId>net.bytebuddy</groupId>
+                    <artifactId>byte-buddy</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Jackson 2 for iiif-apis compatibility - use latest 2.x version for consistency -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.17.0</version>
+            <exclusions>
+                <!-- byte-buddy version managed by Hibernate 7 -->
+                <exclusion>
+                    <groupId>net.bytebuddy</groupId>
+                    <artifactId>byte-buddy</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

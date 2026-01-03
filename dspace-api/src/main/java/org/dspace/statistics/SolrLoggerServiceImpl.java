@@ -22,7 +22,6 @@ import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -52,9 +51,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -183,7 +182,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         String statisticsCoreURL = configurationService.getProperty("solr-statistics.server");
 
         if (null != statisticsCoreURL) {
-            Path statisticsPath = Paths.get(new URI(statisticsCoreURL).getPath());
+            Path statisticsPath = Path.of(new URI(statisticsCoreURL).getPath());
             statisticsCoreBase = statisticsPath
                 .getName(statisticsPath.getNameCount() - 1)
                 .toString();
@@ -232,7 +231,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             throw new RuntimeException(e);
         }
 
-        if (dspaceObject instanceof Bitstream && !isBitstreamLoggable((Bitstream) dspaceObject)) {
+        if (dspaceObject instanceof Bitstream bitstream && !isBitstreamLoggable(bitstream)) {
             return;
         }
 
@@ -247,8 +246,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             if (doc1 == null) {
                 return;
             }
-            if (dspaceObject instanceof Bitstream) {
-                Bitstream bit = (Bitstream) dspaceObject;
+            if (dspaceObject instanceof Bitstream bit) {
                 List<Bundle> bundles = bit.getBundles();
                 for (Bundle bundle : bundles) {
                     doc1.addField("bundleName", bundle.getName());
@@ -283,7 +281,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public void postView(DSpaceObject dspaceObject,
                          String ip, String userAgent, String xforwardedfor, EPerson currentUser, String referrer) {
-        if (dspaceObject instanceof Bitstream && !isBitstreamLoggable((Bitstream) dspaceObject)) {
+        if (dspaceObject instanceof Bitstream bitstream && !isBitstreamLoggable(bitstream)) {
             return;
         }
 
@@ -298,8 +296,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             if (doc1 == null) {
                 return;
             }
-            if (dspaceObject instanceof Bitstream) {
-                Bitstream bit = (Bitstream) dspaceObject;
+            if (dspaceObject instanceof Bitstream bit) {
                 List<Bundle> bundles = bit.getBundles();
                 for (Bundle bundle : bundles) {
                     doc1.addField("bundleName", bundle.getName());
@@ -637,29 +634,25 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public void storeParents(SolrInputDocument doc1, DSpaceObject dso)
         throws SQLException {
-        if (dso instanceof Community) {
-            Community comm = (Community) dso;
+        if (dso instanceof Community comm) {
             List<Community> parentCommunities = comm.getParentCommunities();
             for (Community parent : parentCommunities) {
                 doc1.addField("owningComm", parent.getID().toString());
                 storeParents(doc1, parent);
             }
-        } else if (dso instanceof Collection) {
-            Collection coll = (Collection) dso;
+        } else if (dso instanceof Collection coll) {
             List<Community> communities = coll.getCommunities();
             for (Community community : communities) {
                 doc1.addField("owningComm", community.getID().toString());
                 storeParents(doc1, community);
             }
-        } else if (dso instanceof Item) {
-            Item item = (Item) dso;
+        } else if (dso instanceof Item item) {
             List<Collection> collections = item.getCollections();
             for (Collection collection : collections) {
                 doc1.addField("owningColl", collection.getID().toString());
                 storeParents(doc1, collection);
             }
-        } else if (dso instanceof Bitstream) {
-            Bitstream bitstream = (Bitstream) dso;
+        } else if (dso instanceof Bitstream bitstream) {
             List<Bundle> bundles = bitstream.getBundles();
             for (Bundle bundle : bundles) {
                 List<Item> items = bundle.getItems();
@@ -1217,7 +1210,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                         + i
                         + ".csv");
                 try (CloseableHttpClient hc = DSpaceHttpClientFactory.getInstance().buildWithoutProxy()) {
-                    HttpResponse response = hc.execute(get);
+                    ClassicHttpResponse response = hc.execute(get);
                     csvInputstream = response.getEntity().getContent();
                     //Write the csv output to a file !
                     FileUtils.copyInputStreamToFile(csvInputstream, csvFile);
@@ -1359,7 +1352,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 HttpGet get = new HttpGet(solrRequestUrl);
                 List<String[]> rows;
                 try (CloseableHttpClient hc = DSpaceHttpClientFactory.getInstance().buildWithoutProxy()) {
-                    HttpResponse response = hc.execute(get);
+                    ClassicHttpResponse response = hc.execute(get);
                     InputStream csvOutput = response.getEntity().getContent();
                     Reader csvReader = new InputStreamReader(csvOutput);
                     rows = new CSVReader(csvReader).readAll();

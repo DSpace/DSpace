@@ -29,9 +29,10 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -60,39 +61,39 @@ public class StatisticsRestController implements InitializingBean {
                 .asList(Link.of("/api/" + RestAddressableModel.STATISTICS, RestAddressableModel.STATISTICS)));
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public StatisticsSupportResource getStatisticsSupport() throws Exception {
         StatisticsSupportRest statisticsSupportRest = statisticsRestRepository.getStatisticsSupport();
         return converter.toResource(statisticsSupportRest);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/viewevents/{uuid}")
+    @GetMapping("/viewevents/{uuid}")
     public PagedModel<ViewEventResource> getViewEvent(@PathVariable(name = "uuid") UUID uuid) throws Exception {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/searchevents/{uuid}")
+    @GetMapping("/searchevents/{uuid}")
     public PagedModel<SearchEventResource> getSearchEvent(@PathVariable(name = "uuid") UUID uuid) throws Exception {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/viewevents")
+    @GetMapping("/viewevents")
     public PagedModel<ViewEventResource> getViewEvents() throws Exception {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/searchevents")
+    @GetMapping("/searchevents")
     public PagedModel<SearchEventResource> getSearchEvents() throws Exception {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/viewevents")
+    @PostMapping("/viewevents")
     public ResponseEntity<RepresentationModel<?>> postViewEvent() throws Exception {
         ViewEventResource result = converter.toResource(viewEventRestRepository.createViewEvent());
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/searchevents")
+    @PostMapping("/searchevents")
     public ResponseEntity<RepresentationModel<?>> postSearchEvent() throws Exception {
         SearchEventResource result = converter.toResource(searchEventRestRepository.createSearchEvent());
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);

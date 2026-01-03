@@ -7,20 +7,24 @@
  */
 package org.dspace.app.rest.link.search;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 import org.dspace.app.rest.DiscoveryRestController;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.hateoas.FacetConfigurationResource;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 /**
  * This class' purpose is to test the FacetConfigurationResourceHalLinkFactory
  */
+@ExtendWith(MockitoExtension.class)
 public class FacetConfigurationResourceHalLinkFactoryTest {
 
 
@@ -33,7 +37,7 @@ public class FacetConfigurationResourceHalLinkFactoryTest {
     @InjectMocks
     private FacetConfigurationResourceHalLinkFactory facetConfigurationResourceHalLinkFactory;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         facetConfigurationResourceHalLinkFactory = new FacetConfigurationResourceHalLinkFactory();
     }

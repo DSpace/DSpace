@@ -7,7 +7,7 @@
  */
 package org.dspace.google.client;
 
-import static org.apache.commons.lang.StringUtils.startsWith;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import java.net.URLEncoder;

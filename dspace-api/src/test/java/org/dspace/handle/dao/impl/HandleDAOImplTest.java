@@ -7,8 +7,8 @@
  */
 package org.dspace.handle.dao.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -34,9 +34,9 @@ import org.dspace.handle.dao.HandleDAO;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersioningService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class for the Handle DAO
@@ -76,7 +76,7 @@ public class HandleDAOImplTest extends AbstractUnitTest {
     private static final String SUFFIX_3 = "303";
     private static final String SUFFIX_4 = "404";
 
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -117,7 +117,7 @@ public class HandleDAOImplTest extends AbstractUnitTest {
         }
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         try {

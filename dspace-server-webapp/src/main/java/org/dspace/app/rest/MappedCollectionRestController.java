@@ -32,9 +32,10 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -79,7 +80,7 @@ public class MappedCollectionRestController {
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST, consumes = {"text/uri-list"})
+    @PostMapping( consumes = {"text/uri-list"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void createCollectionToItemRelation(@PathVariable UUID uuid,
                                                HttpServletResponse response, HttpServletRequest request)
@@ -134,7 +135,7 @@ public class MappedCollectionRestController {
      * @throws AuthorizeException   If something goes wrong
      * @throws IOException          If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{collectionUuid}")
+    @DeleteMapping("/{collectionUuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCollectionToItemRelation(@PathVariable UUID uuid, @PathVariable UUID collectionUuid,
                                                HttpServletResponse response, HttpServletRequest request)

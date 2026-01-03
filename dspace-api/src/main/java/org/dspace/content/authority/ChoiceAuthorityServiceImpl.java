@@ -219,8 +219,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                 "No choices plugin was configured for  field \"" + fieldKey
                     + "\", collection=" + collection.getID().toString() + ".");
         }
-        if (ma instanceof AuthorityVariantsSupport) {
-            AuthorityVariantsSupport avs = (AuthorityVariantsSupport) ma;
+        if (ma instanceof AuthorityVariantsSupport avs) {
             return avs.getVariants(metadataValue.getAuthority(), metadataValue.getLanguage());
         }
         return null;
@@ -560,7 +559,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         } else {
             init();
             ChoiceAuthority source = this.getChoiceAuthorityByAuthorityName(nameVocab);
-            if (source != null && source instanceof DSpaceControlledVocabulary) {
+            if (source != null && source instanceof DSpaceControlledVocabulary vocabulary) {
 
                 // First, check if this vocabulary index is disabled
                 String[] vocabulariesDisabled = configurationService
@@ -609,7 +608,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                 }
 
                 DSpaceControlledVocabularyIndex vocabularyIndex =
-                        new DSpaceControlledVocabularyIndex((DSpaceControlledVocabulary) source, metadataFields,
+                        new DSpaceControlledVocabularyIndex(vocabulary, metadataFields,
                                 matchingFacet);
                 this.vocabularyIndexMap.put(nameVocab, vocabularyIndex);
                 return vocabularyIndex;

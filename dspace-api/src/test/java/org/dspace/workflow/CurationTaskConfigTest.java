@@ -7,10 +7,10 @@
  */
 package org.dspace.workflow;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -18,8 +18,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import jakarta.xml.bind.JAXBException;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 /**
@@ -61,7 +61,7 @@ public class CurationTaskConfigTest {
             + "  </tasksets>"
             + "</workflow-curation>";
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass()
             throws JAXBException, SAXException, IOException {
         instance = new CurationTaskConfig(
@@ -75,8 +75,8 @@ public class CurationTaskConfigTest {
     @Test
     public void testFindTaskSet() {
         TaskSet taskSet = instance.findTaskSet("123456789/2");
-        assertNotNull("The 'default' Handle should match", taskSet);
-        assertEquals("The wrong taskset was found.", TEST1, taskSet.name);
+        assertNotNull(taskSet, "The 'default' Handle should match");
+        assertEquals(TEST1, taskSet.name, "The wrong taskset was found.");
 
         FlowStep foundStep = null;
         for (FlowStep step : taskSet.steps) {
@@ -85,7 +85,7 @@ public class CurationTaskConfigTest {
                 break;
             }
         }
-        assertNotNull(STEP1 + " should be in this taskset.", foundStep);
+        assertNotNull(foundStep, STEP1 + " should be in this taskset.");
 
         Task foundTask = null;
         for (Task task : foundStep.tasks) {
@@ -94,16 +94,16 @@ public class CurationTaskConfigTest {
                 break;
             }
         }
-        assertNotNull(TASK1 + " should be in " + STEP1 + ".", foundTask);
+        assertNotNull(foundTask, TASK1 + " should be in " + STEP1 + ".");
 
-        assertTrue(TASK1 + " should have 'reject' action",
-                foundTask.powers.contains(ACTION_REJECT));
+        assertTrue(foundTask.powers.contains(ACTION_REJECT),
+                TASK1 + " should have 'reject' action");
 
         List<String> contacts = foundTask.contacts.get(CONDITION_FAIL);
-        assertNotNull(TASK1 + " should have contacts for condition " + CONDITION_FAIL,
-                contacts);
-        assertTrue(TASK1 + " on condition " + CONDITION_FAIL + " should contact " + ADMINISTRATOR,
-                contacts.contains(ADMINISTRATOR));
+        assertNotNull(contacts,
+                TASK1 + " should have contacts for condition " + CONDITION_FAIL);
+        assertTrue(contacts.contains(ADMINISTRATOR),
+                TASK1 + " on condition " + CONDITION_FAIL + " should contact " + ADMINISTRATOR);
     }
 
     /**
@@ -114,11 +114,11 @@ public class CurationTaskConfigTest {
         boolean isContained;
 
         isContained = instance.containsKey(COLLECTION_9_HANDLE);
-        assertTrue("Collection '" + COLLECTION_9_HANDLE + "' should be found.",
-                isContained);
+        assertTrue(isContained,
+                "Collection '" + COLLECTION_9_HANDLE + "' should be found.");
 
         isContained = instance.containsKey(BAD_HANDLE);
-        assertFalse("Collection '" + BAD_HANDLE + "' should not be found.",
-                isContained);
+        assertFalse(isContained,
+                "Collection '" + BAD_HANDLE + "' should not be found.");
     }
 }

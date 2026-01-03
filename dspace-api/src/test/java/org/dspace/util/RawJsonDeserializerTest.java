@@ -11,11 +11,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.junit.Test;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import org.junit.jupiter.api.Test;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DatabindException;
 
 /**
  * Unit tests for {@link RawJsonDeserializer}.
@@ -34,7 +34,7 @@ public class RawJsonDeserializerTest {
         + "}";
 
     @Test
-    public void testDeserialization() throws JsonMappingException, JsonProcessingException {
+    public void testDeserialization() throws DatabindException, JacksonException {
 
         ObjectMapper mapper = new ObjectMapper();
 

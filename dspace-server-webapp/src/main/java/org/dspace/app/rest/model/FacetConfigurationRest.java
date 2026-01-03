@@ -77,14 +77,14 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof FacetConfigurationRest &&
-            new EqualsBuilder().append(this.getCategory(), ((FacetConfigurationRest) object).getCategory())
-                               .append(this.getType(), ((FacetConfigurationRest) object).getType())
-                               .append(this.getController(), ((FacetConfigurationRest) object).getController())
-                               .append(this.getScope(), ((FacetConfigurationRest) object).getScope())
+        return (object instanceof FacetConfigurationRest fcr &&
+            new EqualsBuilder().append(this.getCategory(), fcr.getCategory())
+                               .append(this.getType(), fcr.getType())
+                               .append(this.getController(), fcr.getController())
+                               .append(this.getScope(), fcr.getScope())
                                .append(this.getConfiguration(),
-                                       ((FacetConfigurationRest) object).getConfiguration())
-                               .append(this.getSidebarFacets(), ((FacetConfigurationRest) object).getSidebarFacets())
+                                       fcr.getConfiguration())
+                               .append(this.getSidebarFacets(), fcr.getSidebarFacets())
                                .isEquals());
     }
 

@@ -254,10 +254,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                     logError(formatBitstreamDetails(myItem.getHandle(), myBitstream));
                     logError(ThrowableUtils.formatCauseChain(e));
                 }
-            } else if (filterClass instanceof SelfRegisterInputFormats) {
-                // Filter implements self registration, so check to see if it should be applied
-                // given the formats it claims to support
-                SelfRegisterInputFormats srif = (SelfRegisterInputFormats) filterClass;
+            } else if (filterClass instanceof SelfRegisterInputFormats srif) {
                 boolean applyFilter = false;
 
                 // Check MIME type

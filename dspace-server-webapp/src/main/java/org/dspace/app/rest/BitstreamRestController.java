@@ -9,7 +9,6 @@ package org.dspace.app.rest;
 
 import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
-import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -50,6 +49,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -340,7 +340,7 @@ public class BitstreamRestController {
      * @return The wrapped resource containing the bitstream which in turn contains the bitstream format
      * @throws SQLException       If something goes wrong in the database
      */
-    @RequestMapping(method = PUT, consumes = {"text/uri-list"}, value = "format")
+    @PutMapping( consumes = {"text/uri-list"}, value = "format")
     @PreAuthorize("hasPermission(#uuid, 'BITSTREAM','WRITE')")
     @PostAuthorize("returnObject != null")
     public BitstreamResource updateBitstreamFormat(@PathVariable UUID uuid,

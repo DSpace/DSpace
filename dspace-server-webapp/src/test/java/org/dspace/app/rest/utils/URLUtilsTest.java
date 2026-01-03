@@ -7,11 +7,12 @@
  */
 package org.dspace.app.rest.utils;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mwood
@@ -24,7 +25,7 @@ public class URLUtilsTest {
     /**
      * Test of decode method, of class URLUtils.
      */
-    @Ignore
+    @Disabled
     @Test
     public void testDecode() {
     }
@@ -32,7 +33,7 @@ public class URLUtilsTest {
     /**
      * Test of encode method, of class URLUtils.
      */
-    @Ignore
+    @Disabled
     @Test
     public void testEncode() {
     }
@@ -40,35 +41,37 @@ public class URLUtilsTest {
     /**
      * Test of urlIsPrefixOf method, of class URLUtils.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     @SuppressWarnings("UnusedAssignment")
     public void testUrlIsPrefixOf() {
-        boolean isPrefix;
+        assertThrows(IllegalArgumentException.class, () -> {
+            boolean isPrefix;
 
-        isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path", "http://example.com/path");
-        assertTrue("Should match if all is equal", isPrefix);
-        isPrefix = URLUtils.urlIsPrefixOf("http://example.com:80/test", "http://example.com:80/test/1");
-        assertTrue("Should match if pattern path is longer", isPrefix);
-        isPrefix = URLUtils.urlIsPrefixOf("http://example.com:80/test", "http://example.com/test");
-        assertTrue("Should match if missing port matches default", isPrefix);
+            isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path", "http://example.com/path");
+            assertTrue(isPrefix, "Should match if all is equal");
+            isPrefix = URLUtils.urlIsPrefixOf("http://example.com:80/test", "http://example.com:80/test/1");
+            assertTrue(isPrefix, "Should match if pattern path is longer");
+            isPrefix = URLUtils.urlIsPrefixOf("http://example.com:80/test", "http://example.com/test");
+            assertTrue(isPrefix, "Should match if missing port matches default");
 
-        isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path", "https://example.com/path");
-        assertFalse("Should not match if protocols don't match", isPrefix);
-        isPrefix = URLUtils.urlIsPrefixOf("http://example.com/", "http://oops.example.com/");
-        assertFalse("Should not match if hosts don't match", isPrefix);
-        isPrefix = URLUtils.urlIsPrefixOf("http://example.com:80/", "http://example.com:8080/");
-        assertFalse("Should not match if ports don't match", isPrefix);
-        isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path1/a", "http://example.com/path2/a");
-        assertFalse("Should not match if paths don't match", isPrefix);
+            isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path", "https://example.com/path");
+            assertFalse(isPrefix, "Should not match if protocols don't match");
+            isPrefix = URLUtils.urlIsPrefixOf("http://example.com/", "http://oops.example.com/");
+            assertFalse(isPrefix, "Should not match if hosts don't match");
+            isPrefix = URLUtils.urlIsPrefixOf("http://example.com:80/", "http://example.com:8080/");
+            assertFalse(isPrefix, "Should not match if ports don't match");
+            isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path1/a", "http://example.com/path2/a");
+            assertFalse(isPrefix, "Should not match if paths don't match");
 
-        isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path", "http://example.com/path/");
-        assertTrue("Should match with, without trailing slash", isPrefix);
-        isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path1", "http://example.com/path2");
-        assertFalse("Should not match if paths don't match", isPrefix);
-        isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path", "http://example.com/path2/sub");
-        assertFalse("Should not match if interior path elements don't match", isPrefix);
+            isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path", "http://example.com/path/");
+            assertTrue(isPrefix, "Should match with, without trailing slash");
+            isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path1", "http://example.com/path2");
+            assertFalse(isPrefix, "Should not match if paths don't match");
+            isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path", "http://example.com/path2/sub");
+            assertFalse(isPrefix, "Should not match if interior path elements don't match");
 
-        // Check if a malformed URL raises an exception
-        isPrefix = URLUtils.urlIsPrefixOf(null, "http://example.com/");
+            // Check if a malformed URL raises an exception
+            isPrefix = URLUtils.urlIsPrefixOf(null, "http://example.com/");
+        });
     }
 }

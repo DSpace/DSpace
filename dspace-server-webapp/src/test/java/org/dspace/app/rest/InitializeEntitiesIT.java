@@ -27,9 +27,9 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Constants;
 import org.dspace.services.ConfigurationService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -56,7 +56,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
     /**
      * Build the relationships using the standard test XML with the initialize-entities script
      */
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
 
         //Set up the database for the next test
@@ -66,7 +66,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
 
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         //Clean up the database for the next test

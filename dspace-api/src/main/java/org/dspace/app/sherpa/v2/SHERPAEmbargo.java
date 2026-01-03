@@ -7,6 +7,7 @@
  */
 package org.dspace.app.sherpa.v2;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -16,6 +17,7 @@ import java.io.Serializable;
  */
 public class SHERPAEmbargo implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 6140668058547523656L;
 
     private int amount;

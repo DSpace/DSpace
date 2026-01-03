@@ -143,9 +143,11 @@ public class XSLTDisseminationCrosswalk
             LOG.warn("No schemaLocation for crosswalk={}, key={}schemaLocation", myAlias, prefix);
         } else if (schemaLocation.length() > 0 && schemaLocation.indexOf(' ') < 0) {
             // sanity check: schemaLocation should have space.
-            LOG.warn("Possible INVALID schemaLocation (no space found) for crosswalk={},"
-                         + " key={}schemaLocation"
-                         + "\n\tCorrect format is \"{namespace} {schema-URL}\"",
+            LOG.warn("""
+                         Possible INVALID schemaLocation (no space found) for crosswalk={},\
+                          key={}schemaLocation
+                         	Correct format is "{namespace} {schema-URL}"\
+                         """,
                     myAlias, prefix);
         }
 

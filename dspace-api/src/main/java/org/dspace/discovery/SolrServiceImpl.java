@@ -582,8 +582,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             Object value = doc.getFieldValue(SearchUtils.LAST_INDEXED_FIELD);
 
             // If it's a java.util.Date, convert to an Instant
-            if (value instanceof java.util.Date) {
-                value = ((java.util.Date) value).toInstant();
+            if (value instanceof java.util.Date date) {
+                value = date.toInstant();
             }
 
             if (value instanceof Instant lastIndexed) {
@@ -1177,7 +1177,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 getIndexFactoryByType(type);
         Optional<IndexableObject> indexableObject = indexableObjectService.findIndexableObject(context, id);
 
-        if (!indexableObject.isPresent()) {
+        if (indexableObject.isEmpty()) {
             log.warn("Not able to retrieve object RESOURCE_ID:" + id + " - RESOURCE_TYPE_ID:" + type);
         }
         return indexableObject.orElse(null);
@@ -1269,7 +1269,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     if (value.matches("\\[\\d{1,4} TO \\d{1,4}\\]")) {
                         int minRange = Integer.parseInt(value.substring(1, value.length() - 1).split(" TO ")[0]);
                         int maxRange = Integer.parseInt(value.substring(1, value.length() - 1).split(" TO ")[1]);
-                        value = "[" + String.format("%04d", minRange) + " TO " + String.format("%04d", maxRange) + "]";
+                        value = "[" + "%04d".formatted(minRange) + " TO " + "%04d".formatted(maxRange) + "]";
                     }
                     filterQuery.append(value);
                 }
@@ -1327,8 +1327,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 for (Object relatedDoc : relatedDocs) {
                     SolrDocument relatedDocument = (SolrDocument) relatedDoc;
                     IndexableObject relatedItem = findIndexableObject(context, relatedDocument);
-                    if (relatedItem instanceof IndexableItem) {
-                        results.add(((IndexableItem) relatedItem).getIndexedObject());
+                    if (relatedItem instanceof IndexableItem indexableItem) {
+                        results.add(indexableItem.getIndexedObject());
                     }
                 }
             }

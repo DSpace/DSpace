@@ -50,24 +50,24 @@ public class ChecksumCheck extends Check {
         }
 
         if (collector.arr.size() > 0) {
-            ret = String.format("Checksum performed on [%d] items:\n",
-                                collector.arr.size());
+            ret = "Checksum performed on [%d] items:\n".formatted(
+                collector.arr.size());
             int ok_items = 0;
             for (MostRecentChecksum bi : collector.arr) {
                 if (!ChecksumResultCode.CHECKSUM_MATCH.equals(bi
                                                                   .getChecksumResult().getResultCode())) {
-                    ret += String
-                        .format("md5 checksum FAILED (%s): %s id: %s bitstream-id: %s\n was: %s\n  is: %s\n",
-                                bi.getChecksumResult(), bi.getBitstream().getName(),
-                                bi.getBitstream().getInternalId(), bi.getBitstream().getID(),
-                                bi.getExpectedChecksum(),
-                                bi.getCurrentChecksum());
+                    ret += "md5 checksum FAILED (%s): %s id: %s bitstream-id: %s\n was: %s\n  is: %s\n"
+                        .formatted(
+                            bi.getChecksumResult(), bi.getBitstream().getName(),
+                            bi.getBitstream().getInternalId(), bi.getBitstream().getID(),
+                            bi.getExpectedChecksum(),
+                            bi.getCurrentChecksum());
                 } else {
                     ok_items++;
                 }
             }
 
-            ret += String.format("checksum OK for [%d] items\n", ok_items);
+            ret += "checksum OK for [%d] items\n".formatted(ok_items);
         }
         return ret;
     }

@@ -10,13 +10,13 @@ package org.dspace.importer.external.metadatamapping.contributor;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import tools.jackson.core.JacksonException;
 
 /**
  * A metadata contributor that applies a given {@link MetadataContributor} to each object within
@@ -90,7 +90,7 @@ public class ArrayJsonPathMetadataContributor implements MetadataContributor<Str
         JsonNode body = null;
         try {
             body = mapper.readTree(json);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Unable to process json response.", e);
         }
         return body;

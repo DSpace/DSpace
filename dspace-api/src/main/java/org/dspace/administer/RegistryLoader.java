@@ -161,9 +161,11 @@ public class RegistryLoader {
         formatter.printHelp("RegistryLoader",
                             "Load bitstream format or metadata registries into the database\n",
                             options,
-                            "\nExamples:\n" +
-                            " RegistryLoader -b bitstream-formats.xml\n" +
-                            " RegistryLoader -m dc-types.xml",
+                            """
+                            
+                            Examples:
+                             RegistryLoader -b bitstream-formats.xml
+                             RegistryLoader -m dc-types.xml""",
                             true);
     }
 

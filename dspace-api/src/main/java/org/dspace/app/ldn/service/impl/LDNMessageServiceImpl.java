@@ -20,8 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -50,6 +49,7 @@ import org.dspace.event.Event;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.core.JacksonException;
 
 
 /**
@@ -130,7 +130,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         try {
             message = mapper.writeValueAsString(notification);
             ldnMessage.setMessage(message);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Notification json can't be correctly processed " +
                 "and stored inside the LDN Message Entity" + ldnMessage);
             log.error(e);

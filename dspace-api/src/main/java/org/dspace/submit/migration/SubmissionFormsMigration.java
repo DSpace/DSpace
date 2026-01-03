@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.transform.Result;
@@ -154,7 +153,7 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
         String dir = StringUtils.substringBeforeLast(fileInInputDir, File.separator);
         File dummyFile = new File (dir + File.separator + dummyFileName);
         if (!dummyFile.isFile()) {
-            Path path = Paths.get(dir + File.separator + dummyFileName);
+            Path path = Path.of(dir + File.separator + dummyFileName);
             byte[] strToBytes = dummyContent.getBytes();
 
             try {

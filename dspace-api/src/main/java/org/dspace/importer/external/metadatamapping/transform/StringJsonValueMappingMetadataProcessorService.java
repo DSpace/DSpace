@@ -13,14 +13,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.JsonNodeType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.contributor.JsonPathMetadataProcessor;
 import org.dspace.util.SimpleMapConverter;
+import tools.jackson.core.JacksonException;
 
 /**
  * This class is a Metadata processor from a structured JSON Metadata result
@@ -50,7 +50,7 @@ public class StringJsonValueMappingMetadataProcessorService implements JsonPathM
 
         if (abstractNode.isPresent() && abstractNode.get().getNodeType().equals(JsonNodeType.STRING)) {
 
-            String stringValue = abstractNode.get().asText();
+            String stringValue = abstractNode.get().asString();
             values.add(ofNullable(stringValue)
                          .map(value -> valueMapConverter != null ? valueMapConverter.getValue(value) : value)
                          .orElse(valueMapConverter.getValue(null)));
@@ -63,7 +63,7 @@ public class StringJsonValueMappingMetadataProcessorService implements JsonPathM
         JsonNode body = null;
         try {
             body = mapper.readTree(json);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Unable to process json response.", e);
         }
         return body;

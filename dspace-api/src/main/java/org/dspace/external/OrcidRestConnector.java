@@ -11,10 +11,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
@@ -46,8 +46,8 @@ public class OrcidRestConnector {
             try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
                 if (!isSuccessful(httpResponse)) {
                     var statusCode = getStatusCode(httpResponse);
-                    var reason = httpResponse.getStatusLine().getReasonPhrase();
-                    var error = String.format("The request failed with:%d code, reason:%s ", statusCode, reason);
+                    var reason = httpResponse.getReasonPhrase();
+                    var error = "The request failed with:%d code, reason:%s ".formatted(statusCode, reason);
                     throw new OrcidConnectionException(error, statusCode);
                 }
                 try (InputStream responseStream = httpResponse.getEntity().getContent()) {
@@ -74,13 +74,13 @@ public class OrcidRestConnector {
         return path;
     }
 
-    private boolean isSuccessful(HttpResponse response) {
+    private boolean isSuccessful(ClassicHttpResponse response) {
         int statusCode = getStatusCode(response);
         return statusCode >= 200 || statusCode <= 299;
     }
 
-    private int getStatusCode(HttpResponse response) {
-        return response.getStatusLine().getStatusCode();
+    private int getStatusCode(ClassicHttpResponse response) {
+        return response.getCode();
     }
 
 }

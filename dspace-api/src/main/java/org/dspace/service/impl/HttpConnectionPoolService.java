@@ -7,22 +7,24 @@
  */
 package org.dspace.service.impl;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Iterator;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import org.apache.http.HeaderElement;
-import org.apache.http.HeaderElementIterator;
-import org.apache.http.HttpResponse;
-import org.apache.http.conn.ConnectionKeepAliveStrategy;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicHeaderElementIterator;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.protocol.HttpContext;
+import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.services.ConfigurationService;
 
@@ -91,15 +93,18 @@ public class HttpConnectionPoolService {
 
     @PostConstruct
     protected void init() {
-        connManager = new PoolingHttpClientConnectionManager(
-                configurationService.getIntProperty(configPrefix + ".client.timeToLive", DEFAULT_TTL),
-                TimeUnit.SECONDS);
+        int ttl = configurationService.getIntProperty(configPrefix + ".client.timeToLive", DEFAULT_TTL);
 
-        connManager.setMaxTotal(configurationService.getIntProperty(
-                configPrefix + ".client.maxTotalConnections", DEFAULT_MAX_TOTAL_CONNECTIONS));
-        connManager.setDefaultMaxPerRoute(
-                configurationService.getIntProperty(configPrefix + ".client.maxPerRoute",
-                        DEFAULT_MAX_PER_ROUTE));
+        connManager = PoolingHttpClientConnectionManagerBuilder.create()
+                .setDefaultConnectionConfig(ConnectionConfig.custom()
+                        .setTimeToLive(TimeValue.ofSeconds(ttl))
+                        .setConnectTimeout(Timeout.ofSeconds(30))
+                        .build())
+                .setMaxConnTotal(configurationService.getIntProperty(
+                        configPrefix + ".client.maxTotalConnections", DEFAULT_MAX_TOTAL_CONNECTIONS))
+                .setMaxConnPerRoute(configurationService.getIntProperty(
+                        configPrefix + ".client.maxPerRoute", DEFAULT_MAX_PER_ROUTE))
+                .build();
 
         Thread connectionMonitor = new IdleConnectionMonitorThread(connManager);
         connectionMonitor.setDaemon(true);
@@ -128,22 +133,24 @@ public class HttpConnectionPoolService {
     public class KeepAliveStrategy
             implements ConnectionKeepAliveStrategy {
         @Override
-        public long getKeepAliveDuration(HttpResponse response,
-                HttpContext context) {
-            HeaderElementIterator it = new BasicHeaderElementIterator(
-                    response.headerIterator(HTTP.CONN_KEEP_ALIVE));
+        public TimeValue getKeepAliveDuration(HttpResponse response, HttpContext context) {
+            Iterator<Header> it = response.headerIterator(HttpHeaders.KEEP_ALIVE);
             while (it.hasNext()) {
-                HeaderElement he = it.nextElement();
-                String name = he.getName();
-                String value = he.getValue();
-                if (value != null && "timeout".equalsIgnoreCase(name)) {
-                    return Long.parseLong(value) * 1000;
+                Header header = it.next();
+                String value = header.getValue();
+                if (value != null && value.toLowerCase().contains("timeout=")) {
+                    try {
+                        String timeoutStr = value.replaceAll(".*timeout=", "").replaceAll("[^0-9].*", "");
+                        return TimeValue.ofSeconds(Long.parseLong(timeoutStr));
+                    } catch (NumberFormatException ignore) {
+                        // Fall through to default
+                    }
                 }
             }
 
             // If server did not request keep-alive, use configured value.
-            return configurationService.getIntProperty(configPrefix + ".client.keepAlive",
-                    DEFAULT_KEEPALIVE);
+            return TimeValue.ofMilliseconds(
+                    configurationService.getIntProperty(configPrefix + ".client.keepAlive", DEFAULT_KEEPALIVE));
         }
     }
 
@@ -154,7 +161,7 @@ public class HttpConnectionPoolService {
      */
     public class IdleConnectionMonitorThread
             extends Thread {
-        private final HttpClientConnectionManager connMgr;
+        private final PoolingHttpClientConnectionManager connMgr;
         private volatile boolean shutdown;
 
         /**
@@ -174,8 +181,8 @@ public class HttpConnectionPoolService {
                 while (!shutdown) {
                     synchronized (this) {
                         wait(CHECK_INTERVAL);
-                        connMgr.closeExpiredConnections();
-                        connMgr.closeIdleConnections(IDLE_INTERVAL, TimeUnit.SECONDS);
+                        connMgr.closeExpired();
+                        connMgr.closeIdle(TimeValue.ofSeconds(IDLE_INTERVAL));
                     }
                 }
             } catch (InterruptedException ex) {

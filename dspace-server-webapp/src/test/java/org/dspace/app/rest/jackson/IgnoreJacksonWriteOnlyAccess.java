@@ -8,8 +8,9 @@
 package org.dspace.app.rest.jackson;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.introspect.Annotated;
-import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import tools.jackson.databind.cfg.MapperConfig;
+import tools.jackson.databind.introspect.Annotated;
+import tools.jackson.databind.introspect.JacksonAnnotationIntrospector;
 
 /**
  * This is a custom JacksonAnnotationIntrospector which allows us to ignore `@JsonProperty(access = Access
@@ -19,14 +20,14 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
  * In some tests, we need to ignore this annotation so that the test can use/verify the property
  * during both serialization & deserialization.
  *
- * In order to use this class in a test, assign it the the current mapper like this:
- * mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+ * In order to use this class in a test, use JsonMapper.builder():
+ * JsonMapper mapper = JsonMapper.builder().annotationIntrospector(new IgnoreJacksonWriteOnlyAccess()).build();
  */
 public class IgnoreJacksonWriteOnlyAccess extends JacksonAnnotationIntrospector {
 
     @Override
-    public JsonProperty.Access findPropertyAccess(Annotated m) {
-        JsonProperty.Access access = super.findPropertyAccess(m);
+    public JsonProperty.Access findPropertyAccess(MapperConfig<?> cfg, Annotated m) {
+        JsonProperty.Access access = super.findPropertyAccess(cfg, m);
         if (access == JsonProperty.Access.WRITE_ONLY) {
             return JsonProperty.Access.AUTO;
         }

@@ -31,8 +31,8 @@ public class SolrServiceContentInOriginalBundleFilterPlugin implements SolrServi
 
     @Override
     public void additionalIndex(Context context, IndexableObject indexableObject, SolrInputDocument document) {
-        if (indexableObject instanceof IndexableItem) {
-            Item item = ((IndexableItem) indexableObject).getIndexedObject();
+        if (indexableObject instanceof IndexableItem indexableItem) {
+            Item item = indexableItem.getIndexedObject();
             boolean hasOriginalBundleWithContent = hasOriginalBundleWithContent(item);
 
             // _keyword and _filter because

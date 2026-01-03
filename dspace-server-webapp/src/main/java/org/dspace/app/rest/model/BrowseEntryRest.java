@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serial;
+
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -15,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class BrowseEntryRest implements RestModel {
+    @Serial
     private static final long serialVersionUID = -3415049466402327251L;
     public static final String NAME = "browseEntry";
     public static final String PLURAL_NAME = "browseEntries";

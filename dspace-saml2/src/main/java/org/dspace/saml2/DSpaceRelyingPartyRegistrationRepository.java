@@ -131,75 +131,76 @@ public class DSpaceRelyingPartyRegistrationRepository implements RelyingPartyReg
 
             registrationBuilder.assertionConsumerServiceLocation("{baseUrl}/saml2/assertion-consumer/{registrationId}");
 
-            registrationBuilder.assertingPartyDetails(assertingParty -> {
-                String entityId = assertingPartyConfiguration.getString("entity-id");
+            // Configure asserting party details using the non-deprecated API
+            String entityId = assertingPartyConfiguration.getString("entity-id");
+            if (entityId != null) {
+                registrationBuilder.assertingPartyMetadata(metadata -> metadata.entityId(entityId));
+            }
 
-                if (entityId != null) {
-                    assertingParty.entityId(entityId);
+            HierarchicalConfiguration<ImmutableNode> ssoConfiguration =
+                getConfigurationAt(assertingPartyConfiguration, "single-sign-on");
+
+            if (ssoConfiguration != null) {
+                String url = ssoConfiguration.getString("url");
+                String binding = ssoConfiguration.getString("binding");
+                Boolean shouldSignRequest = ssoConfiguration.getBoolean("sign-request", null);
+
+                if (url != null) {
+                    registrationBuilder.assertingPartyMetadata(metadata ->
+                        metadata.singleSignOnServiceLocation(url));
                 }
 
-                HierarchicalConfiguration<ImmutableNode> ssoConfiguration =
-                    getConfigurationAt(assertingPartyConfiguration, "single-sign-on");
-
-                if (ssoConfiguration != null) {
-                    String url = ssoConfiguration.getString("url");
-
-                    if (url != null) {
-                        assertingParty.singleSignOnServiceLocation(url);
-                    }
-
-                    String binding = ssoConfiguration.getString("binding");
-
-                    if (binding != null) {
-                        assertingParty.singleSignOnServiceBinding(Saml2MessageBinding.valueOf(binding.toUpperCase()));
-                    }
-
-                    Boolean shouldSignRequest = ssoConfiguration.getBoolean("sign-request", null);
-
-                    if (shouldSignRequest != null) {
-                        assertingParty.wantAuthnRequestsSigned(shouldSignRequest);
-                    }
+                if (binding != null) {
+                    registrationBuilder.assertingPartyMetadata(metadata ->
+                        metadata.singleSignOnServiceBinding(Saml2MessageBinding.valueOf(binding.toUpperCase())));
                 }
 
-                HierarchicalConfiguration<ImmutableNode> sloConfiguration =
-                    getConfigurationAt(assertingPartyConfiguration, "single-logout");
+                if (shouldSignRequest != null) {
+                    registrationBuilder.assertingPartyMetadata(metadata ->
+                        metadata.wantAuthnRequestsSigned(shouldSignRequest));
+                }
+            }
 
-                if (sloConfiguration != null) {
-                    String url = sloConfiguration.getString("url");
+            HierarchicalConfiguration<ImmutableNode> sloConfiguration =
+                getConfigurationAt(assertingPartyConfiguration, "single-logout");
 
-                    if (url != null) {
-                        assertingParty.singleLogoutServiceLocation(url);
-                    }
+            if (sloConfiguration != null) {
+                String url = sloConfiguration.getString("url");
+                String binding = sloConfiguration.getString("binding");
+                String responseUrl = sloConfiguration.getString("response-url");
 
-                    String binding = sloConfiguration.getString("binding");
-
-                    if (binding != null) {
-                        assertingParty.singleLogoutServiceBinding(Saml2MessageBinding.valueOf(binding.toUpperCase()));
-                    }
-
-                    String responseUrl = sloConfiguration.getString("response-url");
-
-                    if (responseUrl != null) {
-                        assertingParty.singleLogoutServiceResponseLocation(responseUrl);
-                    }
+                if (url != null) {
+                    registrationBuilder.assertingPartyMetadata(metadata ->
+                        metadata.singleLogoutServiceLocation(url));
                 }
 
-                List<Saml2X509Credential> verificationCredentials =
-                    assertingPartyConfiguration.childConfigurationsAt("verification.credentials").stream()
-                        .map(credentialsConfiguration -> credentialsConfiguration.getString("certificate-location"))
-                        .filter(certificateLocation -> certificateLocation != null)
-                        .map(certificateLocation -> certificateFromUrl(certificateLocation))
-                        .filter(certificate -> certificate != null)
-                        .map(certificate -> Saml2X509Credential.verification(certificate))
-                        .collect(Collectors.toList());
+                if (binding != null) {
+                    registrationBuilder.assertingPartyMetadata(metadata ->
+                        metadata.singleLogoutServiceBinding(Saml2MessageBinding.valueOf(binding.toUpperCase())));
+                }
 
-                if (verificationCredentials.size() > 0) {
-                    assertingParty.verificationX509Credentials(credentials -> {
+                if (responseUrl != null) {
+                    registrationBuilder.assertingPartyMetadata(metadata ->
+                        metadata.singleLogoutServiceResponseLocation(responseUrl));
+                }
+            }
+
+            List<Saml2X509Credential> verificationCredentials =
+                assertingPartyConfiguration.childConfigurationsAt("verification.credentials").stream()
+                    .map(credentialsConfiguration -> credentialsConfiguration.getString("certificate-location"))
+                    .filter(certificateLocation -> certificateLocation != null)
+                    .map(certificateLocation -> certificateFromUrl(certificateLocation))
+                    .filter(certificate -> certificate != null)
+                    .map(certificate -> Saml2X509Credential.verification(certificate))
+                    .collect(Collectors.toList());
+
+            if (verificationCredentials.size() > 0) {
+                registrationBuilder.assertingPartyMetadata(metadata ->
+                    metadata.verificationX509Credentials(credentials -> {
                         credentials.clear();
                         credentials.addAll(verificationCredentials);
-                    });
-                }
-            });
+                    }));
+            }
 
             configuration.childConfigurationsAt("signing.credentials").stream()
                 .forEach(credentialsConfiguration -> {

@@ -78,8 +78,7 @@ public class RegisterDOI extends AbstractCurationTask {
             distribute(dso);
         } else {
             // This task is NOT configured for distributed use (default). Instead process a single item directly
-            if (dso instanceof Item) {
-                Item item = (Item) dso;
+            if (dso instanceof Item item) {
                 performRegistration(item);
             } else {
                 log.warn("DOI registration attempted on non-item DSpace Object: " + dso.getID());

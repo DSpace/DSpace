@@ -13,12 +13,13 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
@@ -72,7 +73,7 @@ public class OpenUrlServiceImpl implements OpenUrlService {
         try (CloseableHttpClient httpClient = getHttpClient(getHttpClientRequestConfig())) {
             HttpGet httpGet = new HttpGet(urlStr);
             try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-                return httpResponse.getStatusLine().getStatusCode();
+                return httpResponse.getCode();
             }
         }
     }
@@ -83,7 +84,7 @@ public class OpenUrlServiceImpl implements OpenUrlService {
 
     protected RequestConfig getHttpClientRequestConfig() {
         return RequestConfig.custom()
-            .setConnectTimeout(10 * 1000)
+            .setConnectTimeout(10 * 1000, TimeUnit.MILLISECONDS)
             .build();
     }
 

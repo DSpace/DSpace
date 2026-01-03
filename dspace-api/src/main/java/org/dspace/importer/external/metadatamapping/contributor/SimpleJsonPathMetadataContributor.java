@@ -12,15 +12,15 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import tools.jackson.core.JacksonException;
 
 /**
  * A simple JsonPath Metadata processor
@@ -157,13 +157,13 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
     }
 
     private String getStringValue(JsonNode node) {
-        if (node.isTextual()) {
-            return node.textValue();
+        if (node.isString()) {
+            return node.asString();
         }
         if (node.isNumber()) {
             return node.numberValue().toString();
         }
-        log.error("It wasn't possible to convert the value of the following JsonNode:" + node.asText());
+        log.error("It wasn't possible to convert the value of the following JsonNode:" + node.asString());
         return StringUtils.EMPTY;
     }
 
@@ -172,7 +172,7 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
         JsonNode body = null;
         try {
             body = mapper.readTree(json);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Unable to process json response.", e);
         }
         return body;

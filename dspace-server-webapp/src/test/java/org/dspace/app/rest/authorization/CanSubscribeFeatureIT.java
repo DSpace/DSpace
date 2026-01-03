@@ -46,8 +46,8 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -75,7 +75,7 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
     private AuthorizationFeature canSubscribeFeature;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();

@@ -10,6 +10,7 @@ package org.dspace.sword2;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -139,7 +140,7 @@ public class SimpleZipContentIngester extends AbstractSwordContentIngester {
             while (zenum.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry) zenum.nextElement();
                 String entryName = entry.getName();
-                java.nio.file.Path entryPath = java.nio.file.Paths.get(entryName).normalize();
+                Path entryPath = Path.of(entryName).normalize();
                 if (entryPath.isAbsolute() || entryPath.startsWith("..")) {
                     throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, "Invalid zip entry: " + entryName);
                 }

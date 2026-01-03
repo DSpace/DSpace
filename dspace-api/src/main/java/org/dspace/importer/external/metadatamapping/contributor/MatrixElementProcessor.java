@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tools.jackson.core.JacksonException;
 
 /**
  * This Processor allows to extract all values of a matrix.
@@ -47,20 +47,20 @@ public class MatrixElementProcessor implements JsonPathMetadataProcessor {
     @Override
     public Collection<String> processMetadata(String json) {
         JsonNode rootNode = convertStringJsonToJsonNode(json);
-        Iterator<JsonNode> array = rootNode.at(pathToMatrix).elements();
+        Iterator<JsonNode> array = rootNode.at(pathToMatrix).values().iterator();
         Collection<String> values = new ArrayList<>();
         while (array.hasNext()) {
             JsonNode element = array.next();
             if (element.isArray()) {
                 Iterator<JsonNode> nodes = element.iterator();
                 while (nodes.hasNext()) {
-                    String nodeValue = nodes.next().textValue();
+                    String nodeValue = nodes.next().asString();
                     if (StringUtils.isNotBlank(nodeValue)) {
                         values.add(nodeValue);
                     }
                 }
             } else {
-                String nodeValue = element.textValue();
+                String nodeValue = element.asString();
                 if (StringUtils.isNotBlank(nodeValue)) {
                     values.add(nodeValue);
                 }
@@ -74,7 +74,7 @@ public class MatrixElementProcessor implements JsonPathMetadataProcessor {
         JsonNode body = null;
         try {
             body = mapper.readTree(json);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Unable to process json response.", e);
         }
         return body;

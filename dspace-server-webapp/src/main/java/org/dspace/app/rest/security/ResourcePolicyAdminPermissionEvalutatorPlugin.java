@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -71,7 +71,7 @@ public class ProfileFormats extends AbstractCurationTask {
             StringBuilder sb = new StringBuilder();
             for (String fmt : fmtTable.keySet()) {
                 BitstreamFormat bsf = bitstreamFormatService.findByShortDescription(Curator.curationContext(), fmt);
-                sb.append(String.format("%6d", fmtTable.get(fmt))).append(" (").
+                sb.append("%6d".formatted(fmtTable.get(fmt))).append(" (").
                     append(bitstreamFormatService.getSupportLevelText(bsf).charAt(0)).append(") ").
                       append(bsf.getDescription()).append("\n");
             }

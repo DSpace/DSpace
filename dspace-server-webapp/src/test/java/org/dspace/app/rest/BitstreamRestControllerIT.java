@@ -22,12 +22,12 @@ import static org.dspace.core.Constants.READ;
 import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -56,7 +56,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
@@ -97,9 +97,9 @@ import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -151,14 +151,14 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
     private BitstreamFormat knownFormat;
     private BitstreamFormat unknownFormat;
 
-    @BeforeClass
+    @BeforeAll
     public static void clearStatistics() throws Exception {
         // To ensure these tests start "fresh", clear out any existing statistics data.
         // NOTE: this is committed immediately in removeIndex()
         StatisticsServiceFactory.getInstance().getSolrLoggerService().removeIndex("*:*");
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
 
@@ -395,9 +395,9 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
             //We expect the content disposition to have the encoded bitstream name
             .andExpect(header().string(
                 "Content-Disposition",
-                String.format("attachment; filename=\"%s\"; filename*=UTF-8''%s",
-                              expectedAscii,
-                              expectedUtf8Encoded)
+            "attachment; filename=\"%s\"; filename*=UTF-8''%s".formatted(
+                expectedAscii,
+                expectedUtf8Encoded)
             ));
     }
 
@@ -1402,15 +1402,15 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                                          .andExpect(content().contentType(contentType))
                                          .andReturn().getResponse().getHeader("content-disposition");
         if (shouldDownload) {
-            assertTrue("Content-Disposition should contain 'attachment' for " + contentType,
-                       header.contains("attachment"));
-            assertFalse("Content-Disposition should NOT contain 'inline' for " + contentType,
-                        header.contains("inline"));
+            assertTrue(header.contains("attachment"),
+                       "Content-Disposition should contain 'attachment' for " + contentType);
+            assertFalse(header.contains("inline"),
+                        "Content-Disposition should NOT contain 'inline' for " + contentType);
         } else {
-            assertTrue("Content-Disposition should contain 'inline' for " + contentType,
-                       header.contains("inline"));
-            assertFalse("Content-Disposition should NOT contain 'attachment' for " + contentType,
-                        header.contains("attachment"));
+            assertTrue(header.contains("inline"),
+                       "Content-Disposition should contain 'inline' for " + contentType);
+            assertFalse(header.contains("attachment"),
+                        "Content-Disposition should NOT contain 'attachment' for " + contentType);
         }
     }
 

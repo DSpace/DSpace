@@ -40,8 +40,8 @@ import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessLogLevel;
 import org.dspace.scripts.service.ProcessService;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
@@ -54,7 +54,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
     LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
 
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException {
         CollectionUtils.emptyIfNull(processService.findAll(context)).stream().forEach(process -> {
             try {

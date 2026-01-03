@@ -7,6 +7,9 @@
  */
 package org.dspace.usage;
 
+import java.io.Serial;
+
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
@@ -48,6 +51,7 @@ public class UsageEvent extends Event {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private HttpServletRequest request;

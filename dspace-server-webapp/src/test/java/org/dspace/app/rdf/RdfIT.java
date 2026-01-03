@@ -9,7 +9,7 @@ package org.dspace.app.rdf;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doReturn;
 
 import java.net.URI;
@@ -24,10 +24,12 @@ import org.dspace.rdf.factory.RDFFactoryImpl;
 import org.dspace.rdf.storage.RDFStorage;
 import org.dspace.rdf.storage.RDFStorageImpl;
 import org.dspace.services.ConfigurationService;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +49,7 @@ import org.springframework.test.context.TestPropertySource;
  */
 // Ensure the RDF endpoint IS ENABLED before any tests run.
 // This annotation overrides default DSpace config settings loaded into Spring Context
+@ExtendWith(MockitoExtension.class)
 @TestPropertySource(properties = {"rdf.enabled = true"})
 public class RdfIT extends AbstractWebClientIntegrationTest {
 
@@ -71,7 +74,7 @@ public class RdfIT extends AbstractWebClientIntegrationTest {
     private final String SERIALIZE_PATH = "/rdf/handle";
     private final String REDIRECTION_PATH = "/rdf/resource";
 
-    @Before
+    @BeforeEach
     public void onlyRunIfConfigExists() {
         // These integration tests REQUIRE that RDFWebConfig is found/available (as this class deploys RDF)
         // If this class is not available, the below "Assume" will cause all tests to be SKIPPED
@@ -79,7 +82,7 @@ public class RdfIT extends AbstractWebClientIntegrationTest {
         try {
             Class.forName("org.dspace.app.configuration.RDFWebConfig");
         } catch (ClassNotFoundException ce) {
-            Assume.assumeNoException(ce);
+            Assumptions.assumeTrue(false, "Required class not available: " + ce.getMessage());
         }
 
         // Change the running RDFFactory to use our spy-able, default instance of RDFStorage

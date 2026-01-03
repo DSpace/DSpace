@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
@@ -88,9 +88,12 @@ import org.dspace.orcid.service.OrcidSynchronizationService;
 import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -101,6 +104,7 @@ import org.springframework.test.web.servlet.MvcResult;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
+@ExtendWith(MockitoExtension.class)
 public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
@@ -136,6 +140,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     /**
      * Tests setup.
      */
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -174,7 +179,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         useInstanceForBean(researcherProfileAddOrcidOperation, orcidClientMock);
     }
 
-    @After
+    @AfterEach
     public void after() {
         orcidTokenService.deleteAll(context);
         useInstanceForBean(orcidSynchronizationService, orcidClient);
@@ -995,7 +1000,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         // the profile item should be the same
         String secondItemId = getItemIdByProfileId(adminToken, id);
-        assertEquals("The item should be the same", firstItemId, secondItemId);
+        assertEquals(firstItemId, secondItemId, "The item should be the same");
 
     }
 
@@ -1026,7 +1031,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         // the profile item should be the same
         String firstItemId = itemToBeClaimed.getID().toString();
         String secondItemId = getItemIdByProfileId(newUserToken, id);
-        assertEquals("The item should be the same", firstItemId, secondItemId);
+        assertEquals(firstItemId, secondItemId, "The item should be the same");
 
     }
 
@@ -1125,7 +1130,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         token = getAuthToken(ePerson.getEmail(), password);
 
         String newProfileItemId = getItemIdByProfileId(token, epersonId);
-        assertEquals("The item should be the same", newProfileItemId, profileItemId);
+        assertEquals(newProfileItemId, profileItemId, "The item should be the same");
 
     }
 
@@ -2783,10 +2788,12 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         context.restoreAuthSystemState();
 
-        when(orcidClientMock.getAccessToken(code)).thenThrow(new OrcidClientException(400, "{\n" +
-            "    \"error\": \"invalid_grant\",\n" +
-            "    \"error_description\": \"Invalid authorization code: 123456\"\n" +
-            "}"));
+        when(orcidClientMock.getAccessToken(code)).thenThrow(new OrcidClientException(400, """
+            {
+                "error": "invalid_grant",
+                "error_description": "Invalid authorization code: 123456"
+            }\
+            """));
 
         getClient(getAuthToken(user.getEmail(), password))
             .perform(patch("/api/eperson/profiles/{id}", user.getID().toString())

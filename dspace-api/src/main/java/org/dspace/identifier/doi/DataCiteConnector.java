@@ -19,24 +19,24 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.core5.http.message.StatusLine;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.CredentialsStore;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
@@ -712,18 +712,18 @@ public class DataCiteConnector
      */
     protected DataCiteResponse sendHttpRequest(HttpUriRequest req, String doi)
         throws DOIIdentifierException {
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        CredentialsStore credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(new AuthScope(HOST, 443),
-                new UsernamePasswordCredentials(this.getUsername(), this.getPassword()));
+                new UsernamePasswordCredentials(this.getUsername(), this.getPassword().toCharArray()));
 
         HttpClientContext httpContext = HttpClientContext.create();
         httpContext.setCredentialsProvider(credentialsProvider);
 
         HttpEntity entity = null;
         try (CloseableHttpClient httpclient = DSpaceHttpClientFactory.getInstance().build()) {
-            HttpResponse response = httpclient.execute(req, httpContext);
+            ClassicHttpResponse response = httpclient.execute(req, httpContext);
 
-            StatusLine status = response.getStatusLine();
+            StatusLine status = new StatusLine(response);
             int statusCode = status.getStatusCode();
 
             String content = null;
@@ -807,7 +807,7 @@ public class DataCiteConnector
 
 
             return new DataCiteResponse(statusCode, content);
-        } catch (IOException e) {
+        } catch (IOException | org.apache.hc.core5.http.ParseException e) {
             log.warn("Caught an IOException: {}", e::getMessage);
             throw new RuntimeException(e);
         } finally {

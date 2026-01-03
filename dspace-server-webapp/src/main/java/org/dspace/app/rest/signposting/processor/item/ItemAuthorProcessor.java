@@ -8,7 +8,7 @@
 package org.dspace.app.rest.signposting.processor.item;
 
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.dspace.content.Item.ANY;
 

@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model.step;
 
+import java.io.Serial;
 import java.time.Instant;
 
 import org.dspace.app.sherpa.v2.SHERPAResponse;
@@ -18,6 +19,7 @@ import org.dspace.app.sherpa.v2.SHERPAResponse;
  */
 public class SherpaPolicy implements SectionData {
 
+    @Serial
     private static final long serialVersionUID = 2440249335255683173L;
 
     private Instant retrievalTime;

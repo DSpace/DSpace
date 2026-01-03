@@ -8,9 +8,8 @@
 package org.dspace.authenticate;
 
 
-import static java.lang.String.format;
 import static java.net.URLEncoder.encode;
-import static org.apache.commons.lang.BooleanUtils.toBoolean;
+import static org.apache.commons.lang3.BooleanUtils.toBoolean;
 import static org.apache.commons.lang3.StringUtils.isAnyBlank;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -214,7 +213,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
         }
 
         try {
-            return format(LOGIN_PAGE_URL_FORMAT, authorizeUrl, clientId, scopes, encode(redirectUri, "UTF-8"));
+            return LOGIN_PAGE_URL_FORMAT.formatted(authorizeUrl, clientId, scopes, encode(redirectUri, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
             LOGGER.error(e::getMessage, e);
             return "";

@@ -7,11 +7,10 @@
  */
 package org.dspace.matomo.client;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * This class is a {@code JSONSerializer} that will convert a {@code MatomoBulkRequest} into a proper JSON
@@ -21,12 +20,7 @@ import org.apache.logging.log4j.Logger;
 public class MatomoRequestBuilder {
 
     private static final Logger log = LogManager.getLogger(MatomoRequestBuilder.class);
-    ObjectMapper objectMapper;
-
-    {
-        objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-    }
+    private final JsonMapper objectMapper = JsonMapper.builder().build();
 
     /**
      * This method converts a {@code MatomoBulkRequest} request into a JSON
@@ -39,7 +33,7 @@ public class MatomoRequestBuilder {
         }
         try {
             return objectMapper.writeValueAsString(request);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Cannot convert the Matomo request properly!", e);
         }
         return null;

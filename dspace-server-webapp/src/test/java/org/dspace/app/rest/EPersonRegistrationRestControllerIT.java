@@ -28,11 +28,11 @@ import org.dspace.eperson.dto.RegistrationDataPatch;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,17 +59,17 @@ public class EPersonRegistrationRestControllerIT extends AbstractControllerInteg
     private String customPassword;
 
 
-    @BeforeClass
+    @BeforeAll
     public static void init() throws Exception {
         emailMockedStatic = Mockito.mockStatic(Email.class);
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
         emailMockedStatic.close();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();
@@ -108,7 +108,7 @@ public class EPersonRegistrationRestControllerIT extends AbstractControllerInteg
         context.restoreAuthSystemState();
     }
 
-    @After
+    @AfterEach
     public void destroy() throws Exception {
         RegistrationData found = context.reloadEntity(orcidRegistration);
         if (found != null) {

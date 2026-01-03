@@ -150,22 +150,22 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
 
         // Inspect the indexable object, and extract the DSpace item depending on
         // what submission / archived state it is in
-        if (indexableObject instanceof IndexableWorkspaceItem) {
-            workspaceItem = ((IndexableWorkspaceItem) indexableObject).getIndexedObject();
+        if (indexableObject instanceof IndexableWorkspaceItem item) {
+            workspaceItem = item.getIndexedObject();
             // Only process workspace items that belong to the submitter
             if (workspaceItem != null && workspaceItem.getSubmitter() != null
                     && workspaceItem.getSubmitter().equals(context.getCurrentUser())) {
                 resultItem = workspaceItem.getItem();
             }
         }
-        if (indexableObject instanceof IndexableWorkflowItem) {
-            workflowItem = ((IndexableWorkflowItem) indexableObject).getIndexedObject();
+        if (indexableObject instanceof IndexableWorkflowItem item) {
+            workflowItem = item.getIndexedObject();
             if (workflowItem != null) {
                 resultItem = workflowItem.getItem();
             }
         }
-        if (indexableObject instanceof IndexableItem) {
-            resultItem = ((IndexableItem) indexableObject).getIndexedObject();
+        if (indexableObject instanceof IndexableItem item) {
+            resultItem = item.getIndexedObject();
             // Attempt resolution of workflow or workspace items, tested later
             workflowItem = workflowItemService.findByItem(context, resultItem);
             workspaceItem = workspaceItemService.findByItem(context, resultItem);

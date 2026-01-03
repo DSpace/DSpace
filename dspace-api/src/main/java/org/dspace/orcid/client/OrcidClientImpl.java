@@ -7,10 +7,10 @@
  */
 package org.dspace.orcid.client;
 
-import static org.apache.http.client.methods.RequestBuilder.delete;
-import static org.apache.http.client.methods.RequestBuilder.get;
-import static org.apache.http.client.methods.RequestBuilder.post;
-import static org.apache.http.client.methods.RequestBuilder.put;
+import static org.apache.hc.core5.http.io.support.ClassicRequestBuilder.delete;
+import static org.apache.hc.core5.http.io.support.ClassicRequestBuilder.get;
+import static org.apache.hc.core5.http.io.support.ClassicRequestBuilder.post;
+import static org.apache.hc.core5.http.io.support.ClassicRequestBuilder.put;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -24,24 +24,25 @@ import java.util.Optional;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.orcid.OrcidToken;
@@ -104,7 +105,7 @@ public class OrcidClientImpl implements OrcidClient {
         params.add(new BasicNameValuePair("client_id", orcidConfiguration.getClientId()));
         params.add(new BasicNameValuePair("client_secret", orcidConfiguration.getClientSecret()));
 
-        HttpUriRequest httpUriRequest = RequestBuilder.post(orcidConfiguration.getTokenEndpointUrl())
+        ClassicHttpRequest httpUriRequest = ClassicRequestBuilder.post(orcidConfiguration.getTokenEndpointUrl())
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .addHeader("Accept", "application/json")
             .setEntity(new UrlEncodedFormEntity(params, Charset.defaultCharset()))
@@ -116,20 +117,20 @@ public class OrcidClientImpl implements OrcidClient {
 
     @Override
     public Person getPerson(String accessToken, String orcid) {
-        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/person");
+        ClassicHttpRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/person");
         return executeAndUnmarshall(httpUriRequest, false, Person.class);
     }
 
     @Override
     public Works getWorks(String accessToken, String orcid) {
-        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/works");
+        ClassicHttpRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/works");
         Works works = executeAndUnmarshall(httpUriRequest, true, Works.class);
         return works != null ? works : new Works();
     }
 
     @Override
     public Works getWorks(String orcid) {
-        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + "/works");
+        ClassicHttpRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + "/works");
         Works works = executeAndUnmarshall(httpUriRequest, true, Works.class);
         return works != null ? works : new Works();
     }
@@ -137,7 +138,7 @@ public class OrcidClientImpl implements OrcidClient {
     @Override
     public WorkBulk getWorkBulk(String accessToken, String orcid, List<String> putCodes) {
         String putCode = String.join(",", putCodes);
-        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/works/" + putCode);
+        ClassicHttpRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/works/" + putCode);
         WorkBulk workBulk = executeAndUnmarshall(httpUriRequest, true, WorkBulk.class);
         return workBulk != null ? workBulk : new WorkBulk();
     }
@@ -145,7 +146,7 @@ public class OrcidClientImpl implements OrcidClient {
     @Override
     public WorkBulk getWorkBulk(String orcid, List<String> putCodes) {
         String putCode = String.join(",", putCodes);
-        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + "/works/" + putCode);
+        ClassicHttpRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + "/works/" + putCode);
         WorkBulk workBulk = executeAndUnmarshall(httpUriRequest, true, WorkBulk.class);
         return workBulk != null ? workBulk : new WorkBulk();
     }
@@ -153,14 +154,14 @@ public class OrcidClientImpl implements OrcidClient {
     @Override
     public <T> Optional<T> getObject(String accessToken, String orcid, String putCode, Class<T> clazz) {
         String path = getOrcidPathFromOrcidObjectType(clazz);
-        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + path + "/" + putCode);
+        ClassicHttpRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + path + "/" + putCode);
         return Optional.ofNullable(executeAndUnmarshall(httpUriRequest, true, clazz));
     }
 
     @Override
     public <T> Optional<T> getObject(String orcid, String putCode, Class<T> clazz) {
         String path = getOrcidPathFromOrcidObjectType(clazz);
-        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + path + "/" + putCode);
+        ClassicHttpRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + path + "/" + putCode);
         return Optional.ofNullable(executeAndUnmarshall(httpUriRequest, true, clazz));
     }
 
@@ -203,7 +204,7 @@ public class OrcidClientImpl implements OrcidClient {
         params.add(new BasicNameValuePair("client_id", orcidConfiguration.getClientId()));
         params.add(new BasicNameValuePair("client_secret", orcidConfiguration.getClientSecret()));
 
-        HttpUriRequest httpUriRequest = RequestBuilder.post(orcidConfiguration.getTokenEndpointUrl())
+        ClassicHttpRequest httpUriRequest = ClassicRequestBuilder.post(orcidConfiguration.getTokenEndpointUrl())
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .addHeader("Accept", "application/json")
             .setEntity(new UrlEncodedFormEntity(params, Charset.defaultCharset()))
@@ -212,20 +213,20 @@ public class OrcidClientImpl implements OrcidClient {
         return executeAndParseJson(httpUriRequest, OrcidTokenResponseDTO.class);
     }
 
-    private HttpUriRequest buildGetUriRequest(String accessToken, String relativePath) {
+    private ClassicHttpRequest buildGetUriRequest(String accessToken, String relativePath) {
         return get(orcidConfiguration.getApiUrl() + relativePath.trim())
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .addHeader("Authorization", "Bearer " + accessToken)
             .build();
     }
 
-    private HttpUriRequest buildGetUriRequestToPublicEndpoint(String relativePath) {
+    private ClassicHttpRequest buildGetUriRequestToPublicEndpoint(String relativePath) {
         return get(orcidConfiguration.getPublicUrl() + relativePath.trim())
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .build();
     }
 
-    private HttpUriRequest buildPostUriRequest(String accessToken, String relativePath, Object object) {
+    private ClassicHttpRequest buildPostUriRequest(String accessToken, String relativePath, Object object) {
         return post(orcidConfiguration.getApiUrl() + relativePath.trim())
             .addHeader("Content-Type", "application/vnd.orcid+xml")
             .addHeader("Authorization", "Bearer " + accessToken)
@@ -233,7 +234,7 @@ public class OrcidClientImpl implements OrcidClient {
             .build();
     }
 
-    private HttpUriRequest buildPostForRevokeToken(HttpEntity entity) {
+    private ClassicHttpRequest buildPostForRevokeToken(HttpEntity entity) {
         return post(orcidConfiguration.getRevokeUrl())
             .addHeader("Accept", "application/json")
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
@@ -241,7 +242,7 @@ public class OrcidClientImpl implements OrcidClient {
             .build();
     }
 
-    private HttpUriRequest buildPutUriRequest(String accessToken, String relativePath, Object object) {
+    private ClassicHttpRequest buildPutUriRequest(String accessToken, String relativePath, Object object) {
         return put(orcidConfiguration.getApiUrl() + relativePath.trim())
             .addHeader("Content-Type", "application/vnd.orcid+xml")
             .addHeader("Authorization", "Bearer " + accessToken)
@@ -249,19 +250,25 @@ public class OrcidClientImpl implements OrcidClient {
             .build();
     }
 
-    private HttpUriRequest buildDeleteUriRequest(String accessToken, String relativePath) {
+    private ClassicHttpRequest buildDeleteUriRequest(String accessToken, String relativePath) {
         return delete(orcidConfiguration.getApiUrl() + relativePath.trim())
             .addHeader("Authorization", "Bearer " + accessToken)
             .build();
     }
 
-    private void executeSuccessful(HttpUriRequest httpUriRequest) {
+    private void executeSuccessful(ClassicHttpRequest httpUriRequest) {
         try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
             CloseableHttpResponse response = client.execute(httpUriRequest);
             if (isNotSuccessfull(response)) {
+                String uri;
+                try {
+                    uri = httpUriRequest.getUri().toString();
+                } catch (java.net.URISyntaxException e) {
+                    uri = "unknown";
+                }
                 throw new OrcidClientException(
                     getStatusCode(response),
-                    "Operation " + httpUriRequest.getMethod() + " for the resource " + httpUriRequest.getURI() +
+                    "Operation " + httpUriRequest.getMethod() + " for the resource " + uri +
                     " was not successful: " + new String(response.getEntity().getContent().readAllBytes(),
                                                          StandardCharsets.UTF_8)
                 );
@@ -271,7 +278,7 @@ public class OrcidClientImpl implements OrcidClient {
         }
     }
 
-    private <T> T executeAndParseJson(HttpUriRequest httpUriRequest, Class<T> clazz) {
+    private <T> T executeAndParseJson(ClassicHttpRequest httpUriRequest, Class<T> clazz) {
         try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
             return executeAndReturns(() -> {
                 CloseableHttpResponse response = client.execute(httpUriRequest);
@@ -296,7 +303,7 @@ public class OrcidClientImpl implements OrcidClient {
      * @return                      the response body
      * @throws OrcidClientException if the incoming response is not successful
      */
-    private <T> T executeAndUnmarshall(HttpUriRequest httpUriRequest, boolean handleNotFoundAsNull, Class<T> clazz) {
+    private <T> T executeAndUnmarshall(ClassicHttpRequest httpUriRequest, boolean handleNotFoundAsNull, Class<T> clazz) {
         try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
             return executeAndReturns(() -> {
                 CloseableHttpResponse response = client.execute(httpUriRequest);
@@ -313,7 +320,7 @@ public class OrcidClientImpl implements OrcidClient {
         }
     }
 
-    private OrcidResponse execute(HttpUriRequest httpUriRequest, boolean handleNotFoundAsNull) {
+    private OrcidResponse execute(ClassicHttpRequest httpUriRequest, boolean handleNotFoundAsNull) {
         try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
             return executeAndReturns(() -> {
                 CloseableHttpResponse response = client.execute(httpUriRequest);
@@ -360,13 +367,13 @@ public class OrcidClientImpl implements OrcidClient {
 
     private HttpEntity convertToEntity(Object object) {
         try {
-            return new StringEntity(marshall(object), StandardCharsets.UTF_8);
+            return new StringEntity(marshall(object), ContentType.create("application/vnd.orcid+xml", StandardCharsets.UTF_8));
         } catch (JAXBException ex) {
             throw new IllegalArgumentException("The given object cannot be sent to ORCID", ex);
         }
     }
 
-    private String formatErrorMessage(HttpResponse response) {
+    private String formatErrorMessage(ClassicHttpResponse response) {
         try {
             return IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset());
         } catch (UnsupportedOperationException | IOException e) {
@@ -374,17 +381,17 @@ public class OrcidClientImpl implements OrcidClient {
         }
     }
 
-    private boolean isNotSuccessfull(HttpResponse response) {
+    private boolean isNotSuccessfull(ClassicHttpResponse response) {
         int statusCode = getStatusCode(response);
         return statusCode < 200 || statusCode > 299;
     }
 
-    private boolean isNotFound(HttpResponse response) {
+    private boolean isNotFound(ClassicHttpResponse response) {
         return getStatusCode(response) == HttpStatus.SC_NOT_FOUND;
     }
 
-    private int getStatusCode(HttpResponse response) {
-        return response.getStatusLine().getStatusCode();
+    private int getStatusCode(ClassicHttpResponse response) {
+        return response.getCode();
     }
 
     private String getOrcidPathFromOrcidObjectType(Class<?> clazz) {
@@ -395,7 +402,7 @@ public class OrcidClientImpl implements OrcidClient {
         return path;
     }
 
-    private String getContent(HttpResponse response) throws UnsupportedOperationException, IOException {
+    private String getContent(ClassicHttpResponse response) throws UnsupportedOperationException, IOException {
         HttpEntity entity = response.getEntity();
         return entity != null ? IOUtils.toString(entity.getContent(), StandardCharsets.UTF_8.name()) : null;
     }
@@ -407,7 +414,7 @@ public class OrcidClientImpl implements OrcidClient {
      * @param  response the http response coming from ORCID
      * @return          the put code, if any
      */
-    private String getPutCode(HttpResponse response) {
+    private String getPutCode(ClassicHttpResponse response) {
         Header[] headers = response.getHeaders("Location");
         if (headers.length == 0) {
             return null;

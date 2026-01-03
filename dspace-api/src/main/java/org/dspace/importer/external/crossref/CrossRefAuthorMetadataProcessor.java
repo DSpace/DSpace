@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.contributor.JsonPathMetadataProcessor;
+import tools.jackson.core.JacksonException;
 
 /**
  * This class is used for CrossRef's Live-Import to extract
@@ -40,8 +40,8 @@ public class CrossRefAuthorMetadataProcessor implements JsonPathMetadataProcesso
         Collection<String> values = new ArrayList<>();
         while (authors.hasNext()) {
             JsonNode author = authors.next();
-            String givenName = author.at("/given").textValue();
-            String familyName = author.at("/family").textValue();
+            String givenName = author.at("/given").asString();
+            String familyName = author.at("/family").asString();
             if (StringUtils.isNotBlank(givenName) && StringUtils.isNotBlank(familyName)) {
                 values.add(familyName.trim() + ", " + givenName.trim());
             }
@@ -54,7 +54,7 @@ public class CrossRefAuthorMetadataProcessor implements JsonPathMetadataProcesso
         JsonNode body = null;
         try {
             body = mapper.readTree(json);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Unable to process json response.", e);
         }
         return body;

@@ -1258,45 +1258,47 @@ public class LogAnalyser {
      * print out the usage information for this class to the standard out
      */
     public static void usage() {
-        String usage = "Usage Information:\n" +
-            "LogAnalyser [options [parameters]]\n" +
-            "-log [log directory]\n" +
-            "\tOptional\n" +
-            "\tSpecify a directory containing log files\n" +
-            "\tDefault uses [dspace.dir]/log from dspace.cfg\n" +
-            "-file [file name regex]\n" +
-            "\tOptional\n" +
-            "\tSpecify a regular expression as the file name template.\n" +
-            "\tCurrently this needs to be correctly escaped for Java string handling (FIXME)\n" +
-            "\tDefault uses dspace.log*\n" +
-            "-cfg [config file path]\n" +
-            "\tOptional\n" +
-            "\tSpecify a config file to be used\n" +
-            "\tDefault uses dstat.cfg in dspace config directory\n" +
-            "-out [output file path]\n" +
-            "\tOptional\n" +
-            "\tSpecify an output file to write results into\n" +
-            "\tDefault uses dstat.dat in dspace log directory\n" +
-            "-start [YYYY-MM-DD]\n" +
-            "\tOptional\n" +
-            "\tSpecify the start date of the analysis\n" +
-            "\tIf a start date is specified then no attempt to gather \n" +
-            "\tcurrent database statistics will be made unless -lookup is\n" +
-            "\talso passed\n" +
-            "\tDefault is to start from the earliest date records exist for\n" +
-            "-end [YYYY-MM-DD]\n" +
-            "\tOptional\n" +
-            "\tSpecify the end date of the analysis\n" +
-            "\tIf an end date is specified then no attempt to gather \n" +
-            "\tcurrent database statistics will be made unless -lookup is\n" +
-            "\talso passed\n" +
-            "\tDefault is to work up to the last date records exist for\n" +
-            "-lookup\n" +
-            "\tOptional\n" +
-            "\tForce a lookup of the current database statistics\n" +
-            "\tOnly needs to be used if date constraints are also in place\n" +
-            "-help\n" +
-            "\tdisplay this usage information\n";
+        String usage = """
+            Usage Information:
+            LogAnalyser [options [parameters]]
+            -log [log directory]
+            	Optional
+            	Specify a directory containing log files
+            	Default uses [dspace.dir]/log from dspace.cfg
+            -file [file name regex]
+            	Optional
+            	Specify a regular expression as the file name template.
+            	Currently this needs to be correctly escaped for Java string handling (FIXME)
+            	Default uses dspace.log*
+            -cfg [config file path]
+            	Optional
+            	Specify a config file to be used
+            	Default uses dstat.cfg in dspace config directory
+            -out [output file path]
+            	Optional
+            	Specify an output file to write results into
+            	Default uses dstat.dat in dspace log directory
+            -start [YYYY-MM-DD]
+            	Optional
+            	Specify the start date of the analysis
+            	If a start date is specified then no attempt to gather\s
+            	current database statistics will be made unless -lookup is
+            	also passed
+            	Default is to start from the earliest date records exist for
+            -end [YYYY-MM-DD]
+            	Optional
+            	Specify the end date of the analysis
+            	If an end date is specified then no attempt to gather\s
+            	current database statistics will be made unless -lookup is
+            	also passed
+            	Default is to work up to the last date records exist for
+            -lookup
+            	Optional
+            	Force a lookup of the current database statistics
+            	Only needs to be used if date constraints are also in place
+            -help
+            	display this usage information
+            """;
 
         System.out.println(usage);
     }

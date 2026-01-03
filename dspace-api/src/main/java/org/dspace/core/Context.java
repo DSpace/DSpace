@@ -7,7 +7,6 @@
  */
 package org.dspace.core;
 
-import java.lang.ref.Cleaner;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -20,7 +19,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
@@ -54,24 +52,6 @@ import org.springframework.util.CollectionUtils;
 public class Context implements AutoCloseable {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Context.class);
     protected static final AtomicBoolean databaseUpdated = new AtomicBoolean(false);
-
-    /**
-     * Cleaner for Java 21+ compatibility (replaces deprecated finalize() method).
-     * Used to clean up database connections if Context is garbage-collected without being properly closed.
-     */
-    private static final Cleaner cleaner = Cleaner.create();
-
-    /**
-     * Handle to the registered cleanup action. Used to prevent double-cleanup when close() is called normally.
-     */
-    private Cleaner.Cleanable cleanable;
-
-    /**
-     * Holder for the database connection reference, used by the Cleaner.
-     * Using AtomicReference allows the cleanup action to safely access the connection
-     * without preventing GC of the Context object.
-     */
-    private final AtomicReference<DBConnection> dbConnectionHolder = new AtomicReference<>();
 
     /**
      * Current user - null means anonymous access
@@ -203,10 +183,6 @@ public class Context implements AutoCloseable {
                               "Check previous entries in the dspace.log to find why the db failed to initialize.");
             }
         }
-
-        // Store reference for the Cleaner and register cleanup action
-        dbConnectionHolder.set(dbConnection);
-        cleanable = cleaner.register(this, new ContextCleanup(dbConnectionHolder));
 
         currentUser = null;
         currentLocale = I18nUtil.getDefaultLocale();
@@ -632,12 +608,6 @@ public class Context implements AutoCloseable {
                 log.error("Error closing the database connection", ex);
             }
             events = null;
-
-            // Clear the holder and unregister the Cleaner to prevent double-cleanup
-            dbConnectionHolder.set(null);
-            if (cleanable != null) {
-                cleanable.clean();
-            }
         }
     }
 
@@ -767,40 +737,9 @@ public class Context implements AutoCloseable {
         currentUserPreviousState = null;
     }
 
-    /**
-     * Static cleanup class for use with java.lang.ref.Cleaner (Java 21+ replacement for finalize()).
-     * This class must be static to avoid preventing garbage collection of the Context object.
-     * It holds a reference to the AtomicReference containing the DBConnection, which is cleared
-     * when abort() is called normally, preventing double-cleanup.
-     */
-    private static class ContextCleanup implements Runnable {
-        private static final Logger cleanupLog = org.apache.logging.log4j.LogManager.getLogger(ContextCleanup.class);
-        private final AtomicReference<DBConnection> dbConnectionRef;
-
-        ContextCleanup(AtomicReference<DBConnection> dbConnectionRef) {
-            this.dbConnectionRef = dbConnectionRef;
-        }
-
-        @Override
-        public void run() {
-            // Get and clear the reference atomically
-            DBConnection connection = dbConnectionRef.getAndSet(null);
-            if (connection != null && connection.isTransActionAlive()) {
-                cleanupLog.warn("Context was garbage-collected without being properly closed. " +
-                    "Rolling back uncommitted transaction and closing database connection.");
-                try {
-                    connection.rollback();
-                } catch (SQLException e) {
-                    cleanupLog.error("Error rolling back transaction during cleanup", e);
-                }
-                try {
-                    connection.closeDBConnection();
-                } catch (SQLException e) {
-                    cleanupLog.error("Error closing database connection during cleanup", e);
-                }
-            }
-        }
-    }
+    // Note: finalize() method removed for Java 21 compatibility.
+    // Context implements AutoCloseable, so cleanup should be done via close() or try-with-resources.
+    // If a Context is not properly closed, the database connection will be released by the connection pool.
 
     public void shutDownDatabase() throws SQLException {
         dbConnection.shutdown();

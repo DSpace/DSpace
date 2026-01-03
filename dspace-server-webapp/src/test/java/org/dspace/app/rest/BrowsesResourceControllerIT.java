@@ -41,7 +41,7 @@ import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
@@ -1190,9 +1190,9 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         //2. Twenty-one public items that are readable by Anonymous
         for (int i = 0; i <= 20; i++) {
             ItemBuilder.createItem(context, col1)
-                  .withTitle("Public item " + String.format("%02d", i))
+                  .withTitle("Public item " + "%02d".formatted(i))
                   .withIssueDate("2017-10-17")
-                  .withAuthor("Test, Author" + String.format("%02d", i))
+                  .withAuthor("Test, Author" + "%02d".formatted(i))
                   .withSubject("Java").withSubject("Unit Testing")
                   .build();
         }
@@ -2224,9 +2224,9 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         //2. Twenty-one public items that are readable by Anonymous
         for (int i = 0; i <= 20; i++) {
             ItemBuilder.createItem(context, col1)
-                       .withTitle("Public item " + String.format("%02d", i))
+                       .withTitle("Public item " + "%02d".formatted(i))
                        .withIssueDate("2017-10-17")
-                       .withAuthor("Test, Author" + String.format("%02d", i))
+                       .withAuthor("Test, Author" + "%02d".formatted(i))
                        .withSubject("Java").withSubject("Unit Testing")
                        .build();
         }

@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import org.dspace.contentreport.FilteredCollections;
  */
 public class FilteredCollectionsRest extends BaseObjectRest<String> {
 
+    @Serial
     private static final long serialVersionUID = -1109226348211060786L;
     /** Type of instances of this class, used by the DSpace REST infrastructure */
     public static final String NAME = "filteredcollectionsreport";

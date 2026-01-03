@@ -587,10 +587,7 @@ public abstract class AbstractMETSDisseminator
 
                 if (xwalk.canDisseminate(dso)) {
                     // Check if our Crosswalk actually wraps another Packager Plugin
-                    if (xwalk instanceof AbstractPackagerWrappingCrosswalk) {
-                        // If this crosswalk wraps another Packager Plugin, we can pass it our Packaging Parameters
-                        // (which essentially allow us to customize the output of the crosswalk)
-                        AbstractPackagerWrappingCrosswalk wrapper = (AbstractPackagerWrappingCrosswalk) xwalk;
+                    if (xwalk instanceof AbstractPackagerWrappingCrosswalk wrapper) {
                         wrapper.setPackagingParameters(params);
                     }
 
@@ -618,10 +615,7 @@ public abstract class AbstractMETSDisseminator
                 if (sxwalk != null) {
                     if (sxwalk.canDisseminate(context, dso)) {
                         // Check if our Crosswalk actually wraps another Packager Plugin
-                        if (sxwalk instanceof AbstractPackagerWrappingCrosswalk) {
-                            // If this crosswalk wraps another Packager Plugin, we can pass it our Packaging Parameters
-                            // (which essentially allow us to customize the output of the crosswalk)
-                            AbstractPackagerWrappingCrosswalk wrapper = (AbstractPackagerWrappingCrosswalk) sxwalk;
+                        if (sxwalk instanceof AbstractPackagerWrappingCrosswalk wrapper) {
                             wrapper.setPackagingParameters(params);
                         }
 
@@ -1374,13 +1368,14 @@ public abstract class AbstractMETSDisseminator
      */
     @Override
     public String getParameterHelp() {
-        return "* manifestOnly=[boolean]      " +
-            "If true, only export the METS manifest (mets.xml) and don't export content files (defaults to false)." +
-            "\n\n" +
-            "* unauthorized=[value]      " +
-            "If 'skip', skip over any files which the user doesn't have authorization to read. " +
-            "If 'zero', create a zero-length file for any files the user doesn't have authorization to read. " +
-            "By default, an AuthorizationException will be thrown for any files the user cannot read.";
+        return """
+            * manifestOnly=[boolean]      \
+            If true, only export the METS manifest (mets.xml) and don't export content files (defaults to false).
+            
+            * unauthorized=[value]      \
+            If 'skip', skip over any files which the user doesn't have authorization to read. \
+            If 'zero', create a zero-length file for any files the user doesn't have authorization to read. \
+            By default, an AuthorizationException will be thrown for any files the user cannot read.""";
     }
 
     /**

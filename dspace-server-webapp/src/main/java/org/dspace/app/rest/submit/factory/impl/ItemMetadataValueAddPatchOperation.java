@@ -170,7 +170,7 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
                 Optional<MetadataValue> preExistentMv = preExistentMetadata.stream().filter(mvr ->
                     Strings.CS.equals(ll.getAuthority(), mvr.getAuthority())).findFirst();
 
-                if (!preExistentMv.isPresent()) {
+                if (preExistentMv.isEmpty()) {
                     throw new UnprocessableEntityException(
                             "Relationship with authority=" + ll.getAuthority() + " not found");
                 }
@@ -195,9 +195,9 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
             List<MetadataValue> preExistentMetadata) throws SQLException {
         Map<Integer, Relationship> relationshipsMap = new HashMap<Integer, Relationship>();
         for (MetadataValue ll : preExistentMetadata) {
-            if (ll instanceof RelationshipMetadataValue) {
+            if (ll instanceof RelationshipMetadataValue value) {
                 Relationship relationship = relationshipService
-                        .find(context, ((RelationshipMetadataValue) ll).getRelationshipId());
+                        .find(context, value.getRelationshipId());
                 if (relationship != null) {
                     relationshipsMap.put(relationship.getID(), relationship);
                 }

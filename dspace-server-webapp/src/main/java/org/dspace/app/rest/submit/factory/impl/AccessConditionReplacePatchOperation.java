@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -162,10 +162,9 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
     }
 
     private String getValue(Object value) {
-        if (value instanceof JsonValueEvaluator) {
-            JsonValueEvaluator jsonValue = (JsonValueEvaluator) value;
-            if (jsonValue.getValueNode().fields().hasNext()) {
-                return jsonValue.getValueNode().fields().next().getValue().asText();
+        if (value instanceof JsonValueEvaluator jsonValue) {
+            if (jsonValue.getValueNode().properties().iterator().hasNext()) {
+                return jsonValue.getValueNode().properties().iterator().next().getValue().asString();
             }
         }
         return StringUtils.EMPTY;

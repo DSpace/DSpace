@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serial;
+
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import org.dspace.app.rest.RestResourceController;
@@ -19,6 +22,7 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class SuggestionSourceRest extends BaseObjectRest<String> {
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
     public static final String NAME = "suggestionsource";
