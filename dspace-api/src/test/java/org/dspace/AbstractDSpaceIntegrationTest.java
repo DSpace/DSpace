@@ -7,12 +7,14 @@
  */
 package org.dspace;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.ZoneOffset;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.TimeZone;
 
@@ -22,12 +24,11 @@ import org.dspace.builder.AbstractBuilder;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  * Abstract Test class copied from DSpace API
@@ -54,8 +55,8 @@ public class AbstractDSpaceIntegrationTest {
     /**
      * Obtain the TestName from JUnit, so that we can print it out in the test logs (see below)
      */
-    @Rule
-    public TestName testName = new TestName();
+    
+    public String testName;
 
     /**
      * Default constructor
@@ -68,13 +69,12 @@ public class AbstractDSpaceIntegrationTest {
      *
      * This method loads our test properties for usage in test environment.
      */
-    @BeforeClass
+    @BeforeAll
     public static void initTestEnvironment() {
         try {
-            // NOTE: SecurityManager was removed here for Java 21 compatibility.
-            // Java 21 removes SecurityManager entirely (JEP 411).
-            // The NoExitSecurityManager was a defensive measure to catch System.exit() calls,
-            // but tests work correctly without it.
+            // Note: SecurityManager removed for Java 21 compatibility (SecurityManager is deprecated for removal).
+            // Tests that rely on catching System.exit() calls will need to be refactored.
+            // See: https://openjdk.org/jeps/411
 
             // All tests should assume UTC timezone by default (unless overridden in the test itself)
             // This ensures that Spring doesn't attempt to change the timezone of dates that are read from the
@@ -105,18 +105,22 @@ public class AbstractDSpaceIntegrationTest {
         }
     }
 
-    @Before
-    public void printTestMethodBefore() {
+    @BeforeEach
+    public void printTestMethodBefore(TestInfo testInfo) {
+        Optional<Method> testMethod = testInfo.getTestMethod();
+        if (testMethod.isPresent()) {
+            this.testName = testMethod.get().getName();
+        }
         // Log the test method being executed. Put lines around it to make it stand out.
         log.info("---");
-        log.info("Starting execution of test method: {}()",  testName.getMethodName());
+        log.info("Starting execution of test method: {}()", testName);
         log.info("---");
     }
 
-    @After
+    @AfterEach
     public void printTestMethodAfter() {
         // Log the test method just completed.
-        log.info("Finished execution of test method: {}()", testName.getMethodName());
+        log.info("Finished execution of test method: {}()", testName);
     }
 
     /**
@@ -124,9 +128,9 @@ public class AbstractDSpaceIntegrationTest {
      * will clean resources initialized by the @BeforeClass methods.
      * @throws java.sql.SQLException
      */
-    @AfterClass
+    @AfterAll
     public static void destroyTestEnvironment() throws SQLException {
-        // NOTE: SecurityManager cleanup removed for Java 21 compatibility (JEP 411)
+        // Note: SecurityManager cleanup removed for Java 21 compatibility
 
         // Clear our test properties
         testProps.clear();

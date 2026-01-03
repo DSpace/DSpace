@@ -79,8 +79,8 @@ public class DiscoveryConfigurationService {
         String name;
         if (indexableObject == null) {
             return getDiscoveryConfiguration(null);
-        } else if (indexableObject instanceof IndexableDSpaceObject) {
-            return getDiscoveryDSOConfiguration(context, ((IndexableDSpaceObject) indexableObject).getIndexedObject());
+        } else if (indexableObject instanceof IndexableDSpaceObject object) {
+            return getDiscoveryDSOConfiguration(context, object.getIndexedObject());
         } else {
             name = indexableObject.getUniqueIndexID();
         }

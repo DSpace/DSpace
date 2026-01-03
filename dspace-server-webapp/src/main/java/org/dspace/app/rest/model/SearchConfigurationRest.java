@@ -96,15 +96,15 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof SearchConfigurationRest &&
-            new EqualsBuilder().append(this.getCategory(), ((SearchConfigurationRest) object).getCategory())
-                               .append(this.getType(), ((SearchConfigurationRest) object).getType())
-                               .append(this.getController(), ((SearchConfigurationRest) object).getController())
-                               .append(this.getScope(), ((SearchConfigurationRest) object).getScope())
+        return (object instanceof SearchConfigurationRest scr &&
+            new EqualsBuilder().append(this.getCategory(), scr.getCategory())
+                               .append(this.getType(), scr.getType())
+                               .append(this.getController(), scr.getController())
+                               .append(this.getScope(), scr.getScope())
                                .append(this.getConfiguration(),
-                                       ((SearchConfigurationRest) object).getConfiguration())
-                               .append(this.getFilters(), ((SearchConfigurationRest) object).getFilters())
-                               .append(this.getSortOptions(), ((SearchConfigurationRest) object).getSortOptions())
+                                       scr.getConfiguration())
+                               .append(this.getFilters(), scr.getFilters())
+                               .append(this.getSortOptions(), scr.getSortOptions())
                                .isEquals());
     }
 
@@ -220,9 +220,9 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
 
         @Override
         public boolean equals(Object object) {
-            return (object instanceof SearchConfigurationRest.Filter &&
-                new EqualsBuilder().append(this.filter, ((Filter) object).filter)
-                                   .append(this.getOperators(), ((Filter) object).getOperators())
+            return (object instanceof Filter f &&
+                new EqualsBuilder().append(this.filter, f.filter)
+                                   .append(this.getOperators(), f.getOperators())
                                    .isEquals());
         }
 
@@ -247,8 +247,8 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
 
             @Override
             public boolean equals(Object object) {
-                return (object instanceof SearchConfigurationRest.Filter.Operator &&
-                    new EqualsBuilder().append(this.getOperator(), ((Operator) object).getOperator()).isEquals());
+                return (object instanceof Operator o &&
+                    new EqualsBuilder().append(this.getOperator(), o.getOperator()).isEquals());
             }
 
             @Override
@@ -294,9 +294,9 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
 
         @Override
         public boolean equals(Object object) {
-            return (object instanceof SearchConfigurationRest.SortOption &&
-                new EqualsBuilder().append(this.getName(), ((SortOption) object).getName())
-                                   .append(this.getActualName(), ((SortOption) object).getActualName())
+            return (object instanceof SortOption so &&
+                new EqualsBuilder().append(this.getName(), so.getName())
+                                   .append(this.getActualName(), so.getActualName())
                                    .isEquals());
         }
 

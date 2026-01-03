@@ -13,7 +13,7 @@ import static org.dspace.authorize.ResourcePolicy.TYPE_CUSTOM;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.model.ParameterValueRest;
 import org.dspace.app.rest.model.ProcessRest;
@@ -45,8 +45,8 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.service.ProcessService;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -74,7 +74,7 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
     private final static String CURATE_SCRIPT_ENDPOINT = SCRIPTS_ENDPOINT + "/bulk-access-control/" +
         ProcessRest.PLURAL_NAME;
 
-    @After
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         List<Process> processes = processService.findAll(context);
@@ -106,14 +106,16 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
-        String json = "{ \"item\": {\n" +
-            "      \"mode\": \"replace\",\n" +
-            "      \"accessConditions\": [\n" +
-            "          {\n" +
-            "            \"name\": \"openaccess\"\n" +
-            "          }\n" +
-            "      ]\n" +
-            "   }}\n";
+        String json = """
+            { "item": {
+                  "mode": "replace",
+                  "accessConditions": [
+                      {
+                        "name": "openaccess"
+                      }
+                  ]
+               }}
+            """;
 
         InputStream inputStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
 
@@ -160,14 +162,16 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
                                           .withAdminGroup(eperson)
                                           .build();
 
-        String json = "{ \"item\": {\n" +
-            "      \"mode\": \"replace\",\n" +
-            "      \"accessConditions\": [\n" +
-            "          {\n" +
-            "            \"name\": \"openaccess\"\n" +
-            "          }\n" +
-            "      ]\n" +
-            "   }}\n";
+        String json = """
+            { "item": {
+                  "mode": "replace",
+                  "accessConditions": [
+                      {
+                        "name": "openaccess"
+                      }
+                  ]
+               }}
+            """;
 
         InputStream inputStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
 
@@ -222,14 +226,16 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
                                                  .withAdminGroup(eperson)
                                                  .build();
 
-        String json = "{ \"item\": {\n" +
-            "      \"mode\": \"replace\",\n" +
-            "      \"accessConditions\": [\n" +
-            "          {\n" +
-            "            \"name\": \"openaccess\"\n" +
-            "          }\n" +
-            "      ]\n" +
-            "   }}\n";
+        String json = """
+            { "item": {
+                  "mode": "replace",
+                  "accessConditions": [
+                      {
+                        "name": "openaccess"
+                      }
+                  ]
+               }}
+            """;
 
         InputStream inputStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
 
@@ -289,14 +295,16 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
                                .withAdminUser(eperson)
                                .build();
 
-        String json = "{ \"item\": {\n" +
-            "      \"mode\": \"replace\",\n" +
-            "      \"accessConditions\": [\n" +
-            "          {\n" +
-            "            \"name\": \"openaccess\"\n" +
-            "          }\n" +
-            "      ]\n" +
-            "   }}\n";
+        String json = """
+            { "item": {
+                  "mode": "replace",
+                  "accessConditions": [
+                      {
+                        "name": "openaccess"
+                      }
+                  ]
+               }}
+            """;
 
         InputStream inputStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
 
@@ -362,14 +370,16 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
                                     .withTitle("Public item three")
                                     .build();
 
-        String json = "{ \"item\": {\n" +
-            "      \"mode\": \"replace\",\n" +
-            "      \"accessConditions\": [\n" +
-            "          {\n" +
-            "            \"name\": \"openaccess\"\n" +
-            "          }\n" +
-            "      ]\n" +
-            "   }}\n";
+        String json = """
+            { "item": {
+                  "mode": "replace",
+                  "accessConditions": [
+                      {
+                        "name": "openaccess"
+                      }
+                  ]
+               }}
+            """;
 
         InputStream inputStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
 
@@ -464,14 +474,16 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
                                           .withName("Parent Community")
                                           .build();
 
-        String json = "{ \"item\": {\n" +
-            "      \"mode\": \"replace\",\n" +
-            "      \"accessConditions\": [\n" +
-            "          {\n" +
-            "            \"name\": \"openaccess\"\n" +
-            "          }\n" +
-            "      ]\n" +
-            "   }}\n";
+        String json = """
+            { "item": {
+                  "mode": "replace",
+                  "accessConditions": [
+                      {
+                        "name": "openaccess"
+                      }
+                  ]
+               }}
+            """;
 
         InputStream inputStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
 

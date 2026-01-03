@@ -11,10 +11,10 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -39,8 +39,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
 import jakarta.servlet.http.Cookie;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
@@ -62,9 +62,9 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.exparity.hamcrest.date.LocalDateTimeMatchers;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
@@ -106,12 +106,12 @@ public class RequestItemRepositoryIT
 
     private Map<String, Object> altchaPayload;
 
-    @After
+    @AfterEach
     public void tearDown() {
         configurationService.setProperty("captcha.provider", "google");
     }
 
-    @Before
+    @BeforeEach
     public void init()
             throws SQLException, AuthorizeException, IOException {
         context.turnOffAuthorisationSystem();
@@ -535,7 +535,7 @@ public class RequestItemRepositoryIT
                         read(result.getResponse().getContentAsString(), "token")));
         RequestItem foundRequest
                 = requestItemService.findByToken(context, requestTokenRef.get());
-        assertTrue("acceptRequest should be true", foundRequest.isAccept_request());
+        assertTrue(foundRequest.isAccept_request(), "acceptRequest should be true");
         assertThat("decision_date must be within a minute of now",
                    foundRequest.getDecision_date().atZone(ZoneOffset.UTC).toLocalDateTime(),
                    LocalDateTimeMatchers.within(1, ChronoUnit.MINUTES, LocalDateTime.now()));
@@ -625,7 +625,7 @@ public class RequestItemRepositoryIT
     public void testGetDomainClass() {
         RequestItemRepository instance = new RequestItemRepository();
         Class instanceClass = instance.getDomainClass();
-        assertEquals("Wrong domain class", RequestItemRest.class, instanceClass);
+        assertEquals(RequestItemRest.class, instanceClass, "Wrong domain class");
     }
 
     /**

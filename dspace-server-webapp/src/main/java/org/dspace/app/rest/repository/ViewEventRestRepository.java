@@ -8,12 +8,13 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +51,7 @@ public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
         try {
             ServletInputStream input = req.getInputStream();
             viewEventRest = mapper.readValue(input, ViewEventRest.class);
-        } catch (IOException e1) {
+        } catch (IOException | JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
         if (viewEventRest.getTargetId() == null || StringUtils.isBlank(viewEventRest.getTargetType()) ||

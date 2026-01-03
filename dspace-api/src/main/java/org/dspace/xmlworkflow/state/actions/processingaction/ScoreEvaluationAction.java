@@ -86,7 +86,7 @@ public class ScoreEvaluationAction extends ProcessingAction {
     private void addRatingInfoToProv(Context c, XmlWorkflowItem wfi, int scoreMean)
         throws SQLException, AuthorizeException {
         StringBuilder provDescription = new StringBuilder();
-        provDescription.append(String.format("%s Approved for entry into archive with a score of: %s",
+        provDescription.append("%s Approved for entry into archive with a score of: %s".formatted(
             getProvenanceStartId(), scoreMean));
         List<MetadataValue> reviews = itemService
             .getMetadata(wfi.getItem(), REVIEW_FIELD.schema, REVIEW_FIELD.element, REVIEW_FIELD.qualifier, Item.ANY);
@@ -94,7 +94,7 @@ public class ScoreEvaluationAction extends ProcessingAction {
             provDescription.append(" | Reviews: ");
         }
         for (MetadataValue review : reviews) {
-            provDescription.append(String.format("; %s", review.getValue()));
+            provDescription.append("; %s".formatted(review.getValue()));
         }
         c.turnOffAuthorisationSystem();
         itemService.addMetadata(c, wfi.getItem(), MetadataSchemaEnum.DC.getName(),

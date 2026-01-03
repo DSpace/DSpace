@@ -12,12 +12,12 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JsonGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * This class will be used to convert each {@code MatomoRequestDetails} into a proper URL that will be serialized
@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
  *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
-public class MatomoRequestDetailsListConverter<T extends Collection<MatomoRequestDetails>> extends JsonSerializer<T> {
+public class MatomoRequestDetailsListConverter<T extends Collection<MatomoRequestDetails>> extends ValueSerializer<T> {
 
     private static final Logger log = LogManager.getLogger(MatomoRequestDetailsListConverter.class);
     // each request will be mapped to: ?parameter1=value1&parameter2=value2
@@ -34,9 +34,8 @@ public class MatomoRequestDetailsListConverter<T extends Collection<MatomoReques
     private final String keyValueTemplate = "{0}={1}";
 
     @Override
-    public void serialize(T requests, JsonGenerator gen, SerializerProvider serializers)
-        throws IOException {
-        gen.writeObject(
+    public void serialize(T requests, JsonGenerator gen, SerializationContext serializers) {
+        gen.writePOJO(
             requests.stream()
                     .map(this::mapRequest)
                     .collect(Collectors.toList())

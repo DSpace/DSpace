@@ -15,19 +15,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authenticate.oidc.OidcClient;
 import org.dspace.authenticate.oidc.OidcClientException;
@@ -50,7 +49,6 @@ public class OidcClientImpl implements OidcClient {
 
     @PostConstruct
     private void setup() {
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     @Override
@@ -62,7 +60,7 @@ public class OidcClientImpl implements OidcClient {
         params.add(new BasicNameValuePair("client_secret", getClientSecret()));
         params.add(new BasicNameValuePair("redirect_uri", getRedirectUrl()));
 
-        HttpUriRequest httpUriRequest = RequestBuilder.post(getTokenEndpointUrl())
+        ClassicHttpRequest httpUriRequest = ClassicRequestBuilder.post(getTokenEndpointUrl())
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .addHeader("Accept", "application/json")
             .setEntity(new UrlEncodedFormEntity(params, Charset.defaultCharset()))
@@ -76,14 +74,14 @@ public class OidcClientImpl implements OidcClient {
     @SuppressWarnings("unchecked")
     public Map<String, Object> getUserInfo(String accessToken) throws OidcClientException {
 
-        HttpUriRequest httpUriRequest = RequestBuilder.get(getUserInfoEndpointUrl())
+        ClassicHttpRequest httpUriRequest = ClassicRequestBuilder.get(getUserInfoEndpointUrl())
             .addHeader("Authorization", "Bearer " + accessToken)
             .build();
 
         return executeAndParseJson(httpUriRequest, Map.class);
     }
 
-    private <T> T executeAndParseJson(HttpUriRequest httpUriRequest, Class<T> clazz) {
+    private <T> T executeAndParseJson(ClassicHttpRequest httpUriRequest, Class<T> clazz) {
         try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
             return executeAndReturns(() -> {
                 CloseableHttpResponse response = client.execute(httpUriRequest);
@@ -107,7 +105,7 @@ public class OidcClientImpl implements OidcClient {
         }
     }
 
-    private String formatErrorMessage(HttpResponse response) {
+    private String formatErrorMessage(ClassicHttpResponse response) {
         try {
             return IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset());
         } catch (UnsupportedOperationException | IOException e) {
@@ -115,16 +113,16 @@ public class OidcClientImpl implements OidcClient {
         }
     }
 
-    private boolean isNotSuccessfull(HttpResponse response) {
+    private boolean isNotSuccessfull(ClassicHttpResponse response) {
         int statusCode = getStatusCode(response);
         return statusCode < 200 || statusCode > 299;
     }
 
-    private int getStatusCode(HttpResponse response) {
-        return response.getStatusLine().getStatusCode();
+    private int getStatusCode(ClassicHttpResponse response) {
+        return response.getCode();
     }
 
-    private String getContent(HttpResponse response) throws UnsupportedOperationException, IOException {
+    private String getContent(ClassicHttpResponse response) throws UnsupportedOperationException, IOException {
         HttpEntity entity = response.getEntity();
         return entity != null ? IOUtils.toString(entity.getContent(), UTF_8.name()) : null;
     }

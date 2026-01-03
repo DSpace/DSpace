@@ -60,9 +60,11 @@ public class MediaFilterScriptConfiguration<T extends MediaFilterScript> extends
                                   .hasArgs()
                                   .valueSeparator(',')
                                   .desc(
-                                          "SKIP the bitstreams belonging to identifier\n" +
-                                                  "Separate multiple identifiers with a comma (,)\n" +
-                                                  "(e.g. MediaFilterManager -s \n 123456789/34,123456789/323)")
+                                          """
+                                          SKIP the bitstreams belonging to identifier
+                                          Separate multiple identifiers with a comma (,)
+                                          (e.g. MediaFilterManager -s\s
+                                           123456789/34,123456789/323)""")
                                   .build();
         options.addOption(skipOption);
 

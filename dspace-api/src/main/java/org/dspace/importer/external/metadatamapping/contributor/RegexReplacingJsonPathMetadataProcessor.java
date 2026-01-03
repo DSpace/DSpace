@@ -7,7 +7,7 @@
  */
 package org.dspace.importer.external.metadatamapping.contributor;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,10 +40,10 @@ public class RegexReplacingJsonPathMetadataProcessor extends AbstractJsonPathMet
      */
     @Override
     protected String getStringValue(JsonNode node) {
-        if (node == null || !node.isTextual()) {
+        if (node == null || !node.isString()) {
             throw new IllegalArgumentException("Input must be a non-null JsonNode containing a text value");
         }
-        String idStr = node.asText();
+        String idStr = node.asString();
         if (regexPattern == null || regexPattern.isEmpty() || replacement == null) {
             return idStr;
         }

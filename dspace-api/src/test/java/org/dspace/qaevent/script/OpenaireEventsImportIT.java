@@ -57,10 +57,10 @@ import org.dspace.qaevent.service.QAEventService;
 import org.dspace.qaevent.service.impl.OpenaireClientFactoryImpl;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link OpenaireEventsImport}.
@@ -83,7 +83,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
     private ConfigurationService configurationService = new DSpace().getConfigurationService();
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         context.turnOffAuthorisationSystem();
@@ -105,7 +105,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
         ((OpenaireClientFactoryImpl) OpenaireClientFactory.getInstance()).setBrokerClient(mockBrokerClient);
     }
 
-    @After
+    @AfterEach
     public void after() {
         ((OpenaireClientFactoryImpl) OpenaireClientFactory.getInstance()).setBrokerClient(brokerClient);
     }
@@ -486,7 +486,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
      * which must be tested via LDNMessage at DNInboxControllerIT
     */
     @Test
-    @Ignore
+    @Disabled
     public void testImportFromFileEventMoreReview() throws Exception {
 
         context.turnOffAuthorisationSystem();

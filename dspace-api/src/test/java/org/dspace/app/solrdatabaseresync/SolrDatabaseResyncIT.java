@@ -9,8 +9,8 @@ package org.dspace.app.solrdatabaseresync;
 
 import static org.dspace.discovery.indexobject.ItemIndexFactoryImpl.STATUS_FIELD;
 import static org.dspace.discovery.indexobject.ItemIndexFactoryImpl.STATUS_FIELD_PREDB;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.List;
 
@@ -32,8 +32,8 @@ import org.dspace.discovery.MockSolrSearchCore;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * IT for {@link org.dspace.app.solrdatabaseresync.SolrDatabaseResyncIT}
@@ -61,7 +61,7 @@ public class SolrDatabaseResyncIT extends AbstractIntegrationTestWithDatabase {
     private Item item10;
     private Item item11;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         configurationService.setProperty("solr-database-resync.time-until-reindex", 1);

@@ -42,8 +42,8 @@ public class AccessConditionDiscoverableReplacePatchOperation extends ReplacePat
         }
 
         Boolean discoverable;
-        if (value instanceof String) {
-            discoverable = BooleanUtils.toBooleanObject((String) value);
+        if (value instanceof String string1) {
+            discoverable = BooleanUtils.toBooleanObject(string1);
         } else {
             discoverable = (Boolean) value;
         }

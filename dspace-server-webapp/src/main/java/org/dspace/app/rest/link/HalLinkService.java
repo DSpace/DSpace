@@ -53,28 +53,28 @@ public class HalLinkService {
         halResource.add(links);
 
         for (Object obj : halResource.getEmbeddedResources().values()) {
-            if (obj instanceof Collection) {
-                for (Object subObj : (Collection) obj) {
-                    if (subObj instanceof HALResource) {
-                        addLinks((HALResource) subObj);
+            if (obj instanceof Collection collection) {
+                for (Object subObj : collection) {
+                    if (subObj instanceof HALResource resource) {
+                        addLinks(resource);
                     }
                 }
-            } else if (obj instanceof Map) {
-                for (Object subObj : ((Map) obj).values()) {
-                    if (subObj instanceof HALResource) {
-                        addLinks((HALResource) subObj);
+            } else if (obj instanceof Map map) {
+                for (Object subObj : map.values()) {
+                    if (subObj instanceof HALResource resource) {
+                        addLinks(resource);
                     }
                 }
-            } else if (obj instanceof EmbeddedPage) {
-                for (Map.Entry<String, List> pageContent : ((EmbeddedPage) obj).getPageContent().entrySet()) {
+            } else if (obj instanceof EmbeddedPage page) {
+                for (Map.Entry<String, List> pageContent : page.getPageContent().entrySet()) {
                     for (Object subObj : CollectionUtils.emptyIfNull(pageContent.getValue())) {
-                        if (subObj instanceof HALResource) {
-                            addLinks((HALResource) subObj);
+                        if (subObj instanceof HALResource resource) {
+                            addLinks(resource);
                         }
                     }
                 }
-            } else if (obj instanceof HALResource) {
-                addLinks((HALResource) obj);
+            } else if (obj instanceof HALResource resource) {
+                addLinks(resource);
             }
         }
     }

@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tools.jackson.core.JacksonException;
 
 /**
  * This Processor extracts values from a JSON array, but only when a condition
@@ -71,25 +71,25 @@ public class ConditionalArrayElementAttributeProcessor implements JsonPathMetada
 
             if (filterNode.isArray()) {
                 for (JsonNode filterValue : filterNode) {
-                    if (requiredValueInFilter.equalsIgnoreCase(filterValue.textValue())) {
+                    if (requiredValueInFilter.equalsIgnoreCase(filterValue.asString())) {
                         match = true;
                         break;
                     }
                 }
-            } else if (filterNode.isTextual()) {
-                if (requiredValueInFilter.equalsIgnoreCase(filterNode.textValue())) {
+            } else if (filterNode.isString()) {
+                if (requiredValueInFilter.equalsIgnoreCase(filterNode.asString())) {
                     match = true;
                 }
             }
 
             if (match) {
                 JsonNode valueNode = element.at(elementAttribute);
-                if (valueNode.isTextual()) {
-                    results.add(valueNode.textValue());
+                if (valueNode.isString()) {
+                    results.add(valueNode.asString());
                 } else if (valueNode.isArray()) {
                     for (JsonNode item : valueNode) {
-                        if (item.isTextual() && StringUtils.isNotBlank(item.textValue())) {
-                            results.add(item.textValue());
+                        if (item.isString() && StringUtils.isNotBlank(item.asString())) {
+                            results.add(item.asString());
                         }
                     }
                 }
@@ -103,7 +103,7 @@ public class ConditionalArrayElementAttributeProcessor implements JsonPathMetada
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readTree(json);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Unable to process JSON response.", e);
             return null;
         }

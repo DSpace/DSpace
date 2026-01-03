@@ -2077,7 +2077,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      * @return the filename
      */
     protected String generateRandomFilename(boolean hidden) {
-        String filename = String.format("%s", RandomStringUtils.randomAlphanumeric(8));
+        String filename = "%s".formatted(RandomStringUtils.randomAlphanumeric(8));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm");
         String datePart = formatter.format(LocalDateTime.now(ZoneOffset.UTC));
         filename = datePart + "_" + filename;

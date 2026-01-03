@@ -12,11 +12,10 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.util.dao.WebAppDAO;
@@ -79,7 +78,7 @@ public class WebAppServiceImpl implements WebAppService {
                 int status;
                 try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
                     CloseableHttpResponse response = client.execute(method);
-                    status = response.getStatusLine().getStatusCode();
+                    status = response.getCode();
                 }
                 if (status != HttpStatus.SC_OK) {
                     delete(context, app);
@@ -94,7 +93,7 @@ public class WebAppServiceImpl implements WebAppService {
             log.error("Failure checking for a running webapp", e);
         } finally {
             if (null != method) {
-                method.releaseConnection();
+                method.reset();
             }
             if (null != context) {
                 context.abort();

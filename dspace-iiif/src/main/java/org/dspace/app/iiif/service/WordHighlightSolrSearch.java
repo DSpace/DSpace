@@ -14,9 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -37,6 +36,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
 
 
 /**
@@ -167,7 +167,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
         JsonNode body = null;
         try {
             body = mapper.readTree(json);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Unable to process json response.", e);
         }
         // If error occurred or no body, return immediately
@@ -221,7 +221,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
      * @return generator for a single annotation
      */
     private AnnotationGenerator getAnnotation(JsonNode highlight, String pageId, UUID uuid) {
-        String text = highlight.get("text") != null ? highlight.get("text").asText() : null;
+        String text = highlight.get("text") != null ? highlight.get("text").asString() : null;
         int ulx = highlight.get("ulx") != null ? highlight.get("ulx").asInt() : -1;
         int uly = highlight.get("uly") != null ? highlight.get("uly").asInt() : -1;
         int lrx = highlight.get("lrx") != null ? highlight.get("lrx").asInt() : -1;
@@ -251,7 +251,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
             if (page != null) {
                 JsonNode pageId = page.get("id");
                 if (pageId != null) {
-                    String[] identArr = pageId.asText().split("\\.");
+                    String[] identArr = pageId.asString().split("\\.");
                     // the canvas id.
                     return "c" + identArr[1];
                 }

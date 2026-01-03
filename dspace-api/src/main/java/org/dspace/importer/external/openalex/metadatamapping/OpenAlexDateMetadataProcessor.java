@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.contributor.AbstractJsonPathMetadataProcessor;
@@ -52,12 +52,12 @@ public class OpenAlexDateMetadataProcessor extends AbstractJsonPathMetadataProce
     @Override
     protected String getStringValue(JsonNode node) {
 
-        if (node == null || !node.isTextual()) {
+        if (node == null || !node.isString()) {
             throw new IllegalArgumentException("Input must be a non-null JsonNode containing a text value");
         }
 
         try {
-            String dateStr = node.asText();
+            String dateStr = node.asString();
             LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ISO_DATE);
             return date.toString();
         } catch (DateTimeParseException e) {

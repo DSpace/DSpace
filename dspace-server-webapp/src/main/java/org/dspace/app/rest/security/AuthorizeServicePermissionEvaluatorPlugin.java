@@ -92,8 +92,7 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
                     }
 
 
-                    if (dSpaceObject instanceof Item) {
-                        Item item = (Item) dSpaceObject;
+                    if (dSpaceObject instanceof Item item) {
                         if (DSpaceRestPermission.STATUS.equals(restPermission) && item.isWithdrawn()) {
                             return true;
                         }

@@ -40,8 +40,8 @@ public abstract class DSpaceFilter implements Filter {
 
     @Override
     public boolean isItemShown(ItemIdentifier item) {
-        if (item instanceof DSpaceItem) {
-            return isShown((DSpaceItem) item);
+        if (item instanceof DSpaceItem spaceItem) {
+            return isShown(spaceItem);
         }
         return false;
     }

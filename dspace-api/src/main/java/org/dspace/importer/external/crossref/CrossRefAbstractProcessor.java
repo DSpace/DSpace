@@ -14,9 +14,8 @@ import java.util.Collection;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +27,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import tools.jackson.core.JacksonException;
 
 public class CrossRefAbstractProcessor implements JsonPathMetadataProcessor {
 
@@ -41,7 +41,7 @@ public class CrossRefAbstractProcessor implements JsonPathMetadataProcessor {
         JsonNode abstractNode = rootNode.at(path);
         Collection<String> values = new ArrayList<>();
         if (!abstractNode.isMissingNode()) {
-            String abstractValue = abstractNode.textValue();
+            String abstractValue = abstractNode.asString();
             if (StringUtils.isNotEmpty(abstractValue)) {
                 abstractValue = prettifyAbstract(abstractValue);
                 if (abstractValue != null) {
@@ -107,7 +107,7 @@ public class CrossRefAbstractProcessor implements JsonPathMetadataProcessor {
         JsonNode body = null;
         try {
             body = mapper.readTree(json);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Unable to process json response.", e);
         }
         return body;

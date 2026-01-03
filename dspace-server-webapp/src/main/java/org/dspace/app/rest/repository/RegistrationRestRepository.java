@@ -10,9 +10,10 @@ package org.dspace.app.rest.repository;
 import static org.dspace.eperson.service.CaptchaService.REGISTER_ACTION;
 
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -131,7 +132,7 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         try {
             ServletInputStream input = request.getInputStream();
             registrationRest = mapper.readValue(input, RegistrationRest.class);
-        } catch (IOException e1) {
+        } catch (IOException | JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
         if (StringUtils.isBlank(registrationRest.getEmail())) {

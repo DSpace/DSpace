@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serial;
+
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
@@ -17,6 +20,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class CorrectionTypeRest extends BaseObjectRest<String> {
 
+    @Serial
     private static final long serialVersionUID = -8297846719538025938L;
 
     public static final String NAME = "correctiontype";

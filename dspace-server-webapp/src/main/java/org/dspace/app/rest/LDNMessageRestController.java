@@ -12,8 +12,7 @@ import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFI
 import java.sql.SQLException;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.LDNMessageEntity;
@@ -35,6 +34,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.core.JacksonException;
 
 /**
  * Rest Controller for requesting the reprocessing of LDNMessageEntity
@@ -74,7 +74,7 @@ public class LDNMessageRestController implements InitializingBean {
     @PostMapping(produces = "application/json")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> findByItem(@PathVariable("id") String id)
-        throws SQLException, AuthorizeException, JsonProcessingException {
+        throws SQLException, AuthorizeException, JacksonException {
 
         Context context = ContextUtil.obtainCurrentRequestContext();
         LDNMessageEntity ldnMessageEntity = ldnMessageService.find(context, id);

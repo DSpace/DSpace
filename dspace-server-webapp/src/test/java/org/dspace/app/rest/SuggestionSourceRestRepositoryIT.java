@@ -23,8 +23,8 @@ import org.dspace.builder.SuggestionTargetBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration Tests against the /api/integration/suggestionsources endpoint
@@ -33,7 +33,7 @@ public class SuggestionSourceRestRepositoryIT extends AbstractControllerIntegrat
     private Collection colPeople;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         // We turn off the authorization system in order to create the structure as

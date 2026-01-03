@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serial;
+
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import org.dspace.app.rest.RestResourceController;
@@ -22,6 +25,7 @@ import org.dspace.app.rest.RestResourceController;
     @LinkRest(name = SuggestionTargetRest.TARGET, method = "getTarget")
 })
 public class SuggestionTargetRest extends BaseObjectRest<String> {
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final String NAME = "suggestiontarget";
     public static final String PLURAL_NAME = "suggestiontargets";

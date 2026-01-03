@@ -7,9 +7,9 @@
  */
 package org.dspace.content.logic;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -60,9 +60,9 @@ import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for logical filters, conditions and operators
@@ -113,7 +113,7 @@ public class LogicalFilterTest extends AbstractUnitTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -174,7 +174,7 @@ public class LogicalFilterTest extends AbstractUnitTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         context.turnOffAuthorisationSystem();
@@ -224,16 +224,16 @@ public class LogicalFilterTest extends AbstractUnitTest {
         try {
             // Set to True, True (expect True)
             and.setStatements(trueStatements);
-            assertTrue("AND operator did not return true for a list of true statements",
-                and.getResult(context, itemOne));
+            assertTrue(and.getResult(context, itemOne),
+                "AND operator did not return true for a list of true statements");
             // Set to True, False (expect False)
             and.setStatements(trueFalseStatements);
-            assertFalse("AND operator did not return false for a list of statements with at least one false",
-                and.getResult(context, itemOne));
+            assertFalse(and.getResult(context, itemOne),
+                "AND operator did not return false for a list of statements with at least one false");
             // Set to False, False (expect False)
             and.setStatements(falseStatements);
-            assertFalse("AND operator did not return false for a list of false statements",
-                and.getResult(context, itemOne));
+            assertFalse(and.getResult(context, itemOne),
+                "AND operator did not return false for a list of false statements");
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the AND operator" + e.getMessage());
@@ -251,16 +251,16 @@ public class LogicalFilterTest extends AbstractUnitTest {
         try {
             // Set to True, True (expect True)
             or.setStatements(trueStatements);
-            assertTrue("OR operator did not return true for a list of true statements",
-                or.getResult(context, itemOne));
+            assertTrue(or.getResult(context, itemOne),
+                "OR operator did not return true for a list of true statements");
             // Set to True, False (expect True)
             or.setStatements(trueFalseStatements);
-            assertTrue("OR operator did not return true for a list of statements with at least one false",
-                or.getResult(context, itemOne));
+            assertTrue(or.getResult(context, itemOne),
+                "OR operator did not return true for a list of statements with at least one false");
             // Set to False, False (expect False)
             or.setStatements(falseStatements);
-            assertFalse("OR operator did not return false for a list of false statements",
-                or.getResult(context, itemOne));
+            assertFalse(or.getResult(context, itemOne),
+                "OR operator did not return false for a list of false statements");
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the OR operator" + e.getMessage());
@@ -278,16 +278,16 @@ public class LogicalFilterTest extends AbstractUnitTest {
         try {
             // Set to True, True (expect False)
             nand.setStatements(trueStatements);
-            assertFalse("NAND operator did not return false for a list of true statements",
-                nand.getResult(context, itemOne));
+            assertFalse(nand.getResult(context, itemOne),
+                "NAND operator did not return false for a list of true statements");
             // Set to True, False (expect True)
             nand.setStatements(trueFalseStatements);
-            assertTrue("NAND operator did not return true for a list of statements with at least one false",
-                nand.getResult(context, itemOne));
+            assertTrue(nand.getResult(context, itemOne),
+                "NAND operator did not return true for a list of statements with at least one false");
             // Set to False, False (expect True)
             nand.setStatements(falseStatements);
-            assertTrue("NAND operator did not return true for a list of false statements",
-                nand.getResult(context, itemOne));
+            assertTrue(nand.getResult(context, itemOne),
+                "NAND operator did not return true for a list of false statements");
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the NAND operator" + e.getMessage());
@@ -305,16 +305,16 @@ public class LogicalFilterTest extends AbstractUnitTest {
         try {
             // Set to True, True (expect False)
             nor.setStatements(trueStatements);
-            assertFalse("NOR operator did not return false for a list of true statements",
-                nor.getResult(context, itemOne));
+            assertFalse(nor.getResult(context, itemOne),
+                "NOR operator did not return false for a list of true statements");
             // Set to True, False (expect False)
             nor.setStatements(trueFalseStatements);
-            assertFalse("NOR operator did not return false for a list of statements with a true and a false",
-                nor.getResult(context, itemOne));
+            assertFalse(nor.getResult(context, itemOne),
+                "NOR operator did not return false for a list of statements with a true and a false");
             // Set to False, False (expect True)
             nor.setStatements(falseStatements);
-            assertTrue("NOR operator did not return true for a list of false statements",
-                nor.getResult(context, itemOne));
+            assertTrue(nor.getResult(context, itemOne),
+                "NOR operator did not return true for a list of false statements");
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the NOR operator" + e.getMessage());
@@ -332,12 +332,12 @@ public class LogicalFilterTest extends AbstractUnitTest {
         try {
             // Set to True (expect False)
             not.setStatements(trueStatementOne);
-            assertFalse("NOT operator did not return false for a true statement",
-                not.getResult(context, itemOne));
+            assertFalse(not.getResult(context, itemOne),
+                "NOT operator did not return false for a true statement");
             // Set to False (expect True)
             not.setStatements(falseStatementOne);
-            assertTrue("NOT operator did not return true for a false statement",
-                not.getResult(context, itemOne));
+            assertTrue(not.getResult(context, itemOne),
+                "NOT operator did not return true for a false statement");
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the NOT operator" + e.getMessage());
@@ -375,11 +375,11 @@ public class LogicalFilterTest extends AbstractUnitTest {
             condition.setParameters(parameters);
             filter.setStatement(condition);
             // Test the filter on the first item - expected outcome is true
-            assertTrue("itemOne unexpectedly did not match the 'dc.title starts with TEST' test",
-                filter.getResult(context, itemOne));
+            assertTrue(filter.getResult(context, itemOne),
+                "itemOne unexpectedly did not match the 'dc.title starts with TEST' test");
             // Test the filter on the second item - expected outcome is false
-            assertFalse("itemTwo unexpectedly matched the 'dc.title starts with TEST' test",
-                filter.getResult(context, itemTwo));
+            assertFalse(filter.getResult(context, itemTwo),
+                "itemTwo unexpectedly matched the 'dc.title starts with TEST' test");
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the MetadataValueMatchCondition filter" + e.getMessage());
@@ -433,20 +433,20 @@ public class LogicalFilterTest extends AbstractUnitTest {
             condition.setParameters(parameters);
             filter.setStatement(condition);
             // Test the filter on the first item - expected outcome is true
-            assertTrue("itemOne unexpectedly did not match the " +
-                "'dc.title starts with TEST or ends with yes' test", filter.getResult(context, itemOne));
+            assertTrue(filter.getResult(context, itemOne), "itemOne unexpectedly did not match the " +
+                "'dc.title starts with TEST or ends with yes' test");
             // Test the filter on the second item - expected outcome is true
-            assertTrue("itemTwo unexpectedly did not match the " +
-                "'dc.title starts with TEST or ends with yes' test", filter.getResult(context, itemTwo));
+            assertTrue(filter.getResult(context, itemTwo), "itemTwo unexpectedly did not match the " +
+                "'dc.title starts with TEST or ends with yes' test");
             // Test the filter on the third item - expected outcome is false
-            assertFalse("itemThree unexpectedly matched the " +
-                "'dc.title starts with TEST or ends with yes' test", filter.getResult(context, itemThree));
+            assertFalse(filter.getResult(context, itemThree), "itemThree unexpectedly matched the " +
+                "'dc.title starts with TEST or ends with yes' test");
             // Set condition and filter to use the missing field instead
             condition.setParameters(missingParameters);
             filter.setStatement(condition);
             // Test this updated filter against the first item - expected outcome is false
-            assertFalse("itemOne unexpectedly matched the 'dc.subject contains TEST' test" +
-                "(it has no dc.subject metadata value)", filter.getResult(context, itemOne));
+            assertFalse(filter.getResult(context, itemOne), "itemOne unexpectedly matched the 'dc.subject contains TEST' test" +
+                "(it has no dc.subject metadata value)");
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the MetadataValuesMatchCondition filter" + e.getMessage());
@@ -477,11 +477,11 @@ public class LogicalFilterTest extends AbstractUnitTest {
             filter.setStatement(condition);
 
             // Test the filter on the first item - this item is in collectionOne: expected outcome is true
-            assertTrue("itemOne unexpectedly did not match the 'item in collectionOne' test",
-                filter.getResult(context, itemOne));
+            assertTrue(filter.getResult(context, itemOne),
+                "itemOne unexpectedly did not match the 'item in collectionOne' test");
             // Test the filter on the second item - this item is NOT in collectionOne: expected outcome is false
-            assertFalse("itemTwo unexpectedly matched the 'item in collectionOne' test",
-                filter.getResult(context, itemTwo));
+            assertFalse(filter.getResult(context, itemTwo),
+                "itemTwo unexpectedly matched the 'item in collectionOne' test");
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the InCollectionCondition filter" + e.getMessage());
@@ -512,11 +512,11 @@ public class LogicalFilterTest extends AbstractUnitTest {
             filter.setStatement(condition);
 
             // Test the filter on the first item - this item is in communityOne: expected outcome is true
-            assertTrue("itemOne unexpectedly did not match the 'item in communityOne' test",
-                filter.getResult(context, itemOne));
+            assertTrue(filter.getResult(context, itemOne),
+                "itemOne unexpectedly did not match the 'item in communityOne' test");
             // Test the filter on the second item - this item is NOT in communityOne: expected outcome is false
-            assertFalse("itemTwo unexpectedly matched the 'item in communityOne' test",
-                filter.getResult(context, itemTwo));
+            assertFalse(filter.getResult(context, itemTwo),
+                "itemTwo unexpectedly matched the 'item in communityOne' test");
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the InCommunityCondition filter" + e.getMessage());
@@ -538,11 +538,11 @@ public class LogicalFilterTest extends AbstractUnitTest {
             filter.setStatement(condition);
 
             // Test the filter on itemOne - this item is not withdrawn: expected outcome is false
-            assertFalse("itemOne unexpectedly matched the 'item is withdrawn' test",
-                filter.getResult(context, itemOne));
+            assertFalse(filter.getResult(context, itemOne),
+                "itemOne unexpectedly matched the 'item is withdrawn' test");
             // Test the filter on itemTwo - this item was withdrawn in setup: expected outcome is true
-            assertTrue("itemTwo unexpectedly did NOT match the 'item is withdrawn' test",
-                filter.getResult(context, itemTwo));
+            assertTrue(filter.getResult(context, itemTwo),
+                "itemTwo unexpectedly did NOT match the 'item is withdrawn' test");
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the IsWithdrawnCondition filter" + e.getMessage());
@@ -570,14 +570,14 @@ public class LogicalFilterTest extends AbstractUnitTest {
             filter.setStatement(condition);
 
             // Test the filter on itemOne - this item has one THUMBNAIL but zero ORIGINAL bitstreams: expect false
-            assertFalse("itemOne unexpectedly matched the '>=1 and <=2 ORIGINAL bitstreams' test" +
-                    " (it has zero ORIGINAL bitstreams)", filter.getResult(context, itemOne));
+            assertFalse(filter.getResult(context, itemOne), "itemOne unexpectedly matched the '>=1 and <=2 ORIGINAL bitstreams' test" +
+                    " (it has zero ORIGINAL bitstreams)");
             // Test the filter on itemTwo - this item has two ORIGINAL bitstreams: expect true
-            assertTrue("itemTwo unexpectedly did NOT match the '>=1 and <=2 ORIGINAL bitstreams' test" +
-                    " (it has 2 ORIGINAL bitstreams)", filter.getResult(context, itemTwo));
+            assertTrue(filter.getResult(context, itemTwo), "itemTwo unexpectedly did NOT match the '>=1 and <=2 ORIGINAL bitstreams' test" +
+                    " (it has 2 ORIGINAL bitstreams)");
             // Test the filter on itemTwo - this item has three ORIGINAL bitstreams: expect false
-            assertFalse("itemThree unexpectedly did NOT match the '>=1 and <=2 ORIGINAL bitstreams' test" +
-                " (it has 3 ORIGINAL bitstreams)", filter.getResult(context, itemThree));
+            assertFalse(filter.getResult(context, itemThree), "itemThree unexpectedly did NOT match the '>=1 and <=2 ORIGINAL bitstreams' test" +
+                " (it has 3 ORIGINAL bitstreams)");
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the IsWithdrawnCondition filter: " + e.getMessage());
@@ -615,11 +615,11 @@ public class LogicalFilterTest extends AbstractUnitTest {
             filter.setStatement(condition);
 
             // Test the filter on itemOne - this item was explicitly set with expected group READ policy
-            assertTrue("itemOne unexpectedly did not match the 'is readable by Test Group' test",
-                filter.getResult(context, itemOne));
+            assertTrue(filter.getResult(context, itemOne),
+                "itemOne unexpectedly did not match the 'is readable by Test Group' test");
             // Test the filter on itemTwo - this item has no policies: expect false
-            assertFalse("itemTwo unexpectedly matched the 'is readable by Test Group' test",
-                filter.getResult(context, itemTwo));
+            assertFalse(filter.getResult(context, itemTwo),
+                "itemTwo unexpectedly matched the 'is readable by Test Group' test");
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the ReadableByGroup filter" + e.getMessage());

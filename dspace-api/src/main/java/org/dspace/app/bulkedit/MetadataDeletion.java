@@ -80,7 +80,7 @@ public class MetadataDeletion extends DSpaceRunnable<MetadataDeletionScriptConfi
             throw new IllegalArgumentException("The given metadata field cannot be bulk deleted");
         }
 
-        handler.logInfo(String.format("Deleting the field '%s' from all objects", metadataField));
+        handler.logInfo("Deleting the field '%s' from all objects".formatted(metadataField));
 
         metadataValueService.deleteByMetadataField(context, field);
     }

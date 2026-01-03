@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.Instant;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.NotifyServiceEntity;

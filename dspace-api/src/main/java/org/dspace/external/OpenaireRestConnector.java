@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -20,18 +21,18 @@ import java.util.List;
 import eu.openaire.jaxb.helper.OpenAIREHandler;
 import eu.openaire.jaxb.model.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.NoHttpResponseException;
-import org.apache.http.StatusLine;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.NoHttpResponseException;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.message.StatusLine;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.util.Util;
@@ -118,10 +119,10 @@ public class OpenaireRestConnector {
         // Request parameters and other properties.
         List<NameValuePair> params = new ArrayList<NameValuePair>(1);
         params.add(new BasicNameValuePair("grant_type", "client_credentials"));
-        httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+        httpPost.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
 
         try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
-            HttpResponse getResponse = httpClient.execute(httpPost);
+            ClassicHttpResponse getResponse = httpClient.execute(httpPost);
 
             JSONObject responseObject = null;
             try (InputStream is = getResponse.getEntity().getContent();
@@ -158,7 +159,7 @@ public class OpenaireRestConnector {
      * @return an InputStream with a Result
      */
     public InputStream get(String file, String accessToken) {
-        HttpResponse getResponse = null;
+        ClassicHttpResponse getResponse = null;
         InputStream result = null;
         file = trimSlashes(file);
 
@@ -175,7 +176,7 @@ public class OpenaireRestConnector {
             try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
                 getResponse = httpClient.execute(httpGet);
 
-                StatusLine status = getResponse.getStatusLine();
+                StatusLine status = new StatusLine(getResponse);
 
                 // registering errors
                 switch (status.getStatusCode()) {

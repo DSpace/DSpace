@@ -16,7 +16,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -26,8 +25,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -181,7 +180,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
             }
 
             // Validate directory
-            Path dirPath = Paths.get(directory);
+            Path dirPath = Path.of(directory);
             if (!Files.exists(dirPath)) {
                 if (mode.equals("export")) {
                     Files.createDirectories(dirPath);
@@ -287,8 +286,8 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
 
         // If dates not provided, get them from SOLR
         if (StringUtils.isBlank(minDate) || StringUtils.isBlank(maxDate)) {
-            String statsUrl = String.format("%s/select?q=*:*&rows=0&wt=json&stats=true&stats.field=%s",
-                    baseUrl, dateField);
+            String statsUrl = "%s/select?q=*:*&rows=0&wt=json&stats=true&stats.field=%s".formatted(
+                baseUrl, dateField);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(statsUrl))
@@ -307,12 +306,12 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
             JsonNode stats = jsonResponse.path("stats").path("stats_fields").path(dateField);
 
             if (StringUtils.isBlank(minDate)) {
-                String solrMinDate = stats.path("min").asText();
+                String solrMinDate = stats.path("min").asString();
                 // Normalize to date-only format
                 minDate = solrMinDate.length() >= 10 ? solrMinDate.substring(0, 10) : solrMinDate;
             }
             if (StringUtils.isBlank(maxDate)) {
-                String solrMaxDate = stats.path("max").asText();
+                String solrMaxDate = stats.path("max").asString();
                 // Normalize to date-only format
                 maxDate = solrMaxDate.length() >= 10 ? solrMaxDate.substring(0, 10) : solrMaxDate;
             }
@@ -394,13 +393,13 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
 
         // Build SOLR query for date range using filter query
         String query = "*:*";
-        String filterQuery = String.format("%s:[%s TO %s]", dateField, range.start, range.end);
-        String url = String.format("%s/select?q=%s&fq=%s&rows=%d&wt=%s",
-                baseUrl,
-                java.net.URLEncoder.encode(query, "UTF-8"),
-                java.net.URLEncoder.encode(filterQuery, "UTF-8"),
-                Integer.MAX_VALUE,
-                format);
+        String filterQuery = "%s:[%s TO %s]".formatted(dateField, range.start, range.end);
+        String url = "%s/select?q=%s&fq=%s&rows=%d&wt=%s".formatted(
+            baseUrl,
+            java.net.URLEncoder.encode(query, "UTF-8"),
+            java.net.URLEncoder.encode(filterQuery, "UTF-8"),
+            Integer.MAX_VALUE,
+            format);
 
         // Add field list
         List<String> fields = getAvailableFields(baseUrl);
@@ -424,8 +423,8 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         }
 
         // Write response directly to file
-        String filename = String.format("solr_export_range_%04d.%s", rangeIndex, format);
-        Path filePath = Paths.get(directory, filename);
+        String filename = "solr_export_range_%04d.%s".formatted(rangeIndex, format);
+        Path filePath = Path.of(directory, filename);
 
         log.debug("Thread '{}' writing to file: {}", currentThread.getName(), filename);
         long writeStart = System.currentTimeMillis();
@@ -621,7 +620,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
 
         if (fieldsArray.isArray()) {
             for (JsonNode field : fieldsArray) {
-                String fieldName = field.path("name").asText();
+                String fieldName = field.path("name").asString();
                 // Exclude problematic fields
                 if (!fieldName.startsWith("_") && !fieldName.equals("_version_") && !fieldName.equals("_root_")) {
                     fields.add(fieldName);
@@ -660,7 +659,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
 
         if (docs.isArray() && docs.size() > 0) {
             JsonNode firstDoc = docs.get(0);
-            firstDoc.fieldNames().forEachRemaining(fieldName -> {
+            firstDoc.propertyNames().iterator().forEachRemaining(fieldName -> {
                 // Exclude problematic fields
                 if (!fieldName.startsWith("_") && !fieldName.equals("_version_") && !fieldName.equals("_root_")) {
                     fields.add(fieldName);

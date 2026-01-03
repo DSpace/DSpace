@@ -8,14 +8,15 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -83,7 +84,6 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     @Autowired
     private ObjectMapper mapper;
 
-    @Autowired
     public BitstreamRestRepository(BitstreamService dsoService) {
         super(dsoService);
         this.bs = dsoService;

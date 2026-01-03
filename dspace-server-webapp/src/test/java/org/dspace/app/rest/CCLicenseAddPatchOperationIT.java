@@ -29,7 +29,7 @@ import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.WorkspaceItem;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Class to test the methods from the CCLicenseAddPatchOperation

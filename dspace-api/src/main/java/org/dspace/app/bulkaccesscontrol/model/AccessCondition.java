@@ -9,7 +9,7 @@ package org.dspace.app.bulkaccesscontrol.model;
 
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonDeserialize;
 import org.dspace.app.bulkaccesscontrol.BulkAccessControl;
 import org.dspace.util.MultiFormatDateDeserializer;
 

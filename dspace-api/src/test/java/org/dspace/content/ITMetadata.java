@@ -9,8 +9,8 @@ package org.dspace.content;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -26,9 +26,9 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * This is an integration test to validate the metadata classes
@@ -53,7 +53,7 @@ public class ITMetadata extends AbstractIntegrationTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -66,7 +66,7 @@ public class ITMetadata extends AbstractIntegrationTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         super.destroy();
@@ -106,25 +106,25 @@ public class ITMetadata extends AbstractIntegrationTest {
         assertThat("testCreateSchema 2", field2.getMetadataSchema(), equalTo(schema));
 
         List<MetadataField> fields = metadataFieldService.findAllInSchema(context, schema);
-        assertTrue("testCreateSchema 3", fields.size() == 2);
+        assertTrue(fields.size() == 2, "testCreateSchema 3");
         boolean exist = true;
         for (MetadataField f : fields) {
             if (!f.equals(field1) && !f.equals(field2)) {
                 exist = false;
             }
         }
-        assertTrue("testCreateSchema 4", exist);
+        assertTrue(exist, "testCreateSchema 4");
 
         List<MetadataValue> col1 = metadataValueService.findByField(context, field1);
-        assertTrue("testCreateSchema 5", col1.contains(value1));
+        assertTrue(col1.contains(value1), "testCreateSchema 5");
 
         List<MetadataValue> col2 = metadataValueService.findByField(context, field2);
-        assertTrue("testCreateSchema 6", col2.contains(value2));
+        assertTrue(col2.contains(value2), "testCreateSchema 6");
 
         //clean database
         it.removeMetadata(value1);
         col1 = metadataValueService.findByField(context, field1);
-        assertFalse("testCreateSchema 7", col1.contains(value1));
+        assertFalse(col1.contains(value1), "testCreateSchema 7");
 
         it.removeMetadata(value2);
         metadataFieldService.delete(context, field1);

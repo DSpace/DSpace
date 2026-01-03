@@ -162,10 +162,9 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
     }
 
     private String getValue(Object value) {
-        if (value instanceof JsonValueEvaluator) {
-            JsonValueEvaluator jsonValue = (JsonValueEvaluator) value;
-            if (jsonValue.getValueNode().fields().hasNext()) {
-                return jsonValue.getValueNode().fields().next().getValue().asText();
+        if (value instanceof JsonValueEvaluator jsonValue) {
+            if (jsonValue.getValueNode().properties().iterator().hasNext()) {
+                return jsonValue.getValueNode().properties().iterator().next().getValue().asString();
             }
         }
         return StringUtils.EMPTY;

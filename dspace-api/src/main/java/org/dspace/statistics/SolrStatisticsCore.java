@@ -55,8 +55,9 @@ public class SolrStatisticsCore {
         log.info("usage-statistics.dbfile:  {}", configurationService.getProperty("usage-statistics.dbfile"));
 
         try {
+            // Note: Cannot use custom HttpClient with Solr 8.x as it requires HttpClient 4
+            // and we've upgraded to HttpClient 5. Solr will manage its own connections.
             solr = new HttpSolrClient.Builder(solrService)
-                    .withHttpClient(httpConnectionPoolService.getClient())
                     .build();
         } catch (Exception e) {
             log.error("Error accessing Solr server configured in 'solr-statistics.server'", e);

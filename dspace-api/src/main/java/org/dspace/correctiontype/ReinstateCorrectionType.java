@@ -13,8 +13,8 @@ import static org.dspace.correctiontype.WithdrawnCorrectionType.WITHDRAWAL_REINS
 import java.sql.SQLException;
 import java.time.Instant;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;

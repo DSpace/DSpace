@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.dspace.app.rest.model.patch.Patch;
 
 /**

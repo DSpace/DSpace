@@ -22,14 +22,14 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.apache.http.HttpException;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.HttpException;
 import org.apache.jena.ext.xerces.impl.dv.util.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -148,10 +148,10 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         Map<String, Map<String, String>> params = getLoginParams();
         String entity = "grant_type=client_credentials";
         String json = liveImportClient.executeHttpPostRequest(this.authUrl, params, entity);
-        ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+        ObjectMapper mapper = new JsonMapper();
         JsonNode rootNode = mapper.readTree(json);
         JsonNode accessTokenNode = rootNode.get("access_token");
-        return accessTokenNode.asText();
+        return accessTokenNode.asString();
     }
 
     private Map<String, Map<String, String>> getLoginParams() {
@@ -518,14 +518,14 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     }
 
     private String getValue(Object el) {
-        if (el instanceof Element) {
-            return ((Element) el).getText();
-        } else if (el instanceof Attribute) {
-            return ((Attribute) el).getValue();
-        } else if (el instanceof String) {
-            return (String)el;
-        } else if (el instanceof Text) {
-            return ((Text) el).getText();
+        if (el instanceof Element element) {
+            return element.getText();
+        } else if (el instanceof Attribute attribute) {
+            return attribute.getValue();
+        } else if (el instanceof String string) {
+            return string;
+        } else if (el instanceof Text text) {
+            return text.getText();
         } else {
             log.error("node of type: " + el.getClass());
             return "";

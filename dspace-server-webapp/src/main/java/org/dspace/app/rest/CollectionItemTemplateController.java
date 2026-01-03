@@ -10,11 +10,12 @@ package org.dspace.app.rest;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.BadRequestException;
 import org.dspace.app.rest.converter.ConverterService;
@@ -37,10 +38,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -102,7 +104,7 @@ public class CollectionItemTemplateController {
      * @throws AuthorizeException
      */
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public ResponseEntity<RepresentationModel<?>> createTemplateItem(HttpServletRequest request,
                                                           @PathVariable UUID uuid,
                                                           @RequestBody(required = false) JsonNode itemBody)
@@ -118,7 +120,7 @@ public class CollectionItemTemplateController {
         TemplateItemRest inputTemplateItemRest;
         try {
             inputTemplateItemRest = mapper.readValue(itemBody.toString(), TemplateItemRest.class);
-        } catch (IOException e1) {
+        } catch (JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
@@ -146,7 +148,7 @@ public class CollectionItemTemplateController {
      * @throws SQLException
      */
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public TemplateItemResource getTemplateItem(HttpServletRequest request, @PathVariable UUID uuid)
             throws SQLException {
 

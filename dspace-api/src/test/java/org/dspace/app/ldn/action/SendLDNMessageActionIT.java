@@ -9,7 +9,7 @@ package org.dspace.app.ldn.action;
 
 import static org.dspace.app.ldn.action.LDNActionStatus.ABORT;
 import static org.dspace.app.ldn.action.LDNActionStatus.CONTINUE;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -18,14 +18,12 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicStatusLine;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.NotifyServiceEntity;
@@ -46,9 +44,9 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration Tests against {@link SendLDNMessageAction}
@@ -64,7 +62,7 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
     private WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
     private SendLDNMessageAction sendLDNMessageAction;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         configurationService.setProperty("ldn.enabled", "true");
@@ -94,9 +92,7 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
     @Test
     public void testLDNMessageConsumerRequestReview() throws Exception {
         CloseableHttpResponse response = mock(CloseableHttpResponse.class);
-        StatusLine sl = mock(BasicStatusLine.class);
-        when(response.getStatusLine()).thenReturn(sl);
-        when(sl.getStatusCode()).thenReturn(HttpStatus.SC_ACCEPTED);
+        when(response.getCode()).thenReturn(HttpStatus.SC_ACCEPTED);
         CloseableHttpClient mockedClient = mock(CloseableHttpClient.class);
         when(mockedClient.execute(any(HttpPost.class))).
         thenReturn(response);
@@ -142,9 +138,7 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
     @Test
     public void testLDNMessageConsumerRequestReviewGotRedirection() throws Exception {
         CloseableHttpResponse response = mock(CloseableHttpResponse.class);
-        StatusLine sl = mock(BasicStatusLine.class);
-        when(response.getStatusLine()).thenReturn(sl);
-        when(sl.getStatusCode()).thenReturn(HttpStatus.SC_ACCEPTED);
+        when(response.getCode()).thenReturn(HttpStatus.SC_ACCEPTED);
         CloseableHttpClient mockedClient = mock(CloseableHttpClient.class);
         when(mockedClient.execute(any(HttpPost.class))).
         thenReturn(response);
@@ -190,9 +184,7 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
     @Test
     public void testLDNMessageConsumerRequestReviewWithInvalidLdnUrl() throws Exception {
         CloseableHttpResponse response = mock(CloseableHttpResponse.class);
-        StatusLine sl = mock(BasicStatusLine.class);
-        when(response.getStatusLine()).thenReturn(sl);
-        when(sl.getStatusCode()).thenReturn(HttpStatus.SC_NOT_FOUND);
+        when(response.getCode()).thenReturn(HttpStatus.SC_NOT_FOUND);
         CloseableHttpClient mockedClient = mock(CloseableHttpClient.class);
         when(mockedClient.execute(any(HttpPost.class))).
         thenReturn(response);
@@ -233,7 +225,7 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
     }
 
     @Override
-    @After
+    @AfterEach
     public void destroy() throws Exception {
         List<LDNMessageEntity> ldnMessageEntities = ldnMessageService.findAll(context);
         if (CollectionUtils.isNotEmpty(ldnMessageEntities)) {

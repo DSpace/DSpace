@@ -10,10 +10,10 @@ package org.dspace.util;
 import java.io.IOException;
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
+import tools.jackson.core.JacksonException;
 
 /**
  * This is a custom date deserializer for jackson that make use of our
@@ -34,8 +34,8 @@ public class MultiFormatDateDeserializer extends StdDeserializer<LocalDate> {
 
     @Override
     public LocalDate deserialize(JsonParser jsonparser, DeserializationContext context)
-            throws IOException, JsonProcessingException {
-        String date = jsonparser.getText();
+            throws JacksonException {
+        String date = jsonparser.getString();
         return MultiFormatDateParser.parse(date).toLocalDate();
     }
 }

@@ -44,9 +44,9 @@ import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -71,7 +71,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
     @Autowired
     private WorkspaceItemService workspaceItemService;
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         versionHistory = versionHistoryService.create(context);
@@ -95,7 +95,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
     }
 
-    @After
+    @AfterEach
     public void cleanup() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         versionHistoryService.delete(context, versionHistory);

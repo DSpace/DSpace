@@ -7,9 +7,9 @@
  */
 package org.dspace.statistics;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -17,7 +17,6 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 
@@ -42,11 +41,11 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test some methods of SolrLoggerServiceImpl.
@@ -85,10 +84,10 @@ public class SolrLoggerServiceImplIT
     private static Path testAddressesPath;
     private static Path testAgentsPath;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass()
             throws IOException {
-        Path spidersPath = Paths.get(cfg.getProperty("dspace.dir"), "config", "spiders");
+        Path spidersPath = Path.of(cfg.getProperty("dspace.dir"), "config", "spiders");
         Writer writer;
 
         // Ensure the presence of a known "bot" address.
@@ -109,18 +108,18 @@ public class SolrLoggerServiceImplIT
                 .close();
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass()
             throws IOException {
         Files.deleteIfExists(testAddressesPath);
         Files.deleteIfExists(testAgentsPath);
     }
 
-    @Before
+    @BeforeEach
     public void setUpTest() {
     }
 
-    @After
+    @AfterEach
     public void tearDownTest() {
     }
 
@@ -207,11 +206,11 @@ public class SolrLoggerServiceImplIT
             boolean isBot = (null == isBotRaw) ? false : (Boolean) isBotRaw;
 
             if (NOT_BOT_IP.equals(ip) && NOT_BOT_AGENT.equals(agent)) {
-                assertFalse(String.format("IP %s plus Agent %s is marked as bot --", ip, agent),
-                        isBot);
+                assertFalse(isBot,
+                    "IP %s plus Agent %s is marked as bot --".formatted(ip, agent));
             } else {
-                assertTrue(String.format("IP %s or Agent %s is not marked as bot --", ip, agent),
-                        isBot);
+                assertTrue(isBot,
+                    "IP %s or Agent %s is not marked as bot --".formatted(ip, agent));
             }
 
             nDocs++;
@@ -219,8 +218,8 @@ public class SolrLoggerServiceImplIT
                 nGood++;
             }
         }
-        assertEquals("Wrong number of documents", 4, nDocs);
-        assertEquals("Wrong number of non-bot views", 1, nGood);
+        assertEquals(4, nDocs, "Wrong number of documents");
+        assertEquals(1, nGood, "Wrong number of non-bot views");
     }
 
     /**
@@ -305,10 +304,10 @@ public class SolrLoggerServiceImplIT
             Object isBotRaw = document.getFieldValue(F_IS_BOT);
             boolean isBot = (null == isBotRaw) ? false : (Boolean) isBotRaw;
 
-            assertEquals("Marked document was not removed --",
-                    false, isBot);
+            assertEquals(false,
+                    isBot, "Marked document was not removed --");
         }
-        assertEquals("Wrong number of documents remaining --", 1, nDocs);
+        assertEquals(1, nDocs, "Wrong number of documents remaining --");
     }
 
     @Test
@@ -356,10 +355,10 @@ public class SolrLoggerServiceImplIT
 
         SolrQuery thumbnailQuery = new SolrQuery("id:" + thumbnailBitstream.getID().toString());
         QueryResponse thumbnailResponse = solrStatisticsCore.getSolr().query(thumbnailQuery);
-        assertEquals("Thumbnail bundle should NOT be logged", 0, thumbnailResponse.getResults().getNumFound());
+        assertEquals(0, thumbnailResponse.getResults().getNumFound(), "Thumbnail bundle should NOT be logged");
 
         SolrQuery originalQuery = new SolrQuery("id:" + originalBitstream.getID().toString());
         QueryResponse originalResponse = solrStatisticsCore.getSolr().query(originalQuery);
-        assertEquals("ORIGINAL bundle SHOULD be logged", 1, originalResponse.getResults().getNumFound());
+        assertEquals(1, originalResponse.getResults().getNumFound(), "ORIGINAL bundle SHOULD be logged");
     }
 }

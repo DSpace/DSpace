@@ -11,16 +11,16 @@ import static org.dspace.app.ldn.LDNMessageEntity.QUEUE_STATUS_QUEUED;
 import static org.dspace.matcher.NotifyServiceEntityMatcher.matchesNotifyServiceEntity;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.ldn.factory.NotifyServiceFactory;
@@ -44,9 +44,9 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration Tests against {@link LDNMessageConsumer}
@@ -63,7 +63,7 @@ public class LDNMessageConsumerIT extends AbstractIntegrationTestWithDatabase {
     private WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();
@@ -432,7 +432,7 @@ public class LDNMessageConsumerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Override
-    @After
+    @AfterEach
     public void destroy() throws Exception {
         List<LDNMessageEntity> ldnMessageEntities = ldnMessageService.findAll(context);
         if (CollectionUtils.isNotEmpty(ldnMessageEntities)) {

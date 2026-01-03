@@ -28,21 +28,18 @@ import org.dspace.eperson.EPerson;
 import org.dspace.util.DSpaceConfigurationInitializer;
 import org.dspace.util.DSpaceKernelInitializer;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * Test the attachment of curation tasks to workflows.
  *
  * @author mwood
  */
-@RunWith(SpringRunner.class)
-@ContextConfiguration(
-        initializers = { DSpaceKernelInitializer.class, DSpaceConfigurationInitializer.class },
-        locations = { "classpath:spring/*.xml" }
+@SpringJUnitConfig(
+    initializers = {DSpaceKernelInitializer.class, DSpaceConfigurationInitializer.class},
+    locations = {"classpath:spring/*.xml"}
 )
 public class WorkflowCurationIT
         extends AbstractIntegrationTestWithDatabase {
