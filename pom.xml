@@ -26,7 +26,8 @@
         <hibernate-validator.version>8.0.3.Final</hibernate-validator.version>
         <postgresql.driver.version>42.7.8</postgresql.driver.version>
         <flyway.version>10.22.0</flyway.version>
-        <solr.client.version>8.11.4</solr.client.version>
+        <solr.client.version>9.10.0</solr.client.version>
+        <lucene.version>9.12.3</lucene.version>
 
         <ehcache.version>3.11.1</ehcache.version>
         <errorprone.version>2.42.0</errorprone.version>
@@ -1302,7 +1303,7 @@
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-core</artifactId>
-                <version>${solr.client.version}</version>
+                <version>${lucene.version}</version>
             </dependency>
 
             <!-- Tika is used to extract full text from documents in order to index in Solr -->
@@ -1389,27 +1390,34 @@
                 <version>2.13.2</version>
             </dependency>
 
-            <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
-             otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
+            <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analysis-icu below,
+             otherwise ICUFoldingFilterFactory may throw errors in tests.
+             NOTE: In Lucene 9.x, analyzer modules were renamed from lucene-analyzers-* to lucene-analysis-* -->
             <dependency>
                 <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-analyzers-icu</artifactId>
-                <version>${solr.client.version}</version>
+                <artifactId>lucene-analysis-icu</artifactId>
+                <version>${lucene.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-analyzers-smartcn</artifactId>
-                <version>${solr.client.version}</version>
+                <artifactId>lucene-analysis-smartcn</artifactId>
+                <version>${lucene.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-analyzers-stempel</artifactId>
-                <version>${solr.client.version}</version>
+                <artifactId>lucene-analysis-stempel</artifactId>
+                <version>${lucene.version}</version>
                 <scope>test</scope>
             </dependency>
 
+            <!-- Swagger version management to resolve convergence between Solr and ORCID dependencies -->
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>2.2.22</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.ant</groupId>
@@ -1654,7 +1662,7 @@
                 <version>1.4.01</version>
             </dependency>
 
-            <!-- Keep icu4j synced with version used by lucene-analyzers-icu (Solr) -->
+            <!-- Keep icu4j synced with version used by lucene-analysis-icu (Solr 9.x) -->
             <dependency>
                 <groupId>com.ibm.icu</groupId>
                 <artifactId>icu4j</artifactId>
@@ -1808,10 +1816,21 @@
             </dependency>
 
             <!-- Converge miscellaneous transitive dependencies. -->
+            <!-- Jackson 2.x versions for third-party dependencies (Solr, IIIF, etc.) -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>2.18.0</version>
+            </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>${jackson-annotations.version}</version>
+                <version>2.18.0</version>
             </dependency>
             <dependency>
                 <groupId>tools.jackson.core</groupId>
