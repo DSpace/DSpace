@@ -376,6 +376,11 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
         </dependency>
+        <!-- Jackson 2 databind - required by Flyway which hasn't migrated to Jackson 3 yet -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
         <dependency>
             <groupId>javax.cache</groupId>
             <artifactId>cache-api</artifactId>
@@ -724,24 +729,21 @@
             <version>1.56.0-alpha</version>
             <scope>test</scope>
         </dependency>
-        <!-- Jetty dependencies required by Solr 10.x EmbeddedSolrServer -->
+        <!-- Jetty dependencies required by Solr 10.x HttpJettySolrClient -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-client</artifactId>
             <version>${jetty.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.http2</groupId>
             <artifactId>jetty-http2-client</artifactId>
             <version>${jetty.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.http2</groupId>
             <artifactId>jetty-http2-client-transport</artifactId>
             <version>${jetty.version}</version>
-            <scope>test</scope>
         </dependency>
         <!-- Curator framework is required by Solr 10.x EmbeddedSolrServer for ZooKeeper coordination -->
         <dependency>
