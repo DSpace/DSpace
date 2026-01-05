@@ -66,8 +66,6 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
 
             //We expect a 200 OK status
             .andExpect(status().isOk())
-            //The type has to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
             //There needs to be a self link to this endpoint
             .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
             //We have 4 facets in the default configuration, they need to all be present in the embedded section
@@ -119,31 +117,33 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         //** WHEN **
         //An anonymous user browses this endpoint to find the objects in the system and enters a size of 2
         getClient().perform(get("/api/discover/facets/author")
-                .param("size", "2"))
+                .param("size", "2")
+                .param("embed", "values"))
 
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
             //The type needs to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             //The name of the facet needs to be author, because that's what we called
             .andExpect(jsonPath("$.name", is("author")))
             //The facetType has to be 'text' because that's how the author facet is configured by default
             .andExpect(jsonPath("$.facetType", is("text")))
             //Because we've constructed such a structure so that we have more than 2 (size) authors, there
             // needs to be a next link
-            .andExpect(jsonPath("$._links.next.href", containsString("api/discover/facets/author")))
+            .andExpect(jsonPath("$._embedded.values._links.next.href",
+                containsString("api/discover/facets/author")))
             //There always needs to be a self link
             .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author")))
             //Because there are more authors than is represented (because of the size param), hasMore has to
             // be true
             //The page object needs to be present and just like specified in the matcher
-            .andExpect(jsonPath("$.page",
+            .andExpect(jsonPath("$._embedded.values.page",
                 is(PageMatcher.pageEntry(0, 2))))
             //These authors need to be in the response because it's sorted on how many times the author comes
             // up in different items
             //These authors are the most used ones. Only two show up because of the size.
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entryAuthor("Doe, Jane"),
                 FacetValueMatcher.entryAuthor("Smith, Maria")
             )))
@@ -208,29 +208,31 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         //** WHEN **
         //An anonymous user browses this endpoint to find the objects in the system and enters a size of 2
         getClient().perform(get("/api/discover/facets/author")
-                .param("size", "2"))
+                .param("size", "2")
+                .param("embed", "values"))
 
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
             //The type needs to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             //The name of the facet needs to be author, because that's what we called
             .andExpect(jsonPath("$.name", is("author")))
             //Because we've constructed such a structure so that we have more than 2 (size) subjects, there
             // needs to be a next link
-            .andExpect(jsonPath("$._links.next.href", containsString("api/discover/facets/author")))
+            .andExpect(jsonPath("$._embedded.values._links.next.href",
+                containsString("api/discover/facets/author")))
             //There always needs to be a self link
             .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author")))
             //Because there are more subjects than is represented (because of the size param), hasMore has to
             // be true
             //The page object needs to be present and just like specified in the matcher
-            .andExpect(jsonPath("$.page",
+            .andExpect(jsonPath("$._embedded.values.page",
                 is(PageMatcher.pageEntry(0, 2))))
             //These subjecs need to be in the response because it's sorted on how many times the author comes
             // up in different items
             //These subjects are the most used ones. Only two show up because of the size.
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entryAuthorWithAuthority("Doe, Jane", "test_authority_4", 2),
                 FacetValueMatcher.entryAuthorWithAuthority("Smith, Maria", "test_authority_3", 2)
             )));
@@ -283,30 +285,31 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         //** WHEN **
         //An anonymous user browses this endpoint to find the objects in the system and enters a size of 2
         getClient().perform(get("/api/discover/facets/author?prefix=smith")
-                .param("size", "10"))
+                .param("size", "10")
+                .param("embed", "values"))
 
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
             //The type needs to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             //The name of the facet needs to be author, because that's what we called
             .andExpect(jsonPath("$.name", is("author")))
             //The facetType has to be 'text' because that's how the author facet is configured by default
             .andExpect(jsonPath("$.facetType", is("text")))
             //We only request value starting with "smith", so we expect to only receive one page
-            .andExpect(jsonPath("$._links.next").doesNotExist())
+            .andExpect(jsonPath("$._embedded.values._links.next").doesNotExist())
             //There always needs to be a self link
             .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author?prefix=smith")))
             //Because there are more authors than is represented (because of the size param), hasMore has to
             // be true
             //The page object needs to be present and just like specified in the matcher
-            .andExpect(jsonPath("$.page",
+            .andExpect(jsonPath("$._embedded.values.page",
                 is(PageMatcher.pageEntry(0, 10))))
             //These authors need to be in the response because it's sorted on how many times the author comes
             // up in different items
             //These authors are order according to count. Only two show up because of the prefix.
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entryAuthor("Smith, Maria"),
                 FacetValueMatcher.entryAuthor("Smith, Donald")
             )))
@@ -379,15 +382,17 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         // The prefix query for author queries should be case-insensitive and correctly handle special characters
 
         getClient().perform(get("/api/discover/facets/author")
-                .param("prefix", "Smith"))
+                .param("prefix", "Smith")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entryFacetWithoutSelfLink("Smith, John"),
                 FacetValueMatcher.entryFacetWithoutSelfLink("stIjn, SmITH"))));
 
         getClient().perform(get("/api/discover/facets/author")
-                .param("prefix", "S"))
-            .andExpect(jsonPath("$._embedded.values",
+                .param("prefix", "S")
+                .param("embed", "values"))
+            .andExpect(jsonPath("$._embedded.values._embedded.values",
                 containsInAnyOrder(FacetValueMatcher
                         .entryFacetWithoutSelfLink("Smith, John"),
                     FacetValueMatcher
@@ -399,61 +404,70 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
                         .entryFacetWithoutSelfLink("stIjn, SmITH"))));
 
         getClient().perform(get("/api/discover/facets/author")
-                .param("prefix", "M A"))
+                .param("prefix", "M A")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values",
+            .andExpect(jsonPath("$._embedded.values._embedded.values",
                 containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("M Akai"))));
 
         getClient().perform(get("/api/discover/facets/author")
-                .param("prefix", "S’I"))
+                .param("prefix", "S’I")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values",
+            .andExpect(jsonPath("$._embedded.values._embedded.values",
                 containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("S’Idan, Mo"))));
 
         getClient().perform(get("/api/discover/facets/author")
-                .param("prefix", "Jan, D"))
+                .param("prefix", "Jan, D")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values",
+            .andExpect(jsonPath("$._embedded.values._embedded.values",
                 containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("Jan, Doe"))));
 
         getClient().perform(get("/api/discover/facets/author")
-                .param("prefix", "Tick&"))
+                .param("prefix", "Tick&")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values",
+            .andExpect(jsonPath("$._embedded.values._embedded.values",
                 containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("Tick&Tock"))));
 
         // Should also be the case for subject queries
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "St A"))
+                .param("prefix", "St A")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values",
+            .andExpect(jsonPath("$._embedded.values._embedded.values",
                 containsInAnyOrder(FacetValueMatcher
                     .entryFacetWithoutSelfLink("St Augustine"))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "Health & M"))
+                .param("prefix", "Health & M")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values",
+            .andExpect(jsonPath("$._embedded.values._embedded.values",
                 containsInAnyOrder(FacetValueMatcher
                     .entryFacetWithoutSelfLink("Health & Medicine"))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "1% e"))
+                .param("prefix", "1% e")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values",
+            .andExpect(jsonPath("$._embedded.values._embedded.values",
                 containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("1% economy"))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "I."))
+                .param("prefix", "I.")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values",
+            .andExpect(jsonPath("$._embedded.values._embedded.values",
                 containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("I.T."))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "U"))
+                .param("prefix", "U")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values",
+            .andExpect(jsonPath("$._embedded.values._embedded.values",
                 containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("?Unknown"))));
     }
 
@@ -480,23 +494,26 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/discover/facets/author")
-                .param("prefix", "john"))
+                .param("prefix", "john")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values",
+            .andExpect(jsonPath("$._embedded.values._embedded.values",
                 containsInAnyOrder(
                     FacetValueMatcher.entryAuthor("Smith, John"))));
 
         getClient().perform(get("/api/discover/facets/author")
-                .param("prefix", "jane"))
+                .param("prefix", "jane")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values",
+            .andExpect(jsonPath("$._embedded.values._embedded.values",
                 containsInAnyOrder(
                     FacetValueMatcher.entryAuthor("Smith, Jane"))));
 
         getClient().perform(get("/api/discover/facets/author")
-                .param("prefix", "j"))
+                .param("prefix", "j")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values",
+            .andExpect(jsonPath("$._embedded.values._embedded.values",
                 containsInAnyOrder(
                     FacetValueMatcher.entryAuthor("Smith, John"),
                     FacetValueMatcher.entryAuthor("Smith, Jane"))));
@@ -533,7 +550,7 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
                 .param("prefix", "j")
                 .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values",
+            .andExpect(jsonPath("$._embedded.values._embedded.values",
                 containsInAnyOrder(
                     FacetValueMatcher.entryAuthorWithAuthority(
                         "Smith, John", "test_authority_1", 1),
@@ -588,13 +605,13 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the authors by the facets and doesn't enter a size
-        getClient().perform(get("/api/discover/facets/author"))
+        getClient().perform(get("/api/discover/facets/author").param("embed", "values"))
 
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
             //The type has to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             //The name has to be author, because that's the facet that we called upon
             .andExpect(jsonPath("$.name", is("author")))
             //The facetType has to be 'text' because that's the default configuration for this facet
@@ -603,11 +620,11 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
             .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author")))
             //The page object needs to present and exactly like how it is specified here. 20 is entered as the
             // size because that's the default in the configuration if no size parameter has been given
-            .andExpect(jsonPath("$.page",
+            .andExpect(jsonPath("$._embedded.values.page",
                 is(PageMatcher.pageEntry(0, 20))))
             //The authors need to be embedded in the values, all 4 of them have to be present as the size
             // allows it
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entryAuthor("Doe, Jane"),
                 FacetValueMatcher.entryAuthor("Smith, Maria"),
                 FacetValueMatcher.entryAuthor("Doe, John"),
@@ -666,27 +683,29 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         //The user enters a size of two and wants to see page 1, this is the second page.
         getClient().perform(get("/api/discover/facets/author")
                 .param("size", "2")
-                .param("page", "1"))
+                .param("page", "1")
+                .param("embed", "values"))
 
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
             //The type has to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             //The name of the facet has to be author as that's the one we called
             .andExpect(jsonPath("$.name", is("author")))
             //The facetType has to be 'text' as this is the default configuration
             .andExpect(jsonPath("$.facetType", is("text")))
             //There needs to be a next link because there are more authors than the current size is allowed to
             // show. There are more pages after this one
-            .andExpect(jsonPath("$._links.next.href", containsString("api/discover/facets/author")))
+            .andExpect(jsonPath("$._embedded.values._links.next.href",
+                containsString("api/discover/facets/author")))
             //There always needs to be a self link
             .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author")))
             //The page object has to be like this because that's what we've asked in the parameters
-            .andExpect(jsonPath("$.page",
+            .andExpect(jsonPath("$._embedded.values.page",
                 is(PageMatcher.pageEntry(1, 2))))
             //These authors have to be present because of the current configuration
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entryAuthor("Doe, John"),
                 FacetValueMatcher.entryAuthor("Smith, Donald")
             )))
@@ -740,13 +759,14 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         //An anonymous user browses this endpoint to find the authors by the facet
         //The user enters a small query, namely the title has to contain 'test'
         getClient().perform(get("/api/discover/facets/author")
-                .param("f.title", "test,contains"))
+                .param("f.title", "test,contains")
+                .param("embed", "values"))
 
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
             //The type has to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             //The name has to be author as that's the facet that we've asked
             .andExpect(jsonPath("$.name", is("author")))
             //The facetType needs to be 'text' as that's the default configuration for the given facet
@@ -756,22 +776,17 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
             //The self link needs to contain the query that was specified in the parameters, this is how it
             // looks like
             .andExpect(jsonPath("$._links.self.href", containsString("f.title=test,contains")))
-            //The applied filters have to be specified like this, applied filters are the parameters given
-            // below starting with f.
-            .andExpect(jsonPath("$.appliedFilters", contains(
-                AppliedFilterMatcher.appliedFilterEntry("title", "contains", "test", "test")
-            )))
             //This is how the page object must look like because it's the default
-            .andExpect(jsonPath("$.page",
+            .andExpect(jsonPath("$._embedded.values.page",
                 is(PageMatcher.pageEntry(0, 20))))
             //These authors need to be present in the result because these have made items that contain 'test'
             // in the title
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entryAuthor("Smith, Donald"),
                 FacetValueMatcher.entryAuthor("Testing, Works")
             )))
             //These authors cannot be present because they've not produced an item with 'test' in the title
-            .andExpect(jsonPath("$._embedded.values", not(containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", not(containsInAnyOrder(
                 FacetValueMatcher.entryAuthor("Smith, Maria"),
                 FacetValueMatcher.entryAuthor("Doe, Jane")
             ))))
@@ -822,13 +837,13 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the dateIssued results by the facet
-        getClient().perform(get("/api/discover/facets/dateIssued"))
+        getClient().perform(get("/api/discover/facets/dateIssued").param("embed", "values"))
 
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
             //The type has to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             //The name has to be 'dateIssued' as that's the facet that we've called
             .andExpect(jsonPath("$.name", is("dateIssued")))
             //The facetType has to be 'date' because that's the default configuration for this facet
@@ -836,10 +851,10 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
             //There always needs to be a self link available
             .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/dateIssued")))
             //This is how the page object must look like because it's the default with size 20
-            .andExpect(jsonPath("$.page",
+            .andExpect(jsonPath("$._embedded.values.page",
                 is(PageMatcher.pageEntry(0, 20))))
             //The date values need to be as specified below
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 //We'll always get atleast two intervals with the items specified above, so we ask to match
                 // twice atleast
                 FacetValueMatcher.entryDateIssued(),
@@ -894,25 +909,24 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         //An anonymous user browses this endpoint to find the author results by the facet
         //With a certain scope
         getClient().perform(get("/api/discover/facets/author")
-                .param("scope", "testScope"))
+                .param("scope", "testScope")
+                .param("embed", "values"))
 
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
             //The type has to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             //The name has to be author as that's the facet that we've called
             .andExpect(jsonPath("$.name", is("author")))
             //The facetType has to be 'text' as that's the default configuration for this facet
             .andExpect(jsonPath("$.facetType", is("text")))
-            //The scope has to be the same as the one that we've given in the parameters
-            .andExpect(jsonPath("$.scope", is("testScope")))
             //There always needs to be a self link available
             .andExpect(jsonPath("$._links.self.href",
-                containsString("api/discover/facets/author?configuration=default&scope=testScope")))
+                containsString("api/discover/facets/author?scope=testScope")))
             //These are all the authors for the items that were created and thus they have to be present in
             // the embedded values section
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entryAuthor("Doe, Jane"),
                 FacetValueMatcher.entryAuthor("Smith, Maria"),
                 FacetValueMatcher.entryAuthor("Doe, John"),
@@ -924,26 +938,25 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         //And a size of 2
         getClient().perform(get("/api/discover/facets/author")
                 .param("scope", "testScope")
-                .param("size", "2"))
+                .param("size", "2")
+                .param("embed", "values"))
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
             //The type has to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             //The name has to be 'author' as that's the facet that we called
             .andExpect(jsonPath("$.name", is("author")))
             //The facetType has to be 'text' as that's the default configuration for this facet
             .andExpect(jsonPath("$.facetType", is("text")))
-            //The scope has to be same as the param that we've entered
-            .andExpect(jsonPath("$.scope", is("testScope")))
             //There always needs to be a self link available
             .andExpect(jsonPath("$._links.self.href",
-                containsString("api/discover/facets/author?configuration=default&scope=testScope")))
-            .andExpect(jsonPath("$._links.next.href",
-                containsString("api/discover/facets/author?configuration=default&scope=testScope&page=1&size=2")))
+                containsString("api/discover/facets/author?scope=testScope")))
+            .andExpect(jsonPath("$._embedded.values._links.next.href",
+                containsString("api/discover/facets/author/values?scope=testScope&page=1&size=2")))
             //These are the values that need to be present as it's ordered by count and these authors are the
             // most common ones in the items that we've created
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entryAuthor("Doe, Jane"),
                 FacetValueMatcher.entryAuthor("Smith, Maria")
             )))
@@ -1032,13 +1045,14 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         //An anonymous user browses this endpoint to find the dateIssued results by the facet
         //And a size of 2
         getClient().perform(get("/api/discover/facets/dateIssued")
-                .param("size", "2"))
+                .param("size", "2")
+                .param("embed", "values"))
 
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
             //The type has to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             //The name needs to be dateIssued as that's the facet that we've called
             .andExpect(jsonPath("$.name", is("dateIssued")))
             //the facetType needs to be 'date' as that's the default facetType for this facet in the
@@ -1048,14 +1062,15 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
             .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/dateIssued")))
             //Seeing as we've entered a size of two and there are more dates than just two, we'll need a next
             // link to go to the next page to see the rest of the dates
-            .andExpect(jsonPath("$._links.next.href", containsString("api/discover/facets/dateIssued")))
+            .andExpect(jsonPath("$._embedded.values._links.next.href",
+                containsString("api/discover/facets/dateIssued")))
             //The page object needs to look like this because we've entered a size of 2 and we didn't specify
             // a starting page so it defaults to 0
-            .andExpect(jsonPath("$.page",
+            .andExpect(jsonPath("$._embedded.values.page",
                 is(PageMatcher.pageEntry(0, 2))))
             //There needs to be two date results in the embedded values section because that's what we've
             // specified
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entryDateIssued(),
                 FacetValueMatcher.entryDateIssued()
             )))
@@ -1112,13 +1127,14 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         //And a size of 2
         getClient().perform(get("/api/discover/facets/dateIssued")
                 .param("f.title", "test,contains")
-                .param("size", "2"))
+                .param("size", "2")
+                .param("embed", "values"))
 
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
             //The type has to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             //The name has to be dateIssued because that's the facet that we called
             .andExpect(jsonPath("$.name", is("dateIssued")))
             //The facetType needs to be 'date' as that's the default facetType for this facet in the
@@ -1126,17 +1142,12 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
             .andExpect(jsonPath("$.facetType", is("date")))
             //There always needs to be a self link
             .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/dateIssued")))
-            //There needs to be an appliedFilters section that looks like this because we've specified a query
-            // in the parameters
-            .andExpect(jsonPath("$.appliedFilters", containsInAnyOrder(
-                AppliedFilterMatcher.appliedFilterEntry("title", "contains", "test", "test")
-            )))
             //The page object needs to look like this because we entered a size of 2 and we didn't specify a
             // starting page so it defaults to 0
-            .andExpect(jsonPath("$.page",
+            .andExpect(jsonPath("$._embedded.values.page",
                 is(PageMatcher.pageEntry(0, 2))))
             //There needs to be only two date intervals with a count of 1 because of the query we specified
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entryDateIssuedWithCountOne(),
                 FacetValueMatcher.entryDateIssuedWithCountOne()
             )))
@@ -1198,8 +1209,6 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
-            //The type has to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
             .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                 FacetEntryMatcher.authorFacetWithMinMax("Doe, Jane", "Testing, Works"),
                 FacetEntryMatcher.entityTypeFacet(),
@@ -1260,11 +1269,12 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
                 .param("configuration", "administrativeView")
                 .param("sort", "score,DESC")
                 .param("page", "0")
-                .param("size", "10"))
+                .param("size", "10")
+                .param("embed", "values"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.self.href",containsString(
                 "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC")))
-            .andExpect(jsonPath("$._embedded.values", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", Matchers.containsInAnyOrder(
                 SearchResultMatcher.matchEmbeddedFacetValues("true", 2, "discover",
                     "/api/discover/search/objects?configuration=administrativeView&f.discoverable=true,equals"),
                 SearchResultMatcher.matchEmbeddedFacetValues("false", 1, "discover",
@@ -1320,13 +1330,14 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
                 .param("configuration", "administrativeView")
                 .param("sort", "score,DESC")
                 .param("page", "0")
-                .param("size", "1"))
+                .param("size", "1")
+                .param("embed", "values"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.self.href",containsString(
                 "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC")))
-            .andExpect(jsonPath("$._links.next.href",containsString(
+            .andExpect(jsonPath("$._embedded.values._links.next.href",containsString(
                 "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC&page=1&size=1")))
-            .andExpect(jsonPath("$._embedded.values", Matchers.contains(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", Matchers.contains(
                 SearchResultMatcher.matchEmbeddedFacetValues("true", 2, "discover",
                     "/api/discover/search/objects?configuration=administrativeView&f.discoverable=true,equals")
             )));
@@ -1335,7 +1346,8 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
                 .param("configuration", "administrativeView")
                 .param("sort", "score,DESC")
                 .param("page", "1")
-                .param("size", "1"))
+                .param("size", "1")
+                .param("embed", "values"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.first.href",containsString(
                 "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC&page=0&size=1")))
@@ -1343,7 +1355,7 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
                 "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC&page=0&size=1")))
             .andExpect(jsonPath("$._links.self.href",containsString(
                 "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC&page=1&size=1")))
-            .andExpect(jsonPath("$._embedded.values", Matchers.contains(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", Matchers.contains(
                 SearchResultMatcher.matchEmbeddedFacetValues("false", 1, "discover",
                     "/api/discover/search/objects?configuration=administrativeView&f.discoverable=false,equals")
             )));
@@ -1386,20 +1398,20 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/discover/facets/author")
-                .param("query", "Donald"))
+                .param("query", "Donald")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             .andExpect(jsonPath("$.name", is("author")))
             .andExpect(jsonPath("$.facetType", is("text")))
-            .andExpect(jsonPath("$.scope", is(emptyOrNullString())))
             .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author?query=Donald")))
-            .andExpect(jsonPath("$._embedded.values[0].label", is("Smith, Donald")))
-            .andExpect(jsonPath("$._embedded.values[0].count", is(1)))
-            .andExpect(jsonPath("$._embedded.values[0]._links.search.href",
+            .andExpect(jsonPath("$._embedded.values._embedded.values[0].label", is("Smith, Donald")))
+            .andExpect(jsonPath("$._embedded.values._embedded.values[0].count", is(1)))
+            .andExpect(jsonPath("$._embedded.values._embedded.values[0]._links.search.href",
                 containsString("api/discover/search/objects?query=Donald&f.author=" +
                     urlPathSegmentEscaper().escape("Smith, Donald,equals")
                 )))
-            .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
+            .andExpect(jsonPath("$._embedded.values._embedded.values").value(Matchers.hasSize(1)));
 
     }
 
@@ -1440,21 +1452,21 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/discover/facets/dateIssued")
-                .param("dsoType", "Item"))
+                .param("dsoType", "Item")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             .andExpect(jsonPath("$.name", is("dateIssued")))
             .andExpect(jsonPath("$.facetType", is("date")))
-            .andExpect(jsonPath("$.scope", is(emptyOrNullString())))
             .andExpect(jsonPath("$._links.self.href",
                 containsString("api/discover/facets/dateIssued?dsoType=Item")))
-            .andExpect(jsonPath("$._embedded.values[0].label", is("2017 - 2020")))
-            .andExpect(jsonPath("$._embedded.values[0].count", is(3)))
-            .andExpect(jsonPath("$._embedded.values[0]._links.search.href",
+            .andExpect(jsonPath("$._embedded.values._embedded.values[0].label", is("2017 - 2020")))
+            .andExpect(jsonPath("$._embedded.values._embedded.values[0].count", is(3)))
+            .andExpect(jsonPath("$._embedded.values._embedded.values[0]._links.search.href",
                 containsString("api/discover/search/objects?dsoType=Item&f.dateIssued=" +
                     urlPathSegmentEscaper().escape("[2017 TO 2020],equals")
                 )))
-            .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
+            .andExpect(jsonPath("$._embedded.values._embedded.values").value(Matchers.hasSize(1)));
 
     }
 
@@ -1521,45 +1533,51 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "with a lot of word"))
+                .param("prefix", "with a lot of word")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubject("Subject with a lot of Word values", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "multiple words"))
+                .param("prefix", "multiple words")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubject("Value with: Multiple Words", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "mUltiPle wor"))
+                .param("prefix", "mUltiPle wor")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubject("Multiple worded subject", 1),
                 FacetValueMatcher.entrySubject("Value with: Multiple Words", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "with"))
+                .param("prefix", "with")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubject("With, Values", 1),
                 FacetValueMatcher.entrySubject("Subject with a lot of Word values", 1),
                 FacetValueMatcher.entrySubject("Value with: Multiple Words", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "of"))
+                .param("prefix", "of")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubject("Subject with a lot of Word values", 1),
                 FacetValueMatcher.entrySubject("Test,of,comma", 1),
                 FacetValueMatcher.entrySubject("Test:of:the:colon", 1),
                 FacetValueMatcher.entrySubject("test||of|Pipe", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "tEsT"))
+                .param("prefix", "tEsT")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubject("Test,of,comma", 1),
                 FacetValueMatcher.entrySubject("Test-Subject", 1),
                 FacetValueMatcher.entrySubject("Test:of:the:colon", 1),
@@ -1567,54 +1585,62 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
                 FacetValueMatcher.entrySubject("test||of|Pipe", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "colon"))
+                .param("prefix", "colon")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubject("Test:of:the:colon", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "coMma"))
+                .param("prefix", "coMma")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubject("Test,of,comma", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "guyen"))
+                .param("prefix", "guyen")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubject("N’guyen", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "semiColon"))
+                .param("prefix", "semiColon")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubject("test;Semicolon", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "pipe"))
+                .param("prefix", "pipe")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubject("test||of|Pipe", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "Subject"))
+                .param("prefix", "Subject")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubject("Multiple worded subject", 1),
                 FacetValueMatcher.entrySubject("Test-Subject", 1),
                 FacetValueMatcher.entrySubject("Subject with a lot of Word values", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "Subject of word"))
+                .param("prefix", "Subject of word")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values").isEmpty())
-            .andExpect(jsonPath("$.page.number", is(0)));
+            .andExpect(jsonPath("$._embedded.values._embedded.values").isEmpty())
+            .andExpect(jsonPath("$._embedded.values.page.number", is(0)));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "Value with words"))
+                .param("prefix", "Value with words")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values").isEmpty())
-            .andExpect(jsonPath("$.page.number", is(0)));
+            .andExpect(jsonPath("$._embedded.values._embedded.values").isEmpty())
+            .andExpect(jsonPath("$._embedded.values.page.number", is(0)));
     }
 
     @Test
@@ -1653,41 +1679,46 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "with a lot of word"))
+                .param("prefix", "with a lot of word")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubjectWithAuthority("Subject with a lot of Word values",
                     "test_authority_3", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "mUltiPle wor"))
+                .param("prefix", "mUltiPle wor")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubjectWithAuthority("Multiple worded subject",
                     "test_authority_2", 1),
                 FacetValueMatcher.entrySubjectWithAuthority("Value with: Multiple Words",
                     "test_authority_1", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "Subject"))
+                .param("prefix", "Subject")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 FacetValueMatcher.entrySubjectWithAuthority("Multiple worded subject",
                     "test_authority_2", 1),
                 FacetValueMatcher.entrySubjectWithAuthority("Subject with a lot of Word values",
                     "test_authority_3", 1))));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "Subject of word"))
+                .param("prefix", "Subject of word")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values").isEmpty())
-            .andExpect(jsonPath("$.page.number", is(0)));
+            .andExpect(jsonPath("$._embedded.values._embedded.values").isEmpty())
+            .andExpect(jsonPath("$._embedded.values.page.number", is(0)));
 
         getClient().perform(get("/api/discover/facets/subject")
-                .param("prefix", "Value with words"))
+                .param("prefix", "Value with words")
+                .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.values").isEmpty())
-            .andExpect(jsonPath("$.page.number", is(0)));
+            .andExpect(jsonPath("$._embedded.values._embedded.values").isEmpty())
+            .andExpect(jsonPath("$._embedded.values.page.number", is(0)));
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
 
@@ -1754,12 +1785,13 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         //** WHEN **
         //The Admin user browses this endpoint to find the supervisedBy results by the facet
         getClient(getAuthToken(admin.getEmail(), password)).perform(get("/api/discover/facets/supervisedBy")
-                .param("configuration", "supervision"))
+                .param("configuration", "supervision")
+                .param("embed", "values"))
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
             //The type has to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             //The name has to be 'supervisedBy' as that's the facet that we've called
             .andExpect(jsonPath("$.name", is("supervisedBy")))
             //The facetType has to be `authority` because that's the default configuration for this facet
@@ -1768,10 +1800,10 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
             .andExpect(jsonPath("$._links.self.href",
                 containsString("api/discover/facets/supervisedBy?configuration=supervision")))
             //This is how the page object must look like because it's the default with size 20
-            .andExpect(jsonPath("$.page",
+            .andExpect(jsonPath("$._embedded.values.page",
                 is(PageMatcher.pageEntry(0, 20))))
             //The supervisedBy values need to be as specified below
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 entrySupervisedBy(groupA.getName(), groupA.getID().toString(), 2),
                 entrySupervisedBy(groupB.getName(), groupB.getID().toString(), 2)
             )));
@@ -1836,12 +1868,13 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         //The Admin user browses this endpoint to find the supervisedBy results by the facet
         getClient(getAuthToken(admin.getEmail(), password)).perform(get("/api/discover/facets/supervisedBy")
                 .param("configuration", "supervision")
-                .param("prefix", "group B"))
+                .param("prefix", "group B")
+                .param("embed", "values"))
             //** THEN **
             //The status has to be 200 OK
             .andExpect(status().isOk())
             //The type has to be 'discover'
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("facet")))
             //The name has to be 'supervisedBy' as that's the facet that we've called
             .andExpect(jsonPath("$.name", is("supervisedBy")))
             //The facetType has to be `authority` because that's the default configuration for this facet
@@ -1850,10 +1883,10 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
             .andExpect(jsonPath("$._links.self.href",
                 containsString("api/discover/facets/supervisedBy?prefix=group%20B&configuration=supervision")))
             //This is how the page object must look like because it's the default with size 20
-            .andExpect(jsonPath("$.page",
+            .andExpect(jsonPath("$._embedded.values.page",
                 is(PageMatcher.pageEntry(0, 20))))
             //The supervisedBy values need to be as specified below
-            .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.values._embedded.values", containsInAnyOrder(
                 entrySupervisedBy(groupB.getName(), groupB.getID().toString(), 2)
             )));
     }

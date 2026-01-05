@@ -19,6 +19,7 @@ public class DiscoverFacetEntryConverter
     @Override
     public SearchFacetEntryRest convert(DiscoverySearchFilterFacet discoverySearchFilterFacet, Projection projection) {
         SearchFacetEntryRest facetEntry = new SearchFacetEntryRest(discoverySearchFilterFacet.getIndexFieldName());
+        facetEntry.setProjection(projection);
         facetEntry.setFacetType(discoverySearchFilterFacet.getType());
         facetEntry.setFacetLimit(discoverySearchFilterFacet.getFacetLimit());
         facetEntry.setOpenByDefault(discoverySearchFilterFacet.isOpenByDefault());

@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
+import org.dspace.app.rest.model.SearchFacetInformation;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
@@ -36,22 +37,30 @@ public class SearchFacetRestRepository extends DSpaceRestRepository<SearchFacetE
     @PreAuthorize("permitAll()")
     public SearchFacetEntryRest findOne(Context context, String facetName) {
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        String scope = request.getParameter("scope");
-        String configuration = request.getParameter("configuration");
-        DiscoveryConfiguration discoveryConfiguration = getConfiguration(context, configuration, scope);
+        SearchFacetInformation information = SearchFacetInformation.fromRequest(request, facetName);
+        DiscoveryConfiguration discoveryConfiguration =
+            getConfiguration(context, information.getConfiguration(), information.getScope());
 
-        return converter.toRest(discoveryConfiguration.getSidebarFacet(facetName), utils.obtainProjection());
+        SearchFacetEntryRest facet =
+            converter.toRest(discoveryConfiguration.getSidebarFacet(facetName), utils.obtainProjection());
+        facet.setFacetInformation(information);
+        return facet;
     }
 
     @Override
     @PreAuthorize("permitAll()")
     public Page<SearchFacetEntryRest> findAll(Context context, Pageable pageable) {
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        String scope = request.getParameter("scope");
-        String configuration = request.getParameter("configuration");
-        DiscoveryConfiguration discoveryConfiguration = getConfiguration(context, configuration, scope);
+        SearchFacetInformation information = SearchFacetInformation.fromRequest(request);
+        DiscoveryConfiguration discoveryConfiguration =
+            getConfiguration(context, information.getConfiguration(), information.getScope());
 
-        return converter.toRestPage(discoveryConfiguration.getSidebarFacets(), pageable, utils.obtainProjection());
+        Page<SearchFacetEntryRest> page =
+            converter.toRestPage(discoveryConfiguration.getSidebarFacets(), pageable, utils.obtainProjection());
+        page.getContent().forEach((entry) -> {
+            entry.setFacetInformation(information);
+        });
+        return page;
     }
 
     private DiscoveryConfiguration getConfiguration(Context context, String configuration, String dsoScope) {

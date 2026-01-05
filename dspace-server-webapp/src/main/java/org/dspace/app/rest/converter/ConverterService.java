@@ -382,10 +382,16 @@ public class ConverterService {
         if (converterMap.containsKey(sourceClass)) {
             return converterMap.get(sourceClass);
         }
+        Class bestMatch = null;
         for (Class converterSourceClass : converterMap.keySet()) {
             if (converterSourceClass.isAssignableFrom(sourceClass)) {
-                return converterMap.get(converterSourceClass);
+                if (bestMatch == null || bestMatch.isAssignableFrom(converterSourceClass)) {
+                    bestMatch = converterSourceClass;
+                }
             }
+        }
+        if (bestMatch != null) {
+            return converterMap.get(bestMatch);
         }
         throw new IllegalArgumentException("No converter found to get rest class from " + sourceClass);
     }

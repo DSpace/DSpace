@@ -48,6 +48,9 @@ public class SearchFacetEntryRest extends BaseObjectRest<String> {
     private String maxValue;
 
     @JsonIgnore
+    private SearchFacetInformation facetInformation;
+
+    @JsonIgnore
     private List<SearchFacetValueRest> values = new LinkedList<>();
 
     public SearchFacetEntryRest(final String name) {
@@ -59,7 +62,6 @@ public class SearchFacetEntryRest extends BaseObjectRest<String> {
         return CATEGORY;
     }
 
-    @JsonIgnore
     public String getType() {
         return NAME;
     }
@@ -82,6 +84,14 @@ public class SearchFacetEntryRest extends BaseObjectRest<String> {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public SearchFacetInformation getFacetInformation() {
+        return facetInformation;
+    }
+
+    public void setFacetInformation(SearchFacetInformation facetInformation) {
+        this.facetInformation = facetInformation;
     }
 
     public void addValue(final SearchFacetValueRest valueRest) {

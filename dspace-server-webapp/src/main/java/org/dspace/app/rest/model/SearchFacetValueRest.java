@@ -28,6 +28,8 @@ public class SearchFacetValueRest extends RestAddressableModel {
     private String sortValue;
     @JsonIgnore
     private String filterType;
+    @JsonIgnore
+    private SearchFacetInformation facetInformation;
 
     public String getCategory() {
         return CATEGORY;
@@ -96,5 +98,13 @@ public class SearchFacetValueRest extends RestAddressableModel {
     public void setFilterType(final String filterType) {
 
         this.filterType = filterType;
+    }
+
+    public SearchFacetInformation getFacetInformation() {
+        return facetInformation;
+    }
+
+    public void setFacetInformation(SearchFacetInformation facetInformation) {
+        this.facetInformation = facetInformation;
     }
 }
