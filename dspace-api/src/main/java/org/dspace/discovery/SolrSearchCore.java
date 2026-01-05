@@ -14,10 +14,10 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.service.impl.HttpConnectionPoolService;
 import org.dspace.services.ConfigurationService;
@@ -83,11 +83,10 @@ public class SolrSearchCore {
                     log.debug("Solr URL: {}", solrService);
                     // Note: Cannot use custom HttpClient with Solr 8.x as it requires HttpClient 4
                     // and we've upgraded to HttpClient 5. Solr will manage its own connections.
-                    HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService)
+                    // Note: In Solr 10, base URL is set via builder; multipart is handled automatically
+                    HttpJettySolrClient solrServer = new HttpJettySolrClient.Builder(solrService)
                             .build();
 
-                    solrServer.setBaseURL(solrService);
-                    solrServer.setUseMultiPartPost(true);
                     // Dummy/test query to search for Item (type=2) of ID=1
                     SolrQuery solrQuery = new SolrQuery();
                     solrQuery.setQuery("*:*");

@@ -27,10 +27,10 @@ import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrQuery.SortClause;
+import org.apache.solr.client.solrj.request.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -73,7 +73,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
         if (solrSuggestionClient == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
                     .getProperty("suggestion.solr.server", "http://localhost:8983/solr/suggestion");
-            solrSuggestionClient = new HttpSolrClient.Builder(solrService).build();
+            solrSuggestionClient = new HttpJettySolrClient.Builder(solrService).build();
         }
         return solrSuggestionClient;
     }

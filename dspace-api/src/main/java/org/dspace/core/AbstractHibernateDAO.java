@@ -22,6 +22,10 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Root;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Session;
+import org.hibernate.engine.spi.EntityEntry;
+import org.hibernate.engine.spi.PersistenceContext;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.Status;
 
 /**
  * Hibernate implementation for generic DAO interface.  Also includes additional
@@ -61,6 +65,15 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
     @Override
     public void delete(Context context, T t) throws SQLException {
+        // Track the deleted entity's UUID in the context for Hibernate 7 compatibility.
+        // This is needed because Hibernate 7 may return deleted entities from session.get()
+        // even after they've been scheduled for removal.
+        if (t instanceof ReloadableEntity) {
+            Object id = ((ReloadableEntity<?>) t).getID();
+            if (id instanceof UUID) {
+                context.markEntityDeleted((UUID) id);
+            }
+        }
         getHibernateSession(context).remove(t);
     }
 
@@ -90,16 +103,21 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         if (id == null) {
             return null;
         }
+        // First check if this entity was deleted in this context (Hibernate 7 compatibility)
+        if (context.isEntityDeleted(id)) {
+            return null;
+        }
         @SuppressWarnings("unchecked")
         T result = (T) getHibernateSession(context).get(clazz, id);
-        return result;
+        // Also check the persistence context status as a fallback
+        return isEntityRemoved(context, result) ? null : result;
     }
 
     @Override
     public T findByID(Context context, Class clazz, int id) throws SQLException {
         @SuppressWarnings("unchecked")
         T result = (T) getHibernateSession(context).get(clazz, id);
-        return result;
+        return isEntityRemoved(context, result) ? null : result;
     }
 
     @Override
@@ -109,7 +127,32 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         }
         @SuppressWarnings("unchecked")
         T result = (T) getHibernateSession(context).get(clazz, id);
-        return result;
+        return isEntityRemoved(context, result) ? null : result;
+    }
+
+    /**
+     * Check if an entity is scheduled for removal (DELETED or GONE status).
+     * In Hibernate 7, session.get() returns entities from the persistence context
+     * even if they've been scheduled for removal. This method allows callers
+     * to filter out such entities.
+     *
+     * @param context the DSpace context
+     * @param entity the entity to check
+     * @return true if the entity is scheduled for removal, false otherwise
+     * @throws SQLException if a database error occurs
+     */
+    protected boolean isEntityRemoved(Context context, Object entity) throws SQLException {
+        if (entity == null) {
+            return false;
+        }
+        Session session = getHibernateSession(context);
+        PersistenceContext persistenceContext = ((SessionImplementor) session).getPersistenceContext();
+        EntityEntry entry = persistenceContext.getEntry(entity);
+        if (entry != null) {
+            Status status = entry.getStatus();
+            return status == Status.DELETED || status == Status.GONE;
+        }
+        return false;
     }
 
     @Override

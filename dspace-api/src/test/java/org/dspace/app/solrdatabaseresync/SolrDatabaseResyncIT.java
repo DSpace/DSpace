@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.dspace.AbstractIntegrationTestWithDatabase;

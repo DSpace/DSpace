@@ -564,7 +564,18 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         // Remove any ResourcePolicies that reference this group
         authorizeService.removeGroupPolicies(context, group);
 
+        // Properly synchronize bidirectional ManyToMany relationships before clearing
+        // (Required for Hibernate 7 which strictly enforces JPA spec during auto-flush)
+        // Remove this group from all child groups' parentGroups list
+        for (Group childGroup : new ArrayList<>(group.getMemberGroups())) {
+            childGroup.removeParentGroup(group);
+        }
         group.getMemberGroups().clear();
+
+        // Remove this group from all parent groups' groups list
+        for (Group parentGroup : new ArrayList<>(group.getParentGroups())) {
+            parentGroup.remove(group);
+        }
         group.getParentGroups().clear();
 
         //Remove all eperson references from this group

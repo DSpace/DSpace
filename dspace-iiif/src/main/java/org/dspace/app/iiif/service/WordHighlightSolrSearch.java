@@ -8,6 +8,7 @@
 package org.dspace.app.iiif.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -18,10 +19,10 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.impl.NoOpResponseParser;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
+import org.apache.solr.client.solrj.response.InputStreamResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.util.NamedList;
@@ -86,16 +87,18 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
                 .getBooleanProperty("discovery.solr.url.validation.enabled");
         UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
         if (urlValidator.isValid(solrService) || validationEnabled) {
-            HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
-            solrServer.setUseMultiPartPost(true);
+            // Note: In Solr 10, base URL is set via builder; multipart is handled automatically
+            HttpJettySolrClient solrServer = new HttpJettySolrClient.Builder(solrService).build();
             SolrQuery solrQuery = getSolrQuery(adjustQuery(query), manifestId);
+            solrQuery.setParam(CommonParams.WT, "json");
             QueryRequest req = new QueryRequest(solrQuery);
-            // returns raw json response.
-            req.setResponseParser(new NoOpResponseParser("json"));
+            // Returns raw response as InputStream (Solr 10 uses InputStreamResponseParser)
+            req.setResponseParser(new InputStreamResponseParser("application/json"));
             NamedList<Object> resp;
             try {
                 resp = solrServer.request(req);
-                json =  (String) resp.get("response");
+                InputStream stream = (InputStream) resp.get(InputStreamResponseParser.STREAM_KEY);
+                json = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
             } catch (SolrServerException | IOException e) {
                 throw new RuntimeException("Unable to retrieve search response.", e);
             }

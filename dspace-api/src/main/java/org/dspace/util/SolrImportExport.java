@@ -30,9 +30,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
@@ -250,12 +250,14 @@ public class SolrImportExport {
         }
 
         try {
-            HttpSolrClient adminSolr = new HttpSolrClient.Builder(baseSolrUrl).build();
+            HttpJettySolrClient adminSolr = new HttpJettySolrClient.Builder(baseSolrUrl).build();
 
             // try to find out size of core and compare with free space in export directory
             CoreAdminResponse status = CoreAdminRequest.getStatus(indexName, adminSolr);
-            Object coreSizeObj = status.getCoreStatus(indexName).get("sizeInBytes");
-            long coreSize = coreSizeObj != null ? Long.valueOf(coreSizeObj.toString()) : -1;
+            // Solr 10 uses typed response objects with public fields instead of generic Maps
+            var coreData = status.getCoreStatus(indexName);
+            long coreSize = (coreData != null && coreData.index != null && coreData.index.sizeInBytes != null)
+                ? coreData.index.sizeInBytes : -1;
             long usableExportSpace = exportDir.getUsableSpace();
             if (coreSize >= 0 && usableExportSpace < coreSize) {
                 System.err.println("Not enough space in export directory " + exportDirName
@@ -317,7 +319,7 @@ public class SolrImportExport {
             }
 
             // commit changes
-            HttpSolrClient origSolr = new HttpSolrClient.Builder(origSolrUrl).build();
+            HttpJettySolrClient origSolr = new HttpJettySolrClient.Builder(origSolrUrl).build();
             origSolr.commit();
 
             // swap back (statistics now going to actual core name in actual data dir)
@@ -398,7 +400,7 @@ public class SolrImportExport {
                                                     + indexName);
         }
 
-        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
+        HttpJettySolrClient solr = new HttpJettySolrClient.Builder(solrUrl).build();
 
         // must get multivalue fields before clearing
         List<String> multivaluedFields = getMultiValuedFields(solr);
@@ -431,7 +433,8 @@ public class SolrImportExport {
             }
             contentStreamUpdateRequest.setParam("stream.contentType", "text/csv;charset=utf-8");
             contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
-            contentStreamUpdateRequest.addFile(file, "text/csv;charset=utf-8");
+            // Solr 10 uses Path instead of File
+            contentStreamUpdateRequest.addFile(file.toPath(), "text/csv;charset=utf-8");
 
             solr.request(contentStreamUpdateRequest);
         }
@@ -445,7 +448,7 @@ public class SolrImportExport {
      * @param solr the solr server to query.
      * @return A list containing all multi-valued fields, or an empty list if none are found / there aren't any.
      */
-    private static List<String> getMultiValuedFields(HttpSolrClient solr) {
+    private static List<String> getMultiValuedFields(HttpJettySolrClient solr) {
         List<String> result = new ArrayList<>();
         try {
             LukeRequest request = new LukeRequest();
@@ -471,7 +474,7 @@ public class SolrImportExport {
      * @throws SolrServerException if there is a problem in communicating with Solr.
      */
     public static void clearIndex(String solrUrl) throws IOException, SolrServerException {
-        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
+        HttpJettySolrClient solr = new HttpJettySolrClient.Builder(solrUrl).build();
         solr.deleteByQuery("*:*");
         solr.commit();
         solr.optimize();
@@ -510,7 +513,7 @@ public class SolrImportExport {
                                                     + indexName);
         }
 
-        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
+        HttpJettySolrClient solr = new HttpJettySolrClient.Builder(solrUrl).build();
 
         SolrQuery query = new SolrQuery("*:*");
         if (StringUtils.isNotBlank(fromWhen)) {

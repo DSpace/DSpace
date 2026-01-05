@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;

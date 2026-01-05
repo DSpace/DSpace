@@ -8,7 +8,7 @@
 package org.dspace.app.rest.health;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.BaseHttpSolrClient.RemoteSolrException;
+import org.apache.solr.client.solrj.RemoteSolrException;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.common.params.CoreAdminParams;
 import org.springframework.boot.health.contributor.AbstractHealthIndicator;

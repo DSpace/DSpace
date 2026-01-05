@@ -17,11 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.withSettings;
+import static org.mockito.Mockito.spy;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -86,6 +84,11 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     private AuthorizeService authorizeServiceSpy;
 
     /**
+     * Original AuthorizeService (saved before spying for restoration in @After)
+     */
+    private AuthorizeService originalAuthorizeService;
+
+    /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
      *
@@ -105,11 +108,12 @@ public class WorkspaceItemTest extends AbstractUnitTest {
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
 
+            // Save the original authorizeService before spying (for restoration in @After)
+            originalAuthorizeService = authorizeService;
+
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
-            Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
-            authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
-                withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
+            authorizeServiceSpy = spy(originalAuthorizeService);
             // "Wire" our spy to be used by the current loaded object services
             // (To ensure these services use the spy instead of the real service)
             ReflectionTestUtils.setField(workspaceItemService, "authorizeService", authorizeServiceSpy);
@@ -152,6 +156,15 @@ public class WorkspaceItemTest extends AbstractUnitTest {
             context.restoreAuthSystemState();
         }
         context.restoreAuthSystemState();
+
+        // Restore the original authorizeService to prevent test pollution
+        if (originalAuthorizeService != null) {
+            ReflectionTestUtils.setField(workspaceItemService, "authorizeService", originalAuthorizeService);
+            ReflectionTestUtils.setField(itemService, "authorizeService", originalAuthorizeService);
+            ReflectionTestUtils.setField(collectionService, "authorizeService", originalAuthorizeService);
+            ReflectionTestUtils.setField(communityService, "authorizeService", originalAuthorizeService);
+        }
+
         super.destroy();
     }
 

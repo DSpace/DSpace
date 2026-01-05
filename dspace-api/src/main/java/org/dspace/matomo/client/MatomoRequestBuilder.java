@@ -7,6 +7,7 @@
  */
 package org.dspace.matomo.client;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import tools.jackson.core.JacksonException;
@@ -20,7 +21,9 @@ import tools.jackson.databind.json.JsonMapper;
 public class MatomoRequestBuilder {
 
     private static final Logger log = LogManager.getLogger(MatomoRequestBuilder.class);
-    private final JsonMapper objectMapper = JsonMapper.builder().build();
+    private final JsonMapper objectMapper = JsonMapper.builder()
+        .changeDefaultPropertyInclusion(v -> v.withValueInclusion(JsonInclude.Include.NON_NULL))
+        .build();
 
     /**
      * This method converts a {@code MatomoBulkRequest} request into a JSON

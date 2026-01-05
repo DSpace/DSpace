@@ -41,8 +41,12 @@ public class MatomoResponseReaderTest extends AbstractUnitTest {
         MatomoResponse actual = matomoResponseReader.fromJSON("{}");
         assertThat(actual, notNullValue());
         assertThat(actual.status(), nullValue());
-        assertThat(actual.tracked(), is(0));
-        assertThat(actual.invalid(), is(0));
+        // Integer fields are null when not present in JSON
+        assertThat(actual.tracked(), nullValue());
+        assertThat(actual.invalid(), nullValue());
+        // Helper methods provide default values
+        assertThat(actual.trackedCount(), is(0));
+        assertThat(actual.invalidCount(), is(0));
         assertThat(actual.invalidIndices(), nullValue());
     }
 

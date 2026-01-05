@@ -23,9 +23,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -123,7 +123,7 @@ public class SolrUpgradePre6xStatistics {
 
     // This code will operate on one shard at a time, therefore the SOLR web service will be accessed directly rather
     // than make use of the DSpace Solr Logger which only writes to the current shard
-    private final HttpSolrClient server;
+    private final HttpJettySolrClient server;
 
     //Allows for smart use of hibernate cache
     private Item lastItem = null;
@@ -147,7 +147,7 @@ public class SolrUpgradePre6xStatistics {
         String serverPath = configurationService.getProperty("solr-statistics.server");
         serverPath = serverPath.replaceAll("statistics$", indexName);
         System.out.println("Connecting to " + serverPath);
-        server = new HttpSolrClient.Builder(serverPath)
+        server = new HttpJettySolrClient.Builder(serverPath)
                 .build();
         this.numRec = numRec;
         this.batchSize = batchSize;

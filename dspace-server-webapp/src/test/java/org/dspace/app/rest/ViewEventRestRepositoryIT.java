@@ -18,7 +18,7 @@ import java.util.UUID;
 import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.rest.model.ViewEventRest;
