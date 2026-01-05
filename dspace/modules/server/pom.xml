@@ -332,13 +332,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Jetty 10 IO required by Solr 9's EmbeddedSolrServer (provides MappedByteBufferPool) -->
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-io</artifactId>
-            <version>10.0.26</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analysis-icu</artifactId>

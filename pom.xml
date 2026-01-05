@@ -23,11 +23,16 @@
         <spring-boot.version>4.0.1</spring-boot.version>
         <spring-security.version>7.0.2</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>7.1.13.Final</hibernate.version>
-        <hibernate-validator.version>8.0.3.Final</hibernate-validator.version>
+        <hibernate-validator.version>9.1.0.Final</hibernate-validator.version>
+        <expressly.version>6.0.0</expressly.version>
         <postgresql.driver.version>42.7.8</postgresql.driver.version>
         <flyway.version>10.22.0</flyway.version>
-        <solr.client.version>9.10.0</solr.client.version>
-        <lucene.version>9.12.3</lucene.version>
+        <!-- Solr 10.1.0 from Jenkins CI build - manually installed to local Maven repo
+             TODO: Update to official Solr 10.x release when available -->
+        <solr.client.version>10.1.0-JENKINS</solr.client.version>
+        <lucene.version>10.3.2</lucene.version>
+        <!-- ZooKeeper version matching Solr 10.1.0 -->
+        <zookeeper.version>3.9.4</zookeeper.version>
 
         <ehcache.version>3.11.1</ehcache.version>
         <errorprone.version>2.42.0</errorprone.version>
@@ -1159,6 +1164,13 @@
                 <version>${hibernate-validator.version}</version>
             </dependency>
 
+            <!-- Jakarta Expression Language implementation required by Hibernate Validator 9.x -->
+            <dependency>
+                <groupId>org.glassfish.expressly</groupId>
+                <artifactId>expressly</artifactId>
+                <version>${expressly.version}</version>
+            </dependency>
+
             <!-- Hibernate introduces multiple versions of jboss-logging. So, specify version we want -->
             <dependency>
                 <groupId>org.jboss.logging</groupId>
@@ -1299,6 +1311,29 @@
                         <artifactId>log4j-slf4j-impl</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <!-- solr-api is a new module in Solr 10.x containing core API classes -->
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-api</artifactId>
+                <version>${solr.client.version}</version>
+            </dependency>
+            <!-- solr-solrj-zookeeper is a separate module in Solr 10.x for ZooKeeper support -->
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-solrj-zookeeper</artifactId>
+                <version>${solr.client.version}</version>
+            </dependency>
+            <!-- ZooKeeper dependencies required by Solr 10.x -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>${zookeeper.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper-jute</artifactId>
+                <version>${zookeeper.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
@@ -1662,11 +1697,11 @@
                 <version>1.4.01</version>
             </dependency>
 
-            <!-- Keep icu4j synced with version used by lucene-analysis-icu (Solr 9.x) -->
+            <!-- Keep icu4j synced with version used by lucene-analysis-icu (Lucene 10.x / Solr 10.x) -->
             <dependency>
                 <groupId>com.ibm.icu</groupId>
                 <artifactId>icu4j</artifactId>
-                <version>62.2</version>
+                <version>77.1</version>
             </dependency>
             <!-- Codebase at https://github.com/DSpace/oclc-harvester2 -->
             <dependency>
@@ -1830,7 +1865,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.18.0</version>
+                <version>${jackson-annotations.version}</version>
             </dependency>
             <dependency>
                 <groupId>tools.jackson.core</groupId>
@@ -2036,6 +2071,19 @@
             <url>https://handle.net/maven</url>
             <snapshots>
                 <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <!-- Apache Snapshot Repository for Solr 10.0.0-SNAPSHOT
+             NOTE: Track Solr 10 GA release progress and update to stable version before DSpace 10 release (May/June 2026) -->
+        <repository>
+            <id>apache.snapshots</id>
+            <name>Apache Snapshot Repository</name>
+            <url>https://repository.apache.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
             </snapshots>
         </repository>
     </repositories>

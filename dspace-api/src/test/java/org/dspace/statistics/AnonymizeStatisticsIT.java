@@ -20,7 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;

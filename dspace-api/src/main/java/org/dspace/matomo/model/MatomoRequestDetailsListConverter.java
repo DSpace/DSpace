@@ -7,7 +7,6 @@
  */
 package org.dspace.matomo.model;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -25,7 +24,8 @@ import tools.jackson.databind.ValueSerializer;
  *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
-public class MatomoRequestDetailsListConverter<T extends Collection<MatomoRequestDetails>> extends ValueSerializer<T> {
+public class MatomoRequestDetailsListConverter<T extends Collection<MatomoRequestDetails>>
+        extends ValueSerializer<T> {
 
     private static final Logger log = LogManager.getLogger(MatomoRequestDetailsListConverter.class);
     // each request will be mapped to: ?parameter1=value1&parameter2=value2

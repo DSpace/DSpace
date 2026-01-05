@@ -124,6 +124,13 @@ public class Context implements AutoCloseable {
      */
     private final ContextReadOnlyCache readOnlyCache = new ContextReadOnlyCache();
 
+    /**
+     * Track entity UUIDs that have been deleted in this context.
+     * In Hibernate 7, session.get() may return deleted entities from the persistence context
+     * even after they've been removed. This Set allows us to filter them out.
+     */
+    private final Set<UUID> deletedEntityIds = new HashSet<>();
+
     protected EventService eventService;
 
     private DBConnection dbConnection;
@@ -690,6 +697,37 @@ public class Context implements AutoCloseable {
         }
 
         return myGroups;
+    }
+
+    /**
+     * Mark an entity UUID as deleted in this context.
+     * This is used to track deleted entities for Hibernate 7 compatibility,
+     * where session.get() may return deleted entities from the persistence context.
+     *
+     * @param entityId the UUID of the deleted entity
+     */
+    public void markEntityDeleted(UUID entityId) {
+        if (entityId != null) {
+            deletedEntityIds.add(entityId);
+        }
+    }
+
+    /**
+     * Check if an entity UUID has been marked as deleted in this context.
+     *
+     * @param entityId the UUID to check
+     * @return true if the entity was deleted in this context, false otherwise
+     */
+    public boolean isEntityDeleted(UUID entityId) {
+        return entityId != null && deletedEntityIds.contains(entityId);
+    }
+
+    /**
+     * Clear the set of deleted entity IDs.
+     * This should be called after a successful commit.
+     */
+    public void clearDeletedEntityIds() {
+        deletedEntityIds.clear();
     }
 
     /**

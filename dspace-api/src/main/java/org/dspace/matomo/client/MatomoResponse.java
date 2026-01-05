@@ -14,8 +14,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
-record MatomoResponse(String status, int tracked, int invalid, @JsonProperty("invalid_indices") int[] invalidIndices) {
+record MatomoResponse(String status, Integer tracked, Integer invalid, @JsonProperty("invalid_indices") int[] invalidIndices) {
 
     public static final String SUCCESS = "success";
+
+    /**
+     * Provides default value of 0 for null tracked count.
+     * @return tracked count or 0 if null
+     */
+    public int trackedCount() {
+        return tracked != null ? tracked : 0;
+    }
+
+    /**
+     * Provides default value of 0 for null invalid count.
+     * @return invalid count or 0 if null
+     */
+    public int invalidCount() {
+        return invalid != null ? invalid : 0;
+    }
 
 }

@@ -28,7 +28,7 @@ public class MatomoResponseReader {
      * @return
      */
     MatomoResponse fromJSON(String response) {
-        if (response == null) {
+        if (response == null || response.isEmpty()) {
             return null;
         }
         try {

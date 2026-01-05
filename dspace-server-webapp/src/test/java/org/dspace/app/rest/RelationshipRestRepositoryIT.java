@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.Strings;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.RelationshipMatcher;

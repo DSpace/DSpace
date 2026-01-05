@@ -20,6 +20,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.apache.commons.lang3.tuple.Pair;
+import org.hibernate.Session;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -41,12 +42,22 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
 
     @Override
     public Set<Pair<UUID, UUID>> getCache(Context context) throws SQLException {
-        Query query = createQuery(
-            context,
-            "SELECT new org.apache.commons.lang3.tuple.ImmutablePair(g.parent.id, g.child.id) FROM Group2GroupCache g"
-        );
-        List<Pair<UUID, UUID>> results = query.getResultList();
-        return new HashSet<Pair<UUID, UUID>>(results);
+        // In Hibernate 7, we need to use a native SQL query to avoid auto-flush issues.
+        // This is needed because during group deletion, Group2GroupCache entries
+        // may reference deleted (transient) Group entities, which would cause
+        // TransientPropertyValueException during auto-flush of HQL queries.
+        @SuppressWarnings("unchecked")
+        List<Object[]> results = getHibernateSession(context)
+            .createNativeQuery("SELECT CAST(parent_id AS VARCHAR), CAST(child_id AS VARCHAR) FROM group2groupcache")
+            .getResultList();
+
+        Set<Pair<UUID, UUID>> cache = new HashSet<>();
+        for (Object[] row : results) {
+            UUID parentId = UUID.fromString((String) row[0]);
+            UUID childId = UUID.fromString((String) row[1]);
+            cache.add(Pair.of(parentId, childId));
+        }
+        return cache;
     }
 
     @Override
@@ -102,7 +113,22 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
 
     @Override
     public void deleteAll(Context context) throws SQLException {
-        createQuery(context, "delete from Group2GroupCache").executeUpdate();
+        Session session = getHibernateSession(context);
+
+        // In Hibernate 7, we need to clear the session to avoid TransientPropertyValueException
+        // during auto-flush. The problem is that Group2GroupCache entities have EAGER ManyToOne
+        // relationships to Group, and if a Group has been deleted (now transient), any auto-flush
+        // will fail with "references an unsaved transient instance".
+        //
+        // We use session.clear() to detach all entities from the session, then delete via native SQL.
+        // This is safe because we're deleting ALL rows from the cache table anyway.
+        session.clear();
+
+        // Clear second-level cache for Group2GroupCache
+        session.getSessionFactory().getCache().evictEntityData(Group2GroupCache.class);
+
+        // Use native SQL query to delete from database
+        session.createNativeQuery("DELETE FROM group2groupcache").executeUpdate();
     }
 
     @Override

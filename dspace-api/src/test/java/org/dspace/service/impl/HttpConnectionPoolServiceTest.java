@@ -25,24 +25,26 @@ import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockserver.client.MockServerClient;
-import org.mockserver.junit.MockServerRule;
+import org.mockserver.junit.jupiter.MockServerExtension;
 
 /**
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
+@ExtendWith(MockServerExtension.class)
 public class HttpConnectionPoolServiceTest
         extends AbstractDSpaceTest {
     private static ConfigurationService configurationService;
 
-    @Rule
-    public MockServerRule mockServerRule = new MockServerRule(this);
+    private final MockServerClient mockServerClient;
 
-    private MockServerClient mockServerClient;
+    public HttpConnectionPoolServiceTest(MockServerClient mockServerClient) {
+        this.mockServerClient = mockServerClient;
+    }
 
     @BeforeAll
     public static void initClass() {

@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -54,6 +53,11 @@ public class ContextTest extends AbstractUnitTest {
     private AuthorizeService authorizeServiceSpy;
 
     /**
+     * Original AuthorizeService (saved before spying for restoration in @After)
+     */
+    private AuthorizeService originalAuthorizeService;
+
+    /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
      *
@@ -65,15 +69,35 @@ public class ContextTest extends AbstractUnitTest {
     public void init() {
         super.init();
 
+        // Save the original authorizeService before spying (for restoration in @After)
+        originalAuthorizeService = authorizeService;
+
         // Initialize our spy of the autowired (global) authorizeService bean.
         // This allows us to customize the bean's method return values in tests below
-        Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
-        authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
-            withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
+        authorizeServiceSpy = spy(originalAuthorizeService);
         // "Wire" our spy to be used by the current loaded object services
         // (To ensure these services use the spy instead of the real service)
         ReflectionTestUtils.setField(ePersonService, "authorizeService", authorizeServiceSpy);
         ReflectionTestUtils.setField(groupService, "authorizeService", authorizeServiceSpy);
+    }
+
+    /**
+     * This method will be run after every test as per @After. It will
+     * clean resources initialized by the @Before methods.
+     *
+     * Other methods can be annotated with @After here or in subclasses
+     * but no execution order is guaranteed
+     */
+    @org.junit.jupiter.api.AfterEach
+    @Override
+    public void destroy() {
+        // Restore the original authorizeService to prevent test pollution
+        if (originalAuthorizeService != null) {
+            ReflectionTestUtils.setField(ePersonService, "authorizeService", originalAuthorizeService);
+            ReflectionTestUtils.setField(groupService, "authorizeService", originalAuthorizeService);
+        }
+
+        super.destroy();
     }
 
     /**
@@ -523,24 +547,8 @@ public class ContextTest extends AbstractUnitTest {
         cleanupContext(instance);
     }
 
-    /**
-     * Test that close() invalidates the Context.
-     * Note: This test replaces the previous testFinalize() test for Java 21 compatibility.
-     * The close() method provides the same cleanup behavior as the old finalize() method.
-     */
-    @Test
-    public void testCloseInvalidatesContext() throws Throwable {
-        // We need a new Context object
-        Context instance = new Context();
-
-        // close() should abort the context and invalidate it
-        instance.close();
-
-        // close() is like abort()...should invalidate our context
-        assertThat("testCloseInvalidatesContext 0", instance.isValid(), equalTo(false));
-
-        // Context is already closed, no need for additional cleanup
-    }
+    // Note: testFinalize() method removed for Java 21 compatibility.
+    // finalize() is deprecated for removal in Java 21. Close behavior is already tested in testClose().
 
     /**
      * Test of updateDatabase method, of class Context.

@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -78,6 +77,11 @@ public class MetadataFieldTest extends AbstractUnitTest {
     private AuthorizeService authorizeServiceSpy;
 
     /**
+     * Original AuthorizeService (saved before spying for restoration in @After)
+     */
+    private AuthorizeService originalAuthorizeService;
+
+    /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
      *
@@ -102,11 +106,12 @@ public class MetadataFieldTest extends AbstractUnitTest {
 
             this.mf.setScopeNote(scopeNote);
 
+            // Save the original authorizeService before spying (for restoration in @After)
+            originalAuthorizeService = authorizeService;
+
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
-            Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
-            authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
-                withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
+            authorizeServiceSpy = spy(originalAuthorizeService);
             // "Wire" our spy to be used by the current loaded object services
             // (To ensure these services use the spy instead of the real service)
             ReflectionTestUtils.setField(metadataFieldService, "authorizeService", authorizeServiceSpy);
@@ -134,6 +139,13 @@ public class MetadataFieldTest extends AbstractUnitTest {
     @Override
     public void destroy() {
         mf = null;
+
+        // Restore the original authorizeService to prevent test pollution
+        if (originalAuthorizeService != null) {
+            ReflectionTestUtils.setField(metadataFieldService, "authorizeService", originalAuthorizeService);
+            ReflectionTestUtils.setField(metadataSchemaService, "authorizeService", originalAuthorizeService);
+        }
+
         super.destroy();
     }
 
