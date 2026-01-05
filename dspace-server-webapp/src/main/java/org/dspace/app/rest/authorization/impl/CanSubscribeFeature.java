@@ -21,6 +21,7 @@ import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,10 +41,19 @@ public class CanSubscribeFeature implements AuthorizationFeature {
     private Utils utils;
     @Autowired
     private AuthorizeService authorizeService;
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Override
     @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
+        boolean isEnabled = configurationService
+            .getBooleanProperty("can-subscribe-feature.enable", true);
+
+        if (!isEnabled) {
+            return false;
+        }
+
         if (Objects.isNull(context.getCurrentUser())) {
             return false;
         }
