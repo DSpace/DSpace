@@ -9,9 +9,8 @@ package org.dspace.app.customurl.consumer;
 
 import static org.apache.commons.lang3.ArrayUtils.contains;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.normalizeSpace;
-import static org.apache.commons.lang3.StringUtils.stripAccents;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +32,7 @@ import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
+import org.dspace.versioning.VersionHistoryServiceImpl;
 
 /**
  * Consumer that automatically generates and assigns custom URLs to DSpace items
@@ -74,16 +74,6 @@ public class CustomUrlConsumer implements Consumer {
     private static final String METADATA_FIELD_SEPARATOR = ";";
 
     /**
-     * Character used to replace spaces in generated URLs
-     */
-    private static final String URL_SPACE_REPLACEMENT = "-";
-
-    /**
-     * Regex pattern for characters to remove from URLs
-     */
-    private static final String INVALID_URL_CHARS_REGEX = "[^a-z0-9 ,]";
-
-    /**
      * Set to track items already processed in current transaction to avoid duplicates
      */
     private final Set<Item> itemsAlreadyProcessed = new HashSet<>();
@@ -91,6 +81,7 @@ public class CustomUrlConsumer implements Consumer {
     private ItemService itemService;
     private CustomUrlService customUrlService;
     private ConfigurationService configurationService;
+    private VersionHistoryServiceImpl versionHistoryService;
 
     /**
      * Initializes the consumer by setting up required services.
@@ -102,6 +93,7 @@ public class CustomUrlConsumer implements Consumer {
         this.itemService = ContentServiceFactory.getInstance().getItemService();
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.customUrlService = new DSpace().getSingletonService(CustomUrlService.class);
+        this.versionHistoryService = new DSpace().getSingletonService(VersionHistoryServiceImpl.class);
     }
 
     /**
@@ -127,7 +119,7 @@ public class CustomUrlConsumer implements Consumer {
     public void consume(Context context, Event event) throws Exception {
         Item item = (Item) event.getSubject(context);
 
-        if (!shouldProcessItem(item)) {
+        if (!shouldProcessItem(item) || !isItemLastVersion(context, item)) {
             return;
         }
 
@@ -139,6 +131,17 @@ public class CustomUrlConsumer implements Consumer {
         } finally {
             context.restoreAuthSystemState();
         }
+    }
+
+    /**
+     * Checks whether the specified item is the latest version in its version history.
+     *
+     * @param context DSpace context
+     * @param item    the item to check
+     * @return true if the item is the last version, false otherwise
+     */
+    private boolean isItemLastVersion(Context context, Item item) throws SQLException {
+        return versionHistoryService.isLastVersion(context, item);
     }
 
     /**
@@ -247,22 +250,11 @@ public class CustomUrlConsumer implements Consumer {
             return Optional.empty();
         }
 
-        String normalizedUrl = normalizeForUrl(concatenatedValues);
-        if (isBlank(normalizedUrl)) {
-            log.debug("Cannot generate custom URL for item {} - normalized URL is empty after removing "
-                          + "invalid characters", item.getID());
-            return Optional.empty();
-        }
-
         // Check if the generated URL already exists and generate a progressive version if needed
-        String finalUrl = generateUniqueCustomUrl(context, normalizedUrl);
+        String finalUrl = customUrlService.generateUniqueCustomUrl(context, concatenatedValues);
 
         log.debug("Generated custom URL '{}' for item {}", finalUrl, item.getID());
         return Optional.of(finalUrl);
-    }
-
-    private String generateUniqueCustomUrl(Context context, String baseUrl) {
-        return customUrlService.generateUniqueCustomUrl(context, baseUrl);
     }
 
     /**
@@ -318,26 +310,7 @@ public class CustomUrlConsumer implements Consumer {
         customUrlService.replaceCustomUrl(context, item, customUrl);
     }
 
-    /**
-     * Normalizes a string for use as a URL by removing accents, converting to lowercase,
-     * removing invalid characters, and replacing spaces with hyphens.
-     *
-     * @param text the text to normalize
-     * @return normalized text suitable for use in URLs
-     */
-    private String normalizeForUrl(String text) {
-        // Remove accents and convert to lowercase
-        String normalized = stripAccents(text).toLowerCase();
 
-        // Remove invalid characters (keep only letters, numbers, spaces, and commas)
-        normalized = normalized.replaceAll(INVALID_URL_CHARS_REGEX, "");
-
-        // Replace commas with spaces
-        normalized = normalized.replaceAll(",", " ");
-
-        // Normalize whitespace and replace with hyphens
-        return normalizeSpace(normalized).replaceAll(" ", URL_SPACE_REPLACEMENT);
-    }
 
     /**
      * Gets the array of supported entity types from configuration.

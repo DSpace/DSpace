@@ -11,6 +11,7 @@ import static java.util.Optional.ofNullable;
 import static org.dspace.content.Item.ANY;
 
 import java.sql.SQLException;
+import java.text.Normalizer;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -47,6 +48,7 @@ public class CustomUrlServiceImpl implements CustomUrlService {
 
     // Pre-compiled regex pattern for performance
     private static final String NUMERIC_SUFFIX_PATTERN = "-(\\d+)$";
+
 
     @Autowired
     private ItemService itemService;
@@ -175,18 +177,58 @@ public class CustomUrlServiceImpl implements CustomUrlService {
     }
 
     @Override
-    public String generateUniqueCustomUrl(Context context, String baseUrl) {
-        if (StringUtils.isBlank(baseUrl)) {
-            throw new IllegalArgumentException("Base URL cannot be null or empty");
+    public String generateUniqueCustomUrl(Context context, String rawInput) {
+
+        if (StringUtils.isBlank(rawInput)) {
+            throw new IllegalArgumentException("Input for custom URL generation cannot be null or empty");
         }
 
-        // Check if the base URL is available
-        if (!customUrlExists(context, baseUrl)) {
-            return baseUrl;
+        String cleanBase = normalizeUrl(rawInput);
+        if (StringUtils.isBlank(cleanBase)) {
+            throw new IllegalArgumentException("Input '" + rawInput + "' does not contain any valid " +
+                                                   "alphanumeric characters to generate a URL");
         }
 
-        // Find the next available URL with numeric suffix
-        return findNextAvailableUrl(context, baseUrl);
+        if (!customUrlExists(context, cleanBase)) {
+            return cleanBase;
+        }
+
+        return findNextAvailableUrl(context, cleanBase);
+    }
+
+    /**
+     * Normalizes a given string into a URL-friendly "slug".
+     * <p>
+     * The normalization process follows these steps:
+     * <ul>
+     * <li>Decomposes Unicode characters to remove accents (e.g., "é" becomes "e").</li>
+     * <li>Converts the entire string to lowercase.</li>
+     * <li>Replaces all sequences of non-alphanumeric characters with a single hyphen.</li>
+     * <li>Trims leading and trailing hyphens.</li>
+     * </ul>
+     * </p>
+     * * @param text the raw string to be normalized (e.g., an Item title or metadata value).
+     *
+     * @return a sanitized, lowercase, hyphenated string suitable for use in a URL,
+     * or an empty string if the input is {@code null} or blank.
+     */
+    private String normalizeUrl(String text) {
+        if (StringUtils.isBlank(text)) {
+            return "";
+        }
+
+        // 1. Remove accents (Normalize Unicode to ASCII)
+        String normalized = Normalizer.normalize(text, Normalizer.Form.NFD);
+        normalized = normalized.replaceAll("\\p{InCombiningDiacriticalMarks}", "");
+
+        // 2. Lowercase and replace anything NOT alphanumeric with a dash
+        normalized = normalized.toLowerCase()
+                               .replaceAll("[^a-z0-9]+", "-");
+
+        // 3. Remove leading/trailing dashes that might result from step 2
+        normalized = normalized.replaceAll("^-|-$", "");
+
+        return normalized;
     }
 
     /**
@@ -296,26 +338,23 @@ public class CustomUrlServiceImpl implements CustomUrlService {
      * @return the next available URL with numeric suffix
      */
     private String findNextAvailableUrl(Context context, String baseUrl) {
-        Optional<String> latestUrl = findLatestCustomUrlByPattern(context, baseUrl);
+        Optional<String> latest = findLatestCustomUrlByPattern(context, baseUrl);
 
-        if (latestUrl.isEmpty()) {
-            return baseUrl + "-1";
-        }
-
-        String latest = latestUrl.get();
-
-        // If the latest is the base URL itself, start with -1
-        if (latest.equals(baseUrl)) {
+        // If no latest URL found, or the match is exactly the base, start at -1
+        if (latest.isEmpty() || latest.get().equals(baseUrl)) {
             return baseUrl + "-1";
         }
 
         // Extract and increment the numeric suffix
         Pattern pattern = Pattern.compile(Pattern.quote(baseUrl) + NUMERIC_SUFFIX_PATTERN);
-        Matcher matcher = pattern.matcher(latest);
+        Matcher matcher = pattern.matcher(latest.get());
 
         if (matcher.matches()) {
             try {
                 int currentNumber = Integer.parseInt(matcher.group(1));
+                if (currentNumber == Integer.MAX_VALUE) {
+                    throw new IllegalStateException("No more custom URLs available for base: " + baseUrl);
+                }
                 return baseUrl + "-" + (currentNumber + 1);
             } catch (NumberFormatException e) {
                 LOGGER.warn("Invalid numeric suffix in URL: {}", latest);

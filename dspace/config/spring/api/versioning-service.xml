@@ -20,7 +20,6 @@
            <bean class="org.dspace.versioning.DefaultItemVersionProvider">
                <property name="ignoredMetadataFields">
                    <set>
-                       <value>dspace.customurl</value>
                        <value>dc.date.accessioned</value>
                        <value>dc.description.provenance</value>
                    </set>

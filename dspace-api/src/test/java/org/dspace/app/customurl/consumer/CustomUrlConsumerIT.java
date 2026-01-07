@@ -16,7 +16,6 @@ import static org.hamcrest.Matchers.hasSize;
 import java.sql.SQLException;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
-import org.dspace.app.customurl.CustomUrlService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -32,7 +31,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,8 +47,6 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
                                                                                    .getConfigurationService();
 
     private final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-
-    private final CustomUrlService customUrlService = new DSpace().getSingletonService(CustomUrlService.class);
 
     private final InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
 
@@ -473,8 +469,12 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
         // The versioned item will have the same title, so it should get the same custom URL
         versionedItem = context.reloadEntity(versionedItem);
 
-        // Verify the versioned item got the same custom URL (this exposes the duplicate URL problem)
-        assertThat(versionedItem.getMetadata(), hasItem(with("dspace.customurl", "advanced-algorithms-study-1")));
+        // Verify the versioned item got the same custom URL
+        assertThat(versionedItem.getMetadata(), hasItem(with("dspace.customurl", "advanced-algorithms-study")));
+        // Verify the original item got the old custom URL
+        assertThat(originalItem.getMetadata(), hasItem(with("dspace.customurl.old", "advanced-algorithms-study")));
+        // Verify the original item does not contain the custom URL
+        assertThat(itemService.getMetadataByMetadataString(originalItem, "dspace.customurl"), empty());
 
     }
 
