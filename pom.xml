@@ -1850,7 +1850,7 @@
                 <artifactId>jakarta.annotation-api</artifactId>
                 <version>${jakarta-annotation.version}</version>
             </dependency>
-            <!-- Dependencies to add OpenAPI support for the REST API -->
+            <!-- The following dependencies work together to provide OpenAPI support for the REST API -->
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
