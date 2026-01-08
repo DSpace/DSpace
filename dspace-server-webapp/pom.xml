@@ -349,7 +349,12 @@
             </exclusions>
         </dependency>
 
-        <!-- The following dependencies provide OpenAPI support for the REST API -->
+        <!-- The following dependencies are required to add OpenAPI support for the REST API -->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.4</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
