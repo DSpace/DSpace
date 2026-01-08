@@ -1847,6 +1847,7 @@
                 <artifactId>jakarta.annotation-api</artifactId>
                 <version>${jakarta-annotation.version}</version>
             </dependency>
+
             <!-- The following dependency provides OpenAPI support for the REST API -->
             <dependency>
                 <groupId>org.springdoc</groupId>
