@@ -1872,6 +1872,7 @@
                 <artifactId>swagger-core-jakarta</artifactId>
                 <version>${swagger.version}</version>
                 <exclusions>
+                    <!-- Exclude snakeyaml as a newer version is brought in by Spring Boot -->
                     <exclusion>
                         <groupId>org.yaml</groupId>
                         <artifactId>snakeyaml</artifactId>

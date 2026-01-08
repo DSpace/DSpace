@@ -364,10 +364,12 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <exclusions>
+                <!-- Exclude spring-boot-autoconfigure as another version is brought in by Spring Boot -->
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-autoconfigure</artifactId>
                 </exclusion>
+                <!-- Exclude spring-boot-starter-validation as another version is brought in by Spring Boot -->
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-validation</artifactId>
