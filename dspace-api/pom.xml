@@ -760,6 +760,11 @@
                     <groupId>org.yaml</groupId>
                     <artifactId>snakeyaml</artifactId>
                 </exclusion>
+                <!-- Exclude jackson-jakarta-rs-json-provider as a newer version is brought in by Swagger -->
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+                    <artifactId>jackson-jakarta-rs-json-provider</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
