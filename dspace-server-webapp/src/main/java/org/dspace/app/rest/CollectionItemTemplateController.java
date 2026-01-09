@@ -64,6 +64,9 @@ public class CollectionItemTemplateController {
     @Autowired
     private ConverterService converter;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     /**
      * This method will create an Item and add it as a template to a Collection.
      *
@@ -114,7 +117,6 @@ public class CollectionItemTemplateController {
 
         TemplateItemRest inputTemplateItemRest;
         try {
-            ObjectMapper mapper = new ObjectMapper();
             inputTemplateItemRest = mapper.readValue(itemBody.toString(), TemplateItemRest.class);
         } catch (IOException e1) {
             throw new UnprocessableEntityException("Error parsing request body", e1);

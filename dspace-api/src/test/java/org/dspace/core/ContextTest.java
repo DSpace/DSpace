@@ -558,4 +558,29 @@ public class ContextTest extends AbstractUnitTest {
         cleanupContext(instance);
     }
 
+    @Test
+    public void testUncacheEntities() throws Throwable {
+        // To set up the test, ensure the cache contains more than the current user entity
+        groupService.findByName(context, Group.ANONYMOUS);
+        assertTrue("Cache size should be greater than one", context.getDBConnection().getCacheSize() > 1);
+
+        context.uncacheEntities();
+
+        assertThat("Cache size should be one (current user)", context.getDBConnection().getCacheSize(), equalTo(1L));
+        context.reloadEntity(context.getCurrentUser());
+        assertThat("Cache should only contain the current user", context.getDBConnection().getCacheSize(), equalTo(1L));
+    }
+
+    @Test
+    public void testUncacheEntity() throws Throwable {
+        // Remember the cache size after loading an entity
+        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        long oldCacheSize = context.getDBConnection().getCacheSize();
+
+        // Uncache the entity
+        context.uncacheEntity(group);
+
+        long newCacheSize = context.getDBConnection().getCacheSize();
+        assertThat("Cache size should be reduced by one", newCacheSize, equalTo(oldCacheSize - 1));
+    }
 }

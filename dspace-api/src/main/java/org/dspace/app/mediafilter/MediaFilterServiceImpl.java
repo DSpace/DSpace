@@ -13,14 +13,13 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.mediafilter.service.MediaFilterService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -128,7 +127,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             Iterator<Item> itemIterator =
                     itemService.findByLastModifiedSince(
                             context,
-                            Date.from(fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                            fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
                     );
             while (itemIterator.hasNext() && processed < max2Process) {
                 applyFiltersItem(context, itemIterator.next());
@@ -461,7 +460,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                       .flatMap(bundle ->
                           bundle.getBitstreams().stream())
                       .filter(bitstream ->
-                          StringUtils.equals(bitstream.getName().trim(), bitstreamName.trim()))
+                          Strings.CS.equals(bitstream.getName().trim(), bitstreamName.trim()))
                       .collect(Collectors.toList());
     }
 

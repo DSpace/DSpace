@@ -14,6 +14,7 @@ import java.util.Arrays;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.health.GeoIpHealthIndicator;
+import org.dspace.app.rest.health.SEOHealthIndicator;
 import org.dspace.app.rest.health.SolrHealthIndicator;
 import org.dspace.authority.AuthoritySolrServiceImpl;
 import org.dspace.discovery.SolrSearchCore;
@@ -80,6 +81,12 @@ public class ActuatorConfiguration {
     public SolrHealthIndicator solrOaiCoreHealthIndicator(SolrServerResolver solrServerResolver)
         throws SolrServerException {
         return new SolrHealthIndicator(solrServerResolver.getServer());
+    }
+
+    @Bean
+    @ConditionalOnEnabledHealthIndicator("seo")
+    public SEOHealthIndicator seoHealthIndicator() {
+        return new SEOHealthIndicator();
     }
 
     @Bean

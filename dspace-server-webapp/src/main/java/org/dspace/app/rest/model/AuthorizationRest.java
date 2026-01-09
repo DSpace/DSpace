@@ -18,9 +18,9 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(method = "getEperson", name = AuthorizationRest.EPERSON),
-        @LinkRest(method = "getFeature", name = AuthorizationRest.FEATURE),
-        @LinkRest(method = "getObject", name = AuthorizationRest.OBJECT)
+    @LinkRest(method = "getEperson", name = AuthorizationRest.EPERSON),
+    @LinkRest(method = "getFeature", name = AuthorizationRest.FEATURE),
+    @LinkRest(method = "getObject", name = AuthorizationRest.OBJECT)
 })
 public class AuthorizationRest extends BaseObjectRest<String> {
     public static final String NAME = "authorization";

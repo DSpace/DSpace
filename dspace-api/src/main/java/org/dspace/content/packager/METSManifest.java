@@ -20,6 +20,7 @@ import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -209,7 +210,7 @@ public class METSManifest {
             //  mets.xsd.dc =  http://purl.org/dc/elements/1.1/ dc.xsd
             // (filename is relative to {dspace_dir}/config/schemas/)
             String spec = configurationService.getProperty(key);
-            String val[] = spec.trim().split("\\s+");
+            String[] val = spec.trim().split("\\s+");
             if (val.length == 2) {
                 File xsd = new File(xsdPath1, val[1]);
                 if (!xsd.exists()) {
@@ -220,7 +221,7 @@ public class METSManifest {
                 } else {
                     try {
                         String u = xsd.toURI().toURL().toString();
-                        if (result.length() > 0) {
+                        if (!result.isEmpty()) {
                             result.append(" ");
                         }
                         result.append(val[0]).append(" ").append(u);
@@ -265,12 +266,13 @@ public class METSManifest {
     public static METSManifest create(InputStream is, boolean validate, String configName)
         throws IOException,
         MetadataValidationException {
-        SAXBuilder builder = new SAXBuilder(validate);
 
+        SAXBuilder builder = XMLUtils.getSAXBuilder();
         builder.setIgnoringElementContentWhitespace(true);
 
         // Set validation feature
         if (validate) {
+            builder.setValidation(true);
             builder.setFeature("http://apache.org/xml/features/validation/schema", true);
 
             // Tell the parser where local copies of schemas are, to speed up
@@ -278,10 +280,6 @@ public class METSManifest {
             if (localSchemas.length() > 0) {
                 builder.setProperty("http://apache.org/xml/properties/schema/external-schemaLocation", localSchemas);
             }
-        } else {
-            // disallow DTD parsing to ensure no XXE attacks can occur.
-            // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
-            builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         }
 
         // Parse the METS file
@@ -653,7 +651,7 @@ public class METSManifest {
 
                         String mimeType = mdWrap.getAttributeValue("MIMETYPE");
                         if (mimeType != null && mimeType.equalsIgnoreCase("text/xml")) {
-                            byte value[] = Base64.decodeBase64(bin.getText().getBytes(StandardCharsets.UTF_8));
+                            byte[] value = Base64.decodeBase64(bin.getText().getBytes(StandardCharsets.UTF_8));
                             Document mdd = parser.build(new ByteArrayInputStream(value));
                             List<Element> result = new ArrayList<>(1);
                             result.add(mdd.getRootElement());
@@ -721,7 +719,7 @@ public class METSManifest {
                     throw new MetadataValidationException(
                         "Invalid METS Manifest: mdWrap element with neither xmlData nor binData child.");
                 } else {
-                    byte value[] = Base64.decodeBase64(bin.getText().getBytes(StandardCharsets.UTF_8));
+                    byte[] value = Base64.decodeBase64(bin.getText().getBytes(StandardCharsets.UTF_8));
                     return new ByteArrayInputStream(value);
                 }
             } else {
@@ -952,8 +950,8 @@ public class METSManifest {
     public Element[] getDmdElements(String dmdList)
         throws MetadataValidationException {
         if (dmdList != null && !dmdList.isEmpty()) {
-            String dmdID[] = dmdList.split("\\s+");
-            Element result[] = new Element[dmdID.length];
+            String[] dmdID = dmdList.split("\\s+");
+            Element[] result = new Element[dmdID.length];
 
             for (int i = 0; i < dmdID.length; ++i) {
                 result[i] = getElementByXPath("mets:dmdSec[@ID=\"" + dmdID[i] + "\"]", false);
@@ -982,7 +980,7 @@ public class METSManifest {
             }
             return new Element[0];
         }
-        String amdID[] = amds.split("\\s+");
+        String[] amdID = amds.split("\\s+");
         List<Element> resultList = new ArrayList<>();
         for (int i = 0; i < amdID.length; ++i) {
             List rmds = getElementByXPath("mets:amdSec[@ID=\"" + amdID[i] + "\"]", false).
@@ -1169,7 +1167,7 @@ public class METSManifest {
                                     "Invalid METS Manifest: mdWrap element for streaming crosswalk without binData " +
                                         "child.");
                             } else {
-                                byte value[] = Base64.decodeBase64(bin.getText().getBytes(StandardCharsets.UTF_8));
+                                byte[] value = Base64.decodeBase64(bin.getText().getBytes(StandardCharsets.UTF_8));
                                 sxwalk.ingest(context, dso,
                                               new ByteArrayInputStream(value),
                                               mdWrap.getAttributeValue("MIMETYPE"));
@@ -1230,7 +1228,7 @@ public class METSManifest {
             log.warn("Got no bitstream ADMID, file@ID=" + fileId);
             return;
         }
-        String amdID[] = amds.split("\\s+");
+        String[] amdID = amds.split("\\s+");
         for (int i = 0; i < amdID.length; ++i) {
             Element amdSec = getElementByXPath("mets:amdSec[@ID=\"" + amdID[i] + "\"]", false);
             for (Iterator ti = amdSec.getChildren("techMD", metsNS).iterator(); ti.hasNext(); ) {
@@ -1264,7 +1262,7 @@ public class METSManifest {
             log.warn("Got no bitstream ADMID, file@ID=" + fileId);
             return;
         }
-        String amdID[] = amds.split("\\s+");
+        String[] amdID = amds.split("\\s+");
         for (int i = 0; i < amdID.length; ++i) {
             Element amdSec = getElementByXPath("mets:amdSec[@ID=\"" + amdID[i] + "\"]", false);
             for (Iterator ti = amdSec.getChildren("techMD", metsNS).iterator(); ti.hasNext(); ) {

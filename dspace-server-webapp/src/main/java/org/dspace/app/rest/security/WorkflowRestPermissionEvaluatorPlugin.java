@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.WorkflowItemRest;
@@ -67,7 +67,7 @@ public class WorkflowRestPermissionEvaluatorPlugin extends RestObjectPermissionE
         //This plugin currently only evaluates READ access
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
         if (!DSpaceRestPermission.READ.equals(restPermission)
-                || !StringUtils.equalsIgnoreCase(WorkflowItemRest.NAME, targetType)) {
+                || !Strings.CI.equals(WorkflowItemRest.NAME, targetType)) {
             return false;
         }
 

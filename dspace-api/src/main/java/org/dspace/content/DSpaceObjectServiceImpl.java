@@ -23,7 +23,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.audit.MetadataEvent;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
@@ -187,11 +189,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                                            String authority) {
         List<MetadataValue> metadata = getMetadata(dso, schema, element, qualifier, lang);
         List<MetadataValue> result = new ArrayList<>(metadata);
-        if (!authority.equals(Item.ANY)) {
+        if (!Item.ANY.equals(authority)) {
             Iterator<MetadataValue> iterator = result.iterator();
             while (iterator.hasNext()) {
                 MetadataValue metadataValue = iterator.next();
-                if (!authority.equals(metadataValue.getAuthority())) {
+                if (!Strings.CS.equals(authority, metadataValue.getAuthority())) {
                     iterator.remove();
                 }
             }
@@ -275,7 +277,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         for (int i = 0; i < values.size(); i++) {
             if (values.get(i) != null) {
                 if (authorities != null && authorities.size() >= i) {
-                    if (StringUtils.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+                    if (Strings.CS.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
                         continue;
                     }
                 }
@@ -325,7 +327,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 metadataValue.setValue(String.valueOf(dcvalue));
                 //An update here isn't needed, this is persisted upon the merge of the owning object
 //            metadataValueService.update(context, metadataValue);
-                dso.addDetails(metadataField.toString());
+                dso.addMetadataEventDetails(new MetadataEvent(metadataValue, MetadataEvent.ADD));
             }
         }
         setMetadataModified(dso);
@@ -399,6 +401,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             MetadataValue metadataValue = metadata.next();
             // If this value matches, delete it
             if (match(schema, element, qualifier, lang, metadataValue)) {
+                dso.addMetadataEventDetails(new MetadataEvent(metadataValue, MetadataEvent.REMOVE));
                 metadata.remove();
                 metadataValueService.delete(context, metadataValue);
             }
@@ -412,6 +415,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         while (metadata.hasNext()) {
             MetadataValue metadataValue = metadata.next();
             if (values.contains(metadataValue)) {
+                dso.addMetadataEventDetails(new MetadataEvent(metadataValue, MetadataEvent.REMOVE));
                 metadata.remove();
                 metadataValueService.delete(context, metadataValue);
             }
@@ -509,7 +513,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         MetadataField metadataField = metadataValue.getMetadataField();
         MetadataSchema metadataSchema = metadataField.getMetadataSchema();
         // We will attempt to disprove a match - if we can't we have a match
-        if (!element.equals(Item.ANY) && !element.equals(metadataField.getElement())) {
+        if (!Item.ANY.equals(element) && !Strings.CS.equals(element, metadataField.getElement())) {
             // Elements do not match, no wildcard
             return false;
         }
@@ -520,9 +524,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 // Value is qualified, so no match
                 return false;
             }
-        } else if (!qualifier.equals(Item.ANY)) {
+        } else if (!Item.ANY.equals(qualifier)) {
             // Not a wildcard, so qualifier must match exactly
-            if (!qualifier.equals(metadataField.getQualifier())) {
+            if (!Strings.CS.equals(qualifier, metadataField.getQualifier())) {
                 return false;
             }
         }
@@ -533,15 +537,15 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 // Value is qualified, so no match
                 return false;
             }
-        } else if (!language.equals(Item.ANY)) {
+        } else if (!Item.ANY.equals(language)) {
             // Not a wildcard, so language must match exactly
-            if (!language.equals(metadataValue.getLanguage())) {
+            if (!Strings.CS.equals(language, metadataValue.getLanguage())) {
                 return false;
             }
         }
 
-        if (!schema.equals(Item.ANY)) {
-            if (metadataSchema != null && !metadataSchema.getName().equals(schema)) {
+        if (!Item.ANY.equals(schema)) {
+            if (!Strings.CS.equals(schema, metadataSchema.getName())) {
                 // The namespace doesn't match
                 return false;
             }
@@ -655,7 +659,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     // update both the place of the metadatum and the place of the Relationship.
                     // E.g. for an Author relationship,
                     //   the place should be updated using the same principle as dc.contributor.author.
-                    StringUtils.startsWith(metadataValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)
+                    Strings.CS.startsWith(metadataValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)
                         && metadataValue instanceof RelationshipMetadataValue
                         && ((RelationshipMetadataValue) metadataValue).isUseForPlace()
                 ) {
@@ -677,7 +681,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     // This case is a leftover from when a Relationship is removed and copied to metadata.
                     // If we let its place change the order of any remaining Relationships will be affected.
                     // todo: this makes it so these leftover MDVs can't be reordered later on
-                    !StringUtils.equals(
+                    !Strings.CS.equals(
                         metadataValue.getMetadataField().getMetadataSchema().getName(), "relation"
                     )
                 ) {

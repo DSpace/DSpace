@@ -18,18 +18,9 @@ import org.dspace.app.rest.RestResourceController;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @LinksRest(links = {
-        @LinkRest(
-                name = GroupRest.SUBGROUPS,
-                method = "getGroups"
-        ),
-        @LinkRest(
-                name = GroupRest.EPERSONS,
-                method = "getMembers"
-        ),
-        @LinkRest(
-                name = GroupRest.OBJECT,
-                method = "getParentObject"
-        )
+    @LinkRest(name = GroupRest.SUBGROUPS, method = "getGroups"),
+    @LinkRest(name = GroupRest.EPERSONS, method = "getMembers"),
+    @LinkRest(name = GroupRest.OBJECT, method = "getParentObject")
 })
 public class GroupRest extends DSpaceObjectRest {
     public static final String NAME = "group";

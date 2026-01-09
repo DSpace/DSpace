@@ -12,6 +12,7 @@ import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.TestApplication;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +23,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -52,9 +52,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ContextConfiguration(initializers = { DSpaceKernelInitializer.class, DSpaceConfigurationInitializer.class })
 // Load our src/test/resources/application-test.properties to override some settings in default application.properties
 @TestPropertySource(locations = "classpath:application-test.properties")
-// Enable our custom Logging listener to log when each test method starts/stops
-@TestExecutionListeners(listeners = {LoggingTestExecutionListener.class},
-                        mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class AbstractWebClientIntegrationTest extends AbstractIntegrationTestWithDatabase {
     // (Random) port chosen for test web server
     @LocalServerPort
@@ -67,6 +64,21 @@ public class AbstractWebClientIntegrationTest extends AbstractIntegrationTestWit
     // Spring Application context
     @Autowired
     protected ApplicationContext applicationContext;
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+
+        // Because AbstractWebClientIntegrationTest starts a new webserver, we need to ensure *everything* created by
+        // the "super.setUp()" script is committed to the test database. Otherwise, the new webserver may not see the
+        // created test data in the database.
+        // NOTE: This commit() does NOT occur in AbstractIntegrationTestDatabase because it will remove newly created
+        // Hibernate entities from the current Hibernate session. For most ITs we don't want that as it may result
+        // in "could not initialize proxy - no Session" errors when using those entities in other tests (or other tests
+        // would need to reload each test entity back into the Hibernate session)
+        context.commit();
+    }
 
     /**
      * Get client TestRestTemplate for making HTTP requests to test webserver

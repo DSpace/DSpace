@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.Date;
+import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.dspace.app.rest.RestResourceController;
@@ -16,14 +16,8 @@ import org.dspace.app.rest.RestResourceController;
  * The REST object for the {@link org.dspace.versioning.Version} objects
  */
 @LinksRest(links = {
-    @LinkRest(
-        name = VersionRest.VERSION_HISTORY,
-        method = "getVersionHistory"
-    ),
-    @LinkRest(
-        name = VersionRest.ITEM,
-        method = "getVersionItem"
-    )
+    @LinkRest(name = VersionRest.VERSION_HISTORY, method = "getVersionHistory"),
+    @LinkRest(name = VersionRest.ITEM, method = "getVersionItem")
 })
 public class VersionRest extends BaseObjectRest<Integer> {
 
@@ -36,7 +30,7 @@ public class VersionRest extends BaseObjectRest<Integer> {
 
     private Integer id;
     private Integer version;
-    private Date created;
+    private Instant created;
     private String summary;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -80,7 +74,7 @@ public class VersionRest extends BaseObjectRest<Integer> {
      * Generic getter for the created
      * @return the created value of this VersionRest
      */
-    public Date getCreated() {
+    public Instant getCreated() {
         return created;
     }
 
@@ -88,7 +82,7 @@ public class VersionRest extends BaseObjectRest<Integer> {
      * Generic setter for the created
      * @param created   The created to be set on this VersionRest
      */
-    public void setCreated(Date created) {
+    public void setCreated(Instant created) {
         this.created = created;
     }
 

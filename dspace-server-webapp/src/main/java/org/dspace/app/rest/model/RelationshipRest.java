@@ -19,10 +19,7 @@ import org.dspace.app.rest.RestResourceController;
  * Refer to {@link org.dspace.content.Relationship} for explanation about the properties
  */
 @LinksRest(links = {
-    @LinkRest(
-        name = RelationshipRest.RELATIONSHIP_TYPE,
-        method = "getRelationshipType"
-    )
+    @LinkRest(name = RelationshipRest.RELATIONSHIP_TYPE, method = "getRelationshipType")
 })
 public class RelationshipRest extends BaseObjectRest<Integer> {
     public static final String NAME = "relationship";

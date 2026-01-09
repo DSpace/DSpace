@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.file.PathUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
@@ -56,7 +56,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Basic integration testing for the SAF Export feature via UI {@link ItemExport}.
- * https://wiki.lyrasis.org/display/DSDOC7x/Importing+and+Exporting+Items+via+Simple+Archive+Format
+ * https://wiki.lyrasis.org/display/DSDOC9x/Importing+and+Exporting+Items+via+Simple+Archive+Format
  *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
@@ -76,6 +76,8 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
     private ProcessService processService;
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
+    @Autowired
+    private ObjectMapper mapper;
     private Collection collection;
     private Path workDir;
 
@@ -327,7 +329,7 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
 
             getClient(token)
                 .perform(multipart("/api/system/scripts/export/processes")
-                        .param("properties", new ObjectMapper().writeValueAsString(list)))
+                        .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                         ProcessMatcher.matchProcess("export",
@@ -348,11 +350,11 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
         assertEquals(2, process.getBitstreams().size());
         assertEquals(1,
                 process.getBitstreams().stream()
-                .filter(b -> StringUtils.contains(b.getName(), ".log"))
+                .filter(b -> Strings.CS.contains(b.getName(), ".log"))
                 .count());
         assertEquals(1,
                 process.getBitstreams().stream()
-                .filter(b -> StringUtils.contains(b.getName(), ".zip"))
+                .filter(b -> Strings.CS.contains(b.getName(), ".zip"))
                 .count());
     }
 }

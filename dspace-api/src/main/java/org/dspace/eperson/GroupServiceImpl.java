@@ -20,7 +20,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,6 +45,7 @@ import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.dspace.util.UUIDUtils;
 import org.dspace.xmlworkflow.Role;
@@ -139,8 +142,11 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         group.addMember(e);
         e.getGroups().add(group);
         context.addEvent(
-            new Event(Event.ADD, Constants.GROUP, group.getID(), Constants.EPERSON, e.getID(), e.getEmail(),
-                      getIdentifiers(context, group)));
+            new Event(Event.ADD, Constants.GROUP, group.getID(), Constants.EPERSON, e.getID(),
+                e.getEmail(), DetailType.EPERSON_EMAIL,
+                getIdentifiers(context, group)));
+        log.info(LogHelper.getHeader(context, "add_group_eperson",
+            "group_id=" + group.getID() + ", eperson_id=" + e.getID()));
     }
 
     @Override
@@ -155,7 +161,10 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         groupChild.addParentGroup(groupParent);
 
         context.addEvent(new Event(Event.ADD, Constants.GROUP, groupParent.getID(), Constants.GROUP, groupChild.getID(),
-                                   groupChild.getName(), getIdentifiers(context, groupParent)));
+            groupChild.getName(), DetailType.DSO_NAME, getIdentifiers(context, groupParent)));
+        log.info(LogHelper.getHeader(context, "add_group_subgroup",
+                "group_id=" + groupParent.getID() + ", subgroup_id=" + groupChild.getID()));
+
     }
 
     /**
@@ -177,7 +186,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 Step stepByName = workflowFactory.getStepByName(claimedTask.getStepID());
                 Role role = stepByName.getRole();
                 for (CollectionRole collectionRole : collectionRoles) {
-                    if (StringUtils.equals(collectionRole.getRoleId(), role.getId())
+                    if (Strings.CS.equals(collectionRole.getRoleId(), role.getId())
                             && claimedTask.getWorkflowItem().getCollection().equals(collectionRole.getCollection())) {
                         // Count number of EPersons who are *direct* members of this group
                         int totalDirectEPersons = ePersonService.countByGroups(context, Set.of(group));
@@ -212,7 +221,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         }
         if (group.remove(ePerson)) {
             context.addEvent(new Event(Event.REMOVE, Constants.GROUP, group.getID(), Constants.EPERSON, ePerson.getID(),
-                                       ePerson.getEmail(), getIdentifiers(context, group)));
+                ePerson.getEmail(), DetailType.EPERSON_EMAIL, getIdentifiers(context, group)));
+            log.info(LogHelper.getHeader(context, "remove_group_eperson",
+                    "group_id=" + group.getID() + ", eperson_id=" + ePerson.getID()));
         }
     }
 
@@ -240,14 +251,16 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             childGroup.removeParentGroup(groupParent);
             context.addEvent(
                 new Event(Event.REMOVE, Constants.GROUP, groupParent.getID(), Constants.GROUP, childGroup.getID(),
-                          childGroup.getName(), getIdentifiers(context, groupParent)));
+                    childGroup.getName(), DetailType.DSO_NAME, getIdentifiers(context, groupParent)));
+            log.info(LogHelper.getHeader(context, "remove_group_subgroup",
+                    "group_id=" + groupParent.getID() + ", subgroup_id=" + childGroup.getID()));
         }
     }
 
     @Override
     public boolean isDirectMember(Group group, EPerson ePerson) {
         // special, group 0 is anonymous
-        return StringUtils.equals(group.getName(), Group.ANONYMOUS) || group.contains(ePerson);
+        return Strings.CS.equals(group.getName(), Group.ANONYMOUS) || group.contains(ePerson);
     }
 
     @Override
@@ -272,7 +285,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             return false;
 
             // special, everyone is member of group 0 (anonymous)
-        } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS) ||
+        } else if (Strings.CS.equals(group.getName(), Group.ANONYMOUS) ||
                    isParentOf(context, group, findByName(context, Group.ANONYMOUS))) {
             return true;
 
@@ -546,7 +559,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         }
 
         context.addEvent(new Event(Event.DELETE, Constants.GROUP, group.getID(),
-                                   group.getName(), getIdentifiers(context, group)));
+            group.getName(), DetailType.DSO_NAME, getIdentifiers(context, group)));
 
         // Remove any ResourcePolicies that reference this group
         authorizeService.removeGroupPolicies(context, group);
@@ -651,8 +664,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         groupDAO.save(context, group);
 
         if (group.isMetadataModified()) {
-            context.addEvent(new Event(Event.MODIFY_METADATA, Constants.GROUP, group.getID(), group.getDetails(),
-                                       getIdentifiers(context, group)));
+            context.addEvent(new Event(Event.MODIFY_METADATA, Constants.GROUP, group.getID(),
+                group.getMetadataEventDetails(), DetailType.DSO_SUMMARY,
+                getIdentifiers(context, group)));
             group.clearDetails();
         }
 
@@ -673,15 +687,14 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
 
     /**
-     * Regenerate the group cache AKA the group2groupcache table in the database -
-     * meant to be called when a group is added or removed from another group
+     * Returns a set with pairs of parent and child group UUIDs, representing the new cache table rows.
      *
-     * @param context      The relevant DSpace Context.
-     * @param flushQueries flushQueries Flush all pending queries
+     * @param context       The relevant DSpace Context.
+     * @param flushQueries  flushQueries Flush all pending queries
+     * @return              Pairs of parent and child group UUID of the new cache.
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    protected void rethinkGroupCache(Context context, boolean flushQueries) throws SQLException {
-
+    private Set<Pair<UUID, UUID>> computeNewCache(Context context, boolean flushQueries) throws SQLException {
         Map<UUID, Set<UUID>> parents = new HashMap<>();
 
         List<Pair<UUID, UUID>> group2groupResults = groupDAO.getGroup2GroupResults(context, flushQueries);
@@ -689,19 +702,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             UUID parent = group2groupResult.getLeft();
             UUID child = group2groupResult.getRight();
 
-            // if parent doesn't have an entry, create one
-            if (!parents.containsKey(parent)) {
-                Set<UUID> children = new HashSet<>();
-
-                // add child id to the list
-                children.add(child);
-                parents.put(parent, children);
-            } else {
-                // parent has an entry, now add the child to the parent's record
-                // of children
-                Set<UUID> children = parents.get(parent);
-                children.add(child);
-            }
+            parents.putIfAbsent(parent, new HashSet<>());
+            parents.get(parent).add(child);
         }
 
         // now parents is a hash of all of the IDs of groups that are parents
@@ -714,27 +716,42 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             parent.getValue().addAll(myChildren);
         }
 
-        // empty out group2groupcache table
-        group2GroupCacheDAO.deleteAll(context);
-
-        // write out new one
+        // write out new cache IN MEMORY ONLY and returns it
+        Set<Pair<UUID, UUID>> newCache = new HashSet<>();
         for (Map.Entry<UUID, Set<UUID>> parent : parents.entrySet()) {
             UUID key = parent.getKey();
-
             for (UUID child : parent.getValue()) {
-
-                Group parentGroup = find(context, key);
-                Group childGroup = find(context, child);
-
-
-                if (parentGroup != null && childGroup != null && group2GroupCacheDAO
-                    .find(context, parentGroup, childGroup) == null) {
-                    Group2GroupCache group2GroupCache = group2GroupCacheDAO.create(context, new Group2GroupCache());
-                    group2GroupCache.setParent(parentGroup);
-                    group2GroupCache.setChild(childGroup);
-                    group2GroupCacheDAO.save(context, group2GroupCache);
-                }
+                newCache.add(Pair.of(key, child));
             }
+        }
+        return newCache;
+    }
+
+
+    /**
+     * Regenerate the group cache AKA the group2groupcache table in the database -
+     * meant to be called when a group is added or removed from another group
+     *
+     * @param context      The relevant DSpace Context.
+     * @param flushQueries flushQueries Flush all pending queries
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    protected void rethinkGroupCache(Context context, boolean flushQueries) throws SQLException {
+        // current cache in the database
+        Set<Pair<UUID, UUID>> oldCache = group2GroupCacheDAO.getCache(context);
+
+        // correct cache, computed from the Group table
+        Set<Pair<UUID, UUID>> newCache = computeNewCache(context, flushQueries);
+
+        SetUtils.SetView<Pair<UUID, UUID>> toDelete = SetUtils.difference(oldCache, newCache);
+        SetUtils.SetView<Pair<UUID, UUID>> toCreate = SetUtils.difference(newCache, oldCache);
+
+        for (Pair<UUID, UUID> pair : toDelete ) {
+            group2GroupCacheDAO.deleteFromCache(context, pair.getLeft(), pair.getRight());
+        }
+
+        for (Pair<UUID, UUID> pair : toCreate ) {
+            group2GroupCacheDAO.addToCache(context, pair.getLeft(), pair.getRight());
         }
     }
 
@@ -802,7 +819,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                             List<ResourcePolicy> policies = resourcePolicyService.find(context, null, groups,
                                                             Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);
 
-                            Optional<ResourcePolicy> defaultPolicy = policies.stream().filter(p -> StringUtils.equals(
+                            Optional<ResourcePolicy> defaultPolicy = policies.stream().filter(p -> Strings.CS.equals(
                                     collectionService.getDefaultReadGroupName((Collection) p.getdSpaceObject(), "ITEM"),
                                     group.getName())).findFirst();
 
@@ -813,7 +830,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                                                              Constants.DEFAULT_BITSTREAM_READ, Constants.COLLECTION);
 
                             defaultPolicy = policies.stream()
-                                    .filter(p -> StringUtils.equals(collectionService.getDefaultReadGroupName(
+                                    .filter(p -> Strings.CS.equals(collectionService.getDefaultReadGroupName(
                                             (Collection) p.getdSpaceObject(), "BITSTREAM"), group.getName()))
                                     .findFirst();
 

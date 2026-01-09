@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -25,6 +26,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,7 +62,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     /**
      * BitStream instance for the tests
      */
-    private Bitstream bs;
+    protected Bitstream bs;
 
     /**
      * Spy of AuthorizeService to use for tests
@@ -146,6 +150,44 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
             }
         }
         assertTrue("testFindAll 2", added);
+    }
+
+    @Test
+    public void testFindAllBatches() throws Exception {
+        //Adding some data for processing and cleaning this up at the end
+        context.turnOffAuthorisationSystem();
+        File f = new File(testProps.get("test.bitstream").toString());
+        List<Bitstream> inserted = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
+            inserted.add(bs);
+        }
+        context.restoreAuthSystemState();
+
+        // sorted list of all bitstreams
+        List<Bitstream> all = bitstreamService.findAll(context);
+        List<Bitstream> expected = new ArrayList<>(all);
+        expected.sort(Comparator.comparing(bs -> bs.getID().toString()));
+
+        int total = bitstreamService.countTotal(context);
+        int batchSize = 2;
+        int numberOfBatches = (int) Math.ceil((double) total / batchSize);
+
+        //collect in batches
+        List<Bitstream> collected = new ArrayList<>();
+        for (int i = 0; i < numberOfBatches; i++) {
+            Iterator<Bitstream> it = bitstreamService.findAll(context, batchSize, i * batchSize);
+            it.forEachRemaining(collected::add);
+        }
+
+        assertEquals("Batched results should match sorted findAll", expected, collected);
+
+        // Cleanup
+        context.turnOffAuthorisationSystem();
+        for (Bitstream b : inserted) {
+            bitstreamService.delete(context, b);
+        }
+        context.restoreAuthSystemState();
     }
 
     /**

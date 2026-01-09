@@ -8,7 +8,7 @@
 package org.dspace.checker.dao.impl;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,7 +46,7 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
 
 
     @Override
-    public List<MostRecentChecksum> findByNotProcessedInDateRange(Context context, Date startDate, Date endDate)
+    public List<MostRecentChecksum> findByNotProcessedInDateRange(Context context, Instant startDate, Instant endDate)
         throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
@@ -56,8 +56,8 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         criteriaQuery.where(criteriaBuilder.and(
             criteriaBuilder.equal(mostRecentChecksumRoot.get(MostRecentChecksum_.toBeProcessed), false),
             criteriaBuilder
-                .lessThanOrEqualTo(mostRecentChecksumRoot.get(MostRecentChecksum_.processStartDate), startDate),
-            criteriaBuilder.greaterThan(mostRecentChecksumRoot.get(MostRecentChecksum_.processStartDate), endDate)
+                .lessThanOrEqualTo(mostRecentChecksumRoot.get(MostRecentChecksum_.processStartDate), endDate),
+            criteriaBuilder.greaterThan(mostRecentChecksumRoot.get(MostRecentChecksum_.processStartDate), startDate)
                             )
         );
         List<Order> orderList = new LinkedList<>();
@@ -80,7 +80,7 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
 
 
     @Override
-    public List<MostRecentChecksum> findByResultTypeInDateRange(Context context, Date startDate, Date endDate,
+    public List<MostRecentChecksum> findByResultTypeInDateRange(Context context, Instant startDate, Instant endDate,
                                                                 ChecksumResultCode resultCode) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
@@ -126,7 +126,7 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
     }
 
     @Override
-    public MostRecentChecksum getOldestRecord(Context context, Date lessThanDate) throws SQLException {
+    public MostRecentChecksum getOldestRecord(Context context, Instant lessThanDate) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
         Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);

@@ -10,16 +10,30 @@ package org.dspace.app.sword;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
+import java.nio.file.Path;
+import java.util.List;
+
 import org.dspace.app.rest.test.AbstractWebClientIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.content.Collection;
 import org.dspace.services.ConfigurationService;
+import org.hamcrest.MatcherAssert;
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
@@ -44,6 +58,9 @@ public class Swordv1IT extends AbstractWebClientIntegrationTest {
     private final String SERVICE_DOC_PATH = "/sword/servicedocument";
     private final String DEPOSIT_PATH = "/sword/deposit";
     private final String MEDIA_LINK_PATH = "/sword/media-link";
+
+    // ATOM Content type returned by SWORDv1
+    private final String ATOM_CONTENT_TYPE = "application/atom+xml;charset=UTF-8";
 
     @Before
     public void onlyRunIfConfigExists() {
@@ -93,10 +110,76 @@ public class Swordv1IT extends AbstractWebClientIntegrationTest {
     }
 
     @Test
-    @Ignore
     public void depositTest() throws Exception {
-        // TODO: Actually test a full deposit via SWORD.
-        // Currently, we are just ensuring the /deposit endpoint exists (see above) and isn't throwing a 404
+        context.turnOffAuthorisationSystem();
+        // Create a top level community and one Collection
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        // Make sure our Collection allows the "eperson" user to submit into it
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test SWORDv1 Collection")
+                                                 .withSubmitterGroup(eperson)
+                                                 .build();
+        // Above changes MUST be committed to the database for SWORDv2 to see them.
+        context.commit();
+        context.restoreAuthSystemState();
+
+        // Specify zip file
+        // NOTE: We are using the same "example.zip" as SWORDv2IT because that same ZIP is valid for both v1 and v2
+        FileSystemResource zipFile = new FileSystemResource(Path.of("src", "test", "resources", "org",
+                                                                    "dspace", "app", "sword2", "example.zip"));
+
+        // Add required headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.valueOf("application/zip"));
+        headers.setContentDisposition(ContentDisposition.attachment().filename("example.zip").build());
+        headers.set("X-Packaging", "http://purl.org/net/sword-types/METSDSpaceSIP");
+        headers.setAccept(List.of(MediaType.APPLICATION_ATOM_XML));
+
+        //----
+        // STEP 1: Verify upload/submit via SWORDv1 works
+        //----
+        // Send POST to upload Zip file via SWORD
+        ResponseEntity<String> response = postResponseAsString(DEPOSIT_PATH + "/" + collection.getHandle(),
+                                                               eperson.getEmail(), password,
+                                                               new HttpEntity<>(zipFile.getContentAsByteArray(),
+                                                                                headers));
+
+        // Expect a 201 CREATED response with ATOM content returned
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(ATOM_CONTENT_TYPE, response.getHeaders().getContentType().toString());
+
+        // MUST return a "Location" header which is the "/sword/media-link/*" URI of the zip file bitstream within
+        // the created item (e.g. /sword/media-link/[handle-prefix]/[handle-suffix]/bitstream/[uuid])
+        assertNotNull(response.getHeaders().getLocation());
+        String mediaLink = response.getHeaders().getLocation().toString();
+
+        // Body should include the SWORD version in generator tag
+        MatcherAssert.assertThat(response.getBody(),
+                                 containsString("<atom:generator uri=\"http://www.dspace.org/ns/sword/1.3.1\"" +
+                                                    " version=\"1.3\"/>"));
+        // Verify Item title also is returned in the body
+        MatcherAssert.assertThat(response.getBody(), containsString("Attempts to detect retrotransposition"));
+
+        //----
+        // STEP 2: Verify /media-link access works
+        //----
+        // Media-Link URI should work when requested by the EPerson who did the deposit
+        HttpHeaders authHeaders = new HttpHeaders();
+        authHeaders.setBasicAuth(eperson.getEmail(), password);
+        RequestEntity request = RequestEntity.get(mediaLink)
+                                             .accept(MediaType.valueOf("application/atom+xml"))
+                                             .headers(authHeaders)
+                                             .build();
+        response = responseAsString(request);
+
+        // Expect a 200 response with ATOM feed content returned
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(ATOM_CONTENT_TYPE, response.getHeaders().getContentType().toString());
+        // Body should include a link to the zip bitstream in the newly created Item
+        // This just verifies "example.zip" exists in the body.
+        MatcherAssert.assertThat(response.getBody(), containsString("example.zip"));
     }
 
     @Test
@@ -105,13 +188,8 @@ public class Swordv1IT extends AbstractWebClientIntegrationTest {
         ResponseEntity<String> response = getResponseAsString(MEDIA_LINK_PATH);
         // Expect a 401 response code
         assertThat(response.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
-    }
 
-    @Test
-    @Ignore
-    public void mediaLinkTest() throws Exception {
-        // TODO: Actually test a /media-link request.
-        // Currently, we are just ensuring the /media-link endpoint exists (see above) and isn't throwing a 404
+        //NOTE: An authorized /media-link test is performed in depositTest() above.
     }
 }
 

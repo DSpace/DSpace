@@ -8,18 +8,22 @@
 package org.dspace.xmlworkflow.state.actions.processingaction;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionAdvancedInfo;
@@ -33,6 +37,9 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public class ScoreReviewAction extends ProcessingAction {
     private static final Logger log = LogManager.getLogger(ScoreReviewAction.class);
+
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     // Option(s)
     public static final String SUBMIT_SCORE = "submit_score";
@@ -61,7 +68,7 @@ public class ScoreReviewAction extends ProcessingAction {
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException {
         if (super.isOptionInParam(request) &&
-            StringUtils.equalsIgnoreCase(Util.getSubmitButton(request, SUBMIT_CANCEL), SUBMIT_SCORE)) {
+            Strings.CI.equals(Util.getSubmitButton(request, SUBMIT_CANCEL), SUBMIT_SCORE)) {
             return processSetRating(c, wfi, request);
         }
         return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
@@ -114,7 +121,14 @@ public class ScoreReviewAction extends ProcessingAction {
 
     @Override
     public List<String> getOptions() {
-        return List.of(SUBMIT_SCORE, RETURN_TO_POOL);
+        List<String> options = new ArrayList<>();
+        options.add(SUBMIT_SCORE);
+        if (configurationService.getBooleanProperty("workflow.reviewer.file-edit", false)) {
+            options.add(SUBMIT_EDIT_METADATA);
+        }
+        options.add(RETURN_TO_POOL);
+
+        return options;
     }
 
     @Override

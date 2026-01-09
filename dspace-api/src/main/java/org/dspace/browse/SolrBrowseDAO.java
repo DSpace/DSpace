@@ -7,12 +7,17 @@
  */
 package org.dspace.browse;
 
+import static org.dspace.discovery.SearchUtils.RESOURCE_ID_FIELD;
+import static org.dspace.discovery.SearchUtils.RESOURCE_TYPE_FIELD;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -21,7 +26,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
 import org.dspace.discovery.DiscoverResult;
@@ -32,7 +36,6 @@ import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
-import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -179,19 +182,30 @@ public class SolrBrowseDAO implements BrowseDAO {
             addLocationScopeFilter(query);
             addDefaultFilterQueries(query);
             if (distinct) {
-                DiscoverFacetField dff;
-                if (StringUtils.isNotBlank(startsWith)) {
-                    dff = new DiscoverFacetField(facetField,
-                        DiscoveryConfigurationParameters.TYPE_TEXT, -1,
-                        DiscoveryConfigurationParameters.SORT.VALUE, startsWith);
+                // We use a json.facet query for metadata browsing because it allows us to limit the results
+                // while obtaining the total number of facet values with numBuckets:true and sort in reverse order
+                // Example of json.facet query:
+                // {"<fieldName>": {"type":"terms","field": "<fieldName>_filter", "limit":0, "offset":0,
+                // "sort":"index desc", "numBuckets":true, "prefix":"<startsWith>"}}
+                ObjectNode jsonFacet = JsonNodeFactory.instance.objectNode();
+                ObjectNode entriesFacet = JsonNodeFactory.instance.objectNode();
+                entriesFacet.put("type", "terms");
+                entriesFacet.put("field", facetField + "_filter");
+                entriesFacet.put("limit", limit);
+                entriesFacet.put("offset", offset);
+                entriesFacet.put("numBuckets", true);
+                if (ascending) {
+                    entriesFacet.put("sort", "index");
                 } else {
-                    dff = new DiscoverFacetField(facetField,
-                        DiscoveryConfigurationParameters.TYPE_TEXT, -1,
-                        DiscoveryConfigurationParameters.SORT.VALUE);
+                    entriesFacet.put("sort", "index desc");
                 }
-                query.addFacetField(dff);
-                query.setFacetMinCount(1);
+                if (StringUtils.isNotBlank(startsWith)) {
+                    // Add the prefix to the json facet query
+                    entriesFacet.put("prefix", startsWith);
+                }
+                jsonFacet.set(facetField, entriesFacet);
                 query.setMaxResults(0);
+                query.addProperty("json.facet", jsonFacet.toString());
             } else {
                 query.setMaxResults(limit/* > 0 ? limit : 20*/);
                 if (offset > 0) {
@@ -248,8 +262,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         DiscoverResult resp = getSolrResponse();
         int count = 0;
         if (distinct) {
-            List<FacetResult> facetResults = resp.getFacetResult(facetField);
-            count = facetResults.size();
+            count = (int) resp.getTotalEntries();
         } else {
             // we need to cast to int to respect the BrowseDAO contract...
             count = (int) resp.getTotalSearchResults();
@@ -266,26 +279,15 @@ public class SolrBrowseDAO implements BrowseDAO {
         DiscoverResult resp = getSolrResponse();
         List<FacetResult> facet = resp.getFacetResult(facetField);
         int count = doCountQuery();
-        int start = offset > 0 ? offset : 0;
-        int max = limit > 0 ? limit : count; //if negative, return everything
+        int max = facet.size();
         List<String[]> result = new ArrayList<>();
-        if (ascending) {
-            for (int i = start; i < (start + max) && i < count; i++) {
-                FacetResult c = facet.get(i);
-                String freq = showFrequencies ? String.valueOf(c.getCount())
-                    : "";
-                result.add(new String[] {c.getDisplayedValue(),
-                    c.getAuthorityKey(), freq});
-            }
-        } else {
-            for (int i = count - start - 1; i >= count - (start + max)
-                && i >= 0; i--) {
-                FacetResult c = facet.get(i);
-                String freq = showFrequencies ? String.valueOf(c.getCount())
-                    : "";
-                result.add(new String[] {c.getDisplayedValue(),
-                    c.getAuthorityKey(), freq});
-            }
+
+        for (int i = 0; i < max && i < count; i++) {
+            FacetResult c = facet.get(i);
+            String freq = showFrequencies ? String.valueOf(c.getCount())
+                : "";
+            result.add(new String[] {c.getDisplayedValue(),
+                c.getAuthorityKey(), freq});
         }
 
         return result;
@@ -309,8 +311,10 @@ public class SolrBrowseDAO implements BrowseDAO {
     public String doMaxQuery(String column, String table, int itemID)
         throws BrowseException {
         DiscoverQuery query = new DiscoverQuery();
-        query.setQuery("search.resourceid:" + itemID
-                           + " AND search.resourcetype:" + IndexableItem.TYPE);
+        query.setQuery("*:*");
+        query.addFilterQueries(
+                RESOURCE_ID_FIELD + ":" + itemID,
+                RESOURCE_TYPE_FIELD + ":" + IndexableItem.TYPE);
         query.setMaxResults(1);
         DiscoverResult resp = null;
         try {
@@ -346,9 +350,9 @@ public class SolrBrowseDAO implements BrowseDAO {
         }
 
         if (isAscending) {
-            query.setQuery("bi_" + column + "_sort" + ": [* TO \"" + value + "\"}");
+            query.setQuery("bi_" + column + "_sort" + ":[* TO \"" + value + "\"}");
         } else {
-            query.setQuery("bi_" + column + "_sort" + ": {\"" + value + "\" TO *]");
+            query.setQuery("bi_" + column + "_sort" + ":{\"" + value + "\" TO *]");
             query.addFilterQueries("-(bi_" + column + "_sort" + ":" + value + "*)");
         }
         DiscoverResult resp = null;

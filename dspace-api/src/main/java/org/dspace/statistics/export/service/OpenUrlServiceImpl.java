@@ -10,17 +10,18 @@ package org.dspace.statistics.export.service;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.core.Context;
 import org.dspace.statistics.export.OpenURLTracker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,7 @@ public class OpenUrlServiceImpl implements OpenUrlService {
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 logfailed(c, urlStr);
             } else if (log.isDebugEnabled()) {
-                log.debug("Successfully posted " + urlStr + " on " + new Date());
+                log.debug("Successfully posted " + urlStr + " on " + Instant.now());
             }
         } catch (Exception e) {
             log.error("Failed to send url to tracker URL: " + urlStr);
@@ -68,16 +69,16 @@ public class OpenUrlServiceImpl implements OpenUrlService {
      * @throws IOException
      */
     protected int getResponseCodeFromUrl(final String urlStr) throws IOException {
-        HttpGet httpGet = new HttpGet(urlStr);
-        HttpClient httpClient = getHttpClient(getHttpClientRequestConfig());
-        HttpResponse httpResponse = httpClient.execute(httpGet);
-        return httpResponse.getStatusLine().getStatusCode();
+        try (CloseableHttpClient httpClient = getHttpClient(getHttpClientRequestConfig())) {
+            HttpGet httpGet = new HttpGet(urlStr);
+            try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
+                return httpResponse.getStatusLine().getStatusCode();
+            }
+        }
     }
 
-    protected HttpClient getHttpClient(RequestConfig requestConfig) {
-        return HttpClientBuilder.create()
-            .setDefaultRequestConfig(requestConfig)
-            .build();
+    protected CloseableHttpClient getHttpClient(RequestConfig requestConfig) {
+        return DSpaceHttpClientFactory.getInstance().buildWithRequestConfig(requestConfig);
     }
 
     protected RequestConfig getHttpClientRequestConfig() {
@@ -141,7 +142,7 @@ public class OpenUrlServiceImpl implements OpenUrlService {
      */
     @Override
     public void logfailed(Context context, String url) throws SQLException {
-        Date now = new Date();
+        LocalDate now = LocalDate.now();
         if (StringUtils.isBlank(url)) {
             return;
         }

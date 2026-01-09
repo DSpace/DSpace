@@ -12,8 +12,8 @@ import static org.dspace.app.rest.repository.WorkspaceItemRestRepository.OPERATI
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Inject;
 
+import jakarta.inject.Inject;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.DCInputsReaderException;

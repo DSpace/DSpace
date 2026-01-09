@@ -10,7 +10,7 @@ package org.dspace.scripts.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -253,7 +253,7 @@ public interface ProcessService {
      * @return                    The list of all Processes which match requirements
      * @throws AuthorizeException If something goes wrong
      */
-    List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses, Date date)
+    List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses, Instant date)
         throws SQLException;
 
     /**
@@ -277,4 +277,14 @@ public interface ProcessService {
      * @throws SQLException If something goes wrong
      */
     int countByUser(Context context, EPerson user) throws SQLException;
+
+    /**
+     * Cleans up running processes by failing them an attaching their logs to the process objects.
+     *
+     * @param context   The DSpace context
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     */
+    void failRunningProcesses(Context context) throws SQLException, IOException, AuthorizeException;
 }

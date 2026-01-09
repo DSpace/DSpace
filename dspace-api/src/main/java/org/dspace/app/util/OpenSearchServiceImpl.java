@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import com.rometools.modules.opensearch.OpenSearchModule;
 import com.rometools.modules.opensearch.entity.OSQuery;
@@ -58,12 +57,12 @@ public class OpenSearchServiceImpl implements OpenSearchService {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(OpenSearchServiceImpl.class);
 
     // Namespaces used
-    protected final String osNs = "http://a9.com/-/spec/opensearch/1.1/";
+    protected final static String osNs = "http://a9.com/-/spec/opensearch/1.1/";
 
-    @Autowired(required = true)
+    @Autowired
     protected ConfigurationService configurationService;
 
-    @Autowired(required = true)
+    @Autowired
     protected HandleService handleService;
 
     protected OpenSearchServiceImpl() {
@@ -101,6 +100,14 @@ public class OpenSearchServiceImpl implements OpenSearchService {
             configurationService.getProperty("websvc.opensearch.uicontext");
     }
 
+    /**
+     * Get base search UI URL (websvc.opensearch.max_num_of_items_per_request)
+     */
+    public int getMaxNumOfItemsPerRequest() {
+        return configurationService.getIntProperty(
+                "websvc.opensearch.max_num_of_items_per_request", 100);
+    }
+
     @Override
     public String getContentType(String format) {
         return "html".equals(format) ? "text/html" :
@@ -119,11 +126,10 @@ public class OpenSearchServiceImpl implements OpenSearchService {
 
     @Override
     public String getResultsString(Context context, String format, String query, int totalResults, int start,
-                                   int pageSize,
-                                   IndexableObject scope, List<IndexableObject> results,
-                                   Map<String, String> labels) throws IOException {
+                                   int pageSize, IndexableObject scope, List<IndexableObject> results)
+        throws IOException {
         try {
-            return getResults(context, format, query, totalResults, start, pageSize, scope, results, labels)
+            return getResults(context, format, query, totalResults, start, pageSize, scope, results)
                 .outputString();
         } catch (FeedException e) {
             log.error(e.toString(), e);
@@ -133,11 +139,10 @@ public class OpenSearchServiceImpl implements OpenSearchService {
 
     @Override
     public Document getResultsDoc(Context context, String format, String query, int totalResults, int start,
-                                  int pageSize,
-                                  IndexableObject scope, List<IndexableObject> results, Map<String, String> labels)
+                                  int pageSize, IndexableObject scope, List<IndexableObject> results)
         throws IOException {
         try {
-            return getResults(context, format, query, totalResults, start, pageSize, scope, results, labels)
+            return getResults(context, format, query, totalResults, start, pageSize, scope, results)
                 .outputW3CDom();
         } catch (FeedException e) {
             log.error(e.toString(), e);
@@ -146,8 +151,7 @@ public class OpenSearchServiceImpl implements OpenSearchService {
     }
 
     protected SyndicationFeed getResults(Context context, String format, String query, int totalResults, int start,
-                                         int pageSize, IndexableObject scope,
-                                         List<IndexableObject> results, Map<String, String> labels) {
+                                         int pageSize, IndexableObject scope, List<IndexableObject> results) {
         // Encode results in requested format
         if ("rss".equals(format)) {
             format = "rss_2.0";
@@ -156,7 +160,7 @@ public class OpenSearchServiceImpl implements OpenSearchService {
         }
 
         SyndicationFeed feed = new SyndicationFeed();
-        feed.populate(null, context, scope, results, labels);
+        feed.populate(null, context, scope, results);
         feed.setType(format);
         feed.addModule(openSearchMarkup(query, totalResults, start, pageSize));
         return feed;

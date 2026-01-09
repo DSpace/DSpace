@@ -13,13 +13,14 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
 import com.lyncode.xoai.util.XSLPipeline;
+import org.apache.commons.io.IOUtils;
 import org.dspace.xoai.tests.support.XmlMatcherBuilder;
 import org.junit.Test;
-import org.parboiled.common.FileUtils;
 
 public class PipelineTest {
     private static TransformerFactory factory = TransformerFactory.newInstance();
@@ -28,9 +29,9 @@ public class PipelineTest {
     public void pipelineTest() throws Exception {
         InputStream input = PipelineTest.class.getClassLoader().getResourceAsStream("item.xml");
         InputStream xslt = PipelineTest.class.getClassLoader().getResourceAsStream("oai_dc.xsl");
-        String output = FileUtils.readAllText(new XSLPipeline(input, true)
-                                                  .apply(factory.newTemplates(new StreamSource(xslt)))
-                                                  .getTransformed());
+        String output = IOUtils.toString(new XSLPipeline(input, true)
+                                             .apply(factory.newTemplates(new StreamSource(xslt)))
+                                             .getTransformed(), Charset.defaultCharset());
 
         assertThat(output, oai_dc().withXPath("/oai_dc:dc/dc:title", equalTo("Teste")));
 

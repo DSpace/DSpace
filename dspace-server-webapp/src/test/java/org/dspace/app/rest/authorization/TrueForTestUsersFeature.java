@@ -9,7 +9,7 @@ package org.dspace.app.rest.authorization;
 
 import java.sql.SQLException;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.ItemRest;
@@ -34,7 +34,7 @@ public class TrueForTestUsersFeature implements AuthorizationFeature {
         if (context.getCurrentUser() == null) {
             return false;
         }
-        return StringUtils.containsIgnoreCase(context.getCurrentUser().getEmail(), "test");
+        return Strings.CI.contains(context.getCurrentUser().getEmail(), "test");
     }
 
     @Override

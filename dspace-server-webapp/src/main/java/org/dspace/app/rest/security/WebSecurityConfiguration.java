@@ -88,6 +88,17 @@ public class WebSecurityConfiguration {
         // Get the current AuthenticationManager (defined above) to apply filters below
         AuthenticationManager authenticationManager = authenticationManager();
 
+        // Create a custom CsrfTokenRequestHandler to restore the eager loading of the CSRF token.
+        // In DSpace 8+, the upgrade to Spring Security 6 changed the default behavior to "deferred loading",
+        // which meant the DSPACE-XSRF-TOKEN was no longer automatically sent on most GET requests.
+        // This was a breaking change for REST API clients expecting the DSpace 7.x behavior.
+        //
+        // By setting the csrfRequestAttributeName to null, we explicitly opt-out of deferred loading and
+        // force Spring Security to load the token on every request, restoring the old functionality.
+        // This resolves https://github.com/DSpace/DSpace/issues/9774
+        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        requestHandler.setCsrfRequestAttributeName(null);
+
         // Configure authentication requirements for ${dspace.server.url}/api/ URL only
         // NOTE: REST API is hardcoded to respond on /api/. Other modules (OAI, SWORD, IIIF, etc) use other root paths.
         http.securityMatcher("/api/**", "/iiif/**", actuatorBasePath + "/**", "/signposting/**")
@@ -118,7 +129,7 @@ public class WebSecurityConfiguration {
                 // See https://github.com/DSpace/DSpace/issues/9450
                 // NOTE: DSpace doesn't need BREACH protection as it's only necessary when sending the token via a
                 // request attribute (e.g. "_csrf") which the DSpace UI never does.
-                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
+                .csrfTokenRequestHandler(requestHandler))
             .exceptionHandling((exceptionHandling) -> exceptionHandling
                 // Return 401 on authorization failures with a correct WWWW-Authenticate header
                 .authenticationEntryPoint(new DSpace401AuthenticationEntryPoint(restAuthenticationService))
@@ -159,6 +170,12 @@ public class WebSecurityConfiguration {
             // This endpoint only responds to GET as the actual authentication is performed by OIDC, which then
             // redirects to this endpoint to forward the authentication data to DSpace.
             .addFilterBefore(new OidcLoginFilter("/api/authn/oidc", HttpMethod.GET.name(),
+                                                 authenticationManager, restAuthenticationService),
+                             LogoutFilter.class)
+            // Add a filter before our SAML endpoints to do the authentication based on the data in the HTTP request.
+            // This endpoint only responds to GET as the actual authentication is performed by SAML, which then
+            // forwards to this endpoint to pass the authentication data to DSpace.
+            .addFilterBefore(new SamlLoginFilter("/api/authn/saml", HttpMethod.GET.name(),
                                                  authenticationManager, restAuthenticationService),
                              LogoutFilter.class)
             // Add a custom Token based authentication filter based on the token previously given to the client

@@ -1,0 +1,589 @@
+#-------------------
+# DSpace's dependabot rules. Enables maven updates for all dependencies on a weekly basis
+# for main and any maintenance branches. Security updates only apply to main.
+#-------------------
+version: 2
+updates:
+  ###############
+  ## Main branch
+  ###############
+  # NOTE: At this time, "security-updates" rules only apply if "target-branch" is unspecified
+  # So, only this first section can include "applies-to: security-updates"
+  - package-ecosystem: "maven"
+    directory: "/"
+    # Monthly dependency updates (NOTE: "schedule" doesn't apply to security updates)
+    schedule:
+      interval: "monthly"
+      time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
+    # Allow up to 10 open PRs for dependencies
+    open-pull-requests-limit: 10
+    # Group together some upgrades in a single PR
+    groups:
+      # Group together all Build Tools in a single PR
+      build-tools:
+        applies-to: version-updates
+        patterns:
+        - "org.apache.maven.plugins:*"
+        - "*:*-maven-plugin"
+        - "*:maven-*-plugin"
+        - "com.github.spotbugs:spotbugs"
+        - "com.google.code.findbugs:*"
+        - "com.google.errorprone:*"
+        - "com.puppycrawl.tools:checkstyle"
+        - "org.sonatype.*:*"
+        exclude-patterns:
+        # Exclude anything from Spring, as that is in a separate group
+        - "org.springframework.*:*"
+        update-types:
+        - "minor"
+        - "patch"
+      test-tools:
+        applies-to: version-updates
+        patterns:
+        - "junit:*"
+        - "com.adobe.testing:*"
+        - "com.github.stefanbirker:system-rules"
+        - "com.h2database:*"
+        - "io.findify:s3mock*"
+        - "io.netty:*"
+        - "org.apache.httpcomponents.client5:*"
+        - "org.hamcrest:*"
+        - "org.mock-server:*"
+        - "org.mockito:*"
+        - "org.testcontainers:*"
+        - "org.xmlunit:*"
+        update-types:
+        - "minor"
+        - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Apache Commons deps in a single PR
+      apache-commons:
+        applies-to: version-updates
+        patterns:
+        - "org.apache.commons:*"
+        - "commons-*:commons-*"
+        update-types:
+        - "minor"
+        - "patch"
+      # Group together all fasterxml deps in a single PR
+      fasterxml:
+        applies-to: version-updates
+        patterns:
+        - "com.fasterxml:*"
+        - "com.fasterxml.*:*"
+        update-types:
+        - "minor"
+        - "patch"
+       # Group together all Hibernate deps in a single PR
+      hibernate:
+        applies-to: version-updates
+        patterns:
+        - "org.hibernate.*:*"
+        update-types:
+        - "patch"
+      # Group together all Jakarta deps in a single PR
+      jakarta:
+        applies-to: version-updates
+        patterns:
+        - "jakarta.*:*"
+        - "org.eclipse.angus:jakarta.mail"
+        - "org.glassfish.jaxb:jaxb-runtime"
+        update-types:
+        - "minor"
+        - "patch"
+      # Group together all Spring deps in a single PR
+      spring:
+        applies-to: version-updates
+        patterns:
+        - "org.springframework:*"
+        - "org.springframework.*:*"
+        update-types:
+        - "minor"
+        - "patch"
+      # Group together all WebJARs deps in a single PR
+      webjars:
+        applies-to: version-updates
+        patterns:
+        - "org.webjars:*"
+        - "org.webjars.*:*"
+        update-types:
+        - "minor"
+        - "patch"
+      # Group Tika, bouncycastle, and asm because they are tightly integrated
+      # and we theoretically want to keep them in sync.
+      tika:
+        applies-to: version-updates
+        patterns:
+        - "org.apache.tika:*:*"
+        - "org.bouncycastle:*:*"
+        - "org.ow2.asm:*:*"
+        update-types:
+        - "minor"
+        - "patch"
+    ignore:
+      # Don't try to auto-update any DSpace dependencies
+      - dependency-name: "org.dspace:*"
+      - dependency-name: "org.dspace.*:*"
+      # Last version of errorprone to support JDK 17 is 2.42.0
+      # TODO: Remove this after this ticket is resolved https://github.com/DSpace/DSpace/issues/11621
+      - dependency-name: "com.google.errorprone:*"
+        versions: [ ">=2.43.0" ]
+      # Don't automatically update BouncyCastle because maven-gpg-plugin REQUIRES a very specific version or release
+      # errors will occur. See https://github.com/DSpace/DSpace/pull/11696
+      - dependency-name: "org.bouncycastle:*"
+      # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
+      - dependency-name: "org.hibernate.*:*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+  ######################
+  ## dspace-9_x branch
+  ######################
+  - package-ecosystem: "maven"
+    directory: "/"
+    target-branch: dspace-9_x
+    schedule:
+      interval: "monthly"
+      time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
+    # Allow up to 10 open PRs for dependencies
+    open-pull-requests-limit: 10
+    # Group together some upgrades in a single PR
+    groups:
+      # Group together all Build Tools in a single PR
+      build-tools:
+        applies-to: version-updates
+        patterns:
+          - "org.apache.maven.plugins:*"
+          - "*:*-maven-plugin"
+          - "*:maven-*-plugin"
+          - "com.github.spotbugs:spotbugs"
+          - "com.google.code.findbugs:*"
+          - "com.google.errorprone:*"
+          - "com.puppycrawl.tools:checkstyle"
+          - "org.sonatype.*:*"
+        exclude-patterns:
+          # Exclude anything from Spring, as that is in a separate group
+          - "org.springframework.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      test-tools:
+        applies-to: version-updates
+        patterns:
+          - "junit:*"
+          - "com.adobe.testing:*"
+          - "com.github.stefanbirker:system-rules"
+          - "com.h2database:*"
+          - "io.findify:s3mock*"
+          - "io.netty:*"
+          - "org.apache.httpcomponents.client5:*"
+          - "org.hamcrest:*"
+          - "org.mock-server:*"
+          - "org.mockito:*"
+          - "org.testcontainers:*"
+          - "org.xmlunit:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Apache Commons deps in a single PR
+      apache-commons:
+        applies-to: version-updates
+        patterns:
+          - "org.apache.commons:*"
+          - "commons-*:commons-*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all fasterxml deps in a single PR
+      fasterxml:
+        applies-to: version-updates
+        patterns:
+          - "com.fasterxml:*"
+          - "com.fasterxml.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+        # Group together all Hibernate deps in a single PR
+      hibernate:
+        applies-to: version-updates
+        patterns:
+          - "org.hibernate.*:*"
+        update-types:
+          - "patch"
+      # Group together all Jakarta deps in a single PR
+      jakarta:
+        applies-to: version-updates
+        patterns:
+          - "jakarta.*:*"
+          - "org.eclipse.angus:jakarta.mail"
+          - "org.glassfish.jaxb:jaxb-runtime"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Spring deps in a single PR
+      spring:
+        applies-to: version-updates
+        patterns:
+          - "org.springframework:*"
+          - "org.springframework.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all WebJARs deps in a single PR
+      webjars:
+        applies-to: version-updates
+        patterns:
+          - "org.webjars:*"
+          - "org.webjars.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group Tika, bouncycastle, and asm because they are tightly integrated
+      # and we theoretically want to keep them in sync.
+      tika:
+        applies-to: version-updates
+        patterns:
+        - "org.apache.tika:*:*"
+        - "org.bouncycastle:*:*"
+        - "org.ow2.asm:*:*"
+        update-types:
+        - "minor"
+        - "patch"
+    ignore:
+      # Don't try to auto-update any DSpace dependencies
+      - dependency-name: "org.dspace:*"
+      - dependency-name: "org.dspace.*:*"
+      # Last version of errorprone to support JDK 17 is 2.42.0
+      - dependency-name: "com.google.errorprone:*"
+        versions: [ ">=2.43.0" ]
+      # Don't automatically update BouncyCastle because maven-gpg-plugin REQUIRES a very specific version or release
+      # errors will occur. See https://github.com/DSpace/DSpace/pull/11696
+      - dependency-name: "org.bouncycastle:*"
+      # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
+      - dependency-name: "org.hibernate.*:*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-major" ]
+  ######################
+  ## dspace-8_x branch
+  ######################
+  - package-ecosystem: "maven"
+    directory: "/"
+    target-branch: dspace-8_x
+    schedule:
+      interval: "monthly"
+      time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
+    # Allow up to 10 open PRs for dependencies
+    open-pull-requests-limit: 10
+    # Group together some upgrades in a single PR
+    groups:
+      # Group together all Build Tools in a single PR
+      build-tools:
+        applies-to: version-updates
+        patterns:
+          - "org.apache.maven.plugins:*"
+          - "*:*-maven-plugin"
+          - "*:maven-*-plugin"
+          - "com.github.spotbugs:spotbugs"
+          - "com.google.code.findbugs:*"
+          - "com.google.errorprone:*"
+          - "com.puppycrawl.tools:checkstyle"
+          - "org.sonatype.*:*"
+        exclude-patterns:
+          # Exclude anything from Spring, as that is in a separate group
+          - "org.springframework.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      test-tools:
+        applies-to: version-updates
+        patterns:
+          - "junit:*"
+          - "com.adobe.testing:*"
+          - "com.github.stefanbirker:system-rules"
+          - "com.h2database:*"
+          - "io.findify:s3mock*"
+          - "io.netty:*"
+          - "org.apache.httpcomponents.client5:*"
+          - "org.hamcrest:*"
+          - "org.mock-server:*"
+          - "org.mockito:*"
+          - "org.testcontainers:*"
+          - "org.xmlunit:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Apache Commons deps in a single PR
+      apache-commons:
+        applies-to: version-updates
+        patterns:
+          - "org.apache.commons:*"
+          - "commons-*:commons-*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all fasterxml deps in a single PR
+      fasterxml:
+        applies-to: version-updates
+        patterns:
+          - "com.fasterxml:*"
+          - "com.fasterxml.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+        # Group together all Hibernate deps in a single PR
+      hibernate:
+        applies-to: version-updates
+        patterns:
+          - "org.hibernate.*:*"
+        update-types:
+          - "patch"
+      # Group together all Jakarta deps in a single PR
+      jakarta:
+        applies-to: version-updates
+        patterns:
+          - "jakarta.*:*"
+          - "org.eclipse.angus:jakarta.mail"
+          - "org.glassfish.jaxb:jaxb-runtime"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Spring deps in a single PR
+      spring:
+        applies-to: version-updates
+        patterns:
+          - "org.springframework:*"
+          - "org.springframework.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all WebJARs deps in a single PR
+      webjars:
+        applies-to: version-updates
+        patterns:
+          - "org.webjars:*"
+          - "org.webjars.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group Tika, bouncycastle, and asm because they are tightly integrated
+      # and we theoretically want to keep them in sync.
+      tika:
+        applies-to: version-updates
+        patterns:
+        - "org.apache.tika:*:*"
+        - "org.bouncycastle:*:*"
+        - "org.ow2.asm:*:*"
+        update-types:
+        - "minor"
+        - "patch"
+    ignore:
+      # Don't try to auto-update any DSpace dependencies
+      - dependency-name: "org.dspace:*"
+      - dependency-name: "org.dspace.*:*"
+      # Last version of errorprone to support JDK 17 is 2.42.0
+      - dependency-name: "com.google.errorprone:*"
+        versions: [ ">=2.43.0" ]
+      # Don't automatically update BouncyCastle because maven-gpg-plugin REQUIRES a very specific version or release
+      # errors will occur. See https://github.com/DSpace/DSpace/pull/11696
+      - dependency-name: "org.bouncycastle:*"
+      # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
+      - dependency-name: "org.hibernate.*:*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-major" ]
+  ######################
+  ## dspace-7_x branch
+  ######################
+  - package-ecosystem: "maven"
+    directory: "/"
+    target-branch: dspace-7_x
+    schedule:
+      interval: "monthly"
+      time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
+    # Allow up to 10 open PRs for dependencies
+    open-pull-requests-limit: 10
+    # Group together some upgrades in a single PR
+    groups:
+      # Group together all Build Tools in a single PR
+      build-tools:
+        applies-to: version-updates
+        patterns:
+          - "org.apache.maven.plugins:*"
+          - "*:*-maven-plugin"
+          - "*:maven-*-plugin"
+          - "com.github.spotbugs:spotbugs"
+          - "com.google.code.findbugs:*"
+          - "com.google.errorprone:*"
+          - "com.puppycrawl.tools:checkstyle"
+          - "org.sonatype.*:*"
+        exclude-patterns:
+          # Exclude anything from Spring, as that is in a separate group
+          - "org.springframework.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      test-tools:
+        applies-to: version-updates
+        patterns:
+          - "junit:*"
+          - "com.adobe.testing:*"
+          - "com.github.stefanbirker:system-rules"
+          - "com.h2database:*"
+          - "io.findify:s3mock*"
+          - "io.netty:*"
+          - "org.hamcrest:*"
+          - "org.mock-server:*"
+          - "org.mockito:*"
+          - "org.testcontainers:*"
+          - "org.xmlunit:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Amazon S3 deps in a single PR
+      amazon-s3:
+        applies-to: version-updates
+        patterns:
+          - "software.amazon.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Apache Commons deps in a single PR
+      apache-commons:
+        applies-to: version-updates
+        patterns:
+          - "org.apache.commons:*"
+          - "commons-*:commons-*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all fasterxml deps in a single PR
+      fasterxml:
+        applies-to: version-updates
+        patterns:
+          - "com.fasterxml:*"
+          - "com.fasterxml.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+        # Group together all Hibernate deps in a single PR
+      hibernate:
+        applies-to: version-updates
+        patterns:
+          - "org.hibernate.*:*"
+        update-types:
+          - "patch"
+      # Group together all Javax deps in a single PR
+      # NOTE: Javax is only used in 7.x and has been replaced by Jakarta in 8.x and later
+      jakarta:
+        applies-to: version-updates
+        patterns:
+          - "javax.*:*"
+          - "*:javax.mail"
+          - "org.glassfish.jaxb:jaxb-runtime"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Google deps in a single PR
+      # NOTE: These Google deps are only used in 7.x and have been removed in 8.x and later
+      google-apis:
+        applies-to: version-updates
+        patterns:
+          - "com.google.apis:*"
+          - "com.google.api-client:*"
+          - "com.google.http-client:*"
+          - "com.google.oauth-client:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all Spring deps in a single PR
+      spring:
+        applies-to: version-updates
+        patterns:
+          - "org.springframework:*"
+          - "org.springframework.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group together all WebJARs deps in a single PR
+      webjars:
+        applies-to: version-updates
+        patterns:
+          - "org.webjars:*"
+          - "org.webjars.*:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group Tika, bouncycastle, and asm because they are tightly integrated
+      # and we theoretically want to keep them in sync.
+      tika:
+        applies-to: version-updates
+        patterns:
+        - "org.apache.tika:*:*"
+        - "org.bouncycastle:*:*"
+        - "org.ow2.asm:*:*"
+        update-types:
+        - "minor"
+        - "patch"
+    ignore:
+      # Don't try to auto-update any DSpace dependencies
+      - dependency-name: "org.dspace:*"
+      - dependency-name: "org.dspace.*:*"
+      # Last version of errorprone to support JDK 11 is 2.31.0
+      - dependency-name: "com.google.errorprone:*"
+        versions: [">=2.32.0"]
+      # Don't automatically update BouncyCastle because maven-gpg-plugin REQUIRES a very specific version or release
+      # errors will occur. See https://github.com/DSpace/DSpace/pull/11696
+      - dependency-name: "org.bouncycastle:*"
+      # Spring Security 5.8 changes the behavior of CSRF Tokens in a way which is incompatible with DSpace 7
+      # See https://github.com/DSpace/DSpace/pull/9888#issuecomment-2408165545
+      - dependency-name: "org.springframework.security:*"
+        versions: [">=5.8.0"]
+      # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
+      - dependency-name: "org.hibernate.*:*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-major" ]

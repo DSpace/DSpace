@@ -13,14 +13,8 @@ import org.dspace.app.rest.RestResourceController;
  * The REST object for the {@link org.dspace.versioning.VersionHistory} object
  */
 @LinksRest(links = {
-    @LinkRest(
-        name = VersionHistoryRest.VERSIONS,
-        method = "getVersions"
-        ),
-        @LinkRest(
-                name = VersionHistoryRest.DRAFT_VERSION,
-                method = "getDraftVersion"
-        )
+    @LinkRest(name = VersionHistoryRest.VERSIONS, method = "getVersions"),
+    @LinkRest(name = VersionHistoryRest.DRAFT_VERSION, method = "getDraftVersion")
 })
 public class VersionHistoryRest extends BaseObjectRest<Integer> {
 

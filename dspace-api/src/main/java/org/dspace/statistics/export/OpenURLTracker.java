@@ -7,7 +7,7 @@
  */
 package org.dspace.statistics.export;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,8 +16,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import org.dspace.core.HibernateProxyHelper;
 import org.dspace.core.ReloadableEntity;
 
@@ -39,8 +37,7 @@ public class OpenURLTracker implements ReloadableEntity<Integer> {
     private String url;
 
     @Column(name = "uploaddate")
-    @Temporal(TemporalType.DATE)
-    private Date uploadDate;
+    private LocalDate uploadDate;
 
     protected OpenURLTracker() {
     }
@@ -74,7 +71,7 @@ public class OpenURLTracker implements ReloadableEntity<Integer> {
      * Returns the upload date
      * @return upload date
      */
-    public Date getUploadDate() {
+    public LocalDate getUploadDate() {
         return uploadDate;
     }
 
@@ -82,7 +79,7 @@ public class OpenURLTracker implements ReloadableEntity<Integer> {
      * Set the upload date
      * @param uploadDate
      */
-    public void setUploadDate(Date uploadDate) {
+    public void setUploadDate(LocalDate uploadDate) {
         this.uploadDate = uploadDate;
     }
 

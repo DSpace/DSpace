@@ -11,12 +11,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
@@ -52,7 +48,7 @@ public interface CitationDocumentService {
      * @return true or false
      * @throws SQLException if error
      */
-    public Boolean isCitationEnabledForBitstream(Bitstream bitstream, Context context) throws SQLException;
+    Boolean isCitationEnabledForBitstream(Bitstream bitstream, Context context) throws SQLException;
 
     /**
      * @param context   DSpace Context
@@ -60,7 +56,7 @@ public interface CitationDocumentService {
      * @return true or false
      * @throws SQLException if error
      */
-    public boolean canGenerateCitationVersion(Context context, Bitstream bitstream) throws SQLException;
+    boolean canGenerateCitationVersion(Context context, Bitstream bitstream) throws SQLException;
 
     /**
      * Creates a
@@ -83,64 +79,7 @@ public interface CitationDocumentService {
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
-    public Pair<byte[], Long> makeCitedDocument(Context context, Bitstream bitstream)
+    Pair<byte[], Long> makeCitedDocument(Context context, Bitstream bitstream)
             throws IOException, SQLException, AuthorizeException;
-
-    /**
-     * @param page          page
-     * @param contentStream content stream
-     * @param text          text to draw
-     * @param startX        x-coordinate of word
-     * @param startY        y-coordinate of word
-     * @param pdfFont       font
-     * @param fontSize      size of font
-     * @return integer
-     * @throws IOException if IO error
-     */
-    public int drawStringWordWrap(PDPage page, PDPageContentStream contentStream, String text,
-                                  int startX, int startY, PDFont pdfFont, float fontSize) throws IOException;
-
-    /**
-     * Get name of owning community
-     *
-     * @param context DSpace context
-     * @param item    DSpace Item
-     * @return name
-     */
-    public String getOwningCommunity(Context context, Item item);
-
-    /**
-     * Get name of owning collection
-     *
-     * @param item DSpace Item
-     * @return owning collection name
-     */
-    public String getOwningCollection(Item item);
-
-    /**
-     * Get metadata separated by value separator (semicolon)
-     *
-     * @param item        DSpace Item
-     * @param metadataKey metadata string
-     * @return string
-     * @see org.dspace.content.service.DSpaceObjectService#getMetadataByMetadataString(org.dspace.content
-     * .DSpaceObject, java.lang.String)
-     */
-    public String getAllMetadataSeparated(Item item, String metadataKey);
-
-    /**
-     * @param page          page
-     * @param contentStream content stream
-     * @param y             the y-coordinate of the first row
-     * @param margin        the padding on left and right of table
-     * @param content       a 2d array containing the table data
-     * @param font          PDFont
-     * @param fontSize      size of font (int)
-     * @param cellBorders   whether to include cellBorders
-     * @throws IOException if error
-     */
-    public void drawTable(PDPage page, PDPageContentStream contentStream,
-                          float y, float margin,
-                          String[][] content, PDFont font, int fontSize, boolean cellBorders) throws IOException;
 
 }

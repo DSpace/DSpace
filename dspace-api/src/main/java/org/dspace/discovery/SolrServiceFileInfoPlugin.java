@@ -52,21 +52,23 @@ public class SolrServiceFileInfoPlugin implements SolrServiceIndexPlugin {
                         List<Bitstream> bitstreams = bundle.getBitstreams();
                         if (bitstreams != null) {
                             for (Bitstream bitstream : bitstreams) {
-                                document.addField(SOLR_FIELD_NAME_FOR_FILENAMES, bitstream.getName());
-                                // Add _keyword and _filter fields which are necessary to support filtering and faceting
-                                // for the file names
-                                document.addField(SOLR_FIELD_NAME_FOR_FILENAMES + "_keyword", bitstream.getName());
-                                document.addField(SOLR_FIELD_NAME_FOR_FILENAMES + "_filter", bitstream.getName());
+                                if (bitstream != null) {
+                                    document.addField(SOLR_FIELD_NAME_FOR_FILENAMES, bitstream.getName());
+                                    // Add _keyword and _filter fields which are necessary to
+                                    // support filtering and faceting for the file names
+                                    document.addField(SOLR_FIELD_NAME_FOR_FILENAMES + "_keyword", bitstream.getName());
+                                    document.addField(SOLR_FIELD_NAME_FOR_FILENAMES + "_filter", bitstream.getName());
 
-                                String description = bitstream.getDescription();
-                                if ((description != null) && !description.isEmpty()) {
-                                    document.addField(SOLR_FIELD_NAME_FOR_DESCRIPTIONS, description);
-                                    // Add _keyword and _filter fields which are necessary to support filtering and
-                                    // faceting for the descriptions
-                                    document.addField(SOLR_FIELD_NAME_FOR_DESCRIPTIONS + "_keyword",
-                                                      description);
-                                    document.addField(SOLR_FIELD_NAME_FOR_DESCRIPTIONS + "_filter",
-                                                      description);
+                                    String description = bitstream.getDescription();
+                                    if ((description != null) && !description.isEmpty()) {
+                                        document.addField(SOLR_FIELD_NAME_FOR_DESCRIPTIONS, description);
+                                        // Add _keyword and _filter fields which are necessary to support filtering and
+                                        // faceting for the descriptions
+                                        document.addField(SOLR_FIELD_NAME_FOR_DESCRIPTIONS + "_keyword",
+                                                        description);
+                                        document.addField(SOLR_FIELD_NAME_FOR_DESCRIPTIONS + "_filter",
+                                                        description);
+                                    }
                                 }
                             }
                         }

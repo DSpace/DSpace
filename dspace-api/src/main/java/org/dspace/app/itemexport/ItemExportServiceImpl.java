@@ -18,10 +18,11 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,6 +35,7 @@ import java.util.zip.ZipOutputStream;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.content.Bitstream;
@@ -352,7 +354,7 @@ public class ItemExportServiceImpl implements ItemExportService {
 
     /**
      * Create the 'collections' file.  List handles of all Collections which
-     * contain this Item.  The "owning" Collection is listed first.
+     * contain this Item. The "owning" Collection is listed first.
      *
      * @param item list collections holding this Item.
      * @param destDir write the file here.
@@ -363,12 +365,14 @@ public class ItemExportServiceImpl implements ItemExportService {
         File outFile = new File(destDir, "collections");
         if (outFile.createNewFile()) {
             try (PrintWriter out = new PrintWriter(new FileWriter(outFile))) {
-                String ownerHandle = item.getOwningCollection().getHandle();
-                out.println(ownerHandle);
+                Collection owningCollection = item.getOwningCollection();
+                // The owning collection is null for workspace and workflow items
+                if (owningCollection != null) {
+                    out.println(owningCollection.getHandle());
+                }
                 for (Collection collection : item.getCollections()) {
-                    String collectionHandle = collection.getHandle();
-                    if (!collectionHandle.equals(ownerHandle)) {
-                        out.println(collectionHandle);
+                    if (!collection.equals(owningCollection)) {
+                        out.println(collection.getHandle());
                     }
                 }
             }
@@ -678,7 +682,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                         context.turnOffAuthorisationSystem();
 
                         String fileName = assembleFileName("item", eperson,
-                                                           new Date());
+                                                           LocalDate.now());
                         String workParentDir = getExportWorkDirectory()
                             + System.getProperty("file.separator")
                             + fileName;
@@ -750,16 +754,16 @@ public class ItemExportServiceImpl implements ItemExportService {
 
     @Override
     public String assembleFileName(String type, EPerson eperson,
-                                   Date date) throws Exception {
+                                   LocalDate date) throws Exception {
         // to format the date
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MMM_dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MMM_dd");
         String downloadDir = getExportDownloadDirectory(eperson);
         // used to avoid name collision
         int count = 1;
         boolean exists = true;
         String fileName = null;
         while (exists) {
-            fileName = type + "_export_" + sdf.format(date) + "_" + count + "_"
+            fileName = type + "_export_" + formatter.format(date) + "_" + count + "_"
                 + eperson.getID();
             exists = new File(downloadDir
                                   + System.getProperty("file.separator") + fileName + ".zip")
@@ -796,7 +800,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 "A dspace.cfg entry for 'org.dspace.app.itemexport.work.dir' does not exist.");
         }
         // clean work dir path from duplicate separators
-        return StringUtils.replace(exportDir, File.separator + File.separator, File.separator);
+        return Strings.CS.replace(exportDir, File.separator + File.separator, File.separator);
     }
 
     @Override
@@ -915,14 +919,12 @@ public class ItemExportServiceImpl implements ItemExportService {
     public void deleteOldExportArchives(EPerson eperson) throws Exception {
         int hours = configurationService
             .getIntProperty("org.dspace.app.itemexport.life.span.hours");
-        Calendar now = Calendar.getInstance();
-        now.setTime(new Date());
-        now.add(Calendar.HOUR, -hours);
+        Instant modifiedTime = Instant.now().minus(hours, ChronoUnit.HOURS);
         File downloadDir = new File(getExportDownloadDirectory(eperson));
         if (downloadDir.exists()) {
             File[] files = downloadDir.listFiles();
             for (File file : files) {
-                if (file.lastModified() < now.getTimeInMillis()) {
+                if (file.lastModified() < modifiedTime.toEpochMilli()) {
                     if (!file.delete()) {
                         logError("Unable to delete export file");
                     }
@@ -935,9 +937,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     @Override
     public void deleteOldExportArchives() throws Exception {
         int hours = configurationService.getIntProperty("org.dspace.app.itemexport.life.span.hours");
-        Calendar now = Calendar.getInstance();
-        now.setTime(new Date());
-        now.add(Calendar.HOUR, -hours);
+        Instant modifiedTime = Instant.now().minus(hours, ChronoUnit.HOURS);
         File downloadDir = new File(configurationService.getProperty("org.dspace.app.itemexport.download.dir"));
         if (downloadDir.exists()) {
             // Get a list of all the sub-directories, potentially one for each ePerson.
@@ -946,7 +946,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 // For each sub-directory delete any old files.
                 File[] files = dir.listFiles();
                 for (File file : files) {
-                    if (file.lastModified() < now.getTimeInMillis()) {
+                    if (file.lastModified() < modifiedTime.toEpochMilli()) {
                         if (!file.delete()) {
                             logError("Unable to delete old files");
                         }
@@ -1059,7 +1059,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 }
                 String strAbsPath = cpFile.getPath();
                 int startIndex = strSource.length();
-                if (!StringUtils.endsWith(strSource, File.separator)) {
+                if (!Strings.CS.endsWith(strSource, File.separator)) {
                     startIndex++;
                 }
                 String strZipEntryName = strAbsPath.substring(startIndex, strAbsPath.length());

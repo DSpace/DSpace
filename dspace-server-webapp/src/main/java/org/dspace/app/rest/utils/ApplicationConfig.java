@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.utils;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -32,10 +32,13 @@ import org.springframework.context.annotation.Configuration;
     "org.dspace.app.rest.converter",
     "org.dspace.app.rest.repository",
     "org.dspace.app.rest.utils",
+    "org.dspace.app.rest.link",
+    "org.dspace.app.rest.converter.factory",
     "org.dspace.app.configuration",
     "org.dspace.iiif",
     "org.dspace.app.iiif",
-    "org.dspace.app.ldn"
+    "org.dspace.app.ldn",
+    "org.dspace.app.scheduler"
 })
 public class ApplicationConfig {
     // Allowed CORS origins ("Access-Control-Allow-Origin" header)
@@ -90,7 +93,7 @@ public class ApplicationConfig {
             // http://example.org and http://example.org/ to be different Origins.
             for (int i = 0; i < corsOrigins.length; i++) {
                 if (corsOrigins[i].endsWith("/")) {
-                    corsOrigins[i] = StringUtils.removeEnd(corsOrigins[i], "/");
+                    corsOrigins[i] = Strings.CS.removeEnd(corsOrigins[i], "/");
                 }
             }
 

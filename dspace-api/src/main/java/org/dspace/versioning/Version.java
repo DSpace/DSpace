@@ -7,7 +7,7 @@
  */
 package org.dspace.versioning;
 
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,8 +19,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
@@ -55,8 +53,7 @@ public class Version implements ReloadableEntity<Integer> {
     private EPerson ePerson;
 
     @Column(name = "version_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date versionDate;
+    private Instant versionDate;
 
     @Column(name = "version_summary", length = 255)
     private String summary;
@@ -72,7 +69,7 @@ public class Version implements ReloadableEntity<Integer> {
      * {@link org.dspace.versioning.service.VersioningService#createNewVersion(Context, Item, String)}
      * or
      * {@link org.dspace.versioning.service.VersioningService#createNewVersion(Context, VersionHistory,
-     * Item, String, Date, int)}
+     * Item, String, Instant, int)}
      */
     protected Version() {
 
@@ -107,11 +104,11 @@ public class Version implements ReloadableEntity<Integer> {
         this.ePerson = ePerson;
     }
 
-    public Date getVersionDate() {
+    public Instant getVersionDate() {
         return versionDate;
     }
 
-    public void setVersionDate(Date versionDate) {
+    public void setVersionDate(Instant versionDate) {
         this.versionDate = versionDate;
     }
 

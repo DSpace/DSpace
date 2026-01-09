@@ -313,7 +313,7 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         org.hibernate.query.Query hquery = query.unwrap(org.hibernate.query.Query.class);
         Stream<T> stream = hquery.stream();
         Iterator<T> iter = stream.iterator();
-        return new AbstractIterator<T> () {
+        return new AbstractIterator<T>() {
             @Override
             protected T computeNext() {
                 return iter.hasNext() ? iter.next() : endOfData();
@@ -468,6 +468,9 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         for (Map.Entry<String, Object> entry : equals.entrySet()) {
             criteria.where(criteriaBuilder.equal(root.get(entry.getKey()), entry.getValue()));
         }
+
+        criteria.orderBy(criteriaBuilder.asc(root.get("id")));
+
         return executeCriteriaQuery(context, criteria, cacheable, maxResults, offset);
     }
 

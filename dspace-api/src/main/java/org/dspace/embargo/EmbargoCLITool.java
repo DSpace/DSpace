@@ -9,7 +9,8 @@ package org.dspace.embargo;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.List;
 
@@ -78,7 +79,7 @@ public class EmbargoCLITool {
      *
      * @param argv the command line arguments given
      */
-    public static void main(String argv[]) {
+    public static void main(String[] argv) {
         int status = 0;
 
         Options options = new Options();
@@ -123,7 +124,7 @@ public class EmbargoCLITool {
         try {
             context = new Context(Context.Mode.BATCH_EDIT);
             context.turnOffAuthorisationSystem();
-            Date now = new Date();
+            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 
             // scan items under embargo
             if (line.hasOption('i')) {
@@ -173,7 +174,7 @@ public class EmbargoCLITool {
 
     // lift or check embargo on one Item, handle exceptions
     // return false on success, true if there was fatal exception.
-    protected static boolean processOneItem(Context context, Item item, CommandLine line, Date now)
+    protected static boolean processOneItem(Context context, Item item, CommandLine line, ZonedDateTime now)
         throws Exception {
         boolean status = false;
         List<MetadataValue> lift = embargoService.getLiftMetadata(context, item);
@@ -186,7 +187,7 @@ public class EmbargoCLITool {
                     embargoService.setEmbargo(context, item);
                 } else {
                     log.debug("Testing embargo on item=" + item.getHandle() + ", date=" + liftDate.toString());
-                    if (liftDate.toDate().before(now)) {
+                    if (liftDate.toDate().isBefore(now)) {
                         if (line.hasOption('v')) {
                             System.err.println(
                                 "Lifting embargo from Item handle=" + item.getHandle() + ", lift date=" +

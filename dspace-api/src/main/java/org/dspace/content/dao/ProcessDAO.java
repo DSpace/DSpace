@@ -8,7 +8,7 @@
 package org.dspace.content.dao;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import org.dspace.content.ProcessStatus;
@@ -95,7 +95,7 @@ public interface ProcessDAO extends GenericDAO<Process> {
      * @return              The list of all Processes which match requirements
      * @throws SQLException If something goes wrong
      */
-    List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses, Date date)
+    List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses, Instant date)
         throws SQLException;
 
     /**

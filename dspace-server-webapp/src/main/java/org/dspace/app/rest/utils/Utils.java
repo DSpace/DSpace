@@ -48,6 +48,7 @@ import jakarta.annotation.Nullable;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
@@ -308,25 +309,25 @@ public class Utils {
         if (modelPlural.equals("resourcepolicies")) {
             return ResourcePolicyRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "processes")) {
+        if (Strings.CS.equals(modelPlural, "processes")) {
             return ProcessRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "versionhistories")) {
+        if (Strings.CS.equals(modelPlural, "versionhistories")) {
             return VersionHistoryRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "properties")) {
+        if (Strings.CS.equals(modelPlural, "properties")) {
             return PropertyRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "vocabularies")) {
+        if (Strings.CS.equals(modelPlural, "vocabularies")) {
             return VocabularyRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, OrcidQueueRest.PLURAL_NAME)) {
+        if (Strings.CS.equals(modelPlural, OrcidQueueRest.PLURAL_NAME)) {
             return OrcidQueueRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "orcidhistories")) {
+        if (Strings.CS.equals(modelPlural, "orcidhistories")) {
             return OrcidHistoryRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "supervisionorders")) {
+        if (Strings.CS.equals(modelPlural, "supervisionorders")) {
             return SupervisionOrderRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
@@ -987,21 +988,26 @@ public class Utils {
     */
     public BaseObjectRest getBaseObjectRestFromUri(Context context, String uri) throws SQLException {
         String dspaceUrl = configurationService.getProperty("dspace.server.url");
+        String dspaceSSRUrl = configurationService.getProperty("dspace.server.ssr.url", dspaceUrl);
 
         // Convert strings to URL objects.
         // Do this early to check that inputs are well-formed.
         URL dspaceUrlObject;
+        URL dspaceUrlSSRObject = null;
         URL requestUrlObject;
         try {
             dspaceUrlObject = new URL(dspaceUrl);
             requestUrlObject = new URL(uri);
+            if (StringUtils.isNoneBlank(dspaceSSRUrl)) {
+                dspaceUrlSSRObject = new URL(dspaceSSRUrl);
+            }
         } catch (MalformedURLException ex) {
             throw new IllegalArgumentException(
                     String.format("Configuration '%s' or request '%s' is malformed", dspaceUrl, uri));
         }
 
         // Check whether the URI could be valid.
-        if (!urlIsPrefixOf(dspaceUrl, uri)) {
+        if (!urlIsPrefixOf(dspaceUrl, uri) && !urlIsPrefixOf(dspaceSSRUrl, uri)) {
             throw new IllegalArgumentException("the supplied uri is not ours: " + uri);
         }
 
@@ -1011,10 +1017,15 @@ public class Utils {
         String[] requestPath = StringUtils.split(requestUrlObject.getPath(), '/');
         String[] uriParts = Arrays.copyOfRange(requestPath, dspacePathLength,
                 requestPath.length);
+
+        int dspaceSSRPathLength = StringUtils.split(dspaceUrlSSRObject.getPath(), '/').length;
+        String[] uriSSRParts = Arrays.copyOfRange(requestPath, dspaceSSRPathLength,
+            requestPath.length);
+
         if ("api".equalsIgnoreCase(uriParts[0])) {
             uriParts = Arrays.copyOfRange(uriParts, 1, uriParts.length);
         }
-        if (uriParts.length != 3) {
+        if (uriParts.length != 3 && uriSSRParts.length != 3) {
             throw new IllegalArgumentException("the supplied uri lacks required path elements: " + uri);
         }
 

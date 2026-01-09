@@ -7,11 +7,12 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.utils.HttpHeadersInitializer.CONTENT_DISPOSITION;
+import static org.dspace.app.rest.utils.HttpHeadersInitializer.CONTENT_DISPOSITION_INLINE;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -21,17 +22,14 @@ import javax.xml.transform.stream.StreamResult;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.rest.utils.RestDiscoverQueryBuilder;
 import org.dspace.app.rest.utils.ScopeResolver;
-import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.OpenSearchService;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
@@ -49,8 +47,10 @@ import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -67,12 +67,9 @@ import org.w3c.dom.Document;
 public class OpenSearchController {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
-    private static final String errorpath = "/error";
+
     private List<String> searchIndices = null;
 
-    private CommunityService communityService;
-    private CollectionService collectionService;
-    private AuthorizeService authorizeService;
     private OpenSearchService openSearchService;
 
     @Autowired
@@ -86,35 +83,45 @@ public class OpenSearchController {
     @Autowired
     private ScopeResolver scopeResolver;
 
+    @Autowired
+    private RestDiscoverQueryBuilder restDiscoverQueryBuilder;
+
     /**
      * This method provides the OpenSearch query on the path /search
      * It will pass the result as a OpenSearchDocument directly to the client
      */
     @GetMapping("/search")
     public void search(HttpServletRequest request,
-                         HttpServletResponse response,
-                         @RequestParam(name = "query", required = false) String query,
-                         @RequestParam(name = "start", required = false) Integer start,
-                         @RequestParam(name = "rpp", required = false) Integer count,
-                         @RequestParam(name = "format", required = false) String format,
-                         @RequestParam(name = "sort", required = false) String sort,
-                         @RequestParam(name = "sort_direction", required = false) String sortDirection,
-                         @RequestParam(name = "scope", required = false) String dsoObject,
-                         Model model) throws IOException, ServletException {
+                       HttpServletResponse response,
+                       @RequestParam(name = "query", required = false) String query,
+                       @RequestParam(name = "start", required = false) Integer start,
+                       @RequestParam(name = "rpp", required = false) Integer count,
+                       @RequestParam(name = "format", required = false) String format,
+                       @RequestParam(name = "sort", required = false) String sort,
+                       @RequestParam(name = "sort_direction", required = false) String sortDirection,
+                       @RequestParam(name = "scope", required = false) String dsoObject,
+                       @RequestParam(name = "configuration", required = false) String configuration,
+                       List<SearchFilter> searchFilters) throws IOException, ServletException {
         context = ContextUtil.obtainContext(request);
-        if (start == null) {
-            start = 0;
-        }
-        if (count == null) {
-            count = -1;
-        }
+
         if (openSearchService == null) {
             openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
         }
+
         if (openSearchService.isEnabled()) {
             init();
+
+            if (start == null) {
+                start = 0;
+            }
+
+            if (count == null) {
+                count = -1;
+            }
+            count = Math.min(count, openSearchService.getMaxNumOfItemsPerRequest());
+
             // get enough request parameters to decide on action to take
-            if (format == null || "".equals(format)) {
+            if (StringUtils.isEmpty(format)) {
                 // default to atom
                 format = "atom";
             }
@@ -133,84 +140,103 @@ public class OpenSearchController {
             // then the rest - we are processing the query
             IndexableObject container = null;
 
-            // support pagination parameters
-            DiscoverQuery queryArgs = new DiscoverQuery();
-            if (query == null) {
-                query = "";
-            } else {
-                queryArgs.setQuery(query);
+            DiscoverQuery queryArgs;
+
+            DiscoveryConfiguration discoveryConfiguration = null;
+            if (StringUtils.isNotBlank(configuration)) {
+                discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration(configuration);
             }
-            queryArgs.setStart(start);
-            queryArgs.setMaxResults(count);
-            queryArgs.setDSpaceObjectFilter(IndexableItem.TYPE);
+            if (discoveryConfiguration == null) {
+                discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration("default");
+            }
+            // If we have search filters, use RestDiscoverQueryBuilder.
+            if (searchFilters != null && searchFilters.size() > 0) {
+                IndexableObject scope = scopeResolver.resolveScope(context, dsoObject);
+                Sort pageSort = sort == null || sortDirection == null
+                        ? Sort.unsorted()
+                        : Sort.by(new Sort.Order(Sort.Direction.fromString(sortDirection), sort));
+                // TODO count can't be < 1 so I put an arbitrary number
+                Pageable page = PageRequest.of(start, count > 0 ? count : 10, pageSort);
+                queryArgs = restDiscoverQueryBuilder.buildQuery(context, scope,
+                        discoveryConfiguration, query, searchFilters, IndexableItem.TYPE, page);
+                queryArgs.setFacetMinCount(-1);
+            } else { // Else, use the older behavior.
+                // support pagination parameters
+                queryArgs = new DiscoverQuery();
+                if (query == null) {
+                    query = "";
+                } else {
+                    queryArgs.setQuery(query);
+                }
+                queryArgs.setStart(start);
+                queryArgs.setMaxResults(count);
+                queryArgs.setDSpaceObjectFilter(IndexableItem.TYPE);
 
-            if (sort != null) {
-                DiscoveryConfiguration discoveryConfiguration =
-                    searchConfigurationService.getDiscoveryConfiguration("");
-                if (discoveryConfiguration != null) {
-                    DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration
-                        .getSearchSortConfiguration();
-                    if (searchSortConfiguration != null) {
-                        DiscoverySortFieldConfiguration sortFieldConfiguration = searchSortConfiguration
-                            .getSortFieldConfiguration(sort);
-                        if (sortFieldConfiguration != null) {
-                            String sortField = searchService
-                                .toSortFieldIndex(sortFieldConfiguration.getMetadataField(),
-                                sortFieldConfiguration.getType());
+                if (sort != null) {
+                    if (discoveryConfiguration != null) {
+                        DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration
+                                .getSearchSortConfiguration();
+                        if (searchSortConfiguration != null) {
+                            DiscoverySortFieldConfiguration sortFieldConfiguration = searchSortConfiguration
+                                    .getSortFieldConfiguration(sort);
+                            if (sortFieldConfiguration != null) {
+                                String sortField = searchService
+                                        .toSortFieldIndex(sortFieldConfiguration.getMetadataField(),
+                                                sortFieldConfiguration.getType());
 
-                            if (sortDirection != null && sortDirection.equals("DESC")) {
-                                queryArgs.setSortField(sortField, SORT_ORDER.desc);
+                                if (sortDirection != null && sortDirection.equals("DESC")) {
+                                    queryArgs.setSortField(sortField, SORT_ORDER.desc);
+                                } else {
+                                    queryArgs.setSortField(sortField, SORT_ORDER.asc);
+                                }
                             } else {
-                                queryArgs.setSortField(sortField, SORT_ORDER.asc);
+                                throw new IllegalArgumentException(sort + " is not a valid sort field");
                             }
-                        } else {
-                            throw new IllegalArgumentException(sort + " is not a valid sort field");
                         }
                     }
+                } else {
+                    // this is the default sort so we want to switch this to date accessioned
+                    queryArgs.setSortField("dc.date.accessioned_dt", SORT_ORDER.desc);
                 }
-            } else {
-                // this is the default sort so we want to switch this to date accessioned
-                queryArgs.setSortField("dc.date.accessioned_dt", SORT_ORDER.desc);
-            }
 
-            if (dsoObject != null) {
-                container = scopeResolver.resolveScope(context, dsoObject);
-                DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
-                        .getDiscoveryConfiguration(context,  container);
-                queryArgs.setDiscoveryConfigurationName(discoveryConfiguration.getId());
-                queryArgs.addFilterQueries(discoveryConfiguration.getDefaultFilterQueries()
-                        .toArray(
-                                new String[discoveryConfiguration.getDefaultFilterQueries()
-                                        .size()]));
+                if (dsoObject != null) {
+                    container = scopeResolver.resolveScope(context, dsoObject);
+                    discoveryConfiguration = searchConfigurationService
+                            .getDiscoveryConfigurationByNameOrIndexableObject(context, "site", container);
+                    queryArgs.setDiscoveryConfigurationName(discoveryConfiguration.getId());
+                    queryArgs.addFilterQueries(discoveryConfiguration.getDefaultFilterQueries()
+                            .toArray(
+                                    new String[discoveryConfiguration.getDefaultFilterQueries()
+                                            .size()]));
+                }
             }
 
             // Perform the search
             DiscoverResult qResults = null;
             try {
                 qResults = SearchUtils.getSearchService().search(context,
-                    container, queryArgs);
+                        container, queryArgs);
             } catch (SearchServiceException e) {
                 log.error(LogHelper.getHeader(context, "opensearch", "query="
-                            + queryArgs.getQuery()
-                            + ",error=" + e.getMessage()), e);
+                        + queryArgs.getQuery()
+                        + ",error=" + e.getMessage()), e);
                 throw new RuntimeException(e.getMessage(), e);
             }
 
             // Log
             log.info("opensearch done, query=\"" + query + "\",results="
-                        + qResults.getTotalSearchResults());
+                    + qResults.getTotalSearchResults());
 
-            // format and return results
-            Map<String, String> labelMap = getLabels(request);
             List<IndexableObject> dsoResults = qResults.getIndexableObjects();
             Document resultsDoc = openSearchService.getResultsDoc(context, format, query,
-                (int) qResults.getTotalSearchResults(), qResults.getStart(),
-                qResults.getMaxResults(), container, dsoResults, labelMap);
+                    (int) qResults.getTotalSearchResults(), qResults.getStart(),
+                    qResults.getMaxResults(), container, dsoResults);
             try {
                 Transformer xf = TransformerFactory.newInstance().newTransformer();
                 response.setContentType(openSearchService.getContentType(format));
+                response.addHeader(CONTENT_DISPOSITION, CONTENT_DISPOSITION_INLINE);
                 xf.transform(new DOMSource(resultsDoc),
-                    new StreamResult(response.getWriter()));
+                        new StreamResult(response.getWriter()));
             } catch (TransformerException e) {
                 log.error(e);
                 throw new ServletException(e.toString());
@@ -231,7 +257,7 @@ public class OpenSearchController {
      */
     @GetMapping("/service")
     public void service(HttpServletRequest request,
-                         HttpServletResponse response) throws IOException {
+                        HttpServletResponse response) throws IOException {
         log.debug("Show OpenSearch Service document");
         if (openSearchService == null) {
             openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
@@ -240,7 +266,7 @@ public class OpenSearchController {
             String svcDescrip = openSearchService.getDescription(null);
             log.debug("opensearchdescription is " + svcDescrip);
             response.setContentType(openSearchService
-                .getContentType("opensearchdescription"));
+                    .getContentType("opensearchdescription"));
             response.setContentLength(svcDescrip.length());
             response.getWriter().write(svcDescrip);
         } else {
@@ -266,28 +292,9 @@ public class OpenSearchController {
                 searchIndices.add(sFilter.getIndexFieldName());
             }
         }
-        communityService = ContentServiceFactory.getInstance().getCommunityService();
-        collectionService = ContentServiceFactory.getInstance().getCollectionService();
-        authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     }
 
     public void setOpenSearchService(OpenSearchService oSS) {
         openSearchService = oSS;
-    }
-
-
-    /**
-     * Internal method to get labels for the returned document
-     */
-    private Map<String, String> getLabels(HttpServletRequest request) {
-        // TODO: get strings from translation file or configuration
-        Map<String, String> labelMap = new HashMap<String, String>();
-        labelMap.put(SyndicationFeed.MSG_UNTITLED, "notitle");
-        labelMap.put(SyndicationFeed.MSG_LOGO_TITLE, "logo.title");
-        labelMap.put(SyndicationFeed.MSG_FEED_DESCRIPTION, "general-feed.description");
-        for (String selector : SyndicationFeed.getDescriptionSelectors()) {
-            labelMap.put("metadata." + selector, selector);
-        }
-        return labelMap;
     }
 }

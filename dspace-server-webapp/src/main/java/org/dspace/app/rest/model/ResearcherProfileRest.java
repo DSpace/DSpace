@@ -20,8 +20,8 @@ import org.dspace.app.rest.RestResourceController;
  *
  */
 @LinksRest(links = {
-        @LinkRest(name = ResearcherProfileRest.ITEM, method = "getItem"),
-        @LinkRest(name = ResearcherProfileRest.EPERSON, method = "getEPerson")
+    @LinkRest(name = ResearcherProfileRest.ITEM, method = "getItem"),
+    @LinkRest(name = ResearcherProfileRest.EPERSON, method = "getEPerson")
 })
 public class ResearcherProfileRest extends BaseObjectRest<UUID> {
 
