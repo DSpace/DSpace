@@ -245,7 +245,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             throws IOException, SQLException {
 
         PDDocument result = new PDDocument();
-        PDDocument source = loadDocumentFromDB(context, bitstream)      
+        PDDocument source = loadDocumentFromDB(context, bitstream);
         try {
             var item = (Item) bitstreamService.getParentObject(context, bitstream);
             try (var cover = coverPageService.renderCoverDocument(item)) {
@@ -270,7 +270,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
         document.setAllSecurityToBeRemoved(true);
         //We already have the full PDF in memory, so keep it there
-        ByteArrayOutputStream out = new ByteArrayOutputStream()
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             document.save(out);
             byte[] data = out.toByteArray();
