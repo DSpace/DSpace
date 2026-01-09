@@ -287,12 +287,12 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
       if (isCitationFirstPage()) {
           //citation as cover page
-          document.addPage(coverPage);
+          mergerUtility.appendDocument(document, coverPage);
           mergerUtility.appendDocument(document, sourceDocument);
       } else {
           //citation as tail page
           mergerUtility.appendDocument(document, sourceDocument);
-          document.addPage(coverPage);
+          mergerUtility.appendDocument(document, coverPage);
       }
     }
 }
