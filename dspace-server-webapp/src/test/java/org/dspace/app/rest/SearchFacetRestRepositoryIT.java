@@ -10,10 +10,8 @@ package org.dspace.app.rest;
 import static com.google.common.net.UrlEscapers.urlPathSegmentEscaper;
 import static org.dspace.app.rest.matcher.FacetEntryMatcher.defaultFacetMatchers;
 import static org.dspace.app.rest.matcher.FacetValueMatcher.entrySupervisedBy;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -21,7 +19,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.dspace.app.rest.matcher.AppliedFilterMatcher;
 import org.dspace.app.rest.matcher.FacetEntryMatcher;
 import org.dspace.app.rest.matcher.FacetValueMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
@@ -1336,10 +1333,12 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
             .andExpect(jsonPath("$._links.self.href",containsString(
                 "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC")))
             .andExpect(jsonPath("$._embedded.values._links.next.href",containsString(
-                "/api/discover/facets/discoverable/values?configuration=administrativeView&sort=score,DESC&page=1&size=1")))
+                "/api/discover/facets/discoverable/values?" +
+                    "configuration=administrativeView&sort=score,DESC&page=1&size=1")))
             .andExpect(jsonPath("$._embedded.values._embedded.values", Matchers.contains(
                 SearchResultMatcher.matchEmbeddedFacetValues("true", 2, "discover",
-                    "/api/discover/search/objects?configuration=administrativeView&f.discoverable=true,equals")
+                    "/api/discover/search/objects?" +
+                        "configuration=administrativeView&f.discoverable=true,equals")
             )));
 
         getClient(adminToken).perform(get("/api/discover/facets/discoverable")
@@ -1350,14 +1349,18 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
                 .param("embed", "values"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.values._links.first.href",containsString(
-                "/api/discover/facets/discoverable/values?configuration=administrativeView&sort=score,DESC&page=0&size=1")))
+                "/api/discover/facets/discoverable/values?" +
+                    "configuration=administrativeView&sort=score,DESC&page=0&size=1")))
             .andExpect(jsonPath("$._embedded.values._links.prev.href",containsString(
-                "/api/discover/facets/discoverable/values?configuration=administrativeView&sort=score,DESC&page=0&size=1")))
+                "/api/discover/facets/discoverable/values?" +
+                    "configuration=administrativeView&sort=score,DESC&page=0&size=1")))
             .andExpect(jsonPath("$._embedded.values._links.self.href",containsString(
-                "/api/discover/facets/discoverable/values?configuration=administrativeView&sort=score,DESC&page=1&size=1")))
+                "/api/discover/facets/discoverable/values?" +
+                    "configuration=administrativeView&sort=score,DESC&page=1&size=1")))
             .andExpect(jsonPath("$._embedded.values._embedded.values", Matchers.contains(
                 SearchResultMatcher.matchEmbeddedFacetValues("false", 1, "discover",
-                    "/api/discover/search/objects?configuration=administrativeView&f.discoverable=false,equals")
+                    "/api/discover/search/objects?" +
+                        "configuration=administrativeView&f.discoverable=false,equals")
             )));
     }
 

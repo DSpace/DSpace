@@ -29,7 +29,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class SearchFacetEntryHalLinkFactory extends HalLinkFactory<SearchFacetEntryResource, RestResourceController> {
     @Override
-    protected void addLinks(SearchFacetEntryResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
+    protected void addLinks(SearchFacetEntryResource halResource, Pageable pageable, LinkedList<Link> list)
+        throws Exception {
         SearchFacetEntryRest facet = halResource.getContent();
         if (facet != null && facet.getFacetInformation() != null) {
             List<Link> updatedLinks = new ArrayList<>();
