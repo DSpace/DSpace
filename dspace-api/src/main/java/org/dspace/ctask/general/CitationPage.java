@@ -112,7 +112,7 @@ public class CitationPage extends AbstractCurationTask {
             this.status = Curator.CURATE_SKIP;
             return;
         }
-        
+
         //Determine if the DISPLAY bundle exits. If not, create it.
         List<Bundle> dBundles = itemService.getBundles(item, CitationPage.DISPLAY_BUNDLE_NAME);
         Bundle dBundle;
