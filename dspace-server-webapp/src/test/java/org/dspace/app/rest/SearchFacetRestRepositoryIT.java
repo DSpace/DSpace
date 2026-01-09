@@ -1204,7 +1204,7 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
         //** WHEN **
         //An anonymous user browses this endpoint to find the objects in the system
         //With a size 2
-        getClient().perform(get("/api/discover/search/facets")
+        getClient().perform(get("/api/discover/facets")
                 .param("configuration", "minAndMaxTests"))
             //** THEN **
             //The status has to be 200 OK
@@ -1217,7 +1217,7 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
                 FacetEntryMatcher.hasContentInOriginalBundleFacet()
             )))
             //There always needs to be a self link available
-            .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/facets")))
+            .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/facets")))
         ;
 
     }
@@ -1336,7 +1336,7 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
             .andExpect(jsonPath("$._links.self.href",containsString(
                 "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC")))
             .andExpect(jsonPath("$._embedded.values._links.next.href",containsString(
-                "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC&page=1&size=1")))
+                "/api/discover/facets/discoverable/values?configuration=administrativeView&sort=score,DESC&page=1&size=1")))
             .andExpect(jsonPath("$._embedded.values._embedded.values", Matchers.contains(
                 SearchResultMatcher.matchEmbeddedFacetValues("true", 2, "discover",
                     "/api/discover/search/objects?configuration=administrativeView&f.discoverable=true,equals")
@@ -1349,12 +1349,12 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
                 .param("size", "1")
                 .param("embed", "values"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._links.first.href",containsString(
-                "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC&page=0&size=1")))
-            .andExpect(jsonPath("$._links.prev.href",containsString(
-                "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC&page=0&size=1")))
-            .andExpect(jsonPath("$._links.self.href",containsString(
-                "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC&page=1&size=1")))
+            .andExpect(jsonPath("$._embedded.values._links.first.href",containsString(
+                "/api/discover/facets/discoverable/values?configuration=administrativeView&sort=score,DESC&page=0&size=1")))
+            .andExpect(jsonPath("$._embedded.values._links.prev.href",containsString(
+                "/api/discover/facets/discoverable/values?configuration=administrativeView&sort=score,DESC&page=0&size=1")))
+            .andExpect(jsonPath("$._embedded.values._links.self.href",containsString(
+                "/api/discover/facets/discoverable/values?configuration=administrativeView&sort=score,DESC&page=1&size=1")))
             .andExpect(jsonPath("$._embedded.values._embedded.values", Matchers.contains(
                 SearchResultMatcher.matchEmbeddedFacetValues("false", 1, "discover",
                     "/api/discover/search/objects?configuration=administrativeView&f.discoverable=false,equals")

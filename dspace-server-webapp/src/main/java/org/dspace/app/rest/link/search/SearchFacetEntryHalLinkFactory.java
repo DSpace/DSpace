@@ -14,6 +14,7 @@ import java.util.List;
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
+import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.SearchFacetEntryResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
@@ -39,6 +40,12 @@ public class SearchFacetEntryHalLinkFactory extends HalLinkFactory<SearchFacetEn
             });
             halResource.removeLinks();
             list.addAll(updatedLinks);
+
+            halResource.getEmbeddedResources().values().forEach(embeddedResource -> {
+                if (embeddedResource instanceof EmbeddedPage embeddedPage) {
+                    facet.getFacetInformation().appendQueryParameters(embeddedPage.getSelf(), false);
+                }
+            });
         }
     }
 
