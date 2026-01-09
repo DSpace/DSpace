@@ -40,7 +40,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.utils.DSpace;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * Import items into DSpace. The conventional use is upload files by copying
@@ -58,7 +58,7 @@ import org.dspace.utils.DSpace;
  * Modified by David Little, UCSD Libraries 12/21/04 to
  * allow the registration of files (bitstreams) into DSpace.
  */
-public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
+public class ItemImport<T extends ScriptConfiguration> extends DSpaceRunnable<T> {
 
     public static String TEMP_DIR = "importSAF";
     public static String MAPFILE_FILENAME = "mapfile";
@@ -92,10 +92,8 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     protected static final HandleService handleService =
             HandleServiceFactory.getInstance().getHandleService();
 
-    @Override
-    public ItemImportScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-                .getServiceByName("import", ItemImportScriptConfiguration.class);
+    public ItemImport(T scriptConfiguration) {
+        super(scriptConfiguration);
     }
 
     @Override

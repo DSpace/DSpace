@@ -7,6 +7,7 @@
  */
 package org.dspace.scripts;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
 import java.util.List;
@@ -47,7 +48,9 @@ public class ScriptServiceImpl implements ScriptService {
     public DSpaceRunnable createDSpaceRunnableForScriptConfiguration(ScriptConfiguration scriptToExecute)
         throws IllegalAccessException, InstantiationException {
         try {
-            return (DSpaceRunnable) scriptToExecute.getDspaceRunnableClass().getDeclaredConstructor().newInstance();
+            Constructor<DSpaceRunnable<?>> declaredConstructor =
+                scriptToExecute.getDspaceRunnableClass().getDeclaredConstructor(ScriptConfiguration.class);
+            return declaredConstructor.newInstance(scriptToExecute);
         } catch (InvocationTargetException | NoSuchMethodException e) {
             log.error(e::getMessage, e);
             throw new RuntimeException(e);
