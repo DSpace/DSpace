@@ -254,7 +254,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             }
         } finally {
             source.close();
-            result.close();          
+            result.close();
         }
     }
 
@@ -281,18 +281,18 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     }
 
     private void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDDocument coverPage)
-        throws IOException {
+            throws IOException {
 
-      PDFMergerUtility mergerUtility = new PDFMergerUtility();
+        PDFMergerUtility mergerUtility = new PDFMergerUtility();
 
-      if (isCitationFirstPage()) {
-          //citation as cover page
-          mergerUtility.appendDocument(document, coverPage);
-          mergerUtility.appendDocument(document, sourceDocument);
-      } else {
-          //citation as tail page
-          mergerUtility.appendDocument(document, sourceDocument);
-          mergerUtility.appendDocument(document, coverPage);
-      }
+        if (isCitationFirstPage()) {
+            //citation as cover page
+            mergerUtility.appendDocument(document, coverPage);
+            mergerUtility.appendDocument(document, sourceDocument);
+        } else {
+            //citation as tail page
+            mergerUtility.appendDocument(document, sourceDocument);
+            mergerUtility.appendDocument(document, coverPage);
+        }
     }
 }
