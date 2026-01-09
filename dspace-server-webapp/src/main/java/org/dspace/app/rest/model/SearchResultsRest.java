@@ -74,11 +74,6 @@ public class SearchResultsRest extends DiscoveryResultsRest {
         return PLURAL_NAME;
     }
 
-    @Override
-    public Class getController() {
-        return RestResourceController.class;
-    }
-
     public static class AppliedFilter {
 
         private String filter;

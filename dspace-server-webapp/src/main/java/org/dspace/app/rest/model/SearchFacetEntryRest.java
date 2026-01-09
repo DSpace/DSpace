@@ -7,9 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.dspace.app.rest.RestResourceController;
@@ -50,9 +47,6 @@ public class SearchFacetEntryRest extends BaseObjectRest<String> {
     @JsonIgnore
     private SearchFacetInformation facetInformation;
 
-    @JsonIgnore
-    private List<SearchFacetValueRest> values = new LinkedList<>();
-
     public SearchFacetEntryRest(final String name) {
         this.name = name;
         setId(name);
@@ -92,14 +86,6 @@ public class SearchFacetEntryRest extends BaseObjectRest<String> {
 
     public void setFacetInformation(SearchFacetInformation facetInformation) {
         this.facetInformation = facetInformation;
-    }
-
-    public void addValue(final SearchFacetValueRest valueRest) {
-        values.add(valueRest);
-    }
-
-    public List<SearchFacetValueRest> getValues() {
-        return values;
     }
 
     public String getFacetType() {
