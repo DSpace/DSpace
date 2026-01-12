@@ -3,9 +3,9 @@
 #
 # - note: default tag for branch: dspace/dspace: dspace/dspace:latest
 
-# This Dockerfile uses JDK17 by default.
+# This Dockerfile uses JDK21 by default.
 # To build with other versions, use "--build-arg JDK_VERSION=[value]"
-ARG JDK_VERSION=17
+ARG JDK_VERSION=21
 # The Docker version tag to build from
 ARG DSPACE_VERSION=latest
 # The Docker registry to use for DSpace images. Defaults to "docker.io"

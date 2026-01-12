@@ -2,9 +2,9 @@
 # The purpose of this image is to make the build for dspace/dspace run faster
 #
 
-# This Dockerfile uses JDK17 by default.
+# This Dockerfile uses JDK21 by default.
 # To build with other versions, use "--build-arg JDK_VERSION=[value]"
-ARG JDK_VERSION=17
+ARG JDK_VERSION=21
 
 # Step 1 - Download all Dependencies
 FROM docker.io/maven:3-eclipse-temurin-${JDK_VERSION} AS build

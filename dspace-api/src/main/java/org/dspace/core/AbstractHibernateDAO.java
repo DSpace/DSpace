@@ -7,11 +7,13 @@
  */
 package org.dspace.core;
 
+import java.lang.ref.Cleaner;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import com.google.common.collect.AbstractIterator;
@@ -32,6 +34,12 @@ import org.hibernate.Session;
  * @param <T> class type
  */
 public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
+
+    /**
+     * Cleaner for Java 21+ compatibility (replaces deprecated finalize() method).
+     * Used to close streams if iterators are garbage-collected without being exhausted.
+     */
+    private static final Cleaner cleaner = Cleaner.create();
 
     protected AbstractHibernateDAO() {
 
@@ -313,16 +321,71 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         org.hibernate.query.Query hquery = query.unwrap(org.hibernate.query.Query.class);
         Stream<T> stream = hquery.stream();
         Iterator<T> iter = stream.iterator();
-        return new AbstractIterator<T>() {
-            @Override
-            protected T computeNext() {
-                return iter.hasNext() ? iter.next() : endOfData();
+        return new CleanableStreamIterator<>(iter, stream, cleaner);
+    }
+
+    /**
+     * Static iterator class that wraps a Stream-backed Iterator and ensures the stream is closed.
+     * Uses java.lang.ref.Cleaner (Java 21+ replacement for finalize()) to close the stream
+     * if the iterator is garbage-collected before being exhausted.
+     *
+     * @param <E> The type of elements returned by this iterator
+     */
+    private static class CleanableStreamIterator<E> extends AbstractIterator<E> {
+        private final Iterator<E> delegate;
+        private final AtomicReference<Stream<E>> streamRef;
+        private final Cleaner.Cleanable cleanable;
+
+        CleanableStreamIterator(Iterator<E> delegate, Stream<E> stream, Cleaner cleaner) {
+            this.delegate = delegate;
+            // Store stream in AtomicReference so cleanup action can close it
+            this.streamRef = new AtomicReference<>(stream);
+            // Register cleanup action with Cleaner
+            this.cleanable = cleaner.register(this, new StreamCleanup<>(streamRef));
+        }
+
+        @Override
+        protected E computeNext() {
+            if (delegate.hasNext()) {
+                return delegate.next();
+            } else {
+                // Stream exhausted - close it now and unregister the Cleaner
+                closeStream();
+                return endOfData();
             }
-            @Override
-            public void finalize() {
+        }
+
+        private void closeStream() {
+            Stream<E> stream = streamRef.getAndSet(null);
+            if (stream != null) {
                 stream.close();
             }
-        };
+            // Unregister the Cleaner since we've already cleaned up
+            if (cleanable != null) {
+                cleanable.clean();
+            }
+        }
+    }
+
+    /**
+     * Static cleanup class for use with java.lang.ref.Cleaner.
+     * This class must be static to avoid preventing garbage collection of the iterator.
+     */
+    private static class StreamCleanup<E> implements Runnable {
+        private final AtomicReference<Stream<E>> streamRef;
+
+        StreamCleanup(AtomicReference<Stream<E>> streamRef) {
+            this.streamRef = streamRef;
+        }
+
+        @Override
+        public void run() {
+            // Get and clear the reference atomically
+            Stream<E> stream = streamRef.getAndSet(null);
+            if (stream != null) {
+                stream.close();
+            }
+        }
     }
 
     /**
