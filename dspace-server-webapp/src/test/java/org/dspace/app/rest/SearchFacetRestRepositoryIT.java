@@ -1273,9 +1273,11 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
                 "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC")))
             .andExpect(jsonPath("$._embedded.values._embedded.values", Matchers.containsInAnyOrder(
                 SearchResultMatcher.matchEmbeddedFacetValues("true", 2, "discover",
-                    "/api/discover/searchresults/search/objects?configuration=administrativeView&f.discoverable=true,equals"),
+                    "/api/discover/searchresults/search/objects?" +
+                        "configuration=administrativeView&f.discoverable=true,equals"),
                 SearchResultMatcher.matchEmbeddedFacetValues("false", 1, "discover",
-                    "/api/discover/searchresults/search/objects?configuration=administrativeView&f.discoverable=false,equals")
+                    "/api/discover/searchresults/search/objects?" +
+                        "configuration=administrativeView&f.discoverable=false,equals")
             )));
 
     }
