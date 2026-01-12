@@ -30,8 +30,6 @@ services:
         target: 80
       - published: 443
         target: 443
-    stdin_open: true
-    tty: true
     environment:
       # Default to using "localhost" for Apache & Shibboleth
       # However, you can override this via the "DSPACE_HOSTNAME" environment variable.
