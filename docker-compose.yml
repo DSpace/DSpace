@@ -19,6 +19,9 @@ services:
       # Uncomment to set a non-default value for dspace.server.url or dspace.ui.url
       # dspace__P__server__P__url: http://localhost:8080/server
       # dspace__P__ui__P__url: http://localhost:4000
+      # Set SSR URL to the Docker container name so that UI can contact container directly in Production mode.
+      # (This is necessary for docker-compose-angular.yml as it uses production mode by default)
+      dspace__P__server__P__ssr__P__url: http://dspace:8080/server
       dspace__P__name: 'DSpace Started with Docker Compose'
       # db.url: Ensure we are using the 'dspacedb' image for our database
       db__P__url: 'jdbc:postgresql://dspacedb:5432/dspace'
