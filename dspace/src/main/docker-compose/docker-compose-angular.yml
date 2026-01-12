@@ -32,5 +32,3 @@ services:
       target: 4000
     - published: 9876
       target: 9876
-    stdin_open: true
-    tty: true
