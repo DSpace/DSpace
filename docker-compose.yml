@@ -43,8 +43,6 @@ services:
       target: 8009
     - published: 8000
       target: 8000
-    stdin_open: true
-    tty: true
     volumes:
     # Keep DSpace assetstore directory between reboots
     - assetstore:/dspace/assetstore
@@ -78,8 +76,6 @@ services:
     ports:
     - published: 5432
       target: 5432
-    stdin_open: true
-    tty: true
     volumes:
     # Keep Postgres data directory between reboots
     - pgdata:/pgdata
@@ -99,8 +95,6 @@ services:
     ports:
     - published: 8983
       target: 8983
-    stdin_open: true
-    tty: true
     working_dir: /var/solr/data
     volumes:
     # Keep Solr data directory between reboots
