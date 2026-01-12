@@ -16,6 +16,7 @@ import org.dspace.app.rest.repository.AbstractDSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,6 +45,7 @@ public class DiscoveryConfigurationSearchFilterLinkRepository extends AbstractDS
         }
 
         Pageable pageable = optionalPageable != null ? optionalPageable : PageRequest.of(0, 20);
-        return converter.toRestPage(discoveryConfiguration.getSearchFilters(), pageable, projection);
+        return converter.toRestPage(discoveryConfiguration.getSearchFilters(), pageable, projection,
+            DiscoverySearchFilter.class);
     }
 }

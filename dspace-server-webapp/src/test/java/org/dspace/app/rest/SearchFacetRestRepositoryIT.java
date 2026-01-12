@@ -1273,9 +1273,9 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
                 "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC")))
             .andExpect(jsonPath("$._embedded.values._embedded.values", Matchers.containsInAnyOrder(
                 SearchResultMatcher.matchEmbeddedFacetValues("true", 2, "discover",
-                    "/api/discover/search/objects?configuration=administrativeView&f.discoverable=true,equals"),
+                    "/api/discover/searchresults/search/objects?configuration=administrativeView&f.discoverable=true,equals"),
                 SearchResultMatcher.matchEmbeddedFacetValues("false", 1, "discover",
-                    "/api/discover/search/objects?configuration=administrativeView&f.discoverable=false,equals")
+                    "/api/discover/searchresults/search/objects?configuration=administrativeView&f.discoverable=false,equals")
             )));
 
     }
@@ -1337,7 +1337,7 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
                     "configuration=administrativeView&sort=score,DESC&page=1&size=1")))
             .andExpect(jsonPath("$._embedded.values._embedded.values", Matchers.contains(
                 SearchResultMatcher.matchEmbeddedFacetValues("true", 2, "discover",
-                    "/api/discover/search/objects?" +
+                    "/api/discover/searchresults/search/objects?" +
                         "configuration=administrativeView&f.discoverable=true,equals")
             )));
 
@@ -1359,7 +1359,7 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
                     "configuration=administrativeView&sort=score,DESC&page=1&size=1")))
             .andExpect(jsonPath("$._embedded.values._embedded.values", Matchers.contains(
                 SearchResultMatcher.matchEmbeddedFacetValues("false", 1, "discover",
-                    "/api/discover/search/objects?" +
+                    "/api/discover/searchresults/search/objects?" +
                         "configuration=administrativeView&f.discoverable=false,equals")
             )));
     }
@@ -1411,7 +1411,7 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
             .andExpect(jsonPath("$._embedded.values._embedded.values[0].label", is("Smith, Donald")))
             .andExpect(jsonPath("$._embedded.values._embedded.values[0].count", is(1)))
             .andExpect(jsonPath("$._embedded.values._embedded.values[0]._links.search.href",
-                containsString("api/discover/search/objects?query=Donald&f.author=" +
+                containsString("api/discover/searchresults/search/objects?query=Donald&f.author=" +
                     urlPathSegmentEscaper().escape("Smith, Donald,equals")
                 )))
             .andExpect(jsonPath("$._embedded.values._embedded.values").value(Matchers.hasSize(1)));
@@ -1466,7 +1466,7 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
             .andExpect(jsonPath("$._embedded.values._embedded.values[0].label", is("2017 - 2020")))
             .andExpect(jsonPath("$._embedded.values._embedded.values[0].count", is(3)))
             .andExpect(jsonPath("$._embedded.values._embedded.values[0]._links.search.href",
-                containsString("api/discover/search/objects?dsoType=Item&f.dateIssued=" +
+                containsString("api/discover/searchresults/search/objects?dsoType=Item&f.dateIssued=" +
                     urlPathSegmentEscaper().escape("[2017 TO 2020],equals")
                 )))
             .andExpect(jsonPath("$._embedded.values._embedded.values").value(Matchers.hasSize(1)));

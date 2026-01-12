@@ -38,7 +38,7 @@ public class SearchFacetValueHalLinkFactory extends HalLinkFactory<SearchFacetVa
 
         String dspaceServerUrl = configurationService.getProperty("dspace.server.url");
         UriComponentsBuilder builder = UriComponentsBuilder
-            .fromUriString(dspaceServerUrl + "/api/discover/search/objects");
+            .fromUriString(dspaceServerUrl + "/api/discover/searchresults/search/objects");
         addDiscoveryParameters(builder, halResource.getContent());
         list.add(buildLink("search", builder.build().encode().toUriString()));
     }

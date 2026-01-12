@@ -723,7 +723,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 
         // Source collection browse is empty
         getClient().perform(
-            get("/api/discover/search/objects")
+            get("/api/discover/searchresults/search/objects")
                 .param("dsoType", "ITEM")
                 .param("scope", sink.getID().toString()))
                    // should return with 200 OK
@@ -744,7 +744,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 
         // Source collection browse contains mapped item
         getClient().perform(
-            get("/api/discover/search/objects")
+            get("/api/discover/searchresults/search/objects")
                 .param("dsoType", "ITEM")
                 .param("scope", sink.getID().toString()))
                    // should return with 200 OK
@@ -791,7 +791,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 
         // Source collection browse contains mapped item
         getClient().perform(
-            get("/api/discover/search/objects")
+            get("/api/discover/searchresults/search/objects")
                 .param("dsoType", "ITEM")
                 .param("scope", sink.getID().toString()))
                    // should return with 200 OK
@@ -811,7 +811,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 
         // Source collection browse is empty
         getClient().perform(
-            get("/api/discover/search/objects")
+            get("/api/discover/searchresults/search/objects")
                 .param("dsoType", "ITEM")
                 .param("scope", sink.getID().toString()))
                    // should return with 200 OK
