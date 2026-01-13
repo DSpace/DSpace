@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
+import org.dspace.utils.DSpace;
 
 /**
  * Cleans up asset store.
@@ -53,7 +54,12 @@ public class Cleanup {
             // create an options object and populate it
             Options options = new Options();
 
-            options.addOption("l", "leave", false, "Leave database records but delete file from assetstore");
+            boolean versioning = new DSpace().getConfigurationService().getBooleanProperty("versioning.enabled", true);
+            String defaultSuffix = String.format(" (default due to versioning.enabled=%b)", versioning);
+            options.addOption("l", "leave", false, "Leave database records but delete file " +
+                    "from assetstore" + (versioning ? defaultSuffix : ""));
+            options.addOption("d", "delete", false, "Delete database records as well as " +
+                    "assetstore files" + (!versioning ? defaultSuffix : ""));
             options.addOption("v", "verbose", false, "Provide verbose output");
             options.addOption("h", "help", false, "Help");
 
@@ -70,11 +76,18 @@ public class Cleanup {
                 System.exit(0);
             }
 
-            boolean deleteDbRecords = true;
+            boolean deleteDbRecords = !versioning;
             // Prune stage
             if (line.hasOption('l')) {
                 log.debug("option l used setting flag to leave db records");
                 deleteDbRecords = false;
+            }
+            if (line.hasOption('d')) {
+                log.debug("option d used setting flag to delete db records");
+                deleteDbRecords = true;
+            }
+            if (line.hasOption('l') && line.hasOption('d')) {
+                throw new IllegalArgumentException("Cannot use --leave and --delete together!");
             }
             log.debug("leave db records = " + deleteDbRecords);
             StorageServiceFactory.getInstance().getBitstreamStorageService()
