@@ -29,6 +29,7 @@ import org.dspace.content.service.BitstreamLinkingService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,8 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     protected ChecksumHistoryService checksumHistoryService;
     @Autowired(required = true)
     protected BitstreamLinkingService bitstreamLinkingService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     /**
      * asset stores
@@ -455,7 +458,9 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         }
 
         // Less than one hour old
-        return (now - lastModified) < (1 * 60 * 1000);
+        return (now - lastModified) < (
+            configurationService.getLongProperty("bitstream.cleanup.isRecent.hours", 1L) * 60 * 1000
+        );
     }
 
     protected BitStoreService getStore(int position) throws IOException {
