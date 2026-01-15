@@ -6,19 +6,89 @@
 ## {3}  Description of task
 ## {4}  link to 'my DSpace' page
 ##
+#set($mimetype = "text/html")
 #set($subject = "${config.get('dspace.name')}: You have a new task")
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Item Submitted for Review</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .notification {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .item-details {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .detail-item {
+            margin: 10px 0;
+        }
+        .description {
+            background-color: #f0f7ff;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .action-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007cba;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .signature {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>New Item Submitted for Review</h2>
 
-A new item has been submitted:
+        <div class="notification">
+            A new item has been submitted and requires your attention.
+        </div>
 
-Title:        ${params[0]}
-Collection:   ${params[1]}
-Submitted by: ${params[2]}
+        <div class="item-details">
+            <div class="detail-item"><strong>Title:</strong> ${params[0]}</div>
+            <div class="detail-item"><strong>Collection:</strong> ${params[1]}</div>
+            <div class="detail-item"><strong>Submitted by:</strong> ${params[2]}</div>
+        </div>
 
-${params[3]}
+        <div class="description">
+            ${params[3]}
+        </div>
 
-To claim this task, please visit your "My${config.get('dspace.shortname')}"
-page:  ${params[4]}
+        <p>To claim this task, please visit your "My${config.get('dspace.shortname')}" page:</p>
 
-Many thanks!
+        <p><a href="${params[4]}" class="action-button">Review Submission</a></p>
+        <p>${params[4]}</p>
 
-The ${config.get('dspace.name')} Team
+        <p class="signature">Many thanks!<br><br>
+        The ${config.get('dspace.name')} Team</p>
+    </div>
+</body>
+</html>
