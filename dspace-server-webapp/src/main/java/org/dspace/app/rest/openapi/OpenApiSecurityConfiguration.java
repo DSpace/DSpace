@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -47,6 +46,14 @@ public class OpenApiSecurityConfiguration {
 
     @Bean
     public OpenApiCustomizer dspaceCsrfHeaderCustomizer() {
+        Parameter csrfHeader = new Parameter()
+            .in("header")
+            .name(CSRF_REQUEST_HEADER)
+            .required(false)
+            .schema(new StringSchema())
+            .description("CSRF token (required for POST/PUT/PATCH/DELETE). "
+                + "Obtain it from the response header '" + CSRF_RESPONSE_HEADER + "'.");
+
         return openApi -> {
             if (openApi.getPaths() == null) {
                 return;
@@ -54,44 +61,32 @@ public class OpenApiSecurityConfiguration {
 
             openApi.getPaths().values().forEach(pathItem -> {
                 if (pathItem.getPost() != null) {
-                    addHeaderIfMissing(pathItem.getPost());
+                    addHeaderIfMissing(pathItem.getPost(), csrfHeader);
                 }
                 if (pathItem.getPut() != null) {
-                    addHeaderIfMissing(pathItem.getPut());
+                    addHeaderIfMissing(pathItem.getPut(), csrfHeader);
                 }
                 if (pathItem.getPatch() != null) {
-                    addHeaderIfMissing(pathItem.getPatch());
+                    addHeaderIfMissing(pathItem.getPatch(), csrfHeader);
                 }
                 if (pathItem.getDelete() != null) {
-                    addHeaderIfMissing(pathItem.getDelete());
+                    addHeaderIfMissing(pathItem.getDelete(), csrfHeader);
                 }
             });
         };
     }
 
-    private static void addHeaderIfMissing(Operation operation) {
+    private static void addHeaderIfMissing(io.swagger.v3.oas.models.Operation operation, Parameter headerParam) {
         if (operation.getParameters() == null) {
             operation.setParameters(new ArrayList<>());
         }
 
         boolean alreadyPresent = operation.getParameters().stream()
-                .anyMatch(p -> p != null
-                    && CSRF_REQUEST_HEADER.equalsIgnoreCase(p.getName())
-                    && "header".equals(p.getIn()));
+            .anyMatch(p -> p != null
+                && CSRF_REQUEST_HEADER.equalsIgnoreCase(p.getName())
+                && "header".equals(p.getIn()));
         if (!alreadyPresent) {
-            operation.addParametersItem(createCsrfHeaderParameter());
+            operation.addParametersItem(headerParam);
         }
-    }
-
-    private static Parameter createCsrfHeaderParameter() {
-        return new Parameter()
-            .in("header")
-            .name(CSRF_REQUEST_HEADER)
-            .required(false)
-            .schema(new StringSchema())
-                .description("CSRF token (required for POST/PUT/PATCH/DELETE). "
-                    + "Obtain it from the response header '" + CSRF_RESPONSE_HEADER + "'. "
-                    + "For example, call POST /api/authn/login once without the token; "
-                    + "a 403 is expected and the header will be returned.");
     }
 }
