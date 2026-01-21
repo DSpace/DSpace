@@ -350,6 +350,9 @@
                 <xsl:if test="starts-with(string(text()), 'http://dx.doi.org/')">
                     <xsl:value-of select="substring(., 19)"/>
                 </xsl:if>
+                <xsl:if test="starts-with(string(text()), 'https://api.test.datacite.org/')">
+                    <xsl:value-of select="substring(., 31)"/>
+                </xsl:if>
             </identifier>
         </xsl:if>
     </xsl:template>
