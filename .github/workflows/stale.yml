@@ -16,6 +16,9 @@ jobs:
     steps:
       - uses: actions/stale@v10
         with:
+          # Number of GitHub API calls to allow in a single run (to avoid hitting GitHub's rate limit)
+          # Default is 30. But, we've found that only results in processing ~7 issues or PRs. So, we've increased it.
+          operations-per-run: 60
           # Issues will be marked stale after 3 years of no activity
           days-before-issue-stale: 1095
           # Issues marked stale will be closed after one additional week of no activity
@@ -24,7 +27,7 @@ jobs:
           exempt-issue-labels: 'high priority'
           # When an issue is marked stale, this label and comment will be added to the issue.
           stale-issue-label: stale
-          stale-issue-message: >
+          stale-issue-message: |
             This issue has been automatically marked as stale because it has not had
             activity in 3 years. It will be closed in 7 days if no further activity occurs.
 
@@ -36,7 +39,7 @@ jobs:
             that this issue is still affecting you with current versions of DSpace, and encourage
             us to re-prioritize this issue.
           # When an issue is closed, this comment will be added to the issue.
-          close-issue-message: >
+          close-issue-message: |
             This issue has been closed automatically as "stale". If this still affects you please 
             request to re-open this issue via a comment, providing us with details on how this still
             impacts your usage of DSpace.
@@ -48,7 +51,7 @@ jobs:
           exempt-pr-labels: 'high priority'
           # When a PR is marked stale, this label and comment will be added to the issue.
           stale-pr-label: stale
-          stale-pr-message: >
+          stale-pr-message: |
             This pull request has been automatically marked as stale because it has not had
             activity in one year. It will be closed in 14 days if no further activity occurs.
 
@@ -61,7 +64,7 @@ jobs:
             If these changes are still relevant then please comment and/or rebase your PR based on the
             latest DSpace code. This will remove the stale status and notify us to assign a reviewer
             for your PR.
-          close-pr-message: >
+          close-pr-message: |
             This pull request has been closed automatically. If these changes are still relevant
             then please re-open this pull request with a comment and rebase your PR based on the latest
             DSpace code. This will notify us to assign a reviewer to your PR.
