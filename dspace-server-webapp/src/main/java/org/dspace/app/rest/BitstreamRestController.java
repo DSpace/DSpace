@@ -160,6 +160,8 @@ public class BitstreamRestController {
             if ((dispositionThreshold >= 0 && filesize > dispositionThreshold)
                     || checkFormatForContentDisposition(format)) {
                 httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_ATTACHMENT);
+            } else {
+                httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_INLINE);
             }
 
             //We have all the data we need, close the connection to the database so that it doesn't stay open during
