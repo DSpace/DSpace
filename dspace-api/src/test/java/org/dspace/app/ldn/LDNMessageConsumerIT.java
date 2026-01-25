@@ -20,7 +20,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
-import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.ldn.factory.NotifyServiceFactory;
@@ -47,6 +46,7 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Integration Tests against {@link LDNMessageConsumer}

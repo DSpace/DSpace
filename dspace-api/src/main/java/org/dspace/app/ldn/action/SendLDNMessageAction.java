@@ -10,22 +10,22 @@ package org.dspace.app.ldn.action;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
-import tools.jackson.databind.ObjectMapper;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpException;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpStatus;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Action to send LDN Message

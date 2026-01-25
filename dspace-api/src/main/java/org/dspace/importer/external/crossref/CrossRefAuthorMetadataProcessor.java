@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.contributor.JsonPathMetadataProcessor;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This class is used for CrossRef's Live-Import to extract

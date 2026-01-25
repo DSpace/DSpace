@@ -13,8 +13,6 @@ import static org.dspace.core.Constants.READ;
 import java.sql.SQLException;
 import java.time.Instant;
 
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -29,6 +27,8 @@ import org.dspace.qaevent.service.dto.QAMessageDTO;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Implementation class for {@link CorrectionType}

@@ -17,12 +17,12 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.google.GoogleAnalyticsEvent;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Implementation of {@link GoogleAnalyticsClientRequestBuilder} that compose

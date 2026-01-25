@@ -7,9 +7,9 @@
  */
 package org.dspace.importer.external.metadatamapping.contributor;
 
-import tools.jackson.databind.JsonNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tools.jackson.databind.JsonNode;
 
 /**
  * A generic JSON metadata processor that extracts a string value from a JSON node

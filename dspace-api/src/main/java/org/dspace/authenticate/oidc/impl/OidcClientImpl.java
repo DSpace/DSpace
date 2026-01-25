@@ -15,17 +15,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import tools.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
-import org.apache.hc.core5.http.ClassicHttpRequest;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authenticate.oidc.OidcClient;
@@ -34,6 +33,7 @@ import org.dspace.authenticate.oidc.model.OidcTokenResponseDTO;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.ThrowingSupplier;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Implementation of {@link OidcClient}.

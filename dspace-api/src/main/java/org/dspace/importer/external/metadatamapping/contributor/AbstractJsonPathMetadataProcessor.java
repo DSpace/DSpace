@@ -10,11 +10,11 @@ package org.dspace.importer.external.metadatamapping.contributor;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 
 /**

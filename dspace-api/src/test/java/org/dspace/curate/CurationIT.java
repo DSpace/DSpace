@@ -9,7 +9,6 @@ package org.dspace.curate;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
 import org.apache.commons.cli.ParseException;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;

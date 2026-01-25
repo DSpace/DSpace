@@ -9,7 +9,6 @@ package org.dspace.content;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.services.ConfigurationService;

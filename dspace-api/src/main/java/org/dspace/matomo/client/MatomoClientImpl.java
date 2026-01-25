@@ -13,11 +13,11 @@ import java.nio.charset.Charset;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.dspace.matomo.exception.MatomoClientException;
 
 /**

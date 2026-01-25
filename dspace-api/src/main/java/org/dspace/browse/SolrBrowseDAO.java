@@ -16,8 +16,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import tools.jackson.databind.node.JsonNodeFactory;
-import tools.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -38,6 +36,8 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Andrea Bollini (CILEA)

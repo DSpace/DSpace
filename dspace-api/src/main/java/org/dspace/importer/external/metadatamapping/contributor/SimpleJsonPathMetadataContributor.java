@@ -12,8 +12,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,6 +19,8 @@ import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * A simple JsonPath Metadata processor

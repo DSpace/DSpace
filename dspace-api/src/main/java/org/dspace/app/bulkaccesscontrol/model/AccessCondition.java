@@ -9,9 +9,9 @@ package org.dspace.app.bulkaccesscontrol.model;
 
 import java.time.LocalDate;
 
-import tools.jackson.databind.annotation.JsonDeserialize;
 import org.dspace.app.bulkaccesscontrol.BulkAccessControl;
 import org.dspace.util.MultiFormatDateDeserializer;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Class that model the values of an Access Condition as expressed in the {@link BulkAccessControl} input file

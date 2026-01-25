@@ -91,6 +91,7 @@ public class ExportEventProcessorIT extends AbstractIntegrationTestWithDatabase 
         ExportEventProcessor exportEventProcessor = new ItemEventProcessor(context, request, item);
 
         when(request.getRemoteAddr()).thenReturn("test-client-ip");
+        when(request.getHeader("X-Forwarded-For")).thenReturn(null);
         when(request.getHeader("USER-AGENT")).thenReturn("test-user-agent");
         when(request.getHeader("referer")).thenReturn("test-referer");
 

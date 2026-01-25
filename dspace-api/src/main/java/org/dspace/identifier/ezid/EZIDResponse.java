@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.identifier.IdentifierException;

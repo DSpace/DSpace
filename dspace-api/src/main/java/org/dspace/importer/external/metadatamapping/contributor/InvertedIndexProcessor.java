@@ -10,9 +10,9 @@ package org.dspace.importer.external.metadatamapping.contributor;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import tools.jackson.databind.JsonNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tools.jackson.databind.JsonNode;
 
 
 /**

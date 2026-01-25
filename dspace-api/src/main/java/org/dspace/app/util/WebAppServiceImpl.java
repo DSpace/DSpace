@@ -12,10 +12,11 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.core5.http.HttpStatus;
+
 import org.apache.hc.client5.http.classic.methods.HttpHead;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.util.dao.WebAppDAO;

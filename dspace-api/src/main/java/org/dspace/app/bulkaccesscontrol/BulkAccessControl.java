@@ -30,7 +30,6 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import tools.jackson.databind.json.JsonMapper;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -69,6 +68,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.model.AccessConditionOption;
 import org.dspace.utils.DSpace;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Implementation of {@link DSpaceRunnable} to perform a bulk access control via json file.

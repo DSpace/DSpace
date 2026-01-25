@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * A ROR JsonPath Metadata processor that should be configured inside the {@code ror-integration.xml} file.

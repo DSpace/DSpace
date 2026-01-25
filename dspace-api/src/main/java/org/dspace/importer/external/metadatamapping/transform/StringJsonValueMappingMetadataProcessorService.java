@@ -13,14 +13,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.JsonNodeType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.contributor.JsonPathMetadataProcessor;
 import org.dspace.util.SimpleMapConverter;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.JsonNodeType;
 
 /**
  * This class is a Metadata processor from a structured JSON Metadata result

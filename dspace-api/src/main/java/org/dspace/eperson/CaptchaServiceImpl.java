@@ -15,13 +15,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import tools.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +29,7 @@ import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Basic services implementation for the Captcha.

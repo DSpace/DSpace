@@ -9,7 +9,6 @@ package org.dspace.discovery;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.MetadataField;

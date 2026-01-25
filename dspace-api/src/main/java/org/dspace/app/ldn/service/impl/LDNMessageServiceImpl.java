@@ -20,7 +20,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import tools.jackson.databind.ObjectMapper;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -50,6 +49,7 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 
 /**

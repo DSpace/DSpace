@@ -190,10 +190,13 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 // increment processed count
                 ++processed;
             }
+            // commit after each item to release DB resources
+            // NOTE: In Hibernate 7, we must commit BEFORE uncaching entities to avoid
+            // "Detached entity passed to persist" errors. The flush during commit
+            // must complete while all entities are still attached to the session.
+            c.commit();
             // clear item objects from context cache and internal cache
             c.uncacheEntity(currentItem);
-            // commit after each item to release DB resources
-            c.commit();
             currentItem = null;
         }
     }
