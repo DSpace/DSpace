@@ -167,6 +167,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- Jackson 2 JSR-310 module required by iiif-apis -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.18.0</version>
+        </dependency>
 
         <!-- Internal -->
         <dependency>

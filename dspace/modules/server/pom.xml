@@ -258,6 +258,18 @@
 
     <dependencies>
 
+        <!-- Jackson 2 modules required by iiif-apis -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.18.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-parameter-names</artifactId>
+            <version>2.18.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.dspace.modules</groupId>
             <artifactId>additions</artifactId>
