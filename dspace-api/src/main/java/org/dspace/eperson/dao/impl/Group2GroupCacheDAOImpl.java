@@ -20,13 +20,13 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.apache.commons.lang3.tuple.Pair;
-import org.hibernate.Session;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Group2GroupCache;
 import org.dspace.eperson.Group2GroupCache_;
 import org.dspace.eperson.dao.Group2GroupCacheDAO;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Group2GroupCache object.

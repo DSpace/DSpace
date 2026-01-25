@@ -72,20 +72,29 @@ public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationDa
 
     @Override
     public void deleteByToken(Context context, String token) throws SQLException {
-        String hql = "delete from RegistrationData where token=:token";
-        Query query = createQuery(context, hql);
-        query.setParameter("token", token);
-        query.executeUpdate();
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        // Bulk HQL deletes don't update the persistence context, causing TransientPropertyValueException.
+        RegistrationData registrationData = findByToken(context, token);
+        if (registrationData != null) {
+            delete(context, registrationData);
+        }
     }
 
     @Override
     public void deleteExpiredBy(Context context, Instant instant) throws SQLException {
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        // Bulk HQL deletes don't update the persistence context, causing TransientPropertyValueException.
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaDelete<RegistrationData> deleteQuery = criteriaBuilder.createCriteriaDelete(RegistrationData.class);
-        Root<RegistrationData> deleteRoot = deleteQuery.from(RegistrationData.class);
-        deleteQuery.where(
-            criteriaBuilder.lessThanOrEqualTo(deleteRoot.get(RegistrationData_.expires), instant)
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RegistrationData.class);
+        Root<RegistrationData> registrationDataRoot = criteriaQuery.from(RegistrationData.class);
+        criteriaQuery.select(registrationDataRoot);
+        criteriaQuery.where(
+            criteriaBuilder.lessThanOrEqualTo(registrationDataRoot.get(RegistrationData_.expires), instant)
         );
-        getHibernateSession(context).createQuery(deleteQuery).executeUpdate();
+        java.util.List<RegistrationData> expiredRecords = list(context, criteriaQuery, false, RegistrationData.class,
+            -1, -1);
+        for (RegistrationData record : expiredRecords) {
+            delete(context, record);
+        }
     }
 }
