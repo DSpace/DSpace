@@ -21,6 +21,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Root;
 import org.apache.commons.collections.CollectionUtils;
+import org.dspace.content.DSpaceObject;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.EntityEntry;
 import org.hibernate.engine.spi.PersistenceContext;
@@ -42,8 +43,28 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T create(Context context, T t) throws SQLException {
-        getHibernateSession(context).persist(t);
+        Session session = getHibernateSession(context);
+
+        // In Hibernate 7, if an entity with the same UUID exists in the session
+        // (even if marked for deletion), persist() will fail with EntityExistsException.
+        // For DSpaceObject entities with a predefined UUID, we need to handle this case.
+        if (t instanceof DSpaceObject dso) {
+            UUID uuid = dso.getPredefinedUUID();
+            if (uuid != null) {
+                // Check if there's an entity with this UUID already in the session.
+                Object existingEntity = session.get(DSpaceObject.class, uuid);
+                if (existingEntity != null) {
+                    // An entity with this UUID exists in the session.
+                    // Use merge() to associate the new entity state with the session,
+                    // which will replace the existing entity.
+                    return (T) session.merge(t);
+                }
+            }
+        }
+
+        session.persist(t);
         return t;
     }
 
