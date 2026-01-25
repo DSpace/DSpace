@@ -553,6 +553,13 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
      */
     protected void rawDelete(Context context, Community community)
         throws SQLException, AuthorizeException, IOException {
+        // Reload community to ensure it's attached to the current session
+        // (Required for Hibernate 7 which may have detached entities during test cleanup)
+        community = context.reloadEntity(community);
+        if (community == null) {
+            return;
+        }
+
         log.info(LogHelper.getHeader(context, "delete_community",
                                       "community_id=" + community.getID()));
 
@@ -594,11 +601,21 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         Group g = community.getAdministrators();
 
+        // Clear the admin reference before deleting to avoid FK constraint violation
+        // when Hibernate flushes the Group delete before the Community delete
+        // (Required for Hibernate 7 which may flush in different order during queries)
+        if (g != null) {
+            community.setAdmins(null);
+        }
+
         // Delete community row
         communityDAO.delete(context, community);
 
-        // Remove administrators group - must happen after deleting community
+        // Flush to ensure the Community delete is executed before we delete the admin Group
+        // (Required for Hibernate 7 which may not auto-flush in correct FK order)
+        context.flush();
 
+        // Remove administrators group - must happen after deleting community
         if (g != null) {
             groupService.delete(context, g);
         }
@@ -683,6 +700,12 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public DSpaceObject getParentObject(Context context, Community community) throws SQLException {
+        // Reload community to ensure it's attached to the current session
+        // (Required for Hibernate 7 which may have detached entities during test cleanup)
+        community = context.reloadEntity(community);
+        if (community == null) {
+            return null;
+        }
         List<Community> parentCommunities = community.getParentCommunities();
         if (CollectionUtils.isNotEmpty(parentCommunities)) {
             return parentCommunities.iterator().next();

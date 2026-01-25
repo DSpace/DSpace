@@ -75,7 +75,9 @@ public class InstallItemServiceImpl implements InstallItemService {
                             String suppliedHandle) throws SQLException,
         AuthorizeException {
         Item item = is.getItem();
-        Collection collection = is.getCollection();
+        // Reload Collection to ensure it's attached to the current session.
+        // Required for Hibernate 7 which is stricter about detached entities in cascade operations.
+        Collection collection = c.reloadEntity(is.getCollection());
         // Get map of filters to use for identifier types.
         Map<Class<? extends Identifier>, Filter> filters = FilterUtils.getIdentifierFilters(false);
         try {
@@ -211,11 +213,15 @@ public class InstallItemServiceImpl implements InstallItemService {
      */
     protected Item finishItem(Context c, Item item, InProgressSubmission is)
         throws SQLException, AuthorizeException {
+        // Reload Collection to ensure it's attached to the current session.
+        // Required for Hibernate 7 which is stricter about detached entities in cascade operations.
+        Collection collection = c.reloadEntity(is.getCollection());
+
         // create collection2item mapping
-        collectionService.addItem(c, is.getCollection(), item);
+        collectionService.addItem(c, collection, item);
 
         // set owning collection
-        item.setOwningCollection(is.getCollection());
+        item.setOwningCollection(collection);
 
         // set in_archive=true
         item.setArchived(true);

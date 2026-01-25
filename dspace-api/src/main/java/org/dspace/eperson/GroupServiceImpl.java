@@ -563,6 +563,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
         // Remove any ResourcePolicies that reference this group
         authorizeService.removeGroupPolicies(context, group);
+        // Flush to ensure ResourcePolicy deletions are executed before Group deletion
+        // (Required for Hibernate 7 which may not auto-flush in correct FK order)
+        context.flush();
 
         // Properly synchronize bidirectional ManyToMany relationships before clearing
         // (Required for Hibernate 7 which strictly enforces JPA spec during auto-flush)
