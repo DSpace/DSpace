@@ -103,8 +103,8 @@ public class EPersonCLIToolIT
         String newPasswordHash = eperson.getPassword();
         assertEquals(oldPasswordHash, newPasswordHash, "Password hash changed");
 
-        assertTrue("Standard error did not mention 'empty'",
-                stderr.contains(EPersonCLITool.ERR_PASSWORD_EMPTY));
+        assertTrue(stderr.contains(EPersonCLITool.ERR_PASSWORD_EMPTY),
+                "Standard error did not mention 'empty'");
     }
 
     /**
@@ -147,7 +147,7 @@ public class EPersonCLIToolIT
         String newPasswordHash = eperson.getPassword();
         assertEquals(oldPasswordHash, newPasswordHash, "Password hash changed");
 
-        assertTrue("Standard error did not indicate password mismatch",
-                stderr.contains(EPersonCLITool.ERR_PASSWORD_NOMATCH));
+        assertTrue(stderr.contains(EPersonCLITool.ERR_PASSWORD_NOMATCH),
+                "Standard error did not indicate password mismatch");
     }
 }

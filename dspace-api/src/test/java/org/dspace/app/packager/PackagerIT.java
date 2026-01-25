@@ -159,6 +159,10 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         //should fail to restore the item because the uuid already exists.
         performExportScript(article.getHandle(), tempFile);
         UUID id = article.getID();
+        // After runDSpaceScript, entities from the old context become detached.
+        // Reload col1 from the database before using it.
+        col1 = collectionService.find(context, col1.getID());
+        article = itemService.find(context, id);
         itemService.delete(context, article);
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col1, id).build();
         installItemService.installItem(context, workspaceItem, "123456789/0100");

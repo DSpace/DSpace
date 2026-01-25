@@ -100,6 +100,9 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     @AfterEach
     @Override
     public void destroy() throws Exception {
+        // Reset configuration properties that may have been changed by tests
+        configurationService.setProperty("orcid.synchronization-enabled", true);
+
         List<OrcidQueue> records = orcidQueueService.findAll(context);
         for (OrcidQueue record : records) {
             orcidQueueService.delete(context, record);

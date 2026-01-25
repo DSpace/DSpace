@@ -81,9 +81,12 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     private CollectionBuilder create(final Community parent, final String handle) {
         try {
-            for (Collection collection : collectionService.findAll(context)) {
-                if (collection.getHandle().equalsIgnoreCase(handle)) {
+            for (Collection collection : this.collectionService.findAll(context)) {
+                String existingHandle = collection.getHandle();
+                // Guard against null handles (collections created but not yet assigned a handle)
+                if (existingHandle != null && existingHandle.equalsIgnoreCase(handle)) {
                     this.collection = collection;
+                    return this;  // Found existing collection with this handle, reuse it
                 }
             }
             this.collection = collectionService.create(context, parent, handle);
