@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
-import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
 /**

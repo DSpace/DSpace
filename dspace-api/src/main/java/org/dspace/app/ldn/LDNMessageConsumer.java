@@ -18,7 +18,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.ldn.factory.NotifyServiceFactory;
@@ -50,6 +49,7 @@ import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.web.ContextUtil;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * class for creating a new LDN Messages of installed item

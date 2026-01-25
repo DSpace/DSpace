@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -30,6 +28,8 @@ import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.DoiCheck;
 import org.springframework.beans.factory.annotation.Autowired;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Implementation of {@link OpenAlexImportMetadataSourceService} that provides

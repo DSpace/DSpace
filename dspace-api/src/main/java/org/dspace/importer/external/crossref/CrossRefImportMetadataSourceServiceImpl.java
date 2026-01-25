@@ -17,8 +17,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -35,6 +33,8 @@ import org.dspace.importer.external.service.DoiCheck;
 import org.dspace.importer.external.service.components.QuerySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Implements a data source for querying CrossRef

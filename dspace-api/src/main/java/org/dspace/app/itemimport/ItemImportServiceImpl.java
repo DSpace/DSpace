@@ -319,12 +319,22 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
                     itemFolderMap.put(dircontents[i], item);
 
-                    c.uncacheEntity(item);
+                    // Flush and clear the session after each item to prevent "Detached entity passed to persist"
+                    // errors in Hibernate 7. When multiple items are created, subsequent item creations may
+                    // trigger queries that auto-flush, and the cascade from entities to previously uncached
+                    // items can fail. Flushing ensures all changes are written to DB before clearing.
+                    c.flush();
+                    c.uncacheEntities();
                     logInfo(i + " " + dircontents[i]);
                 }
             }
 
             //now that all items are imported, iterate again to link relationships
+            // Flush and clear the session before processing relationships to prevent
+            // "Detached entity passed to persist" errors in Hibernate 7 when queries
+            // trigger auto-flush with entities that have cascade=PERSIST relationships.
+            c.flush();
+            c.uncacheEntities();
             addRelationships(c, sourceDir);
 
         } finally {

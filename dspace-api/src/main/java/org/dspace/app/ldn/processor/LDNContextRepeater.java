@@ -12,14 +12,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ArrayNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.model.Context;
 import org.dspace.app.ldn.model.Notification;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * Context repeater to iterate over array context properties of a received

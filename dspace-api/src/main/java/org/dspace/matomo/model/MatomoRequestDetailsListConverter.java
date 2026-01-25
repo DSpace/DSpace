@@ -11,10 +11,10 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import tools.jackson.core.JsonGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.ValueSerializer;
 
