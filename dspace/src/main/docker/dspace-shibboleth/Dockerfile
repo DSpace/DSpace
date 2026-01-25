@@ -39,10 +39,10 @@ RUN a2enmod ssl proxy proxy_ajp proxy_http shib && \
     a2ensite dspace-vhost.conf
 
 # Setup Shibboleth configs
-COPY shibboleth2.xml /etc/shibboleth/
-COPY attribute-map.xml /etc/shibboleth/
-RUN cd /etc/shibboleth/ \
-    && shib-keygen
+WORKDIR /etc/shibboleth
+COPY shibboleth2.xml .
+COPY attribute-map.xml .
+RUN shib-keygen
 
 # Copy over our startup script
 COPY httpd-shibd-foreground.sh /usr/local/bin/
