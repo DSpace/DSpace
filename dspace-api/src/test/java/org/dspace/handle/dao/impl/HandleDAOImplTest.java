@@ -30,6 +30,7 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.handle.Handle;
 import org.dspace.handle.dao.HandleDAO;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.factory.VersionServiceFactory;
@@ -128,6 +129,16 @@ public class HandleDAOImplTest extends AbstractUnitTest {
             owningCommunity = context.reloadEntity(owningCommunity);
             ContentServiceFactory.getInstance().getCommunityService().delete(context, owningCommunity);
             owningCommunity = null;
+
+            // Restore the Site handle if it was changed by the test.
+            // The test updates ALL handles from 123456789 to 987654321, including the Site handle.
+            // We need to restore the Site handle back to its original prefix.
+            // Use findByHandle to get ONLY the Site handle (suffix /0) and update it specifically.
+            Handle siteHandle = handleDAO.findByHandle(context, "987654321/0");
+            if (siteHandle != null) {
+                siteHandle.setHandle(HANDLE_PREFIX + "/0");
+            }
+            context.commit();
         } catch (Exception e) {
             throw new AssertionError("Error occurred in destroy()", e);
         }

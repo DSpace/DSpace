@@ -34,7 +34,7 @@ import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.core.Authentication;
 
 public class SamlLoginFilterTest extends AbstractDSpaceTest {
-    private static ConfigurationService configurationService;
+    private ConfigurationService configurationService;
 
     private AuthenticationManager authManager;
     private HttpServletRequest request;
@@ -43,13 +43,9 @@ public class SamlLoginFilterTest extends AbstractDSpaceTest {
     private FilterChain filterChain;
     private SamlLoginFilter filter;
 
-    @BeforeAll
-    public static void beforeAll() {
-        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-    }
-
     @BeforeEach
     public void beforeEach() throws Exception {
+        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         resetConfigurationService();
 
         authManager = createAuthenticationManager();
@@ -148,6 +144,7 @@ public class SamlLoginFilterTest extends AbstractDSpaceTest {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest(HttpMethod.GET.name(), path);
 
         mockRequest.setPathInfo(path);
+        mockRequest.setServletPath(path);
 
         return mockRequest;
     }

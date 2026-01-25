@@ -65,7 +65,6 @@ import org.dspace.core.SelfNamedPlugin;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.SearchService;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.Group;
@@ -1259,6 +1258,9 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
         assertThat(testDSpaceRunnableHandler.getWarningMessages(), empty());
         assertThat(testDSpaceRunnableHandler.getInfoMessages(), hasSize(60));
 
+        // Clear session cache to ensure fresh data after script execution (Hibernate 7 requirement)
+        context.uncacheEntities();
+
         List<Item> itemsOfSubCommOne = findItems("location.comm:" + subCommunityOne.getID());
         List<Item> itemsOfSubCommTwo = findItems("location.comm:" + subCommunityTwo.getID());
 
@@ -1387,6 +1389,9 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
         assertThat(testDSpaceRunnableHandler.getWarningMessages(), empty());
         assertThat(testDSpaceRunnableHandler.getInfoMessages(), hasSize(10));
 
+        // Clear session cache to ensure fresh data after script execution (Hibernate 7 requirement)
+        context.uncacheEntities();
+
         List<Item> itemsOfSubCommOne = findItems("location.comm:" + subCommunityOne.getID());
 
         assertThat(itemsOfSubCommOne, hasSize(5));
@@ -1495,6 +1500,9 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
         assertThat(testDSpaceRunnableHandler.getErrorMessages(), empty());
         assertThat(testDSpaceRunnableHandler.getWarningMessages(), empty());
         assertThat(testDSpaceRunnableHandler.getInfoMessages(), hasSize(6));
+
+        // Clear session cache to ensure fresh data after script execution (Hibernate 7 requirement)
+        context.uncacheEntities();
 
         List<Item> itemsOfSubCommOne = findItems("location.comm:" + subCommunityOne.getID());
 
@@ -1962,18 +1970,26 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
     }
 
 
-    private List<Item> findItems(String query) throws SearchServiceException {
+    private List<Item> findItems(String query) throws Exception {
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
         discoverQuery.setQuery(query);
 
-        return searchService.search(context, discoverQuery)
+        List<Item> items = searchService.search(context, discoverQuery)
                             .getIndexableObjects()
                             .stream()
                             .map(indexableObject ->
                                 ((IndexableItem) indexableObject).getIndexedObject())
                             .collect(Collectors.toList());
+
+        // Reload items to ensure they are attached to the current session
+        // (In Hibernate 7, items from Solr search may be detached)
+        List<Item> reloadedItems = new ArrayList<>();
+        for (Item item : items) {
+            reloadedItems.add(context.reloadEntity(item));
+        }
+        return reloadedItems;
     }
 
     private List<Bitstream> findAllBitstreams(Item item) {

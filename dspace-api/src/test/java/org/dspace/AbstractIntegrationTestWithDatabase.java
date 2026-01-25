@@ -253,7 +253,42 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      * @throws Exception if there's an error cleaning up after running the command.
      */
     public int runDSpaceScript(String... args) throws Exception {
+        // Track whether authorization was turned off before running the script.
+        // Need to handle the case where the context is in a bad state (e.g., MARKED_ROLLBACK).
+        boolean authorizationWasOff = false;
         try {
+            authorizationWasOff = context.isValid() && context.ignoreAuthorization();
+        } catch (Exception e) {
+            // Context is in a bad state, treat as invalid
+        }
+        try {
+            // For Hibernate 7: We need to commit the test's data to the database so the script
+            // can see it, and we must CLOSE the session completely to avoid detached entity issues.
+            // The script will create its own Context with a fresh session.
+            //
+            // With ThreadLocalSessionContext, closing the session unbinds it from the thread,
+            // allowing the script to get a completely fresh session when it creates its Context.
+            try {
+                if (context.isValid()) {
+                    context.complete();  // Commit and close the session
+                }
+            } catch (Exception e) {
+                // If complete() fails (e.g., MARKED_ROLLBACK), try to abort and close
+                try {
+                    context.abort();
+                } catch (Exception ignored) {
+                    // Best effort cleanup
+                }
+            }
+
+            // Evict all entities from the second-level cache to ensure the script
+            // gets fresh entities from the database. In Hibernate 7, entities loaded
+            // from L2 cache can sometimes cause "Detached entity passed to persist" errors.
+            ServiceManager serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
+            org.hibernate.SessionFactory sessionFactory = serviceManager
+                    .getServiceByName("sessionFactory", org.hibernate.SessionFactory.class);
+            sessionFactory.getCache().evictAllRegions();
+
             // Load up the ScriptLauncher's configuration
             Document commandConfigs = ScriptLauncher.getConfig(kernelImpl);
 
@@ -271,8 +306,17 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                 return status;
             }
         } finally {
-            if (!context.isValid()) {
-                setUp();
+            // After the script runs, we always need a fresh context for the test to continue.
+            // The script will have closed its own context, and the test's original context
+            // was closed before running the script.
+            context = new Context(Context.Mode.READ_WRITE);
+            // Reload the eperson into the new session to avoid detached entity issues
+            eperson = EPersonServiceFactory.getInstance().getEPersonService()
+                    .find(context, eperson.getID());
+            context.setCurrentUser(eperson);
+            // Restore the authorization state if it was off before
+            if (authorizationWasOff) {
+                context.turnOffAuthorisationSystem();
             }
         }
     }

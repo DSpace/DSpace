@@ -25,6 +25,8 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,8 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
     protected Item iiifItem3;
     protected Bitstream bitstream;
     protected Bitstream bitstream2;
+
+    private final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     private final static String METADATA_IIIF_HEIGHT = "iiif.image.height";
     private final static String METADATA_IIIF_WIDTH = "iiif.image.width";
@@ -582,19 +586,36 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
 
     private void execCanvasScript(String id) throws Exception {
         runDSpaceScript("iiif-canvas-dimensions", "-e", "admin@email.com", "-i", id);
+        reloadBitstreams();
     }
 
     private void execCanvasScriptForceOption(String id) throws Exception {
         runDSpaceScript("iiif-canvas-dimensions", "-e", "admin@email.com", "-i", id, "-f");
+        reloadBitstreams();
     }
 
     private void execCanvasScriptWithMaxRecs(String id) throws Exception {
         // maximum 2
         runDSpaceScript("iiif-canvas-dimensions", "-e", "admin@email.com", "-i",  id, "-m", "2", "-f", "-q");
+        reloadBitstreams();
     }
 
     private void execCanvasScriptWithSkipList(String id, String skip) throws Exception {
         runDSpaceScript("iiif-canvas-dimensions", "-e", "admin@email.com", "-i", id, "-s", skip, "-f");
+        reloadBitstreams();
+    }
+
+    /**
+     * Reload bitstream entities from the database after runDSpaceScript() creates a new context.
+     * This is necessary because the old bitstream references become detached.
+     */
+    private void reloadBitstreams() throws Exception {
+        if (bitstream != null) {
+            bitstream = bitstreamService.find(context, bitstream.getID());
+        }
+        if (bitstream2 != null) {
+            bitstream2 = bitstreamService.find(context, bitstream2.getID());
+        }
     }
 
 }
