@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+    <bean class="org.dspace.content.edit.service.impl.EditItemServiceImpl"/>
+    <bean class="org.dspace.content.edit.service.impl.EditItemModeValidatorImpl"/>
+
+    <bean class="org.dspace.content.edit.service.impl.EditItemModeServiceImpl">
+         <property name="editModesMap">
+            <map>
+                <entry key="publication">
+                    <list>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="MODE1" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                ADMIN
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="traditional-cris" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="FIRST" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                ADMIN
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="modeA" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="SECOND" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                ADMIN
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="modeB" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="FIRST-OWNER" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                OWNER
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="modeA" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="TRADITIONAL-OWNER" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                OWNER
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="traditional-cris" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="FIRST-CUSTOM" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                CUSTOM
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="modeA" />
+                            <property name="users" ref="usersMetadata" />
+                            <property name="groups" ref="groupsMetadata" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="AUTHOR-CUSTOM" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                CUSTOM
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="modeA" />
+                            <property name="items" ref="itemsMetadata" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="MODE-CUSTOM-URL" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                ADMIN
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="traditional-with-custom-url" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="RESEARCHERS" />
+                            <property name="security">
+                                <value type="org.dspace.content.security.CrisSecurity">
+                                    GROUP
+                                </value>
+                            </property>
+                            <property name="groups">
+                                <list>
+                                    <value>Researchers</value>
+                                </list>
+                            </property>
+                            <property name="submissionDefinition" value="publication-edit" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="MODE-TEST-HIDDEN" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                ADMIN
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="test-hidden" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="MODE-WITH-MANY-SECURITIES" />
+                            <property name="securities">
+                              <list>
+                                <value>ADMIN</value>
+                                <value>CUSTOM</value>
+                                <value>OWNER</value>
+                              </list>
+                            </property>
+                            <property name="items" ref="itemsMetadata" />
+                            <property name="submissionDefinition" value="traditional-cris" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="MODE-VOC" />
+                            <property name="securities">
+                              <list>
+                                <value>ADMIN</value>
+                              </list>
+                            </property>
+                            <property name="items" ref="itemsMetadata" />
+                            <property name="submissionDefinition" value="controlled-vocabulary-test" />
+                        </bean>
+                    </list>
+                </entry>
+                <entry key="publication.modeC">
+                    <list>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="MODE-A" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                ADMIN
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="traditional-with-custom-url" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="MODE-B" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                OWNER
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="traditional" />
+                        </bean>
+                    </list>
+                </entry>
+                <entry key="funding">
+                    <list>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="FIRST" />
+                            <property name="security">
+                                <value type="org.dspace.content.security.CrisSecurity">
+                                    ADMIN
+                                </value>
+                            </property>
+                            <property name="submissionDefinition" value="funding" />
+                        </bean>
+                    </list>
+                </entry>
+            </map>
+        </property> 
+    </bean>
+
+	<util:list id="usersMetadata" value-type="java.lang.String">
+       <value>cris.policy.eperson</value>
+    </util:list>
+
+	<util:list id="groupsMetadata" value-type="java.lang.String">
+       <value>cris.policy.group</value>
+    </util:list>
+
+	<util:list id="itemsMetadata" value-type="java.lang.String">
+       <value>dc.contributor.author</value>
+    </util:list>
+
+</beans>
