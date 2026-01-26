@@ -69,7 +69,7 @@
 
     <bean id="openaireDoiContrib" class="org.dspace.importer.external.metadatamapping.contributor.XpathNormalizeDOIMetadatumContributor">
         <property name="field" ref="openaire.doi"/>
-        <property name="query" value="descendant::oaf:result/pid"/>
+        <property name="query" value="descendant::oaf:result/pid[@classid='doi']"/>
         <property name="prefixToNamespaceMapping" ref="openairePrefixToNamespaceMapping"/>
     </bean>
     <bean id="openaire.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
