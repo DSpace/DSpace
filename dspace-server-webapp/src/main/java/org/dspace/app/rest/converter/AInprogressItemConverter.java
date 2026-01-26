@@ -32,7 +32,6 @@ import org.dspace.services.model.Request;
 import org.dspace.submit.factory.SubmissionServiceFactory;
 import org.dspace.submit.service.SubmissionConfigService;
 import org.dspace.validation.service.ValidationService;
-import org.dspace.versioning.ItemCorrectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
@@ -70,9 +69,6 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
 
     @Autowired
     private ValidationService validationService;
-
-    @Autowired
-    private ItemCorrectionService itemCorrectionService;
 
     public AInprogressItemConverter() throws SubmissionConfigReaderException {
         submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
@@ -134,29 +130,10 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         }
     }
 
-    private SubmissionConfig getSubmissionConfig(Item item, Collection collection) {
-        if (isCorrectionItem(item)) {
-            return submissionConfigService.getCorrectionSubmissionConfigByCollection(collection);
-        } else {
-            return submissionConfigService.getSubmissionConfigByCollection(collection);
-        }
-    }
-
-    private boolean isCorrectionItem(Item item) {
-        Request currentRequest = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext(currentRequest.getServletRequest());
-        try {
-            return itemCorrectionService.checkIfIsCorrectionItem(context, item);
-        } catch (Exception ex) {
-            log.error("An error occurs checking if the given item is a correction item.", ex);
-            return false;
-        }
-    }
-
     @SuppressWarnings("unchecked")
     private void addValidationErrorsToItem(T obj, R witem) {
         Request currentRequest = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext((HttpServletRequest) currentRequest.getServletRequest());
+        Context context = ContextUtil.obtainContext(currentRequest.getHttpServletRequest());
 
         validationService.validate(context, obj).stream()
                          .map(ErrorRest::fromValidationError)
