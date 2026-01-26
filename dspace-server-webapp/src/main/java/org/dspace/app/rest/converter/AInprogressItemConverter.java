@@ -20,7 +20,6 @@ import org.dspace.app.rest.submit.DataProcessingStep;
 import org.dspace.app.rest.submit.RestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
