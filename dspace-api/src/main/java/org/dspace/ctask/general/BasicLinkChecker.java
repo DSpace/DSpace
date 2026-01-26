@@ -158,7 +158,7 @@ public class BasicLinkChecker extends AbstractCurationTask {
             }
             return statusCode;
         } catch (URISyntaxException e) {
-            log.error("Invalid URL: ", url, e);    
+            log.error("Invalid URL: ", url, e);
             return 0;
         } catch (IOException ioe) {
             // Must be a bad URL
