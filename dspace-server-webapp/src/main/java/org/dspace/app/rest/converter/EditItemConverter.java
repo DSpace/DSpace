@@ -133,7 +133,7 @@ public class EditItemConverter
     }
 
     private void addValidationErrorsToItem(EditItem obj, EditItemRest rest) {
-        Context context = ContextUtil.obtainContext(requestService.getCurrentRequest().getServletRequest());
+        Context context = ContextUtil.obtainContext(requestService.getCurrentRequest().getHttpServletRequest());
 
         validationService.validate(context, obj).stream()
             .map(ErrorRest::fromValidationError)
