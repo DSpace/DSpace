@@ -241,6 +241,16 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
     }
 
     /**
+     * Set the collection to use a shared workspace, allowing multiple users
+     * to collaborate on the same submission.
+     *
+     * @return this builder
+     */
+    public CollectionBuilder withSharedWorkspace() {
+        return setMetadataSingleValue(collection, "cris", "workspace", "shared", "true");
+    }
+
+    /**
      * remove the resource policies with type DEFAULT_ITEM_READ and
      * add new policy with type DEFAULT_ITEM_READ of
      * the new group to current collection.

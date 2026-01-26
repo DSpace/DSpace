@@ -428,6 +428,17 @@ public interface CollectionService
         int offset, int limit) throws SearchServiceException;
 
     /**
+     * Returns true if the given collection is configured so that all items are
+     * shared among all submitters of the collection itself.
+     *
+     * @param  context    the DSpace context
+     * @param  collection the collection to test
+     * @return            true if the given collection's workspace is shared, false
+     *                    otherwise
+     */
+    boolean isSharedWorkspace(Context context, Collection collection);
+
+    /**
      * Retrieve the first collection in the community or its descending that support
      * the provided entityType
      *

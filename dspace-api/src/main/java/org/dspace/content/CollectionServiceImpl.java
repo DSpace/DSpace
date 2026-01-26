@@ -7,6 +7,8 @@
  */
 package org.dspace.content;
 
+import static org.apache.commons.lang3.BooleanUtils.toBoolean;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -1064,6 +1066,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
         DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery, null, community, q);
         return (int)resp.getTotalSearchResults();
+    }
+
+    @Override
+    public boolean isSharedWorkspace(Context context, Collection collection) {
+        return toBoolean(getMetadataFirstValue(collection, "cris", "workspace", "shared", Item.ANY));
     }
 
     @Override
