@@ -474,7 +474,7 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
         // filter valid only on first item
         when(accessMode.getAdditionalFilter()).thenReturn(new Filter() {
             @Override
-            public Boolean getResult(Context context, Item item) throws LogicalStatementException {
+            public boolean getResult(Context context, Item item) throws LogicalStatementException {
                 return item.getName().equals("Test item");
             }
 

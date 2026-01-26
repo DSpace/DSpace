@@ -118,6 +118,10 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return addMetadataValue(collection, MetadataSchemaEnum.DC.getName(), "title", null, language, name);
     }
 
+    public CollectionBuilder withSubmissionDefinition(final String name) {
+        return addMetadataValue(collection, "cris", "submission", "definition", null, name);
+    }
+
     /**
      * Set the Collection's logo.
      * <em>To a String.  Should this not be the bytes of an image of some sort?</em>
