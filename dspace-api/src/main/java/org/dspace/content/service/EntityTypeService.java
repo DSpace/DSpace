@@ -14,7 +14,6 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
-import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.service.DSpaceCRUDService;
 
