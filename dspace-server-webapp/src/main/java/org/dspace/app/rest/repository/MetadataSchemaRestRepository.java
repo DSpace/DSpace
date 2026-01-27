@@ -44,6 +44,9 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
     @Autowired
     MetadataSchemaService metadataSchemaService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Override
     @PreAuthorize("permitAll()")
     public MetadataSchemaRest findOne(Context context, Integer id) {
@@ -82,7 +85,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         // parse request body
         MetadataSchemaRest metadataSchemaRest;
         try {
-            metadataSchemaRest = new ObjectMapper().readValue(
+            metadataSchemaRest = mapper.readValue(
                     getRequestService().getCurrentRequest().getHttpServletRequest().getInputStream(),
                     MetadataSchemaRest.class
             );
@@ -144,7 +147,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
 
         MetadataSchemaRest metadataSchemaRest;
         try {
-            metadataSchemaRest = new ObjectMapper().readValue(jsonNode.toString(), MetadataSchemaRest.class);
+            metadataSchemaRest = mapper.readValue(jsonNode.toString(), MetadataSchemaRest.class);
         } catch (JsonProcessingException e) {
             throw new DSpaceBadRequestException("Cannot parse JSON in request body", e);
         }

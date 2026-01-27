@@ -9,7 +9,9 @@ package org.dspace.content;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
@@ -26,6 +28,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.audit.MetadataEvent;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.handle.Handle;
@@ -48,6 +51,12 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     // e.g. to document metadata fields touched, etc.
     @Transient
     private StringBuffer eventDetails = null;
+
+
+    // accumulate information to be stored in the Audit system
+    // data is stored in a structured way, so no need to concatenate
+    @Transient
+    private Set<MetadataEvent> metadataEventDetails;
 
     /**
      * The same order should be applied inside this comparator
@@ -88,6 +97,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
      */
     @Transient
     protected UUID predefinedUUID;
+
     public UUID getPredefinedUUID() {
         return predefinedUUID;
     }
@@ -104,6 +114,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     }
 
     /**
+     * Deprecated: Use {@link #addMetadataEventDetails(MetadataEvent event)} instead.
      * Add a string to the cache of event details.  Automatically
      * separates entries with a comma.
      * Subclass can just start calling addDetails, since it creates
@@ -111,6 +122,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
      *
      * @param d detail string to add.
      */
+    @Deprecated
     protected void addDetails(String d) {
         if (eventDetails == null) {
             eventDetails = new StringBuffer(d);
@@ -120,10 +132,42 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     }
 
     /**
+     * Deprecated: Use {@link #getMetadataEventDetails()} instead.
+     *
      * @return summary of event details, or null if there are none.
      */
+    @Deprecated
     public String getDetails() {
         return eventDetails == null ? null : eventDetails.toString();
+    }
+
+    /**
+     * Add a MetadataEvent event in the list of metadata event details.
+     * so that is stored in the audit system.
+     *
+     * @param event detail object to add.
+     */
+    public void addMetadataEventDetails(MetadataEvent event) {
+        if (metadataEventDetails == null) {
+            metadataEventDetails = new HashSet<>();
+        }
+        metadataEventDetails.add(event);
+    }
+
+    /**
+     * @return list of metadata event details, or empty list if there is none.
+     */
+    public List<MetadataEvent> getMetadataEventDetails() {
+        return metadataEventDetails == null ? List.of() : metadataEventDetails.stream().toList();
+    }
+
+    /**
+     * Clear the list of metadata event details to avoid duplication in audit logs.
+     */
+    public void clearMetadataEventDetails() {
+        if (metadataEventDetails != null) {
+            metadataEventDetails.clear();
+        }
     }
 
     /**
@@ -191,7 +235,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     protected void addMetadata(MetadataValue metadataValue) {
         setMetadataModified();
         getMetadata().add(metadataValue);
-        addDetails(metadataValue.getMetadataField().toString());
+        addMetadataEventDetails(new MetadataEvent(metadataValue, MetadataEvent.ADD));
     }
 
     public List<ResourcePolicy> getResourcePolicies() {

@@ -79,6 +79,9 @@ public class ItemAddBundleController {
     @Autowired
     Utils utils;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     /**
      * Method to add a Bundle to an Item with the given UUID in the URL. This will create a Bundle with the
      * name provided in the request and attach this to the Item that matches the UUID in the URL.
@@ -101,7 +104,7 @@ public class ItemAddBundleController {
 
         BundleRest bundleRest;
         try {
-            bundleRest = new ObjectMapper().readValue(request.getInputStream(), BundleRest.class);
+            bundleRest = mapper.readValue(request.getInputStream(), BundleRest.class);
         } catch (IOException excIO) {
             throw new UnprocessableEntityException("Could not parse request body");
         }

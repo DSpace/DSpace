@@ -7,6 +7,7 @@
  */
 package org.dspace.saml2;
 
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -376,11 +377,14 @@ public class DSpaceRelyingPartyRegistrationRepositoryTest extends AbstractDSpace
         configurationService.setProperty(
             "saml-relying-party.auth0.asserting-party.metadata-uri", "classpath:auth0-ap-metadata.xml");
 
+        // Windows requires three slashes in a file URL.  Linux/unix does not.
+        String fileUrlPrefix = IS_OS_WINDOWS ? "file:///" : "file://";
+
         configurationService.setProperty("saml-relying-party.auth0.signing.credentials.0.private-key-location",
-            "file://" + new ClassPathResource("auth0-rp-private.key").getFile().getAbsolutePath());
+            fileUrlPrefix + new ClassPathResource("auth0-rp-private.key").getFile().getAbsolutePath());
 
         configurationService.setProperty("saml-relying-party.auth0.signing.credentials.0.certificate-location",
-            "file://" + new ClassPathResource("auth0-rp-certificate.crt").getFile().getAbsolutePath());
+            fileUrlPrefix + new ClassPathResource("auth0-rp-certificate.crt").getFile().getAbsolutePath());
 
         DSpaceRelyingPartyRegistrationRepository repo = new DSpaceRelyingPartyRegistrationRepository();
         RelyingPartyRegistration registration = repo.findByRegistrationId("auth0");

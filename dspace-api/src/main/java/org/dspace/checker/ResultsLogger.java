@@ -8,9 +8,8 @@
 package org.dspace.checker;
 
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
@@ -37,20 +36,6 @@ public class ResultsLogger implements ChecksumResultsCollector {
     private final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     /**
-     * Utility date format.
-     */
-    private static final ThreadLocal<DateFormat> DATE_FORMAT = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            return new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
-        }
-    };
-    /**
-     * Date the current checking run started.
-     */
-    Date startDate = null;
-
-    /**
      * Blanked off, no-op constructor. Do not use.
      */
     private ResultsLogger() {
@@ -61,8 +46,8 @@ public class ResultsLogger implements ChecksumResultsCollector {
      *
      * @param startDt Date the checking run started.
      */
-    public ResultsLogger(Date startDt) {
-        LOG.info(msg("run-start-time") + ": " + DATE_FORMAT.get().format(startDt));
+    public ResultsLogger(Instant startDt) {
+        LOG.info(msg("run-start-time") + ": " + DateTimeFormatter.ISO_INSTANT.format(startDt));
     }
 
     /**
@@ -108,7 +93,7 @@ public class ResultsLogger implements ChecksumResultsCollector {
         LOG.info(msg("previous-checksum") + ": " + info.getExpectedChecksum());
         LOG.info(msg("previous-checksum-date")
                      + ": "
-                     + ((info.getProcessEndDate() != null) ? DATE_FORMAT.get().format(info
+                     + ((info.getProcessEndDate() != null) ? DateTimeFormatter.ISO_INSTANT.format(info
                                                                                           .getProcessEndDate()) :
             "unknown"));
         LOG.info(msg("new-checksum") + ": " + info.getCurrentChecksum());

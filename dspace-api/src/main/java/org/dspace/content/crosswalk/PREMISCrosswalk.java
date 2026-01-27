@@ -14,15 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -59,7 +57,7 @@ public class PREMISCrosswalk
     private final String schemaLocation =
         PREMIS_NS.getURI() + " http://www.loc.gov/standards/premis/PREMIS-v1-0.xsd";
 
-    private static final Namespace namespaces[] = {PREMIS_NS};
+    private static final Namespace[] namespaces = {PREMIS_NS};
 
     protected BundleService bundleService
             = ContentServiceFactory.getInstance().getBundleService();
@@ -133,8 +131,8 @@ public class PREMISCrosswalk
                         String b_md = bitstream.getChecksum();
                         String name = bitstreamService.getName(bitstream);
 
-                        if (StringUtils.equals(alg, b_alg)) {
-                            if (StringUtils.equals(md, b_md)) {
+                        if (Strings.CS.equals(alg, b_alg)) {
+                            if (Strings.CS.equals(md, b_md)) {
                                 log.debug("Bitstream checksum agrees with PREMIS: " + name);
                             } else {
                                 throw new MetadataValidationException(
@@ -228,29 +226,17 @@ public class PREMISCrosswalk
         //  c. made-up name based on sequence ID and extension.
         String sid = String.valueOf(bitstream.getSequenceID());
         String baseUrl = configurationService.getProperty("dspace.ui.url");
-        String handle = null;
-        // get handle of parent Item of this bitstream, if there is one:
-        List<Bundle> bn = bitstream.getBundles();
-        if (bn.size() > 0) {
-            List<Item> bi = bn.get(0).getItems();
-            if (bi.size() > 0) {
-                handle = bi.get(0).getHandle();
-            }
-        }
         // get or make up name for bitstream:
         String bsName = bitstreamService.getName(bitstream);
         if (bsName == null) {
             List<String> ext = bitstreamService.getFormat(context, bitstream).getExtensions();
             bsName = "bitstream_" + sid + (ext.size() > 0 ? ext.get(0) : "");
         }
-        if (handle != null && baseUrl != null) {
+        if (baseUrl != null) {
             oiv.setText(baseUrl
-                            + "/bitstream/"
-                            + URLEncoder.encode(handle, "UTF-8")
-                            + "/"
-                            + sid
-                            + "/"
-                            + URLEncoder.encode(bsName, "UTF-8"));
+                + "/bitstreams/"
+                + bitstream.getID()
+                + "/download");
         } else {
             oiv.setText(URLEncoder.encode(bsName, "UTF-8"));
         }

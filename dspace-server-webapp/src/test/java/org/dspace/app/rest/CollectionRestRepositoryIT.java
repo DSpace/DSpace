@@ -105,6 +105,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     @Autowired
     CommunityService communityService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private Community topLevelCommunityA;
     private Community subCommunityA;
     private Community communityB;
@@ -716,6 +719,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withName("Testing autocomplete in submission")
                                            .withSubmitterGroup(eperson2)
                                            .build();
+        Collection col5 = CollectionBuilder.createCollection(context, child2)
+                                            .withName("Colección de prueba")
+                                            .withSubmitterGroup(eperson2)
+                                            .build();
         context.restoreAuthSystemState();
 
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
@@ -763,7 +770,19 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(tokenEPerson2).perform(get("/api/core/collections/search/findSubmitAuthorized")
                  .param("query", "testing auto"))
                  .andExpect(status().isOk())
-                 .andExpect(jsonPath("$.page.totalElements", is(0)));
+            .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
+                CollectionMatcher.matchProperties(collectionService.getName(col4), col4.getID(), col4.getHandle())
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // Diacritics test
+        getClient(tokenEPerson2).perform(get("/api/core/collections/search/findSubmitAuthorized")
+                .param("query", "coléccion de"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
+                CollectionMatcher.matchProperties(collectionService.getName(col5), col5.getID(), col5.getHandle())
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorized")
@@ -1057,8 +1076,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        ObjectMapper mapper = new ObjectMapper();
-
         CollectionRest collectionRest = collectionConverter.convert(col1, Projection.DEFAULT);
 
         collectionRest.setMetadata(new MetadataRest()
@@ -1195,8 +1212,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
         AtomicReference<String> handle = new AtomicReference<>();
         try {
-
-        ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
         // We send a name but the created collection should set this to the title
         collectionRest.setName("Collection");
@@ -1281,7 +1296,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .withLogo("ThisIsSomeDummyText")
                                           .build();
 
-        ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
         // We send a name but the created collection should set this to the title
         collectionRest.setName("Collection");
@@ -1350,7 +1364,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .withLogo("ThisIsSomeDummyText")
                                           .build();
 
-        ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
         // We send a name but the created collection should set this to the title
         collectionRest.setName("Collection");
@@ -1474,7 +1487,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
-        ObjectMapper mapper = new ObjectMapper();
 
         CollectionRest collectionRest = collectionConverter.convert(col1, Projection.DEFAULT);
 
@@ -1503,6 +1515,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         authorizeService.removePoliciesActionFilter(context, eperson, Constants.WRITE);
     }
 
+    @Test
     public void patchCollectionMetadataAuthorized() throws Exception {
         runPatchMetadataTests(admin, 200);
     }
@@ -1519,7 +1532,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        new MetadataPatchSuite().runWith(getClient(token), "/api/core/collections/" + col.getID(), expectedStatus);
+        new MetadataPatchSuite(mapper).runWith(getClient(token), "/api/core/collections/" + col.getID(),
+                                               expectedStatus);
     }
 
     @Test
@@ -1534,7 +1548,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .withLogo("ThisIsSomeDummyText")
                                           .build();
 
-        ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
         // We send a name but the created collection should set this to the title
         collectionRest.setName("Collection");
@@ -1576,7 +1589,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .withLogo("ThisIsSomeDummyText")
                                           .build();
 
-        ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
         // We send a name but the created collection should set this to the title
         collectionRest.setName("Collection");
@@ -3373,7 +3385,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         AtomicReference<UUID> idRef = new AtomicReference<>();
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(post("/api/core/collections/" + col1.getID() + "/adminGroup")

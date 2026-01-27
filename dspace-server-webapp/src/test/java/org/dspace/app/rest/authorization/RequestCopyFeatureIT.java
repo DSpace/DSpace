@@ -48,6 +48,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
+
 public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
 
     @Autowired
@@ -462,6 +464,7 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
+    @Test
     public void requestACopyItemTypeLoggedAsAnonymous() throws Exception {
         configurationService.setProperty("request.item.type", "logged");
 
@@ -496,6 +499,7 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
                         );
     }
 
+    @Test
     public void requestACopyItemTypeEmptyAsAnonymous() throws Exception {
         configurationService.setProperty("request.item.type", "");
 
@@ -510,6 +514,7 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
+    @Test
     public void requestACopyItemTypeEmptyAsEperson() throws Exception {
         configurationService.setProperty("request.item.type", "");
 
@@ -526,6 +531,7 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
+    @Test
     public void requestACopyItemTypeBogusValueAsAnonymous() throws Exception {
         configurationService.setProperty("request.item.type", "invalid value");
 
@@ -540,6 +546,7 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
+    @Test
     public void requestACopyItemTypeBogusValueAsEperson() throws Exception {
         configurationService.setProperty("request.item.type", "invalid value");
 

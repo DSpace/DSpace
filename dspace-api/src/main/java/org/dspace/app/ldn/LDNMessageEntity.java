@@ -8,7 +8,7 @@
 package org.dspace.app.ldn;
 
 import java.lang.reflect.Field;
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,10 +16,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ReloadableEntity;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Class representing ldnMessages stored in the DSpace system and, when locally resolvable,
@@ -100,13 +100,11 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
     @Column(name = "queue_attempts")
     private Integer queueAttempts = 0;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "queue_last_start_time")
-    private Date queueLastStartTime = null;
+    private Instant queueLastStartTime = null;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "queue_timeout")
-    private Date queueTimeout = null;
+    private Instant queueTimeout = null;
 
     @ManyToOne
     @JoinColumn(name = "origin", referencedColumnName = "id")
@@ -259,19 +257,19 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
         this.queueAttempts = queueAttempts;
     }
 
-    public Date getQueueLastStartTime() {
+    public Instant getQueueLastStartTime() {
         return queueLastStartTime;
     }
 
-    public void setQueueLastStartTime(Date queueLastStartTime) {
+    public void setQueueLastStartTime(Instant queueLastStartTime) {
         this.queueLastStartTime = queueLastStartTime;
     }
 
-    public Date getQueueTimeout() {
+    public Instant getQueueTimeout() {
         return queueTimeout;
     }
 
-    public void setQueueTimeout(Date queueTimeout) {
+    public void setQueueTimeout(Instant queueTimeout) {
         this.queueTimeout = queueTimeout;
     }
 
@@ -289,7 +287,11 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
     }
 
     public static String getNotificationType(LDNMessageEntity ldnMessage) {
-        if (ldnMessage.getInReplyTo() != null || ldnMessage.getOrigin() != null) {
+        // Resubmission outgoing notifications have the inReplyTo, therefore it cannot be used to determine
+        // whether a notification is incoming
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        if (ldnMessage.getOrigin() != null && !ldnMessage.getOrigin().getLdnUrl()
+                .contains(configurationService.getProperty("dspace.ui.url"))) {
             return TYPE_INCOMING;
         }
         return TYPE_OUTGOING;

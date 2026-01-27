@@ -19,9 +19,9 @@ import java.util.concurrent.Callable;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.el.MethodNotFoundException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +47,7 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     private String url;
 
-    private int timeout = 1000;
+    private int timeout = 5000;
 
     @Autowired
     private LiveImportClient liveImportClient;
@@ -91,12 +91,12 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for ROR");
+        throw new UnsupportedOperationException("This method is not implemented for ROR");
     }
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for ROR");
+        throw new UnsupportedOperationException("This method is not implemented for ROR");
     }
 
     @Override
@@ -211,7 +211,7 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
         List<ImportRecord> importResults = new ArrayList<>();
 
-        id = StringUtils.removeStart(id, ROR_IDENTIFIER_PREFIX);
+        id = Strings.CS.removeStart(id, ROR_IDENTIFIER_PREFIX);
 
         try {
             Map<String, Map<String, String>> params = new HashMap<String, Map<String, String>>();

@@ -51,7 +51,7 @@ public class BulkAccessConditionConverter
         optionRest.setHasEndDate(option.getHasEndDate());
         if (StringUtils.isNotBlank(option.getStartDateLimit())) {
             try {
-                optionRest.setMaxStartDate(dateMathParser.parseMath(option.getStartDateLimit()));
+                optionRest.setMaxStartDate(dateMathParser.parseMath(option.getStartDateLimit()).toLocalDate());
             } catch (ParseException e) {
                 throw new IllegalStateException("Wrong start date limit configuration for the access condition "
                         + "option named  " + option.getName());
@@ -59,7 +59,7 @@ public class BulkAccessConditionConverter
         }
         if (StringUtils.isNotBlank(option.getEndDateLimit())) {
             try {
-                optionRest.setMaxEndDate(dateMathParser.parseMath(option.getEndDateLimit()));
+                optionRest.setMaxEndDate(dateMathParser.parseMath(option.getEndDateLimit()).toLocalDate());
             } catch (ParseException e) {
                 throw new IllegalStateException("Wrong end date limit configuration for the access condition "
                         + "option named  " + option.getName());

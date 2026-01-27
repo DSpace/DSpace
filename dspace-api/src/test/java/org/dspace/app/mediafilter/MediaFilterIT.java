@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.BitstreamBuilder;
@@ -195,8 +195,8 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
 
     private void checkItemHasBeenProcessed(Item item) throws IOException, SQLException, AuthorizeException {
         String itemName = itemService.getName(item);
-        String expectedFileName = StringUtils.endsWith(itemName, "_a") ? "test.csv.txt" : "test.txt.txt";
-        String expectedContent = StringUtils.endsWith(itemName, "_a") ? "data3,3" : "quick brown fox";
+        String expectedFileName = Strings.CS.endsWith(itemName, "_a") ? "test.csv.txt" : "test.txt.txt";
+        String expectedContent = Strings.CS.endsWith(itemName, "_a") ? "data3,3" : "quick brown fox";
         List<Bundle> textBundles = itemService.getBundles(item, "TEXT");
         assertTrue("The item " + itemName + " has NOT the TEXT bundle", textBundles.size() == 1);
         List<Bitstream> bitstreams = textBundles.get(0).getBitstreams();
@@ -204,9 +204,9 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
                 bitstreams.size() == 1);
         Bitstream bitstream = bitstreams.get(0);
         assertTrue("The text bitstream in the " + itemName + " is NOT named properly [" + expectedFileName + "]",
-                StringUtils.equals(bitstreamService.getName(bitstream), expectedFileName));
+                   Strings.CS.equals(bitstreamService.getName(bitstream), expectedFileName));
         assertTrue("The text bitstream in the " + itemName + " doesn't contain the proper content ["
-                + expectedContent + "]", StringUtils.contains(getContent(bitstreams.get(0)), expectedContent));
+                + expectedContent + "]", Strings.CS.contains(getContent(bitstreams.get(0)), expectedContent));
     }
 
     private CharSequence getContent(Bitstream bitstream) throws IOException, SQLException, AuthorizeException {

@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.dspace.app.rest.matcher.EPersonMatcher;
@@ -57,6 +58,9 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Before
     public void setUp() throws Exception {
@@ -206,9 +210,11 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
                                 .andDo(result -> wsi.set(read(result.getResponse().getContentAsString(), "$.id")));
 
             getClient(authToken).perform(get("/api/submission/workspaceitems/" + wsi.get())
-                                            .param("embed", "submitter"))
-                                .andExpect(jsonPath("$._embedded.submitter",
-                                                    EPersonMatcher.matchProperties(eperson)));
+                                             .param("embed", "submitter"))
+                                .andExpect(jsonPath(
+                                    "$._embedded.submitter",
+                                    EPersonMatcher.matchProperties(eperson)
+                                ));
 
         } finally {
             WorkspaceItemBuilder.deleteWorkspaceItem(wsi.get());

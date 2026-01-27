@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,13 +26,13 @@ public class TemplateItemRest extends BaseObjectRest<UUID> {
     @JsonIgnore
     private CollectionRest templateItemOf;
     MetadataRest metadata = new MetadataRest();
-    private Date lastModified = new Date();
+    private Instant lastModified = Instant.now();
 
-    public Date getLastModified() {
+    public Instant getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(Date lastModified) {
+    public void setLastModified(Instant lastModified) {
         this.lastModified = lastModified;
     }
 

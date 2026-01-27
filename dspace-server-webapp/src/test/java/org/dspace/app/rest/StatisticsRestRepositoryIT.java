@@ -21,8 +21,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -79,6 +80,9 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     protected AuthorizeService authorizeService;
     @Autowired
     protected ContentServiceFactory contentServiceFactory;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     private Community communityNotVisited;
     private Community communityVisited;
@@ -276,8 +280,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("community");
         viewEventRest.setTargetId(communityVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -326,8 +328,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("collection");
         viewEventRest.setTargetId(collectionVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -382,8 +382,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("item");
         viewEventRest.setTargetId(itemVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -471,8 +469,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("bitstream");
         viewEventRest.setTargetId(bitstreamVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -597,8 +593,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("item");
         viewEventRest.setTargetId(itemVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -681,8 +675,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("collection");
         viewEventRest.setTargetId(collectionVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -714,8 +706,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("bitstream");
         viewEventRest.setTargetId(bitstreamVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -782,8 +772,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("bitstream");
         viewEventRest.setTargetId(bitstreamVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -842,8 +830,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("collection");
         viewEventRest.setTargetId(collectionVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -913,8 +899,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("community");
         viewEventRest.setTargetId(communityVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -972,8 +956,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("item");
         viewEventRest.setTargetId(itemVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -1042,8 +1024,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("community");
         viewEventRest.setTargetId(communityVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -1195,8 +1175,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("item");
         viewEventRest.setTargetId(itemVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient().perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -1206,15 +1184,13 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest2.setTargetType("item");
         viewEventRest2.setTargetId(itemVisited2.getID());
 
-        ObjectMapper mapper2 = new ObjectMapper();
-
         getClient().perform(post("/api/statistics/viewevents")
-            .content(mapper2.writeValueAsBytes(viewEventRest2))
+            .content(mapper.writeValueAsBytes(viewEventRest2))
             .contentType(contentType))
                    .andExpect(status().isCreated());
 
         getClient().perform(post("/api/statistics/viewevents")
-            .content(mapper2.writeValueAsBytes(viewEventRest2))
+            .content(mapper.writeValueAsBytes(viewEventRest2))
             .contentType(contentType))
                    .andExpect(status().isCreated());
 
@@ -1244,8 +1220,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("community");
         viewEventRest.setTargetId(communityVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient().perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -1334,8 +1308,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("item");
         viewEventRest.setTargetId(itemVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient().perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -1399,8 +1371,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("item");
         viewEventRest.setTargetId(itemVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient().perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -1481,8 +1451,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("bitstream");
         viewEventRest.setTargetId(bitstreamVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient().perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -1536,7 +1504,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     private List<UsageReportPointRest> getListOfVisitsPerMonthsPoints(int viewsLastMonth) {
         List<UsageReportPointRest> expectedPoints = new ArrayList<>();
         int nrOfMonthsBack = 6;
-        Calendar cal = Calendar.getInstance();
+        YearMonth month = YearMonth.now();
         for (int i = 0; i <= nrOfMonthsBack; i++) {
             UsageReportPointDateRest expectedPoint = new UsageReportPointDateRest();
             if (i > 0) {
@@ -1544,11 +1512,12 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             } else {
                 expectedPoint.addValue("views", viewsLastMonth);
             }
-            String month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en"));
-            expectedPoint.setId(month + " " + cal.get(Calendar.YEAR));
+            // Get month+year in long format (e.g. "February 2025") using English language
+            String monthYear = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ENGLISH).format(month);
+            expectedPoint.setId(monthYear);
 
             expectedPoints.add(expectedPoint);
-            cal.add(Calendar.MONTH, -1);
+            month = month.minusMonths(1);
         }
         return expectedPoints;
     }

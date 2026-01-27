@@ -87,6 +87,9 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Autowired
     private CollectionService collectionService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     Collection collection;
 
     @Before
@@ -106,7 +109,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         AtomicReference<UUID> idRef = new AtomicReference<>();
         AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
         try {
-            ObjectMapper mapper = new ObjectMapper();
             GroupRest groupRest = new GroupRest();
             GroupRest groupRestNoEmbeds = new GroupRest();
             String groupName = "testGroup1";
@@ -164,7 +166,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void createUnauthauthorizedTest()
             throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         String groupName = "testGroupUnauth1";
 
@@ -178,8 +179,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void createForbiddenTest()
             throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         String groupName = "testGroupForbidden1";
 
@@ -194,8 +193,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void createUnprocessableTest()
             throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
 
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -209,7 +206,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void createWithoutNameTest() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest(); // no name set
 
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -531,7 +527,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/groups/" + group.getID(), expectedStatus);
+        new MetadataPatchSuite(mapper).runWith(getClient(token), "/api/eperson/groups/" + group.getID(),
+                                               expectedStatus);
     }
 
     @Test

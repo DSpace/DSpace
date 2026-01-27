@@ -14,14 +14,16 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
 import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
@@ -156,7 +158,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             return;
         }
 
-        Date startTime = new Date();
+        Instant startTime = Instant.now();
         Context context = new Context(Context.Mode.BATCH_EDIT);
 
         setMapFile();
@@ -254,12 +256,12 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                 }
             }
 
-            Date endTime = new Date();
-            handler.logInfo("Started: " + startTime.getTime());
-            handler.logInfo("Ended: " + endTime.getTime());
+            Instant endTime = Instant.now();
+            handler.logInfo("Started: " + DateTimeFormatter.ISO_INSTANT.format(startTime));
+            handler.logInfo("Ended: " + DateTimeFormatter.ISO_INSTANT.format(endTime));
             handler.logInfo(
-                "Elapsed time: " + ((endTime.getTime() - startTime.getTime()) / 1000) + " secs (" + (endTime
-                    .getTime() - startTime.getTime()) + " msecs)");
+                "Elapsed time: " + ((endTime.toEpochMilli() - startTime.toEpochMilli()) / 1000) + " secs (" +
+                    (endTime.toEpochMilli() - startTime.toEpochMilli()) + " msecs)");
         }
     }
 
@@ -333,33 +335,38 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     protected void readZip(Context context, ItemImportService itemImportService) throws Exception {
         Optional<InputStream> optionalFileStream = Optional.empty();
         Optional<InputStream> validationFileStream = Optional.empty();
-        if (!remoteUrl) {
-            // manage zip via upload
-            optionalFileStream = handler.getFileStream(context, zipfilename);
-            validationFileStream = handler.getFileStream(context, zipfilename);
-        } else {
-            // manage zip via remote url
-            optionalFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
-            validationFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
-        }
-
-        if (validationFileStream.isPresent()) {
-            // validate zip file
-            if (validationFileStream.isPresent()) {
-                validateZip(validationFileStream.get());
+        try {
+            if (!remoteUrl) {
+                // manage zip via upload
+                optionalFileStream = handler.getFileStream(context, zipfilename);
+                validationFileStream = handler.getFileStream(context, zipfilename);
+            } else {
+                // manage zip via remote url
+                optionalFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
+                validationFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
             }
 
-            workFile = new File(itemImportService.getTempWorkDir() + File.separator
-                    + zipfilename + "-" + context.getCurrentUser().getID());
-            FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
-        } else {
-            throw new IllegalArgumentException(
-                    "Error reading file, the file couldn't be found for filename: " + zipfilename);
-        }
+            if (validationFileStream.isPresent()) {
+                // validate zip file
+                if (validationFileStream.isPresent()) {
+                    validateZip(validationFileStream.get());
+                }
 
-        workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
-                           + File.separator + context.getCurrentUser().getID());
-        sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
+                workFile = new File(itemImportService.getTempWorkDir() + File.separator
+                        + zipfilename + "-" + context.getCurrentUser().getID());
+                FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
+            } else {
+                throw new IllegalArgumentException(
+                        "Error reading file, the file couldn't be found for filename: " + zipfilename);
+            }
+
+            workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
+                    + File.separator + context.getCurrentUser().getID());
+            sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
+        } finally {
+            optionalFileStream.ifPresent(IOUtils::closeQuietly);
+            validationFileStream.ifPresent(IOUtils::closeQuietly);
+        }
     }
 
     /**

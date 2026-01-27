@@ -17,7 +17,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>9.0-SNAPSHOT</version>
+      <version>10.0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -255,6 +255,10 @@
             <exclusion>
                <groupId>org.antlr</groupId>
                <artifactId>antlr4-runtime</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.apache.logging.log4j</groupId>
+               <artifactId>log4j-slf4j-impl</artifactId>
             </exclusion>
          </exclusions>
       </dependency>

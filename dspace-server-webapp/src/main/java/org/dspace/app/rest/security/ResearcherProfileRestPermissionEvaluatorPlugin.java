@@ -15,7 +15,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.ResearcherProfileRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
@@ -49,7 +49,7 @@ public class ResearcherProfileRestPermissionEvaluatorPlugin extends RestObjectPe
             return false;
         }
 
-        if (!StringUtils.equalsIgnoreCase(targetType, ResearcherProfileRest.NAME)) {
+        if (!Strings.CI.equals(targetType, ResearcherProfileRest.NAME)) {
             return false;
         }
 

@@ -14,7 +14,7 @@ package org.dspace.content.authority;
 public class SampleAuthority implements ChoiceAuthority {
     private String pluginInstanceName;
 
-    protected static String values[] = {
+    protected static String[] values = {
         "sun",
         "mon",
         "tue",
@@ -24,7 +24,7 @@ public class SampleAuthority implements ChoiceAuthority {
         "sat"
     };
 
-    protected static String labels[] = {
+    protected static String[] labels = {
         "Sunday",
         "Monday",
         "Tuesday",
@@ -37,7 +37,7 @@ public class SampleAuthority implements ChoiceAuthority {
     @Override
     public Choices getMatches(String query, int start, int limit, String locale) {
         int dflt = -1;
-        Choice v[] = new Choice[values.length];
+        Choice[] v = new Choice[values.length];
         for (int i = 0; i < values.length; ++i) {
             v[i] = new Choice(String.valueOf(i), values[i], labels[i]);
             if (values[i].equalsIgnoreCase(query)) {
@@ -51,7 +51,7 @@ public class SampleAuthority implements ChoiceAuthority {
     public Choices getBestMatch(String text, String locale) {
         for (int i = 0; i < values.length; ++i) {
             if (text.equalsIgnoreCase(values[i])) {
-                Choice v[] = new Choice[1];
+                Choice[] v = new Choice[1];
                 v[0] = new Choice(String.valueOf(i), values[i], labels[i]);
                 return new Choices(v, 0, v.length, Choices.CF_UNCERTAIN, false, 0);
             }

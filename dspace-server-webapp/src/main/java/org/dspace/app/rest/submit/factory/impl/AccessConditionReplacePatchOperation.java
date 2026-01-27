@@ -8,10 +8,10 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,7 +32,6 @@ import org.dspace.core.Context;
 import org.dspace.submit.model.AccessConditionConfiguration;
 import org.dspace.submit.model.AccessConditionConfigurationService;
 import org.dspace.submit.model.AccessConditionOption;
-import org.dspace.util.TimeHelpers;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -108,8 +107,7 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
         return null;
     }
 
-    private AccessConditionDTO createDTO(ResourcePolicy rpToReplace, String attributeReplace, String valueToReplace)
-            throws ParseException {
+    private AccessConditionDTO createDTO(ResourcePolicy rpToReplace, String attributeReplace, String valueToReplace) {
         AccessConditionDTO accessCondition = new AccessConditionDTO();
         accessCondition.setName(rpToReplace.getRpName());
         accessCondition.setStartDate(rpToReplace.getStartDate());
@@ -119,10 +117,10 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
                 accessCondition.setName(valueToReplace);
                 return accessCondition;
             case "startDate":
-                accessCondition.setStartDate(TimeHelpers.toMidnightUTC(parseDate(valueToReplace)));
+                accessCondition.setStartDate(parseDate(valueToReplace));
                 return accessCondition;
             case "endDate":
-                accessCondition.setEndDate(TimeHelpers.toMidnightUTC(parseDate(valueToReplace)));
+                accessCondition.setEndDate(parseDate(valueToReplace));
                 return accessCondition;
             default:
                 throw new UnprocessableEntityException("The provided attribute: "
@@ -137,26 +135,26 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
                 rpToReplace.setRpName(valueToReplace);
                 break;
             case "startDate":
-                rpToReplace.setStartDate(TimeHelpers.toMidnightUTC(parseDate(valueToReplace)));
+                rpToReplace.setStartDate(parseDate(valueToReplace));
                 break;
             case "endDate":
-                rpToReplace.setEndDate(TimeHelpers.toMidnightUTC(parseDate(valueToReplace)));
+                rpToReplace.setEndDate(parseDate(valueToReplace));
                 break;
             default:
                 throw new IllegalArgumentException("Attribute to replace is not valid:" + attributeReplace);
         }
     }
 
-    private Date parseDate(String date) {
-        List<SimpleDateFormat> knownPatterns = Arrays.asList(
-                                new SimpleDateFormat("yyyy-MM-dd"),
-                                new SimpleDateFormat("dd-MM-yyyy"),
-                                new SimpleDateFormat("yyyy/MM/dd"),
-                                new SimpleDateFormat("dd/MM/yyyy"));
-        for (SimpleDateFormat pattern : knownPatterns) {
+    private LocalDate parseDate(String date) {
+        List<DateTimeFormatter> knownPatterns = Arrays.asList(
+                                DateTimeFormatter.ISO_LOCAL_DATE,
+                                DateTimeFormatter.ofPattern("dd-MM-yyyy"),
+                                DateTimeFormatter.ofPattern("yyyy/MM/dd"),
+                                DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        for (DateTimeFormatter pattern : knownPatterns) {
             try {
-                return pattern.parse(date);
-            } catch (ParseException e) {
+                return LocalDate.parse(date, pattern);
+            } catch (DateTimeParseException e) {
                 log.error(e::getMessage, e);
             }
         }

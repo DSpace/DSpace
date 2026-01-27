@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.JsonPatchConverter;
@@ -78,6 +79,9 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
 
     @Autowired
     ConfigurationService configurationService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Autowired
     public BitstreamRestRepository(BitstreamService dsoService) {
@@ -207,7 +211,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         }
         if (StringUtils.isNotBlank(filename)) {
             for (Bitstream bitstream : bitstreams) {
-                if (StringUtils.equals(bs.getName(bitstream), filename)) {
+                if (Strings.CS.equals(bs.getName(bitstream), filename)) {
                     return bitstream;
                 }
             }
@@ -266,7 +270,6 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
      */
     public void patchBitstreamsInBulk(Context context, JsonNode jsonNode) throws SQLException {
         int operationsLimit = configurationService.getIntProperty("rest.patch.operations.limit", 1000);
-        ObjectMapper mapper = new ObjectMapper();
         JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
         Patch patch = patchConverter.convert(jsonNode);
         if (patch.getOperations().size() > operationsLimit) {

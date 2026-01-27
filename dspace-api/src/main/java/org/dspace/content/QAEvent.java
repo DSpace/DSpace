@@ -10,7 +10,7 @@ package org.dspace.content;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
+import java.time.Instant;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
@@ -63,14 +63,14 @@ public class QAEvent {
     @JsonDeserialize(using = RawJsonDeserializer.class)
     private String message;
 
-    private Date lastUpdate;
+    private Instant lastUpdate;
 
     private String status = "PENDING";
 
     public QAEvent() {}
 
     public QAEvent(String source, String originalId, String target, String title,
-        String topic, double trust, String message, Date lastUpdate) {
+        String topic, double trust, String message, Instant lastUpdate) {
         super();
         this.source = source;
         this.originalId = originalId;
@@ -150,11 +150,11 @@ public class QAEvent {
         this.target = target;
     }
 
-    public Date getLastUpdate() {
+    public Instant getLastUpdate() {
         return lastUpdate;
     }
 
-    public void setLastUpdate(Date lastUpdate) {
+    public void setLastUpdate(Instant lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
 

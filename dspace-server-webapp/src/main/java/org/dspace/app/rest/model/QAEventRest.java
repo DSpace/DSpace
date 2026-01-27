@@ -9,7 +9,7 @@ package org.dspace.app.rest.model;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Locale;
 
 import org.dspace.app.rest.RestResourceController;
@@ -41,7 +41,7 @@ public class QAEventRest extends BaseObjectRest<String> {
     private String title;
     private String topic;
     private String trust;
-    private Date eventDate;
+    private Instant eventDate;
     private QAEventMessageRest message;
     private String status;
 
@@ -107,11 +107,11 @@ public class QAEventRest extends BaseObjectRest<String> {
         this.trust = trust;
     }
 
-    public Date getEventDate() {
+    public Instant getEventDate() {
         return eventDate;
     }
 
-    public void setEventDate(Date eventDate) {
+    public void setEventDate(Instant eventDate) {
         this.eventDate = eventDate;
     }
 

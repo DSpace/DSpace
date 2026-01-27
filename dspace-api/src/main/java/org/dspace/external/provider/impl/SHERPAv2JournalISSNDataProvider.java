@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.sherpa.SHERPAService;
 import org.dspace.app.sherpa.v2.SHERPAJournal;
@@ -106,8 +106,7 @@ public class SHERPAv2JournalISSNDataProvider extends AbstractExternalDataProvide
             String issn = sherpaJournal.getIssns().get(0);
             externalDataObject.setId(issn);
             externalDataObject.addMetadata(new MetadataValueDTO(
-                "dc", "identifier", "issn", null, issn));
-
+                "creativeworkseries", "issn", null, null, issn));
         }
 
         log.debug("New external data object. Title=" + externalDataObject.getValue() + ". ID="
@@ -150,7 +149,7 @@ public class SHERPAv2JournalISSNDataProvider extends AbstractExternalDataProvide
 
     @Override
     public boolean supports(String source) {
-        return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
+        return Strings.CI.equals(sourceIdentifier, source);
     }
 
     /**

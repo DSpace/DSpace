@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.BadRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,6 +26,10 @@ import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RegistrationRest;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
+import org.dspace.app.rest.repository.patch.operation.RegistrationEmailPatchOperation;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
@@ -32,6 +37,8 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.InvalidReCaptchaException;
 import org.dspace.eperson.RegistrationData;
+import org.dspace.eperson.RegistrationTypeEnum;
+import org.dspace.eperson.factory.CaptchaServiceFactory;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.CaptchaService;
 import org.dspace.eperson.service.EPersonService;
@@ -54,9 +61,10 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
 
     private static Logger log = LogManager.getLogger(RegistrationRestRepository.class);
 
+    public static final String TOKEN_QUERY_PARAM = "token";
     public static final String TYPE_QUERY_PARAM = "accountRequestType";
-    public static final String TYPE_REGISTER = "register";
-    public static final String TYPE_FORGOT = "forgot";
+    public static final String TYPE_REGISTER = RegistrationTypeEnum.REGISTER.toString().toLowerCase();
+    public static final String TYPE_FORGOT = RegistrationTypeEnum.FORGOT.toString().toLowerCase();
 
     @Autowired
     private EPersonService ePersonService;
@@ -70,14 +78,23 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     @Autowired
     private RequestService requestService;
 
-    @Autowired
-    private CaptchaService captchaService;
+    // TODO: Work towards full coverage of captcha, so we can use getCaptchaService() here instead
+    private CaptchaService captchaService = CaptchaServiceFactory.getInstance().getGoogleCaptchaService();
 
     @Autowired
     private ConfigurationService configurationService;
 
     @Autowired
     private RegistrationDataService registrationDataService;
+
+    @Autowired
+    private Utils utils;
+
+    @Autowired
+    private ResourcePatch<RegistrationData> resourcePatch;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Override
     @PreAuthorize("permitAll()")
@@ -93,7 +110,6 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     @Override
     public RegistrationRest createAndReturn(Context context) {
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest;
         String accountType = request.getParameter(TYPE_QUERY_PARAM);
         if (StringUtils.isBlank(accountType) ||
@@ -101,7 +117,7 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
             throw new IllegalArgumentException(String.format("Needs query param '%s' with value %s or %s indicating " +
                 "what kind of registration request it is", TYPE_QUERY_PARAM, TYPE_FORGOT, TYPE_REGISTER));
         }
-        String captchaToken = request.getHeader("X-Recaptcha-Token");
+        String captchaToken = request.getHeader("x-captcha-payload");
         boolean verificationEnabled = configurationService.getBooleanProperty("registration.verification.enabled");
 
         if (verificationEnabled && !accountType.equalsIgnoreCase(TYPE_FORGOT)) {
@@ -147,17 +163,19 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
                     String email = registrationRest.getEmail();
                     if (!AuthorizeUtil.authorizeNewAccountRegistration(context, request)) {
                         throw new AccessDeniedException(
-                            "Registration is disabled, you are not authorized to create a new Authorization");
+                                "Registration is disabled, you are not authorized to create a new Authorization");
                     }
-                    if (!authenticationService.canSelfRegister(context, request, email)) {
+
+                    if (!authenticationService.canSelfRegister(context, request, registrationRest.getEmail())) {
                         throw new UnprocessableEntityException(
-                            String.format("Registration is not allowed with email address" +
-                                          " %s", email));
+                                String.format("Registration is not allowed with email address" +
+                                        " %s", email));
                     }
-                    accountService.sendRegistrationInfo(context, email);
+
+                    accountService.sendRegistrationInfo(context, registrationRest.getEmail());
                 } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
                     log.error("Something went wrong with sending registration info email: "
-                              + registrationRest.getEmail(), e);
+                            + registrationRest.getEmail(), e);
                 }
             } else {
                 // if an eperson with this email already exists then send "forgot password" email instead
@@ -165,23 +183,19 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
                     accountService.sendForgotPasswordInfo(context, registrationRest.getEmail());
                 }  catch (SQLException | IOException | MessagingException | AuthorizeException e) {
                     log.error("Something went wrong with sending forgot password info email: "
-                              + registrationRest.getEmail(), e);
+                            + registrationRest.getEmail(), e);
                 }
             }
         }
         return null;
     }
 
-    @Override
-    public Class<RegistrationRest> getDomainClass() {
-        return RegistrationRest.class;
-    }
-
     /**
      * This method will find the RegistrationRest object that is associated with the token given
+     *
      * @param token The token to be found and for which a RegistrationRest object will be found
-     * @return      A RegistrationRest object for the given token
-     * @throws SQLException If something goes wrong
+     * @return A RegistrationRest object for the given token
+     * @throws SQLException       If something goes wrong
      * @throws AuthorizeException If something goes wrong
      */
     @SearchRestMethod(name = "findByToken")
@@ -192,17 +206,62 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         if (registrationData == null) {
             throw new ResourceNotFoundException("The token: " + token + " couldn't be found");
         }
-        RegistrationRest registrationRest = new RegistrationRest();
-        registrationRest.setEmail(registrationData.getEmail());
-        EPerson ePerson = accountService.getEPerson(context, token);
-        if (ePerson != null) {
-            registrationRest.setUser(ePerson.getID());
+        return converter.toRest(registrationData, utils.obtainProjection());
+    }
+
+    private void validateToken(Context context, String token) {
+        try {
+            RegistrationData registrationData =
+                registrationDataService.findByToken(context, token);
+            if (registrationData == null || !registrationDataService.isValid(registrationData)) {
+                throw new AccessDeniedException("The token is invalid");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return registrationRest;
+    }
+
+    /**
+     * This method can be used to update a {@link RegistrationData} with a given {@code id} that has a valid
+     * {@code token} with the actions described in the {@link Patch} object.
+     * This method is used to patch the email value, and will generate a completely new {@code token} that will be
+     * sent with an email {@link RegistrationEmailPatchOperation}.
+     *
+     */
+    @Override
+    public RegistrationRest patch(
+        HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch
+    ) throws UnprocessableEntityException, DSpaceBadRequestException {
+        if (id == null || id <= 0) {
+            throw new BadRequestException("The id of the registration cannot be null or negative");
+        }
+        if (patch == null || patch.getOperations() == null || patch.getOperations().isEmpty()) {
+            throw new BadRequestException("Patch request is incomplete: cannot find operations");
+        }
+        String token = request.getParameter("token");
+        if (token == null || token.trim().isBlank()) {
+            throw new AccessDeniedException("The token is required");
+        }
+        Context context = obtainContext();
+
+        validateToken(context, token);
+
+        try {
+            resourcePatch.patch(context, registrationDataService.find(context, id), patch.getOperations());
+            context.commit();
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        return null;
     }
 
     public void setCaptchaService(CaptchaService captchaService) {
         this.captchaService = captchaService;
+    }
+
+    @Override
+    public Class<RegistrationRest> getDomainClass() {
+        return RegistrationRest.class;
     }
 
 }

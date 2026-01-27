@@ -83,6 +83,9 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             String token = loginJWTTokenHandler.createTokenForEPerson(context, request,
                                                                  authentication.getPreviousLoginDate());
             context.commit();
+            // Close the Context, because the DSpaceRequestContextFilter is not called for requests that trigger
+            // the authentication filters (filters that extend AbstractAuthenticationProcessingFilter)
+            context.close();
 
             // Add newly generated auth token to the response
             addTokenToResponse(request, response, token, addCookie);

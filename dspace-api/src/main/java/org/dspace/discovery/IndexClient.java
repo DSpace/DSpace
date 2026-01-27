@@ -11,6 +11,7 @@ import static org.dspace.discovery.IndexClientOptions.TYPE_OPTION;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -116,10 +117,10 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                 break;
             case INDEX:
                 handler.logInfo("Indexing " + commandLine.getOptionValue('i') + " force " + commandLine.hasOption("f"));
-                final long startTimeMillis = System.currentTimeMillis();
+                final long startTimeMillis = Instant.now().toEpochMilli();
                 final long count = indexAll(indexer, ContentServiceFactory.getInstance().getItemService(), context,
                     indexableObject.get());
-                final long seconds = (System.currentTimeMillis() - startTimeMillis) / 1000;
+                final long seconds = (Instant.now().toEpochMilli() - startTimeMillis) / 1000;
                 handler.logInfo("Indexed " + count + " object" + (count > 1 ? "s" : "") +
                                 " in " + seconds + " seconds");
                 break;

@@ -8,7 +8,7 @@
 package org.dspace.eperson;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
 import jakarta.mail.MessagingException;
@@ -95,7 +95,7 @@ public class EPersonConsumer implements Consumer {
                                 ePersonService.getFirstName(eperson) + " " + ePersonService.getLastName(eperson)
                             ); // Name
                             adminEmail.addArgument(eperson.getEmail());
-                            adminEmail.addArgument(new Date());
+                            adminEmail.addArgument(Instant.now());
 
                             adminEmail.setReplyTo(eperson.getEmail());
 

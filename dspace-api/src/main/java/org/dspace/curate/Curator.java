@@ -10,6 +10,7 @@ package org.dspace.curate;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -100,7 +101,7 @@ public class Curator {
 
     /**
      * constructor that uses an handler for logging
-     * 
+     *
      * @param handler {@code DSpaceRunnableHandler} used to logs infos
      */
     public Curator(DSpaceRunnableHandler handler) {
@@ -336,7 +337,7 @@ public class Curator {
         if (taskQ != null) {
             EPerson ePerson = c.getCurrentUser();
             taskQ.enqueue(queueId, new TaskQueueEntry(epersonService.getName(ePerson),
-                                                      System.currentTimeMillis(), perfList, id));
+                                                      Instant.now().toEpochMilli(), perfList, id));
         } else {
             System.out.println("curate - no TaskQueue implemented");
         }
@@ -626,7 +627,7 @@ public class Curator {
 
         /**
          * Proxy method for logging with INFO level
-         * 
+         *
          * @param message that needs to be logged
          */
         protected void logInfo(String message) {
@@ -641,7 +642,7 @@ public class Curator {
 
     /**
      * Proxt method for logging with WARN level
-     * 
+     *
      * @param message
      */
     protected void logWarning(String message) {
@@ -651,7 +652,7 @@ public class Curator {
     /**
      * Proxy method for logging with WARN level and a {@code Messageformatter}
      * that generates the final log.
-     * 
+     *
      * @param message Target message to format or print
      * @param object  Object to use inside the message, or null
      */

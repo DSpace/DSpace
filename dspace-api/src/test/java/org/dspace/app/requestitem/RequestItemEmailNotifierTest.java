@@ -10,7 +10,11 @@ package org.dspace.app.requestitem;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 import jakarta.mail.Address;
 import jakarta.mail.Message;
@@ -21,17 +25,17 @@ import org.dspace.AbstractUnitTest;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.builder.AbstractBuilder;
+import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RequestItemBuilder;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.ItemService;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
@@ -40,6 +44,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
 
 /**
  * Tests for {@link RequestItemEmailNotifier}.
@@ -62,8 +67,7 @@ public class RequestItemEmailNotifierTest
     private static BitstreamService bitstreamService;
     private static HandleService handleService;
     private static RequestItemService requestItemService;
-    private static ItemService itemService;
-    private static EPersonService epersonService;
+    private static RequestItemEmailNotifier requestItemEmailNotifier;
 
     public RequestItemEmailNotifierTest() {
         super();
@@ -81,10 +85,17 @@ public class RequestItemEmailNotifierTest
                 = HandleServiceFactory.getInstance().getHandleService();
         requestItemService
                 = RequestItemServiceFactory.getInstance().getRequestItemService();
-        itemService
-                = ContentServiceFactory.getInstance().getItemService();
-        epersonService
-                = EPersonServiceFactory.getInstance().getEPersonService();
+        // Instantiate and initialize the unit, using the "help desk" strategy.
+        requestItemEmailNotifier
+                = new RequestItemEmailNotifier(
+                DSpaceServicesFactory.getInstance()
+                        .getServiceManager()
+                        .getServiceByName(RequestItemHelpdeskStrategy.class.getName(),
+                                RequestItemAuthorExtractor.class));
+        requestItemEmailNotifier.bitstreamService = bitstreamService;
+        requestItemEmailNotifier.configurationService = configurationService;
+        requestItemEmailNotifier.handleService = handleService;
+        requestItemEmailNotifier.requestItemService = requestItemService;
     }
 
     @AfterClass
@@ -96,7 +107,7 @@ public class RequestItemEmailNotifierTest
 
     /**
      * Test of sendRequest method, of class RequestItemEmailNotifier.
-     * @throws java.lang.Exception passed through.
+     * @throws Exception passed through.
      */
     @Ignore
     @Test
@@ -105,7 +116,7 @@ public class RequestItemEmailNotifierTest
 
     /**
      * Test of sendResponse method, of class RequestItemEmailNotifier.
-     * @throws java.lang.Exception passed through.
+     * @throws Exception passed through.
      */
     @Test
     public void testSendResponse() throws Exception {
@@ -146,19 +157,6 @@ public class RequestItemEmailNotifierTest
         // Ensure that mail is "sent".
         configurationService.setProperty("mail.server.disabled", "false");
 
-        // Instantiate and initialize the unit, using the "help desk" strategy.
-        RequestItemEmailNotifier requestItemEmailNotifier
-                = new RequestItemEmailNotifier(
-                        DSpaceServicesFactory.getInstance()
-                                .getServiceManager()
-                                .getServiceByName(RequestItemHelpdeskStrategy.class.getName(),
-                                        RequestItemAuthorExtractor.class));
-        requestItemEmailNotifier.bitstreamService = bitstreamService;
-        requestItemEmailNotifier.configurationService = configurationService;
-        requestItemEmailNotifier.handleService = handleService;
-        requestItemEmailNotifier.requestItemService = requestItemService;
-        requestItemEmailNotifier.itemService = itemService;
-
         // Test the unit.  Template supplies the Subject: value
         requestItemEmailNotifier.sendResponse(context, ri, null, TEST_MESSAGE);
 
@@ -190,7 +188,7 @@ public class RequestItemEmailNotifierTest
 
     /**
      * Test of sendResponse method -- rejection case.
-     * @throws java.lang.Exception passed through.
+     * @throws Exception passed through.
      */
     @Test
     public void testSendRejection()
@@ -232,20 +230,6 @@ public class RequestItemEmailNotifierTest
         // Ensure that mail is "sent".
         configurationService.setProperty("mail.server.disabled", "false");
 
-        // Instantiate and initialize the unit, using the "help desk" strategy.
-        RequestItemEmailNotifier requestItemEmailNotifier
-                = new RequestItemEmailNotifier(
-                        DSpaceServicesFactory.getInstance()
-                                .getServiceManager()
-                                .getServiceByName(RequestItemHelpdeskStrategy.class.getName(),
-                                        RequestItemAuthorExtractor.class));
-        requestItemEmailNotifier.bitstreamService = bitstreamService;
-        requestItemEmailNotifier.configurationService = configurationService;
-        requestItemEmailNotifier.handleService = handleService;
-        requestItemEmailNotifier.requestItemService = requestItemService;
-        requestItemEmailNotifier.itemService = itemService;
-        requestItemEmailNotifier.epersonService = epersonService;
-
         // Test the unit.  Template supplies the Subject: value
         requestItemEmailNotifier.sendResponse(context, ri, null, TEST_MESSAGE);
 
@@ -279,9 +263,54 @@ public class RequestItemEmailNotifierTest
                 (String)content, containsString("denied"));
     }
 
+    @Test
+    public void testEmailGenerationWithLargeFileLink() throws Exception {
+        // Create some content to send.
+        context.turnOffAuthorisationSystem();
+        Community com = CommunityBuilder.createCommunity(context)
+                .withName("Top Community")
+                .build();
+        Collection col = CollectionBuilder.createCollection(context, com)
+                .build();
+        Item item = ItemBuilder.createItem(context, col)
+                .withTitle("Test Item")
+                .build();
+        // Create a large bitstream so that the 20MB threshold is reached for large file link generation.
+        byte[] bytes = new byte[21 * 1024 * 1024];
+        InputStream is = new ByteArrayInputStream(bytes);
+        Bitstream largeBitstream = BitstreamBuilder
+                .createBitstream(context, item, is)
+                .withName("large.pdf")
+                .build();
+        context.restoreAuthSystemState();
+       // Create a request to which we can respond.
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, item, largeBitstream)
+                .withAcceptRequest(true)
+                .build();
+
+        // Install a fake transport for RFC2822 email addresses.
+        Session session = DSpaceServicesFactory.getInstance().getEmailService().getSession();
+        Provider transportProvider = new Provider(Provider.Type.TRANSPORT,
+                DUMMY_PROTO, JavaMailTestTransport.class.getCanonicalName(),
+                "DSpace", "1.0");
+        session.addProvider(transportProvider);
+        session.setProvider(transportProvider);
+        session.setProtocolForAddress("rfc822", DUMMY_PROTO);
+        String responseLink = request.getAccess_token();
+        requestItemEmailNotifier.sendResponse(context, request, "Subject", "Message");
+
+        // Check that the email contains the access link and no attachment.
+        Message myMessage = JavaMailTestTransport.getMessage();
+        String content = (String)myMessage.getContent();
+        assertThat("Should contain access link", content, containsString(responseLink));
+        assertThat("Should not contain attachment marker", content, not(containsString("Attachment")));
+    }
+
+
     /**
      * Test of requestOpenAccess method, of class RequestItemEmailNotifier.
-     * @throws java.lang.Exception passed through.
+     * @throws Exception passed through.
      */
     @Ignore
     @Test

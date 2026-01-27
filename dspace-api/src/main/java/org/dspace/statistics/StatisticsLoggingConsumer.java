@@ -93,7 +93,7 @@ public class StatisticsLoggingConsumer implements Consumer {
             // We are mapping a new item make sure that the owning collection is
             // updated
             Item newItem = (Item) event.getObject(ctx);
-            String updateQuery = "id: " + newItem.getID() + " AND type:"
+            String updateQuery = "id:" + newItem.getID() + " AND type:"
                 + newItem.getType();
 
             List<String> fieldNames = new ArrayList<String>();
@@ -116,7 +116,7 @@ public class StatisticsLoggingConsumer implements Consumer {
             && event.getObject(ctx) instanceof Item) {
             // Unmapping items
             Item newItem = (Item) event.getObject(ctx);
-            String updateQuery = "id: " + newItem.getID() + " AND type:"
+            String updateQuery = "id:" + newItem.getID() + " AND type:"
                 + newItem.getType();
 
             List<String> fieldNames = new ArrayList<String>();

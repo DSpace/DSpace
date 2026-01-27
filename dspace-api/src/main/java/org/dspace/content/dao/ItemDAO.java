@@ -8,7 +8,7 @@
 package org.dspace.content.dao;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -56,7 +56,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return iterator over items
      * @throws SQLException if database error
      */
-    Iterator<Item> findByLastModifiedSince(Context context, Date since)
+    Iterator<Item> findByLastModifiedSince(Context context, Instant since)
         throws SQLException;
 
     Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException;
@@ -177,7 +177,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @throws SQLException if database error
      */
     Iterator<Item> findAll(Context context, boolean archived,
-                                  boolean withdrawn, boolean discoverable, Date lastModified)
+                                  boolean withdrawn, boolean discoverable, Instant lastModified)
         throws SQLException;
 
     /**

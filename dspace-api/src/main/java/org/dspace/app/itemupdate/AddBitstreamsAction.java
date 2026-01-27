@@ -29,6 +29,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.InstallItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -142,10 +143,10 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
         String newBundleName = ce.bundlename;
 
         if (ce.bundlename == null) { // should be required but default convention established
-            if (ce.filename.equals("license.txt")) {
-                newBundleName = "LICENSE";
+            if (ce.filename.equals(Constants.LICENSE_BITSTREAM_NAME)) {
+                newBundleName = Constants.LICENSE_BUNDLE_NAME;
             } else {
-                newBundleName = "ORIGINAL";
+                newBundleName = Constants.CONTENT_BUNDLE_NAME;
             }
         }
         ItemUpdate.pr("  Bitstream " + ce.filename + " to be added to bundle: " + newBundleName);

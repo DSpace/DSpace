@@ -11,6 +11,7 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +49,13 @@ public class UploadStep extends AbstractProcessingStep
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UploadStep.class);
 
+    private static final Pattern UPDATE_METADATA_PATTERN =
+        Pattern.compile("^/sections/[^/]+/files/[^/]+/metadata/[^/]+(/[^/]+)?$");
+    private static final Pattern PRIMARY_FLAG_PATTERN =
+        Pattern.compile("^/sections/[^/]+/primary$");
+    private static final Pattern ACCESS_CONDITION_PATTERN =
+        Pattern.compile("^/sections/[^/]+/files/[^/]+/accessConditions(/[^/]+)?$");
+
     @Override
     public DataUpload getData(SubmissionService submissionService, InProgressSubmission obj,
                               SubmissionStepConfig config) throws Exception {
@@ -55,13 +63,13 @@ public class UploadStep extends AbstractProcessingStep
         DataUpload result = new DataUpload();
         List<Bundle> bundles = itemService.getBundles(obj.getItem(), Constants.CONTENT_BUNDLE_NAME);
         for (Bundle bundle : bundles) {
+            Bitstream primaryBitstream = bundle.getPrimaryBitstream();
+            if (Objects.nonNull(primaryBitstream)) {
+                result.setPrimary(primaryBitstream.getID());
+            }
             for (Bitstream source : bundle.getBitstreams()) {
-                Bitstream primaryBitstream = bundle.getPrimaryBitstream();
                 UploadBitstreamRest b = submissionService.buildUploadBitstream(configurationService, source);
                 result.getFiles().add(b);
-                if (Objects.nonNull(primaryBitstream)) {
-                    result.setPrimary(primaryBitstream.getID());
-                }
             }
         }
         return result;
@@ -73,27 +81,27 @@ public class UploadStep extends AbstractProcessingStep
 
         String instance = null;
         if ("remove".equals(op.getOp())) {
-            if (op.getPath().contains(UPLOAD_STEP_METADATA_PATH)) {
+            if (UPDATE_METADATA_PATTERN.matcher(op.getPath()).matches()) {
                 instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
-            } else if (op.getPath().contains(UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY)) {
+            } else if (ACCESS_CONDITION_PATTERN.matcher(op.getPath()).matches()) {
                 instance = stepConf.getType() + "." + UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY;
-            } else if (op.getPath().contains(PRIMARY_FLAG_ENTRY)) {
+            } else if (PRIMARY_FLAG_PATTERN.matcher(op.getPath()).matches()) {
                 instance = PRIMARY_FLAG_ENTRY;
             } else {
                 instance = UPLOAD_STEP_REMOVE_OPERATION_ENTRY;
             }
         } else if ("move".equals(op.getOp())) {
-            if (op.getPath().contains(UPLOAD_STEP_METADATA_PATH)) {
+            if (UPDATE_METADATA_PATTERN.matcher(op.getPath()).matches()) {
                 instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
             } else {
                 instance = UPLOAD_STEP_MOVE_OPERATION_ENTRY;
             }
         } else {
-            if (op.getPath().contains(UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY)) {
+            if (ACCESS_CONDITION_PATTERN.matcher(op.getPath()).matches()) {
                 instance = stepConf.getType() + "." + UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY;
-            } else if (op.getPath().contains(UPLOAD_STEP_METADATA_PATH)) {
+            } else if (UPDATE_METADATA_PATTERN.matcher(op.getPath()).matches()) {
                 instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
-            } else if (op.getPath().contains(PRIMARY_FLAG_ENTRY)) {
+            } else if (PRIMARY_FLAG_PATTERN.matcher(op.getPath()).matches()) {
                 instance = PRIMARY_FLAG_ENTRY;
             }
         }
