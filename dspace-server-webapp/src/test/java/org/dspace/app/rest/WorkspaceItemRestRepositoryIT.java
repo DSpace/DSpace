@@ -6068,7 +6068,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         try {
             getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                                 .file(pdfFile))
-                                .andExpect(status().is(500));
+                                .andExpect(status().is(400));
         } finally {
             pdf.close();
         }
@@ -8624,8 +8624,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         @Test
     public void uploadAndReplaceTest() throws Exception {
         context.turnOffAuthorisationSystem();
+            configurationService.setProperty("replace-bitstream.enabled", true);
 
-        parentCommunity = CommunityBuilder.createCommunity(context)
+            parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
             .build();
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
@@ -8809,6 +8810,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     @Test
     public void uploadAndReplaceNoWriteRightsTest() throws Exception {
         context.turnOffAuthorisationSystem();
+        configurationService.setProperty("replace-bitstream.enabled", true);
 
         parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
