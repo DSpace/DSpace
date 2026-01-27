@@ -26,7 +26,6 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
 public class EPersonMatcher {
-    // todo: this may not work in all cases!
     public static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     private EPersonMatcher() { }
@@ -91,7 +90,6 @@ public class EPersonMatcher {
                 hasJsonPath("$.type", is("eperson")),
                 hasJsonPath("$.canLogIn", not(empty())),
                 hasJsonPath("$.metadata", Matchers.allOf(
-                        // todo: this fails when matching against the eperson from AbstractIntegrationTestWithDatabase
                         MetadataMatcher.matchMetadata("eperson.firstname", epersonService.getFirstName(ePerson)),
                         MetadataMatcher.matchMetadata("eperson.lastname", epersonService.getLastName(ePerson))
                 ))
