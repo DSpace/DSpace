@@ -78,6 +78,8 @@ public class CustomUrlConsumer implements Consumer {
      */
     private final Set<Item> itemsAlreadyProcessed = new HashSet<>();
 
+    private Map<String, List<String>> entityToMetadataMapping = new HashMap<>();
+
     private ItemService itemService;
     private CustomUrlService customUrlService;
     private ConfigurationService configurationService;
@@ -94,6 +96,7 @@ public class CustomUrlConsumer implements Consumer {
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.customUrlService = new DSpace().getSingletonService(CustomUrlService.class);
         this.versionHistoryService = new DSpace().getSingletonService(VersionHistoryServiceImpl.class);
+        this.entityToMetadataMapping = buildEntityToMetadataFieldsMapping();
     }
 
     /**
@@ -407,7 +410,7 @@ public class CustomUrlConsumer implements Consumer {
      * @return list of metadata field names, empty if none configured
      */
     private List<String> getConfiguredMetadataFieldsForEntity(String entityType) {
-        return buildEntityToMetadataFieldsMapping().getOrDefault(entityType, List.of());
+        return entityToMetadataMapping.getOrDefault(entityType, List.of());
     }
 
     /**

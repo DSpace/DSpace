@@ -44,7 +44,7 @@ public class CustomUrlValidator implements SubmissionStepValidator {
 
     private static final String ERROR_VALIDATION_CONFLICT = "error.validation.custom-url.conflict";
 
-    private static final Pattern URL_PATH_PATTERN = Pattern.compile("[\\/.a-zA-Z0-9-_]+$");
+    private static final Pattern URL_PATH_PATTERN = Pattern.compile("^[.a-zA-Z0-9-_]+$");
 
     @Autowired
     private ItemService itemService;

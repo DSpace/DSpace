@@ -5055,4 +5055,42 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$.withdrawn", is(true)));
     }
 
+    @Test
+    public void testSearchPrivateItemByCustomUrl() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create parent community and collection
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        // Retrieve the Administrator group explicitly
+        Group restrictedGroup = GroupBuilder.createGroup(context)
+                                            .build();
+        // Create a private item with a custom URL, readable only by admins
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Private Item")
+                               .withCustomUrl("private-custom-url")
+                               .withReaderGroup(restrictedGroup)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        // Anonymous user should not find the item
+        getClient().perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "private-custom-url"))
+                        .andExpect(status().isNoContent());
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Admin user should find the item
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "private-custom-url"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", is(item.getID().toString())));
+    }
+
 }

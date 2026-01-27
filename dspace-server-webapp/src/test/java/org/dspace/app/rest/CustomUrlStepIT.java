@@ -219,6 +219,31 @@ public class CustomUrlStepIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void testInvalidCustomUrlReplacementWithForwardSlashesOnWorkspaceItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                                                          .withTitle("Test WorkspaceItem")
+                                                          .withIssueDate("2020")
+                                                          .build();
+
+        context.restoreAuthSystemState();
+
+        Operation replaceOperation = new ReplaceOperation("/sections/custom-url/url", "invalid/url");
+
+        getClient(getAuthToken(eperson.getEmail(), password))
+            .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                         .content(getPatchContent(List.of(replaceOperation)))
+                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.custom-url.invalid-characters')]",
+                                contains(hasJsonPath("$.paths",
+                                                     contains(hasJsonPath("$", is("/sections/custom-url/url")))))))
+            .andExpect(jsonPath("$.sections.custom-url.url", is("invalid/url")))
+            .andExpect(jsonPath("$.sections.custom-url.redirected-urls").doesNotExist());
+    }
+
+    @Test
     public void testAlreadyExistingCustomUrlReplacementOnWorkspaceItem() throws Exception {
 
         context.turnOffAuthorisationSystem();
