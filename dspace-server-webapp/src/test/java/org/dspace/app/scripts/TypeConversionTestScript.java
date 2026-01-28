@@ -17,6 +17,15 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  */
 public class TypeConversionTestScript<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
+    /**
+     * Constructor for the TypeConversionTestScript
+     *
+     * @param scriptConfiguration
+     */
+    public TypeConversionTestScript(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
+
     public void setup() throws ParseException {
         // This script is only used to test rest exposure, no setup is required.
     }
