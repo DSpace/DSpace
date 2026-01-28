@@ -29,6 +29,8 @@ import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
@@ -46,6 +48,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
 
     private final XmlWorkflowFactory xmlWorkflowFactory
             = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
+
+    private final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     private static final String WORKFLOW_DEFINITIONS_ENDPOINT
         = "/api/" + WorkflowDefinitionRest.CATEGORY + "/" + WorkflowDefinitionRest.PLURAL_NAME;
@@ -316,7 +320,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
                 .andExpect(jsonPath("$.page.number", is(0)))
                 //Contains only the first non-mapped collection
                 .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                    WorkflowDefinitionMatcher.matchCollectionEntry(firstNonMappedCollection.getName(),
+                    WorkflowDefinitionMatcher.matchCollectionEntry(
+                        collectionService.getName(firstNonMappedCollection),
                         firstNonMappedCollection.getID(), firstNonMappedCollection.getHandle())
                 )));
         }
@@ -374,7 +379,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
                     .andExpect(jsonPath("$.page.number", is(0)))
                     //Contains only the first mapped collection
                     .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                        WorkflowDefinitionMatcher.matchCollectionEntry(firstMappedCollection.getName(),
+                        WorkflowDefinitionMatcher.matchCollectionEntry(
+                            collectionService.getName(firstMappedCollection),
                             firstMappedCollection.getID(), firstMappedCollection.getHandle())
                     )));
             } else {

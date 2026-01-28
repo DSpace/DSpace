@@ -102,12 +102,12 @@ public class BitstreamFormatBuilder extends AbstractCRUDBuilder<BitstreamFormat>
     }
 
     public BitstreamFormatBuilder withShortDescription(String description) throws SQLException {
-        bitstreamFormat.setShortDescription(context, description);
+        bitstreamFormatService.setShortDescription(context, bitstreamFormat, description);
         return this;
     }
 
     public BitstreamFormatBuilder withSupportLevel(int supportLevel) throws SQLException {
-        bitstreamFormat.setSupportLevel(supportLevel);
+        bitstreamFormatService.setSupportLevel(bitstreamFormat, supportLevel);
         return this;
     }
 

@@ -48,6 +48,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -99,6 +100,8 @@ public class ItemExportServiceImpl implements ItemExportService {
     protected EPersonService ePersonService;
     @Autowired(required = true)
     protected ItemService itemService;
+    @Autowired(required = true)
+    protected BundleService bundleService;
     @Autowired(required = true)
     protected HandleService handleService;
     @Autowired(required = true)
@@ -407,13 +410,13 @@ public class ItemExportServiceImpl implements ItemExportService {
                 // bundles can have multiple bitstreams now...
                 List<Bitstream> bitstreams = bundle.getBitstreams();
 
-                String bundleName = bundle.getName();
+                String bundleName = bundleService.getName(bundle);
 
                 for (Bitstream bitstream : bitstreams) {
-                    String myName = bitstream.getName();
+                    String myName = bitstreamService.getName(bitstream);
                     String oldName = myName;
 
-                    String description = bitstream.getDescription();
+                    String description = bitstreamService.getDescription(bitstream);
                     if (!StringUtils.isEmpty(description)) {
                         description = "\tdescription:" + description;
                     } else {

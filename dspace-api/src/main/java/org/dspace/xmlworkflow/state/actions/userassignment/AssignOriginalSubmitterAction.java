@@ -16,9 +16,15 @@ import java.util.List;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
@@ -44,6 +50,18 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction {
 
     @Autowired(required = true)
     protected WorkflowRequirementsService workflowRequirementsService;
+
+    @Autowired
+    protected EPersonService epersonService;
+
+    @Autowired
+    protected CollectionService collectionService;
+
+    @Autowired
+    protected ItemService itemService;
+
+    @Autowired
+    protected BitstreamService bitstreamService;
 
     @Override
     public boolean isFinished(XmlWorkflowItem wfi) {
@@ -77,14 +95,17 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction {
         if (wfi.getSubmitter() != null) {
             try {
                 XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
-                xmlWorkflowService.alertUsersOnTaskActivation(c, wfi, "submit_task", Arrays.asList(wfi.getSubmitter()),
-                        //The arguments
-                        wfi.getItem().getName(),
-                        wfi.getCollection().getName(),
-                        wfi.getSubmitter().getFullName(),
-                        //TODO: message
-                        "New task available.",
-                        xmlWorkflowService.getMyDSpaceLink()
+                Collection collection = wfi.getCollection();
+                Item item = wfi.getItem();
+                xmlWorkflowService.alertUsersOnTaskActivation(
+                    c, wfi, "submit_task", Arrays.asList(wfi.getSubmitter()),
+                    //The arguments
+                    itemService.getName(item),
+                    collectionService.getName(collection),
+                    epersonService.getFullName(wfi.getSubmitter()),
+                    //TODO: message
+                    "New task available.",
+                    xmlWorkflowService.getMyDSpaceLink()
                 );
             } catch (MessagingException e) {
                 log.info(LogHelper.getHeader(c, "error emailing user(s) for claimed task",

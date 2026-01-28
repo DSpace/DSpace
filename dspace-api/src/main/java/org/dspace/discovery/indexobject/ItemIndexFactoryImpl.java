@@ -64,6 +64,7 @@ import org.dspace.discovery.indexobject.factory.ItemIndexFactory;
 import org.dspace.discovery.indexobject.factory.WorkflowItemIndexFactory;
 import org.dspace.discovery.indexobject.factory.WorkspaceItemIndexFactory;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.MultiFormatDateParser;
@@ -107,6 +108,8 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     protected WorkspaceItemIndexFactory workspaceItemIndexFactory;
     @Autowired
     protected VersionHistoryService versionHistoryService;
+    @Autowired
+    protected EPersonService epersonService;
 
 
     @Override
@@ -157,7 +160,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             "discovery.index.item.submitter.enabled", false))) {
             doc.addField("submitter_authority", submitter.getID().toString());
         } else if (submitter != null) {
-            addFacetIndex(doc, "submitter", submitter.getID().toString(), submitter.getFullName());
+            addFacetIndex(doc, "submitter", submitter.getID().toString(), epersonService.getFullName(submitter));
         }
 
         // Add the item metadata

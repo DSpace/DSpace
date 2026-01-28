@@ -74,8 +74,12 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
         throws SwordServerException, SwordAuthException {
         try {
             InputStream stream = bitstreamService.retrieve(context, bitstream);
-            MediaResource mr = new MediaResource(stream,
-                                                 bitstream.getFormat(context).getMIMEType(), null, true);
+            MediaResource mr = new MediaResource(
+                stream,
+                bitstreamService.getFormat(context, bitstream).getMIMEType(),
+                null,
+                true
+            );
             mr.setContentMD5(bitstream.getChecksum());
             mr.setLastModified(java.util.Date.from(this.getLastModified(context, bitstream)));
             return mr;
@@ -682,7 +686,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
             Iterator<Bundle> bundles = item.getBundles().iterator();
             while (bundles.hasNext()) {
                 Bundle bundle = bundles.next();
-                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+                if (Constants.CONTENT_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                     bundles.remove();
                     vm.removeBundle(swordContext.getContext(), item, bundle);
                 }

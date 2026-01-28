@@ -73,7 +73,7 @@ public class DeleteBitstreamsAction extends UpdateBitstreamsAction {
                             if (alterProvenance && !bundles.isEmpty()) {
                                 DtoMetadata dtom = DtoMetadata.create("dc.description.provenance", "en", "");
 
-                                String append = "Bitstream " + bs.getName() + " deleted on " + DCDate
+                                String append = "Bitstream " + bitstreamService.getName(bs) + " deleted on " + DCDate
                                     .getCurrent() + "; ";
                                 List<Item> items = bundles.iterator().next().getItems();
                                 if (!items.isEmpty()) {

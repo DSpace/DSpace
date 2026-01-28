@@ -65,6 +65,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
@@ -96,6 +97,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private BundleService bundleService;
 
     @Autowired
     CollectionService collectionService;
@@ -1555,7 +1559,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.bundle",
                         BundleMatcher.matchProperties(
-                                bundle.getName(),
+                            bundleService.getName(bundle),
                                 bundle.getID(),
                                 bundle.getHandle(),
                                 bundle.getType()
@@ -1619,12 +1623,13 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         bundles.sort(compareByUUID);
 
         //Get bundle should contain the first bundle in the list
+        Bundle bundle = bundles.get(0);
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$",
                         BundleMatcher.matchProperties(
-                            bundles.get(0).getName(),
+                            bundleService.getName(bundle),
                             bundles.get(0).getID(),
                             bundles.get(0).getHandle(),
                             bundles.get(0).getType()

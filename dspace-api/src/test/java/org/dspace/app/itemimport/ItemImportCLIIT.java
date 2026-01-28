@@ -30,6 +30,7 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.services.ConfigurationService;
@@ -53,6 +54,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     private static final String personTitle = "Person Test";
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     private Collection collection;
@@ -550,7 +552,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      */
     private void checkMetadata() throws Exception {
         Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
-        assertEquals(item.getName(), publicationTitle);
+        assertEquals(itemService.getName(item), publicationTitle);
         assertEquals(itemService.getMetadata(item, "dc.date.issued"), "1990");
         assertEquals(itemService.getMetadata(item, "dc.title.alternative"), "J'aime les Printemps");
     }
@@ -561,7 +563,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      */
     private void checkMetadataWithAnotherSchema() throws Exception {
         Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
-        assertEquals(item.getName(), publicationTitle);
+        assertEquals(itemService.getName(item), publicationTitle);
         assertEquals(itemService.getMetadata(item, "dcterms.title"), publicationTitle);
     }
 
@@ -570,9 +572,9 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     private void checkBitstream() throws Exception {
-        Bitstream bitstream = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next()
-                .getBundles("ORIGINAL").get(0).getBitstreams().get(0);
-        assertEquals(bitstream.getName(), "file1.txt");
+        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
+        Bitstream bitstream = itemService.getBundles(item, "ORIGINAL").get(0).getBitstreams().get(0);
+        assertEquals(bitstreamService.getName(bitstream), "file1.txt");
     }
 
     /**

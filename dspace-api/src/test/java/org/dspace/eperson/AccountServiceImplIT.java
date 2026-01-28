@@ -133,8 +133,8 @@ public class AccountServiceImplIT extends AbstractIntegrationTestWithDatabase {
         assertThat(updatedEperson.getEmail(), is(ORCID_EMAIL));
         assertThat(updatedEperson.getNetid(), is(ORCID_NETID));
         // overwrites values with the one from the token
-        assertThat(updatedEperson.getFirstName(), is("Vins"));
-        assertThat(updatedEperson.getLastName(), is("4Science"));
+        assertThat(ePersonService.getFirstName(updatedEperson), is("Vins"));
+        assertThat(ePersonService.getLastName(updatedEperson), is("4Science"));
 
         String customMetadataFound =
             ePersonService.getMetadataFirstValue(
@@ -193,8 +193,8 @@ public class AccountServiceImplIT extends AbstractIntegrationTestWithDatabase {
 
             // updates value with the one inside the validation token
             assertThat(createdEPerson, notNullValue());
-            assertThat(createdEPerson.getFirstName(), is("Vincenzo"));
-            assertThat(createdEPerson.getLastName(), is("Mecca"));
+            assertThat(ePersonService.getFirstName(createdEPerson), is("Vincenzo"));
+            assertThat(ePersonService.getLastName(createdEPerson), is("Mecca"));
             assertThat(createdEPerson.getEmail(), is(ORCID_EMAIL));
             assertThat(createdEPerson.getNetid(), is(ORCID_NETID));
 

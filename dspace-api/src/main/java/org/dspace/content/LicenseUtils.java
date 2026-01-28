@@ -25,6 +25,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 
 /**
  * Utility class to manage generation and storing of the license text that the
@@ -39,6 +41,7 @@ public class LicenseUtils {
     private static final CollectionService collectionService = ContentServiceFactory.getInstance()
                                                                                     .getCollectionService();
     private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     /**
      * Default constructor
@@ -81,8 +84,8 @@ public class LicenseUtils {
         // collection, item and eperson object will be also available
         int numArgs = 7 + (additionalInfo != null ? additionalInfo.size() : 0);
         Object[] args = new Object[numArgs];
-        args[0] = eperson.getFirstName();
-        args[1] = eperson.getLastName();
+        args[0] = epersonService.getFirstName(eperson);
+        args[1] = epersonService.getLastName(eperson);
         args[2] = eperson.getEmail();
         args[3] = Instant.now();
         args[4] = new FormattableArgument("collection", collection);
@@ -133,7 +136,7 @@ public class LicenseUtils {
                                     String licenseText, String acceptanceDate) throws SQLException, IOException,
         AuthorizeException {
         // Put together text to store
-        // String licenseText = "License granted by " + eperson.getFullName()
+        // String licenseText = "License granted by " + epersonService.getFullName(eperson)
         // + " (" + eperson.getEmail() + ") on "
         // + DCDate.getCurrent().toString() + " (GMT):\n\n" + license;
 
@@ -143,14 +146,14 @@ public class LicenseUtils {
         Bitstream b = itemService.createSingleBitstream(context, bais, item, Constants.LICENSE_BUNDLE_NAME);
 
         // Now set the format and name of the bitstream
-        b.setName(context, Constants.LICENSE_BITSTREAM_NAME);
-        b.setSource(context, "Written by org.dspace.content.LicenseUtils");
+        bitstreamService.setName(context, b, Constants.LICENSE_BITSTREAM_NAME);
+        bitstreamService.setSource(context, b, "Written by org.dspace.content.LicenseUtils");
 
         DCDate acceptanceDCDate = DCDate.getCurrent();
         if (acceptanceDate != null) {
             acceptanceDCDate = new DCDate(acceptanceDate);
         }
-        b.setAcceptanceDate(context, acceptanceDCDate);
+        bitstreamService.setAcceptanceDate(context, b, acceptanceDCDate);
         // Find the License format
         BitstreamFormat bf = bitstreamFormat.findByShortDescription(context,
                                                                     "License");

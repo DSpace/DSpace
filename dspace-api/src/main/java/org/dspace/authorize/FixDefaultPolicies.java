@@ -57,7 +57,7 @@ public class FixDefaultPolicies {
         List<Collection> collections = contentServiceFactory.getCollectionService().findAll(c);
 
         for (Collection t : collections) {
-            System.out.println("Collection " + t + " " + t.getName());
+            System.out.println("Collection " + t + " " + contentServiceFactory.getCollectionService().getName(t));
 
             // check for READ
             if (checkForPolicy(c, t, Constants.READ)) {
@@ -88,7 +88,7 @@ public class FixDefaultPolicies {
         List<Community> communities = contentServiceFactory.getCommunityService().findAll(c);
 
         for (Community t : communities) {
-            System.out.println("Community " + t + " " + t.getName());
+            System.out.println("Community " + t + " " + contentServiceFactory.getCommunityService().getName(t));
 
             // check for READ
             if (checkForPolicy(c, t, Constants.READ)) {

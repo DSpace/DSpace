@@ -95,7 +95,7 @@ public class RequestItemHelpdeskStrategyTest
             throws Exception {
         RequestItemHelpdeskStrategy instance = new RequestItemHelpdeskStrategy();
         instance.configurationService = configurationService;
-        instance.ePersonService = epersonService;
+        instance.epersonService = epersonService;
 
         // Check with help desk enabled.
         configurationService.setProperty(RequestItemHelpdeskStrategy.P_HELPDESK_OVERRIDE, "true");

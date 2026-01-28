@@ -20,6 +20,8 @@ import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.content.MetadataValue;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
@@ -35,6 +37,7 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
     private HttpServletRequest request;
     private SamlAuthentication samlAuth;
     private EPerson testUser;
+    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     @BeforeClass
     public static void beforeAll() {
@@ -89,8 +92,8 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
         assertNotNull(user);
         assertEquals("alyssa@dspace.org", user.getEmail());
         assertNull(user.getNetid());
-        assertEquals("Alyssa", user.getFirstName());
-        assertEquals("Hacker", user.getLastName());
+        assertEquals("Alyssa", ePersonService.getFirstName(user));
+        assertEquals("Hacker", ePersonService.getLastName(user));
     }
 
     @Test
@@ -118,8 +121,8 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
         assertNotNull(user);
         assertEquals("alyssa@dspace.org", user.getEmail());
         assertEquals("001", user.getNetid());
-        assertEquals("Alyssa", user.getFirstName());
-        assertEquals("Hacker", user.getLastName());
+        assertEquals("Alyssa", ePersonService.getFirstName(user));
+        assertEquals("Hacker",ePersonService.getLastName(user));
     }
 
     @Test
@@ -171,8 +174,8 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
         assertNotNull(user);
         assertEquals("carrie@dspace.org", user.getEmail());
         assertEquals("netid-from-idp", user.getNetid());
-        assertEquals("Carrie", user.getFirstName());
-        assertEquals("Pragma", user.getLastName());
+        assertEquals("Carrie", ePersonService.getFirstName(user));
+        assertEquals("Pragma", ePersonService.getLastName(user));
     }
 
     @Test
@@ -201,8 +204,8 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
         assertNotNull(user);
         assertEquals("aphacker@dspace.org", user.getEmail());
         assertEquals("001", user.getNetid());
-        assertEquals("Alyssa", user.getFirstName());
-        assertEquals("Hacker", user.getLastName());
+        assertEquals("Alyssa", ePersonService.getFirstName(user));
+        assertEquals("Hacker", ePersonService.getLastName(user));
     }
 
     @Test
@@ -232,8 +235,8 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
         assertNotNull(user);
         assertEquals("alyssa@dspace.org", user.getEmail());
         assertEquals("001", user.getNetid());
-        assertEquals("Liz", user.getFirstName());
-        assertEquals("Hacker-Bitdiddle", user.getLastName());
+        assertEquals("Liz", ePersonService.getFirstName(user));
+        assertEquals("Hacker-Bitdiddle", ePersonService.getLastName(user));
     }
 
     @Test
@@ -267,8 +270,8 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
         assertNotNull(user);
         assertEquals("alyssa@dspace.org", user.getEmail());
         assertEquals("001", user.getNetid());
-        assertEquals("Alyssa", user.getFirstName());
-        assertEquals("Hacker", user.getLastName());
+        assertEquals("Alyssa", ePersonService.getFirstName(user));
+        assertEquals("Hacker", ePersonService.getLastName(user));
 
         List<MetadataValue> metadata = user.getMetadata();
 
@@ -310,8 +313,8 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
         assertNotNull(user);
         assertEquals("alyssa@dspace.org", user.getEmail());
         assertEquals("001", user.getNetid());
-        assertEquals("Alyssa", user.getFirstName());
-        assertEquals("Hacker", user.getLastName());
+        assertEquals("Alyssa", ePersonService.getFirstName(user));
+        assertEquals("Hacker", ePersonService.getLastName(user));
 
         List<MetadataValue> metadata = user.getMetadata();
 
@@ -353,8 +356,8 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
         assertNotNull(user);
         assertEquals("alyssa@dspace.org", user.getEmail());
         assertEquals("001", user.getNetid());
-        assertEquals("Alyssa", user.getFirstName());
-        assertEquals("Hacker", user.getLastName());
+        assertEquals("Alyssa", ePersonService.getFirstName(user));
+        assertEquals("Hacker", ePersonService.getLastName(user));
 
         List<MetadataValue> metadata = user.getMetadata();
 
@@ -394,8 +397,8 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
         assertNotNull(user);
         assertEquals("alyssa@dspace.org", user.getEmail());
         assertEquals("001", user.getNetid());
-        assertEquals("Alyssa", user.getFirstName());
-        assertEquals("Hacker", user.getLastName());
+        assertEquals("Alyssa", ePersonService.getFirstName(user));
+        assertEquals("Hacker", ePersonService.getLastName(user));
 
         List<MetadataValue> metadata = user.getMetadata();
 
@@ -456,8 +459,8 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
         assertNotNull(user);
         assertEquals("ben@dspace.org", user.getEmail());
         assertEquals("non-existent-netid", user.getNetid());
-        assertEquals("Ben", user.getFirstName());
-        assertEquals("Bitdiddle", user.getLastName());
+        assertEquals("Ben", ePersonService.getFirstName(user));
+        assertEquals("Bitdiddle", ePersonService.getLastName(user));
         assertTrue(user.canLogIn());
         assertTrue(user.getSelfRegistered());
 

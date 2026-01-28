@@ -91,7 +91,7 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
             bundle = bundleService.create(context, item, Constants.CONTENT_BUNDLE_NAME);
             bitstream = bitstreamService.create(context, bundle,
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
-            bitstream.setName(context, "primary");
+            bitstreamService.setName(context, bitstream, "primary");
             context.restoreAuthSystemState();
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);

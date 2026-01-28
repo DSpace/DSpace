@@ -16,7 +16,6 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -37,9 +36,6 @@ public class RequestItemHelpdeskStrategy
     static final String P_HELPDESK_OVERRIDE
             = "request.item.helpdesk.override";
     static final String P_MAIL_HELPDESK = "mail.helpdesk";
-
-    @Autowired(required = true)
-    protected EPersonService ePersonService;
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
@@ -79,11 +75,14 @@ public class RequestItemHelpdeskStrategy
     public RequestItemAuthor getHelpDeskPerson(Context context, String helpDeskEmail)
             throws SQLException {
         context.turnOffAuthorisationSystem();
-        EPerson helpdeskEPerson = ePersonService.findByEmail(context, helpDeskEmail);
+        EPerson helpdeskEPerson = epersonService.findByEmail(context, helpDeskEmail);
         context.restoreAuthSystemState();
 
         if (helpdeskEPerson != null) {
-            return new RequestItemAuthor(helpdeskEPerson);
+            return new RequestItemAuthor(
+                epersonService.getFullName(helpdeskEPerson),
+                helpdeskEPerson.getEmail()
+            );
         } else {
             String helpdeskName = I18nUtil.getMessage(
                     "org.dspace.app.requestitem.RequestItemHelpdeskStrategy.helpdeskname",

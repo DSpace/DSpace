@@ -17,6 +17,7 @@ import org.dspace.app.util.Util;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -35,6 +36,9 @@ public class ItemMarkingAvailabilityBitstreamStrategy implements ItemMarkingExtr
 
     @Autowired(required = true)
     protected ItemService itemService;
+
+    @Autowired(required = true)
+    protected BitstreamService bitstreamService;
 
     private static final Logger LOG = LogManager.getLogger();
 
@@ -60,11 +64,11 @@ public class ItemMarkingAvailabilityBitstreamStrategy implements ItemMarkingExtr
                 return markInfo;
             } else {
                 Bitstream bitstream = originalBundle.getBitstreams().get(0);
+                String bitstreamName = bitstreamService.getName(bitstream);
 
                 ItemMarkingInfo signInfo = new ItemMarkingInfo();
                 signInfo.setImageName(availableImageName);
-                signInfo.setTooltip(bitstream.getName());
-
+                signInfo.setTooltip(bitstreamName);
 
                 String bsLink = "";
 
@@ -73,7 +77,7 @@ public class ItemMarkingAvailabilityBitstreamStrategy implements ItemMarkingExtr
                     + bitstream.getSequenceID() + "/";
 
                 try {
-                    bsLink = bsLink + Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING);
+                    bsLink = bsLink + Util.encodeBitstreamName(bitstreamName, Constants.DEFAULT_ENCODING);
                 } catch (UnsupportedEncodingException e) {
                     LOG.warn("DSpace uses an unsupported encoding", e);
                 }

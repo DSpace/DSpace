@@ -18,12 +18,14 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.logic.Filter;
 import org.dspace.content.logic.FilterUtils;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.embargo.service.EmbargoService;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.dspace.identifier.Identifier;
@@ -41,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @version $Revision$
  */
 public class InstallItemServiceImpl implements InstallItemService {
+    public static final Logger log = LogManager.getLogger(InstallItemServiceImpl.class);
 
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
@@ -53,10 +56,12 @@ public class InstallItemServiceImpl implements InstallItemService {
     @Autowired(required = true)
     protected ItemService itemService;
     @Autowired(required = true)
+    protected BitstreamService bitstreamService;
+    @Autowired(required = true)
     protected SupervisionOrderService supervisionOrderService;
-    @Autowired(required = false)
+    @Autowired
+    EPersonService epersonService;
 
-    Logger log = LogManager.getLogger(InstallItemServiceImpl.class);
 
     @Autowired
     protected ConfigurationService configurationService;
@@ -258,7 +263,7 @@ public class InstallItemServiceImpl implements InstallItemService {
 
         // Add sizes and checksums of bitstreams
         for (Bitstream bitstream : bitstreams) {
-            myMessage.append(bitstream.getName()).append(": ")
+            myMessage.append(bitstreamService.getName(bitstream)).append(": ")
                      .append(bitstream.getSizeBytes()).append(" bytes, checksum: ")
                      .append(bitstream.getChecksum()).append(" (")
                      .append(bitstream.getChecksumAlgorithm()).append(")\n");
@@ -282,7 +287,7 @@ public class InstallItemServiceImpl implements InstallItemService {
         boolean isProvenancePrivacyActive = Boolean.parseBoolean(isProvenancePrivacyActiveProperty);
 
         if (item.getSubmitter() != null && !isProvenancePrivacyActive) {
-            provmessage.append("Submitted by ").append(item.getSubmitter().getFullName())
+            provmessage.append("Submitted by ").append(epersonService.getFullName(item.getSubmitter()))
                     .append(" (").append(item.getSubmitter().getEmail()).append(") on ")
                     .append(now.toString());
         } else {

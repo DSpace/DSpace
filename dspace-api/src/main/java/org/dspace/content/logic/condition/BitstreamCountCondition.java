@@ -51,7 +51,7 @@ public class BitstreamCountCondition extends AbstractCondition {
         int count = 0;
 
         if (bundleName != null) {
-            bundles = item.getBundles(bundleName);
+            bundles = itemService.getBundles(item, bundleName);
         } else {
             bundles = item.getBundles();
         }

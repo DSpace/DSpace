@@ -183,8 +183,8 @@ public class PoolTaskBuilder extends AbstractBuilder<PoolTask, PoolTaskService> 
         try {
             Item item = workspaceItem.getItem();
             Bitstream b = itemService.createSingleBitstream(context, is, item);
-            b.setName(context, name);
-            b.setSource(context, source);
+            bitstreamService.setName(context, b, name);
+            bitstreamService.setSource(context, b, source);
         } catch (Exception e) {
             handleException(e);
         }

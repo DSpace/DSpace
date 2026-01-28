@@ -51,6 +51,7 @@ import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.service.CollectionService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
@@ -81,6 +82,9 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     GroupService groupService;
+
+    @Autowired
+    CollectionService collectionService;
 
     @Test
     /**
@@ -4204,7 +4208,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withWorkflowGroup(2, reviewer2)
                                            .build();
 
-        Group firstWorkflowGroup = col1.getWorkflowStep1(context);
+        Group firstWorkflowGroup = collectionService.getWorkflowGroup(context, col1, 1);
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)

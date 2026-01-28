@@ -61,6 +61,8 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -100,6 +102,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
     private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     private SearchService searchService = SearchUtils.getSearchService();
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     @Before
     @Override
@@ -1620,8 +1623,8 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         item = context.reloadEntity(item);
 
-        Bundle originalBundle = item.getBundles(DEFAULT_BUNDLE_NAME).get(0);
-        Bundle textBundle = item.getBundles("TEXT").get(0);
+        Bundle originalBundle = itemService.getBundles(item, DEFAULT_BUNDLE_NAME).get(0);
+        Bundle textBundle = itemService.getBundles(item, "TEXT").get(0);
 
         assertThat(item.getResourcePolicies(), hasSize(2));
         assertThat(item.getResourcePolicies(), containsInAnyOrder(
@@ -1930,7 +1933,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private List<Bitstream> findAllBitstreams(Item item) {
-        return item.getBundles(CONTENT_BUNDLE_NAME)
+        return itemService.getBundles(item, CONTENT_BUNDLE_NAME)
                    .stream()
                    .flatMap(bundle -> bundle.getBitstreams().stream())
                    .collect(Collectors.toList());

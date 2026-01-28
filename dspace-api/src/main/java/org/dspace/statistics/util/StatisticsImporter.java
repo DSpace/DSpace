@@ -166,7 +166,7 @@ public class StatisticsImporter {
                 List<Bitstream> bitstreams = bitstreamService.findAll(c);
                 localBitstreams = new ArrayList<>();
                 for (Bitstream bitstream : bitstreams) {
-                    if (bitstream.getName() != null) {
+                    if (bitstreamService.getName(bitstream) != null) {
                         localBitstreams.add(bitstream.getID());
                     }
                 }

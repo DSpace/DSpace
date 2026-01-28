@@ -80,7 +80,7 @@ public abstract class AbstractVersionProvider {
     protected void createBundlesAndAddBitstreams(Context c, Item itemNew, Item nativeItem)
         throws SQLException, AuthorizeException, IOException {
         for (Bundle nativeBundle : nativeItem.getBundles()) {
-            Bundle bundleNew = bundleService.create(c, itemNew, nativeBundle.getName());
+            Bundle bundleNew = bundleService.create(c, itemNew, bundleService.getName(nativeBundle));
             // DSpace knows several types of resource policies (see the class
             // org.dspace.authorize.ResourcePolicy): Submission, Workflow, Custom
             // and inherited. Submission, Workflow and Inherited policies will be

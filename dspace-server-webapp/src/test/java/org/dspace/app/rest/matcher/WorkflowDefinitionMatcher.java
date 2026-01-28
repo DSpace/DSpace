@@ -26,7 +26,6 @@ import org.hamcrest.Matchers;
  * @author Maria Verdonck (Atmire) on 03/01/2020
  */
 public class WorkflowDefinitionMatcher {
-
     private static XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
 
     private static final String WORKFLOW_DEFINITIONS_ENDPOINT
@@ -67,7 +66,7 @@ public class WorkflowDefinitionMatcher {
      * Verifies that the content of the `json` matches
      * the detail of the steps
      * Actually we can checks only the identifier to assure they are the same.
-     * 
+     *
      * @param step target step of the workflow
      * @return Matcher
      */

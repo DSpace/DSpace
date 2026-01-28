@@ -390,11 +390,12 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
-                                                                          parentCommunity.getID(),
-                                                                          parentCommunity.getHandle()),
-                       CommunityMatcher
-                           .matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(), child1.getHandle())
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                           communityService.getName(parentCommunity),
+                           parentCommunity.getID(),
+                           parentCommunity.getHandle()),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                           communityService.getName(child1), child1.getID(), child1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
                    .andExpect(jsonPath("$.page.size", is(20)))
@@ -622,8 +623,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
                         CommunityMatcher.matchCommunityEntryMultipleTitles(titles, parentCommunity.getID(),
                                 parentCommunity.getHandle()),
-                        CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(),
-                                                                           child1.getHandle())
+                        CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                            communityService.getName(child1), child1.getID(), child1.getHandle())
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
                 .andExpect(jsonPath("$.page.totalElements", is(2)))
@@ -654,9 +655,10 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
                        CommunityMatcher.matchCommunityEntryMultipleTitles(titles, parentCommunity.getID(),
                                                                           parentCommunity.getHandle()),
-                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(childCommunity.getName(),
-                                                                          childCommunity.getID(),
-                                                                          childCommunity.getHandle())
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                           communityService.getName(childCommunity),
+                           childCommunity.getID(),
+                           childCommunity.getHandle())
                        )))
                    .andExpect(jsonPath("$._links.self.href",
                                        Matchers.containsString("/api/core/communities")))
@@ -668,12 +670,14 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(secondParentCommunity.getName(),
-                                                                          secondParentCommunity.getID(),
-                                                                          secondParentCommunity.getHandle()),
-                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(thirdParentCommunity.getName(),
-                                                                          thirdParentCommunity.getID(),
-                                                                          thirdParentCommunity.getHandle())
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                           communityService.getName(secondParentCommunity),
+                           secondParentCommunity.getID(),
+                           secondParentCommunity.getHandle()),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                           communityService.getName(thirdParentCommunity),
+                           thirdParentCommunity.getID(),
+                           thirdParentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
                    .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(1, 2,
@@ -693,9 +697,10 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
-                        CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
-                                                                           parentCommunity.getID(),
-                                                                           parentCommunity.getHandle())
+                        CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                            communityService.getName(parentCommunity),
+                            parentCommunity.getID(),
+                            parentCommunity.getHandle())
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
@@ -758,14 +763,15 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
-                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
-                                                                          parentCommunity.getID(),
-                                                                          parentCommunity.getHandle())
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                           communityService.getName(parentCommunity),
+                           parentCommunity.getID(),
+                           parentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.not(
                        Matchers.contains(
-                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(),
-                                                                              child1.getHandle())
+                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                               communityService.getName(child1), child1.getID(), child1.getHandle())
                        )
                    )))
                    .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
@@ -793,14 +799,15 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
-                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(),
-                                                                          child1.getHandle())
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                           communityService.getName(child1), child1.getID(), child1.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.not(
                        Matchers.contains(
-                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
-                                                                              parentCommunity.getID(),
-                                                                              parentCommunity.getHandle())
+                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                               communityService.getName(parentCommunity),
+                               parentCommunity.getID(),
+                               parentCommunity.getHandle())
                        )
                    )))
                    .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
@@ -950,7 +957,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", CommunityMatcher.matchNonAdminEmbeds()))
                 .andExpect(jsonPath("$", CommunityMatcher.matchCommunityEntry(
-                        parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle())));
+                    communityService.getName(parentCommunity), parentCommunity.getID(), parentCommunity.getHandle())));
 
         // When no projection is requested, response should include expected properties, links, and no embeds.
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
@@ -959,7 +966,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                 .andExpect(jsonPath("$", CommunityMatcher.matchLinks(parentCommunity.getID())))
                 .andExpect(jsonPath("$", CommunityMatcher.matchProperties(
-                        parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle())));
+                    communityService.getName(parentCommunity), parentCommunity.getID(), parentCommunity.getHandle())));
     }
 
     @Test
@@ -985,14 +992,16 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", CommunityMatcher.matchCommunityEntryFullProjection(
-                       parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle())));
+                       communityService.getName(parentCommunity), parentCommunity.getID(),
+                       parentCommunity.getHandle())));
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
                                 .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.not(CommunityMatcher.matchCommunityEntryFullProjection(
-                       parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle()))));
+                       communityService.getName(parentCommunity), parentCommunity.getID(),
+                       parentCommunity.getHandle()))));
     }
 
     @Test
@@ -1098,14 +1107,15 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
-                                                                          parentCommunity.getID(),
-                                                                          parentCommunity.getHandle())
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                           communityService.getName(parentCommunity),
+                           parentCommunity.getID(),
+                           parentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        Matchers.is(
-                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(),
-                                                                              child1.getHandle())
+                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                               communityService.getName(child1), child1.getID(), child1.getHandle())
                        )
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers
@@ -1180,18 +1190,20 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
-                                                                          parentCommunity.getID(),
-                                                                          parentCommunity.getHandle()),
-                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity2.getName(),
-                                                                          parentCommunity2.getID(),
-                                                                          parentCommunity2.getHandle())
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                           communityService.getName(parentCommunity),
+                           parentCommunity.getID(),
+                           parentCommunity.getHandle()),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                           communityService.getName(parentCommunity2),
+                           parentCommunity2.getID(),
+                           parentCommunity2.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.not(Matchers.containsInAnyOrder(
-                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(),
-                                                                          child1.getHandle()),
-                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child12.getName(), child12.getID(),
-                                                                          child12.getHandle())
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                           communityService.getName(child1), child1.getID(), child1.getHandle()),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                           communityService.getName(child12), child12.getID(), child12.getHandle())
                    ))))
                    .andExpect(
                        jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities/search/top")))
@@ -1657,14 +1669,15 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
-                                                                          parentCommunity.getID(),
-                                                                          parentCommunity.getHandle())
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                           communityService.getName(parentCommunity),
+                           parentCommunity.getID(),
+                           parentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        Matchers.is(
-                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(),
-                                                                              child1.getHandle())
+                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                               communityService.getName(child1), child1.getID(), child1.getHandle())
                        )
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
@@ -1747,9 +1760,10 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
-                                                                               parentCommunity.getID(),
-                                                                               parentCommunity.getHandle())
+                            CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                                communityService.getName(parentCommunity),
+                                parentCommunity.getID(),
+                                parentCommunity.getHandle())
                         )))
                         .andExpect(jsonPath("$._links.self.href",
                                             Matchers.containsString("/api/core/communities")));
@@ -1810,9 +1824,10 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
-                                                                               parentCommunity.getID(),
-                                                                               parentCommunity.getHandle())
+                            CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                                communityService.getName(parentCommunity),
+                                parentCommunity.getID(),
+                                parentCommunity.getHandle())
                         )))
                         .andExpect(jsonPath("$._links.self.href",
                                             Matchers.containsString("/api/core/communities")));
@@ -1844,9 +1859,10 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
-                                                                               parentCommunity.getID(),
-                                                                               parentCommunity.getHandle())
+                            CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                                communityService.getName(parentCommunity),
+                                parentCommunity.getID(),
+                                parentCommunity.getHandle())
                         )))
                         .andExpect(jsonPath("$._links.self.href",
                                             Matchers.containsString("/api/core/communities")));
@@ -1881,14 +1897,15 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
-                                                                          parentCommunity.getID(),
-                                                                          parentCommunity.getHandle())
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                           communityService.getName(parentCommunity),
+                           parentCommunity.getID(),
+                           parentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        Matchers.is(
-                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(),
-                                                                              child1.getHandle())
+                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(
+                               communityService.getName(child1), child1.getID(), child1.getHandle())
                        )
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
@@ -2132,20 +2149,25 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(topLevelCommunityA.getName(), topLevelCommunityA.getID(),
+                CommunityMatcher.matchProperties(
+                    communityService.getName(topLevelCommunityA), topLevelCommunityA.getID(),
                     topLevelCommunityA.getHandle()),
-                CommunityMatcher.matchProperties(subCommunityA.getName(), subCommunityA.getID(),
+                CommunityMatcher.matchProperties(
+                    communityService.getName(subCommunityA), subCommunityA.getID(),
                     subCommunityA.getHandle()),
-                CommunityMatcher.matchProperties(communityB.getName(), communityB.getID(), communityB.getHandle()),
-                CommunityMatcher.matchProperties(communityC.getName(), communityC.getID(), communityC.getHandle())
+                CommunityMatcher.matchProperties(
+                    communityService.getName(communityB), communityB.getID(), communityB.getHandle()),
+                CommunityMatcher.matchProperties(
+                    communityService.getName(communityC), communityC.getID(), communityC.getHandle())
             )));
 
         // Verify the search only shows dso's which according to the query
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityB.getName()))
+            .param("query", communityService.getName(communityB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(communityB.getName(), communityB.getID(), communityB.getHandle())
+                CommunityMatcher.matchProperties(
+                    communityService.getName(communityB), communityB.getID(), communityB.getHandle())
             )));
     }
 
@@ -2169,24 +2191,28 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(topLevelCommunityA.getName(), topLevelCommunityA.getID(),
+                CommunityMatcher.matchProperties(
+                    communityService.getName(topLevelCommunityA), topLevelCommunityA.getID(),
                     topLevelCommunityA.getHandle()),
-                CommunityMatcher.matchProperties(subCommunityA.getName(), subCommunityA.getID(),
+                CommunityMatcher.matchProperties(
+                    communityService.getName(subCommunityA), subCommunityA.getID(),
                     subCommunityA.getHandle()),
-                CommunityMatcher.matchProperties(communityB.getName(), communityB.getID(), communityB.getHandle())
+                CommunityMatcher.matchProperties(
+                    communityService.getName(communityB), communityB.getID(), communityB.getHandle())
             )));
 
         // Verify the search only shows dso's which according to the query
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityB.getName()))
+            .param("query", communityService.getName(communityB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(communityB.getName(), communityB.getID(), communityB.getHandle())
+                CommunityMatcher.matchProperties(
+                    communityService.getName(communityB), communityB.getID(), communityB.getHandle())
             )));
 
         // Verify that a query doesn't show dso's which the user doesn't have rights for
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityC.getName()))
+            .param("query", communityService.getName(communityC)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities").doesNotExist());
     }
@@ -2222,22 +2248,25 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(subCommunityA.getName(), subCommunityA.getID(),
+                CommunityMatcher.matchProperties(
+                    communityService.getName(subCommunityA), subCommunityA.getID(),
                     subCommunityA.getHandle()),
-                CommunityMatcher.matchProperties(communityB.getName(), communityB.getID(), communityB.getHandle())
+                CommunityMatcher.matchProperties(
+                    communityService.getName(communityB), communityB.getID(), communityB.getHandle())
             )));
 
         // Verify the search only shows dso's which according to the query
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityB.getName()))
+            .param("query", communityService.getName(communityB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(communityB.getName(), communityB.getID(), communityB.getHandle())
+                CommunityMatcher.matchProperties(
+                    communityService.getName(communityB), communityB.getID(), communityB.getHandle())
             )));
 
         // Verify that a query doesn't show dso's which the user doesn't have rights for
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityC.getName()))
+            .param("query", communityService.getName(communityC)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities").doesNotExist());
     }
@@ -2266,13 +2295,13 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         // Verify the search only shows dso's which according to the query
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityB.getName()))
+            .param("query", communityService.getName(communityB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities").doesNotExist());
 
         // Verify that a query doesn't show dso's which the user doesn't have rights for
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityC.getName()))
+            .param("query", communityService.getName(communityC)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities").doesNotExist());
     }
@@ -2301,13 +2330,13 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         // Verify the search only shows dso's which according to the query
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityB.getName()))
+            .param("query", communityService.getName(communityB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities").doesNotExist());
 
         // Verify that a query doesn't show dso's which the user doesn't have rights for
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityC.getName()))
+            .param("query", communityService.getName(communityC)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities").doesNotExist());
     }
@@ -2336,20 +2365,25 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(topLevelCommunityA.getName(), topLevelCommunityA.getID(),
+                CommunityMatcher.matchProperties(
+                    communityService.getName(topLevelCommunityA), topLevelCommunityA.getID(),
                     topLevelCommunityA.getHandle()),
-                CommunityMatcher.matchProperties(subCommunityA.getName(), subCommunityA.getID(),
+                CommunityMatcher.matchProperties(
+                    communityService.getName(subCommunityA), subCommunityA.getID(),
                     subCommunityA.getHandle()),
-                CommunityMatcher.matchProperties(communityB.getName(), communityB.getID(), communityB.getHandle()),
-                CommunityMatcher.matchProperties(communityC.getName(), communityC.getID(), communityC.getHandle())
+                CommunityMatcher.matchProperties(
+                    communityService.getName(communityB), communityB.getID(), communityB.getHandle()),
+                CommunityMatcher.matchProperties(
+                    communityService.getName(communityC), communityC.getID(), communityC.getHandle())
             )));
 
         // Verify the search only shows dso's which according to the query
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityB.getName()))
+            .param("query", communityService.getName(communityB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(communityB.getName(), communityB.getID(), communityB.getHandle())
+                CommunityMatcher.matchProperties(
+                    communityService.getName(communityB), communityB.getID(), communityB.getHandle())
             )));
     }
 
@@ -2382,24 +2416,28 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(topLevelCommunityA.getName(), topLevelCommunityA.getID(),
+                CommunityMatcher.matchProperties(
+                    communityService.getName(topLevelCommunityA), topLevelCommunityA.getID(),
                     topLevelCommunityA.getHandle()),
-                CommunityMatcher.matchProperties(subCommunityA.getName(), subCommunityA.getID(),
+                CommunityMatcher.matchProperties(
+                    communityService.getName(subCommunityA), subCommunityA.getID(),
                     subCommunityA.getHandle()),
-                CommunityMatcher.matchProperties(communityB.getName(), communityB.getID(), communityB.getHandle())
+                CommunityMatcher.matchProperties(
+                    communityService.getName(communityB), communityB.getID(), communityB.getHandle())
             )));
 
         // Verify the search only shows dso's which according to the query
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityB.getName()))
+            .param("query", communityService.getName(communityB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(communityB.getName(), communityB.getID(), communityB.getHandle())
+                CommunityMatcher.matchProperties(
+                    communityService.getName(communityB), communityB.getID(), communityB.getHandle())
             )));
 
         // Verify that a query doesn't show dso's which the user doesn't have rights for
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityC.getName()))
+            .param("query", communityService.getName(communityC)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities").doesNotExist());
     }
@@ -2435,22 +2473,25 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(subCommunityA.getName(), subCommunityA.getID(),
+                CommunityMatcher.matchProperties(
+                    communityService.getName(subCommunityA), subCommunityA.getID(),
                     subCommunityA.getHandle()),
-                CommunityMatcher.matchProperties(communityB.getName(), communityB.getID(), communityB.getHandle())
+                CommunityMatcher.matchProperties(
+                    communityService.getName(communityB), communityB.getID(), communityB.getHandle())
             )));
 
         // Verify the search only shows dso's which according to the query
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityB.getName()))
+            .param("query", communityService.getName(communityB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(communityB.getName(), communityB.getID(), communityB.getHandle())
+                CommunityMatcher.matchProperties(
+                    communityService.getName(communityB), communityB.getID(), communityB.getHandle())
             )));
 
         // Verify that a query doesn't show dso's which the user doesn't have rights for
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityC.getName()))
+            .param("query", communityService.getName(communityC)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities").doesNotExist());
     }
@@ -2492,13 +2533,13 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         // Verify the search only shows dso's which according to the query
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityB.getName()))
+            .param("query", communityService.getName(communityB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities").doesNotExist());
 
         // Verify that a query doesn't show dso's which the user doesn't have rights for
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityC.getName()))
+            .param("query", communityService.getName(communityC)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities").doesNotExist());
     }
@@ -2540,13 +2581,13 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         // Verify the search only shows dso's which according to the query
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityB.getName()))
+            .param("query", communityService.getName(communityB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities").doesNotExist());
 
         // Verify that a query doesn't show dso's which the user doesn't have rights for
         getClient(token).perform(get("/api/core/communities/search/findAdminAuthorized")
-            .param("query", communityC.getName()))
+            .param("query", communityService.getName(communityC)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities").doesNotExist());
     }
@@ -2689,9 +2730,10 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                .param("query", "MyTestCom"))
                                .andExpect(status().isOk())
                                .andExpect(jsonPath("$._embedded.communities", Matchers.contains(CommunityMatcher
-                                          .matchProperties(subCommunity.getName(),
-                                                           subCommunity.getID(),
-                                                           subCommunity.getHandle())
+                                          .matchProperties(
+                                              communityService.getName(subCommunity),
+                                              subCommunity.getID(),
+                                              subCommunity.getHandle())
                                           )))
                                .andExpect(jsonPath("$.page.totalElements", is(1)));
 
@@ -2748,9 +2790,10 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                .param("query", "MyTestCom"))
                                .andExpect(status().isOk())
                                .andExpect(jsonPath("$._embedded.communities", Matchers.contains(CommunityMatcher
-                                           .matchProperties(subCommunity.getName(),
-                                                            subCommunity.getID(),
-                                                            subCommunity.getHandle())
+                                           .matchProperties(
+                                               communityService.getName(subCommunity),
+                                               subCommunity.getID(),
+                                               subCommunity.getHandle())
                                            )))
                                .andExpect(jsonPath("$.page.totalElements", is(1)));
     }

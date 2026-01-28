@@ -92,7 +92,7 @@ public class AnnotationListService extends AbstractResourceService {
             BitstreamFormat format;
             String mimetype;
             try {
-                format = bitstream.getFormat(context);
+                format = bitstreamService.getFormat(context, bitstream);
                 mimetype = format.getMIMEType();
             } catch (SQLException e) {
                 throw new RuntimeException(e.getMessage(), e);
@@ -113,6 +113,6 @@ public class AnnotationListService extends AbstractResourceService {
 
         return new ExternalLinksGenerator(identifier)
                 .setFormat(mimetype)
-                .setLabel(bitstream.getName());
+                .setLabel(bitstreamService.getName(bitstream));
     }
 }

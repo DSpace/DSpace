@@ -30,6 +30,9 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
@@ -93,11 +96,12 @@ public class Curator {
     protected CommunityService communityService;
     protected ItemService itemService;
     protected HandleService handleService;
+    protected EPersonService epersonService;
     protected DSpaceRunnableHandler handler;
 
     /**
      * constructor that uses an handler for logging
-     * 
+     *
      * @param handler {@code DSpaceRunnableHandler} used to logs infos
      */
     public Curator(DSpaceRunnableHandler handler) {
@@ -112,6 +116,7 @@ public class Curator {
         communityService = ContentServiceFactory.getInstance().getCommunityService();
         itemService = ContentServiceFactory.getInstance().getItemService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
+        epersonService = EPersonServiceFactory.getInstance().getEPersonService();
         resolver = new TaskResolver();
     }
 
@@ -330,7 +335,8 @@ public class Curator {
             taskQ = (TaskQueue) CoreServiceFactory.getInstance().getPluginService().getSinglePlugin(TaskQueue.class);
         }
         if (taskQ != null) {
-            taskQ.enqueue(queueId, new TaskQueueEntry(c.getCurrentUser().getName(),
+            EPerson ePerson = c.getCurrentUser();
+            taskQ.enqueue(queueId, new TaskQueueEntry(epersonService.getName(ePerson),
                                                       Instant.now().toEpochMilli(), perfList, id));
         } else {
             System.out.println("curate - no TaskQueue implemented");
@@ -621,7 +627,7 @@ public class Curator {
 
         /**
          * Proxy method for logging with INFO level
-         * 
+         *
          * @param message that needs to be logged
          */
         protected void logInfo(String message) {
@@ -636,7 +642,7 @@ public class Curator {
 
     /**
      * Proxt method for logging with WARN level
-     * 
+     *
      * @param message
      */
     protected void logWarning(String message) {
@@ -646,7 +652,7 @@ public class Curator {
     /**
      * Proxy method for logging with WARN level and a {@code Messageformatter}
      * that generates the final log.
-     * 
+     *
      * @param message Target message to format or print
      * @param object  Object to use inside the message, or null
      */
