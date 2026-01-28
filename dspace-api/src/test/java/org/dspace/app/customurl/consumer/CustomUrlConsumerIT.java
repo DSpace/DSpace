@@ -31,6 +31,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,24 +54,32 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
     private final WorkspaceItemService workspaceItemService =
         ContentServiceFactory.getInstance().getWorkspaceItemService();
 
+    private CustomUrlConsumerConfig customUrlConsumerConfig = new DSpace()
+        .getSingletonService(CustomUrlConsumerConfig.class);
+
+
     private Collection collection;
+
 
     @Before
     public void setup() throws Exception {
+
+        configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Person");
+        configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Person",
+                                         "person.familyName;person.givenName");
+        customUrlConsumerConfig.reload();
+
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
 
+
         collection = CollectionBuilder.createCollection(context, parentCommunity)
                                       .withName("Collection 1")
                                       .withEntityType("Person")
                                       .build();
-
-        configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Person");
-        configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Person",
-                                         "person.familyName;person.givenName");
 
         context.restoreAuthSystemState();
     }
@@ -234,6 +243,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
                                          "person.familyName;person.givenName");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Publication",
                                          "dc.title");
+        customUrlConsumerConfig.reload();
 
         Item item = ItemBuilder.createItem(context, publications)
                                .withTitle("Test Publication Title")
@@ -265,6 +275,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
                                          "person.familyName;person.givenName");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Publication",
                                          "dc.contributor.author");
+        customUrlConsumerConfig.reload();
 
         Item item = ItemBuilder.createItem(context, publications)
                                .withAuthor("John Doe")
@@ -296,6 +307,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
                                          "person.familyName;person.givenName");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.OrgUnit",
                                          "dc.title");
+        customUrlConsumerConfig.reload();
 
         Item item = ItemBuilder.createItem(context, orgUnits)
                                .withTitle("Test Org Unit")
@@ -311,15 +323,9 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void testCustomUrlAdditionWithMixedMetadataFields() throws SQLException {
+    public void testCustomUrlAdditionWithMixedMetadataFields() throws Exception {
 
         context.turnOffAuthorisationSystem();
-
-        // Create a collection for an entity type that uses both qualified and unqualified metadata fields
-        Collection publications = CollectionBuilder.createCollection(context, parentCommunity)
-                                                   .withName("Collection 5")
-                                                   .withEntityType("Publication")
-                                                   .build();
 
         // Update configuration to use mixed metadata fields
         configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Person,Publication");
@@ -327,6 +333,13 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
                                          "person.familyName;person.givenName");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Publication",
                                          "dc.title;dc.contributor.author");
+        customUrlConsumerConfig.reload();
+
+        // Create a collection for an entity type that uses both qualified and unqualified metadata fields
+        Collection publications = CollectionBuilder.createCollection(context, parentCommunity)
+                                                   .withName("Collection 5")
+                                                   .withEntityType("Publication")
+                                                   .build();
 
         Item item = ItemBuilder.createItem(context, publications)
                                .withTitle("Test Publication")
@@ -358,6 +371,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
         configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Publication");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Publication",
                                          "dc.title");
+        customUrlConsumerConfig.reload();
 
         // Create first item with title "Test Publication"
         Item item1 = ItemBuilder.createItem(context, publications)
@@ -410,6 +424,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
         configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Publication,OrgUnit");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Publication", "dc.title");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.OrgUnit", "dc.title");
+        customUrlConsumerConfig.reload();
 
         // Create first item (Publication) with a specific title
         Item publication = ItemBuilder.createItem(context, publications)
@@ -446,6 +461,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
         // Configure Publication entity type to use dc.title
         configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Publication");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Publication", "dc.title");
+        customUrlConsumerConfig.reload();
 
         // Create original item
         Item originalItem = ItemBuilder.createItem(context, publications)
@@ -499,6 +515,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Publication", "dc.title");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Person",
                                          "person.familyName;person.givenName");
+        customUrlConsumerConfig.reload();
 
         // Create a publication with title "Smith John"
         Item publication = ItemBuilder.createItem(context, publications)
@@ -537,6 +554,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
         // Configure Publication entity type to use dc.title
         configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Publication");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Publication", "dc.title");
+        customUrlConsumerConfig.reload();
 
         // Create multiple items with the same title to show the problem gets worse
         Item item1 = ItemBuilder.createItem(context, publications)

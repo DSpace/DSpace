@@ -11,11 +11,8 @@ import static org.apache.commons.lang3.ArrayUtils.contains;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -29,8 +26,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.VersionHistoryServiceImpl;
 
@@ -58,32 +53,16 @@ public class CustomUrlConsumer implements Consumer {
 
     private static final Logger log = LogManager.getLogger(CustomUrlConsumer.class);
 
-    /**
-     * Configuration property for defining supported entity types
-     */
-    private static final String CONFIG_SUPPORTED_ENTITIES = "dspace.custom-url.consumer.supported-entities";
-
-    /**
-     * Configuration property prefix for entity metadata mapping
-     */
-    private static final String CONFIG_ENTITY_MAPPING_PREFIX = "dspace.custom-url.consumer.entity-metadata-mapping.";
-
-    /**
-     * Separator for multiple metadata fields in configuration
-     */
-    private static final String METADATA_FIELD_SEPARATOR = ";";
 
     /**
      * Set to track items already processed in current transaction to avoid duplicates
      */
     private final Set<Item> itemsAlreadyProcessed = new HashSet<>();
 
-    private Map<String, List<String>> entityToMetadataMapping = new HashMap<>();
-
     private ItemService itemService;
     private CustomUrlService customUrlService;
-    private ConfigurationService configurationService;
     private VersionHistoryServiceImpl versionHistoryService;
+    private CustomUrlConsumerConfig customUrlConsumerConfig;
 
     /**
      * Initializes the consumer by setting up required services.
@@ -93,10 +72,9 @@ public class CustomUrlConsumer implements Consumer {
     @Override
     public void initialize() throws Exception {
         this.itemService = ContentServiceFactory.getInstance().getItemService();
-        this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.customUrlService = new DSpace().getSingletonService(CustomUrlService.class);
         this.versionHistoryService = new DSpace().getSingletonService(VersionHistoryServiceImpl.class);
-        this.entityToMetadataMapping = buildEntityToMetadataFieldsMapping();
+        this.customUrlConsumerConfig = new DSpace().getSingletonService(CustomUrlConsumerConfig.class);
     }
 
     /**
@@ -200,7 +178,7 @@ public class CustomUrlConsumer implements Consumer {
      */
     private boolean isEntityTypeSupported(Item item) {
         String entityType = getItemEntityType(item);
-        return entityType != null && contains(getSupportedEntityTypes(), entityType);
+        return entityType != null && contains(customUrlConsumerConfig.getSupportedEntityTypes(), entityType);
     }
 
     /**
@@ -239,7 +217,7 @@ public class CustomUrlConsumer implements Consumer {
             return Optional.empty();
         }
 
-        List<String> metadataFields = getConfiguredMetadataFieldsForEntity(entityType);
+        List<String> metadataFields = customUrlConsumerConfig.getConfiguredMetadataFieldsForEntity(entityType);
         if (metadataFields.isEmpty()) {
             log.debug("Cannot generate custom URL for item {} - no metadata fields configured for entity type '{}'",
                       item.getID(), entityType);
@@ -311,106 +289,6 @@ public class CustomUrlConsumer implements Consumer {
     private void assignCustomUrlToItem(Context context, Item item, String customUrl) {
         log.info("Assigning custom URL '{}' to item {}", customUrl, item.getID());
         customUrlService.replaceCustomUrl(context, item, customUrl);
-    }
-
-
-
-    /**
-     * Gets the array of supported entity types from configuration.
-     *
-     * @return array of supported entity type names
-     */
-    private String[] getSupportedEntityTypes() {
-        return configurationService.getArrayProperty(CONFIG_SUPPORTED_ENTITIES, new String[0]);
-    }
-
-    /**
-     * Builds a mapping of entity types to their configured metadata fields.
-     * This mapping is constructed by reading configuration properties for each supported entity type.
-     *
-     * @return map where keys are entity type names and values are lists of metadata field names
-     */
-    private Map<String, List<String>> buildEntityToMetadataFieldsMapping() {
-        Map<String, List<String>> mapping = new HashMap<>();
-        String[] supportedEntityTypes = getSupportedEntityTypes();
-
-        for (String entityType : supportedEntityTypes) {
-            String trimmedEntityType = getTrimmedEntityType(entityType);
-            if (trimmedEntityType == null) {
-                continue;
-            }
-
-            List<String> metadataFields = parseMetadataFieldsFromConfiguration(trimmedEntityType);
-            if (!metadataFields.isEmpty()) {
-                mapping.put(trimmedEntityType, metadataFields);
-            }
-        }
-
-        return mapping;
-    }
-
-    /**
-     * Gets and trims an entity type, returning null if it's null or empty after trimming.
-     *
-     * @param entityType the raw entity type string
-     * @return trimmed entity type or null if invalid
-     */
-    private String getTrimmedEntityType(String entityType) {
-        if (entityType == null) {
-            return null;
-        }
-
-        String trimmed = entityType.trim();
-        return trimmed.isEmpty() ? null : trimmed;
-    }
-
-    /**
-     * Parses metadata field configuration for a specific entity type.
-     *
-     * @param entityType the entity type to get metadata fields for
-     * @return list of metadata field names for the entity type
-     */
-    private List<String> parseMetadataFieldsFromConfiguration(String entityType) {
-        String configKey = CONFIG_ENTITY_MAPPING_PREFIX + entityType;
-        String metadataFieldsConfig = configurationService.getProperty(configKey);
-
-        if (isBlank(metadataFieldsConfig)) {
-            log.debug("No metadata field configuration found for entity type '{}' at key '{}'",
-                      entityType, configKey);
-            return List.of();
-        }
-
-        return parseMetadataFieldList(metadataFieldsConfig);
-    }
-
-    /**
-     * Parses a semicolon-separated list of metadata field names.
-     *
-     * @param metadataFieldsConfig the configuration string containing field names
-     * @return list of trimmed, non-empty metadata field names
-     */
-    private List<String> parseMetadataFieldList(String metadataFieldsConfig) {
-        String[] fieldArray = metadataFieldsConfig.split(METADATA_FIELD_SEPARATOR);
-        List<String> fields = new ArrayList<>();
-
-        for (String field : fieldArray) {
-            String trimmedField = field.trim();
-            if (!trimmedField.isEmpty()) {
-                fields.add(trimmedField);
-            }
-        }
-
-        return fields;
-    }
-
-    /**
-     * Gets the configured metadata fields for a specific entity type.
-     *
-     * @param entityType the entity type to get metadata fields for
-     * @return list of metadata field names, empty if none configured
-     */
-    private List<String> getConfiguredMetadataFieldsForEntity(String entityType) {
-        return entityToMetadataMapping.getOrDefault(entityType, List.of());
     }
 
     /**
