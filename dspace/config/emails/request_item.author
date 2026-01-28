@@ -11,22 +11,107 @@
 ##             8 corresponding author email
 ##             9 configuration property "dspace.name"
 ##             10 configuration property "mail.helpdesk"
+#set($mimetype = "text/html")
 #set($subject = "${config.get('dspace.name')}: Request copy of document")
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request a Copy - Author</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .greeting {
+            margin-bottom: 20px;
+        }
+        .request-info {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .document-info {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .message {
+            background-color: #f0f7ff;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #007cba;
+            font-style: italic;
+        }
+        .action-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007cba;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .important {
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #ff9800;
+        }
+        .signature {
+            margin-top: 30px;
+        }
+        .contact {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="greeting">Dear ${params[7]},</p>
 
-Dear ${params[7]},
+        <div class="request-info">
+            A user of ${params[9]}, named ${params[0]} and using the email ${params[1]}, requested a copy of the file(s) associated with a document submitted by you:
+        </div>
 
-A user of ${params[9]}, named ${params[0]} and using the email ${params[1]}, requested a copy of the file(s) associated with the document: "${params[4]}" (${params[3]}) submitted by you.
+        <div class="document-info">
+            <strong>"${params[4]}"</strong><br>
+            (${params[3]})
+        </div>
 
-This request came along with the following message:
+        <p>This request came along with the following message:</p>
 
-"${params[5]}"
+        <div class="message">
+            "${params[5]}"
+        </div>
 
-To answer, click ${params[6]}. Whether you choose to grant or deny the request, we think that it's in your best interest to respond.
+        <p>To answer, click <a href="${params[6]}" class="action-button">here</a>. Whether you choose to grant or deny the request, we think that it's in your best interest to respond.</p>
 
-IF YOU ARE NOT AN AUTHOR OF THIS DOCUMENT, and only submitted the document on the author's behalf, PLEASE REDIRECT THIS MESSAGE TO THE AUTHOR(S).  Only the author(s) should answer the request to send a copy.
+        <div class="important">
+            <p><strong>IMPORTANT NOTICES:</strong></p>
+            <p><strong>IF YOU ARE NOT AN AUTHOR OF THIS DOCUMENT</strong>, and only submitted the document on the author's behalf, <strong>PLEASE REDIRECT THIS MESSAGE TO THE AUTHOR(S)</strong>. Only the author(s) should answer the request to send a copy.</p>
+            <p><strong>IF YOU ARE AN AUTHOR OF THE REQUESTED DOCUMENT</strong>, thank you for your cooperation!</p>
+        </div>
 
-IF YOU ARE AN AUTHOR OF THE REQUESTED DOCUMENT, thank you for your cooperation!
+        <p class="contact">If you have any questions concerning this request, please contact ${params[10]}.</p>
 
-If you have any questions concerning this request, please contact ${params[10]}.
-
-The ${config.get('dspace.name')} Team
+        <p class="signature">The ${config.get('dspace.name')} Team</p>
+    </div>
+</body>
+</html>

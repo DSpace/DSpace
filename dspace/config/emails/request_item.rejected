@@ -8,19 +8,79 @@
 ##  {3} name of the grantor
 ##  {4} email address of the grantor (unused)
 ##  {5} custom message sent by the grantor.
+#set($mimetype = "text/html")
 #set($subject = 'Request for Copy of Restricted Document is Denied')
-Dear ${params[0]}:
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request a Copy Rejected</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .greeting {
+            margin-bottom: 20px;
+        }
+        .denial-notification {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #d32f2f;
+        }
+        .document-info {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .message {
+            background-color: #f0f7ff;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #007cba;
+        }
+        .signature {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="greeting">Dear ${params[0]},</p>
 
-Your request for a copy of the file(s) from the below document has been denied by ${params[3]}.
+        <div class="denial-notification">
+            Your request for a copy of the file(s) from the below document has been denied by ${params[3]}.
+        </div>
 
-    ${params[2]}
-    ${params[1]} 
-#if( $params[5] )
+        <div class="document-info">
+            ${params[2]}<br>
+            ${params[1]}
+        </div>
 
-An additional message from ${params[3]} follows:
+        #if( $params[5] )
+        <div class="message">
+            <p><strong>An additional message from ${params[3]} follows:</strong></p>
+            <p>${params[5]}</p>
+        </div>
+        #end
 
-${params[5]}
-#end
-
-Best regards,
-The ${config.get('dspace.name')} Team
+        <p class="signature">Best regards,<br>
+        The ${config.get('dspace.name')} Team</p>
+    </div>
+</body>
+</html>
