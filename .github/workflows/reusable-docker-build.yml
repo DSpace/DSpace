@@ -122,8 +122,13 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       # https://github.com/docker/setup-buildx-action
+      # For PR builds of images that depend on dspace-dependencies (dspace-prod, dspace-test, dspace-cli),
+      # use the 'docker' driver so buildx can access images loaded into the local Docker daemon.
+      # For all other builds, use the default 'docker-container' driver.
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver: ${{ (matrix.isPr && (inputs.build_id == 'dspace-prod' || inputs.build_id == 'dspace-test' || inputs.build_id == 'dspace-cli')) && 'docker' || 'docker-container' }}
 
       # https://github.com/docker/metadata-action
       # Extract metadata used for Docker images in all build steps below
@@ -134,6 +139,29 @@ jobs:
           images: ${{ env.DOCKER_BUILD_REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAGS }}
           flavor: ${{ env.TAGS_FLAVOR }}
+
+      #--------------------------------------------------------------------
+      # For PR builds that depend on dspace-dependencies (dspace-prod, dspace-cli,
+      # dspace-test), download and load the dspace-dependencies image from the
+      # artifact uploaded by the dspace-dependencies job. This ensures that
+      # PR builds use the freshly built dependencies image rather than pulling
+      # an outdated version from the registry.
+      # NOTE: Only these three build_ids use dspace-dependencies as a base image.
+      # Other builds (dspace-solr, dspace-postgres-loadsql) have independent Dockerfiles.
+      #--------------------------------------------------------------------
+      # https://github.com/actions/download-artifact
+      - name: Download dspace-dependencies image artifact
+        if: ${{ matrix.isPr && (inputs.build_id == 'dspace-prod' || inputs.build_id == 'dspace-test' || inputs.build_id == 'dspace-cli') && matrix.arch == 'linux/amd64' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image-dspace-dependencies-linux-amd64
+          path: /tmp/docker
+
+      - name: Load dspace-dependencies image into Docker
+        if: ${{ matrix.isPr && (inputs.build_id == 'dspace-prod' || inputs.build_id == 'dspace-test' || inputs.build_id == 'dspace-cli') && matrix.arch == 'linux/amd64' }}
+        run: |
+          docker image load --input /tmp/docker/dspace-dependencies.tar
+          docker image ls | grep dspace-dependencies || true
 
       #--------------------------------------------------------------------
       # First, for all branch commits (non-PRs) we build the image & upload
@@ -199,26 +227,52 @@ jobs:
       # Build local image (again) and store in a TAR file in /tmp directory
       # This step is only done for AMD64, as that's the only image we use in our automated testing (at this time).
       # NOTE: This step cannot be combined with the build above as it's a different type of output.
-      - name: Build and push image to local TAR file
-        if: ${{ matrix.arch == 'linux/amd64'}}
+      # For non-PR builds OR builds that don't depend on dspace-dependencies, use docker-container driver
+      # with direct tarball export. This includes: dspace-dependencies, dspace-solr, dspace-postgres-loadsql
+      - name: Build and push image to local TAR file (docker-container driver)
+        if: ${{ matrix.arch == 'linux/amd64' && (!matrix.isPr || (inputs.build_id != 'dspace-prod' && inputs.build_id != 'dspace-test' && inputs.build_id != 'dspace-cli')) }}
         uses: docker/build-push-action@v5
         with:
           build-contexts: |
             ${{ inputs.dockerfile_additional_contexts }}
           context: ${{ inputs.dockerfile_context }}
           file: ${{ inputs.dockerfile_path }}
-          # Tell DSpace's Docker files to use the build registry instead of DockerHub
+          # Use GHCR as build registry to avoid DockerHub rate limits
           build-args:
             DOCKER_REGISTRY=${{ env.DOCKER_BUILD_REGISTRY }}
           platforms: ${{ matrix.arch }}
           tags: ${{ steps.meta_build.outputs.tags }}
           labels: ${{ steps.meta_build.outputs.labels }}
-          # Use GitHub cache to load cached Docker images and cache the results of this build
-          # This decreases the number of images we need to fetch from DockerHub
+          # Cache Docker layers in GitHub Actions cache to speed up builds
+          # and reduce pulls from DockerHub
           cache-from: type=gha,scope=${{ inputs.build_id }}
           cache-to: type=gha,scope=${{ inputs.build_id }},mode=min
-          # Export image to a local TAR file
+          # Export to TAR for use in automated testing jobs
           outputs: type=docker,dest=/tmp/${{ inputs.build_id }}.tar
+
+      # For PR builds of images that depend on dspace-dependencies (dspace-prod, dspace-cli, dspace-test),
+      # use docker driver which can access the locally loaded dspace-dependencies image.
+      # The docker driver doesn't support tarball export, so we use 'load: true' and then 'docker save'.
+      - name: Build image (docker driver for local dependencies access)
+        if: ${{ matrix.arch == 'linux/amd64' && matrix.isPr && (inputs.build_id == 'dspace-prod' || inputs.build_id == 'dspace-test' || inputs.build_id == 'dspace-cli') }}
+        uses: docker/build-push-action@v5
+        with:
+          build-contexts: |
+            ${{ inputs.dockerfile_additional_contexts }}
+          context: ${{ inputs.dockerfile_context }}
+          file: ${{ inputs.dockerfile_path }}
+          # Use GHCR as build registry to avoid DockerHub rate limits
+          build-args:
+            DOCKER_REGISTRY=${{ env.DOCKER_BUILD_REGISTRY }}
+          tags: ${{ steps.meta_build.outputs.tags }}
+          labels: ${{ steps.meta_build.outputs.labels }}
+          # Load into local Docker daemon (docker driver doesn't support direct TAR export)
+          load: true
+
+      - name: Save image to TAR file (for docker driver builds)
+        if: ${{ matrix.arch == 'linux/amd64' && matrix.isPr && (inputs.build_id == 'dspace-prod' || inputs.build_id == 'dspace-test' || inputs.build_id == 'dspace-cli') }}
+        run: |
+          docker save -o /tmp/${{ inputs.build_id }}.tar ${{ steps.meta_build.outputs.tags }}
 
       # Upload the local docker image (in TAR file) to a build Artifact
       # This step is only done for AMD64, as that's the only image we use in our automated testing (at this time).
