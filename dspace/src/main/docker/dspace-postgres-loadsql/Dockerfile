@@ -22,7 +22,10 @@ ENV POSTGRES_USER=${POSTGRES_USER}
 ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
 # Install curl which is necessary to load SQL file
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
 
 # Load a SQL dump.  Set LOADSQL to a URL for the sql dump file.
 COPY loadsql.sh /docker-entrypoint-initdb.d/
