@@ -237,13 +237,17 @@ jobs:
             ${{ inputs.dockerfile_additional_contexts }}
           context: ${{ inputs.dockerfile_context }}
           file: ${{ inputs.dockerfile_path }}
+          # Use GHCR as build registry to avoid DockerHub rate limits
           build-args:
             DOCKER_REGISTRY=${{ env.DOCKER_BUILD_REGISTRY }}
           platforms: ${{ matrix.arch }}
           tags: ${{ steps.meta_build.outputs.tags }}
           labels: ${{ steps.meta_build.outputs.labels }}
+          # Cache Docker layers in GitHub Actions cache to speed up builds
+          # and reduce pulls from DockerHub
           cache-from: type=gha,scope=${{ inputs.build_id }}
           cache-to: type=gha,scope=${{ inputs.build_id }},mode=min
+          # Export to TAR for use in automated testing jobs
           outputs: type=docker,dest=/tmp/${{ inputs.build_id }}.tar
 
       # For PR builds of images that depend on dspace-dependencies (dspace-prod, dspace-cli, dspace-test),
@@ -257,10 +261,12 @@ jobs:
             ${{ inputs.dockerfile_additional_contexts }}
           context: ${{ inputs.dockerfile_context }}
           file: ${{ inputs.dockerfile_path }}
+          # Use GHCR as build registry to avoid DockerHub rate limits
           build-args:
             DOCKER_REGISTRY=${{ env.DOCKER_BUILD_REGISTRY }}
           tags: ${{ steps.meta_build.outputs.tags }}
           labels: ${{ steps.meta_build.outputs.labels }}
+          # Load into local Docker daemon (docker driver doesn't support direct TAR export)
           load: true
 
       - name: Save image to TAR file (for docker driver builds)
