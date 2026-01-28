@@ -21,6 +21,7 @@ import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,10 +41,29 @@ public class CanSubscribeFeature implements AuthorizationFeature {
     private Utils utils;
     @Autowired
     private AuthorizeService authorizeService;
+    @Autowired
+    private ConfigurationService configurationService;
 
+    /**
+     * The method checks if the CanSubscribeFeature is enabled and an EPerson has logged-in.
+     * @param context
+     *            the DSpace Context
+     * @param object
+     *            the object target by the feature (MUST be NOT null). Use the {@link SiteRest} object for repository
+     *            wide feature
+     * @return false if the feature is disabled or no EPerson is logged-in.
+     *         Otherwise, it returns the value for authorizeActionBoolean.
+     */
     @Override
     @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
+        boolean isEnabled = configurationService
+            .getBooleanProperty("can-subscribe-feature.enable", true);
+
+        if (!isEnabled) {
+            return false;
+        }
+
         if (Objects.isNull(context.getCurrentUser())) {
             return false;
         }
