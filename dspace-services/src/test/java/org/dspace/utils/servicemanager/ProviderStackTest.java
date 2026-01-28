@@ -71,7 +71,7 @@ public class ProviderStackTest {
     public void testProviderStackServiceManagerClassOfT() {
         // fake service manager for testing
         ServiceManager sm = new ServiceManager() {
-            public <T> T getServiceByName(String name, Class<T> type) {
+            public <T> T getServiceByName(String name, Class<? super T> type) {
                 return null;
             }
 

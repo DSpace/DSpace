@@ -407,7 +407,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getServiceByName(String name, Class<T> type) {
+    public <T> T getServiceByName(String name, Class<? super T> type) {
         checkRunning();
         if (type == null) {
             throw new IllegalArgumentException("Type cannot be null");
@@ -447,7 +447,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             if (name == null
                 && service == null) {
                 try {
-                    Map<String, T> map = applicationContext.getBeansOfType(type);
+                    Map<String, ?> map = applicationContext.getBeansOfType(type);
                     if (map.size() == 1) {
                         // only return the bean if there is exactly one
                         service = (T) map.values().iterator().next();

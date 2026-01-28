@@ -58,7 +58,7 @@ public class MockServiceManagerSystem implements ServiceManagerSystem {
     /* (non-Javadoc)
      * @see org.dspace.kernel.ServiceManager#getServiceByName(java.lang.String, java.lang.Class)
      */
-    public <T> T getServiceByName(String name, Class<T> type) {
+    public <T> T getServiceByName(String name, Class<? super T> type) {
         return this.sms.getServiceByName(name, type);
     }
 
