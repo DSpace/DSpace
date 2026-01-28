@@ -11,7 +11,7 @@ import org.apache.commons.cli.Options;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 
 
-public class HarvestScriptConfiguration<T extends Harvest> extends ScriptConfiguration<T> {
+public class HarvestScriptConfiguration<T extends Harvest<?>> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 

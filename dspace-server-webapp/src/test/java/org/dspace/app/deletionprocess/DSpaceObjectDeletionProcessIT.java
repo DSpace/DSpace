@@ -38,9 +38,12 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.deletion.process.DSpaceObjectDeletionProcess;
 import org.dspace.discovery.IndexingService;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
+import org.dspace.scripts.service.ScriptService;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,11 +61,15 @@ public class DSpaceObjectDeletionProcessIT extends AbstractEntityIntegrationTest
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
     @Autowired
+    private ScriptService scriptService;
+    @Autowired
     private IndexingService indexingService;
-
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+
+    private Item item1;
+    private Item item2;
 
     private Community community;
     private Collection collection;

@@ -13,7 +13,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 /**
  * The {@link ScriptConfiguration} for the {@link RetryFailedOpenUrlTracker} script
  */
-public class RetryFailedOpenUrlTrackerScriptConfiguration<T extends RetryFailedOpenUrlTracker>
+public class RetryFailedOpenUrlTrackerScriptConfiguration<T extends RetryFailedOpenUrlTracker<?>>
         extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;

@@ -20,11 +20,11 @@ import org.dspace.content.ProcessStatus;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.Process;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
 
 /**
  * Script to cleanup the old processes in the specified state.
@@ -32,7 +32,7 @@ import org.dspace.utils.DSpace;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class ProcessCleaner extends DSpaceRunnable<ProcessCleanerConfiguration<ProcessCleaner>> {
+public class ProcessCleaner<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     private ConfigurationService configurationService;
 
@@ -48,6 +48,17 @@ public class ProcessCleaner extends DSpaceRunnable<ProcessCleanerConfiguration<P
     private boolean help = false;
 
     private Integer days;
+
+    /**
+     * Constructor for ProcessCleaner script.
+     * Cleans up old processes from the database based on their status
+     * and age to maintain system performance and storage efficiency.
+     * 
+     * @param scriptConfiguration The script configuration defining cleanup criteria and retention policies
+     */
+    public ProcessCleaner(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
 
     @Override
@@ -128,13 +139,6 @@ public class ProcessCleaner extends DSpaceRunnable<ProcessCleanerConfiguration<P
 
     private Instant calculateCreationDate() {
         return Instant.now().minus(days, ChronoUnit.DAYS);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public ProcessCleanerConfiguration<ProcessCleaner> getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-            .getServiceByName("process-cleaner", ProcessCleanerConfiguration.class);
     }
 
 }

@@ -34,7 +34,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.utils.DSpace;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * Item exporter to create simple AIPs for DSpace content. Currently exports
@@ -57,7 +57,7 @@ import org.dspace.utils.DSpace;
  * @author David Little
  * @author Jay Paz
  */
-public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
+public class ItemExport<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     public static final String TEMP_DIR = "exportSAF";
     public static final String ZIP_NAME = "exportSAFZip";
@@ -83,10 +83,15 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
     protected static final EPersonService epersonService =
             EPersonServiceFactory.getInstance().getEPersonService();
 
-    @Override
-    public ItemExportScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-                .getServiceByName("export", ItemExportScriptConfiguration.class);
+    /**
+     * Constructor for ItemExport script.
+     * This script exports DSpace items to Simple Archive Format (SAF) packages.
+     * 
+     * @param scriptConfiguration The script configuration defining export parameters,
+     *                           target items/collections, and output directory settings
+     */
+    public ItemExport(T scriptConfiguration) {
+        super(scriptConfiguration);
     }
 
     @Override

@@ -17,7 +17,7 @@ import org.apache.commons.cli.Options;
  * @author Mohamed Eskander (mohamed.eskander at 4science.it)
  *
  */
-public class BulkAccessControlCliScriptConfiguration<T extends BulkAccessControlCli>
+public class BulkAccessControlCliScriptConfiguration<T extends BulkAccessControl<?>>
     extends BulkAccessControlScriptConfiguration<T> {
 
     @Override

@@ -37,9 +37,9 @@ import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
 
 /**
  * Script for complete export and import of SOLR cores with multithreading support.
@@ -50,7 +50,7 @@ import org.dspace.utils.DSpace;
  *
  * @author Stefano Maffei (stefano.maffei at 4science.com)
  */
-public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScriptConfiguration> {
+public class SolrCoreExportImport<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     private static final Logger log = LogManager.getLogger(SolrCoreExportImport.class);
 
@@ -72,6 +72,17 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
 
     // Cache for fields list to avoid multiple calls to SOLR
     private List<String> cachedFields = null;
+
+    /**
+     * Constructor for SolrCoreExportImport script.
+     * Exports and imports complete Solr cores with multithreading support
+     * for backup, migration, and data exchange purposes.
+     * 
+     * @param scriptConfiguration The script configuration defining export/import parameters and threading options
+     */
+    public SolrCoreExportImport(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     /**
      * Determines if this script execution requires authentication.
@@ -670,12 +681,6 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
 
         handler.logInfo("Retrieved " + fields.size() + " fields from sample document for core '" + coreName + "'");
         return fields;
-    }
-
-    @Override
-    public SolrCoreExportImportScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager().getServiceByName("solr-core-management",
-                SolrCoreExportImportScriptConfiguration.class);
     }
 
     /**

@@ -20,7 +20,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  *
  * @author Maria Verdonck (Atmire) on 05/01/2021
  */
-public class SubmissionFormsMigrationScriptConfiguration<T extends SubmissionFormsMigration>
+public class SubmissionFormsMigrationScriptConfiguration<T extends SubmissionFormsMigration<?>>
     extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;

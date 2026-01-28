@@ -36,7 +36,7 @@ public interface ServiceManager {
      *            as well)
      * @return the list of service singletons OR empty list if none is found
      */
-    public <T> List<T> getServicesByType(Class<T> type);
+    <T> List<T> getServicesByType(Class<? super T> type);
 
     /**
      * Allows developers to get the desired service singleton by the provided name and type.

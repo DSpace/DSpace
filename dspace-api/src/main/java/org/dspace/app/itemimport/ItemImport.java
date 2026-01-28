@@ -58,7 +58,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  * Modified by David Little, UCSD Libraries 12/21/04 to
  * allow the registration of files (bitstreams) into DSpace.
  */
-public class ItemImport<T extends ScriptConfiguration> extends DSpaceRunnable<T> {
+public class ItemImport<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     public static String TEMP_DIR = "importSAF";
     public static String MAPFILE_FILENAME = "mapfile";
@@ -92,6 +92,13 @@ public class ItemImport<T extends ScriptConfiguration> extends DSpaceRunnable<T>
     protected static final HandleService handleService =
             HandleServiceFactory.getInstance().getHandleService();
 
+    /**
+     * Constructor for ItemImport script.
+     * Imports items from Simple Archive Format (SAF) into DSpace repositories,
+     * supporting both file copying and registration modes.
+     * 
+     * @param scriptConfiguration The script configuration defining import parameters and options
+     */
     public ItemImport(T scriptConfiguration) {
         super(scriptConfiguration);
     }

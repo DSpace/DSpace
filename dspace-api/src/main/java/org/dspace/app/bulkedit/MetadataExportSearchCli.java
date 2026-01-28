@@ -8,10 +8,22 @@
 
 package org.dspace.app.bulkedit;
 
+import org.dspace.scripts.configuration.ScriptConfiguration;
+
 /**
  * The cli version of the {@link MetadataExportSearch} script
  */
-public class MetadataExportSearchCli extends MetadataExportSearch {
+public class MetadataExportSearchCli<T extends ScriptConfiguration<?>> extends MetadataExportSearch<T> {
+
+    /**
+     * Constructor for MetadataExportSearchCli.
+     * Command-line interface wrapper for MetadataExportSearch script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
+     */
+    public MetadataExportSearchCli(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     @Override
     protected String getFileNameOrExportFile() {
