@@ -82,6 +82,11 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService {
     }
 
     @Override
+    public ClaimedTask findFirstByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {
+        return claimedTaskDAO.findFirstByWorkflowItem(context, workflowItem);
+    }
+
+    @Override
     public List<ClaimedTask> findByEperson(Context context, EPerson ePerson) throws SQLException {
         return claimedTaskDAO.findByEperson(context, ePerson);
     }
