@@ -132,6 +132,18 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
 
     Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
 
+    /**
+     * Find all Items modified in a collection since a Date.
+     *
+     * @param context Context
+     * @param collection Collection to search in
+     * @param last   Earliest interesting last-modified date.
+     * @return iterator over items
+     * @throws SQLException if database error
+     */
+    Iterator<Item> findAllByCollectionLastModifiedSince(Context context, Collection collection, Instant last)
+        throws SQLException;
+
     Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
         throws SQLException;
 
