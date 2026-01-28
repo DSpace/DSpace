@@ -25,20 +25,21 @@ import org.springframework.beans.factory.annotation.Autowired;
  * The implementation for the {@link ScriptService}
  */
 public class ScriptServiceImpl implements ScriptService {
+
     private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private ServiceManager serviceManager;
 
     @Override
-    public ScriptConfiguration<?> getScriptConfiguration(String name) {
-        return serviceManager.getServiceByName(name, ScriptConfiguration.class);
+    public <S extends ScriptConfiguration<? extends DSpaceRunnable<?>>> S getScriptConfiguration(String name) {
+        return (S) serviceManager.getServiceByName(name, ScriptConfiguration.class);
     }
 
     @Override
-    public <T extends DSpaceRunnable<?>> List<ScriptConfiguration<T>> getScriptConfigurations(Context context) {
-        List<? extends ScriptConfiguration<T>> configurations =
-            serviceManager.getServicesByType(ScriptConfiguration.class);
+    public <S extends ScriptConfiguration<T>, T extends DSpaceRunnable<?>> List<S> getScriptConfigurations(
+        Context context) {
+        List<S> configurations = serviceManager.getServicesByType(ScriptConfiguration.class);
         return configurations
             .stream()
             .filter(scriptConfiguration ->
@@ -50,12 +51,12 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     @Override
-    public <T extends DSpaceRunnable<?>> T createDSpaceRunnableForScriptConfiguration(
-        ScriptConfiguration<T> scriptToExecute
-    ) throws IllegalAccessException, InstantiationException {
+    public <S extends ScriptConfiguration<T>, T extends DSpaceRunnable<? extends ScriptConfiguration<?>>>
+        T createDSpaceRunnableForScriptConfiguration(S scriptToExecute)
+        throws IllegalAccessException, InstantiationException {
         try {
             Constructor<T> declaredConstructor =
-                scriptToExecute.getDspaceRunnableClass().getDeclaredConstructor(ScriptConfiguration.class);
+                scriptToExecute.getDspaceRunnableClass().getDeclaredConstructor(scriptToExecute.getClass());
             return declaredConstructor.newInstance(scriptToExecute);
         } catch (InvocationTargetException | NoSuchMethodException e) {
             log.error(e::getMessage, e);
