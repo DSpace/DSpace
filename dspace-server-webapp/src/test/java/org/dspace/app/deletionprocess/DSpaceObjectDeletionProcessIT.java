@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -44,6 +45,7 @@ import org.dspace.content.RelationshipType;
 import org.dspace.content.service.ItemService;
 import org.dspace.deletion.process.DSpaceObjectDeletionProcess;
 import org.dspace.deletion.process.DSpaceObjectDeletionProcessScriptConfiguration;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.service.ScriptService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -59,6 +61,9 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     @Autowired
     private ScriptService scriptService;
 
+    @Autowired
+    private ItemService itemService;
+
     private Item item1;
     private Item item2;
     private Community community;
@@ -69,9 +74,6 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     private Bitstream bitstream5;
     private Bitstream bitstream6;
     private Collection collection;
-
-    @Autowired
-    private ItemService itemService;
 
     @Override
     public void setUp() throws Exception {
@@ -174,10 +176,10 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", item1.getID().toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
-            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
-        DSpaceObjectDeletionProcess deletionProcess = 
-            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
+        ScriptConfiguration<DSpaceObjectDeletionProcess<?>> scriptConfig =
+            scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
+        DSpaceObjectDeletionProcess<?> deletionProcess =
+            scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
 
@@ -273,12 +275,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", collection.getID().toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
-            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
-        DSpaceObjectDeletionProcess deletionProcess = 
-            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
-        deletionProcess.initialize(args, handler, admin);
-        deletionProcess.run();
+        runDeletionProcessScript(args, handler);
 
         // // verify that collection with items/bitstreams was deleted
         getClient(tokenAdmin).perform(get("/api/core/collections/" + collection.getID()))
@@ -373,12 +370,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", community.getID().toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
-            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
-        DSpaceObjectDeletionProcess deletionProcess = 
-            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
-        deletionProcess.initialize(args, handler, admin);
-        deletionProcess.run();
+        runDeletionProcessScript(args, handler);
 
         // // verify that collection with items/bitstreams was deleted
         getClient(tokenAdmin).perform(get("/api/core/communities/" + community.getID()))
@@ -423,12 +415,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", bitstream1.getID().toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
-            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
-        DSpaceObjectDeletionProcess deletionProcess = 
-            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
-        deletionProcess.initialize(args, handler, admin);
-        deletionProcess.run();
+        runDeletionProcessScript(args, handler);
 
         var message = String.format("DSpaceObject for provided identifier:%s doesn't exist!", bitstream1.getID());
         assertTrue(handler.getException().getMessage().contains(message));
@@ -474,12 +461,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", idRef.get() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
-            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
-        DSpaceObjectDeletionProcess deletionProcess = 
-            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
-        deletionProcess.initialize(args, handler, admin);
-        deletionProcess.run();
+        runDeletionProcessScript(args, handler);
 
         // verify that item with bitstreams was deleted
         getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
@@ -503,12 +485,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         UUID fakeUuid = UUID.randomUUID();
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", fakeUuid.toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
-            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
-        DSpaceObjectDeletionProcess deletionProcess = 
-            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
-        deletionProcess.initialize(args, handler, admin);
-        deletionProcess.run();
+        runDeletionProcessScript(args, handler);
 
         var expectedMessage = String.format("DSpaceObject for provided identifier:%s doesn't exist!", fakeUuid);
         assertTrue(handler.getException().getMessage().contains(expectedMessage));
@@ -518,12 +495,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     public void asyncDeletionWithInvalidHandleTest() throws Exception {
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", "123456789/invalid" };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
-            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
-        DSpaceObjectDeletionProcess deletionProcess = 
-            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
-        deletionProcess.initialize(args, handler, admin);
-        deletionProcess.run();
+        runDeletionProcessScript(args, new TestDSpaceRunnableHandler());
 
         assertTrue(handler.getException() instanceof IllegalArgumentException);
     }
@@ -598,13 +570,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
 
         // Delete person item with -c all option
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", personItem.getID().toString(), "-c", "all" };
-        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
-            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
-        DSpaceObjectDeletionProcess deletionProcess = 
-            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
-        deletionProcess.initialize(args, handler, admin);
-        deletionProcess.run();
+        runDeletionProcessScript(args, new TestDSpaceRunnableHandler());
 
         // Verify that person item was deleted
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -732,13 +698,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         // Delete publication item with -c configured option
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", publicationItem.getID().toString(),
                                                               "-c", "configured" };
-        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
-            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
-        DSpaceObjectDeletionProcess deletionProcess = 
-            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
-        deletionProcess.initialize(args, handler, admin);
-        deletionProcess.run();
+        runDeletionProcessScript(args, new TestDSpaceRunnableHandler());
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         // Verify that publication item was deleted
@@ -894,13 +854,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         String relationshipTypeIds = isAuthorOfPublication.getID() + "," + isOrgUnitOfPublication.getID();
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", publicationItem.getID().toString(),
                                                               "-c", relationshipTypeIds };
-        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
-            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
-        DSpaceObjectDeletionProcess deletionProcess = 
-            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
-        deletionProcess.initialize(args, handler, admin);
-        deletionProcess.run();
+        runDeletionProcessScript(args, new TestDSpaceRunnableHandler());
 
         // Verify that publication item was deleted
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -943,6 +897,15 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
                    "because its relationship type ID was not included in -c parameter",
                    projectPhysicalMetadataAfter.isEmpty());
         context.restoreAuthSystemState();
+    }
+
+    private void runDeletionProcessScript(String[] args, TestDSpaceRunnableHandler handler) throws IllegalAccessException, InstantiationException, ParseException {
+        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig =
+            scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
+        DSpaceObjectDeletionProcess<?> deletionProcess =
+            scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
+        deletionProcess.initialize(args, handler, admin);
+        deletionProcess.run();
     }
 
 }

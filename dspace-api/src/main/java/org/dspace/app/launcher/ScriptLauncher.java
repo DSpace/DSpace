@@ -124,8 +124,8 @@ public class ScriptLauncher {
                                    DSpaceKernelImpl kernelImpl) throws InstantiationException, IllegalAccessException {
         int status;
         ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
-        ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
-        DSpaceRunnable script = null;
+        ScriptConfiguration<DSpaceRunnable<?>> scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
+        DSpaceRunnable<?> script = null;
         if (scriptConfiguration != null) {
             script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
         }
@@ -349,10 +349,10 @@ public class ScriptLauncher {
         }
 
         // commands from script service
-        Collection<ScriptConfiguration<T>> serviceCommands = getServiceCommands();
+        Collection<ScriptConfiguration<DSpaceRunnable<?>>> serviceCommands = getServiceCommands();
         if (!serviceCommands.isEmpty()) {
             System.out.println("\nCommands from script service");
-            for (ScriptConfiguration command : serviceCommands) {
+            for (ScriptConfiguration<?> command : serviceCommands) {
                 displayCommand(
                     command.getName(),
                     command.getDescription()
@@ -394,13 +394,13 @@ public class ScriptLauncher {
      * Get a sorted collection of the commands that are defined as beans. Used by {@link #display}.
      * @return sorted collection of commands
      */
-    private static <T extends DSpaceRunnable<?>> Collection<ScriptConfiguration<T>> getServiceCommands() {
+    private static <S extends ScriptConfiguration<T>, T extends DSpaceRunnable<?>> Collection<S> getServiceCommands() {
         ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
 
         Context throwAwayContext = new Context();
 
         throwAwayContext.turnOffAuthorisationSystem();
-        List<ScriptConfiguration<T>> scriptConfigurations = scriptService.getScriptConfigurations(throwAwayContext);
+        List<S> scriptConfigurations = scriptService.getScriptConfigurations(throwAwayContext);
         throwAwayContext.restoreAuthSystemState();
 
         try {
