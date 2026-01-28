@@ -24,12 +24,19 @@ import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.logic.Filter;
 import org.dspace.content.logic.LogicalStatementException;
 import org.dspace.content.security.service.CrisSecurityService;
 import org.dspace.core.Context;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +48,17 @@ import org.junit.Test;
  *
  */
 public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
+
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+
+    private PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
+
+    private ChoiceAuthorityService choiceAuthorityService = ContentAuthorityServiceFactory
+        .getInstance().getChoiceAuthorityService();
+
+    private MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory
+        .getInstance().getMetadataAuthorityService();
 
     private CrisSecurityService crisSecurityService = getCrisSecurityService();
 
@@ -170,7 +188,40 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void testHasAccessWithCustomConfig() throws SQLException {
+    public void testHasAccessWithCustomConfig() throws Exception {
+
+        choiceAuthorityService.getChoiceAuthoritiesNames();
+        pluginService.clearNamedPluginClasses();
+
+
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] {
+                                             "org.dspace.content.authority.ItemAuthority = AuthorAuthority",
+                                             "org.dspace.content.authority.OrcidAuthority = EditorAuthority",
+                                             "org.dspace.content.authority.EPersonAuthority = EPersonAuthority",
+                                             "org.dspace.content.authority.GroupAuthority = GroupAuthority"
+                                         });
+        configurationService.setProperty("cris.ItemAuthority.OrgUnitAuthority.entityType", "OrgUnit");
+        configurationService.setProperty("cris.ItemAuthority.AuthorAuthority.entityType", "Person");
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+
+        configurationService.setProperty("choices.plugin.dc.contributor.editor", "EditorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.editor", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.editor", "true");
+        configurationService.setProperty("cris.ItemAuthority.EditorAuthority.entityType", "Person");
+
+        configurationService.setProperty("choices.plugin.cris.policy.eperson", "EPersonAuthority");
+        configurationService.setProperty("cchoices.presentation.cris.policy.eperson", "suggest");
+        configurationService.setProperty("authority.controlled.cris.policy.eperson", "true");
+
+        configurationService.setProperty("choices.plugin.cris.policy.group", "GroupAuthority");
+        configurationService.setProperty("cchoices.presentation.cris.policy.group", "suggest");
+        configurationService.setProperty("authority.controlled.cris.policy.group", "true");
+
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
 
         context.turnOffAuthorisationSystem();
 
@@ -252,7 +303,7 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
 
         Item item = ItemBuilder.createItem(context, collection)
             .withTitle("Test item")
-            .withAuthor("Author", ePerson.getID().toString())
+            .withAuthor("Author")
             .build();
 
         context.restoreAuthSystemState();
