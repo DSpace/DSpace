@@ -31,8 +31,14 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
-public class ItemImportCLI<T extends ScriptConfiguration> extends ItemImport<T> {
+public class ItemImportCLI<T extends ScriptConfiguration<?>> extends ItemImport<T> {
 
+    /**
+     * Constructor for ItemImportCLI.
+     * Command-line interface wrapper for ItemImport script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
+     */
     public ItemImportCLI(T scriptConfiguration) {
         super(scriptConfiguration);
     }

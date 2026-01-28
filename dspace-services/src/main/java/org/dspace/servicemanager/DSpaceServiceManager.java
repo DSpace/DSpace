@@ -466,17 +466,17 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> List<T> getServicesByType(Class<T> type) {
+    public <T> List<T> getServicesByType(Class<? super T> type) {
         checkRunning();
         if (type == null) {
             throw new IllegalArgumentException("type cannot be null");
         }
 
-        List<T> services = new ArrayList<>();
-        Map<String, T> beans;
+        List<T> services;
+        Map<String, ?> beans;
         try {
             beans = applicationContext.getBeansOfType(type, true, true);
-            services.addAll((Collection<? extends T>) beans.values());
+            services = new ArrayList<>((Collection<T>) beans.values());
         } catch (BeansException e) {
             throw new RuntimeException("Failed to get beans of type (" + type + "): " + e.getMessage(), e);
         }

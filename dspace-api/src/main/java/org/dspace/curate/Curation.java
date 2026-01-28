@@ -38,15 +38,15 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
 
 /**
  * CurationCli provides command-line access to Curation tools and processes.
  *
  * @author richardrodgers
  */
-public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
+public class Curation<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected DSpaceObjectUtils dspaceObjectUtils = DSpaceServicesFactory.getInstance().getServiceManager()
@@ -63,6 +63,16 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
     private String reporter;
     private Map<String, String> parameters;
     private boolean verbose;
+
+    /**
+     * Constructor for Curation script.
+     * 
+     * @param scriptConfiguration The script configuration that defines curation tasks,
+     *                           target objects, and execution parameters
+     */
+    public Curation(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     @Override
     public void internalRun() throws Exception {
@@ -217,11 +227,6 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         super.handler.logInfo("\nwhole repo: CurationCli -t estimate -i all");
         super.handler.logInfo("single item: CurationCli -t generate -i itemId");
         super.handler.logInfo("task queue: CurationCli -q monthly");
-    }
-
-    @Override
-    public CurationScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager().getServiceByName("curate", CurationScriptConfiguration.class);
     }
 
     @Override

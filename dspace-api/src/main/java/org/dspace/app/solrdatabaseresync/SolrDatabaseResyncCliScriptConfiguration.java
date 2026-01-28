@@ -13,16 +13,17 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 /**
  * The {@link ScriptConfiguration} for the {@link SolrDatabaseResyncCli} script.
  */
-public class SolrDatabaseResyncCliScriptConfiguration extends ScriptConfiguration<SolrDatabaseResyncCli> {
-    private Class<SolrDatabaseResyncCli> dspaceRunnableClass;
+public class SolrDatabaseResyncCliScriptConfiguration<T extends SolrDatabaseResyncCli<?>>
+    extends ScriptConfiguration<T> {
+    private Class<T> dspaceRunnableClass;
 
     @Override
-    public Class<SolrDatabaseResyncCli> getDspaceRunnableClass() {
+    public Class<T> getDspaceRunnableClass() {
         return dspaceRunnableClass;
     }
 
     @Override
-    public void setDspaceRunnableClass(Class<SolrDatabaseResyncCli> dspaceRunnableClass) {
+    public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
         this.dspaceRunnableClass = dspaceRunnableClass;
     }
 

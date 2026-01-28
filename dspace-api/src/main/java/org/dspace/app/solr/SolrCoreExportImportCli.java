@@ -7,7 +7,7 @@
  */
 package org.dspace.app.solr;
 
-import org.dspace.utils.DSpace;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * CLI version of SOLR core export/import script.
@@ -15,12 +15,16 @@ import org.dspace.utils.DSpace;
  *
  * @author Stefano Maffei (stefano.maffei at 4science.com)
  */
-public class SolrCoreExportImportCli extends SolrCoreExportImport {
+public class SolrCoreExportImportCli<T extends ScriptConfiguration<?>> extends SolrCoreExportImport<T> {
 
-    @Override
-    public SolrCoreExportImportCliScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager().getServiceByName("solr-core-management",
-                SolrCoreExportImportCliScriptConfiguration.class);
+    /**
+     * Constructor for SolrCoreExportImportCli.
+     * Command-line interface wrapper for SolrCoreExportImport script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
+     */
+    public SolrCoreExportImportCli(T scriptConfiguration) {
+        super(scriptConfiguration);
     }
 
     @Override

@@ -31,24 +31,30 @@ public class ScriptServiceImpl implements ScriptService {
     private ServiceManager serviceManager;
 
     @Override
-    public ScriptConfiguration getScriptConfiguration(String name) {
+    public ScriptConfiguration<?> getScriptConfiguration(String name) {
         return serviceManager.getServiceByName(name, ScriptConfiguration.class);
     }
 
     @Override
-    public List<ScriptConfiguration> getScriptConfigurations(Context context) {
-        return serviceManager.getServicesByType(ScriptConfiguration.class).stream().filter(
-            scriptConfiguration -> scriptConfiguration.isAllowedToExecute(context, null)
-                             && scriptConfiguration.getIsVisibleFromUI())
-                             .sorted(Comparator.comparing(ScriptConfiguration::getName))
-                             .collect(Collectors.toList());
+    public <T extends DSpaceRunnable<?>> List<ScriptConfiguration<T>> getScriptConfigurations(Context context) {
+        List<? extends ScriptConfiguration<T>> configurations =
+            serviceManager.getServicesByType(ScriptConfiguration.class);
+        return configurations
+            .stream()
+            .filter(scriptConfiguration ->
+                        scriptConfiguration.isAllowedToExecute(context, null) &&
+                            scriptConfiguration.getIsVisibleFromUI()
+            )
+            .sorted(Comparator.comparing(ScriptConfiguration::getName))
+            .collect(Collectors.toList());
     }
 
     @Override
-    public DSpaceRunnable createDSpaceRunnableForScriptConfiguration(ScriptConfiguration scriptToExecute)
-        throws IllegalAccessException, InstantiationException {
+    public <T extends DSpaceRunnable<?>> T createDSpaceRunnableForScriptConfiguration(
+        ScriptConfiguration<T> scriptToExecute
+    ) throws IllegalAccessException, InstantiationException {
         try {
-            Constructor<DSpaceRunnable<?>> declaredConstructor =
+            Constructor<T> declaredConstructor =
                 scriptToExecute.getDspaceRunnableClass().getDeclaredConstructor(ScriptConfiguration.class);
             return declaredConstructor.newInstance(scriptToExecute);
         } catch (InvocationTargetException | NoSuchMethodException e) {

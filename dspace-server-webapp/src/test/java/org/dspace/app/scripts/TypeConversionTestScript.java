@@ -10,18 +10,12 @@ package org.dspace.app.scripts;
 import org.apache.commons.cli.ParseException;
 import org.dspace.app.rest.converter.ScriptConverter;
 import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.utils.DSpace;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * Script used to test the type conversion in the {@link ScriptConverter}
  */
-public class TypeConversionTestScript extends DSpaceRunnable<TypeConversionTestScriptConfiguration> {
-
-
-    public TypeConversionTestScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-                           .getServiceByName("type-conversion-test", TypeConversionTestScriptConfiguration.class);
-    }
+public class TypeConversionTestScript<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     public void setup() throws ParseException {
         // This script is only used to test rest exposure, no setup is required.

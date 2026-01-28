@@ -16,7 +16,7 @@ import org.dspace.app.suggestion.runnable.PublicationLoaderRunnable;
  *
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  */
-public class PublicationLoaderCliScriptConfiguration<T extends PublicationLoaderRunnable>
+public class PublicationLoaderCliScriptConfiguration<T extends PublicationLoaderRunnable<?>>
     extends PublicationLoaderScriptConfiguration<T> {
 
     /**

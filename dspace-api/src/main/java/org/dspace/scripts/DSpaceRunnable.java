@@ -30,7 +30,7 @@ import org.dspace.scripts.handler.DSpaceRunnableHandler;
  * script
  * @param <T>
  */
-public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements Runnable {
+public abstract class DSpaceRunnable<T extends ScriptConfiguration<?>> implements Runnable {
 
     /**
      * The CommandLine object for the script that'll hold the information

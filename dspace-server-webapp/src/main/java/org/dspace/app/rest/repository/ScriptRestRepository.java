@@ -79,7 +79,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     // authorization check is performed inside the script service
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<ScriptRest> findAll(Context context, Pageable pageable) {
-        List<ScriptConfiguration> scriptConfigurations =
+        List<ScriptConfiguration<DSpaceRunnable<?>>> scriptConfigurations =
             scriptService.getScriptConfigurations(context);
         return converter.toRestPage(scriptConfigurations, pageable, utils.obtainProjection());
     }

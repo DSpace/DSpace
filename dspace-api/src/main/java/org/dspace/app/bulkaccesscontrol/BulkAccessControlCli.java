@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * Extension of {@link BulkAccessControl} for CLI.
@@ -23,7 +24,17 @@ import org.dspace.scripts.DSpaceCommandLineParameter;
  * @author Mohamed Eskander (mohamed.eskander at 4science.it)
  *
  */
-public class BulkAccessControlCli extends BulkAccessControl {
+public class BulkAccessControlCli<T extends ScriptConfiguration<?>> extends BulkAccessControl<T> {
+
+    /**
+     * Constructor for BulkAccessControlCli.
+     * Command-line interface wrapper for BulkAccessControl script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
+     */
+    public BulkAccessControlCli(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     @Override
     protected void setEPerson(Context context) throws SQLException {

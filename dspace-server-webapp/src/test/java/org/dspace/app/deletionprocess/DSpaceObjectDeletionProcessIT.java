@@ -43,6 +43,8 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.ItemService;
 import org.dspace.deletion.process.DSpaceObjectDeletionProcess;
+import org.dspace.deletion.process.DSpaceObjectDeletionProcessScriptConfiguration;
+import org.dspace.scripts.service.ScriptService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +55,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
 public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private ScriptService scriptService;
 
     private Item item1;
     private Item item2;
@@ -169,7 +174,10 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", item1.getID().toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
+        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
+            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
+        DSpaceObjectDeletionProcess deletionProcess = 
+            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
 
@@ -265,7 +273,10 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", collection.getID().toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
+        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
+            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
+        DSpaceObjectDeletionProcess deletionProcess = 
+            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
 
@@ -362,7 +373,10 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", community.getID().toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
+        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
+            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
+        DSpaceObjectDeletionProcess deletionProcess = 
+            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
 
@@ -409,7 +423,10 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", bitstream1.getID().toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
+        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
+            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
+        DSpaceObjectDeletionProcess deletionProcess = 
+            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
 
@@ -457,7 +474,10 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", idRef.get() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
+        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
+            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
+        DSpaceObjectDeletionProcess deletionProcess = 
+            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
 
@@ -483,7 +503,10 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         UUID fakeUuid = UUID.randomUUID();
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", fakeUuid.toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
+        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
+            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
+        DSpaceObjectDeletionProcess deletionProcess = 
+            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
 
@@ -495,7 +518,10 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     public void asyncDeletionWithInvalidHandleTest() throws Exception {
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", "123456789/invalid" };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
+        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
+            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
+        DSpaceObjectDeletionProcess deletionProcess = 
+            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
 
@@ -573,7 +599,10 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         // Delete person item with -c all option
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", personItem.getID().toString(), "-c", "all" };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
+        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
+            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
+        DSpaceObjectDeletionProcess deletionProcess = 
+            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
 
@@ -704,7 +733,10 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", publicationItem.getID().toString(),
                                                               "-c", "configured" };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
+        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
+            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
+        DSpaceObjectDeletionProcess deletionProcess = 
+            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
 
@@ -863,7 +895,10 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", publicationItem.getID().toString(),
                                                               "-c", relationshipTypeIds };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
+        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig = 
+            (DSpaceObjectDeletionProcessScriptConfiguration<?>) scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
+        DSpaceObjectDeletionProcess deletionProcess = 
+            (DSpaceObjectDeletionProcess) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
 

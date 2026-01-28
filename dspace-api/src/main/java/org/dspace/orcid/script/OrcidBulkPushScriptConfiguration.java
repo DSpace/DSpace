@@ -17,7 +17,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  *
  * @param  <T> the OrcidBulkPush type
  */
-public class OrcidBulkPushScriptConfiguration<T extends OrcidBulkPush> extends ScriptConfiguration<T> {
+public class OrcidBulkPushScriptConfiguration<T extends OrcidBulkPush<?>> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 

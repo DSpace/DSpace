@@ -10,7 +10,7 @@ package org.dspace.app.harvest;
 import org.apache.commons.cli.Options;
 
 
-public class HarvestCliScriptConfiguration extends HarvestScriptConfiguration {
+public class HarvestCliScriptConfiguration<T extends Harvest<?>> extends HarvestScriptConfiguration<T> {
 
     public Options getOptions() {
         Options options = super.getOptions();

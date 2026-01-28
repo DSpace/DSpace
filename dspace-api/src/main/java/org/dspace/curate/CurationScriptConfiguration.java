@@ -23,7 +23,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  *
  * @author Maria Verdonck (Atmire) on 23/06/2020
  */
-public class CurationScriptConfiguration<T extends Curation> extends ScriptConfiguration<T> {
+public class CurationScriptConfiguration<T extends Curation<?>> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 

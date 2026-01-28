@@ -332,7 +332,7 @@ public class ScriptLauncher {
      * Display the commands that are defined in launcher.xml and/or the script service.
      * @param commandConfigs configs as Document
      */
-    private static void display(Document commandConfigs) {
+    private static <T extends DSpaceRunnable<?>> void display(Document commandConfigs) {
         // usage
         System.out.println("Usage: dspace [command-name] {parameters}");
 
@@ -349,8 +349,8 @@ public class ScriptLauncher {
         }
 
         // commands from script service
-        Collection<ScriptConfiguration> serviceCommands = getServiceCommands();
-        if (serviceCommands.size() > 0) {
+        Collection<ScriptConfiguration<T>> serviceCommands = getServiceCommands();
+        if (!serviceCommands.isEmpty()) {
             System.out.println("\nCommands from script service");
             for (ScriptConfiguration command : serviceCommands) {
                 displayCommand(
@@ -394,13 +394,13 @@ public class ScriptLauncher {
      * Get a sorted collection of the commands that are defined as beans. Used by {@link #display}.
      * @return sorted collection of commands
      */
-    private static Collection<ScriptConfiguration> getServiceCommands() {
+    private static <T extends DSpaceRunnable<?>> Collection<ScriptConfiguration<T>> getServiceCommands() {
         ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
 
         Context throwAwayContext = new Context();
 
         throwAwayContext.turnOffAuthorisationSystem();
-        List<ScriptConfiguration> scriptConfigurations = scriptService.getScriptConfigurations(throwAwayContext);
+        List<ScriptConfiguration<T>> scriptConfigurations = scriptService.getScriptConfigurations(throwAwayContext);
         throwAwayContext.restoreAuthSystemState();
 
         try {
