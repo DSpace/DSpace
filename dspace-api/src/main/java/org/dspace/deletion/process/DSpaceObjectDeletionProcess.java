@@ -34,6 +34,7 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.utils.DSpace;
 
 /**
@@ -43,10 +44,23 @@ import org.dspace.utils.DSpace;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
-public class DSpaceObjectDeletionProcess
-        extends DSpaceRunnable<DSpaceObjectDeletionProcessScriptConfiguration<DSpaceObjectDeletionProcess>> {
+public class DSpaceObjectDeletionProcess<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     public static final String OBJECT_DELETION_SCRIPT = "object-deletion";
+
+    /**
+     * Constructor for DSpaceObjectDeletionProcess script.
+     * This process permanently deletes DSpace objects (Items, Collections, Communities)
+     * and all their child objects using delegation strategies.
+     * 
+     * @param scriptConfiguration The script configuration defining deletion parameters,
+     *                           target object identifiers, and safety options
+     */
+    public DSpaceObjectDeletionProcess(
+        T scriptConfiguration
+    ) {
+        super(scriptConfiguration);
+    }
 
     private ItemService itemService;
     private HandleService handleService;
@@ -158,12 +172,6 @@ public class DSpaceObjectDeletionProcess
         }
         DSpaceObject dso = handleService.resolveToObject(context, identifier);
         return dso != null ? Optional.of(dso) : Optional.empty();
-    }
-
-    @Override
-    public DSpaceObjectDeletionProcessScriptConfiguration<DSpaceObjectDeletionProcess> getScriptConfiguration() {
-        ServiceManager sm = new DSpace().getServiceManager();
-        return sm.getServiceByName(OBJECT_DELETION_SCRIPT, DSpaceObjectDeletionProcessScriptConfiguration.class);
     }
 
 }

@@ -29,8 +29,8 @@ import org.dspace.core.SelfNamedPlugin;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
 
 /**
  * MediaFilterManager is the class that invokes the media/format filters over the
@@ -42,7 +42,7 @@ import org.dspace.utils.DSpace;
  * maximum number of items; -fd [fromdate] takes only items starting from this date,
  * filtering by last_modified in the item table.
  */
-public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfiguration> {
+public class MediaFilterScript<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     //key (in dspace.cfg) which lists all enabled filters by name
     private static final String MEDIA_FILTER_PLUGINS_KEY = "filter.plugins";
@@ -64,9 +64,15 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
     private Map<String, List<String>> filterFormats = new HashMap<>();
     private LocalDate fromDate = null;
 
-    public MediaFilterScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-                           .getServiceByName("filter-media", MediaFilterScriptConfiguration.class);
+    /**
+     * Constructor for MediaFilterScript script.
+     * Performs media filtering operations on bitstreams to generate derivatives
+     * such as thumbnails, text extracts, and format conversions.
+     * 
+     * @param scriptConfiguration The script configuration defining filter settings and processing options
+     */
+    public MediaFilterScript(T scriptConfiguration) {
+        super(scriptConfiguration);
     }
 
     public void setup() throws ParseException {

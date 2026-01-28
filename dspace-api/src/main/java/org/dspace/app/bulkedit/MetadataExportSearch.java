@@ -37,6 +37,7 @@ import org.dspace.discovery.utils.parameter.QueryBuilderSearchFilter;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.sort.SortOption;
 import org.dspace.utils.DSpace;
 
@@ -44,7 +45,7 @@ import org.dspace.utils.DSpace;
  * Metadata exporter to allow the batch export of metadata from a discovery search into a file
  *
  */
-public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScriptConfiguration> {
+public class MetadataExportSearch<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
     private static final String EXPORT_CSV = "exportCSV";
     private boolean help = false;
     private String identifier;
@@ -61,10 +62,15 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     private CollectionService collectionService;
     private DiscoverQueryBuilder queryBuilder;
 
-    @Override
-    public MetadataExportSearchScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-            .getServiceByName("metadata-export-search", MetadataExportSearchScriptConfiguration.class);
+    /**
+     * Constructor for MetadataExportSearch script.
+     * Exports metadata from items found through discovery search queries
+     * to CSV format, enabling targeted metadata extraction and reporting.
+     * 
+     * @param scriptConfiguration The script configuration defining search parameters and export settings
+     */
+    public MetadataExportSearch(T scriptConfiguration) {
+        super(scriptConfiguration);
     }
 
     @Override

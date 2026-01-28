@@ -92,9 +92,9 @@ public class MetadataExportIT
         TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
 
         ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
-        ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
+        ScriptConfiguration<MetadataExport<?>> scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
 
-        DSpaceRunnable script = null;
+        MetadataExport<?> script = null;
         if (scriptConfiguration != null) {
             script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
         }

@@ -14,8 +14,8 @@ import org.apache.commons.cli.Options;
  * This is the CLI version of the {@link MetadataExportSearchScriptConfiguration} class that handles the
  * configuration for the {@link MetadataExportSearchCli} script
  */
-public class MetadataExportSearchCliScriptConfiguration
-    extends MetadataExportSearchScriptConfiguration<MetadataExportSearchCli> {
+public class MetadataExportSearchCliScriptConfiguration<T extends MetadataExportSearch<?>>
+    extends MetadataExportSearchScriptConfiguration<T> {
 
     @Override
     public Options getOptions() {

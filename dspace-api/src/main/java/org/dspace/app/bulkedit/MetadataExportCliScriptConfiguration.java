@@ -11,7 +11,8 @@ import java.io.OutputStream;
 
 import org.apache.commons.cli.Options;
 
-public class MetadataExportCliScriptConfiguration extends MetadataExportScriptConfiguration<MetadataExportCli> {
+public class MetadataExportCliScriptConfiguration<T extends MetadataExport<?>>
+    extends MetadataExportScriptConfiguration<T> {
 
 
     @Override
