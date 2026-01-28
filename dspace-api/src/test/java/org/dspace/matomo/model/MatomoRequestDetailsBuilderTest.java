@@ -100,8 +100,8 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
         try (MockedStatic<ContentServiceFactory> mock = Mockito.mockStatic(ContentServiceFactory.class)) {
             ContentServiceFactory serviceFactory = Mockito.mock(ContentServiceFactory.class);
             Mockito.when(ContentServiceFactory.getInstance()).thenReturn(serviceFactory);
-            Mockito.when(ContentServiceFactory.getInstance()).thenReturn(serviceFactory);
             DSpaceObjectService<Item> itemService = Mockito.mock(ItemService.class);
+            Mockito.when(serviceFactory.getDSpaceObjectService(item)).thenReturn(itemService);
             Mockito.when(itemService.getName(item)).thenReturn("item-name");
             Mockito.when(item.getType()).thenReturn(Constants.ITEM);
             Mockito.when(this.usageEvent.getObject()).thenReturn(item);
