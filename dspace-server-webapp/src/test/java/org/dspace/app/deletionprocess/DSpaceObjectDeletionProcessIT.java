@@ -495,7 +495,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     public void asyncDeletionWithInvalidHandleTest() throws Exception {
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", "123456789/invalid" };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-        runDeletionProcessScript(args, new TestDSpaceRunnableHandler());
+        runDeletionProcessScript(args, handler);
 
         assertTrue(handler.getException() instanceof IllegalArgumentException);
     }
@@ -899,7 +899,8 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
     }
 
-    private void runDeletionProcessScript(String[] args, TestDSpaceRunnableHandler handler) throws IllegalAccessException, InstantiationException, ParseException {
+    private void runDeletionProcessScript(String[] args, TestDSpaceRunnableHandler handler)
+        throws IllegalAccessException, InstantiationException, ParseException {
         DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig =
             scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
         DSpaceObjectDeletionProcess<?> deletionProcess =

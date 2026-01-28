@@ -56,7 +56,7 @@ public class ScriptServiceImpl implements ScriptService {
         throws IllegalAccessException, InstantiationException {
         try {
             Constructor<T> declaredConstructor =
-                scriptToExecute.getDspaceRunnableClass().getDeclaredConstructor(scriptToExecute.getClass());
+                scriptToExecute.getDspaceRunnableClass().getDeclaredConstructor(ScriptConfiguration.class);
             return declaredConstructor.newInstance(scriptToExecute);
         } catch (InvocationTargetException | NoSuchMethodException e) {
             log.error(e::getMessage, e);

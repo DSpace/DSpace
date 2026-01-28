@@ -33,6 +33,7 @@ import org.dspace.discovery.SolrSearchCore;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.SolrUtils;
@@ -42,7 +43,7 @@ import org.dspace.util.SolrUtils;
  * - Delete them from solr if they're not present in the database
  * - Remove their status if they're present in the database
  */
-public class SolrDatabaseResyncCli<T extends SolrDatabaseResyncCliScriptConfiguration<?>> extends DSpaceRunnable<T> {
+public class SolrDatabaseResyncCli<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
     /* Log4j logger */
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrDatabaseResyncCli.class);
 
