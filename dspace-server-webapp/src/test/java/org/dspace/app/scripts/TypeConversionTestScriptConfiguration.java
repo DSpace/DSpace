@@ -16,7 +16,8 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 /**
  * Script configuration used to test the type conversion in the {@link ScriptConverter}
  */
-public class TypeConversionTestScriptConfiguration<T extends TypeConversionTestScript> extends ScriptConfiguration<T> {
+public class TypeConversionTestScriptConfiguration<T extends TypeConversionTestScript<?>>
+    extends ScriptConfiguration<T> {
 
 
     public Class<T> getDspaceRunnableClass() {

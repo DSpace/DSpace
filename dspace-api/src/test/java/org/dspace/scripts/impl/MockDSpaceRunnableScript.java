@@ -13,6 +13,14 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 
 public class MockDSpaceRunnableScript<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
+    /**
+     * Constructor for the MockDSpaceRunnableScript
+     * @param scriptConfiguration
+     */
+    public MockDSpaceRunnableScript(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
+
     @Override
     public void internalRun() {
     }

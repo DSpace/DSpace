@@ -79,7 +79,7 @@ public class ProviderStackTest {
                 return null;
             }
 
-            public <T> List<T> getServicesByType(Class<T> type) {
+            public <T> List<T> getServicesByType(Class<? super T> type) {
                 return new ArrayList<>();
             }
 
