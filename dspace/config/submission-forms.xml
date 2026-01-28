@@ -59,6 +59,7 @@
                     <repeatable>true</repeatable>
                     <label>Author</label>
                     <input-type>onebox</input-type>
+                    <vocabulary closed="false" type="suggest">authors</vocabulary>
                     <hint>Enter the author's name (Family name, Given names).</hint>
                     <required></required>
                 </field>
@@ -197,7 +198,7 @@
                     <input-type>tag</input-type>
                     <hint>Enter appropriate subject keywords or phrases.</hint>
                     <required></required>
-                    <vocabulary>srsc</vocabulary>
+                    <vocabulary type="suggest">subject</vocabulary>
                 </field>
             </row>
             <row>
@@ -1083,7 +1084,7 @@
                     <input-type>tag</input-type>
                     <hint>Enter appropriate subject keywords or phrases.</hint>
                     <required></required>
-                    <vocabulary>srsc</vocabulary>
+                    <vocabulary type="suggest">subject</vocabulary>
                 </field>
             </row>
 
