@@ -403,7 +403,8 @@ public class DSpaceObjectDeletionProcessIT extends AbstractEntityIntegrationTest
                          .collect(Collectors.toList());
     }
 
-    private void runDeletionProcessScript(String[] args, TestDSpaceRunnableHandler handler) throws IllegalAccessException, InstantiationException, ParseException {
+    private void runDeletionProcessScript(String[] args, TestDSpaceRunnableHandler handler)
+        throws IllegalAccessException, InstantiationException, ParseException {
         DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig =
             scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
         DSpaceObjectDeletionProcess<?> deletionProcess =
