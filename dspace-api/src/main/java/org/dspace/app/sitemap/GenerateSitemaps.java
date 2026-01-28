@@ -7,6 +7,7 @@
  */
 package org.dspace.app.sitemap;
 
+import static org.dspace.core.Constants.ENTITY_TYPE_NONE;
 import static org.dspace.discovery.SearchUtils.RESOURCE_TYPE_FIELD;
 
 import java.io.File;
@@ -255,8 +256,12 @@ public class GenerateSitemaps {
                     List<String> entityTypeFieldValues = discoverResult.getSearchDocument(doc).get(0)
                                             .getSearchFieldValues("search.entitytype");
                     if (CollectionUtils.isNotEmpty(entityTypeFieldValues)) {
-                        url = uiURLStem + "entities/" + StringUtils.lowerCase(entityTypeFieldValues.get(0)) + "/"
-                                + doc.getID();
+                        String entityType = StringUtils.lowerCase(entityTypeFieldValues.get(0));
+                        if (!ENTITY_TYPE_NONE.equalsIgnoreCase(entityType)) {
+                            url = uiURLStem + "entities/" + entityType + "/" + doc.getID();
+                        } else {
+                            url = uiURLStem + "items/" + doc.getID();
+                        }
                     } else {
                         url = uiURLStem + "items/" + doc.getID();
                     }

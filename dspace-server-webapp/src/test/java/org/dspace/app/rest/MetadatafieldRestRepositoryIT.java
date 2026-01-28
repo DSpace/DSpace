@@ -86,7 +86,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/metadatafields")
-            .param("size", String.valueOf(100)))
+            .param("size", String.valueOf(200)))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
@@ -98,7 +98,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                    .andExpect(jsonPath("$._links.next.href", Matchers.containsString("/api/core/metadatafields")))
                    .andExpect(jsonPath("$._links.last.href", Matchers.containsString("/api/core/metadatafields")))
 
-                   .andExpect(jsonPath("$.page.size", is(100)));
+                   .andExpect(jsonPath("$.page.size", is(200)));
     }
 
     @Test

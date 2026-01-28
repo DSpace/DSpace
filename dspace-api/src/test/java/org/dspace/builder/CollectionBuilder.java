@@ -81,12 +81,12 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     private CollectionBuilder create(final Community parent, final String handle) {
         try {
-            for (Collection collection : this.collectionService.findAll(context)) {
+            for (Collection collection : collectionService.findAll(context)) {
                 if (collection.getHandle().equalsIgnoreCase(handle)) {
                     this.collection = collection;
                 }
             }
-            this.collection = this.collectionService.create(context, parent, handle);
+            this.collection = collectionService.create(context, parent, handle);
         } catch (Exception e) {
             return handleException(e);
         }

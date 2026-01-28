@@ -36,6 +36,7 @@ public class DiscoverQuery {
     private List<String> dspaceObjectFilters = new ArrayList<>();
     private final List<String> fieldPresentQueries;
     private boolean spellCheck;
+    private boolean includeNotDiscoverableOrWithdrawn;
 
     private int start = 0;
     private int maxResults = -1;
@@ -410,5 +411,13 @@ public class DiscoverQuery {
      */
     public void setDiscoveryConfigurationName(String discoveryConfigurationName) {
         this.discoveryConfigurationName = discoveryConfigurationName;
+    }
+
+    public boolean isIncludeNotDiscoverableOrWithdrawn() {
+        return includeNotDiscoverableOrWithdrawn;
+    }
+
+    public void setIncludeNotDiscoverableOrWithdrawn(boolean includeNotDiscoverableAndWithdrawn) {
+        this.includeNotDiscoverableOrWithdrawn = includeNotDiscoverableAndWithdrawn;
     }
 }

@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.FactoryConfigurationError;
 
@@ -706,6 +707,51 @@ public class DCInputsReader {
             }
         }
         throw new DCInputsReaderException("No field configuration found!");
+    }
+
+
+    /**
+     * Returns a list of set of DC inputs belonging to group field used for a particular input form
+     *
+     * @param formName input form unique name
+     * @return List of DC input set
+     * @throws DCInputsReaderException if not found
+     */
+    public List<DCInputSet> getInputsByGroup(String formName)
+        throws DCInputsReaderException {
+
+        List<DCInputSet> results = new ArrayList<DCInputSet>();
+
+        // cache miss - construct new DCInputSet
+        List<List<Map<String, String>>> pages = formDefns.get(formName);
+        if (pages == null) {
+            return results;
+        }
+
+        Iterator<List<Map<String, String>>> iterator = pages.iterator();
+
+        while (iterator.hasNext()) {
+            List<Map<String, String>> input = iterator.next();
+
+            for (Map<String, String> entry : input) {
+                Set<Map.Entry<String, String>> entrySet =
+                    entry.entrySet();
+
+                for (Map.Entry<String, String> attr : entrySet) {
+                    if (attr.getKey().equals("input-type") &&
+                        (attr.getValue().equals("group") || attr.getValue().equals("inline-group"))) {
+                        String schema = entry.get("dc-schema");
+                        String element = entry.get("dc-element");
+                        String qualifier = entry.get("dc-qualifier");
+                        String subFormName = formName + "-" + Utils.standardize(schema, element, qualifier, "-");
+                        results.add(getInputsByFormName(subFormName));
+                    }
+                }
+            }
+
+        }
+
+        return results;
     }
 
 }
