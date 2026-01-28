@@ -2855,7 +2855,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient(token).perform(patch("/api/core/bitstreams")
                                      .content(patchBody)
                                      .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                        .andExpect(status().isForbidden());
+                        .andExpect(status().isUnprocessableEntity());
         // Remove the bitstream that does not originate from the collection we are administrator of, should return OK
         ops.remove(0);
         patchBody = getPatchContent(ops);
