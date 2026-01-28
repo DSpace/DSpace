@@ -8,7 +8,9 @@
 package org.dspace.content;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,6 +23,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -104,7 +108,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
             ReflectionTestUtils.setField(itemService, "authorizeService", authorizeServiceSpy);
             // Also wire into current AuthorizeServiceFactory, as that is used for some checks (e.g. AuthorizeUtil)
             ReflectionTestUtils.setField(AuthorizeServiceFactory.getInstance(), "authorizeService",
-                                         authorizeServiceSpy);
+                    authorizeServiceSpy);
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
             fail("Authorization Error in init: " + ex.getMessage());
@@ -184,15 +188,15 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         String handleAdditionalPrefixes = configurationService.getProperty("handle.additional.prefixes");
 
         try {
-        configurationService.setProperty("handle.additional.prefixes", "987654321");
+            configurationService.setProperty("handle.additional.prefixes", "987654321");
 
-        // test creating collection with a specified handle which is NOT already in use
-        // (this handle should not already be used by system, as it doesn't start with "1234567689" prefix)
-        Collection created = collectionService.create(context, owningCommunity, "987654321/100");
+            // test creating collection with a specified handle which is NOT already in use
+            // (this handle should not already be used by system, as it doesn't start with "1234567689" prefix)
+            Collection created = collectionService.create(context, owningCommunity, "987654321/100");
 
-        // check that collection was created, and that its handle was set to proper value
-        assertThat("testCreateWithValidHandle 0", created, notNullValue());
-        assertThat("testCreateWithValidHandle 1", created.getHandle(), equalTo("987654321/100"));
+            // check that collection was created, and that its handle was set to proper value
+            assertThat("testCreateWithValidHandle 0", created, notNullValue());
+            assertThat("testCreateWithValidHandle 1", created.getHandle(), equalTo("987654321/100"));
 
         } finally {
             configurationService.setProperty("handle.additional.prefixes", handleAdditionalPrefixes);
@@ -586,7 +590,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testGetLicense() {
         assertThat("testGetLicense 0", collectionService.getLicense(collection), notNullValue());
         assertThat("testGetLicense 1", collectionService.getLicense(collection),
-                   equalTo(licenseService.getDefaultSubmissionLicense()));
+                equalTo(licenseService.getDefaultSubmissionLicense()));
     }
 
     /**
@@ -721,10 +725,10 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.REMOVE);
         // Allow Item DELETE perms
         doNothing().when(authorizeServiceSpy)
-                   .authorizeAction(any(Context.class), any(Item.class), eq(Constants.DELETE));
+                .authorizeAction(any(Context.class), any(Item.class), eq(Constants.DELETE));
         // Allow Item REMOVE perms
         doNothing().when(authorizeServiceSpy)
-                   .authorizeAction(any(Context.class), any(Item.class), eq(Constants.REMOVE));
+                .authorizeAction(any(Context.class), any(Item.class), eq(Constants.REMOVE));
 
         // create & add item first
         context.turnOffAuthorisationSystem();
@@ -751,7 +755,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testRemoveItemNoAuth() throws Exception {
         // Disallow Collection REMOVE perms
         doThrow(new AuthorizeException()).when(authorizeServiceSpy)
-                                         .authorizeAction(context, collection, Constants.REMOVE);
+                .authorizeAction(context, collection, Constants.REMOVE);
 
         // create & add item first
         context.turnOffAuthorisationSystem();
@@ -795,7 +799,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testUpdateNoAuth() throws Exception {
         // Disallow Collection WRITE perms
         doThrow(new AuthorizeException()).when(authorizeServiceSpy)
-                                         .authorizeAction(context, collection, Constants.WRITE, true);
+                .authorizeAction(context, collection, Constants.WRITE, true);
 
         collectionService.update(context, collection);
         fail("Exception expected");
@@ -831,7 +835,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testCanEditBooleanNoAuth() throws Exception {
         // Disallow Collection WRITE perms
         doThrow(new AuthorizeException()).when(authorizeServiceSpy)
-                                         .authorizeAction(context, collection, Constants.WRITE, true);
+                .authorizeAction(context, collection, Constants.WRITE, true);
 
         assertFalse("testCanEditBooleanNoAuth 0", collectionService.canEditBoolean(context, collection));
     }
@@ -845,7 +849,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.WRITE, true);
 
         assertTrue("testCanEditBooleanAuth_useInheritance",
-                   collectionService.canEditBoolean(context, collection, true));
+                collectionService.canEditBoolean(context, collection, true));
     }
 
     /**
@@ -857,7 +861,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         doNothing().when(authorizeServiceSpy).authorizeAction(context, owningCommunity, Constants.WRITE, true);
 
         assertTrue("testCanEditBooleanAuth2_useInheritance",
-                   collectionService.canEditBoolean(context, collection, true));
+                collectionService.canEditBoolean(context, collection, true));
     }
 
     /**
@@ -869,7 +873,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.WRITE, false);
 
         assertTrue("testCanEditBooleanAuth_noInheritance",
-                   collectionService.canEditBoolean(context, collection, false));
+                collectionService.canEditBoolean(context, collection, false));
     }
 
     /**
@@ -878,7 +882,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     @Test
     public void testCanEditBooleanAuth2_noInheritance() throws Exception {
         assertFalse("testCanEditBooleanAuth_noInheritance",
-                    collectionService.canEditBoolean(context, collection, false));
+                collectionService.canEditBoolean(context, collection, false));
     }
 
 
@@ -889,7 +893,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testCanEditBooleanNoAuth_boolean() throws Exception {
         // Disallow Collection WRITE perms
         doThrow(new AuthorizeException()).when(authorizeServiceSpy)
-                                         .authorizeAction(context, collection, Constants.WRITE, true);
+                .authorizeAction(context, collection, Constants.WRITE, true);
 
         assertFalse("testCanEditBooleanNoAuth_boolean 0", collectionService.canEditBoolean(context, collection, true));
     }
@@ -901,7 +905,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testCanEditBooleanNoAuth2_boolean() throws Exception {
         // Disallow Collection WRITE perms
         doThrow(new AuthorizeException()).when(authorizeServiceSpy)
-                                         .authorizeAction(context, collection, Constants.WRITE, false);
+                .authorizeAction(context, collection, Constants.WRITE, false);
 
         assertFalse("testCanEditBooleanNoAuth_boolean 0", collectionService.canEditBoolean(context, collection, false));
     }
@@ -925,7 +929,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testCanEditNoAuth_0args() throws Exception {
         // Disallow Collection WRITE perms
         doThrow(new AuthorizeException()).when(authorizeServiceSpy)
-                                         .authorizeAction(context, collection, Constants.WRITE, true);
+                .authorizeAction(context, collection, Constants.WRITE, true);
 
         collectionService.canEdit(context, collection);
         fail("Exception expected");
@@ -1017,15 +1021,15 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         context.turnOffAuthorisationSystem();
         Community community = communityService.create(null, context);
         communityService.setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
-                                                "title", null, Item.ANY, "community 3");
+                "title", null, Item.ANY, "community 3");
         this.collection.addCommunity(community);
         community = communityService.create(null, context);
         communityService.setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
-                                                "title", null, Item.ANY, "community 1");
+                "title", null, Item.ANY, "community 1");
         this.collection.addCommunity(community);
         community = communityService.create(null, context);
         communityService.setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
-                                                "title", null, Item.ANY, "community 2");
+                "title", null, Item.ANY, "community 2");
         this.collection.addCommunity(community);
         context.restoreAuthSystemState();
         assertTrue("testGetCommunities 0", collection.getCommunities().size() == 4);
@@ -1356,15 +1360,15 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testGetAdminObject() throws SQLException {
         //default community has no admin object
         assertThat("testGetAdminObject 0",
-                   (Collection) collectionService.getAdminObject(context, collection, Constants.REMOVE),
-                   equalTo(collection));
+                (Collection) collectionService.getAdminObject(context, collection, Constants.REMOVE),
+                equalTo(collection));
         assertThat("testGetAdminObject 1",
-                   (Collection) collectionService.getAdminObject(context, collection, Constants.ADD),
-                   equalTo(collection));
+                (Collection) collectionService.getAdminObject(context, collection, Constants.ADD),
+                equalTo(collection));
         assertThat("testGetAdminObject 2", collectionService.getAdminObject(context, collection, Constants.DELETE),
-                   instanceOf(Community.class));
+                instanceOf(Community.class));
         assertThat("testGetAdminObject 3", collectionService.getAdminObject(context, collection, Constants.ADMIN),
-                   instanceOf(Collection.class));
+                instanceOf(Collection.class));
     }
 
     /**
@@ -1375,7 +1379,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testGetParentObject() throws SQLException {
         assertThat("testGetParentObject 1", collectionService.getParentObject(context, collection), notNullValue());
         assertThat("testGetParentObject 2", (Community) collectionService.getParentObject(context, collection),
-                   equalTo(owningCommunity));
+                equalTo(owningCommunity));
     }
 
     /**
@@ -1390,14 +1394,14 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         Group submitters = groupService.create(context);
         Collection collection = collectionService.create(context, com);
         collectionService.addMetadata(context, collection, "dspace", "entity", "type",
-            null, "Publication");
+                null, "Publication");
         com.addCollection(collection);
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
         Item item = installItemService.installItem(context, workspaceItem);
         EPerson epersonA = ePersonService.create(context);
         Collection collectionPerson = collectionService.create(context, com);
         collectionService.addMetadata(context, collectionPerson, "dspace", "entity", "type",
-            null, "Person");
+                null, "Person");
         collectionPerson.setSubmitters(submitters);
         groupService.addMember(context, submitters, epersonA);
         context.setCurrentUser(epersonA);
@@ -1424,14 +1428,14 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         Group submitters = groupService.create(context);
         Collection collection = collectionService.create(context, com);
         collectionService.addMetadata(context, collection, "dspace", "entity", "type",
-            null, "Publication");
+                null, "Publication");
         com.addCollection(collection);
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
         Item item = installItemService.installItem(context, workspaceItem);
         EPerson epersonA = ePersonService.create(context);
         Collection collectionPerson = collectionService.create(context, com);
         collectionService.addMetadata(context, collectionPerson, "dspace", "entity", "type",
-            null, "Person");
+                null, "Person");
         collectionPerson.setSubmitters(submitters);
         groupService.addMember(context, submitters, epersonA);
         context.setCurrentUser(epersonA);
@@ -1444,5 +1448,46 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         assertThat("testRetrieveCollectionWithSubmitByEntityType 1", resultCollection, equalTo(collectionPerson));
 
         context.setDispatcher("exclude-discovery");
+    }
+
+    /**
+     * Test of move method, of class Collection.
+     */
+    @Test
+    public void testMove() throws Exception {
+        //we disable the permission testing as it's shared with other methods where it's already tested (can edit)
+        context.turnOffAuthorisationSystem();
+        Community from = createCommunity();
+        Community to = createCommunity();
+        collection.addCommunity(from);
+        collectionService.move(context, collection, from, to, true);
+        context.restoreAuthSystemState();
+        assertThat("testMove 0", collection.getCommunities(), notNullValue());
+        assertThat("testMove 1", collection.getCommunities(), hasItem(to));
+        assertThat("testMove 2", collection.getCommunities(), not(hasItem(from)));
+    }
+
+    /**
+     * Test of move method, of class Collection, where both Communities are the same.
+     */
+    @Test
+    public void testMoveSameCommunity() throws Exception {
+        context.turnOffAuthorisationSystem();
+        while (collection.getCommunities().size() > 1) {
+            collection.removeCommunity(collection.getCommunities().get(0));
+        }
+
+        Community community = collection.getCommunities().get(0);
+        CollectionService collectionServiceSpy = spy(collectionService);
+
+        collectionService.move(context, collection, community, community, true);
+        context.restoreAuthSystemState();
+        assertThat("testMoveSameCommunity 0", collection.getCommunities(), notNullValue());
+        assertThat("testMoveSameCommunity 1", collection.getCommunities().get(0), equalTo(community));
+        verify(collectionServiceSpy, times(0)).delete(context, collection);
+    }
+
+    protected Community createCommunity() throws SQLException, AuthorizeException {
+        return communityService.create(owningCommunity, context);
     }
 }
