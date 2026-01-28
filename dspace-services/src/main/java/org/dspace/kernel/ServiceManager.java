@@ -57,7 +57,7 @@ public interface ServiceManager {
      *             the interface class but can be concrete as well).
      * @return the service singleton OR null if none is found
      */
-    public <T> T getServiceByName(String name, Class<T> type);
+    <T> T getServiceByName(String name, Class<? super T> type);
 
     /**
      * Lookup to see if a service exists with the given name.

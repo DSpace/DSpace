@@ -33,7 +33,7 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Override
     public <S extends ScriptConfiguration<? extends DSpaceRunnable<?>>> S getScriptConfiguration(String name) {
-        return (S) serviceManager.getServiceByName(name, ScriptConfiguration.class);
+        return serviceManager.getServiceByName(name, ScriptConfiguration.class);
     }
 
     @Override

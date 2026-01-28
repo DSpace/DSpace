@@ -19,8 +19,6 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -49,8 +47,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Component(ScriptRest.CATEGORY + "." + ScriptRest.PLURAL_NAME)
 public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, String> {
 
-    private static final Logger log = LogManager.getLogger();
-
     @Autowired
     private ScriptService scriptService;
 
@@ -64,7 +60,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     // authorization is verified inside the method
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public ScriptRest findOne(Context context, String name) {
-        ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(name);
+        ScriptConfiguration<?> scriptConfiguration = scriptService.getScriptConfiguration(name);
         if (scriptConfiguration != null) {
             if (scriptConfiguration.isAllowedToExecute(context, null)) {
                 return converter.toRest(scriptConfiguration, utils.obtainProjection());
@@ -101,7 +97,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         String properties = requestService.getCurrentRequest().getServletRequest().getParameter("properties");
         List<DSpaceCommandLineParameter> dSpaceCommandLineParameters =
             processPropertiesToDSpaceCommandLineParameters(properties);
-        ScriptConfiguration scriptToExecute = scriptService.getScriptConfiguration(scriptName);
+        ScriptConfiguration<?> scriptToExecute = scriptService.getScriptConfiguration(scriptName);
 
         if (scriptToExecute == null) {
             throw new ResourceNotFoundException("The script for name: " + scriptName + " wasn't found");
@@ -147,10 +143,11 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         return args;
     }
 
-    private void runDSpaceScript(List<MultipartFile> files, Context context, ScriptConfiguration scriptToExecute,
+    private void runDSpaceScript(List<MultipartFile> files, Context context,
+                                 ScriptConfiguration<? extends DSpaceRunnable<?>> scriptToExecute,
                                  RestDSpaceRunnableHandler restDSpaceRunnableHandler, List<String> args)
         throws IOException, SQLException, AuthorizeException, InstantiationException, IllegalAccessException {
-        DSpaceRunnable dSpaceRunnable = scriptService.createDSpaceRunnableForScriptConfiguration(scriptToExecute);
+        DSpaceRunnable<?> dSpaceRunnable = scriptService.createDSpaceRunnableForScriptConfiguration(scriptToExecute);
         try {
             dSpaceRunnable.initialize(args.toArray(new String[0]), restDSpaceRunnableHandler, context.getCurrentUser());
             if (files != null && !files.isEmpty()) {
@@ -186,7 +183,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
      * @param dSpaceRunnable   The script that we'll attempt to run
      * @param files             The list of files in the request
      */
-    private void checkFileNames(DSpaceRunnable dSpaceRunnable, List<MultipartFile> files) {
+    private void checkFileNames(DSpaceRunnable<?> dSpaceRunnable, List<MultipartFile> files) {
         List<String> fileNames = new LinkedList<>();
         for (MultipartFile file : files) {
             String fileName = file.getOriginalFilename();
