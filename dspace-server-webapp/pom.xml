@@ -301,7 +301,7 @@
         <!-- Spring Boot dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
             <version>${spring-boot.version}</version>
             <exclusions>
                 <!-- Later version provided by dspace-api -->
@@ -327,12 +327,6 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-            <version>${spring-boot.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
             <version>${spring-boot.version}</version>
             <exclusions>
@@ -353,6 +347,13 @@
             <groupId>com.flipkart.zjsonpatch</groupId>
             <artifactId>zjsonpatch</artifactId>
             <version>0.4.16</version>
+            <exclusions>
+                <!-- Exclude Jackson 2 - managed by parent pom for IIIF module -->
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- HAL Browser (via WebJars) : https://github.com/mikekelly/hal-browser -->
@@ -473,6 +474,11 @@
             <artifactId>spring-boot-starter-log4j2</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
+  <dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-restclient</artifactId>
+   <version>4.0.1</version>
+  </dependency>
 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -505,6 +511,23 @@
             <artifactId>dspace-services</artifactId>
         </dependency>
 
+        <!-- Jetty client required by Solr 10.x HttpJettySolrClient -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-client</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.http2</groupId>
+            <artifactId>jetty-http2-client</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.http2</groupId>
+            <artifactId>jetty-http2-client-transport</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+
         <!-- DSpace modules to deploy (these modules are all optional, but add features/endpoints to webapp) -->
         <!-- You may choose to comment out any of these modules if you do not want/need its features -->
         <dependency>
@@ -532,13 +555,19 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
         </dependency>
+  <dependency>
+   <groupId>org.apache.httpcomponents.client5</groupId>
+   <artifactId>httpclient5</artifactId>
+   <version>5.4.4</version>
+  </dependency>
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+   <version>3.0.3</version>
         </dependency>
 
         <dependency>
@@ -585,7 +614,13 @@
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <version>${ehcache.version}</version>
+   <classifier>jakarta</classifier>
         </dependency>
+  <dependency>
+   <groupId>org.jspecify</groupId>
+   <artifactId>jspecify</artifactId>
+   <version>1.0.0</version>
+  </dependency>
 
         <!-- TEST DEPENDENCIES -->
         <dependency>
@@ -593,6 +628,70 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Jersey dependencies required by Solr 10.x EmbeddedSolrServer for tests -->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>3.1.11</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>3.1.11</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- OpenTelemetry required by Solr 10.x EmbeddedSolrServer for tests -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
+            <version>1.56.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk</artifactId>
+            <version>1.56.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk-metrics</artifactId>
+            <version>1.56.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-runtime-telemetry-java17</artifactId>
+            <version>2.18.0-alpha</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-exporter-prometheus</artifactId>
+            <version>1.56.0-alpha</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Apache Curator required by Solr 10.x EmbeddedSolrServer for tests (ZooKeeper support) -->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>5.8.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Solr streaming expressions required by Solr 10.x EmbeddedSolrServer for tests -->
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj-streaming</artifactId>
+            <version>${solr.client.version}</version>
+            <scope>test</scope>
+        </dependency>
+  <dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-webmvc-test</artifactId>
+   <version>4.0.1</version>
+   <scope>test</scope>
+  </dependency>
         <!-- Required for ITs to ensure they use Apache HttpClient in AbstractWebClientIntegrationTest -->
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
@@ -601,9 +700,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <version>${spring-security.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-test</artifactId>
+            <version>${spring-boot.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -622,13 +721,25 @@
             <artifactId>json-path-assert</artifactId>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
+            <scope>test</scope>
+        </dependency>
+  <dependency>
+   <groupId>org.hamcrest</groupId>
+   <artifactId>hamcrest-junit</artifactId>
+   <version>2.0.0.0</version>
+   <scope>test</scope>
+  </dependency>
+  <dependency>
+        <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- JUnit Platform Launcher required for maven-surefire-plugin 3.x -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -641,6 +752,17 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+  <dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-resttestclient</artifactId>
+   <version>4.0.1</version>
+   <scope>test</scope>
+  </dependency>
         <!-- Solr Core is needed for Integration Tests (to run a MockSolrServer)     -->
         <!-- The following Solr / Lucene dependencies also support integration tests -->
         <dependency>
@@ -662,17 +784,127 @@
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-icu</artifactId>
+            <artifactId>lucene-analysis-icu</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-smartcn</artifactId>
+            <artifactId>lucene-analysis-smartcn</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-stempel</artifactId>
+            <artifactId>lucene-analysis-stempel</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Lucene queries module required by Solr 10 for ValueSource -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queries</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Lucene suggest module required by Solr 10 for spell checking -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-suggest</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Lucene join module required by Solr 10 for BitSetProducer -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-join</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Lucene misc module required by Solr 10 -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-misc</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Lucene highlighter module required by Solr 10 -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-highlighter</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Lucene grouping module required by Solr 10 -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-grouping</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Lucene facet module required by Solr 10 -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-facet</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Lucene queryparser required by Solr 10 -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Lucene spatial-extras required by Solr 10 -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-spatial-extras</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Lucene sandbox required by Solr 10 -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-sandbox</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- HPPC (High Performance Primitive Collections) required by Solr 10 -->
+        <dependency>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>hppc</artifactId>
+            <version>0.10.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Additional OpenTelemetry dependencies for Solr 10 -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk-common</artifactId>
+            <version>1.56.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-runtime-telemetry-java8</artifactId>
+            <version>2.18.0-alpha</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.semconv</groupId>
+            <artifactId>opentelemetry-semconv</artifactId>
+            <version>1.37.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Curator client for Solr 10 ZooKeeper -->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-client</artifactId>
+            <version>5.8.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Jackson CBOR format required by Solr 10.x for CborResponseWriter -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-cbor</artifactId>
+            <version>2.18.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -684,6 +916,7 @@
         <dependency>
           <groupId>jakarta.annotation</groupId>
           <artifactId>jakarta.annotation-api</artifactId>
+   <scope>provided</scope>
         </dependency>
     </dependencies>
 

@@ -12,7 +12,7 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 import jakarta.inject.Named;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.dspace.service.impl.HttpConnectionPoolService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +55,9 @@ public class SolrStatisticsCore {
         log.info("usage-statistics.dbfile:  {}", configurationService.getProperty("usage-statistics.dbfile"));
 
         try {
-            solr = new HttpSolrClient.Builder(solrService)
-                    .withHttpClient(httpConnectionPoolService.getClient())
+            // Note: Cannot use custom HttpClient with Solr 8.x as it requires HttpClient 4
+            // and we've upgraded to HttpClient 5. Solr will manage its own connections.
+            solr = new HttpJettySolrClient.Builder(solrService)
                     .build();
         } catch (Exception e) {
             log.error("Error accessing Solr server configured in 'solr-statistics.server'", e);

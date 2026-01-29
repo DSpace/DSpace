@@ -12,16 +12,11 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
@@ -34,6 +29,10 @@ import org.dspace.qaevent.service.QAEventActionService;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Implementation of {@link QAEventActionService}.
@@ -68,7 +67,6 @@ public class QAEventActionServiceImpl implements QAEventActionService {
 
     public QAEventActionServiceImpl() {
         jsonMapper = new JsonMapper();
-        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @Override
@@ -91,7 +89,7 @@ public class QAEventActionServiceImpl implements QAEventActionService {
                 jsonMapper.readValue(qaevent.getMessage(), qaevent.getMessageDtoClass()));
             qaEventService.deleteEventByEventId(qaevent.getEventId());
             makeAcknowledgement(qaevent.getEventId(), qaevent.getSource(), QAEvent.ACCEPTED);
-        } catch (SQLException | JsonProcessingException e) {
+        } catch (SQLException | JacksonException e) {
             throw new RuntimeException(e);
         } finally {
             context.restoreAuthSystemState();

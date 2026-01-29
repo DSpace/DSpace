@@ -106,9 +106,11 @@ public class CanvasDimensionCLI {
                                   .hasArgs()
                                   .valueSeparator(',')
                                   .desc(
-                                      "SKIP the bitstreams belonging to identifier\n" +
-                                          "Separate multiple identifiers with a comma (,)\n" +
-                                          "(e.g. -s \n 123456789/34,123456789/323)")
+                                      """
+                                      SKIP the bitstreams belonging to identifier
+                                      Separate multiple identifiers with a comma (,)
+                                      (e.g. -s\s
+                                       123456789/34,123456789/323)""")
                                   .build();
         options.addOption(skipOption);
 
@@ -127,11 +129,15 @@ public class CanvasDimensionCLI {
             HelpFormatter help = new HelpFormatter();
             help.printHelp("CanvasDimension processor\n", options);
             System.out
-                .println("\nUUID example:    iiif-canvas-dimensions -e user@email.org " +
-                    "-i 1086306d-8a51-43c3-98b9-c3b00f49105f");
+                .println("""
+                    
+                    UUID example:    iiif-canvas-dimensions -e user@email.org \
+                    -i 1086306d-8a51-43c3-98b9-c3b00f49105f""");
             System.out
-                .println("\nHandle example:    iiif-canvas-dimensions -e user@email.org " +
-                        "-i 123456789/12");
+                .println("""
+
+                        Handle example:    iiif-canvas-dimensions -e user@email.org \
+                        -i 123456789/12""");
             return;
         }
 
@@ -167,9 +173,12 @@ public class CanvasDimensionCLI {
             skipIds = line.getOptionValues('s');
 
             if (skipIds == null || skipIds.length == 0) {   //display error, since no identifiers specified to skip
-                System.err.println("\nERROR: -s (-skip) option requires at least one identifier to SKIP.\n" +
-                    "Make sure to separate multiple identifiers with a comma!\n" +
-                    "(e.g. -s 123456789/34,123456789/323)\n");
+                System.err.println("""
+                    
+                    ERROR: -s (-skip) option requires at least one identifier to SKIP.
+                    Make sure to separate multiple identifiers with a comma!
+                    (e.g. -s 123456789/34,123456789/323)
+                    """);
                 HelpFormatter myhelp = new HelpFormatter();
                 myhelp.printHelp("Canvas Dimensions\n", options);
                 return;

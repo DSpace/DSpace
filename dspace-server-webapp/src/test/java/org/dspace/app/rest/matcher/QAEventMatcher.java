@@ -16,9 +16,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.hateoas.QAEventResource;
 import org.dspace.content.QAEvent;
@@ -28,6 +27,7 @@ import org.dspace.qaevent.service.dto.QAMessageDTO;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.IsAnything;
+import tools.jackson.core.JacksonException;
 
 
 /**
@@ -68,7 +68,7 @@ public class QAEventMatcher {
                     hasJsonPath("$._links.related.href", Matchers.endsWith(event.getEventId() + "/related")),
                     hasJsonPath("$._links.topic.href", Matchers.endsWith(event.getEventId() + "/topic")),
                     hasJsonPath("$.type", is("qualityassuranceevent")));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
@@ -90,13 +90,12 @@ public class QAEventMatcher {
                     hasJsonPath("$._links.related.href", Matchers.endsWith(event.getEventId() + "/related")),
                     hasJsonPath("$._links.topic.href", Matchers.endsWith(event.getEventId() + "/topic")),
                     hasJsonPath("$.type", is("qualityassuranceevent")));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
     private static Matcher<? super Object> matchMessage(String topic, QAMessageDTO message) {
-        if (message instanceof OpenaireMessageDTO) {
-            OpenaireMessageDTO oadto = (OpenaireMessageDTO) message;
+        if (message instanceof OpenaireMessageDTO oadto) {
             if (Strings.CS.endsWith(topic, "/ABSTRACT")) {
                 return allOf(hasJsonPath("$.abstract", is(oadto.getAbstracts())));
             } else if (Strings.CS.endsWith(topic, "/PID")) {
@@ -114,8 +113,7 @@ public class QAEventMatcher {
                         hasJsonPath("$.jurisdiction", is(oadto.getJurisdiction())),
                         hasJsonPath("$.title", is(oadto.getTitle())));
             }
-        } else if (message instanceof NotifyMessageDTO) {
-            NotifyMessageDTO notifyDTO = (NotifyMessageDTO) message;
+        } else if (message instanceof NotifyMessageDTO notifyDTO) {
             if (Strings.CS.endsWith(topic, "/REVIEW")) {
                 return allOf(
                             hasJsonPath("$.serviceName", is(notifyDTO.getServiceName())),

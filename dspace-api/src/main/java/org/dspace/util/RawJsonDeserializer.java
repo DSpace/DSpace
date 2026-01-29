@@ -9,27 +9,24 @@ package org.dspace.util;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
 
 /**
- * Extension of {@link JsonDeserializer} that convert a json to a String.
+ * Extension of {@link ValueDeserializer} that convert a json to a String.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class RawJsonDeserializer extends JsonDeserializer<String> {
+public class RawJsonDeserializer extends ValueDeserializer<String> {
 
     @Override
     public String deserialize(JsonParser jp, DeserializationContext ctxt)
-           throws IOException, JsonProcessingException {
-
-        ObjectMapper mapper = (ObjectMapper) jp.getCodec();
-        JsonNode node = mapper.readTree(jp);
-        return mapper.writeValueAsString(node);
+           throws JacksonException {
+        JsonNode node = jp.readValueAsTree();
+        return node.toString();
     }
 }

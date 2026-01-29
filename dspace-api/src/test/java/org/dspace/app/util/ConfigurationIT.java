@@ -12,14 +12,14 @@ import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.collection.ArrayMatching.arrayContainingInAnyOrder;
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for configuration utilities.
@@ -50,7 +50,7 @@ public class ConfigurationIT
     /**
      * Create some expected properties before all tests.
      */
-    @BeforeClass
+    @BeforeAll
     public static void setupSuite() {
         cfg = kernelImpl.getConfigurationService();
 
@@ -63,7 +63,7 @@ public class ConfigurationIT
     /**
      * After all tests, remove the properties that were created at entry.
      */
-    @AfterClass
+    @AfterAll
     public static void teardownSuite() {
         if (null != cfg) {
             cfg.setProperty(SINGLE_PROPERTY, null);
@@ -83,7 +83,7 @@ public class ConfigurationIT
 
         String stdout = tapSystemOut(() -> {
             int exitStatus = Configuration.runConfiguration(argv);
-            assertEquals("Exit status should be 0", 0, exitStatus);
+            assertEquals(0, exitStatus, "Exit status should be 0");
         });
 
         String[] output = stdout.trim().split("\n");
@@ -102,7 +102,7 @@ public class ConfigurationIT
 
         String stdout = tapSystemOut(() -> {
             int exitStatus = Configuration.runConfiguration(argv);
-            assertEquals("Exit status should be 0", 0, exitStatus);
+            assertEquals(0, exitStatus, "Exit status should be 0");
         });
 
         String[] output = stdout.trim().split("\n");
@@ -122,7 +122,7 @@ public class ConfigurationIT
 
         String stdout = tapSystemOut(() -> {
             int exitStatus = Configuration.runConfiguration(argv);
-            assertEquals("Exit status should be 0", 0, exitStatus);
+            assertEquals(0, exitStatus, "Exit status should be 0");
         });
 
         String[] output = stdout.trim().split("\n");
@@ -143,7 +143,7 @@ public class ConfigurationIT
 
         String stdout = tapSystemOut(() -> {
             int exitStatus = Configuration.runConfiguration(argv);
-            assertEquals("Exit status should be 0", 0, exitStatus);
+            assertEquals(0, exitStatus, "Exit status should be 0");
         });
 
         String[] output = stdout.trim().split("\n");
@@ -162,7 +162,7 @@ public class ConfigurationIT
 
         String stdout = tapSystemOut(() -> {
             int exitStatus = Configuration.runConfiguration(argv);
-            assertEquals("Exit status should be 0", 0, exitStatus);
+            assertEquals(0, exitStatus, "Exit status should be 0");
         });
 
         // Empty output for undefined property
@@ -182,12 +182,12 @@ public class ConfigurationIT
 
         String stdout = tapSystemOut(() -> {
             int exitStatus = Configuration.runConfiguration(argv);
-            assertEquals("Exit status should be 0", 0, exitStatus);
+            assertEquals(0, exitStatus, "Exit status should be 0");
         });
 
         String[] output = stdout.trim().split("\n");
         assertThat(output, arrayWithSize(1));
-        assertEquals("--first should return first value", ARRAY_VALUE[0], output[0]);
+        assertEquals(ARRAY_VALUE[0], output[0], "--first should return first value");
     }
 
     /**
@@ -202,11 +202,11 @@ public class ConfigurationIT
 
         String stdout = tapSystemOut(() -> {
             int exitStatus = Configuration.runConfiguration(argv);
-            assertEquals("Exit status should be 0", 0, exitStatus);
+            assertEquals(0, exitStatus, "Exit status should be 0");
         });
 
         String[] output = stdout.trim().split("\n");
         assertThat(output, arrayWithSize(1));
-        assertEquals("--first should return only value", SINGLE_VALUE, output[0]);
+        assertEquals(SINGLE_VALUE, output[0], "--first should return only value");
     }
 }

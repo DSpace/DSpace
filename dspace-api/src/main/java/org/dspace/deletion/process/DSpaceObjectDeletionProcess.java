@@ -94,7 +94,7 @@ public class DSpaceObjectDeletionProcess
         Optional<DSpaceObject> dSpaceObjectOptional = resolveDSpaceObject(this.id);
 
         if (dSpaceObjectOptional.isEmpty()) {
-            var error = String.format("DSpaceObject for provided identifier:%s doesn't exist!", this.id);
+            var error = "DSpaceObject for provided identifier:%s doesn't exist!".formatted(this.id);
             throw new IllegalArgumentException(error);
         }
 
@@ -105,7 +105,7 @@ public class DSpaceObjectDeletionProcess
         }
 
         var info = "Performing deletion of DSpaceObject (and all child objects) for type=%s and uuid=%s";
-        handler.logInfo(String.format(info, Constants.typeText[dso.getType()], dso.getID().toString()));
+        handler.logInfo(info.formatted(Constants.typeText[dso.getType()], dso.getID().toString()));
         getStrategy(dso).delete(this.context, dso, this.copyVirtualMetadata);
         handler.logInfo("Deletion completed!");
     }

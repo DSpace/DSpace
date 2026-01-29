@@ -6,6 +6,7 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.model.step;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,6 +20,7 @@ import org.dspace.app.rest.model.AccessConditionDTO;
  */
 public class DataAccessCondition implements SectionData {
 
+    @Serial
     private static final long serialVersionUID = -502652293641527738L;
 
     /**

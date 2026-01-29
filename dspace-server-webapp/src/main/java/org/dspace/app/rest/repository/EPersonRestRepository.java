@@ -8,12 +8,13 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -105,7 +106,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         EPersonRest epersonRest = null;
         try {
             epersonRest = mapper.readValue(req.getInputStream(), EPersonRest.class);
-        } catch (IOException e1) {
+        } catch (IOException | JacksonException e1) {
             throw new UnprocessableEntityException("error parsing the body... maybe this is not the right error code");
         }
         String token = req.getParameter("token");

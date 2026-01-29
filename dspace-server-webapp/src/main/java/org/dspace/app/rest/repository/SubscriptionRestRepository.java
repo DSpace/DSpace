@@ -14,6 +14,7 @@ import static org.dspace.core.Constants.COMMUNITY;
 import static org.dspace.core.Constants.READ;
 
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,8 +22,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
@@ -236,7 +237,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         SubscriptionRest subscriptionRest;
         try {
             subscriptionRest = mapper.readValue(jsonNode.toString(), SubscriptionRest.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new UnprocessableEntityException("Error parsing subscription json: " + e.getMessage(), e);
         }
 

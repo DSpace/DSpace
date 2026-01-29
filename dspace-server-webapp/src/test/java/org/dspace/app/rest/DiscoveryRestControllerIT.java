@@ -38,7 +38,7 @@ import java.nio.charset.Charset;
 import java.time.Period;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
@@ -84,8 +84,10 @@ import org.dspace.supervision.SupervisionOrder;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
@@ -108,6 +110,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
      */
     boolean escapeHTML;
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -116,6 +119,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
     }
 
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -2037,7 +2041,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     // This test has been disable due to its innate dependency on knowing the facetLimit
     // This is currently untrue and resulted in hardcoding of expectations.
     @Test
-    @Ignore
+    @Disabled
     public void discoverFacetsDateTestWithLabels() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
@@ -2406,7 +2410,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     //TODO Enable when solr fulltext indexing is policy-aware, see https://jira.duraspace.org/browse/DS-3758
     @Test
-    @Ignore
+    @Disabled
     public void discoverSearchObjectsTestWithContentInAPrivateBitstream() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();

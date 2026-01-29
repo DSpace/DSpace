@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import jakarta.annotation.Nonnull;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.CopyOperation;
@@ -58,16 +58,16 @@ public class JsonPatchConverter implements PatchConverter<JsonNode> {
         ArrayNode opNodes = (ArrayNode) jsonNode;
         List<Operation> ops = new ArrayList<Operation>(opNodes.size());
 
-        for (Iterator<JsonNode> elements = opNodes.elements(); elements.hasNext(); ) {
+        for (Iterator<JsonNode> elements = opNodes.elements().iterator(); elements.hasNext(); ) {
 
             JsonNode opNode = elements.next();
 
-            String opType = opNode.get("op").textValue();
-            String path = opNode.get("path").textValue();
+            String opType = opNode.get("op").asString();
+            String path = opNode.get("path").asString();
 
             JsonNode valueNode = opNode.get("value");
             Object value = valueFromJsonNode(path, valueNode);
-            String from = opNode.has("from") ? opNode.get("from").textValue() : null;
+            String from = opNode.has("from") ? opNode.get("from").asString() : null;
 
             //IDEA maybe if the operation have a universal name the PatchOperation can be retrieve here not in
             // WorkspaceItemRestRepository.evaluatePatch
@@ -107,16 +107,14 @@ public class JsonPatchConverter implements PatchConverter<JsonNode> {
             opNode.set("op", nodeFactory.textNode(operation.getOp()));
             opNode.set("path", nodeFactory.textNode(operation.getPath()));
 
-            if (operation instanceof FromOperation) {
-
-                FromOperation fromOp = (FromOperation) operation;
+            if (operation instanceof FromOperation fromOp) {
                 opNode.set("from", nodeFactory.textNode(fromOp.getFrom()));
             }
 
             Object value = operation.getValue();
 
             if (value != null) {
-                opNode.set("value", value instanceof JsonValueEvaluator ? ((JsonValueEvaluator) value).getValueNode()
+                opNode.set("value", value instanceof JsonValueEvaluator jve ? jve.getValueNode()
                         : mapper.valueToTree(value));
             }
 
@@ -130,8 +128,8 @@ public class JsonPatchConverter implements PatchConverter<JsonNode> {
 
         if (valueNode == null || valueNode.isNull()) {
             return null;
-        } else if (valueNode.isTextual()) {
-            return valueNode.asText();
+        } else if (valueNode.isString()) {
+            return valueNode.asString();
         } else if (valueNode.isFloatingPointNumber()) {
             return valueNode.asDouble();
         } else if (valueNode.isBoolean()) {
@@ -145,7 +143,7 @@ public class JsonPatchConverter implements PatchConverter<JsonNode> {
         }
 
         throw new PatchException(
-            String.format("Unrecognized valueNode type at path %s and value node %s.", path, valueNode));
+            "Unrecognized valueNode type at path %s and value node %s.".formatted(path, valueNode));
     }
 
 

@@ -78,13 +78,13 @@ public class RootRest extends RestAddressableModel {
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof RootRest &&
-            new EqualsBuilder().append(this.getCategory(), ((RootRest) object).getCategory())
-                               .append(this.getType(), ((RootRest) object).getType())
-                               .append(this.getController(), ((RootRest) object).getController())
-                               .append(this.getDspaceUI(), ((RootRest) object).getDspaceUI())
-                               .append(this.getDspaceName(), ((RootRest) object).getDspaceName())
-                               .append(this.getDspaceServer(), ((RootRest) object).getDspaceServer())
+        return (object instanceof RootRest rr &&
+            new EqualsBuilder().append(this.getCategory(), rr.getCategory())
+                               .append(this.getType(), rr.getType())
+                               .append(this.getController(), rr.getController())
+                               .append(this.getDspaceUI(), rr.getDspaceUI())
+                               .append(this.getDspaceName(), rr.getDspaceName())
+                               .append(this.getDspaceServer(), rr.getDspaceServer())
                                .isEquals());
     }
 

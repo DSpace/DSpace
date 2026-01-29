@@ -16,8 +16,8 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.MetadataFieldService;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit Tests for Performance of class MetadataField
@@ -48,10 +48,10 @@ public class MetadataFieldPerformanceTest extends AbstractUnitTest {
         double maxDuration = maxDurationPerCall * amount;
         //Duration is 0.05798 without performance improvements
         //Duration is 0.0022 with performance improvements
-        Assert.assertTrue("Duration (" + duration + ") should be smaller than " + maxDuration +
+        Assertions.assertTrue(duration < maxDuration, "Duration (" + duration + ") should be smaller than " + maxDuration +
                 " for " + amount + " tests." +
                 " Max of " + maxDurationPerCall + " ms per operation exceeded: " +
-                (((double) duration) / amount) + " ms.", duration < maxDuration);
+                (((double) duration) / amount) + " ms.");
     }
 
     @Test
@@ -79,10 +79,10 @@ public class MetadataFieldPerformanceTest extends AbstractUnitTest {
         double maxDuration = maxDurationPerCall * amount;
         //Duration is 1.542 without performance improvements
         //Duration is 0.0538 with performance improvements
-        Assert.assertTrue("Duration (" + duration + ") should be smaller than " + maxDuration +
+        Assertions.assertTrue(duration < maxDuration, "Duration (" + duration + ") should be smaller than " + maxDuration +
                 " for " + amount + " tests." +
                 " Max of " + maxDurationPerCall + " ms per operation exceeded: " +
-                (((double) duration) / amount) + " ms.", duration < maxDuration);
+                (((double) duration) / amount) + " ms.");
 
         context.turnOffAuthorisationSystem();
         // Delete community & collection created in init()

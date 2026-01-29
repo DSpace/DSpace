@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serial;
+
+
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -19,6 +22,7 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class EntityTypeRest extends BaseObjectRest<Integer> {
 
+    @Serial
     private static final long serialVersionUID = 8166078961459192770L;
 
     public static final String NAME = "entitytype";

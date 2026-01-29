@@ -10,7 +10,6 @@ package org.dspace.app.rest;
 import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT;
 import static org.dspace.core.Constants.EPERSON;
-import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -34,6 +33,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -53,7 +53,7 @@ public class ResourcePolicyEPersonReplaceRestController {
     private ResourcePolicyService resourcePolicyService;
 
     @PreAuthorize("hasPermission(#id, 'resourcepolicy', 'ADMIN')")
-    @RequestMapping(method = PUT, consumes = {"text/uri-list"})
+    @PutMapping( consumes = {"text/uri-list"})
     public ResponseEntity<RepresentationModel<?>> replaceEPersonOfResourcePolicy(@PathVariable Integer id,
             HttpServletResponse response, HttpServletRequest request) throws SQLException, AuthorizeException {
 

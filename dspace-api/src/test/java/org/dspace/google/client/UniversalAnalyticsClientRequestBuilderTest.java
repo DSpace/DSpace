@@ -8,18 +8,18 @@
 package org.dspace.google.client;
 
 import static java.util.List.of;
-import static org.apache.commons.lang.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.countMatches;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
 import org.dspace.google.GoogleAnalyticsEvent;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link UniversalAnalyticsClientRequestBuilder}.
@@ -31,7 +31,7 @@ public class UniversalAnalyticsClientRequestBuilderTest {
 
     private UniversalAnalyticsClientRequestBuilder requestBuilder;
 
-    @Before
+    @BeforeEach
     public void setup() {
         requestBuilder = new UniversalAnalyticsClientRequestBuilder("https://google-analytics/test");
     }
@@ -58,8 +58,8 @@ public class UniversalAnalyticsClientRequestBuilderTest {
         GoogleAnalyticsEvent event = buildEvent("123", "192.168.1.25", "Chrome", "REF",
             "/api/documents/123", "Test publication");
 
-        assertThrows("Only keys with G- prefix are supported",
-            IllegalArgumentException.class, () -> requestBuilder.composeRequestsBody("G-12345", List.of(event)));
+        assertThrows(IllegalArgumentException.class,
+            () -> requestBuilder.composeRequestsBody("G-12345", List.of(event)), "Only keys with G- prefix are supported");
 
     }
 
@@ -101,10 +101,11 @@ public class UniversalAnalyticsClientRequestBuilderTest {
 
         String requestBodyWithoutTime = removeAllTimeSections(requestBody);
 
-        String expectedRequestBodyWithoutTime = "v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Chrome&dr=REF"
-            + "&dp=%2Fapi%2Fdocuments%2F123&dt=Test+publication&ec=bitstream&ea=download&el=item\n"
-            + "v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Mozilla+Firefox&dr=REF-2"
-            + "&dp=%2Fapi%2Fdocuments%2F12345&dt=Test+publication+2&ec=bitstream&ea=download&el=item";
+        String expectedRequestBodyWithoutTime = """
+            v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Chrome&dr=REF\
+            &dp=%2Fapi%2Fdocuments%2F123&dt=Test+publication&ec=bitstream&ea=download&el=item
+            v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Mozilla+Firefox&dr=REF-2\
+            &dp=%2Fapi%2Fdocuments%2F12345&dt=Test+publication+2&ec=bitstream&ea=download&el=item""";
 
         assertThat(requestBodyWithoutTime, is(expectedRequestBodyWithoutTime));
 
@@ -130,12 +131,13 @@ public class UniversalAnalyticsClientRequestBuilderTest {
 
         String requestBodyWithoutTime = removeAllTimeSections(requestBody);
 
-        String expectedRequestBodyWithoutTime = "v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Chrome&dr=REF"
-            + "&dp=%2Fapi%2Fdocuments%2F123&dt=Test+publication&ec=bitstream&ea=download&el=item\n"
-            + "v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Mozilla+Firefox&dr=REF-2"
-            + "&dp=%2Fapi%2Fdocuments%2F12345&dt=Test+publication+2&ec=bitstream&ea=download&el=item\n"
-            + "v=1&tid=UA-12345&cid=987&t=event&uip=192.168.1.13&ua=Postman&dr="
-            + "&dp=%2Fapi%2Fdocuments%2F654&dt=Test+publication+3&ec=bitstream&ea=download&el=item";
+        String expectedRequestBodyWithoutTime = """
+            v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Chrome&dr=REF\
+            &dp=%2Fapi%2Fdocuments%2F123&dt=Test+publication&ec=bitstream&ea=download&el=item
+            v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Mozilla+Firefox&dr=REF-2\
+            &dp=%2Fapi%2Fdocuments%2F12345&dt=Test+publication+2&ec=bitstream&ea=download&el=item
+            v=1&tid=UA-12345&cid=987&t=event&uip=192.168.1.13&ua=Postman&dr=\
+            &dp=%2Fapi%2Fdocuments%2F654&dt=Test+publication+3&ec=bitstream&ea=download&el=item""";
 
         assertThat(requestBodyWithoutTime, is(expectedRequestBodyWithoutTime));
 

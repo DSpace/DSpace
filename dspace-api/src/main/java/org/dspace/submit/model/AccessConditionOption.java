@@ -227,16 +227,14 @@ public class AccessConditionOption {
                 latestStartDate, latestEndDate);
         // throw if startDate after latestStartDate
         if (Objects.nonNull(startDate) && Objects.nonNull(latestStartDate) && startDate.isAfter(latestStartDate)) {
-            throw new IllegalStateException(String.format(
-                "The start date of access condition %s should be earlier than %s from now (%s).",
+            throw new IllegalStateException("The start date of access condition %s should be earlier than %s from now (%s).".formatted(
                 getName(), getStartDateLimit(), dateMathParser.getNow()
             ));
         }
 
         // throw if endDate after latestEndDate
         if (Objects.nonNull(endDate) && Objects.nonNull(latestEndDate)  && endDate.isAfter(latestEndDate)) {
-            throw new IllegalStateException(String.format(
-                "The end date of access condition %s should be earlier than %s from now (%s).",
+            throw new IllegalStateException("The end date of access condition %s should be earlier than %s from now (%s).".formatted(
                 getName(), getEndDateLimit(), dateMathParser.getNow()
             ));
         }

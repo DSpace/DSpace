@@ -75,9 +75,10 @@ public class UpdateHandlePrefix {
 
                 // Confirm with the user that this is what they want to do
                 System.out.print(
-                    "Servlet container (e.g. Apache Tomcat, Jetty, Caucho Resin) must be running.\n" +
-                        "If it is necessary, please make a backup of the database.\n" +
-                        "Are you ready to continue? [y/n]: "
+                    """
+                    Servlet container (e.g. Apache Tomcat, Jetty, Caucho Resin) must be running.
+                    If it is necessary, please make a backup of the database.
+                    Are you ready to continue? [y/n]: """
                 );
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
                 String choiceString = input.readLine();
@@ -147,9 +148,15 @@ public class UpdateHandlePrefix {
                         // Not a lot we can do
                         System.out.println("Error during re-indexing.");
                         System.out.println(
-                            "\n\nAutomatic re-indexing failed. Please perform it manually.\n\n" +
-                                "  [dspace]/bin/dspace index-discovery -b\n\n" +
-                                "When launching this command, your servlet container must be running.\n"
+                            """
+                            
+                            
+                            Automatic re-indexing failed. Please perform it manually.
+                            
+                              [dspace]/bin/dspace index-discovery -b
+                            
+                            When launching this command, your servlet container must be running.
+                            """
                         );
                         throw e;
                     }

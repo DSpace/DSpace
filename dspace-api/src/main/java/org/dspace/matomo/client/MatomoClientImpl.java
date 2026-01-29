@@ -13,11 +13,11 @@ import java.nio.charset.Charset;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.dspace.matomo.exception.MatomoClientException;
 
 /**
@@ -26,7 +26,7 @@ import org.dspace.matomo.exception.MatomoClientException;
  *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
-public class MatomoClientImpl extends MatomoAbstractClient<CloseableHttpClient, HttpPost, HttpResponse> {
+public class MatomoClientImpl extends MatomoAbstractClient<CloseableHttpClient, HttpPost, ClassicHttpResponse> {
 
     public MatomoClientImpl(
         String baseUrl, String token,
@@ -39,7 +39,7 @@ public class MatomoClientImpl extends MatomoAbstractClient<CloseableHttpClient, 
 
     @Override
     protected void executeRequest(
-        String requestBody, String cookies, BiConsumer<HttpResponse, String> responseConsumer
+        String requestBody, String cookies, BiConsumer<ClassicHttpResponse, String> responseConsumer
     ) {
         try (CloseableHttpResponse response = httpClient.execute(createRequest(requestBody, cookies))) {
             responseConsumer.accept(response, requestBody);
@@ -53,23 +53,19 @@ public class MatomoClientImpl extends MatomoAbstractClient<CloseableHttpClient, 
     @Override
     protected HttpPost createRequest(String requestBody, String cookies) {
         HttpPost httpPost = new HttpPost(baseUrl);
-        try {
-            httpPost.setHeader("Cookie", cookies);
-            httpPost.setEntity(new StringEntity(requestBody));
-        } catch (UnsupportedEncodingException e) {
-            throw new MatomoClientException("Error creating request", e);
-        }
+        httpPost.setHeader("Cookie", cookies);
+        httpPost.setEntity(new StringEntity(requestBody));
         return httpPost;
     }
 
 
     @Override
-    protected int getStatusCode(HttpResponse response) {
-        return response.getStatusLine().getStatusCode();
+    protected int getStatusCode(ClassicHttpResponse response) {
+        return response.getCode();
     }
 
     @Override
-    protected String getResponseContent(HttpResponse response) {
+    protected String getResponseContent(ClassicHttpResponse response) {
         try {
             return IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset());
         } catch (UnsupportedOperationException | IOException e) {

@@ -69,9 +69,8 @@ public class DailyReportEmailer {
                     = DSpaceServicesFactory.getInstance().getConfigurationService();
             String hostname = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
             Email email = new Email();
-            email.setSubject(String.format(
-                "Checksum checker Report - %d Bitstreams found with POSSIBLE issues on %s",
-                    numberOfBitstreams, hostname));
+            email.setSubject("Checksum checker Report - %d Bitstreams found with POSSIBLE issues on %s".formatted(
+                numberOfBitstreams, hostname));
             email.setContent("Checker Report", "report is attached ...");
             email.addAttachment(attachment, "checksum_checker_report.txt");
             email.addRecipient(configurationService.getProperty("mail.admin"));

@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serial;
+
+
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -17,6 +20,7 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class ExternalSourceRest extends BaseObjectRest<String> {
 
+    @Serial
     private static final long serialVersionUID = 6951711935287912124L;
 
     public static final String NAME = "externalsource";

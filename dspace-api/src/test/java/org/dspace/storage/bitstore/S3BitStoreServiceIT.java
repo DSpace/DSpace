@@ -17,16 +17,16 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
@@ -36,7 +36,7 @@ import java.util.Map;
 
 import com.adobe.testing.s3mock.testcontainers.S3MockContainer;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.matcher.LambdaMatcher;
 import org.dspace.authorize.AuthorizeException;
@@ -52,10 +52,10 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.regions.Region;
@@ -80,7 +80,7 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    @BeforeClass
+    @BeforeAll
     public static void setupS3() {
         s3Mock.start();
 
@@ -91,13 +91,13 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
                 .build();
     }
 
-    @AfterClass
+    @AfterAll
     public static void cleanupS3() {
         s3Mock.close();
         s3AsyncClient.close();
     }
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         configurationService.setProperty("assetstore.s3.enabled", "true");
 
@@ -453,7 +453,7 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
     // We use 'Paths' instead of splitting on slashes because these OSes use different path separators.
     private int countPathElements(String stringPath) {
         List<String> pathElements = new ArrayList<>();
-        Paths.get(stringPath).forEach(p -> pathElements.add(p.toString()));
+        Path.of(stringPath).forEach(p -> pathElements.add(p.toString()));
         return pathElements.size();
     }
 

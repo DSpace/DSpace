@@ -531,8 +531,8 @@ public class SwordConfigurationDSpace implements SwordConfiguration {
             return true;
         }
 
-        if (dso instanceof Collection) {
-            List<String> accepts = this.getAcceptPackaging((Collection) dso);
+        if (dso instanceof Collection collection) {
+            List<String> accepts = this.getAcceptPackaging(collection);
             for (String accept : accepts) {
                 if (accept.equals(packageFormat)) {
                     return true;

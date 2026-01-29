@@ -9,13 +9,15 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
+import tools.jackson.core.JacksonException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -134,7 +136,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         try {
             ServletInputStream input = req.getInputStream();
             communityRest = mapper.readValue(input, CommunityRest.class);
-        } catch (IOException e1) {
+        } catch (IOException | JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
 
@@ -254,7 +256,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         CommunityRest communityRest;
         try {
             communityRest = mapper.readValue(jsonNode.toString(), CommunityRest.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new UnprocessableEntityException("Error parsing community json: " + e.getMessage());
         }
         Community community = cs.find(context, id);
@@ -348,7 +350,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
                 }
             }
             metadataConverter.setMetadata(context, group, metadata);
-        } catch (IOException e1) {
+        } catch (IOException | JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
         return converter.toRest(group, utils.obtainProjection());

@@ -8,7 +8,7 @@
 package org.dspace.google.client;
 
 import static java.util.stream.Collectors.groupingBy;
-import static org.apache.commons.lang.StringUtils.startsWith;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +17,12 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.google.GoogleAnalyticsEvent;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Implementation of {@link GoogleAnalyticsClientRequestBuilder} that compose
@@ -96,7 +96,7 @@ public class GoogleAnalytics4ClientRequestBuilder implements GoogleAnalyticsClie
     private String toJsonAsString(GoogleAnalytics4EventsVO eventsVo) {
         try {
             return objectMapper.writeValueAsString(eventsVo);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new GoogleAnalyticsClientException(e);
         }
     }

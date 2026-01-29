@@ -14,8 +14,10 @@ import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Period;
+import java.util.List;
 import java.util.UUID;
 
+import org.dspace.app.ldn.NotifyPatternToTrigger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
@@ -424,10 +426,24 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             item = c.reloadEntity(item);
             if (item != null) {
+                 // Delete any NotifyPatternToTrigger entries that reference this item before deleting the item.
+                 // Required for Hibernate 7 compatibility - must delete referencing entities before the Item.
+                 deleteNotifyPatternsForItem(c, item);
                  delete(c, item);
             }
             c.complete();
        }
+    }
+
+    /**
+     * Delete all NotifyPatternToTrigger entries that reference the given Item.
+     * This must be done before deleting the Item to avoid TransientPropertyValueException in Hibernate 7.
+     */
+    private void deleteNotifyPatternsForItem(Context c, Item itemToClean) throws SQLException {
+        List<NotifyPatternToTrigger> patterns = notifyPatternToTriggerService.findByItem(c, itemToClean);
+        for (NotifyPatternToTrigger pattern : patterns) {
+            notifyPatternToTriggerService.delete(c, pattern);
+        }
     }
 
     @Override

@@ -7,9 +7,10 @@
  */
 package org.dspace.app.rest.repository;
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;

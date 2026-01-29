@@ -16,8 +16,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -38,6 +36,8 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Andrea Bollini (CILEA)
@@ -56,13 +56,11 @@ public class SolrBrowseDAO implements BrowseDAO {
         public int compare(Object o1, Object o2) {
             String s1 = "";
             String s2 = "";
-            if (o1 instanceof FacetResult && o2 instanceof String) {
-                FacetResult c = (FacetResult) o1;
+            if (o1 instanceof FacetResult c && o2 instanceof String string1) {
                 s1 = c.getSortValue();
-                s2 = (String) o2;
-            } else if (o2 instanceof FacetResult && o1 instanceof String) {
-                FacetResult c = (FacetResult) o2;
-                s1 = (String) o1;
+                s2 = string1;
+            } else if (o2 instanceof FacetResult c && o1 instanceof String string) {
+                s1 = string;
                 s2 = c.getSortValue();
             }
             // both object are FacetResult so they are already sorted

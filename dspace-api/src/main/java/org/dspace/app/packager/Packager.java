@@ -367,8 +367,10 @@ public class Packager {
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
                 System.out.println("\n\nWARNING -- You are running the packager in REPLACE mode.");
                 System.out.println(
-                    "\nREPLACE mode may be potentially dangerous as it will automatically remove and replace contents" +
-                        " within DSpace.");
+                    """
+                    
+                    REPLACE mode may be potentially dangerous as it will automatically remove and replace contents\
+                     within DSpace.""");
                 System.out.println(
                     "We highly recommend backing up all your DSpace contents (files & database) before continuing.");
                 System.out.print("\nWould you like to continue? [y/n]: ");

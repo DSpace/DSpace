@@ -12,17 +12,16 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.withSettings;
+import static org.mockito.Mockito.spy;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,10 +43,9 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.test.util.AopTestUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -78,13 +76,18 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     private AuthorizeService authorizeServiceSpy;
 
     /**
+     * Original AuthorizeService (saved before spying for restoration in @After)
+     */
+    private AuthorizeService originalAuthorizeService;
+
+    /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
      *
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -97,11 +100,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
 
+            // Save the original authorizeService before spying (for restoration in @After)
+            originalAuthorizeService = authorizeService;
+
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
-            Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
-            authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
-                withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
+            authorizeServiceSpy = spy(originalAuthorizeService);
             // "Wire" our spy to be used by the current loaded object services
             // (To ensure these services use the spy instead of the real service)
             ReflectionTestUtils.setField(communityService, "authorizeService", authorizeServiceSpy);
@@ -126,7 +130,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         context.turnOffAuthorisationSystem();
@@ -145,6 +149,16 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
 
         collection = null;
         owningCommunity = null;
+
+        // Restore the original authorizeService to prevent test pollution
+        if (originalAuthorizeService != null) {
+            ReflectionTestUtils.setField(communityService, "authorizeService", originalAuthorizeService);
+            ReflectionTestUtils.setField(collectionService, "authorizeService", originalAuthorizeService);
+            ReflectionTestUtils.setField(itemService, "authorizeService", originalAuthorizeService);
+            ReflectionTestUtils.setField(AuthorizeServiceFactory.getInstance(), "authorizeService",
+                                         originalAuthorizeService);
+        }
+
         super.destroy();
     }
 
@@ -208,18 +222,20 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     /**
      * Test of create method (with specified invalid handle), of class Collection.
      */
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testCreateWithInvalidHandle() throws Exception {
-        // Allow Community ADD perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, owningCommunity, Constants.ADD);
+        assertThrows(IllegalStateException.class, () -> {
+            // Allow Community ADD perms
+            doNothing().when(authorizeServiceSpy).authorizeAction(context, owningCommunity, Constants.ADD);
 
-        //get handle of our default created collection
-        String inUseHandle = collection.getHandle();
+            //get handle of our default created collection
+            String inUseHandle = collection.getHandle();
 
-        // test creating collection with a specified handle which IS already in use
-        // This should throw an exception
-        collectionService.create(context, owningCommunity, inUseHandle);
-        fail("Exception expected");
+            // test creating collection with a specified handle which IS already in use
+            // This should throw an exception
+            collectionService.create(context, owningCommunity, inUseHandle);
+            fail("Exception expected");
+        });
     }
 
 
@@ -230,7 +246,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testFindAll() throws Exception {
         List<Collection> all = collectionService.findAll(context);
         assertThat("testFindAll 0", all, notNullValue());
-        assertTrue("testFindAll 1", all.size() >= 1);
+        assertTrue(all.size() >= 1, "testFindAll 1");
 
         boolean added = false;
         for (Collection cl : all) {
@@ -238,7 +254,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
                 added = true;
             }
         }
-        assertTrue("testFindAll 2", added);
+        assertTrue(added, "testFindAll 2");
     }
 
     /**
@@ -249,7 +265,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         Iterator<Item> items = itemService.findByCollection(context, collection);
         assertThat("testGetItems 0", items, notNullValue());
         //by default is empty
-        assertFalse("testGetItems 1", items.hasNext());
+        assertFalse(items.hasNext(), "testGetItems 1");
     }
 
     /**
@@ -260,7 +276,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         Iterator<Item> items = itemService.findByCollection(context, collection);
         assertThat("testGetAllItems 0", items, notNullValue());
         //by default is empty
-        assertFalse("testGetAllItems 1", items.hasNext());
+        assertFalse(items.hasNext(), "testGetAllItems 1");
     }
 
     /**
@@ -269,12 +285,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     @Test
     @Override
     public void testGetID() {
-        assertTrue("testGetID 0", collection.getID() != null);
+        assertTrue(collection.getID() != null, "testGetID 0");
     }
 
     @Test
     public void testLegacyID() {
-        assertTrue("testGetLegacyID 0", collection.getLegacyId() == null);
+        assertTrue(collection.getLegacyId() == null, "testGetLegacyID 0");
     }
 
     /**
@@ -284,7 +300,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     @Override
     public void testGetHandle() {
         //default instance has a random handle
-        assertTrue("testGetHandle 0", collection.getHandle().contains("123456789/"));
+        assertTrue(collection.getHandle().contains("123456789/"), "testGetHandle 0");
     }
 
     /**
@@ -316,27 +332,27 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         collectionService.setMetadataSingleValue(context, collection,
                 CollectionService.MD_LICENSE, null, license);
 
-        assertEquals("Name was not set properly.", name,
-                collectionService.getMetadataFirstValue(collection,
-                        CollectionService.MD_NAME, Item.ANY));
-        assertEquals("Short description was not set properly.", sdesc,
-                collectionService.getMetadataFirstValue(collection,
-                        CollectionService.MD_SHORT_DESCRIPTION, Item.ANY));
-        assertEquals("Introductory text was not set properly.", itext,
-                collectionService.getMetadataFirstValue(collection,
-                        CollectionService.MD_INTRODUCTORY_TEXT, Item.ANY));
-        assertEquals("Copyright text was not set properly.", copy,
-                collectionService.getMetadataFirstValue(collection,
-                        CollectionService.MD_COPYRIGHT_TEXT, Item.ANY));
-        assertEquals("Sidebar text was not set properly.", sidebar,
-                collectionService.getMetadataFirstValue(collection,
-                        CollectionService.MD_SIDEBAR_TEXT, Item.ANY));
-        assertEquals("Provenance was not set properly.", provDesc,
-                collectionService.getMetadataFirstValue(collection,
-                        CollectionService.MD_PROVENANCE_DESCRIPTION, Item.ANY));
-        assertEquals("License text was not set properly.", license,
-                collectionService.getMetadataFirstValue(collection,
-                        CollectionService.MD_LICENSE, Item.ANY));
+        assertEquals(name, collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_NAME, Item.ANY),
+                "Name was not set properly.");
+        assertEquals(sdesc, collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_SHORT_DESCRIPTION, Item.ANY),
+                "Short description was not set properly.");
+        assertEquals(itext, collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_INTRODUCTORY_TEXT, Item.ANY),
+                "Introductory text was not set properly.");
+        assertEquals(copy, collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_COPYRIGHT_TEXT, Item.ANY),
+                "Copyright text was not set properly.");
+        assertEquals(sidebar, collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_SIDEBAR_TEXT, Item.ANY),
+                "Sidebar text was not set properly.");
+        assertEquals(provDesc, collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_PROVENANCE_DESCRIPTION, Item.ANY),
+                "Provenance was not set properly.");
+        assertEquals(license, collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_LICENSE, Item.ANY),
+                "License text was not set properly.");
     }
 
     /**
@@ -393,11 +409,13 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     /**
      * Test of setLogo method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testSetLogoNoAuth() throws Exception {
-        File f = new File(testProps.get("test.bitstream").toString());
-        collectionService.setLogo(context, collection, new FileInputStream(f));
-        fail("Exception expected");
+        assertThrows(AuthorizeException.class, () -> {
+            File f = new File(testProps.get("test.bitstream").toString());
+            collectionService.setLogo(context, collection, new FileInputStream(f));
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -416,11 +434,13 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     /**
      * Test of createWorkflowGroup method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testCreateWorkflowGroupNoAuth() throws Exception {
-        int step = 1;
-        collectionService.createWorkflowGroup(context, collection, step);
-        fail("Exception expected");
+        assertThrows(AuthorizeException.class, () -> {
+            int step = 1;
+            collectionService.createWorkflowGroup(context, collection, step);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -485,10 +505,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     /**
      * Test of createSubmitters method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testCreateSubmittersNoAuth() throws Exception {
-        collectionService.createSubmitters(context, collection);
-        fail("Exception expected");
+        assertThrows(AuthorizeException.class, () -> {
+            collectionService.createSubmitters(context, collection);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -506,10 +528,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     /**
      * Test of removeSubmitters method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testRemoveSubmittersNoAuth() throws Exception {
-        collectionService.removeSubmitters(context, collection);
-        fail("Exception expected");
+        assertThrows(AuthorizeException.class, () -> {
+            collectionService.removeSubmitters(context, collection);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -535,10 +559,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     /**
      * Test of createAdministrators method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testCreateAdministratorsNoAuth() throws Exception {
-        collectionService.createAdministrators(context, collection);
-        fail("Exception expected");
+        assertThrows(AuthorizeException.class, () -> {
+            collectionService.createAdministrators(context, collection);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -563,17 +589,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     /**
      * Test of removeAdministrators method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testRemoveAdministratorsNoAuth() throws Exception {
-        // Ensure admin group is created first
-        context.turnOffAuthorisationSystem();
-        Group result = collectionService.createAdministrators(context, collection);
-        context.restoreAuthSystemState();
+        assertThrows(AuthorizeException.class, () -> {
+            // Ensure admin group is created first
+            context.turnOffAuthorisationSystem();
+            Group result = collectionService.createAdministrators(context, collection);
+            context.restoreAuthSystemState();
 
-        assertThat("testRemoveAdministratorsAuth 0", collection.getAdministrators(), notNullValue());
-        assertThat("testRemoveAdministratorsAuth 1", collection.getAdministrators(), equalTo(result));
-        collectionService.removeAdministrators(context, collection);
-        fail("Exception expected");
+            assertThat("testRemoveAdministratorsAuth 0", collection.getAdministrators(), notNullValue());
+            assertThat("testRemoveAdministratorsAuth 1", collection.getAdministrators(), equalTo(result));
+            collectionService.removeAdministrators(context, collection);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -608,7 +636,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testHasCustomLicense() {
-        assertFalse("testHasCustomLicense 0", collectionService.hasCustomLicense(collection));
+        assertFalse(collectionService.hasCustomLicense(collection), "testHasCustomLicense 0");
     }
 
     /**
@@ -647,10 +675,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     /**
      * Test of createTemplateItem method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testCreateTemplateItemNoAuth() throws Exception {
-        itemService.createTemplateItem(context, collection);
-        fail("Exception expected");
+        assertThrows(AuthorizeException.class, () -> {
+            itemService.createTemplateItem(context, collection);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -668,10 +698,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     /**
      * Test of removeTemplateItem method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testRemoveTemplateItemNoAuth() throws Exception {
-        collectionService.removeTemplateItem(context, collection);
-        fail("Exception expected");
+        assertThrows(AuthorizeException.class, () -> {
+            collectionService.removeTemplateItem(context, collection);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -696,25 +728,27 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
                 added = true;
             }
         }
-        assertTrue("testAddItemAuth 0", added);
+        assertTrue(added, "testAddItemAuth 0");
     }
 
     /**
      * Test of addItem method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testAddItemNoAuth() throws Exception {
-        // Disallow Collection ADD perms
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow Collection ADD perms
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
 
-        // create item first
-        context.turnOffAuthorisationSystem();
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
-        Item item = installItemService.installItem(context, workspaceItem);
-        context.restoreAuthSystemState();
+            // create item first
+            context.turnOffAuthorisationSystem();
+            WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+            Item item = installItemService.installItem(context, workspaceItem);
+            context.restoreAuthSystemState();
 
-        collectionService.addItem(context, collection, item);
-        fail("Exception expected");
+            collectionService.addItem(context, collection, item);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -746,27 +780,29 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
                 isthere = true;
             }
         }
-        assertFalse("testRemoveItemAuth 0", isthere);
+        assertFalse(isthere, "testRemoveItemAuth 0");
     }
 
     /**
      * Test of removeItem method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testRemoveItemNoAuth() throws Exception {
-        // Disallow Collection REMOVE perms
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy)
-                                         .authorizeAction(context, collection, Constants.REMOVE);
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow Collection REMOVE perms
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy)
+                .authorizeAction(context, collection, Constants.REMOVE);
 
-        // create & add item first
-        context.turnOffAuthorisationSystem();
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
-        Item item = installItemService.installItem(context, workspaceItem);
-        collectionService.addItem(context, collection, item);
-        context.restoreAuthSystemState();
+            // create & add item first
+            context.turnOffAuthorisationSystem();
+            WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+            Item item = installItemService.installItem(context, workspaceItem);
+            collectionService.addItem(context, collection, item);
+            context.restoreAuthSystemState();
 
-        collectionService.removeItem(context, collection, item);
-        fail("Exception expected");
+            collectionService.removeItem(context, collection, item);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -796,14 +832,16 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     /**
      * Test of update method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testUpdateNoAuth() throws Exception {
-        // Disallow Collection WRITE perms
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy)
-                                         .authorizeAction(context, collection, Constants.WRITE, true);
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow Collection WRITE perms
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy)
+                .authorizeAction(context, collection, Constants.WRITE, true);
 
-        collectionService.update(context, collection);
-        fail("Exception expected");
+            collectionService.update(context, collection);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -814,7 +852,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         // Allow Collection WRITE perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.WRITE, true);
 
-        assertTrue("testCanEditBooleanAuth 0", collectionService.canEditBoolean(context, collection));
+        assertTrue(collectionService.canEditBoolean(context, collection), "testCanEditBooleanAuth 0");
     }
 
     /**
@@ -826,7 +864,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         doNothing().when(authorizeServiceSpy).authorizeAction(context, owningCommunity, Constants.WRITE, true);
 
 
-        assertTrue("testCanEditBooleanAuth2 0", collectionService.canEditBoolean(context, collection));
+        assertTrue(collectionService.canEditBoolean(context, collection), "testCanEditBooleanAuth2 0");
     }
 
     /**
@@ -838,7 +876,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         doThrow(new AuthorizeException()).when(authorizeServiceSpy)
                                          .authorizeAction(context, collection, Constants.WRITE, true);
 
-        assertFalse("testCanEditBooleanNoAuth 0", collectionService.canEditBoolean(context, collection));
+        assertFalse(collectionService.canEditBoolean(context, collection), "testCanEditBooleanNoAuth 0");
     }
 
     /**
@@ -849,8 +887,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         // Allow Collection WRITE perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.WRITE, true);
 
-        assertTrue("testCanEditBooleanAuth_useInheritance",
-                   collectionService.canEditBoolean(context, collection, true));
+        assertTrue(collectionService.canEditBoolean(context, collection, true),
+                   "testCanEditBooleanAuth_useInheritance");
     }
 
     /**
@@ -861,8 +899,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         // Allow parent Community WRITE perms (test inheritance to Collection)
         doNothing().when(authorizeServiceSpy).authorizeAction(context, owningCommunity, Constants.WRITE, true);
 
-        assertTrue("testCanEditBooleanAuth2_useInheritance",
-                   collectionService.canEditBoolean(context, collection, true));
+        assertTrue(collectionService.canEditBoolean(context, collection, true),
+                   "testCanEditBooleanAuth2_useInheritance");
     }
 
     /**
@@ -873,8 +911,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         // Allow Collection WRITE perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.WRITE, false);
 
-        assertTrue("testCanEditBooleanAuth_noInheritance",
-                   collectionService.canEditBoolean(context, collection, false));
+        assertTrue(collectionService.canEditBoolean(context, collection, false),
+                   "testCanEditBooleanAuth_noInheritance");
     }
 
     /**
@@ -882,8 +920,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCanEditBooleanAuth2_noInheritance() throws Exception {
-        assertFalse("testCanEditBooleanAuth_noInheritance",
-                    collectionService.canEditBoolean(context, collection, false));
+        assertFalse(collectionService.canEditBoolean(context, collection, false),
+                    "testCanEditBooleanAuth_noInheritance");
     }
 
 
@@ -896,7 +934,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         doThrow(new AuthorizeException()).when(authorizeServiceSpy)
                                          .authorizeAction(context, collection, Constants.WRITE, true);
 
-        assertFalse("testCanEditBooleanNoAuth_boolean 0", collectionService.canEditBoolean(context, collection, true));
+        assertFalse(collectionService.canEditBoolean(context, collection, true), "testCanEditBooleanNoAuth_boolean 0");
     }
 
     /**
@@ -908,7 +946,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         doThrow(new AuthorizeException()).when(authorizeServiceSpy)
                                          .authorizeAction(context, collection, Constants.WRITE, false);
 
-        assertFalse("testCanEditBooleanNoAuth_boolean 0", collectionService.canEditBoolean(context, collection, false));
+        assertFalse(collectionService.canEditBoolean(context, collection, false), "testCanEditBooleanNoAuth_boolean 0");
     }
 
     /**
@@ -926,14 +964,16 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     /**
      * Test of canEditBoolean method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testCanEditNoAuth_0args() throws Exception {
-        // Disallow Collection WRITE perms
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy)
-                                         .authorizeAction(context, collection, Constants.WRITE, true);
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow Collection WRITE perms
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy)
+                .authorizeAction(context, collection, Constants.WRITE, true);
 
-        collectionService.canEdit(context, collection);
-        fail("Exception expected");
+            collectionService.canEdit(context, collection);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -974,19 +1014,23 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     /**
      * Test of canEditBoolean method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testCanEditNoAuth_boolean() throws Exception {
-        collectionService.canEdit(context, collection, false);
-        fail("Exception expected");
+        assertThrows(AuthorizeException.class, () -> {
+            collectionService.canEdit(context, collection, false);
+            fail("Exception expected");
+        });
     }
 
     /**
      * Test of canEditBoolean method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testCanEditNoAuth2_boolean() throws Exception {
-        collectionService.canEdit(context, collection, true);
-        fail("Exception expected");
+        assertThrows(AuthorizeException.class, () -> {
+            collectionService.canEdit(context, collection, true);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -1008,10 +1052,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     /**
      * Test of delete method, of class Collection.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testDeleteNoAuth() throws Exception {
-        collectionService.delete(context, collection);
-        fail("Exception expected");
+        assertThrows(AuthorizeException.class, () -> {
+            collectionService.delete(context, collection);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -1033,11 +1079,11 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
                                                 "title", null, Item.ANY, "community 2");
         this.collection.addCommunity(community);
         context.restoreAuthSystemState();
-        assertTrue("testGetCommunities 0", collection.getCommunities().size() == 4);
+        assertTrue(collection.getCommunities().size() == 4, "testGetCommunities 0");
         //Communities should be sorted by name
-        assertTrue("testGetCommunities 1", collection.getCommunities().get(1).getName().equals("community 1"));
-        assertTrue("testGetCommunities 1", collection.getCommunities().get(2).getName().equals("community 2"));
-        assertTrue("testGetCommunities 1", collection.getCommunities().get(3).getName().equals("community 3"));
+        assertTrue(collection.getCommunities().get(1).getName().equals("community 1"), "testGetCommunities 1");
+        assertTrue(collection.getCommunities().get(2).getName().equals("community 2"), "testGetCommunities 1");
+        assertTrue(collection.getCommunities().get(3).getName().equals("community 3"), "testGetCommunities 1");
     }
 
     /**
@@ -1051,9 +1097,9 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         Collection newCollection = collectionService.create(context, owningCommunity);
         context.restoreAuthSystemState();
 
-        assertFalse("testEquals 0", collection.equals(null));
-        assertFalse("testEquals 1", collection.equals(newCollection));
-        assertTrue("testEquals 2", collection.equals(collection));
+        assertFalse(collection.equals(null), "testEquals 0");
+        assertFalse(collection.equals(newCollection), "testEquals 1");
+        assertTrue(collection.equals(collection), "testEquals 2");
     }
 
     /**
@@ -1076,27 +1122,27 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
 
         List<Collection> found = collectionService.findAuthorized(context, com, Constants.WRITE);
         assertThat("testFindAuthorized 0", found, notNullValue());
-        assertTrue("testFindAuthorized 1", found.size() == 0);
+        assertTrue(found.size() == 0, "testFindAuthorized 1");
 
         found = collectionService.findAuthorized(context, null, Constants.WRITE);
         assertThat("testFindAuthorized 2", found, notNullValue());
-        assertTrue("testFindAuthorized 3", found.size() == 0);
+        assertTrue(found.size() == 0, "testFindAuthorized 3");
 
         found = collectionService.findAuthorized(context, com, Constants.ADD);
         assertThat("testFindAuthorized 3", found, notNullValue());
-        assertTrue("testFindAuthorized 4", found.size() == 0);
+        assertTrue(found.size() == 0, "testFindAuthorized 4");
 
         found = collectionService.findAuthorized(context, null, Constants.ADD);
         assertThat("testFindAuthorized 5", found, notNullValue());
-        assertTrue("testFindAuthorized 6", found.size() == 0);
+        assertTrue(found.size() == 0, "testFindAuthorized 6");
 
         found = collectionService.findAuthorized(context, com, Constants.READ);
         assertThat("testFindAuthorized 7", found, notNullValue());
-        assertTrue("testFindAuthorized 8", found.size() == 0);
+        assertTrue(found.size() == 0, "testFindAuthorized 8");
 
         found = collectionService.findAuthorized(context, null, Constants.READ);
         assertThat("testFindAuthorized 9", found, notNullValue());
-        assertTrue("testFindAuthorized 10", found.size() >= 1);
+        assertTrue(found.size() >= 1, "testFindAuthorized 10");
     }
 
     /**
@@ -1137,31 +1183,31 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
 
         context.setCurrentUser(epersonA);
         List<Collection> personACollections = collectionService.findAuthorizedOptimized(context, Constants.ADD);
-        assertTrue("testFindAuthorizeOptimized A", personACollections.size() == 2);
-        assertTrue("testFindAuthorizeOptimized A.A", personACollections.contains(collectionA));
-        assertFalse("testFindAuthorizeOptimized A.A", personACollections.contains(collectionB));
-        assertTrue("testFindAuthorizeOptimized A.A", personACollections.contains(collectionC));
+        assertTrue(personACollections.size() == 2, "testFindAuthorizeOptimized A");
+        assertTrue(personACollections.contains(collectionA), "testFindAuthorizeOptimized A.A");
+        assertFalse(personACollections.contains(collectionB), "testFindAuthorizeOptimized A.A");
+        assertTrue(personACollections.contains(collectionC), "testFindAuthorizeOptimized A.A");
 
         context.setCurrentUser(epersonB);
         List<Collection> personBCollections = collectionService.findAuthorizedOptimized(context, Constants.ADD);
-        assertTrue("testFindAuthorizeOptimized B", personBCollections.size() == 2);
-        assertFalse("testFindAuthorizeOptimized B.A", personBCollections.contains(collectionA));
-        assertTrue("testFindAuthorizeOptimized B.B", personBCollections.contains(collectionB));
-        assertTrue("testFindAuthorizeOptimized B.C", personBCollections.contains(collectionC));
+        assertTrue(personBCollections.size() == 2, "testFindAuthorizeOptimized B");
+        assertFalse(personBCollections.contains(collectionA), "testFindAuthorizeOptimized B.A");
+        assertTrue(personBCollections.contains(collectionB), "testFindAuthorizeOptimized B.B");
+        assertTrue(personBCollections.contains(collectionC), "testFindAuthorizeOptimized B.C");
 
         context.setCurrentUser(epersonC);
         List<Collection> personCCollections = collectionService.findAuthorizedOptimized(context, Constants.ADD);
-        assertTrue("testFindAuthorizeOptimized C", personCCollections.size() == 1);
-        assertFalse("testFindAuthorizeOptimized collection.A", personCCollections.contains(collectionA));
-        assertFalse("testFindAuthorizeOptimized collection.B", personCCollections.contains(collectionB));
-        assertTrue("testFindAuthorizeOptimized collection.C", personCCollections.contains(collectionC));
+        assertTrue(personCCollections.size() == 1, "testFindAuthorizeOptimized C");
+        assertFalse(personCCollections.contains(collectionA), "testFindAuthorizeOptimized collection.A");
+        assertFalse(personCCollections.contains(collectionB), "testFindAuthorizeOptimized collection.B");
+        assertTrue(personCCollections.contains(collectionC), "testFindAuthorizeOptimized collection.C");
 
         context.setCurrentUser(epersonD);
         List<Collection> personDCollections = collectionService.findAuthorizedOptimized(context, Constants.ADD);
-        assertTrue("testFindAuthorizeOptimized D", personDCollections.size() == 0);
-        assertFalse("testFindAuthorizeOptimized D.A", personDCollections.contains(collectionA));
-        assertFalse("testFindAuthorizeOptimized D.B", personDCollections.contains(collectionB));
-        assertFalse("testFindAuthorizeOptimized D.C", personDCollections.contains(collectionC));
+        assertTrue(personDCollections.size() == 0, "testFindAuthorizeOptimized D");
+        assertFalse(personDCollections.contains(collectionA), "testFindAuthorizeOptimized D.A");
+        assertFalse(personDCollections.contains(collectionB), "testFindAuthorizeOptimized D.B");
+        assertFalse(personDCollections.contains(collectionC), "testFindAuthorizeOptimized D.C");
     }
 
     /**
@@ -1201,10 +1247,10 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         context.setCurrentUser(epersonA);
         List<Collection> personACollections =
             collectionService.findAuthorized(context, null, List.of(Constants.ADD, Constants.ADMIN));
-        assertTrue("testFindAuthorizedByEPerson A", personACollections.size() == 2);
-        assertTrue("testFindAuthorizedByEPerson A.A", personACollections.contains(collectionA));
-        assertTrue("testFindAuthorizedByEPerson A.B", personACollections.contains(collectionB));
-        assertFalse("testFindAuthorizedByEPerson A.C", personACollections.contains(collectionC));
+        assertTrue(personACollections.size() == 2, "testFindAuthorizedByEPerson A");
+        assertTrue(personACollections.contains(collectionA), "testFindAuthorizedByEPerson A.A");
+        assertTrue(personACollections.contains(collectionB), "testFindAuthorizedByEPerson A.B");
+        assertFalse(personACollections.contains(collectionC), "testFindAuthorizedByEPerson A.C");
     }
 
     /**
@@ -1269,21 +1315,21 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         context.setCurrentUser(epersonA);
         List<Collection> personACollectionsAdminCommA =
             collectionService.findAuthorized(context, null, List.of(Constants.ADD, Constants.ADMIN));
-        assertTrue("testFindAuthorizedEPersonCommunityAdmin A", personACollectionsAdminCommA.size() == 4);
-        assertTrue("testFindAuthorizedEPersonCommunityAdmin A.A", personACollectionsAdminCommA
-            .containsAll(List.of(collectionA1, collectionD1, collectionC1, collectionC2)));
-        assertFalse("testFindAuthorizedEPersonCommunityAdmin A.B", personACollectionsAdminCommA
-            .containsAll(List.of(collectionE1, collectionE2)));
+        assertTrue(personACollectionsAdminCommA.size() == 4, "testFindAuthorizedEPersonCommunityAdmin A");
+        assertTrue(personACollectionsAdminCommA
+            .containsAll(List.of(collectionA1, collectionD1, collectionC1, collectionC2)), "testFindAuthorizedEPersonCommunityAdmin A.A");
+        assertFalse(personACollectionsAdminCommA
+            .containsAll(List.of(collectionE1, collectionE2)), "testFindAuthorizedEPersonCommunityAdmin A.B");
 
         //PersonB Can get AllCollection From Top to Bottom com ComE, but not from ComA
         context.setCurrentUser(epersonB);
         List<Collection> personACollectionsAdminCommE =
             collectionService.findAuthorized(context, null, List.of(Constants.ADD, Constants.ADMIN));
-        assertTrue("testFindAuthorizedEPersonCommunityAdmin B", personACollectionsAdminCommE.size() == 3);
-        assertFalse("testFindAuthorizedEPersonCommunityAdmin B.A", personACollectionsAdminCommE
-            .containsAll(List.of(collectionA1, collectionC1, collectionC2)));
-        assertTrue("testFindAuthorizedEPersonCommunityAdmin B.B", personACollectionsAdminCommE
-            .containsAll(List.of(collectionD1, collectionE1, collectionE2)));
+        assertTrue(personACollectionsAdminCommE.size() == 3, "testFindAuthorizedEPersonCommunityAdmin B");
+        assertFalse(personACollectionsAdminCommE
+            .containsAll(List.of(collectionA1, collectionC1, collectionC2)), "testFindAuthorizedEPersonCommunityAdmin B.A");
+        assertTrue(personACollectionsAdminCommE
+            .containsAll(List.of(collectionD1, collectionE1, collectionE2)), "testFindAuthorizedEPersonCommunityAdmin B.B");
     }
 
     /**
@@ -1321,25 +1367,25 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         context.setCurrentUser(epersonA);
         List<Collection> personACollectionsRD =
             collectionService.findAuthorized(context, null, List.of(Constants.WRITE, Constants.DELETE));
-        assertTrue("testFindAuthorizedEPersonDifferentActions A", personACollectionsRD.isEmpty());
-        assertFalse("testFindAuthorizedEPersonDifferentActions A.A", personACollectionsRD.contains(collectionA));
-        assertFalse("testFindAuthorizedEPersonDifferentActions A.B", personACollectionsRD.contains(collectionB));
+        assertTrue(personACollectionsRD.isEmpty(), "testFindAuthorizedEPersonDifferentActions A");
+        assertFalse(personACollectionsRD.contains(collectionA), "testFindAuthorizedEPersonDifferentActions A.A");
+        assertFalse(personACollectionsRD.contains(collectionB), "testFindAuthorizedEPersonDifferentActions A.B");
 
         //But It Should get Collection B if we pass the ADMIN Action too
         List<Collection>  personACollectionsADD =
             collectionService.findAuthorized(context, null,
                 List.of(Constants.WRITE, Constants.DELETE, Constants.ADD));
-        assertTrue("testFindAuthorizedEPersonDifferentActions B", personACollectionsADD.size() == 1);
-        assertTrue("testFindAuthorizedEPersonDifferentActions B.A", personACollectionsADD.contains(collectionA));
-        assertFalse("testFindAuthorizedEPersonDifferentActions B.B", personACollectionsADD.contains(collectionB));
+        assertTrue(personACollectionsADD.size() == 1, "testFindAuthorizedEPersonDifferentActions B");
+        assertTrue(personACollectionsADD.contains(collectionA), "testFindAuthorizedEPersonDifferentActions B.A");
+        assertFalse(personACollectionsADD.contains(collectionB), "testFindAuthorizedEPersonDifferentActions B.B");
 
         //But It Should get Collection A  if we pass the ADD Action too
         List<Collection>  personACollections =
             collectionService.findAuthorized(context, null,
                 List.of(Constants.WRITE, Constants.DELETE, Constants.ADMIN));
-        assertTrue("testFindAuthorizedEPersonDifferentActions C", personACollections.size() == 1);
-        assertFalse("testFindAuthorizedEPersonDifferentActions C.A", personACollections.contains(collectionA));
-        assertTrue("testFindAuthorizedEPersonDifferentActions C.B", personACollections.contains(collectionB));
+        assertTrue(personACollections.size() == 1, "testFindAuthorizedEPersonDifferentActions C");
+        assertFalse(personACollections.contains(collectionA), "testFindAuthorizedEPersonDifferentActions C.A");
+        assertTrue(personACollections.contains(collectionB), "testFindAuthorizedEPersonDifferentActions C.B");
     }
 
     /**
@@ -1348,7 +1394,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     @Test
     public void testCountItems() throws Exception {
         //0 by default
-        assertTrue("testCountItems 0", itemService.countItems(context, collection) == 0);
+        assertTrue(itemService.countItems(context, collection) == 0, "testCountItems 0");
 
         //NOTE: a more thorough test of item counting is in ITCommunityCollection integration test
     }

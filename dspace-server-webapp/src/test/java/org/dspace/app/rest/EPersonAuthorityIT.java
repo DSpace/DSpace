@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.EPersonBuilder;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link EPersonAuthority}.

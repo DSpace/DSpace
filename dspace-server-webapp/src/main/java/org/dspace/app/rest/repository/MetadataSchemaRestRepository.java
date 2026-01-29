@@ -10,13 +10,13 @@ package org.dspace.app.rest.repository;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -32,6 +32,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import java.io.IOException;
+import tools.jackson.core.JacksonException;
 
 /**
  * This is the repository responsible to manage MetadataSchema Rest object
@@ -148,7 +150,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         MetadataSchemaRest metadataSchemaRest;
         try {
             metadataSchemaRest = mapper.readValue(jsonNode.toString(), MetadataSchemaRest.class);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new DSpaceBadRequestException("Cannot parse JSON in request body", e);
         }
 

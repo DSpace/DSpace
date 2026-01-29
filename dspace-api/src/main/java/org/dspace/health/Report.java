@@ -59,8 +59,8 @@ public class Report {
             String check_name = check_entry.getKey();
             Check check = check_entry.getValue();
 
-            log.info(String.format("#%d. Processing [%s] at [%s]",
-                                   pos, check_name, Instant.now().toString()));
+            log.info("#%d. Processing [%s] at [%s]".formatted(
+                pos, check_name, Instant.now().toString()));
 
             try {
                 // do the stuff
@@ -89,8 +89,7 @@ public class Report {
             if (null != check) {
                 checks.put(check_name, check);
             } else {
-                log.warn(String.format(
-                    "Could not find implementation for [%s]", check_name));
+                log.warn("Could not find implementation for [%s]".formatted(check_name));
             }
         }
         return checks;
@@ -103,13 +102,12 @@ public class Report {
 
     //
     private void store(String name, long took, String report) {
-        name += String.format(" [took: %ds] [# lines: %d]",
-                              took / 1000,
-                              new StringTokenizer(report, "\r\n").countTokens()
+        name += " [took: %ds] [# lines: %d]".formatted(
+            took / 1000,
+            new StringTokenizer(report, "\r\n").countTokens()
         );
 
-        String one_summary = String.format(
-            "\n#### %s\n%s\n\n###############################\n",
+        String one_summary = "\n#### %s\n%s\n\n###############################\n".formatted(
             name,
             report.replaceAll("\\s+$", "")
         );
@@ -157,7 +155,7 @@ public class Report {
             String checks_summary = "";
             int pos = 0;
             for (String check_name : checks().keySet()) {
-                checks_summary += String.format("%d. %s\n", pos++, check_name);
+                checks_summary += "%d. %s\n".formatted(pos++, check_name);
             }
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("dspace healthcheck", options);
@@ -205,8 +203,7 @@ public class Report {
                     String email_path = dspace_dir.endsWith("/") ? dspace_dir
                         : dspace_dir + "/";
                     email_path += Report.EMAIL_PATH;
-                    log.info(String.format(
-                        "Looking for email template at [%s]", email_path));
+                    log.info("Looking for email template at [%s]".formatted(email_path));
                     Email email = Email.getEmail(email_path);
                     email.addRecipient(to);
                     email.addArgument(r.toString());

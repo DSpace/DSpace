@@ -7,10 +7,14 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serial;
+
+
 import org.dspace.app.rest.ContentReportRestController;
 
 public class ContentReportSupportRest extends BaseObjectRest<String> {
 
+    @Serial
     private static final long serialVersionUID = 9137258312781361906L;
     public static final String NAME = "contentreport";
     public static final String CATEGORY = RestModel.CONTENT_REPORT;

@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.matcher.UsageReportMatcher;
 import org.dspace.app.rest.model.UsageReportPointCityRest;
@@ -59,9 +59,9 @@ import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
@@ -93,14 +93,14 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     private String loggedInToken;
     private String adminToken;
 
-    @BeforeClass
+    @BeforeAll
     public static void clearStatistics() throws Exception {
         // To ensure these tests start "fresh", clear out any existing statistics data.
         // NOTE: this is committed immediately in removeIndex()
         StatisticsServiceFactory.getInstance().getSolrLoggerService().removeIndex("*:*");
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

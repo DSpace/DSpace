@@ -25,22 +25,24 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.dspace.core.Context;
 import org.dspace.statistics.export.OpenURLTracker;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 /**
  * Test class for the OpenUrlServiceImpl
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class OpenUrlServiceImplTest {
 
     /**
@@ -54,7 +56,7 @@ public class OpenUrlServiceImplTest {
     @Mock
     private CloseableHttpClient httpClient;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         // spy on the class under test
         openUrlService = Mockito.spy(OpenUrlServiceImpl.class);
@@ -72,12 +74,8 @@ public class OpenUrlServiceImplTest {
      * @return a mocked http response.
      */
     protected CloseableHttpResponse createMockHttpResponse(int statusCode) {
-        StatusLine statusLine = mock(StatusLine.class);
-        when(statusLine.getStatusCode()).thenReturn(statusCode);
-
         CloseableHttpResponse httpResponse = mock(CloseableHttpResponse.class);
-        when(httpResponse.getStatusLine()).thenReturn(statusLine);
-
+        when(httpResponse.getCode()).thenReturn(statusCode);
         return httpResponse;
     }
 
@@ -187,6 +185,7 @@ public class OpenUrlServiceImplTest {
         verify(openUrlService).getHttpClientRequestConfig();
 
         // 2. verify that getHttpClientRequestConfig sets the timeout
-        assertThat(openUrlService.getHttpClientRequestConfig().getConnectTimeout(), is(10 * 1000));
+        // HttpClient 5: getConnectTimeout() returns a Timeout, use toMilliseconds()
+        assertThat(openUrlService.getHttpClientRequestConfig().getConnectTimeout().toMilliseconds(), is(10L * 1000));
     }
 }

@@ -295,7 +295,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                         Class stepClass;
                         try {
                             stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-                            Object stepInstance = stepClass.newInstance();
+                            Object stepInstance = stepClass.getDeclaredConstructor().newInstance();
                             if (UploadableStep.class.isAssignableFrom(stepClass)) {
                                 UploadableStep uploadableStep = (UploadableStep) stepInstance;
                                 for (MultipartFile mpFile : uploadfiles) {

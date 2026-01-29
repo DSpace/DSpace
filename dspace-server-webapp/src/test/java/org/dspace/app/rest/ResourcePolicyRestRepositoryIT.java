@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
@@ -61,8 +61,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -513,7 +513,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
     // This test is currently not working as intended, needs to be reviewed.
     @Test
-    @Ignore
+    @Disabled
     public void findResourcePoliciesOfOneResourceWithActionTest() throws Exception {
         context.turnOffAuthorisationSystem();
 

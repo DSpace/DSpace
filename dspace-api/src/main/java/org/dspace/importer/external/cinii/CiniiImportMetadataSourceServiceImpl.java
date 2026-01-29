@@ -21,9 +21,9 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpException;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;

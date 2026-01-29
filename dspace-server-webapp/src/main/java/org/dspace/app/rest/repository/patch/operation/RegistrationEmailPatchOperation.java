@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Optional;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.JsonValueEvaluator;
@@ -108,16 +108,16 @@ public class RegistrationEmailPatchOperation<R extends RegistrationData> extends
     private static String getTextValue(Operation operation) {
         Object value = operation.getValue();
 
-        if (value instanceof String) {
-            return ((String) value);
+        if (value instanceof String string) {
+            return string;
         }
 
-        if (value instanceof JsonValueEvaluator) {
-            return Optional.of((JsonValueEvaluator) value)
+        if (value instanceof JsonValueEvaluator evaluator) {
+            return Optional.of(evaluator)
                            .map(JsonValueEvaluator::getValueNode)
                            .filter(nodes -> !nodes.isEmpty())
                            .map(nodes -> nodes.get(0))
-                           .map(JsonNode::asText)
+                           .map(JsonNode::asString)
                            .orElseThrow(() -> new DSpaceBadRequestException("No value provided for operation"));
         }
         throw new DSpaceBadRequestException("Invalid patch value for operation!");
