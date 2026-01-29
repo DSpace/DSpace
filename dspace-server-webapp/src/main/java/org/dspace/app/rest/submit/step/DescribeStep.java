@@ -93,6 +93,13 @@ public class DescribeStep extends AbstractProcessingStep {
                     for (Object qualifier : input.getPairs()) {
                         fieldsName.add(input.getFieldName() + "." + (String) qualifier);
                     }
+                } else if (Strings.CI.equals(input.getInputType(), "group") ||
+                    Strings.CI.equals(input.getInputType(), "inline-group")) {
+                    log.debug("Called child form:" + config.getId() + "-" +
+                             Utils.standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
+                    DCInputSet inputConfigChild = inputReader.getInputsByFormName(config.getId() + "-" + Utils
+                        .standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
+                    readField(obj, config, data, inputConfigChild);
                 } else {
                     String fieldName = input.getFieldName();
                     if (fieldName != null) {
