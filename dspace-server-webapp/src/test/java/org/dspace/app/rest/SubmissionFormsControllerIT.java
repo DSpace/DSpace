@@ -829,4 +829,21 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                              .andExpect(jsonPath("$.page.totalPages", equalTo(6)))
                              .andExpect(jsonPath("$.page.number", is(5)));
     }
+
+    @Test
+    public void findPublicationStepGroupAndInlineGroupFields() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/config/submissionforms/publicationStepGroup"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.id", is("publicationStepGroup")))
+            // Check for the group (Author) --- row[0] relation-field with group child
+            .andExpect(jsonPath("$.rows[0].fields[0].input.type", is("group")))
+            .andExpect(jsonPath("$.rows[0].fields[0].rows").exists())
+            .andExpect(jsonPath("$.rows[0].fields[0].rows").isArray())
+            // Check for inline-group (Editor) --- row[1] field
+            .andExpect(jsonPath("$.rows[1].fields[0].input.type", is("inline-group")))
+            .andExpect(jsonPath("$.rows[1].fields[0].rows").exists())
+            .andExpect(jsonPath("$.rows[1].fields[0].rows").isArray());
+    }
 }

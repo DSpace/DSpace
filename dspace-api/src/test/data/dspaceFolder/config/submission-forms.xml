@@ -287,6 +287,59 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
    </form>
 
+   <form name="publicationStepGroup-dc-contributor-author">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>author</dc-qualifier>
+         <label>Author</label>
+         <input-type>onebox</input-type>
+         <repeatable>false</repeatable>
+         <required>You must enter at least the author.</required>
+         <hint>Enter the names of the authors of this item in the form Lastname, Firstname [i.e. Smith, Josh or Smith, J].</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>oairecerif</dc-schema>
+         <dc-element>author</dc-element>
+         <dc-qualifier>affiliation</dc-qualifier>
+         <label>Affiliation</label>
+         <input-type>onebox</input-type>
+         <repeatable>false</repeatable>
+         <required />
+         <hint>Enter the affiliation of the author as stated on the publication.</hint>
+       </field>
+     </row>
+   </form>
+   <form name="publicationStepGroup-dc-contributor-editor">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>editor</dc-qualifier>
+         <label>Editor</label>
+         <input-type>onebox</input-type>
+         <repeatable>false</repeatable>
+         <required>You must enter at least the author.</required>
+         <hint>The editors of this publication.</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>oairecerif</dc-schema>
+         <dc-element>editor</dc-element>
+         <dc-qualifier>affiliation</dc-qualifier>
+         <label>Affiliation</label>
+         <input-type>onebox</input-type>
+         <repeatable>false</repeatable>
+         <required />
+         <hint>Enter the affiliation of the editor as stated on the publication.</hint>
+       </field>
+     </row>
+   </form>
+
    <form name="qualdroptest">
      <row>
        <field>
@@ -480,6 +533,38 @@ it, please enter the types and the actual numbers or codes.</hint>
               However, this is disabled by default to support organizations as authors, etc. -->
          <!--<regex>\w+(,)+\w+</regex>-->
        </relation-field>
+     </row>
+   </form>
+
+   <form name="publicationStepGroup">
+     <row>
+       <relation-field>
+         <relationship-type>isAuthorOfPublication</relationship-type>
+         <search-configuration>person</search-configuration>
+         <repeatable>true</repeatable>
+         <label>Author</label>
+         <hint>Enter the author's name (Family name, Given names).</hint>
+         <linked-metadata-field>
+           <dc-schema>dc</dc-schema>
+           <dc-element>contributor</dc-element>
+           <dc-qualifier>author</dc-qualifier>
+           <input-type>group</input-type>
+         </linked-metadata-field>
+         <externalsources>orcid</externalsources>
+         <required></required>
+       </relation-field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>editor</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Editor</label>
+         <input-type>inline-group</input-type>
+         <hint>The editors of this publication.</hint>
+         <required>You must enter at least the author.</required>
+       </field>
      </row>
    </form>
 
