@@ -41,6 +41,7 @@
     <util:map id="isAuthorOfPublicationMap">
         <entry key="dc.contributor.author" value-ref="publicationAuthor_author"/>
         <entry key="person.identifier.orcid" value-ref="publicationAuthor_identifierOrcid"/>
+        <entry key="dspace.relatedentity.type" value-ref="publicationAuthor_entityType"/>
     </util:map>
     <!--
          If the related item has:
@@ -66,6 +67,14 @@
         <property name="fields">
             <util:list>
                 <value>person.identifier.orcid</value>
+            </util:list>
+        </property>
+    </bean>
+
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_entityType">
+        <property name="fields">
+            <util:list>
+                <value>dspace.entity.type</value>
             </util:list>
         </property>
     </bean>
