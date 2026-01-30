@@ -220,8 +220,7 @@ public class DCInputsReader {
         if (pages == null) {
             throw new DCInputsReaderException("Missing the " + formName + " form");
         }
-        lastInputSet = new DCInputSet(formName,
-                                      pages, valuePairs);
+        lastInputSet = new DCInputSet(this, formName, pages, valuePairs);
         return lastInputSet;
     }
 

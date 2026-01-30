@@ -325,8 +325,6 @@ it, please enter the types and the actual numbers or codes.</hint>
          <required>You must enter at least the author.</required>
          <hint>The editors of this publication.</hint>
        </field>
-     </row>
-     <row>
        <field>
          <dc-schema>oairecerif</dc-schema>
          <dc-element>editor</dc-element>
