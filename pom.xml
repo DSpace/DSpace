@@ -27,11 +27,11 @@
         <expressly.version>6.0.0</expressly.version>
         <postgresql.driver.version>42.7.8</postgresql.driver.version>
         <flyway.version>10.22.0</flyway.version>
-        <!-- Solr 10.1.0 from Jenkins CI build - manually installed to local Maven repo
-             TODO: Update to official Solr 10.x release when available -->
-        <solr.client.version>10.1.0-JENKINS</solr.client.version>
+        <!-- Solr 10.0.0 RC3 - artifacts must be installed locally until official release
+             TODO: Update to official Solr 10.0.0 release when available on Maven Central -->
+        <solr.client.version>10.0.0</solr.client.version>
         <lucene.version>10.3.2</lucene.version>
-        <!-- ZooKeeper version matching Solr 10.1.0 -->
+        <!-- ZooKeeper version matching Solr 10.0.0 -->
         <zookeeper.version>3.9.4</zookeeper.version>
 
         <ehcache.version>3.11.1</ehcache.version>
@@ -1322,6 +1322,12 @@
             <dependency>
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-solrj-zookeeper</artifactId>
+                <version>${solr.client.version}</version>
+            </dependency>
+            <!-- solr-solrj-jetty provides HttpJettySolrClient, split from solr-solrj in 10.0.0 -->
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-solrj-jetty</artifactId>
                 <version>${solr.client.version}</version>
             </dependency>
             <!-- ZooKeeper dependencies required by Solr 10.x -->

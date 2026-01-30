@@ -636,6 +636,11 @@
             <artifactId>solr-solrj-zookeeper</artifactId>
             <version>${solr.client.version}</version>
         </dependency>
+        <!-- solr-solrj-jetty provides HttpJettySolrClient, split from solr-solrj in 10.0.0 -->
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj-jetty</artifactId>
+        </dependency>
         <!-- solr-solrj-streaming is needed for Solr 10.x EmbeddedSolrServer -->
         <dependency>
             <groupId>org.apache.solr</groupId>
