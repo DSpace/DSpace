@@ -39,6 +39,13 @@
 
     <dc-type>
         <schema>dspace</schema>
+        <element>relatedentity</element>
+        <qualifier>type</qualifier>
+        <scope_note>Stores the type of Entity that a specific Item represents when it is linked to another item</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
         <element>iiif</element>
         <qualifier>enabled</qualifier>
         <scope_note>Stores a boolean text value (true or false) to indicate if the iiif feature is enabled or not for the dspace object. If absent the value is derived from the parent dspace object</scope_note>
