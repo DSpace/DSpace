@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
  * multiple bundle resources in a single operation (e.g., bulk delete).
  * </p>
  *
- * @author DSpace contributors
  */
 @RestController
 @RequestMapping("/api/" + BundleRest.CATEGORY + "/" + BundleRest.PLURAL_NAME)

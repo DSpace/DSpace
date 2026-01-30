@@ -17,8 +17,6 @@ import org.dspace.core.I18nUtil;
  * in the REST response when a bundle is not found. The error message is added to the response in
  * {@link DSpaceApiExceptionControllerAdvice#handleCustomUnprocessableEntityException},
  * hence it should not contain sensitive or security-compromising info.</p>
- *
- * @author Ali Jaber - Atmire
  */
 public class RESTBundleNotFoundException extends UnprocessableEntityException implements TranslatableException {
 

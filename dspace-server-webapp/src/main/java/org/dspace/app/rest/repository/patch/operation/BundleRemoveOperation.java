@@ -14,10 +14,8 @@ import java.util.UUID;
 import org.dspace.app.rest.exception.RESTBundleNotFoundException;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bundle;
 import org.dspace.content.service.BundleService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -28,21 +26,17 @@ import org.springframework.stereotype.Component;
  * Deleting a bundle will also delete all bitstreams contained within it.
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.server.url}/api/core/bundles -H "Content-Type: application/json"
+ * curl -X PATCH https://${dspace.server.url}/api/core/bundles -H "Content-Type: application/json"
  * -d '[
  *       {"op": "remove", "path": "/bundles/${bundle1UUID}"},
  *       {"op": "remove", "path": "/bundles/${bundle2UUID}"}
  *     ]'
  * </code>
- *
- * @author Ali Jaber - Atmire
  */
 @Component
 public class BundleRemoveOperation extends PatchOperation<Bundle> {
     @Autowired
     BundleService bundleService;
-    @Autowired
-    AuthorizeService authorizeService;
 
     public static final String OPERATION_PATH_BUNDLE_REMOVE = "/bundles/";
 
@@ -53,11 +47,12 @@ public class BundleRemoveOperation extends PatchOperation<Bundle> {
         if (bundleToDelete == null) {
             throw new RESTBundleNotFoundException(bundleIDtoDelete);
         }
-        authorizeBundleRemoveAction(context, bundleToDelete, Constants.DELETE);
 
         try {
             bundleService.delete(context, bundleToDelete);
-        } catch (AuthorizeException | IOException e) {
+        } catch (AuthorizeException e) {
+            throw new AccessDeniedException("The current user is not allowed to remove the bundle", e);
+        } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         return null;
@@ -67,22 +62,5 @@ public class BundleRemoveOperation extends PatchOperation<Bundle> {
     public boolean supports(Object objectToMatch, Operation operation) {
         return objectToMatch == null && operation.getOp().trim().equalsIgnoreCase(OPERATION_REMOVE) &&
             operation.getPath().trim().startsWith(OPERATION_PATH_BUNDLE_REMOVE);
-    }
-
-    /**
-     * Authorize the bundle remove action.
-     *
-     * @param context   the DSpace context
-     * @param bundle    the bundle to check authorization for
-     * @param operation the operation constant (e.g., Constants.DELETE)
-     * @throws SQLException if a database error occurs
-     */
-    public void authorizeBundleRemoveAction(Context context, Bundle bundle, int operation)
-        throws SQLException {
-        try {
-            authorizeService.authorizeAction(context, bundle, operation);
-        } catch (AuthorizeException e) {
-            throw new AccessDeniedException("The current user is not allowed to remove the bundle", e);
-        }
     }
 }
