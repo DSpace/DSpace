@@ -56,7 +56,7 @@
     <bean id="orcidRestConnector" class="org.dspace.external.OrcidRestConnector">
         <constructor-arg value="${orcid.api-url}"/>
     </bean>
-    
+
     <bean id="orcidPublicationDataProvider" class="org.dspace.external.provider.impl.OrcidPublicationDataProvider">
         <property name="sourceIdentifier" value="orcidWorks"/>
         <property name="fieldMapping" ref="orcidPublicationDataProviderFieldMapping"/>
@@ -89,7 +89,7 @@
             </list>
         </property>
     </bean>
-    
+
     <bean class="org.dspace.app.suggestion.MockSuggestionExternalDataSource" />
 
     <bean id="dataciteLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">

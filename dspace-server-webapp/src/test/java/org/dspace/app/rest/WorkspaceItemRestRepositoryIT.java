@@ -2108,35 +2108,39 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                .withName("Collection 1")
-                .withSubmitterGroup(eperson)
-                .build();
+        CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
 
         InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
-        MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/myfile.pdf", "application/pdf", pdf);
+        final MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/myfile.pdf", "application/pdf",
+                                                                pdf);
 
-        context.restoreAuthSystemState();
-
-        // create a workspaceitem
+        // bulk create a workspaceitem
         getClient(authToken).perform(multipart("/api/submission/workspaceitems")
-                    .file(pdfFile))
-                // create should return 200, 201 (created) is better for single resource
-                .andExpect(status().isOk())
-                //FIXME it will be nice to setup a mock grobid server for end to end testing
-                // no metadata for now
-//              .andExpect(jsonPath("$._embedded.workspaceitems[0]._embedded.traditionalpageone['dc.title'][0].value",
-//              is("This is a simple test file")))
-                // we can just check that the pdf is stored in the item
-                .andExpect(
-                        jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0].metadata['dc.title'][0].value",
-                                is("myfile.pdf")))
-                .andExpect(jsonPath(
-                        "$._embedded.workspaceitems[0].sections.upload.files[0].metadata['dc.source'][0].value",
-                        is("/local/path/myfile.pdf")))
-        ;
+                                         .file(pdfFile))
+                            // bulk create should return 200, 201 (created) is better for single resource
+                            .andExpect(status().isOk())
+                            // testing grobid extraction
+                            .andExpect(jsonPath(
+                                "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
+                                is("This is a simple test file")))
+                            .andExpect(jsonPath(
+                                "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.contributor.author'][0].value",
+                                is("Bollini, Andrea")))
+                            .andExpect(jsonPath(
+                                "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.date.issued'][0].value",
+                                is("2018")))
+                            .andExpect(jsonPath(
+                                "$._embedded.workspaceitems[0].sections.traditionalpagetwo['dc.description.abstract'][0].value",
+                                is("This is the abstract of our PDF file")))
+                            // we can just check that the pdf is stored in the item
+                            .andExpect(
+                                jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0].metadata['dc.title'][0].value",
+                                         is("myfile.pdf")))
+                            .andExpect(jsonPath(
+                                "$._embedded.workspaceitems[0].sections.upload.files[0].metadata['dc.source'][0].value",
+                                is("/local/path/myfile.pdf")));
 
         pdf.close();
     }

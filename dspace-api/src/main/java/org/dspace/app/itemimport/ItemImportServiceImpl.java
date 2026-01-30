@@ -337,7 +337,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
      /**
       * Add relationships from a 'relationships' manifest file.
-      * 
+      *
       * @param c Context
       * @param sourceDir The parent import source directory
       * @throws Exception
@@ -441,7 +441,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     /**
      * Get the item's entity type from meta.
-     * 
+     *
      * @param item
      * @return
      */
@@ -451,7 +451,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     /**
      * Read the relationship manifest file.
-     * 
+     *
      * Each line in the file contains a relationship type id and an item
      * identifier in the following format:
      *
@@ -537,7 +537,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
       * The import item map will be checked first to see if the identifier refers to an item folder
       * that was just imported. Next it will try to find the item by handle or UUID, or by a unique
       * meta value.
-      * 
+      *
       * @param c Context
       * @param itemIdentifier The identifier string found in the import manifest (handle, uuid, or import subfolder)
       * @return Item if found, or null.
@@ -574,7 +574,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     /**
      * Resolve an item identifier.
-     * 
+     *
      * @param c Context
      * @param itemIdentifier The identifier string found in the import file (handle or UUID)
      * @return Item if found, or null.
@@ -595,7 +595,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     /**
      * Lookup an item by a (unique) meta value.
-     * 
+     *
      * @param c current DSpace session.
      * @param metaKey name of the metadata field to match.
      * @param metaValue value to be matched.
