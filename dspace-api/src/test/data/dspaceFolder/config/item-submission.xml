@@ -20,6 +20,8 @@
         <name-map collection-handle="default" submission-name="traditional"/>
         <name-map collection-handle="123456789/traditional-with-custom-url"
                   submission-name="traditional-with-custom-url"/>
+        <name-map collection-handle="123456789/nested-metadata-test"
+                  submission-name="nestedMetadataTest"/>
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
         <name-map collection-handle="123456789/extraction-test" submission-name="extractiontestprocess"/>
         <name-map collection-handle="123456789/qualdrop-test" submission-name="qualdroptest"/>
@@ -223,6 +225,12 @@
             <type>submission-form</type>
         </step-definition>
 
+        <step-definition id="publicationStepGroup" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
         <step-definition id="custom-url">
             <heading>submit.progressbar.CustomUrlStep</heading>
             <processing-class>org.dspace.app.rest.submit.step.CustomUrlStep</processing-class>
@@ -351,6 +359,11 @@
             <step id="traditionalpageone" />
             <step id="upload-no-required-metadata" />
             <step id="license" />
+        </submission-process>
+
+        <submission-process name="nestedMetadataTest">
+            <step id="collection" />
+            <step id="publicationStepGroup" />
         </submission-process>
 
         <submission-process name="person-submission">
