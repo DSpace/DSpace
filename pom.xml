@@ -1205,7 +1205,8 @@
                 <groupId>org.springframework.ldap</groupId>
                 <artifactId>spring-ldap-core</artifactId>
                 <version>${spring-ldap.version}</version>
-            </dependency>
+	    </dependency>
+            <!-- Specify the version of micrometer to use. Solves dependency convergence issues in spring-ldap-core -->
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-core</artifactId>
