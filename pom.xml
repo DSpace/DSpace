@@ -1383,7 +1383,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.52.0</version>
+                <version>3.53.0</version>
             </dependency>
 
             <!-- Several dependencies disagree on version of GSON including Jena, Google-OAuth-Client
