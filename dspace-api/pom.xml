@@ -630,7 +630,7 @@
         <dependency>
             <groupId>dnsjava</groupId>
             <artifactId>dnsjava</artifactId>
-            <version>3.6.3</version>
+            <version>3.6.4</version>
         </dependency>
 
         <dependency>
