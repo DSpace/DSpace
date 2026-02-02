@@ -35,11 +35,6 @@ public class CustomUrlConsumerConfig {
     private static final String CONFIG_ENTITY_MAPPING_PREFIX = "dspace.custom-url.consumer.entity-metadata-mapping.";
 
     /**
-     * Separator for multiple metadata fields in configuration
-     */
-    private static final String METADATA_FIELD_SEPARATOR = ";";
-
-    /**
      * Internal cache mapping entity types to their respective list of metadata fields.
      * This map is rebuilt from the ConfigurationService via the {@link #reload()} method.
      */
@@ -100,31 +95,32 @@ public class CustomUrlConsumerConfig {
 
     /**
      * Parses metadata field configuration for a specific entity type.
+     * Uses getArrayProperty to read comma-separated values from configuration.
      *
      * @param entityType the entity type to get metadata fields for
      * @return list of metadata field names for the entity type
      */
     private List<String> parseMetadataFieldsFromConfiguration(String entityType) {
         String configKey = CONFIG_ENTITY_MAPPING_PREFIX + entityType;
-        String metadataFieldsConfig = configurationService.getProperty(configKey);
+        String[] metadataFieldsArray = configurationService.getArrayProperty(configKey, new String[0]);
 
-        if (isBlank(metadataFieldsConfig)) {
+        if (metadataFieldsArray.length == 0) {
             log.debug("No metadata field configuration found for entity type '{}' at key '{}'",
                       entityType, configKey);
             return List.of();
         }
 
-        return parseMetadataFieldList(metadataFieldsConfig);
+        return parseMetadataFieldList(metadataFieldsArray);
     }
 
     /**
-     * Parses a semicolon-separated list of metadata field names.
+     * Parses an array of metadata field names, filtering out blank values.
      *
-     * @param metadataFieldsConfig the configuration string containing field names
+     * @param metadataFieldsArray the configuration array containing field names
      * @return list of trimmed, non-empty metadata field names
      */
-    private List<String> parseMetadataFieldList(String metadataFieldsConfig) {
-        return Arrays.stream(metadataFieldsConfig.split(METADATA_FIELD_SEPARATOR))
+    private List<String> parseMetadataFieldList(String[] metadataFieldsArray) {
+        return Arrays.stream(metadataFieldsArray)
                      .map(String::trim)
                      .filter(field -> !isBlank(field))
                      .collect(Collectors.toList());

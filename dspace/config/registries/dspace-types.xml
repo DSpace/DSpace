@@ -118,14 +118,14 @@
         <schema>dspace</schema>
         <element>customurl</element>
         <qualifier/>
-        <scope_note>Custom URL for Dspace entities (e.g., items, collections, communities).</scope_note>
+        <scope_note>Custom URL for DSpace entities (e.g. Person, Publication, etc).</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>dspace</schema>
         <element>customurl</element>
         <qualifier>old</qualifier>
-        <scope_note>Previous custom URLs for Dspace entities, used for redirects and legacy support.</scope_note>
+        <scope_note>Previous custom URLs for DSpace entities, used for redirects and legacy support.</scope_note>
     </dc-type>
 
 

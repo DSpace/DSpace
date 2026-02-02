@@ -66,7 +66,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Person");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Person",
-                                         "person.familyName;person.givenName");
+                                         "person.familyName,person.givenName");
         customUrlConsumerConfig.reload();
 
         context.turnOffAuthorisationSystem();
@@ -240,7 +240,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
         // Update configuration to support Publication entity type
         configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Person,Publication");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Person",
-                                         "person.familyName;person.givenName");
+                                         "person.familyName,person.givenName");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Publication",
                                          "dc.title");
         customUrlConsumerConfig.reload();
@@ -272,7 +272,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
         // Update configuration to use qualified metadata field (dc.contributor.author)
         configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Person,Publication");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Person",
-                                         "person.familyName;person.givenName");
+                                         "person.familyName,person.givenName");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Publication",
                                          "dc.contributor.author");
         customUrlConsumerConfig.reload();
@@ -304,7 +304,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
         // Update configuration to support OrgUnit
         configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Person,OrgUnit");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Person",
-                                         "person.familyName;person.givenName");
+                                         "person.familyName,person.givenName");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.OrgUnit",
                                          "dc.title");
         customUrlConsumerConfig.reload();
@@ -330,9 +330,9 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
         // Update configuration to use mixed metadata fields
         configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Person,Publication");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Person",
-                                         "person.familyName;person.givenName");
+                                         "person.familyName,person.givenName");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Publication",
-                                         "dc.title;dc.contributor.author");
+                                         "dc.title,dc.contributor.author");
         customUrlConsumerConfig.reload();
 
         // Create a collection for an entity type that uses both qualified and unqualified metadata fields
@@ -514,7 +514,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
         configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Publication,Person");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Publication", "dc.title");
         configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Person",
-                                         "person.familyName;person.givenName");
+                                         "person.familyName,person.givenName");
         customUrlConsumerConfig.reload();
 
         // Create a publication with title "Smith John"

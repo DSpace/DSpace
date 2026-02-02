@@ -338,7 +338,9 @@
         <submission-process name="Person">
             <step id="collection"/>
             <step id="personStep"/>
-            <step id="custom-url"/>
+            <!-- The custom-url step can be uncommented to allow the Person's custom URL (when enabled) to be
+                 customized during submission.-->
+            <!-- <step id="custom-url"/> -->
             <step id="upload"/>
             <step id="license"/>
         </submission-process>
