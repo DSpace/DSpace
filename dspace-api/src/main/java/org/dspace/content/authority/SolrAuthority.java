@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -76,15 +77,15 @@ public class SolrAuthority implements ChoiceAuthority {
                 Integer.parseInt(locale);
                 locale = null;
             } catch (NumberFormatException e) {
-                //Everything is allright
+                //Everything is alright
             }
             if (locale != null && !"".equals(locale)) {
                 localSearchField = searchField + "_" + locale;
             }
 
-            String query = "(" + toQuery(searchField, text) + ") ";
+            String query = "(" + toQuery(searchField, text) + ")";
             if (!localSearchField.equals("")) {
-                query += " or (" + toQuery(localSearchField, text) + ")";
+                query += " OR (" + toQuery(localSearchField, text) + ")";
             }
             queryArgs.setQuery(query);
         }
@@ -200,8 +201,8 @@ public class SolrAuthority implements ChoiceAuthority {
     }
 
     private String toQuery(String searchField, String text) {
-        return searchField + ":(" + text.toLowerCase().replaceAll(":", "\\:") + "*) or " + searchField + ":(" + text
-            .toLowerCase().replaceAll(":", "\\:") + ")";
+        return searchField + ":(" + text.toLowerCase().replaceAll(":", "\\\\:") + "*) OR " + searchField + ":(" + text
+            .toLowerCase().replaceAll(":", "\\\\:") + ")";
     }
 
     @Override
@@ -225,7 +226,7 @@ public class SolrAuthority implements ChoiceAuthority {
                 log.debug("requesting label for key " + key + " using locale " + locale);
             }
             SolrQuery queryArgs = new SolrQuery();
-            queryArgs.setQuery("id:" + key);
+            queryArgs.setQuery("id:" + key.replaceAll(":", "\\\\:"));
             queryArgs.setRows(1);
             QueryResponse searchResponse = getSearchService().search(queryArgs);
             SolrDocumentList docs = searchResponse.getResults();
@@ -289,8 +290,8 @@ public class SolrAuthority implements ChoiceAuthority {
     public void setPluginInstanceName(String name) {
         authorityName = name;
         for (Entry conf : configurationService.getProperties().entrySet()) {
-            if (StringUtils.startsWith((String) conf.getKey(), ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX)
-                    && StringUtils.equals((String) conf.getValue(), authorityName)) {
+            if (Strings.CS.startsWith((String) conf.getKey(), ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX)
+                    && Strings.CS.equals((String) conf.getValue(), authorityName)) {
                 field = ((String) conf.getKey()).substring(ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX.length())
                         .replace(".", "_");
                 // exit the look immediately as we have found it

@@ -8,17 +8,17 @@
 package org.dspace.xmlworkflow.storedcomponents;
 
 import java.sql.SQLException;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
@@ -44,8 +44,6 @@ public class WorkflowItemRole implements ReloadableEntity<Integer> {
     @SequenceGenerator(name = "cwf_workflowitemrole_seq", sequenceName = "cwf_workflowitemrole_seq", allocationSize = 1)
     private Integer id;
 
-    //    @Column(name = "role_id")
-//    @Lob
     @Column(name = "role_id", columnDefinition = "text")
     private String roleId;
 

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
-import javax.el.MethodNotFoundException;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -27,6 +26,7 @@ import org.apache.http.HttpException;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -113,7 +113,7 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for Cinii");
+        throw new UnsupportedOperationException("This method is not implemented for Cinii");
     }
 
     public String getUrl() {
@@ -302,7 +302,7 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
 
     private List<Element> splitToRecords(String recordsSrc) {
         try {
-            SAXBuilder saxBuilder = new SAXBuilder();
+            SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
             Document document = saxBuilder.build(new StringReader(recordsSrc));
             Element root = document.getRootElement();
             return root.getChildren();
@@ -355,7 +355,7 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
             Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
             String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
             int url_len = this.url.length() - 1;
-            SAXBuilder saxBuilder = new SAXBuilder();
+            SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
             Document document = saxBuilder.build(new StringReader(response));
             Element root = document.getRootElement();
             List<Namespace> namespaces = Arrays.asList(
@@ -417,7 +417,7 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
             Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
             String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
 
-            SAXBuilder saxBuilder = new SAXBuilder();
+            SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
             Document document = saxBuilder.build(new StringReader(response));
             Element root = document.getRootElement();
             List<Namespace> namespaces = Arrays

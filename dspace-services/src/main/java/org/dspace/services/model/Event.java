@@ -161,7 +161,7 @@ public class Event implements Serializable {
     /**
      * Did this event modify something in the system?
      *
-     * @return true if this event modified soemthing in the system, false if it was read only
+     * @return true if this event modified something in the system, false if it was read only
      */
     public boolean isModify() {
         return modify;

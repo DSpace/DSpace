@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.projection.Projection;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for the direct "groups" subresource of an individual eperson.
  */
-@Component(EPersonRest.CATEGORY + "." + EPersonRest.NAME + "." + EPersonRest.GROUPS)
+@Component(EPersonRest.CATEGORY + "." + EPersonRest.PLURAL_NAME + "." + EPersonRest.GROUPS)
 public class EPersonGroupLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

@@ -4,13 +4,6 @@
 # Can be validated via instructions at:
 # https://docs.codecov.io/docs/codecov-yaml#validate-your-repository-yaml
 
-# Tell Codecov not to send a coverage notification until (at least) 2 builds are completed
-# Since we run Unit & Integration tests in parallel, this lets Codecov know that coverage
-# needs to be merged across those builds
-codecov:
-  notify:
-    after_n_builds: 2
-
 # Settings related to code coverage analysis
 coverage:
   status:

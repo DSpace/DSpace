@@ -8,7 +8,7 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
-#set($subject = 'DSpace: Harvesting Error')
+#set($subject = "${config.get('dspace.name')}: Harvesting Error")
 Collection ${params[0]} failed on harvest:
 
 Date:       	${params[1]}
@@ -18,3 +18,5 @@ ${params[3]}
 
 Exception:
 ${params[4]}
+
+The ${config.get('dspace.name')} Team

@@ -8,11 +8,11 @@
 package org.dspace.harvest.dao.impl;
 
 import java.sql.SQLException;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Root;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.Item_;

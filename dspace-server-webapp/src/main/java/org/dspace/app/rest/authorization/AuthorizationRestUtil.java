@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.ReloadableEntityObjectRepository;
@@ -66,7 +67,8 @@ public class AuthorizationRestUtil {
         String[] objType;
         try {
             objType = parts[2].split("\\.");
-            DSpaceRestRepository repository = utils.getResourceRepositoryByCategoryAndModel(objType[0], objType[1]);
+            DSpaceRestRepository repository = utils
+                .getResourceRepositoryByCategoryAndModel(objType[0], English.plural(objType[1]));
             Serializable pk = utils.castToPKClass((ReloadableEntityObjectRepository) repository, objIdStr);
             try {
                 // disable the security as we only need to retrieve the object to further process the authorization
@@ -141,7 +143,7 @@ public class AuthorizationRestUtil {
             objId = idParts[2];
         } else {
             throw new IllegalArgumentException(
-                    "the authoization id is invalid, it must have the form " +
+                    "the authorization id is invalid, it must have the form " +
                     "[eperson-uuid_]feature-id_object-type_object-id");
         }
         return new String[] { eperson, feature, objType, objId };

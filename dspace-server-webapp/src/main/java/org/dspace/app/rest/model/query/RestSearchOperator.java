@@ -23,18 +23,18 @@ import java.util.regex.Pattern;
 public enum RestSearchOperator {
 
     /**
-     * The notcontains operator can be used by adding a - (minus) infront of the search query
+     * The notcontains operator can be used by adding a - (minus) in front of the search query
      * and a * at the end
      * It then becomes -VALUE* to call for a search on the notcontains operator for VALUE
      */
     NOTCONTAINS("-(.+)\\*", "notcontains"),
     /**
-     * The notauthority operator can be used by adding a -id: infront of the search query
+     * The notauthority operator can be used by adding a -id: in front of the search query
      * It then becomes -id:VALUE to call for a search on the notauthority operator for VALUE
      */
     NOTAUTHORITY("-id:(.+)", "notauthority"),
     /**
-     * The notequals operator can be used by adding a - infront of the search query
+     * The notequals operator can be used by adding a - in front of the search query
      * It then becomes -VALUE to call for a search on the notequals operator for VALUE
      */
     NOTEQUALS("-(.+)", "notequals"),
@@ -44,7 +44,7 @@ public enum RestSearchOperator {
      */
     CONTAINS("(.+)\\*", "contains"),
     /**
-     * The authority operator can be used by adding an id: infront of the search query
+     * The authority operator can be used by adding an id: in front of the search query
      * It then becomes id:VALUE to call for a search on the authority operator for VALUE
      */
     AUTHORITY("id:(.+)", "authority"),

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node id='Countries' label='Countries'>
+    <isComposedBy>
+        <node id='Africa' label='Africa'>
+            <isComposedBy>
+                <node id='DZA' label='Algeria'/>
+            </isComposedBy>
+        </node>
+    </isComposedBy>
+</node>

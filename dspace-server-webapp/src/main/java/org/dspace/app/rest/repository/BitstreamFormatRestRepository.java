@@ -10,11 +10,11 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamFormatRest;
@@ -35,11 +35,14 @@ import org.springframework.stereotype.Component;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Component(BitstreamFormatRest.CATEGORY + "." + BitstreamFormatRest.NAME)
+@Component(BitstreamFormatRest.CATEGORY + "." + BitstreamFormatRest.PLURAL_NAME)
 public class BitstreamFormatRestRepository extends DSpaceRestRepository<BitstreamFormatRest, Integer> {
 
     @Autowired
     BitstreamFormatService bitstreamFormatService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Override
     @PreAuthorize("permitAll()")
@@ -70,7 +73,6 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     @PreAuthorize("hasAuthority('ADMIN')")
     protected BitstreamFormatRest createAndReturn(Context context) throws AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         BitstreamFormatRest bitstreamFormatRest = null;
         try {
             ServletInputStream input = req.getInputStream();
@@ -98,7 +100,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
                                       Integer id, JsonNode jsonNode) throws SQLException, AuthorizeException {
         BitstreamFormatRest bitstreamFormatRest = null;
         try {
-            bitstreamFormatRest = new ObjectMapper().readValue(jsonNode.toString(), BitstreamFormatRest.class);
+            bitstreamFormatRest = mapper.readValue(jsonNode.toString(), BitstreamFormatRest.class);
         } catch (IOException e) {
             throw new UnprocessableEntityException("Error parsing collection json: " + e.getMessage());
         }

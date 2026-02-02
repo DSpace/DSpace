@@ -40,6 +40,11 @@ dspace.dir=/dspace
 # It corresponds to the URL that you would type into your browser to access the REST API.
 dspace.server.url = http://localhost:8080/server
 
+# Additional URL of DSpace backend which could be used by DSpace frontend during SSR execution.
+# May require a port number if not using standard ports (80 or 443)
+# DO NOT end it with '/'.
+dspace.server.ssr.url = ${dspace.server.url}
+
 # Public URL of DSpace frontend (Angular UI). May require a port number if not using standard ports (80 or 443)
 # DO NOT end it with '/'.
 # This is used by the backend to provide links in emails, RSS feeds, Sitemaps, etc.
@@ -71,34 +76,14 @@ dspace.name = DSpace at My University
 ##########################
 # DATABASE CONFIGURATION #
 ##########################
-# DSpace only supports two database types: PostgreSQL or Oracle
-# PostgreSQL is highly recommended.
-# Oracle support is DEPRECATED. See https://github.com/DSpace/DSpace/issues/8214
+# DSpace ONLY supports PostgreSQL at this time.
 
 # URL for connecting to database
-#    * Postgres template: jdbc:postgresql://localhost:5432/dspace
-#    * Oracle template (DEPRECATED): jdbc:oracle:thin:@//localhost:1521/xe
 db.url = jdbc:postgresql://localhost:5432/dspace
-
-# JDBC Driver
-#    * For Postgres: org.postgresql.Driver
-#    * For Oracle (DEPRECATED):   oracle.jdbc.OracleDriver
-db.driver = org.postgresql.Driver
-
-# Database Dialect (for Hibernate)
-#    * For Postgres: org.hibernate.dialect.PostgreSQL94Dialect
-#    * For Oracle (DEPRECATED):   org.hibernate.dialect.Oracle10gDialect
-db.dialect = org.hibernate.dialect.PostgreSQL94Dialect
 
 # Database username and password
 db.username = dspace
 db.password = dspace
-
-# Database Schema name
-#    * For Postgres, this is often "public" (default schema)
-#    * For Oracle (DEPRECATED), schema is equivalent to the username of your database account,
-#      so this may be set to ${db.username} in most scenarios.
-db.schema = public
 
 ## Connection pool parameters
 
@@ -215,8 +200,8 @@ db.schema = public
 # ORCID certificate authentication.
 # plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.OrcidAuthentication
 
-# X.509 certificate authentication. See authentication-x509.cfg for default configuration.
-#plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.X509Authentication
+# SAML authentication/authorization. See authenication-saml.cfg for default configuration.
+#plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.SamlAuthentication
 
 # Authentication by Password (encrypted in DSpace's database). See authentication-password.cfg for default configuration.
 # Enabled by default in authentication.cfg
@@ -251,3 +236,8 @@ db.schema = public
 
 # Maximum size of a multipart request (i.e. max total size of all files in one request)
 #spring.servlet.multipart.max-request-size = 512MB
+
+########################
+#  LDN INBOX SETTINGS  #
+########################
+ldn.enabled = true

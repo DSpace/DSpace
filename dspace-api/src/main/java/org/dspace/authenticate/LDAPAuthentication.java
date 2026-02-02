@@ -11,10 +11,13 @@ import static org.dspace.eperson.service.EPersonService.MD_PHONE;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -27,10 +30,11 @@ import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.StartTlsRequest;
 import javax.naming.ldap.StartTlsResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
@@ -64,13 +68,10 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @author Reuben Pasquini
  * @author Samuel Ottenhoff
  * @author Ivan Masár
+ * @author Michael Plate
  */
-public class LDAPAuthentication
-    implements AuthenticationMethod {
+public class LDAPAuthentication implements AuthenticationMethod {
 
-    /**
-     * log4j category
-     */
     private static final Logger log
             = org.apache.logging.log4j.LogManager.getLogger(LDAPAuthentication.class);
 
@@ -127,7 +128,7 @@ public class LDAPAuthentication
         return false;
     }
 
-    /*
+    /**
      * This is an explicit method.
      */
     @Override
@@ -135,7 +136,7 @@ public class LDAPAuthentication
         return false;
     }
 
-    /*
+    /**
      * Add authenticated users to the group defined in dspace.cfg by
      * the login.specialgroup key.
      */
@@ -174,7 +175,7 @@ public class LDAPAuthentication
         return Collections.EMPTY_LIST;
     }
 
-    /*
+    /**
      * Authenticate the given credentials.
      * This is the heart of the authentication method: test the
      * credentials for authenticity, and if accepted, attempt to match
@@ -184,7 +185,7 @@ public class LDAPAuthentication
      * @param context
      *  DSpace context, will be modified (ePerson set) upon success.
      *
-     * @param username
+     * @param netid
      *  Username (or email address) when method is explicit. Use null for
      *  implicit method.
      *
@@ -203,7 +204,7 @@ public class LDAPAuthentication
      * <p>Meaning:
      * <br>SUCCESS         - authenticated OK.
      * <br>BAD_CREDENTIALS - user exists, but credentials (e.g. passwd) don't match
-     * <br>CERT_REQUIRED   - not allowed to login this way without X.509 cert.
+     * <br>CERT_REQUIRED   - not allowed to login this way without a cert.
      * <br>NO_SUCH_USER    - user not found using this method.
      * <br>BAD_ARGS        - user/pw not appropriate for this method
      */
@@ -247,7 +248,7 @@ public class LDAPAuthentication
         }
 
         // Check a DN was found
-        if ((dn == null) || (dn.trim().equals(""))) {
+        if (StringUtils.isBlank(dn)) {
             log.info(LogHelper
                          .getHeader(context, "failed_login", "no DN found for user " + netid));
             return BAD_CREDENTIALS;
@@ -265,6 +266,18 @@ public class LDAPAuthentication
             if (ldap.ldapAuthenticate(dn, password, context)) {
                 context.setCurrentUser(eperson);
                 request.setAttribute(LDAP_AUTHENTICATED, true);
+
+                // update eperson's attributes
+                context.turnOffAuthorisationSystem();
+                setEpersonAttributes(context, eperson, ldap, Optional.empty());
+                try {
+                    ePersonService.update(context, eperson);
+                    context.dispatchEvents();
+                } catch (AuthorizeException e) {
+                    log.warn("update of eperson " + eperson.getID()  + " failed", e);
+                } finally {
+                    context.restoreAuthSystemState();
+                }
 
                 // assign user to groups based on ldap dn
                 assignGroups(dn, ldap.ldapGroup, context);
@@ -310,13 +323,12 @@ public class LDAPAuthentication
                             log.info(LogHelper.getHeader(context,
                                                           "type=ldap-login", "type=ldap_but_already_email"));
                             context.turnOffAuthorisationSystem();
-                            eperson.setNetid(netid.toLowerCase());
+                            setEpersonAttributes(context, eperson, ldap, Optional.of(netid));
                             ePersonService.update(context, eperson);
                             context.dispatchEvents();
                             context.restoreAuthSystemState();
                             context.setCurrentUser(eperson);
                             request.setAttribute(LDAP_AUTHENTICATED, true);
-
 
                             // assign user to groups based on ldap dn
                             assignGroups(dn, ldap.ldapGroup, context);
@@ -328,20 +340,7 @@ public class LDAPAuthentication
                                 try {
                                     context.turnOffAuthorisationSystem();
                                     eperson = ePersonService.create(context);
-                                    if (StringUtils.isNotEmpty(email)) {
-                                        eperson.setEmail(email);
-                                    }
-                                    if (StringUtils.isNotEmpty(ldap.ldapGivenName)) {
-                                        eperson.setFirstName(context, ldap.ldapGivenName);
-                                    }
-                                    if (StringUtils.isNotEmpty(ldap.ldapSurname)) {
-                                        eperson.setLastName(context, ldap.ldapSurname);
-                                    }
-                                    if (StringUtils.isNotEmpty(ldap.ldapPhone)) {
-                                        ePersonService.setMetadataSingleValue(context, eperson,
-                                                MD_PHONE, ldap.ldapPhone, null);
-                                    }
-                                    eperson.setNetid(netid.toLowerCase());
+                                    setEpersonAttributes(context, eperson, ldap, Optional.of(netid));
                                     eperson.setCanLogIn(true);
                                     authenticationService.initEPerson(context, request, eperson);
                                     ePersonService.update(context, eperson);
@@ -380,6 +379,29 @@ public class LDAPAuthentication
     }
 
     /**
+     * Update eperson's attributes
+     */
+    private void setEpersonAttributes(Context context, EPerson eperson, SpeakerToLDAP ldap, Optional<String> netid)
+        throws SQLException {
+
+        if (StringUtils.isNotEmpty(ldap.ldapEmail)) {
+            eperson.setEmail(ldap.ldapEmail);
+        }
+        if (StringUtils.isNotEmpty(ldap.ldapGivenName)) {
+            eperson.setFirstName(context, ldap.ldapGivenName);
+        }
+        if (StringUtils.isNotEmpty(ldap.ldapSurname)) {
+            eperson.setLastName(context, ldap.ldapSurname);
+        }
+        if (StringUtils.isNotEmpty(ldap.ldapPhone)) {
+            ePersonService.setMetadataSingleValue(context, eperson, MD_PHONE, ldap.ldapPhone, null);
+        }
+        if (netid.isPresent()) {
+            eperson.setNetid(netid.get().toLowerCase());
+        }
+    }
+
+    /**
      * Internal class to manage LDAP query and results, mainly
      * because there are multiple values to return.
      */
@@ -391,7 +413,7 @@ public class LDAPAuthentication
         protected String ldapGivenName = null;
         protected String ldapSurname = null;
         protected String ldapPhone = null;
-        protected String ldapGroup = null;
+        protected ArrayList<String> ldapGroup = null;
 
         /**
          * LDAP settings
@@ -406,8 +428,8 @@ public class LDAPAuthentication
         final String ldap_surname_field;
         final String ldap_phone_field;
         final String ldap_group_field;
-
         final boolean useTLS;
+
 
         SpeakerToLDAP(Logger thelog) {
             ConfigurationService configurationService
@@ -491,6 +513,8 @@ public class LDAPAuthentication
                 try {
                     SearchControls ctrls = new SearchControls();
                     ctrls.setSearchScope(ldap_search_scope_value);
+                    // Fetch both user attributes '*' (eg. uid, cn) and operational attributes '+' (eg. memberOf)
+                    ctrls.setReturningAttributes(new String[] {"*", "+"});
 
                     String searchName;
                     if (useTLS) {
@@ -498,6 +522,7 @@ public class LDAPAuthentication
                     } else {
                         searchName = ldap_provider_url + ldap_search_context;
                     }
+                    @SuppressWarnings("BanJNDI")
                     NamingEnumeration<SearchResult> answer = ctx.search(
                         searchName,
                         "(&({0}={1}))", new Object[] {ldap_id_field,
@@ -511,7 +536,7 @@ public class LDAPAuthentication
                             resultDN = (sr.getName() + "," + ldap_search_context);
                         }
 
-                        String attlist[] = {ldap_email_field, ldap_givenname_field,
+                        String[] attlist = {ldap_email_field, ldap_givenname_field,
                             ldap_surname_field, ldap_phone_field, ldap_group_field};
                         Attributes atts = sr.getAttributes();
                         Attribute att;
@@ -547,7 +572,11 @@ public class LDAPAuthentication
                         if (attlist[4] != null) {
                             att = atts.get(attlist[4]);
                             if (att != null) {
-                                ldapGroup = (String) att.get();
+                                // loop through all groups returned by LDAP
+                                ldapGroup = new ArrayList<>();
+                                for (NamingEnumeration val = att.getAll(); val.hasMoreElements(); )  {
+                                    ldapGroup.add((String) val.next());
+                                }
                             }
                         }
 
@@ -624,7 +653,8 @@ public class LDAPAuthentication
                         ctx.addToEnvironment(javax.naming.Context.AUTHORITATIVE, "true");
                         ctx.addToEnvironment(javax.naming.Context.REFERRAL, "follow");
                         // dummy operation to check if authentication has succeeded
-                        ctx.getAttributes("");
+                        @SuppressWarnings("BanJNDI")
+                        Attributes trash = ctx.getAttributes("");
                     } else if (!useTLS) {
                         // Authenticate
                         env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "Simple");
@@ -662,7 +692,7 @@ public class LDAPAuthentication
         }
     }
 
-    /*
+    /**
      * Returns the URL of an external login page which is not applicable for this authn method.
      *
      * Note: Prior to DSpace 7, this method return the page of login servlet.
@@ -690,56 +720,100 @@ public class LDAPAuthentication
         return "ldap";
     }
 
-    /*
+    /**
      * Add authenticated users to the group defined in dspace.cfg by
      * the authentication-ldap.login.groupmap.* key.
+     *
+     * @param dn
+     *  The string containing distinguished name of the user
+     *
+     * @param group
+     *  List of strings with LDAP dn of groups
+     *
+     * @param context
+     *  DSpace context
      */
-    private void assignGroups(String dn, String group, Context context) {
+    private void assignGroups(String dn, ArrayList<String> group, Context context) {
         if (StringUtils.isNotBlank(dn)) {
             System.out.println("dn:" + dn);
-            int i = 1;
-            String groupMap = configurationService.getProperty("authentication-ldap.login.groupmap." + i);
-
+            int groupmapIndex = 1;
+            String groupMap = configurationService.getProperty("authentication-ldap.login.groupmap." + groupmapIndex);
             boolean cmp;
 
+
+            // groupmap contains the mapping of LDAP groups to DSpace groups
+            // outer loop with the DSpace groups
             while (groupMap != null) {
-                String t[] = groupMap.split(":");
+                String[] t = groupMap.split(":");
                 String ldapSearchString = t[0];
                 String dspaceGroupName = t[1];
 
                 if (group == null) {
-                    cmp = StringUtils.containsIgnoreCase(dn, ldapSearchString + ",");
-                } else {
-                    cmp = StringUtils.equalsIgnoreCase(group, ldapSearchString);
-                }
+                    cmp = Strings.CI.contains(dn, ldapSearchString + ",");
 
-                if (cmp) {
-                    // assign user to this group
-                    try {
-                        Group ldapGroup = groupService.findByName(context, dspaceGroupName);
-                        if (ldapGroup != null) {
-                            groupService.addMember(context, ldapGroup, context.getCurrentUser());
-                            groupService.update(context, ldapGroup);
+                    if (cmp) {
+                        assignGroup(context, groupmapIndex, dspaceGroupName);
+                    }
+                } else {
+                    // list of strings with dn from LDAP groups
+                    // inner loop
+                    Iterator<String> groupIterator = group.iterator();
+                    while (groupIterator.hasNext())  {
+
+                        // save the current entry from iterator for further use
+                        String currentGroup = groupIterator.next();
+
+                        // very much the old code from DSpace <= 7.5
+                        if (currentGroup == null) {
+                            cmp = Strings.CI.contains(dn, ldapSearchString + ",");
                         } else {
-                            // The group does not exist
-                            log.warn(LogHelper.getHeader(context,
-                                                          "ldap_assignGroupsBasedOnLdapDn",
-                                                          "Group defined in authentication-ldap.login.groupmap." + i
-                                                              + " does not exist :: " + dspaceGroupName));
+                            cmp = Strings.CI.equals(currentGroup, ldapSearchString);
                         }
-                    } catch (AuthorizeException ae) {
-                        log.debug(LogHelper.getHeader(context,
-                                                       "assignGroupsBasedOnLdapDn could not authorize addition to " +
-                                                           "group",
-                                                       dspaceGroupName));
-                    } catch (SQLException e) {
-                        log.debug(LogHelper.getHeader(context, "assignGroupsBasedOnLdapDn could not find group",
-                                                       dspaceGroupName));
+
+                        if (cmp) {
+                            assignGroup(context, groupmapIndex, dspaceGroupName);
+                        }
                     }
                 }
 
-                groupMap = configurationService.getProperty("authentication-ldap.login.groupmap." + ++i);
+                groupMap = configurationService.getProperty("authentication-ldap.login.groupmap." + ++groupmapIndex);
             }
+        }
+    }
+
+    /**
+     * Add the current authenticated user to the specified group
+     *
+     * @param context
+     *  DSpace context
+     *
+     * @param groupmapIndex
+     *  authentication-ldap.login.groupmap.* key index defined in dspace.cfg
+     *
+     * @param dspaceGroupName
+     *  The DSpace group to add the user to
+     */
+    private void assignGroup(Context context, int groupmapIndex, String dspaceGroupName) {
+        try {
+            Group ldapGroup = groupService.findByName(context, dspaceGroupName);
+            if (ldapGroup != null) {
+                groupService.addMember(context, ldapGroup, context.getCurrentUser());
+                groupService.update(context, ldapGroup);
+            } else {
+                // The group does not exist
+                log.warn(LogHelper.getHeader(context,
+                        "ldap_assignGroupsBasedOnLdapDn",
+                        "Group defined in authentication-ldap.login.groupmap." + groupmapIndex
+                        + " does not exist :: " + dspaceGroupName));
+            }
+        } catch (AuthorizeException ae) {
+            log.debug(LogHelper.getHeader(context,
+                    "assignGroupsBasedOnLdapDn could not authorize addition to " +
+                            "group",
+                            dspaceGroupName));
+        } catch (SQLException e) {
+            log.debug(LogHelper.getHeader(context, "assignGroupsBasedOnLdapDn could not find group",
+                    dspaceGroupName));
         }
     }
 

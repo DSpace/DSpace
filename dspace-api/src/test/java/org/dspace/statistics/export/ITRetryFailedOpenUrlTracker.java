@@ -100,7 +100,7 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
     }
 
     /**
-     * Test to check that all logged failed urls are reprocessed succesfully and removed from the db
+     * Test to check that all logged failed urls are reprocessed successfully and removed from the db
      *
      * @throws Exception
      */

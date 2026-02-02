@@ -11,13 +11,14 @@ package org.dspace.rdf.providing;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.jena.rdf.model.Model;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
@@ -159,7 +160,7 @@ public class DataProviderServlet extends HttpServlet {
     }
 
     protected String detectContentType(HttpServletRequest request, String lang) {
-        // It is usefull to be able to overwrite the content type, to see the
+        // It is useful to be able to overwrite the content type, to see the
         // request result directly in the browser. If a parameter "text" is part
         // of the request, we send the result with the content type "text/plain".
         if (request.getParameter("text") != null) {
@@ -193,11 +194,11 @@ public class DataProviderServlet extends HttpServlet {
         if (StringUtils.endsWithIgnoreCase(lang, "ttl")) {
             return "TURTLE";
         }
-        if (StringUtils.equalsIgnoreCase(lang, "n3")) {
+        if (Strings.CI.equals(lang, "n3")) {
             return "N3";
         }
-        if (StringUtils.equalsIgnoreCase(lang, "rdf")
-            || StringUtils.equalsIgnoreCase(lang, "xml")) {
+        if (Strings.CI.equals(lang, "rdf")
+            || Strings.CI.equals(lang, "xml")) {
             return "RDF/XML";
         }
         if (StringUtils.endsWithIgnoreCase(lang, "nt")) {

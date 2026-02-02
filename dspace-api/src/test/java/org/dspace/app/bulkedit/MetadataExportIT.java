@@ -16,7 +16,7 @@ import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
@@ -99,8 +99,9 @@ public class MetadataExportIT
             script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
         }
         if (script != null) {
-            script.initialize(args, testDSpaceRunnableHandler, null);
-            script.run();
+            if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
+                script.run();
+            }
         }
     }
 
@@ -206,15 +207,16 @@ public class MetadataExportIT
             script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
         }
         if (script != null) {
-            script.initialize(args, testDSpaceRunnableHandler, null);
-            script.run();
+            if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
+                script.run();
+            }
         }
 
         Exception exceptionDuringTestRun = testDSpaceRunnableHandler.getException();
         assertTrue("Random UUID caused IllegalArgumentException",
             exceptionDuringTestRun instanceof IllegalArgumentException);
         assertTrue("IllegalArgumentException contains mention of the non-valid UUID",
-            StringUtils.contains(exceptionDuringTestRun.getMessage(), nonValidUUID));
+            Strings.CS.contains(exceptionDuringTestRun.getMessage(), nonValidUUID));
     }
 
     @Test
@@ -235,16 +237,17 @@ public class MetadataExportIT
             script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
         }
         if (script != null) {
-            script.initialize(args, testDSpaceRunnableHandler, null);
-            script.run();
+            if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
+                script.run();
+            }
         }
 
         Exception exceptionDuringTestRun = testDSpaceRunnableHandler.getException();
         assertTrue("UUID of non-supported dsoType IllegalArgumentException",
             exceptionDuringTestRun instanceof IllegalArgumentException);
         assertTrue("IllegalArgumentException contains mention of the UUID of non-supported dsoType",
-            StringUtils.contains(exceptionDuringTestRun.getMessage(), uuidNonValidDSOType));
+            Strings.CS.contains(exceptionDuringTestRun.getMessage(), uuidNonValidDSOType));
         assertTrue("IllegalArgumentException contains mention of the non-supported dsoType",
-            StringUtils.contains(exceptionDuringTestRun.getMessage(), Constants.typeText[eperson.getType()]));
+            Strings.CS.contains(exceptionDuringTestRun.getMessage(), Constants.typeText[eperson.getType()]));
     }
 }

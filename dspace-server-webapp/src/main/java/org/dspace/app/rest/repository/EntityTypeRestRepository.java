@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 /**
  * This is the repository that is responsible to manage EntityType Rest objects
  */
-@Component(EntityTypeRest.CATEGORY + "." + EntityTypeRest.NAME)
+@Component(EntityTypeRest.CATEGORY + "." + EntityTypeRest.PLURAL_NAME)
 public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRest, Integer> {
 
     @Autowired

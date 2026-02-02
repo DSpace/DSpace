@@ -8,30 +8,27 @@
 package org.dspace.eperson;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.content.DSpaceObject;
+import org.apache.commons.lang3.Strings;
+import org.dspace.content.CacheableDSpaceObject;
 import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.HibernateProxyHelper;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.proxy.HibernateProxyHelper;
 
 /**
  * Class representing an e-person.
@@ -39,10 +36,8 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * @author David Stuve
  */
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 @Table(name = "eperson")
-public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
     @Column(name = "eperson_id", insertable = false, updatable = false)
     private Integer legacyId;
 
@@ -50,8 +45,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
     private String netid;
 
     @Column(name = "last_active")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastActive;
+    private Instant lastActive;
 
     @Column(name = "can_log_in", nullable = true)
     private Boolean canLogIn;
@@ -109,7 +103,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
     protected transient EPersonService ePersonService;
 
     @Transient
-    private Date previousActive;
+    private Instant previousActive;
 
     /**
      * Protected constructor, create object using:
@@ -143,10 +137,10 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
         if (!this.getID().equals(other.getID())) {
             return false;
         }
-        if (!StringUtils.equals(this.getEmail(), other.getEmail())) {
+        if (!Strings.CS.equals(this.getEmail(), other.getEmail())) {
             return false;
         }
-        if (!StringUtils.equals(this.getFullName(), other.getFullName())) {
+        if (!Strings.CS.equals(this.getFullName(), other.getFullName())) {
             return false;
         }
         return true;
@@ -178,7 +172,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
     /**
      * Set the EPerson's language.  Value is expected to be a Unix/POSIX
      * Locale specification of the form {language} or {language}_{territory},
-     * e.g. "en", "en_US", "pt_BR" (the latter is Brazilian Portugese).
+     * e.g. "en", "en_US", "pt_BR" (the latter is Brazilian Portuguese).
      *
      * @param context  The relevant DSpace Context.
      * @param language language code
@@ -349,7 +343,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
      *
      * @param when latest activity timestamp, or null to clear.
      */
-    public void setLastActive(Date when) {
+    public void setLastActive(Instant when) {
         this.previousActive = lastActive;
         this.lastActive = when;
     }
@@ -359,7 +353,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
      *
      * @return date when last logged on, or null.
      */
-    public Date getLastActive() {
+    public Instant getLastActive() {
         return lastActive;
     }
 
@@ -373,7 +367,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     @Override
     public String getName() {
-        return getEmail();
+        return this.getFullName();
     }
 
     String getDigestAlgorithm() {
@@ -439,9 +433,9 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
         this.sessionSalt = sessionSalt;
     }
 
-    public Date getPreviousActive() {
+    public Instant getPreviousActive() {
         if (previousActive == null) {
-            return new Date(0);
+            return Instant.now();
         }
         return previousActive;
     }

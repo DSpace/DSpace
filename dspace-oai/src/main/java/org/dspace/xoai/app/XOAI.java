@@ -9,7 +9,7 @@ package org.dspace.xoai.app;
 
 import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.solr.common.params.CursorMarkParams.CURSOR_MARK_PARAM;
 import static org.apache.solr.common.params.CursorMarkParams.CURSOR_MARK_START;
 import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
@@ -18,10 +18,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,7 +87,6 @@ public class XOAI {
 
     // needed because the solr query only returns 10 rows by default
     private final Context context;
-    private boolean optimize;
     private final boolean verbose;
     private boolean clean;
 
@@ -111,7 +112,7 @@ public class XOAI {
         try {
             for (Bundle b : itemService.getBundles(item, "ORIGINAL")) {
                 for (Bitstream bs : b.getBitstreams()) {
-                    if (!formats.contains(bs.getFormat(context).getMIMEType())) {
+                    if (bs != null && !formats.contains(bs.getFormat(context).getMIMEType())) {
                         formats.add(bs.getFormat(context).getMIMEType());
                     }
                 }
@@ -122,9 +123,8 @@ public class XOAI {
         return formats;
     }
 
-    public XOAI(Context context, boolean optimize, boolean clean, boolean verbose) {
+    public XOAI(Context context, boolean clean, boolean verbose) {
         this.context = context;
-        this.optimize = optimize;
         this.clean = clean;
         this.verbose = verbose;
 
@@ -167,27 +167,22 @@ public class XOAI {
                     System.out.println("There are no indexed documents, using full import.");
                     result = this.indexAll();
                 } else {
-                    result = this.index((Date) results.get(0).getFieldValue("item.lastmodified"));
+                    result = this.index(((java.util.Date) results.get(0).getFieldValue("item.lastmodified"))
+                                            .toInstant());
                 }
 
             }
             solrServerResolver.getServer().commit();
 
-            if (optimize) {
-                println("Optimizing Index");
-                solrServerResolver.getServer().optimize();
-                println("Index optimized");
-            }
-
             // Set last compilation date
-            xoaiLastCompilationCacheService.put(new Date());
+            xoaiLastCompilationCacheService.put(Instant.now());
             return result;
         } catch (DSpaceSolrException | SolrServerException | IOException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
         }
     }
 
-    private int index(Date last) throws DSpaceSolrIndexerException, IOException {
+    private int index(Instant last) throws DSpaceSolrIndexerException, IOException {
         System.out.println("Incremental import. Searching for documents modified after: " + last.toString());
         /*
          * Index all changed or new items or items whose visibility is viable to change
@@ -216,7 +211,8 @@ public class XOAI {
      *         since the last update.
      * @throws DSpaceSolrIndexerException
      */
-    private Iterator<Item> getItemsWithPossibleChangesBefore(Date last) throws DSpaceSolrIndexerException, IOException {
+    private Iterator<Item> getItemsWithPossibleChangesBefore(Instant last)
+        throws DSpaceSolrIndexerException, IOException {
         try {
             SolrQuery params = new SolrQuery("item.willChangeStatus:true").addField("item.id").setRows(100)
                     .addSort("item.handle", SolrQuery.ORDER.asc);
@@ -240,7 +236,7 @@ public class XOAI {
                     Item item = itemService.find(context, UUID.fromString((String) document.getFieldValue("item.id")));
                     if (nonNull(item)) {
                         if (nonNull(item.getLastModified())) {
-                            if (item.getLastModified().before(last)) {
+                            if (item.getLastModified().isBefore(last)) {
                                 items.add(item);
                             }
                         } else {
@@ -342,6 +338,11 @@ public class XOAI {
                     server.add(list);
                     server.commit();
                     list.clear();
+                    try {
+                        context.uncacheEntities();
+                    } catch (SQLException ex) {
+                        log.error("Error uncaching entities", ex);
+                    }
                 }
             }
             System.out.println("Total: " + i + " items");
@@ -367,26 +368,26 @@ public class XOAI {
      * @return date
      * @throws SQLException
      */
-    private Date getMostRecentModificationDate(Item item) throws SQLException {
-        List<Date> dates = new LinkedList<>();
+    private Instant getMostRecentModificationDate(Item item) throws SQLException {
+        List<Instant> dates = new LinkedList<>();
         List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
         for (ResourcePolicy policy : policies) {
             if ((policy.getGroup() != null) && (policy.getGroup().getName().equals("Anonymous"))) {
                 if (policy.getStartDate() != null) {
-                    dates.add(policy.getStartDate());
+                    dates.add(policy.getStartDate().atStartOfDay(ZoneOffset.UTC).toInstant());
                 }
                 if (policy.getEndDate() != null) {
-                    dates.add(policy.getEndDate());
+                    dates.add(policy.getEndDate().atStartOfDay(ZoneOffset.UTC).toInstant());
                 }
             }
             context.uncacheEntity(policy);
         }
         dates.add(item.getLastModified());
         Collections.sort(dates);
-        Date now = new Date();
-        Date lastChange = null;
-        for (Date d : dates) {
-            if (d.before(now)) {
+        Instant now = Instant.now();
+        Instant lastChange = null;
+        for (Instant d : dates) {
+            if (d.isBefore(now)) {
                 lastChange = d;
             }
         }
@@ -458,6 +459,16 @@ public class XOAI {
             doc.addField("item.communities", "com_" + com.getHandle().replace("/", "_"));
         }
 
+        boolean hasBitstream = false;
+
+        for (Bundle b : item.getBundles("ORIGINAL")) {
+            if (b.getBitstreams().size() > 0) {
+                hasBitstream = true;
+            }
+        }
+
+        doc.addField("item.hasbitstream", hasBitstream);
+
         List<MetadataValue> allData = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (MetadataValue dc : allData) {
             MetadataField field = dc.getMetadataField();
@@ -506,10 +517,10 @@ public class XOAI {
         List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
         for (ResourcePolicy policy : policies) {
             if ((policy.getGroup() != null) && (policy.getGroup().getName().equals("Anonymous"))) {
-                if (policy.getStartDate() != null && policy.getStartDate().after(new Date())) {
+                if (policy.getStartDate() != null && policy.getStartDate().isAfter(LocalDate.now(ZoneOffset.UTC))) {
                     return true;
                 }
-                if (policy.getEndDate() != null && policy.getEndDate().after(new Date())) {
+                if (policy.getEndDate() != null && policy.getEndDate().isAfter(LocalDate.now(ZoneOffset.UTC))) {
                     return true;
                 }
             }
@@ -586,7 +597,6 @@ public class XOAI {
             CommandLineParser parser = new DefaultParser();
             Options options = new Options();
             options.addOption("c", "clear", false, "Clear index before indexing");
-            options.addOption("o", "optimize", false, "Optimize index at the end");
             options.addOption("v", "verbose", false, "Verbose output");
             options.addOption("h", "help", false, "Shows some help");
             options.addOption("n", "number", true, "FOR DEVELOPMENT MUST DELETE");
@@ -614,13 +624,13 @@ public class XOAI {
 
             if (!line.hasOption('h') && run) {
                 System.out.println("OAI 2.0 manager action started");
-                long start = System.currentTimeMillis();
+                long start = Instant.now().toEpochMilli();
 
                 String command = line.getArgs()[0];
 
                 if (COMMAND_IMPORT.equals(command)) {
                     ctx = new Context(Context.Mode.READ_ONLY);
-                    XOAI indexer = new XOAI(ctx, line.hasOption('o'), line.hasOption('c'), line.hasOption('v'));
+                    XOAI indexer = new XOAI(ctx, line.hasOption('c'), line.hasOption('v'));
 
                     applicationContext.getAutowireCapableBeanFactory().autowireBean(indexer);
 
@@ -645,7 +655,7 @@ public class XOAI {
                 }
 
                 System.out.println("OAI 2.0 manager action ended. It took "
-                        + ((System.currentTimeMillis() - start) / 1000) + " seconds.");
+                        + ((Instant.now().toEpochMilli() - start) / 1000) + " seconds.");
             } else {
                 usage();
             }
@@ -670,7 +680,7 @@ public class XOAI {
     private void compile() throws CompilingException {
         Iterator<Item> iterator;
         try {
-            Date last = xoaiLastCompilationCacheService.get();
+            Instant last = xoaiLastCompilationCacheService.get();
 
             if (last == null) {
                 System.out.println("Retrieving all items to be compiled");
@@ -688,7 +698,7 @@ public class XOAI {
                 xoaiItemCacheService.put(item, retrieveMetadata(context, item));
             }
 
-            xoaiLastCompilationCacheService.put(new Date());
+            xoaiLastCompilationCacheService.put(Instant.now());
         } catch (SQLException | IOException e) {
             throw new CompilingException(e);
         }
@@ -706,7 +716,6 @@ public class XOAI {
             System.out.println("     " + COMMAND_IMPORT + " - To import DSpace items into OAI index and cache system");
             System.out.println("     " + COMMAND_CLEAN_CACHE + " - Cleans the OAI cached responses");
             System.out.println("> Parameters:");
-            System.out.println("     -o Optimize index after indexing (" + COMMAND_IMPORT + " only)");
             System.out.println("     -c Clear index (" + COMMAND_IMPORT + " only)");
             System.out.println("     -v Verbose output");
             System.out.println("     -h Shows this text");

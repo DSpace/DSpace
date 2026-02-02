@@ -12,9 +12,9 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,7 +64,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(PoolTaskRest.CATEGORY + "." + ClaimedTaskRest.NAME)
+@Component(PoolTaskRest.CATEGORY + "." + ClaimedTaskRest.PLURAL_NAME)
 public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskRest, Integer>
                                        implements InitializingBean {
 

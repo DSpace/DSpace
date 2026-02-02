@@ -4,13 +4,13 @@
 ## {1}  Name of collection
 ## {2}  handle
 ##
-#set($subject = 'DSpace: Submission Approved and Archived')
+#set($subject = "${config.get('dspace.name')}: Submission Approved and Archived")
 
 You submitted: ${params[0]}
 
 To collection: ${params[1]}
 
-Your submission has been accepted and archived in DSpace,
+Your submission has been accepted and archived in ${config.get('dspace.name')},
 and it has been assigned the following identifier:
 ${params[2]}
 
@@ -18,4 +18,4 @@ Please use this identifier when citing your submission.
 
 Many thanks!
 
-DSpace
+The ${config.get('dspace.name')} Team

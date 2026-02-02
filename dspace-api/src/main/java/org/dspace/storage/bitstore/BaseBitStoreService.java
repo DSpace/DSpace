@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -153,22 +155,24 @@ public abstract class BaseBitStoreService implements BitStoreService {
      * Retrieves a map of useful metadata about the File (size, checksum, modified)
      * 
      * @param file The File to analyze
-     * @param attrs The map where we are storing values
+     * @param attrs The list of requested metadata values
      * @return Map of updated metadatas / attrs
      * @throws IOException
      */
-    public Map about(File file, Map attrs) throws IOException {
+    public Map<String, Object> about(File file, List<String> attrs) throws IOException {
+
+        Map<String, Object> metadata = new HashMap<String, Object>();
+
         try {
             if (file != null && file.exists()) {
-                this.putValueIfExistsKey(attrs, SIZE_BYTES, file.length());
-                if (attrs.containsKey(CHECKSUM)) {
-                    attrs.put(CHECKSUM, Utils.toHex(this.generateChecksumFrom(file)));
-                    attrs.put(CHECKSUM_ALGORITHM, CSA);
+                this.putValueIfExistsKey(attrs, metadata, SIZE_BYTES, file.length());
+                if (attrs.contains(CHECKSUM)) {
+                    metadata.put(CHECKSUM, Utils.toHex(this.generateChecksumFrom(file)));
+                    metadata.put(CHECKSUM_ALGORITHM, CSA);
                 }
-                this.putValueIfExistsKey(attrs, MODIFIED, String.valueOf(file.lastModified()));
-                return attrs;
+                this.putValueIfExistsKey(attrs, metadata, MODIFIED, String.valueOf(file.lastModified()));
             }
-            return null;
+            return metadata;
         } catch (Exception e) {
             log.error("about( FilePath: " + file.getAbsolutePath() + ", Map: " + attrs.toString() + ")", e);
             throw new IOException(e);
@@ -204,13 +208,9 @@ public abstract class BaseBitStoreService implements BitStoreService {
         }
     }
 
-    protected void putValueIfExistsKey(Map attrs, String key, Object value) {
-        this.putEntryIfExistsKey(attrs, key, Map.entry(key, value));
-    }
-
-    protected void putEntryIfExistsKey(Map attrs, String key, Map.Entry entry) {
-        if (attrs.containsKey(key)) {
-            attrs.put(entry.getKey(), entry.getValue());
+    protected void putValueIfExistsKey(List<String> attrs, Map<String, Object> metadata, String key, Object value) {
+        if (attrs.contains(key)) {
+            metadata.put(key, value);
         }
     }
 

@@ -10,7 +10,7 @@ package org.dspace.app.rest.model;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * This class serves as a REST representation for a paramater with a value given to the script
+ * This class serves as a REST representation for a parameter with a value given to the script
  */
 public class ParameterValueRest {
 

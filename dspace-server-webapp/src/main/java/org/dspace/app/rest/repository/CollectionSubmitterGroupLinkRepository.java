@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.projection.Projection;
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  * Link repository for "submittergroup" subresource of an individual collection.
  *
  */
-@Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME + "." + CollectionRest.SUBMITTERS_GROUP)
+@Component(CollectionRest.CATEGORY + "." + CollectionRest.PLURAL_NAME + "." + CollectionRest.SUBMITTERS_GROUP)
 public class CollectionSubmitterGroupLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

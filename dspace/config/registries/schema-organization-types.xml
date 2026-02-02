@@ -42,10 +42,10 @@
         </scope_note>
     </dc-type>
     
-    <!-- OpenAIRE4 Guidelines -->
+    <!-- Openaire4 Guidelines -->
     <!-- 2.2.2.1. Attribute nameType (R) -->
     <!-- and 3.2.6. Subproperty nameIdentifier (R) -->
-    <!-- specific type required by OpenAIRE4 Guidelines -->  
+    <!-- specific type required by Openaire4 Guidelines -->  
     
     <dc-type>
         <schema>organization</schema>
@@ -80,6 +80,24 @@
         <qualifier>crossrefid</qualifier>
         <scope_note>Crossref identifier</scope_note>
     </dc-type>
-    
+
+    <dc-type>
+        <schema>organization</schema>
+        <element>parentOrganization</element>
+        <scope_note>The larger organization that this organization is a subOrganization of, if any.</scope_note>
+    </dc-type>
+
+
+    <dc-type>
+        <schema>organization</schema>
+        <element>alternateName</element>
+        <scope_note>An alias for the organization.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>organization</schema>
+        <element>url</element>
+        <scope_note>Url of the organization.</scope_note>
+    </dc-type>
 
 </dspace-dc-types>

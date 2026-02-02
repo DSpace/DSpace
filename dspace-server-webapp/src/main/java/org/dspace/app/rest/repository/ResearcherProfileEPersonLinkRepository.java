@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.ResearcherProfileRest;
 import org.dspace.app.rest.projection.Projection;
@@ -34,7 +34,8 @@ import org.springframework.stereotype.Component;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-@Component(ResearcherProfileRest.CATEGORY + "." + ResearcherProfileRest.NAME + "." + ResearcherProfileRest.EPERSON)
+@Component(ResearcherProfileRest.CATEGORY + "." + ResearcherProfileRest.PLURAL_NAME + "." +
+    ResearcherProfileRest.EPERSON)
 public class ResearcherProfileEPersonLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

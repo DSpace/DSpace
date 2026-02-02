@@ -8,12 +8,13 @@
 package org.dspace.content.dao;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import org.dspace.content.ProcessStatus;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
+import org.dspace.eperson.EPerson;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessQueryParameterContainer;
 
@@ -94,7 +95,29 @@ public interface ProcessDAO extends GenericDAO<Process> {
      * @return              The list of all Processes which match requirements
      * @throws SQLException If something goes wrong
      */
-    List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses, Date date)
+    List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses, Instant date)
         throws SQLException;
+
+    /**
+     * Returns a list of all Process objects in the database by the given user.
+     *
+     * @param context The relevant DSpace context
+     * @param user    The user to search for
+     * @param limit   The limit for the amount of Processes returned
+     * @param offset  The offset for the Processes to be returned
+     * @return The list of all Process objects in the Database
+     * @throws SQLException If something goes wrong
+     */
+    List<Process> findByUser(Context context, EPerson user, int limit, int offset) throws SQLException;
+
+    /**
+     * Count all the processes which is related to the given user.
+     *
+     * @param context The relevant DSpace context
+     * @param user    The user to search for
+     * @return The number of results matching the query
+     * @throws SQLException If something goes wrong
+     */
+    int countByUser(Context context, EPerson user) throws SQLException;
 
 }

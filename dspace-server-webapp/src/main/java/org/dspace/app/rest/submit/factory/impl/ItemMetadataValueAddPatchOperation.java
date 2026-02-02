@@ -12,9 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -103,10 +103,11 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
             // call with "-" or "index-based" we should receive only single
             // object member
             MetadataValueRest object = evaluateSingleObject((LateObjectEvaluator) value);
+            String mdString = split[0];
             // check if is not empty
             List<MetadataValue> metadataByMetadataString = itemService.getMetadataByMetadataString(source.getItem(),
-                                                                                                   split[0]);
-            Assert.notEmpty(metadataByMetadataString);
+                                                                                                   mdString);
+            Assert.notEmpty(metadataByMetadataString, "No metadata fields match ".concat(mdString));
             if (split.length > 1) {
                 String controlChar = split[1];
                 switch (controlChar) {
@@ -164,10 +165,10 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
         // (with this operator virtual value can only be moved or deleted).
         int idx = 0;
         for (MetadataValueRest ll : list) {
-            if (StringUtils.startsWith(ll.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+            if (Strings.CS.startsWith(ll.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
 
                 Optional<MetadataValue> preExistentMv = preExistentMetadata.stream().filter(mvr ->
-                    StringUtils.equals(ll.getAuthority(), mvr.getAuthority())).findFirst();
+                    Strings.CS.equals(ll.getAuthority(), mvr.getAuthority())).findFirst();
 
                 if (!preExistentMv.isPresent()) {
                     throw new UnprocessableEntityException(
@@ -213,7 +214,7 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
     private void updateRelationshipPlace(Context context, Item dso, int place, Relationship rs) {
 
         try {
-            if (rs.getLeftItem() == dso) {
+            if (rs.getLeftItem().equals(dso)) {
                 rs.setLeftPlace(place);
             } else {
                 rs.setRightPlace(place);

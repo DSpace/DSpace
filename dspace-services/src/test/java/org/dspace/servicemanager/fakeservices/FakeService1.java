@@ -10,9 +10,9 @@ package org.dspace.servicemanager.fakeservices;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.dspace.kernel.mixins.ConfigChangeListener;
 import org.dspace.kernel.mixins.ServiceChangeListener;
 import org.dspace.services.ConfigurationService;

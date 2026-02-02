@@ -8,9 +8,11 @@
 package org.dspace.submit.model;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -28,9 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  * set permission on a file. An option is defined by a name such as "open
  * access", "embargo", "restricted access", etc. and some optional attributes to
  * better clarify the constraints and input available to the user. For instance
- * an embargo option could allow to set a start date not longer than 3 years,
- * etc
- * 
+ * an embargo option could allow to set a start date not longer than 3 years.
+ *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class AccessConditionOption {
@@ -44,9 +45,9 @@ public class AccessConditionOption {
     @Autowired
     private ResourcePolicyService resourcePolicyService;
 
-    DateMathParser dateMathParser = new DateMathParser();
+    private static final Logger LOG = LogManager.getLogger();
 
-    /** An unique name identifying the access contion option **/
+    /** A unique name identifying the access condition option. **/
     private String name;
 
     /**
@@ -147,9 +148,12 @@ public class AccessConditionOption {
      *                  startDate should be null. Otherwise startDate may not be null.
      * @param endDate end date of the resource policy. If {@link #getHasEndDate()} returns false,
      *                endDate should be null. Otherwise endDate may not be null.
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     * @throws ParseException passed through (indicates problem with a date).
      */
     public void createResourcePolicy(Context context, DSpaceObject obj, String name, String description,
-                                     Date startDate, Date endDate)
+                                     LocalDate startDate, LocalDate endDate)
             throws SQLException, AuthorizeException, ParseException {
         validateResourcePolicy(context, name, startDate, endDate);
         Group group = groupService.findByName(context, getGroupName());
@@ -160,7 +164,7 @@ public class AccessConditionOption {
 
     /**
      * Validate ResourcePolicy and after update it
-     * 
+     *
      * @param context               DSpace context
      * @param resourcePolicy        ResourcePolicy to update
      * @throws SQLException         If database error
@@ -175,17 +179,25 @@ public class AccessConditionOption {
     }
 
     /**
-     * Validate the policy properties, throws exceptions if any is not valid
-     * 
-     * @param context                DSpace context
-     * @param name                   Name of the resource policy
-     * @param startDate              Start date of the resource policy. If {@link #getHasStartDate()}
-     *                                    returns false, startDate should be null. Otherwise startDate may not be null.
-     * @param endDate                End date of the resource policy. If {@link #getHasEndDate()}
-     *                                    returns false, endDate should be null. Otherwise endDate may not be null.
+     * Validate the policy properties, throws exceptions if any is not valid.
+     *
+     * @param context   DSpace context.
+     * @param name      Name of the resource policy.
+     * @param startDate Start date of the resource policy. If
+     *                  {@link #getHasStartDate()} returns false, startDate
+     *                  should be null. Otherwise startDate may not be null.
+     * @param endDate   End date of the resource policy. If
+     *                  {@link #getHasEndDate()} returns false, endDate should
+     *                  be null. Otherwise endDate may not be null.
+     * @throws IllegalStateException if a date is required and absent,
+     *              a date is not required and present, or a date exceeds its
+     *              configured maximum.
+     * @throws ParseException passed through.
      */
-    private void validateResourcePolicy(Context context, String name, Date startDate, Date endDate)
-           throws SQLException, AuthorizeException, ParseException {
+    public void validateResourcePolicy(Context context, String name, LocalDate startDate, LocalDate endDate)
+           throws IllegalStateException, ParseException {
+        LOG.debug("Validate policy dates:  name '{}', startDate {}, endDate {}",
+                name, startDate, endDate);
         if (getHasStartDate() && Objects.isNull(startDate)) {
             throw new IllegalStateException("The access condition " + getName() + " requires a start date.");
         }
@@ -199,29 +211,33 @@ public class AccessConditionOption {
             throw new IllegalStateException("The access condition " + getName() + " cannot contain an end date.");
         }
 
-        Date latestStartDate = null;
+        DateMathParser dateMathParser = new DateMathParser();
+
+        LocalDate latestStartDate = null;
         if (Objects.nonNull(getStartDateLimit())) {
-            latestStartDate = dateMathParser.parseMath(getStartDateLimit());
+            latestStartDate = LocalDate.from(dateMathParser.parseMath(getStartDateLimit()));
         }
 
-        Date latestEndDate = null;
+        LocalDate latestEndDate = null;
         if (Objects.nonNull(getEndDateLimit())) {
-            latestEndDate = dateMathParser.parseMath(getEndDateLimit());
+            latestEndDate = LocalDate.from(dateMathParser.parseMath(getEndDateLimit()));
         }
 
+        LOG.debug("  latestStartDate {}, latestEndDate {}",
+                latestStartDate, latestEndDate);
         // throw if startDate after latestStartDate
-        if (Objects.nonNull(startDate) && Objects.nonNull(latestStartDate) && startDate.after(latestStartDate)) {
+        if (Objects.nonNull(startDate) && Objects.nonNull(latestStartDate) && startDate.isAfter(latestStartDate)) {
             throw new IllegalStateException(String.format(
-                "The start date of access condition %s should be earlier than %s from now.",
-                getName(), getStartDateLimit()
+                "The start date of access condition %s should be earlier than %s from now (%s).",
+                getName(), getStartDateLimit(), dateMathParser.getNow()
             ));
         }
 
         // throw if endDate after latestEndDate
-        if (Objects.nonNull(endDate) && Objects.nonNull(latestEndDate)  && endDate.after(latestEndDate)) {
+        if (Objects.nonNull(endDate) && Objects.nonNull(latestEndDate)  && endDate.isAfter(latestEndDate)) {
             throw new IllegalStateException(String.format(
-                "The end date of access condition %s should be earlier than %s from now.",
-                getName(), getEndDateLimit()
+                "The end date of access condition %s should be earlier than %s from now (%s).",
+                getName(), getEndDateLimit(), dateMathParser.getNow()
             ));
         }
     }

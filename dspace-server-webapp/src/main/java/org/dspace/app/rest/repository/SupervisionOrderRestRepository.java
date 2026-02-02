@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.exception.ResourceAlreadyExistsException;
@@ -52,7 +52,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science dot it)
  */
-@Component(SupervisionOrderRest.CATEGORY + "." + SupervisionOrderRest.NAME)
+@Component(SupervisionOrderRest.CATEGORY + "." + SupervisionOrderRest.PLURAL_NAME)
 public class SupervisionOrderRestRepository extends DSpaceRestRepository<SupervisionOrderRest, Integer> {
 
     private static final Logger log =

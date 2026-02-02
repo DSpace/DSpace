@@ -20,8 +20,8 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -179,7 +179,7 @@ public class Util {
      * @return the file size as a String
      */
     public static String formatFileSize(double in) {
-        // Work out the size of the file, and format appropriatly
+        // Work out the size of the file, and format appropriately
         // FIXME: When full i18n support is available, use the user's Locale
         // rather than the default Locale.
         NumberFormat nf = NumberFormat.getNumberInstance(Locale.getDefault());
@@ -238,7 +238,7 @@ public class Util {
         } catch (Exception e) {
             // at least log this error to make debugging easier
             // do not silently return null only.
-            log.warn("Unable to recoginze UUID from String \""
+            log.warn("Unable to recognize UUID from String \""
                          + val + "\". Will return null.", e);
             // Problem with parameter
             return null;
@@ -405,21 +405,13 @@ public class Util {
         DCInput myInputs = null;
         boolean myInputsFound = false;
         String formFileName = I18nUtil.getInputFormsFileName(locale);
-        String col_handle = "";
 
         Collection collection = item.getOwningCollection();
-
-        if (collection == null) {
-            // set an empty handle so to get the default input set
-            col_handle = "";
-        } else {
-            col_handle = collection.getHandle();
-        }
 
         // Read the input form file for the specific collection
         DCInputsReader inputsReader = new DCInputsReader(formFileName);
 
-        List<DCInputSet> inputSets = inputsReader.getInputsByCollectionHandle(col_handle);
+        List<DCInputSet> inputSets = inputsReader.getInputsByCollection(collection);
 
         // Replace the values of Metadatum[] with the correct ones in case
         // of
@@ -500,8 +492,8 @@ public class Util {
     public static List<String> differenceInSubmissionFields(Collection fromCollection, Collection toCollection)
         throws DCInputsReaderException {
         DCInputsReader reader = new DCInputsReader();
-        List<DCInputSet> from = reader.getInputsByCollectionHandle(fromCollection.getHandle());
-        List<DCInputSet> to = reader.getInputsByCollectionHandle(toCollection.getHandle());
+        List<DCInputSet> from = reader.getInputsByCollection(fromCollection);
+        List<DCInputSet> to = reader.getInputsByCollection(toCollection);
 
         Set<String> fromFieldName = new HashSet<>();
         Set<String> toFieldName = new HashSet<>();

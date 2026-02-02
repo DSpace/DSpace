@@ -5,7 +5,7 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
-#set($subject = 'DSpace - Item export requested is ready for download')
+#set($subject = "${config.get('dspace.name')}: Item export requested is ready for download")
 The item export you requested from the repository is now ready for download.
 
 You may download the compressed file using the following link:
@@ -13,6 +13,4 @@ ${params[0]}
 
 This file will remain available for at least ${params[1]} hours.
 
-
-The DSpace Team
-
+The ${config.get('dspace.name')} Team

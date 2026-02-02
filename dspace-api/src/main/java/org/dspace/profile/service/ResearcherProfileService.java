@@ -67,7 +67,7 @@ public interface ResearcherProfileService {
 
     /**
      * Changes the visibility of the given profile using the given new visible
-     * value. The visiblity controls whether the Profile is Anonymous READ or not.
+     * value. The visibility controls whether the Profile is Anonymous READ or not.
      *
      * @param  context            the relevant DSpace Context.
      * @param  profile            the researcher profile to update

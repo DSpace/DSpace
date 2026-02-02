@@ -57,7 +57,7 @@ public class DiscoverySearchFilter {
       * For the DiscoverySearchFilter only the TYPE_TEXT, TYPE_DATE and TYPE_HIERARCHICAL are allowed
       *
       * @param type  The type for this DiscoverySearchFilter
-      * @throws DiscoveryConfigurationException  If none of the types match, this error will be thrown indiciating this
+      * @throws DiscoveryConfigurationException  If none of the types match, this error will be thrown indicating this
       */
     public void setType(String type) throws DiscoveryConfigurationException {
         if (type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_TEXT)) {

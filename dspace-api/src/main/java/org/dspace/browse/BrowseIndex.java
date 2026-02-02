@@ -22,11 +22,13 @@ import org.dspace.sort.SortOption;
  * This class holds all the information about a specifically configured
  * BrowseIndex.  It is responsible for parsing the configuration, understanding
  * about what sort options are available, and what the names of the database
- * tables that hold all the information are actually called.
+ * tables that hold all the information are actually called. Hierarchical browse
+ * indexes also contain information about the vocabulary they're using, see:
+ * {@link org.dspace.content.authority.DSpaceControlledVocabularyIndex}
  *
  * @author Richard Jones
  */
-public final class BrowseIndex {
+public class BrowseIndex {
     /** the configuration number, as specified in the config */
     /**
      * used for single metadata browse tables for generating the table name
@@ -102,7 +104,7 @@ public final class BrowseIndex {
      *
      * @param baseName The base of the table name
      */
-    private BrowseIndex(String baseName) {
+    protected BrowseIndex(String baseName) {
         try {
             number = -1;
             tableBaseName = baseName;
@@ -193,7 +195,7 @@ public final class BrowseIndex {
                                 }
                             }
 
-                            // for backward compatability we ignore the keywords
+                            // for backward compatibility we ignore the keywords
                             // single and full here
                             if (!sortName.equalsIgnoreCase("single")
                                 && !sortName.equalsIgnoreCase("full")
@@ -542,19 +544,6 @@ public final class BrowseIndex {
     }
 
     /**
-     * Get the name of the column that is used to store the default value column
-     *
-     * @return the name of the value column
-     */
-    public String getValueColumn() {
-        if (!isDate()) {
-            return "sort_text_value";
-        } else {
-            return "text_value";
-        }
-    }
-
-    /**
      * Get the name of the primary key index column
      *
      * @return the name of the primary key index column
@@ -564,38 +553,9 @@ public final class BrowseIndex {
     }
 
     /**
-     * Is this browse index type for a title?
-     *
-     * @return true if title type, false if not
-     */
-//    public boolean isTitle()
-//    {
-//        return "title".equals(getDataType());
-//    }
-
-    /**
-     * Is the browse index type for a date?
-     *
-     * @return true if date type, false if not
-     */
-    public boolean isDate() {
-        return "date".equals(getDataType());
-    }
-
-    /**
-     * Is the browse index type for a plain text type?
-     *
-     * @return true if plain text type, false if not
-     */
-//    public boolean isText()
-//    {
-//        return "text".equals(getDataType());
-//    }
-
-    /**
      * Is the browse index of display type single?
      *
-     * @return true if singe, false if not
+     * @return true if single, false if not
      */
     public boolean isMetadataIndex() {
         return displayType != null && displayType.startsWith("metadata");

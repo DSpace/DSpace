@@ -18,7 +18,7 @@ import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
 /**
- * Insert a 'dc.idendifier.uri' metadata record for each Community and Collection in the database.
+ * Insert a 'dc.identifier.uri' metadata record for each Community and Collection in the database.
  * The value is calculated concatenating the canonicalPrefix extracted from the configuration
  * (default is "http://hdl.handle.net/) and the object's handle suffix stored inside the handle table.
  *

@@ -16,23 +16,26 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.oidc.OidcClient;
 import org.dspace.authenticate.oidc.model.OidcTokenResponseDTO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -49,9 +52,12 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
 
     public static final String OIDC_AUTH_ATTRIBUTE = "oidc";
 
+    protected GroupService groupService
+            = EPersonServiceFactory.getInstance().getGroupService();
+
     private final static String LOGIN_PAGE_URL_FORMAT = "%s?client_id=%s&response_type=code&scope=%s&redirect_uri=%s";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OidcAuthenticationBean.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String OIDC_AUTHENTICATED = "oidc.authenticated";
 
@@ -85,6 +91,26 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
 
     @Override
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request) throws SQLException {
+        // Check if authentication-oidc.login.specialgroup config has a group defined
+        try {
+            // without a logged in user, this method should return an empty list
+            if (context.getCurrentUser() == null) {
+                return List.of();
+            }
+            String groupName = configurationService.getProperty("authentication-oidc.login.specialgroup");
+            if ((groupName != null) && (!groupName.trim().equals(""))) {
+                Group group = groupService.findByName(context, groupName);
+                if (group == null) {
+                    // Group not found
+                    LOGGER.warn("Group defined in authentication-oidc.login.specialgroup does not exist");
+                    return List.of();
+                } else {
+                    return Arrays.asList(group);
+                }
+            }
+        } catch (SQLException ex) {
+            // Database error, ignore
+        }
         return List.of();
     }
 
@@ -141,9 +167,16 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
         if (! canSelfRegister()) {
             LOGGER.warn("Self registration is currently disabled for OIDC, and no ePerson could be found for email: {}",
                 email);
+            return NO_SUCH_USER;
+        } else {
+            int result = registerNewEPerson(context, userInfo, email);
+            if (result == SUCCESS) {
+                // It is important to set this attribute so the new user
+                // can be granted permissions of the special group in the first login
+                request.setAttribute(OIDC_AUTHENTICATED, true);
+            }
+            return result;
         }
-
-        return canSelfRegister() ? registerNewEPerson(context, userInfo, email) : NO_SUCH_USER;
     }
 
     @Override
@@ -174,7 +207,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
                 final Entry<String, String> entry = iterator.next();
 
                 if (isBlank(entry.getValue())) {
-                    LOGGER.error(" * {} is missing", entry.getKey());
+                    LOGGER.error(" * {} is missing", entry::getKey);
                 }
             }
             return "";
@@ -183,7 +216,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
         try {
             return format(LOGIN_PAGE_URL_FORMAT, authorizeUrl, clientId, scopes, encode(redirectUri, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error(e::getMessage, e);
             return "";
         }
 
@@ -235,7 +268,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
         try {
             return oidcClient.getAccessToken(code);
         } catch (Exception ex) {
-            LOGGER.error("An error occurs retriving the OIDC access_token", ex);
+            LOGGER.error("An error occurs retrieving the OIDC access_token", ex);
             return null;
         }
     }
@@ -244,7 +277,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
         try {
             return oidcClient.getUserInfo(accessToken);
         } catch (Exception ex) {
-            LOGGER.error("An error occurs retriving the OIDC user info", ex);
+            LOGGER.error("An error occurs retrieving the OIDC user info", ex);
             return Map.of();
         }
     }

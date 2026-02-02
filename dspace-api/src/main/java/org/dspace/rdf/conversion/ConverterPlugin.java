@@ -10,7 +10,7 @@ package org.dspace.rdf.conversion;
 
 import java.sql.SQLException;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;

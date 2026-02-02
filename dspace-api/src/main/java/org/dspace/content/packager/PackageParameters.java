@@ -9,7 +9,8 @@ package org.dspace.content.packager;
 
 import java.util.Enumeration;
 import java.util.Properties;
-import javax.servlet.ServletRequest;
+
+import jakarta.servlet.ServletRequest;
 
 /**
  * Parameter list for SIP and DIP packagers. It's really just
@@ -51,7 +52,7 @@ public class PackageParameters extends Properties {
         Enumeration pe = request.getParameterNames();
         while (pe.hasMoreElements()) {
             String name = (String) pe.nextElement();
-            String v[] = request.getParameterValues(name);
+            String[] v = request.getParameterValues(name);
             if (v.length == 0) {
                 result.setProperty(name, "");
             } else if (v.length == 1) {

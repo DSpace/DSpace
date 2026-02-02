@@ -14,7 +14,7 @@ import org.dspace.content.MetadataField;
 /**
  * Broker for metadata authority settings configured for each metadata field.
  *
- * Configuration keys, per metadata field (e.g. "dc.contributer.author")
+ * Configuration keys, per metadata field (e.g. "dc.contributor.author")
  *
  * # is field authority controlled (i.e. store authority, confidence values)?
  * {@code authority.controlled.<FIELD> = true}

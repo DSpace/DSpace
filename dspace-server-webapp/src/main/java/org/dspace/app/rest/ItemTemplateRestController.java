@@ -12,9 +12,9 @@ import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFI
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -120,7 +120,7 @@ public class ItemTemplateRestController {
      * @throws SQLException
      * @throws AuthorizeException
      */
-    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'WRITE')")
+    @PreAuthorize("hasPermission(#uuid, 'ITEMTEMPLATE', 'WRITE')")
     @RequestMapping(method = RequestMethod.PATCH)
     public ResponseEntity<RepresentationModel<?>> patch(HttpServletRequest request, @PathVariable UUID uuid,
                                                         @RequestBody(required = true) JsonNode jsonNode)
@@ -153,7 +153,7 @@ public class ItemTemplateRestController {
      * @throws AuthorizeException
      * @throws IOException
      */
-    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'DELETE')")
+    @PreAuthorize("hasPermission(#uuid, 'ITEMTEMPLATE', 'DELETE')")
     @RequestMapping(method = RequestMethod.DELETE)
     public ResponseEntity<RepresentationModel<?>> deleteTemplateItem(HttpServletRequest request,
                                                                      @PathVariable UUID uuid)

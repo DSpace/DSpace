@@ -10,13 +10,14 @@ package org.dspace.storage.bitstore;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
+import jakarta.annotation.Nullable;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.LogManager;
@@ -91,6 +92,11 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     }
 
     @Override
+    public void setIncomingExternal(int incoming) {
+        this.incoming = incoming;
+    }
+
+    @Override
     public void afterPropertiesSet() throws Exception {
         for (Map.Entry<Integer, BitStoreService> storeEntry : stores.entrySet()) {
             if (storeEntry.getValue().isEnabled() && !storeEntry.getValue().isInitialized()) {
@@ -148,7 +154,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
      * @param assetstore    The assetstore number for the bitstream to be
      *                      registered
      * @param bitstreamPath The relative path of the bitstream to be registered.
-     *                      The path is relative to the path of ths assetstore.
+     *                      The path is relative to the path of this assetstore.
      * @return The ID of the registered bitstream
      * @throws SQLException If a problem occurs accessing the RDBMS
      * @throws IOException  if IO error
@@ -166,12 +172,9 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         bitstream.setStoreNumber(assetstore);
         bitstreamService.update(context, bitstream);
 
-        Map wantedMetadata = new HashMap();
-        wantedMetadata.put("size_bytes", null);
-        wantedMetadata.put("checksum", null);
-        wantedMetadata.put("checksum_algorithm", null);
+        List<String> wantedMetadata = List.of("size_bytes", "checksum", "checksum_algorithm");
+        Map<String, Object> receivedMetadata = this.getStore(assetstore).about(bitstream, wantedMetadata);
 
-        Map receivedMetadata = this.getStore(assetstore).about(bitstream, wantedMetadata);
         if (MapUtils.isEmpty(receivedMetadata)) {
             String message = "Not able to register bitstream:" + bitstream.getID() + " at path: " + bitstreamPath;
             log.error(message);
@@ -201,13 +204,8 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     }
 
     @Override
-    public Map computeChecksum(Context context, Bitstream bitstream) throws IOException {
-        Map wantedMetadata = new HashMap();
-        wantedMetadata.put("checksum", null);
-        wantedMetadata.put("checksum_algorithm", null);
-
-        Map receivedMetadata = this.getStore(bitstream.getStoreNumber()).about(bitstream, wantedMetadata);
-        return receivedMetadata;
+    public Map<String, Object> computeChecksum(Context context, Bitstream bitstream) throws IOException {
+        return this.getStore(bitstream.getStoreNumber()).about(bitstream, List.of("checksum", "checksum_algorithm"));
     }
 
     @Override
@@ -232,7 +230,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         int cleanedBitstreamCount = 0;
 
         int deletedBitstreamCount = bitstreamService.countDeletedBitstreams(context);
-        System.out.println("Found " + deletedBitstreamCount + " deleted bistream to cleanup");
+        System.out.println("Found " + deletedBitstreamCount + " deleted bitstream to cleanup");
 
         try {
             context.turnOffAuthorisationSystem();
@@ -247,10 +245,9 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 
                 for (Bitstream bitstream : storage) {
                     UUID bid = bitstream.getID();
-                    Map wantedMetadata = new HashMap();
-                    wantedMetadata.put("size_bytes", null);
-                    wantedMetadata.put("modified", null);
-                    Map receivedMetadata = this.getStore(bitstream.getStoreNumber()).about(bitstream, wantedMetadata);
+                    List<String> wantedMetadata = List.of("size_bytes", "modified");
+                    Map<String, Object> receivedMetadata = this.getStore(bitstream.getStoreNumber())
+                        .about(bitstream, wantedMetadata);
 
 
                     // Make sure entries which do not exist are removed
@@ -348,13 +345,11 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     @Nullable
     @Override
     public Long getLastModified(Bitstream bitstream) throws IOException {
-        Map attrs = new HashMap();
-        attrs.put("modified", null);
-        attrs = this.getStore(bitstream.getStoreNumber()).about(bitstream, attrs);
-        if (attrs == null || !attrs.containsKey("modified")) {
+        Map<String, Object> metadata = this.getStore(bitstream.getStoreNumber()).about(bitstream, List.of("modified"));
+        if (metadata == null || !metadata.containsKey("modified")) {
             return null;
         }
-        return Long.valueOf(attrs.get("modified").toString());
+        return Long.valueOf(metadata.get("modified").toString());
     }
 
     /**
@@ -434,7 +429,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             //modulo
             if ((processedCounter % batchCommitSize) == 0) {
                 log.info("Migration Commit Checkpoint: " + processedCounter);
-                context.dispatchEvents();
+                context.commit();
             }
         }
 
@@ -489,7 +484,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
      * @return True if this file is too recent to be deleted
      */
     protected boolean isRecent(Long lastModified) {
-        long now = new java.util.Date().getTime();
+        long now = Instant.now().toEpochMilli();
 
         if (lastModified >= now) {
             return true;

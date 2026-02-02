@@ -118,7 +118,8 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
     }
 
     /**
-     * Constructs a solr search URL.
+     * Constructs a solr search URL. Compatible with solr-ocrhighlighting-0.7.2.
+     * https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.7.2
      *
      * @param query the search terms
      * @param manifestId the id of the manifest in which to search
@@ -132,8 +133,9 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
         solrQuery.set("hl.ocr.fl", "ocr_text");
         solrQuery.set("hl.ocr.contextBlock", "line");
         solrQuery.set("hl.ocr.contextSize", "2");
-        solrQuery.set("hl.snippets", "10");
-        solrQuery.set("hl.ocr.trackPages", "off");
+        solrQuery.set("hl.snippets", "8192");
+        solrQuery.set("hl.ocr.maxPassages", "8192");
+        solrQuery.set("hl.ocr.trackPages", "on");
         solrQuery.set("hl.ocr.limitBlock","page");
         solrQuery.set("hl.ocr.absoluteHighlights", "true");
 

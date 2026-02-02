@@ -6,8 +6,6 @@
 # http://www.dspace.org/license/
 #
 
-version: "3.7"
-
 services:
   dspace-cli:
     environment:

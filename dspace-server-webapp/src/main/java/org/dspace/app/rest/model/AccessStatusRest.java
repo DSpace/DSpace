@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
@@ -16,8 +15,10 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
  */
 public class AccessStatusRest implements RestModel {
     public static final String NAME = "accessStatus";
+    public static final String PLURAL_NAME = NAME;
 
     String status;
+    String embargoDate;
 
     @Override
     @JsonProperty(access = Access.READ_ONLY)
@@ -25,18 +26,22 @@ public class AccessStatusRest implements RestModel {
         return NAME;
     }
 
+    /**
+     * The plural name is the same as the singular name
+     */
     @Override
-    @JsonIgnore
     public String getTypePlural() {
-        return getType();
+        return PLURAL_NAME;
     }
 
     public AccessStatusRest() {
         setStatus(null);
+        setEmbargoDate(null);
     }
 
     public AccessStatusRest(String status) {
         setStatus(status);
+        setEmbargoDate(null);
     }
 
     public String getStatus() {
@@ -45,5 +50,13 @@ public class AccessStatusRest implements RestModel {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getEmbargoDate() {
+        return embargoDate;
+    }
+
+    public void setEmbargoDate(String embargoDate) {
+        this.embargoDate = embargoDate;
     }
 }

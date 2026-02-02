@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -104,7 +104,7 @@ public class IIIFSharedUtils {
      * @return true if the bundle can contain bitstreams to use as IIIF resources
      */
     public static boolean isIIIFBundle(Bundle b) {
-        return !StringUtils.equalsAnyIgnoreCase(b.getName(), Constants.LICENSE_BUNDLE_NAME,
+        return !Strings.CI.equalsAny(b.getName(), Constants.LICENSE_BUNDLE_NAME,
             Constants.METADATA_BUNDLE_NAME, CreativeCommonsServiceImpl.CC_BUNDLE_NAME, "THUMBNAIL",
             "BRANDED_PREVIEW", "TEXT", OTHER_CONTENT_BUNDLE)
             && b.getMetadata().stream()

@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * This is the Repository that is responsible for the functionality and implementations coming from
  * {@link org.dspace.app.rest.ExternalSourcesRestController}
  */
-@Component(ExternalSourceRest.CATEGORY + "." + ExternalSourceRest.NAME)
+@Component(ExternalSourceRest.CATEGORY + "." + ExternalSourceRest.PLURAL_NAME)
 public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalSourceRest, String> {
 
     @Autowired

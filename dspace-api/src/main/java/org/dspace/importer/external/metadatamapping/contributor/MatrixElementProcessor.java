@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * This Processor allows to extract all values of a matrix.
  * Only need to configure the path to the matrix in "pathToMatrix"
- * For exaple to extract all values
+ * For example to extract all values
  * "matrix": [
  *     [
  *      "first",

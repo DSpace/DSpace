@@ -8,8 +8,9 @@
 package org.dspace.app.util;
 
 import java.lang.reflect.InvocationTargetException;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 /**
  * Class that registers the web application upon startup of the application.

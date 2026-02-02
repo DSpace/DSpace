@@ -70,7 +70,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 /**
  * Test suite for the Authorization endpoint
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
@@ -99,37 +99,37 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     private Utils utils;
     private SiteService siteService;
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link AlwaysTrueFeature}
      */
     private AuthorizationFeature alwaysTrue;
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link AlwaysFalseFeature}
      */
     private AuthorizationFeature alwaysFalse;
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link AlwaysThrowExceptionFeature}
      */
     private AuthorizationFeature alwaysException;
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link TrueForAdminsFeature}
      */
     private AuthorizationFeature trueForAdmins;
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link TrueForLoggedUsersFeature}
      */
     private AuthorizationFeature trueForLoggedUsers;
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link TrueForTestFeature}
      */
     private AuthorizationFeature trueForTestUsers;
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link TrueForUsersInGroupTestFeature}
      */
     private AuthorizationFeature trueForUsersInGroupTest;
@@ -150,12 +150,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         configurationService.setProperty("webui.user.assumelogin", true);
     }
 
-    @Test
     /**
      * This method is not implemented
      *
      * @throws Exception
      */
+    @Test
     public void findAllTest() throws Exception {
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/authz/authorizations"))
@@ -164,12 +164,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     .andExpect(status().isMethodNotAllowed());
     }
 
-    @Test
     /**
      * Verify that an user can access a specific authorization
      *
      * @throws Exception
      */
+    @Test
     public void findOneTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
@@ -206,12 +206,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                             Matchers.is(AuthorizationMatcher.matchAuthorization(authAnonymousUserSite))));
     }
 
-    @Test
     /**
      * Verify that the unauthorized return code is used in the appropriate scenarios
      *
      * @throws Exception
      */
+    @Test
     public void findOneUnauthorizedTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
@@ -229,12 +229,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     .andExpect(status().isUnauthorized());
     }
 
-    @Test
     /**
      * Verify that the forbidden return code is used in the appropriate scenarios
      *
      * @throws Exception
      */
+    @Test
     public void findOneForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Site site = siteService.findSite(context);
@@ -265,12 +265,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     .andExpect(status().isForbidden());
     }
 
-    @Test
     /**
      * Verify that the not found return code is used in the appropriate scenarios
      *
      * @throws Exception
      */
+    @Test
     public void findOneNotFoundTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Site site = siteService.findSite(context);
@@ -352,12 +352,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
     }
 
-    @Test
     /**
      * Verify that an exception in the feature check will be reported back
      *
      * @throws Exception
      */
+    @Test
     public void findOneInternalServerErrorTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
@@ -375,16 +375,16 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     .andExpect(status().isInternalServerError());
     }
 
-    @Test
     /**
      * Verify that the search by object works properly in allowed scenarios:
      * - for an administrator
      * - for an administrator that want to inspect permission of the anonymous users or another user
      * - for a logged-in "normal" user
      * - for anonymous
-     * 
+     *
      * @throws Exception
      */
+    @Test
     public void findByObjectTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
@@ -547,7 +547,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(2)));
 
-        // verify that it works for administators inspecting other users - by using the eperson parameter
+        // verify that it works for administrators inspecting other users - by using the eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("projection", "full")
                 .param("uri", siteUri)
@@ -589,7 +589,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(2)));
 
-        // verify that it works for administators inspecting other users - by assuming login
+        // verify that it works for administrators inspecting other users - by assuming login
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("projection", "full")
                 .param("uri", siteUri)
@@ -667,13 +667,13 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
     }
 
-    @Test
     /**
      * Verify that the findByObject return an empty page when the requested object doesn't exist but the uri is
      * potentially valid (i.e. deleted object)
-     * 
+     *
      * @throws Exception
      */
+    @Test
     public void findByNotExistingObjectTest() throws Exception {
         String wrongSiteUri = "http://localhost/api/core/sites/" + UUID.randomUUID();
 
@@ -726,7 +726,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
-        // verify that it works for administators inspecting other users - by using the eperson parameter
+        // verify that it works for administrators inspecting other users - by using the eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", wrongSiteUri)
                 .param("eperson", eperson.getID().toString()))
@@ -737,7 +737,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
-        // verify that it works for administators inspecting other users - by assuming login
+        // verify that it works for administrators inspecting other users - by assuming login
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", wrongSiteUri)
                 .header("X-On-Behalf-Of", eperson.getID()))
@@ -759,12 +759,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
-    @Test
     /**
      * Verify that the findByObject return the 400 Bad Request response for invalid or missing URI (required parameter)
-     * 
+     *
      * @throws Exception
      */
+    @Test
     public void findByObjectBadRequestTest() throws Exception {
         String[] invalidUris = new String[] {
                 "invalid-uri",
@@ -803,14 +803,14 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     .param("uri", invalidUri))
                 .andExpect(status().isBadRequest());
 
-            // verify that it works for administators inspecting other users with an invalid or missing uri - by
+            // verify that it works for administrators inspecting other users with an invalid or missing uri - by
             // using the eperson parameter
             getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                     .param("uri", invalidUri)
                     .param("eperson", eperson.getID().toString()))
                 .andExpect(status().isBadRequest());
 
-            // verify that it works for administators inspecting other users with an invalid or missing uri - by
+            // verify that it works for administrators inspecting other users with an invalid or missing uri - by
             // assuming login
             getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                     .param("uri", invalidUri)
@@ -837,12 +837,308 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isBadRequest());
     }
 
-    @Test
     /**
-     * Verify that the findByObject return the 401 Unauthorized response when an eperson is involved
-     * 
+     * Verify that the search by object works properly in allowed scenarios, when SSR rest url is defined, :
+     * - for an administrator
+     * - for an administrator that want to inspect permission of the anonymous users or another user
+     * - for a logged-in "normal" user
+     * - for anonymous
+     *
      * @throws Exception
      */
+    @Test
+    public void findByObjectSSRTest() throws Exception {
+        Site site = siteService.findSite(context);
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
+        String siteUri = "http://ssr.example.com/api/core/sites/" + siteRest.getId();
+
+        // disarm the alwaysThrowExceptionFeature
+        configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
+        configurationService.setProperty("dspace.server.ssr.url", "http://ssr.example.com/api");
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        // verify that it works for administrator users
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", siteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.hasSize(greaterThanOrEqualTo(1))))
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.everyItem(
+                        Matchers.anyOf(
+                            JsonPathMatchers.hasJsonPath("$.type", is("authorization")),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.allOf(
+                                    is(alwaysTrue.getName())
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.not(Matchers.anyOf(
+                                        is(alwaysFalse.getName()),
+                                        is(alwaysException.getName()),
+                                        is(trueForTestUsers.getName()),
+                                        is(trueForAdmins.getName())
+                                    )
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature.resourcetypes",
+                                Matchers.hasItem(is("authorization"))),
+                            JsonPathMatchers.hasJsonPath("$.id",
+                                Matchers.anyOf(
+                                    Matchers.startsWith(eperson.getID().toString()),
+                                    Matchers.endsWith(siteRest.getUniqueType() + "_" + siteRest.getId()))))
+                    )
+                )
+            )
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+
+        // verify that it works for authenticated users
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", siteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.hasSize(greaterThanOrEqualTo(1))))
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.everyItem(
+                        Matchers.anyOf(
+                            JsonPathMatchers.hasJsonPath("$.type", is("authorization")),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.allOf(
+                                    is(alwaysTrue.getName())
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.not(Matchers.anyOf(
+                                        is(alwaysFalse.getName()),
+                                        is(alwaysException.getName()),
+                                        is(trueForTestUsers.getName()),
+                                        is(trueForAdmins.getName())
+                                    )
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature.resourcetypes",
+                                Matchers.hasItem(is("authorization"))),
+                            JsonPathMatchers.hasJsonPath("$.id",
+                                Matchers.anyOf(
+                                    Matchers.startsWith(eperson.getID().toString()),
+                                    Matchers.endsWith(siteRest.getUniqueType() + "_" + siteRest.getId()))))
+                    )
+                )
+            )
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+
+        // verify that it works for anonymous users
+        getClient().perform(get("/api/authz/authorizations/search/object")
+                .param("uri", siteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.hasSize(greaterThanOrEqualTo(1))))
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.everyItem(
+                        Matchers.anyOf(
+                            JsonPathMatchers.hasJsonPath("$.type", is("authorization")),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.allOf(
+                                    is(alwaysTrue.getName())
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.not(Matchers.anyOf(
+                                        is(alwaysFalse.getName()),
+                                        is(alwaysException.getName()),
+                                        is(trueForTestUsers.getName()),
+                                        is(trueForAdmins.getName())
+                                    )
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature.resourcetypes",
+                                Matchers.hasItem(is("authorization"))),
+                            JsonPathMatchers.hasJsonPath("$.id",
+                                Matchers.anyOf(
+                                    Matchers.startsWith(eperson.getID().toString()),
+                                    Matchers.endsWith(siteRest.getUniqueType() + "_" + siteRest.getId()))))
+                    )
+                )
+            )
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+    }
+
+    /**
+     * Verify that the findByObject return the 400 Bad Request response for invalid or missing URI (required parameter)
+     *
+     * @throws Exception
+     */
+    @Test
+    public void findByObjectBadRequestSSRTest() throws Exception {
+        // disarm the alwaysThrowExceptionFeature
+        configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
+        configurationService.setProperty("dspace.server.ssr.url", "http://ssr.example.com/api");
+        String[] invalidUris = new String[] {
+            "invalid-uri",
+            "",
+            "http://localhost/api/wrongcategory/wrongmodel/1",
+            "http://localhost/api/core/sites/this-is-not-an-uuid"
+        };
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        for (String invalidUri : invalidUris) {
+            log.debug("findByObjectBadRequestTest - Testing the URI: " + invalidUri);
+
+            // verify that it works for administrators with an invalid or missing uri - with eperson parameter
+            getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                    .param("uri", invalidUri)
+                    .param("eperson", admin.getID().toString()))
+                .andExpect(status().isBadRequest());
+
+            // verify that it works for administrators with an invalid or missing uri - without eperson parameter
+            getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                    .param("uri", invalidUri))
+                .andExpect(status().isBadRequest());
+
+            // verify that it works for normal loggedin users with an invalid or missing uri - with eperson parameter
+            getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                    .param("uri", invalidUri)
+                    .param("eperson", eperson.getID().toString()))
+                .andExpect(status().isBadRequest());
+
+            // verify that it works for normal loggedin users with an invalid or missing uri - without eperson parameter
+            getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                    .param("uri", invalidUri))
+                .andExpect(status().isBadRequest());
+
+            // verify that it works for administrators inspecting other users with an invalid or missing uri - by
+            // using the eperson parameter
+            getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                    .param("uri", invalidUri)
+                    .param("eperson", eperson.getID().toString()))
+                .andExpect(status().isBadRequest());
+
+            // verify that it works for administrators inspecting other users with an invalid or missing uri - by
+            // assuming login
+            getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                    .param("uri", invalidUri)
+                    .header("X-On-Behalf-Of", eperson.getID()))
+                .andExpect(status().isBadRequest());
+
+            // verify that it works for anonymous users with an invalid or missing uri
+            getClient().perform(get("/api/authz/authorizations/search/object")
+                    .param("uri", invalidUri))
+                .andExpect(status().isBadRequest());
+        }
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("eperson", admin.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                .param("eperson", eperson.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("eperson", eperson.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient().perform(get("/api/authz/authorizations/search/object"))
+            .andExpect(status().isBadRequest());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object"))
+            .andExpect(status().isBadRequest());
+    }
+
+    /**
+     * Verify that the findByObject return an empty page when the requested object doesn't exist but the uri is
+     * potentially valid (i.e. deleted object)
+     *
+     * @throws Exception
+     */
+    @Test
+    public void findByNotExistingObjectSSSTest() throws Exception {
+        String wrongSiteUri = "http://localhost/api/core/sites/" + UUID.randomUUID();
+
+        // disarm the alwaysThrowExceptionFeature
+        configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
+        configurationService.setProperty("dspace.server.ssr.url", "http://ssr.example.com/api");
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // verify that it works for administrators, no result - with eperson parameter
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", wrongSiteUri)
+                .param("eperson", admin.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // verify that it works for administrators, no result - without eperson parameter
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", wrongSiteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        // verify that it works for normal loggedin users - with eperson parameter
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", wrongSiteUri)
+                .param("eperson", eperson.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // verify that it works for normal loggedin users - without eperson parameter
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", wrongSiteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // verify that it works for administrators inspecting other users - by using the eperson parameter
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", wrongSiteUri)
+                .param("eperson", eperson.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // verify that it works for administrators inspecting other users - by assuming login
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", wrongSiteUri)
+                .header("X-On-Behalf-Of", eperson.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // verify that it works for anonymous users
+        getClient().perform(get("/api/authz/authorizations/search/object")
+                .param("uri", wrongSiteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    /**
+     * Verify that the findByObject return the 401 Unauthorized response when an eperson is involved
+     *
+     * @throws Exception
+     */
+    @Test
     public void findByObjectUnauthorizedTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
@@ -876,13 +1172,13 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isUnauthorized());
     }
 
-    @Test
     /**
      * Verify that the findByObject return the 403 Forbidden response when a non-admin eperson try to search the
-     * authorization of another eperson
-     * 
+     * authorization of another eperson.
+     *
      * @throws Exception
      */
+    @Test
     public void findByObjectForbiddenTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
@@ -920,11 +1216,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isForbidden());
     }
 
-    @Test
     /**
      * Verify that an exception in the feature check will be reported back
      * @throws Exception
      */
+    @Test
     public void findByObjectInternalServerErrorTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
@@ -977,16 +1273,18 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isInternalServerError());
     }
 
-    @Test
     /**
-     * Verify that the search by object and feature works properly in allowed scenarios:
-     * - for an administrator
-     * - for an administrator that want to inspect permission of the anonymous users or another user
-     * - for a logged-in "normal" user
-     * - for anonymous
-     * 
+     * Verify that the search by object and feature works properly in allowed scenarios.
+     * <ul>
+     *  <li>for an administrator</li>
+     *  <li>for an administrator that wants to inspect permission of the anonymous users or another user</li>
+     *  <li>for a logged-in "normal" user</li>
+     *  <li>for a not-logged-in "normal" user</li>
+     * </ul>
+     *
      * @throws Exception
      */
+    @Test
     public void findByObjectAndFeatureTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Community com = CommunityBuilder.createCommunity(context).withName("A test community").build();
@@ -1081,7 +1379,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                         )
                 )));
 
-        // verify that it works for administators inspecting other users - by using the eperson parameter
+        // verify that it works for administrators inspecting other users - by using the eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", comUri)
                 .param("projection", "level")
@@ -1103,7 +1401,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                         )
                 )));
 
-        // verify that it works for administators inspecting other users - by assuming login
+        // verify that it works for administrators inspecting other users - by assuming login
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", comUri)
                 .param("projection", "level")
@@ -1146,12 +1444,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 )));
     }
 
-    @Test
     /**
      * Verify that the search by object and feature works return 204 No Content when a feature is not granted
-     * 
+     *
      * @throws Exception
      */
+    @Test
     public void findByObjectAndFeatureNotGrantedTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
@@ -1187,14 +1485,14 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("feature", trueForAdmins.getName()))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
-        // verify that it works for administators inspecting other users - by using the eperson parameter
+        // verify that it works for administrators inspecting other users - by using the eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", siteUri)
                 .param("feature", trueForAdmins.getName())
                 .param("eperson", eperson.getID().toString()))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
-        // verify that it works for administators inspecting other users - by assuming login
+        // verify that it works for administrators inspecting other users - by assuming login
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", siteUri)
                 .param("feature", trueForAdmins.getName())
@@ -1208,13 +1506,13 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
-    @Test
     /**
      * Verify that the findByObject return the 204 No Content code when the requested object doesn't exist but the uri
      * is potentially valid (i.e. deleted object) or the feature doesn't exist
-     * 
+     *
      * @throws Exception
      */
+    @Test
     public void findByNotExistingObjectAndFeatureTest() throws Exception {
         String wrongSiteUri = "http://localhost/api/core/sites/" + UUID.randomUUID();
         Site site = siteService.findSite(context);
@@ -1277,7 +1575,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("feature", "not-existing-feature"))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
-        // verify that it works for administators inspecting other users - by using the eperson parameter
+        // verify that it works for administrators inspecting other users - by using the eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", wrongSiteUri)
                 .param("feature", alwaysTrue.getName())
@@ -1290,7 +1588,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("eperson", eperson.getID().toString()))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
-        // verify that it works for administators inspecting other users - by assuming login
+        // verify that it works for administrators inspecting other users - by assuming login
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", wrongSiteUri)
                 .param("feature", alwaysTrue.getName())
@@ -1315,13 +1613,13 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
-    @Test
     /**
-     * Verify that the findByObject return the 400 Bad Request response for invalid or missing URI or feature (required
-     * parameters)
+     * Verify that the findByObject return the 400 Bad Request response for
+     * invalid or missing URI or feature (required parameters).
      *
      * @throws Exception
      */
+    @Test
     public void findByObjectAndFeatureBadRequestTest() throws Exception {
         String[] invalidUris = new String[] {
                 "invalid-uri",
@@ -1366,7 +1664,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     .param("feature", alwaysTrue.getName()))
                 .andExpect(status().isBadRequest());
 
-            // verify that it works for administators inspecting other users with an invalid or missing uri - by
+            // verify that it works for administrators inspecting other users with an invalid or missing uri - by
             // using the eperson parameter
             getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                     .param("uri", invalidUri)
@@ -1374,7 +1672,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     .param("eperson", eperson.getID().toString()))
                 .andExpect(status().isBadRequest());
 
-            // verify that it works for administators inspecting other users with an invalid or missing uri - by
+            // verify that it works for administrators inspecting other users with an invalid or missing uri - by
             // assuming login
             getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                     .param("uri", invalidUri)
@@ -1390,12 +1688,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         }
     }
 
-    @Test
     /**
      * Verify that the findByObjectAndFeature return the 401 Unauthorized response when an eperson is involved
-     * 
+     *
      * @throws Exception
      */
+    @Test
     public void findByObjectAndFeatureUnauthorizedTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
@@ -1433,13 +1731,14 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isUnauthorized());
     }
 
-    @Test
     /**
-     * Verify that the findByObjectAndFeature return the 403 Forbidden response when a non-admin eperson try to search
-     * the authorization of another eperson
-     * 
+     * Verify that the findByObjectAndFeature returns the 403 Forbidden response
+     * when a non-admin eperson tries to search the authorization of another
+     * eperson.
+     *
      * @throws Exception
      */
+    @Test
     public void findByObjectAndFeatureForbiddenTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
@@ -1481,11 +1780,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isForbidden());
     }
 
-    @Test
     /**
-     * Verify that an exception in the feature check will be reported back
+     * Verify that an exception in the feature check will be reported back.
      * @throws Exception
      */
+    @Test
     public void findByObjectAndFeatureInternalServerErrorTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
@@ -1528,16 +1827,18 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isInternalServerError());
     }
 
-    @Test
     /**
-     * Verify that the search by multiple objects and features works properly in allowed scenarios:
-     * - for an administrator
-     * - for an administrator that want to inspect permission of the anonymous users or another user
-     * - for a logged-in "normal" user
-     * - for anonymous
+     * Verify that the search by multiple objects and features works properly in allowed scenarios.
+     * <ul>
+     *  <li>for an administrator</li>
+     *  <li>for an administrator that wants to inspect permission of the anonymous users or another user</li>
+     *  <li>for a logged-in "normal" user</li>
+     *  <li>for a not-logged-in user</li>
+     * </ul>
      *
      * @throws Exception
      */
+    @Test
     public void findByMultipleObjectsAndFeaturesTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Community com = CommunityBuilder.createCommunity(context).withName("A test community").build();
@@ -1554,7 +1855,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         Supplier<MockHttpServletRequestBuilder> baseFeatureRequest = () ->
             get("/api/authz/authorizations/search/objects")
-                .param("type", "core.community")
+                .param("type", "core.communities")
                 .param("uuid", comId)
                 .param("uuid", secondComId)
                 .param("projection", "level")
@@ -1777,7 +2078,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 )
             )));
 
-        // verify that it works for administators inspecting other users - by using the eperson parameter
+        // verify that it works for administrators inspecting other users - by using the eperson parameter
         getClient(adminToken).perform(baseFeatureRequest.get()
             .param("eperson", eperson.getID().toString()))
             .andExpect(status().isOk())
@@ -1825,7 +2126,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 )
             )));
 
-        // verify that it works for administators inspecting other users - by assuming login
+        // verify that it works for administrators inspecting other users - by assuming login
         getClient(adminToken).perform(baseFeatureRequest.get()
             .header("X-On-Behalf-Of", eperson.getID()))
             .andExpect(status().isOk())
@@ -1899,16 +2200,19 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             )));
     }
 
-    @Test
     /**
-     * Verify that the paginated search by multiple objects and features works properly in allowed scenarios:
-     * - for an administrator
-     * - for an administrator that want to inspect permission of the anonymous users or another user
-     * - for a logged-in "normal" user
-     * - for anonymous
+     * Verify that the paginated search by multiple objects and features works
+     * properly in allowed scenarios.
+     * <ul>
+     * <li>for an administrator</li>
+     * <li>for an administrator that wants to inspect permission of the anonymous users or another user</li>
+     * <li>for a logged-in "normal" user</li>
+     * <li>for a not-logged-in user</li>
+     * </ul>
      *
      * @throws Exception
      */
+    @Test
     public void findByMultipleObjectsAndFeaturesPaginationTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -1927,7 +2231,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         Supplier<MockHttpServletRequestBuilder> baseFeatureRequest = () ->
             get("/api/authz/authorizations/search/objects")
-                .param("type", "core.community")
+                .param("type", "core.communities")
                 .param("uuid", comId)
                 .param("uuid", secondComId)
                 .param("projection", "level")
@@ -2029,7 +2333,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                                    )
                                )));
 
-        // verify that it works for administators inspecting other users - by using the eperson parameter
+        // verify that it works for administrators inspecting other users - by using the eperson parameter
         getClient(adminToken).perform(baseFeatureRequest.get()
                                                         .param("eperson", eperson.getID().toString()))
                              .andExpect(status().isOk())
@@ -2052,7 +2356,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                                  )
                              )));
 
-        // verify that it works for administators inspecting other users - by assuming login
+        // verify that it works for administrators inspecting other users - by assuming login
         getClient(adminToken).perform(baseFeatureRequest.get()
                                                         .header("X-On-Behalf-Of", eperson.getID()))
                              .andExpect(status().isOk())
@@ -2098,12 +2402,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                                        )));
     }
 
-    @Test
     /**
      * Verify that the search by many objects and features works return 204 No Content when no feature is granted.
      *
      * @throws Exception
      */
+    @Test
     public void findByMultipleObjectsAndFeatureNotGrantedTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -2123,7 +2427,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administrators - with eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("uuid", itemId)
             .param("uuid", secondItemId)
             .param("feature", alwaysFalse.getName())
@@ -2132,7 +2436,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administrators - without eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("uuid", itemId)
             .param("uuid", secondItemId)
             .param("feature", alwaysFalse.getName())
@@ -2143,7 +2447,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for normal loggedin users - with eperson parameter
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("uuid", itemId)
             .param("uuid", secondItemId)
             .param("feature", alwaysFalse.getName())
@@ -2153,16 +2457,16 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for normal loggedin users - without eperson parameter
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("uuid", itemId)
             .param("uuid", secondItemId)
             .param("feature", alwaysFalse.getName())
             .param("feature", trueForAdmins.getName()))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
-        // verify that it works for administators inspecting other users - by using the eperson parameter
+        // verify that it works for administrators inspecting other users - by using the eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("uuid", itemId)
             .param("uuid", secondItemId)
             .param("feature", alwaysFalse.getName())
@@ -2170,9 +2474,9 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .param("eperson", eperson.getID().toString()))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
-        // verify that it works for administators inspecting other users - by assuming login
+        // verify that it works for administrators inspecting other users - by assuming login
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("uuid", itemId)
             .param("uuid", secondItemId)
             .param("feature", alwaysFalse.getName())
@@ -2182,7 +2486,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for anonymous users
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("uuid", itemId)
             .param("uuid", secondItemId)
             .param("feature", alwaysFalse.getName())
@@ -2190,14 +2494,15 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
-    @Test
     /**
      * Verify that the find by multiple objects and features
-     * return the 204 No Content code when the requested object doesn't exist but the uri
-     * is potentially valid (i.e. deleted object) or the feature doesn't exist
+     * return the 204 No Content code when the requested object doesn't exist
+     * but the uri is potentially valid (a deleted object) or the feature
+     * doesn't exist.
      *
      * @throws Exception
      */
+    @Test
     public void findByNotExistingMultipleObjectsAndFeatureTest() throws Exception {
         String wrongSiteId = UUID.randomUUID().toString();
         Site site = siteService.findSite(context);
@@ -2210,7 +2515,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administrators, no result - with eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", alwaysTrue.getName())
             .param("eperson", admin.getID().toString()))
@@ -2218,7 +2523,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-feature")
             .param("eperson", admin.getID().toString()))
@@ -2226,13 +2531,13 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administrators, no result - without eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", alwaysTrue.getName()))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", "not-existing-feature"))
@@ -2242,7 +2547,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for normal loggedin users - with eperson parameter
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", alwaysTrue.getName())
@@ -2250,7 +2555,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", "not-existing-feature")
@@ -2259,22 +2564,22 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for normal loggedin users - without eperson parameter
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", alwaysTrue.getName()))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", "not-existing-feature"))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
-        // verify that it works for administators inspecting other users - by using the eperson parameter
+        // verify that it works for administrators inspecting other users - by using the eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", alwaysTrue.getName())
@@ -2282,16 +2587,16 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", "not-existing-feature")
             .param("eperson", eperson.getID().toString()))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
-        // verify that it works for administators inspecting other users - by assuming login
+        // verify that it works for administrators inspecting other users - by assuming login
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", alwaysTrue.getName())
@@ -2299,7 +2604,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", "not-existing-feature")
@@ -2308,27 +2613,27 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for anonymous users
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", alwaysTrue.getName()))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", "not-existing-feature"))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
-    @Test
     /**
      * Verify that the find by multiple objects and features
      * return the 400 Bad Request response for invalid or missing UUID or type
      *
      * @throws Exception
      */
+    @Test
     public void findByMultipleObjectsAndFeatureBadRequestTest() throws Exception {
         String[] invalidUris = new String[] {
             "foo",
@@ -2344,7 +2649,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
             // verify that it works for administrators with an invalid or missing uuid - with eperson parameter
             getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-                .param("type", "core.item")
+                .param("type", "core.items")
                 .param("uuid", "foo")
                 .param("uuid", "")
                 .param("uuid", "invalid")
@@ -2355,7 +2660,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
             // verify that it works for administrators with an invalid or missing uuid - without eperson parameter
             getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-                .param("type", "core.item")
+                .param("type", "core.items")
                 .param("uuid", "foo")
                 .param("uuid", "")
                 .param("uuid", "invalid")
@@ -2365,7 +2670,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
             // verify that it works for normal loggedin users with an invalid or missing uuid - with eperson parameter
             getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-                .param("type", "core.item")
+                .param("type", "core.items")
                 .param("uuid", "foo")
                 .param("uuid", "")
                 .param("uuid", "invalid")
@@ -2377,7 +2682,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             // verify that it works for normal loggedin users with an invalid or missing
             // uuid - without eperson parameter
             getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-                .param("type", "core.item")
+                .param("type", "core.items")
                 .param("uuid", "foo")
                 .param("uuid", "")
                 .param("uuid", "invalid")
@@ -2385,10 +2690,10 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("feature", alwaysTrue.getName()))
                 .andExpect(status().isBadRequest());
 
-            // verify that it works for administators inspecting other users with an invalid or missing uri - by
+            // verify that it works for administrators inspecting other users with an invalid or missing uri - by
             // using the eperson parameter
             getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-                .param("type", "core.item")
+                .param("type", "core.items")
                 .param("uuid", "foo")
                 .param("uuid", "")
                 .param("uuid", "invalid")
@@ -2397,10 +2702,10 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("eperson", eperson.getID().toString()))
                 .andExpect(status().isBadRequest());
 
-            // verify that it works for administators inspecting other users with an invalid or missing uri - by
+            // verify that it works for administrators inspecting other users with an invalid or missing uri - by
             // assuming login
             getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-                .param("type", "core.item")
+                .param("type", "core.items")
                 .param("uuid", "foo")
                 .param("uuid", "")
                 .param("uuid", "invalid")
@@ -2411,7 +2716,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
             // verify that it works for anonymous users with an invalid or missing uri
             getClient().perform(get("/api/authz/authorizations/search/objects")
-                .param("type", "core.item")
+                .param("type", "core.items")
                 .param("uuid", "foo")
                 .param("uuid", "")
                 .param("uuid", "invalid")
@@ -2436,18 +2741,18 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that returns bad request for missing uuid
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("feature", alwaysTrue.getName()))
             .andExpect(status().isBadRequest());
     }
 
-    @Test
     /**
      * Verify that the find by multiple objects and features return
      * the 401 Unauthorized response when an eperson is involved
      *
      * @throws Exception
      */
+    @Test
     public void findByMultipleObjectsAndFeatureUnauthorizedTest() throws Exception {
         Site site = siteService.findSite(context);
         String siteId = site.getID().toString();
@@ -2457,7 +2762,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for an anonymous user inspecting an admin user - by using the eperson parameter
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysTrue.getName())
             .param("eperson", admin.getID().toString()))
@@ -2465,7 +2770,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for an anonymous user inspecting an admin user - by assuming login
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysTrue.getName())
             .header("X-On-Behalf-Of", admin.getID()))
@@ -2473,7 +2778,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for an anonymous user inspecting a normal user - by using the eperson parameter
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysTrue.getName())
             .param("eperson", eperson.getID().toString()))
@@ -2481,14 +2786,13 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for an anonymous user inspecting a normal user - by assuming login
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysTrue.getName())
             .header("X-On-Behalf-Of", eperson.getID()))
             .andExpect(status().isUnauthorized());
     }
 
-    @Test
     /**
      * Verify that the find by multiple objects and features
      * returns the 403 Forbidden response when a non-admin eperson try to search
@@ -2496,6 +2800,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      *
      * @throws Exception
      */
+    @Test
     public void findByMultipleObjectsAndFeatureForbiddenTest() throws Exception {
         Site site = siteService.findSite(context);
         String siteId = site.getID().toString();
@@ -2510,7 +2815,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that admin cannot search the admin authorizations - by using the eperson parameter
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysFalse.getName())
             .param("feature", alwaysTrue.getName())
@@ -2519,7 +2824,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that admin cannot search the admin authorizations - by assuming login
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysFalse.getName())
             .param("feature", alwaysTrue.getName())
@@ -2528,7 +2833,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that eperson cannot search the authorizations of another "normal" eperson - by using the parameter
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysFalse.getName())
             .param("feature", alwaysTrue.getName())
@@ -2537,7 +2842,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that eperson cannot search the authorizations of another "normal" eperson - by assuming login
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysFalse.getName())
             .param("feature", alwaysTrue.getName())
@@ -2545,11 +2850,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isForbidden());
     }
 
-    @Test
     /**
      * Verify that an exception in the multiple authorization features check will be reported back
      * @throws Exception
      */
+    @Test
     public void findByMultipleObjectsAndFeatureInternalServerErrorTest() throws Exception {
         Site site = siteService.findSite(context);
         String siteId = site.getID().toString();
@@ -2558,7 +2863,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administrators - with eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysException.getName())
             .param("eperson", admin.getID().toString()))
@@ -2566,7 +2871,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administrators - without eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysException.getName()))
             .andExpect(status().isInternalServerError());
@@ -2575,7 +2880,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for normal loggedin users - with eperson parameter
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysException.getName())
             .param("eperson", eperson.getID().toString()))
@@ -2583,27 +2888,27 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for normal loggedin users - without eperson parameter
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysException.getName()))
             .andExpect(status().isInternalServerError());
 
         // verify that it works for anonymous users
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysException.getName()))
             .andExpect(status().isInternalServerError());
     }
 
-    @Test
     /**
      * This test will check that special group are correctly used to verify
-     * authorization for the current loggedin user but not inherited from the
+     * authorization for the current logged-in user but not inherited from the
      * Administrators login when they look to authorization of third users
-     * 
+     *
      * @throws Exception
      */
+    @Test
     public void verifySpecialGroupMembershipTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
@@ -2801,6 +3106,5 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         return (epersonUuid != null ? epersonUuid + "_" : "") + featureName + "_" + type + "_"
                 + id.toString();
     }
-
 
 }

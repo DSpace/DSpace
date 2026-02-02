@@ -9,18 +9,18 @@ package org.dspace.app.bulkedit;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
@@ -76,13 +76,38 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void metadataImportTestWithDuplicateHeader() {
+        String[] csv = {"id,collection,dc.title,dc.title,dc.contributor.author",
+            "+," + collection.getHandle() + ",\"Test Import 1\",\"Test Import 2\"," + "\"Donald, SmithImported\"," +
+            "+," + collection.getHandle() + ",\"Test Import 3\",\"Test Import 4\"," + "\"Donald, SmithImported\""};
+        // Should throw an exception because of duplicate header
+        try {
+            performImportScript(csv);
+        } catch (Exception e) {
+            assertTrue(e instanceof MetadataImportInvalidHeadingException);
+        }
+    }
+
+    @Test
+    public void metadataImportTestWithAnyLanguage() {
+        String[] csv = {"id,collection,dc.title[*],dc.contributor.author",
+            "+," + collection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
+        // Should throw an exception because of invalid ANY language (*) in metadata field
+        try {
+            performImportScript(csv);
+        } catch (Exception e) {
+            assertTrue(e instanceof MetadataImportInvalidHeadingException);
+        }
+    }
+
+    @Test
     public void metadataImportTest() throws Exception {
         String[] csv = {"id,collection,dc.title,dc.contributor.author",
             "+," + collection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
         performImportScript(csv);
         Item importedItem = findItemByName("Test Import 1");
         assertTrue(
-            StringUtils.equals(
+            Strings.CS.equals(
                 itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY).get(0).getValue(),
                 "Donald, SmithImported"));
         eperson = ePersonService.findByEmail(context, eperson.getEmail());
@@ -99,9 +124,9 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             "+," + publicationCollection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
         performImportScript(csv, true);
         Item importedItem = findItemByName("Test Import 1");
-        assertTrue(StringUtils.equals(itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY)
+        assertTrue(Strings.CS.equals(itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY)
                               .get(0).getValue(), "Donald, SmithImported"));
-        assertTrue(StringUtils.equals(itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
+        assertTrue(Strings.CS.equals(itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
                               .get(0).getValue(), "Publication"));
         eperson = ePersonService.findByEmail(context, eperson.getEmail());
         assertEquals(importedItem.getSubmitter(), eperson);
@@ -117,7 +142,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             "+," + publicationCollection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
         performImportScript(csv, false);
         Item importedItem = findItemByName("Test Import 1");
-        assertTrue(StringUtils.equals(itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY)
+        assertTrue(Strings.CS.equals(itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY)
             .get(0).getValue(), "Donald, SmithImported"));
         assertEquals(0, itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
             .size());
@@ -144,8 +169,9 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
         }
         if (script != null) {
-            script.initialize(args, testDSpaceRunnableHandler, null);
-            script.run();
+            if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
+                script.run();
+            }
         }
     }
 
@@ -207,7 +233,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         performImportScript(csv);
         Item importedItem = findItemByName("Test Import 2");
         assertTrue(
-            StringUtils.equals(
+            Strings.CS.equals(
                 itemService.getMetadata(importedItem, "person", "birthDate", null, Item.ANY)
                            .get(0).getValue(), "2000"));
         context.turnOffAuthorisationSystem();
@@ -217,33 +243,36 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
     @Test
     public void metadataImportRemovingValueTest() throws Exception {
-
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context,personCollection).withAuthor("TestAuthorToRemove").withTitle("title")
+        String itemTitle = "Testing removing author";
+        Item item = ItemBuilder.createItem(context,personCollection).withAuthor("TestAuthorToRemove")
+                               .withTitle(itemTitle)
                                .build();
         context.restoreAuthSystemState();
 
         assertTrue(
-            StringUtils.equals(
+            Strings.CS.equals(
                 itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(0).getValue(),
                 "TestAuthorToRemove"));
 
-        String[] csv = {"id,collection,dc.title,dc.contributor.author[*]",
+        String[] csv = {"id,collection,dc.title,dc.contributor.author",
             item.getID().toString() + "," + personCollection.getHandle() + "," + item.getName() + ","};
         performImportScript(csv);
-        item = findItemByName("title");
+        item = findItemByName(itemTitle);
         assertEquals(0, itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size());
     }
 
-    private Item findItemByName(String name) throws SQLException {
-        Item importedItem = null;
-        List<Item> allItems = IteratorUtils.toList(itemService.findAll(context));
-        for (Item item : allItems) {
-            if (item.getName().equals(name)) {
-                importedItem = item;
-            }
+    private Item findItemByName(String name) throws Exception {
+        List<Item> items =
+            IteratorUtils.toList(itemService.findByMetadataField(context, "dc", "title", null, name));
+
+        if (items != null && !items.isEmpty()) {
+            // Just return first matching Item. Tests should ensure name/title is unique.
+            return items.get(0);
+        } else {
+            fail("Could not find expected Item with dc.title = '" + name + "'");
+            return null;
         }
-        return importedItem;
     }
 
     public void performImportScript(String[] csv) throws Exception {

@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
-import javax.el.MethodNotFoundException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -104,7 +103,7 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for VuFind");
+        throw new UnsupportedOperationException("This method is not implemented for VuFind");
     }
 
     @Override

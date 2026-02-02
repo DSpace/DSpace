@@ -15,8 +15,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -32,10 +34,11 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.AopTestUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
- * This class tests BitstreamFormat. Due to it being tighly coupled with the
+ * This class tests BitstreamFormat. Due to it being tightly coupled with the
  * database, most of the methods use mock objects, which only proved a very
  * basic test level (ensure the method doesn't throw an exception). The real
  * testing of the class will be done in the Integration Tests.
@@ -84,7 +87,9 @@ public class BitstreamFormatTest extends AbstractUnitTest {
 
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
-            authorizeServiceSpy = spy(authorizeService);
+            Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
+            authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
+                withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
             // "Wire" our spy to be used by the current loaded bitstreamFormatService
             // (To ensure it uses the spy instead of the real service)
             ReflectionTestUtils.setField(bitstreamFormatService, "authorizeService", authorizeServiceSpy);
@@ -222,6 +227,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         assertThat("testCreate 3", found.getSupportLevel(), equalTo(-1));
         assertFalse("testCreate 4", found.isInternal());
         bitstreamFormatService.delete(context, found);
+        context.commit();
     }
 
     /**
@@ -229,7 +235,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateNotAdmin() throws SQLException, AuthorizeException {
-        // Disalow full Admin perms
+        // Disallow full Admin perms
         when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
 
         bitstreamFormatService.create(context);
@@ -497,6 +503,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         BitstreamFormat bitstreamFormat = bitstreamFormatService.create(context);
         int toDeleteIdentifier = bitstreamFormat.getID();
         bitstreamFormatService.delete(context, bitstreamFormat);
+        context.commit();
         BitstreamFormat b = bitstreamFormatService.find(context, toDeleteIdentifier);
         assertThat("testDeleteAdmin 0", b, nullValue());
     }

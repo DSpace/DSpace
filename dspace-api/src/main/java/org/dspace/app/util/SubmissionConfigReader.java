@@ -11,17 +11,22 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -88,6 +93,20 @@ public class SubmissionConfigReader {
     private Map<String, String> collectionToSubmissionConfig = null;
 
     /**
+     * Hashmap which stores which submission process configuration is used by
+     * which community, computed from the item submission config file
+     * (specifically, the 'submission-map' tag)
+     */
+    private Map<String, String> communityToSubmissionConfig = null;
+
+    /**
+     * Hashmap which stores which submission process configuration is used by
+     * which entityType, computed from the item submission config file
+     * (specifically, the 'submission-map' tag)
+     */
+    private Map<String, String> entityTypeToSubmissionConfig = null;
+
+    /**
      * Reference to the global submission step definitions defined in the
      * "step-definitions" section
      */
@@ -106,6 +125,13 @@ public class SubmissionConfigReader {
     private SubmissionConfig lastSubmissionConfig = null;
 
     /**
+     * Collection Service instance, needed to interact with collection's
+     * stored data
+     */
+    protected static final CollectionService collectionService
+                = ContentServiceFactory.getInstance().getCollectionService();
+
+    /**
      * Load Submission Configuration from the
      * item-submission.xml configuration file
      *
@@ -117,6 +143,8 @@ public class SubmissionConfigReader {
 
     public void reload() throws SubmissionConfigReaderException {
         collectionToSubmissionConfig = null;
+        communityToSubmissionConfig = null;
+        entityTypeToSubmissionConfig = null;
         stepDefns = null;
         submitDefns = null;
         buildInputs(configDir + SUBMIT_DEF_FILE_PREFIX + SUBMIT_DEF_FILE_SUFFIX);
@@ -130,23 +158,22 @@ public class SubmissionConfigReader {
      * <li>Hashmap of Collection to Submission definition mappings -
      * defines which Submission process a particular collection uses
      * <li>Hashmap of all Submission definitions.  List of all valid
-     * Submision Processes by name.
+     * Submission Processes by name.
      * </ul>
      */
     private void buildInputs(String fileName) throws SubmissionConfigReaderException {
         collectionToSubmissionConfig = new HashMap<String, String>();
-        submitDefns = new HashMap<String, List<Map<String, String>>>();
+        communityToSubmissionConfig = new HashMap<String, String>();
+        entityTypeToSubmissionConfig = new HashMap<String, String>();
+        submitDefns = new LinkedHashMap<String, List<Map<String, String>>>();
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory
-                .newInstance();
-            factory.setValidating(false);
-            factory.setIgnoringComments(true);
-            factory.setIgnoringElementContentWhitespace(true);
-
-            DocumentBuilder db = factory.newDocumentBuilder();
+            // This document builder factory will *not* disable external
+            // entities as they can be useful in managing large forms, but
+            // it will restrict them to the config dir containing submission definitions
+            DocumentBuilder db = XMLUtils.getTrustedDocumentBuilder(configDir);
             Document doc = db.parse(uri);
             doNodes(doc);
         } catch (FactoryConfigurationError fe) {
@@ -197,24 +224,81 @@ public class SubmissionConfigReader {
      * Returns the Item Submission process config used for a particular
      * collection, or the default if none is defined for the collection
      *
-     * @param collectionHandle collection's unique Handle
+     * @param col collection for which search Submission process config
      * @return the SubmissionConfig representing the item submission config
-     * @throws SubmissionConfigReaderException if no default submission process configuration defined
+     * @throws IllegalStateException if no default submission process configuration defined
      */
-    public SubmissionConfig getSubmissionConfigByCollection(String collectionHandle) {
-        // get the name of the submission process config for this collection
-        String submitName = collectionToSubmissionConfig
-            .get(collectionHandle);
-        if (submitName == null) {
+    public SubmissionConfig getSubmissionConfigByCollection(Collection col) {
+
+        String submitName;
+
+        if (col != null) {
+
+            // get the name of the submission process config for this collection
             submitName = collectionToSubmissionConfig
-                .get(DEFAULT_COLLECTION);
+                .get(col.getHandle());
+            if (submitName != null) {
+                return getSubmissionConfigByName(submitName);
+            }
+
+            // get the name of the submission process based on the entity type of this collections
+            if (!entityTypeToSubmissionConfig.isEmpty()) {
+                String entityType = collectionService.getMetadataFirstValue(col, "dspace", "entity", "type", Item.ANY);
+                submitName = entityTypeToSubmissionConfig
+                    .get(entityType);
+                if (submitName != null) {
+                    return getSubmissionConfigByName(submitName);
+                }
+            }
+
+            if (!communityToSubmissionConfig.isEmpty()) {
+                try {
+                    List<Community> communities = col.getCommunities();
+                    for (Community com : communities) {
+                        submitName = getSubmissionConfigByCommunity(com);
+                        if (submitName != null) {
+                            return getSubmissionConfigByName(submitName);
+                        }
+                    }
+                } catch (SQLException sqle) {
+                    throw new IllegalStateException("Error occurred while getting item submission configured " +
+                                                    "by community", sqle);
+                }
+            }
         }
+
+        submitName = collectionToSubmissionConfig.get(DEFAULT_COLLECTION);
+
         if (submitName == null) {
             throw new IllegalStateException(
                 "No item submission process configuration designated as 'default' in 'submission-map' section of " +
                     "'item-submission.xml'.");
         }
         return getSubmissionConfigByName(submitName);
+    }
+
+    /**
+     * Recursive function to return the Item Submission process config
+     * used for a community or the closest community parent, or null
+     * if none is defined
+     *
+     * @param com community for which search Submission process config
+     * @return the SubmissionConfig representing the item submission config
+     */
+    private String getSubmissionConfigByCommunity(Community com) {
+        String submitName = communityToSubmissionConfig
+                .get(com.getHandle());
+        if (submitName != null) {
+            return submitName;
+        }
+        List<Community> communities = com.getParentCommunities();
+        for (Community parentCom : communities) {
+            submitName = getSubmissionConfigByCommunity(parentCom);
+            if (submitName != null) {
+                return submitName;
+            }
+        }
+        return null;
     }
 
     /**
@@ -248,7 +332,7 @@ public class SubmissionConfigReader {
         log.debug("Submission process config '" + submitName
                       + "' not in cache. Reloading from scratch.");
 
-        lastSubmissionConfig = new SubmissionConfig(StringUtils.equals(getDefaultSubmissionConfigName(), submitName),
+        lastSubmissionConfig = new SubmissionConfig(Strings.CS.equals(getDefaultSubmissionConfigName(), submitName),
                                                     submitName, steps);
 
         log.debug("Submission process config has "
@@ -271,7 +355,7 @@ public class SubmissionConfigReader {
         throws SubmissionConfigReaderException {
         // We should already have the step definitions loaded
         if (stepDefns != null) {
-            // retreive step info
+            // retrieve step info
             Map<String, String> stepInfo = stepDefns.get(stepID);
 
             if (stepInfo != null) {
@@ -335,27 +419,37 @@ public class SubmissionConfigReader {
      * by the collection handle.
      */
     private void processMap(Node e) throws SAXException {
+
         NodeList nl = e.getChildNodes();
         int len = nl.getLength();
         for (int i = 0; i < len; i++) {
             Node nd = nl.item(i);
             if (nd.getNodeName().equals("name-map")) {
                 String id = getAttribute(nd, "collection-handle");
+                String communityId = getAttribute(nd, "community-handle");
+                String entityType = getAttribute(nd, "collection-entity-type");
                 String value = getAttribute(nd, "submission-name");
                 String content = getValue(nd);
-                if (id == null) {
+                if (id == null && communityId == null && entityType == null) {
                     throw new SAXException(
-                        "name-map element is missing collection-handle attribute in 'item-submission.xml'");
+                        "name-map element is missing collection-handle or community-handle or collection-entity-type " +
+                            "attribute in 'item-submission.xml'");
                 }
                 if (value == null) {
                     throw new SAXException(
                         "name-map element is missing submission-name attribute in 'item-submission.xml'");
                 }
-                if (content != null && content.length() > 0) {
+                if (content != null && !content.isEmpty()) {
                     throw new SAXException(
                         "name-map element has content in 'item-submission.xml', it should be empty.");
                 }
-                collectionToSubmissionConfig.put(id, value);
+                if (id != null) {
+                    collectionToSubmissionConfig.put(id, value);
+                } else if (communityId != null) {
+                    communityToSubmissionConfig.put(communityId, value);
+                } else {
+                    entityTypeToSubmissionConfig.put(entityType, value);
+                }
             } // ignore any child node that isn't a "name-map"
         }
     }
@@ -377,7 +471,7 @@ public class SubmissionConfigReader {
         for (int i = 0; i < len; i++) {
             Node nd = nl.item(i);
             // process each step definition
-            if (StringUtils.equalsIgnoreCase(nd.getNodeName(), "step-definition")) {
+            if (Strings.CI.equals(nd.getNodeName(), "step-definition")) {
                 String stepID = getAttribute(nd, "id");
                 if (stepID == null) {
                     throw new SAXException(

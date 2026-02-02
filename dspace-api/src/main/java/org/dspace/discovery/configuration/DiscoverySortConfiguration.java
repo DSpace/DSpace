@@ -10,8 +10,10 @@ package org.dspace.discovery.configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -22,6 +24,11 @@ public class DiscoverySortConfiguration {
 
     private List<DiscoverySortFieldConfiguration> sortFields = new ArrayList<DiscoverySortFieldConfiguration>();
 
+    /**
+     * Default sort configuration to use when needed
+     */
+    @Nullable private DiscoverySortFieldConfiguration defaultSortField;
+
     public List<DiscoverySortFieldConfiguration> getSortFields() {
         return sortFields;
     }
@@ -30,19 +37,27 @@ public class DiscoverySortConfiguration {
         this.sortFields = sortFields;
     }
 
+    public DiscoverySortFieldConfiguration getDefaultSortField() {
+        return defaultSortField;
+    }
+
+    public void setDefaultSortField(DiscoverySortFieldConfiguration configuration) {
+        this.defaultSortField = configuration;
+    }
+
     public DiscoverySortFieldConfiguration getSortFieldConfiguration(String sortField) {
         if (StringUtils.isBlank(sortField)) {
             return null;
         }
 
-        if (StringUtils.equalsIgnoreCase(SCORE, sortField)) {
+        if (Strings.CI.equals(SCORE, sortField)) {
             DiscoverySortFieldConfiguration configuration = new DiscoverySortFieldConfiguration();
             configuration.setMetadataField(SCORE);
             return configuration;
         }
 
         for (DiscoverySortFieldConfiguration sortFieldConfiguration : CollectionUtils.emptyIfNull(sortFields)) {
-            if (StringUtils.equals(sortFieldConfiguration.getMetadataField(), sortField)) {
+            if (Strings.CS.equals(sortFieldConfiguration.getMetadataField(), sortField)) {
                 return sortFieldConfiguration;
             }
         }

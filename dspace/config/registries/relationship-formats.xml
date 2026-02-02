@@ -237,7 +237,7 @@
         <scope_note>Contains all uuids of PUBLICATIONS which link to the current ISSUE via a "latest" relationship. In other words, this stores all relationships pointing to the current ISSUE from any PUBLICATION, implying that the ISSUE is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
-    <!-- OpenAIRE4 Guidelines - required relationships -->
+    <!-- Openaire4 Guidelines - required relationships -->
 
     <dc-type>
         <schema>relation</schema>

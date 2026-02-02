@@ -12,13 +12,13 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -31,7 +31,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
  */
 public class DSpaceKernelInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    private static final Logger log = LoggerFactory.getLogger(DSpaceKernelInitializer.class);
+    private static final Logger log = LogManager.getLogger();
 
     private transient DSpaceKernel dspaceKernel;
 
@@ -81,6 +81,7 @@ public class DSpaceKernelInitializer implements ApplicationContextInitializer<Co
      * Initially look for JNDI Resource called "java:/comp/env/dspace.dir".
      * If not found, use value provided in "dspace.dir" in Spring Environment
      */
+    @SuppressWarnings("BanJNDI")
     private String getDSpaceHome(ConfigurableEnvironment environment) {
         // Load the "dspace.dir" property from Spring Boot's Configuration (application.properties)
         // This gives us the location of our DSpace configurations, necessary to start the kernel
@@ -119,6 +120,7 @@ public class DSpaceKernelInitializer implements ApplicationContextInitializer<Co
             this.kernel = kernel;
         }
 
+        @Override
         public void onApplicationEvent(final ContextClosedEvent event) {
             if (this.kernel != null) {
                 this.kernel.destroy();

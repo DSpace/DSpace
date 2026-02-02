@@ -23,9 +23,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.utils.Utils;
@@ -47,7 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
  * This will be the entry point for the api/eperson/groups endpoint with additional paths to it
  */
 @RestController
-@RequestMapping("/api/" + GroupRest.CATEGORY + "/" + GroupRest.GROUPS)
+@RequestMapping("/api/" + GroupRest.CATEGORY + "/" + GroupRest.PLURAL_NAME)
 public class GroupRestController {
 
     @Autowired

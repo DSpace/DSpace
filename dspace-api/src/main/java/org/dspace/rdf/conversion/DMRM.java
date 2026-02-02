@@ -8,10 +8,10 @@
 
 package org.dspace.rdf.conversion;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
 
 /**
  * Schema for DSpace Metadata RDF Mappings.
@@ -88,7 +88,7 @@ public class DMRM {
     public static final Resource DSpaceValue = m_model.createResource(NS + "DSpaceValue");
 
     /**
-     * <p>Specifies the RDF to generate for a specified matadata.</p>
+     * <p>Specifies the RDF to generate for a specified metadata.</p>
      */
     public static final Property creates = m_model.createProperty(NS + "creates");
 

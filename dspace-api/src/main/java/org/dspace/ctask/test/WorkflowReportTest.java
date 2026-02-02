@@ -10,11 +10,11 @@ package org.dspace.ctask.test;
 
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Curation task which simply reports its invocation without changing anything.
@@ -24,13 +24,13 @@ import org.slf4j.LoggerFactory;
  */
 public class WorkflowReportTest
         extends AbstractCurationTask {
-    private static final Logger LOG = LoggerFactory.getLogger(WorkflowReportTest.class);
+    private static final Logger LOG = LogManager.getLogger();
 
     @Override
     public int perform(DSpaceObject dso)
             throws IOException {
         LOG.info("Class {} as task {} received 'perform' for object {}",
-                WorkflowReportTest.class.getSimpleName(), taskId, dso);
+                WorkflowReportTest.class::getSimpleName, () -> taskId, () -> dso);
         curator.report(String.format(
                 "Class %s as task %s received 'perform' for object %s%n",
                 WorkflowReportTest.class.getSimpleName(), taskId, dso));

@@ -22,6 +22,7 @@ import org.dspace.discovery.configuration.DiscoverySearchFilter;
 public class SearchConfigurationRest extends BaseObjectRest<String> {
 
     public static final String NAME = "discover";
+    public static final String PLURAL_NAME = NAME;
     public static final String CATEGORY = RestModel.DISCOVER;
     @JsonIgnore
     private String scope;
@@ -31,12 +32,22 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
     private List<Filter> filters = new LinkedList<>();
     private List<SortOption> sortOptions = new LinkedList<>();
 
+    private SortOption defaultSortOption;
+
     public String getCategory() {
         return CATEGORY;
     }
 
     public String getType() {
         return NAME;
+    }
+
+    /**
+     * The plural name is the same as the singular name
+     */
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public Class getController() {
@@ -73,6 +84,14 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
 
     public List<SortOption> getSortOptions() {
         return sortOptions;
+    }
+
+    public SortOption getDefaultSortOption() {
+        return defaultSortOption;
+    }
+
+    public void setDefaultSortOption(SortOption defaultSortOption) {
+        this.defaultSortOption = defaultSortOption;
     }
 
     @Override

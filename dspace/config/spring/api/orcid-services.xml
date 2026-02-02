@@ -30,6 +30,7 @@
     	<property name="tokenEndpointUrl" value="${orcid.token-url}" />
     	<property name="authorizeEndpointUrl" value="${orcid.authorize-url}" />
     	<property name="scopes" value="${orcid.scope}" />
+		<property name="revokeUrl" value="${orcid.revoke-url}" />
     </bean>
     
     <bean class="org.dspace.orcid.client.OrcidClientImpl" />
@@ -38,40 +39,61 @@
     <bean class="org.dspace.orcid.model.validator.impl.OrcidValidatorImpl" />
     
     <bean class="org.dspace.orcid.service.impl.OrcidEntityFactoryServiceImpl">
-    	<constructor-arg name="itemService" ref="org.dspace.content.ItemServiceImpl" />
-    	<constructor-arg name="entityFactories">
-    		<list>
-    			<bean class="org.dspace.orcid.model.factory.impl.OrcidWorkFactory">
-    				<property name="fieldMapping" ref="orcidWorkFactoryFieldMapping" />
-    			</bean>
-    			<bean class="org.dspace.orcid.model.factory.impl.OrcidFundingFactory">
-    				<property name="fieldMapping" ref="orcidFundingFactoryFieldMapping" />
-    			</bean>
-    		</list>
-   		</constructor-arg>
+        <constructor-arg name="entityFactories">
+            <list>
+                <bean class="org.dspace.orcid.model.factory.impl.OrcidWorkFactory">
+                    <property name="fieldMapping" ref="orcidWorkFactoryFieldMapping" />
+                </bean>
+                <bean class="org.dspace.orcid.model.factory.impl.OrcidFundingFactory">
+                    <property name="fieldMapping" ref="orcidFundingFactoryFieldMapping" />
+                </bean>
+            </list>
+        </constructor-arg>
+        <constructor-arg name="itemService" ref="org.dspace.content.ItemServiceImpl" />
 	</bean>
 	
 	<bean id="orcidWorkFactoryFieldMapping" class="org.dspace.orcid.model.OrcidWorkFieldMapping" >
 		<property name="contributorFields" value="${orcid.mapping.work.contributors}" />
 		<property name="externalIdentifierFields" value="${orcid.mapping.work.external-ids}" />
-		<property name="publicationDateField" value="${orcid.mapping.work.publication-date}" />
-		<property name="titleField" value="${orcid.mapping.work.title}" />
-		<property name="journalTitleField" value="${orcid.mapping.work.journal-title}" />
-		<property name="shortDescriptionField" value="${orcid.mapping.work.short-description}" />
-		<property name="subTitleField" value="${orcid.mapping.work.sub-title}" />
-		<property name="languageField" value="${orcid.mapping.work.language}" />
-		<property name="languageConverter" ref="${orcid.mapping.work.language.converter}" />
-		<property name="typeField" value="${orcid.mapping.work.type}" />
-		<property name="typeConverter" ref="${orcid.mapping.work.type.converter}" />
-	</bean>
-	
-	<bean id="orcidFundingFactoryFieldMapping" class="org.dspace.orcid.model.OrcidFundingFieldMapping" >
-		<property name="contributorFields" value="${orcid.mapping.funding.contributors}" />
-		<property name="externalIdentifierFields" value="${orcid.mapping.funding.external-ids}" />
-		<property name="titleField" value="${orcid.mapping.funding.title}" />
-		<property name="typeField" value="${orcid.mapping.funding.type}" />
-		<property name="typeConverter" ref="${orcid.mapping.funding.type.converter}" />
-		<property name="amountField" value="${orcid.mapping.funding.amount}" />
+            <property name="externalIdentifierPartOfMap">
+                <map>
+                    <entry key="issn">
+                        <list>
+                            <value>journal-article</value>
+                            <value>magazine-article</value>
+                            <value>newspaper-article</value>
+                            <value>data-set</value>
+                            <value>learning-object</value>
+                            <value>other</value>
+                        </list>
+                    </entry>
+                    <entry key="isbn">
+                        <list>
+                            <value>book-chapter</value>
+                            <value>book-review</value>
+                            <value>other</value>
+                        </list>
+                    </entry>
+                </map>
+            </property>
+            <property name="publicationDateField" value="${orcid.mapping.work.publication-date}" />
+            <property name="titleField" value="${orcid.mapping.work.title}" />
+            <property name="journalTitleField" value="${orcid.mapping.work.journal-title}" />
+            <property name="shortDescriptionField" value="${orcid.mapping.work.short-description}" />
+            <property name="subTitleField" value="${orcid.mapping.work.sub-title}" />
+            <property name="languageField" value="${orcid.mapping.work.language}" />
+            <property name="languageConverter" ref="${orcid.mapping.work.language.converter}" />
+            <property name="typeField" value="${orcid.mapping.work.type}" />
+            <property name="typeConverter" ref="${orcid.mapping.work.type.converter}" />
+        </bean>
+        
+        <bean id="orcidFundingFactoryFieldMapping" class="org.dspace.orcid.model.OrcidFundingFieldMapping" >
+            <property name="contributorFields" value="${orcid.mapping.funding.contributors}" />
+            <property name="externalIdentifierFields" value="${orcid.mapping.funding.external-ids}" />
+            <property name="titleField" value="${orcid.mapping.funding.title}" />
+            <property name="typeField" value="${orcid.mapping.funding.type}" />
+            <property name="typeConverter" ref="${orcid.mapping.funding.type.converter}" />
+            <property name="amountField" value="${orcid.mapping.funding.amount}" />
 		<property name="amountCurrencyField" value="${orcid.mapping.funding.amount.currency}" />
 		<property name="amountCurrencyConverter" ref="${orcid.mapping.funding.amount.currency.converter}" />
 		<property name="descriptionField" value="${orcid.mapping.funding.description}" />

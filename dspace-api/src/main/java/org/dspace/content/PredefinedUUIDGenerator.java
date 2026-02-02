@@ -7,7 +7,6 @@
  */
 package org.dspace.content;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
@@ -21,7 +20,7 @@ import org.hibernate.id.UUIDGenerator;
 public class PredefinedUUIDGenerator extends UUIDGenerator {
 
     @Override
-    public Serializable generate(SharedSessionContractImplementor session, Object object) {
+    public Object generate(SharedSessionContractImplementor session, Object object) {
         if (object instanceof DSpaceObject) {
             UUID uuid = ((DSpaceObject) object).getPredefinedUUID();
             if (uuid != null) {

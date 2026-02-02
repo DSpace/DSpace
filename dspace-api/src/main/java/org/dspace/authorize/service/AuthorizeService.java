@@ -8,7 +8,7 @@
 package org.dspace.authorize.service;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
@@ -133,7 +133,7 @@ public interface AuthorizeService {
     public boolean authorizeActionBoolean(Context c, DSpaceObject o, int a, boolean useInheritance) throws SQLException;
 
     /**
-     * same authorize with a specif eperson (not the current user), returns boolean for those who don't want to deal
+     * same authorize with a specific eperson (not the current user), returns boolean for those who don't want to deal
      * with
      * catching exceptions.
      *
@@ -235,7 +235,7 @@ public interface AuthorizeService {
      * @param o        DSpaceObject to add policy to
      * @param actionID ID of action from <code>org.dspace.core.Constants</code>
      * @param e        eperson who can perform the action
-     * @param type     policy type, deafult types are declared in the ResourcePolicy class
+     * @param type     policy type, default types are declared in the ResourcePolicy class
      * @throws SQLException       if database error
      * @throws AuthorizeException if current user in context is not authorized to add policies
      */
@@ -261,7 +261,7 @@ public interface AuthorizeService {
      * @param o        object to add policy for
      * @param actionID ID of action from <code>org.dspace.core.Constants</code>
      * @param g        group to add policy for
-     * @param type     policy type, deafult types are declared in the ResourcePolicy class
+     * @param type     policy type, default types are declared in the ResourcePolicy class
      * @throws SQLException       if there's a database problem
      * @throws AuthorizeException if the current user is not authorized to add this policy
      */
@@ -322,6 +322,19 @@ public interface AuthorizeService {
      */
     public List<ResourcePolicy> getPoliciesActionFilterExceptRpType(Context c, DSpaceObject o, int actionID,
                                                                     String rpType) throws SQLException;
+    /**
+     * Add policies to an object to match those from a previous object
+     *
+     * @param c    context
+     * @param src  source of policies
+     * @param dest destination of inherited policies
+     * @param includeCustom whether TYPE_CUSTOM policies should be inherited
+     * @throws SQLException       if there's a database problem
+     * @throws AuthorizeException if the current user is not authorized to add these policies
+     */
+    public void inheritPolicies(Context c, DSpaceObject src, DSpaceObject dest, boolean includeCustom)
+            throws SQLException, AuthorizeException;
+
     /**
      * Add policies to an object to match those from a previous object
      *
@@ -470,33 +483,16 @@ public interface AuthorizeService {
     public ResourcePolicy findByTypeGroupAction(Context c, DSpaceObject dso, Group group, int action)
         throws SQLException;
 
-
-    /**
-     * Generate Policies policies READ for the date in input adding reason. New policies are assigned automatically
-     * at the groups that
-     * have right on the collection. E.g., if the anonymous can access the collection policies are assigned to
-     * anonymous.
-     *
-     * @param context          current context
-     * @param embargoDate      date
-     * @param reason           reason
-     * @param dso              DSpaceObject
-     * @param owningCollection collection
-     * @throws SQLException       if database error
-     * @throws AuthorizeException if authorization error
-     */
-    public void generateAutomaticPolicies(Context context, Date embargoDate, String reason, DSpaceObject dso,
-                                          Collection owningCollection) throws SQLException, AuthorizeException;
-
     public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson,
                                                int type, String rpType) throws SQLException, AuthorizeException;
 
     public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson,
                                                int type, String rpType, String rpName, String rpDescription,
-                                               Date startDate, Date endDate) throws SQLException, AuthorizeException;
+                                               LocalDate startDate, LocalDate endDate)
+        throws SQLException, AuthorizeException;
 
     public ResourcePolicy createOrModifyPolicy(ResourcePolicy policy, Context context, String name, Group group,
-                                               EPerson ePerson, Date embargoDate, int action, String reason,
+                                               EPerson ePerson, LocalDate embargoDate, int action, String reason,
                                                DSpaceObject dso) throws AuthorizeException, SQLException;
 
     /**
@@ -531,6 +527,15 @@ public interface AuthorizeService {
      *                  false when this is not the case, or an exception occurred
      */
     boolean isCollectionAdmin(Context context) throws SQLException;
+
+    /**
+     * Checks that the context's current user is an item admin in the site by querying the solr database.
+     *
+     * @param context   context with the current user
+     * @return          true if the current user is an item admin in the site
+     *                  false when this is not the case, or an exception occurred
+     */
+    boolean isItemAdmin(Context context) throws SQLException;
 
     /**
      * Checks that the context's current user is a community or collection admin in the site.
@@ -603,7 +608,7 @@ public interface AuthorizeService {
 
     /**
      * Replace all the policies in the target object with exactly the same policies that exist in the source object
-     * 
+     *
      * @param context DSpace Context
      * @param source  source of policies
      * @param dest    destination of inherited policies
@@ -612,5 +617,11 @@ public interface AuthorizeService {
      */
     public void replaceAllPolicies(Context context, DSpaceObject source, DSpaceObject dest)
             throws SQLException, AuthorizeException;
+
+    public void addDefaultPoliciesNotInPlace(Context context, DSpaceObject dso,
+            List<ResourcePolicy> defaultCollectionPolicies) throws SQLException, AuthorizeException;
+
+    public void addCustomPoliciesNotInPlace(Context context, DSpaceObject dso,
+            List<ResourcePolicy> defaultCollectionPolicies) throws SQLException, AuthorizeException;
 
 }

@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.file.PathUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.matcher.RelationshipMatcher;
@@ -61,7 +62,7 @@ import org.springframework.mock.web.MockMultipartFile;
 
 /**
  * Basic integration testing for the SAF Import feature via UI {@link ItemImport}.
- * https://wiki.lyrasis.org/display/DSDOC7x/Importing+and+Exporting+Items+via+Simple+Archive+Format
+ * https://wiki.lyrasis.org/display/DSDOC9x/Importing+and+Exporting+Items+via+Simple+Archive+Format
  *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
@@ -80,8 +81,12 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
     private ProcessService processService;
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
+    @Autowired
+    private ObjectMapper mapper;
+
     private Collection collection;
     private Path workDir;
+    private static final String TEMP_DIR = ItemImport.TEMP_DIR;
 
     @Before
     @Override
@@ -126,6 +131,10 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
         checkMetadata();
         checkMetadataWithAnotherSchema();
         checkBitstream();
+
+        // confirm that TEMP_DIR still exists
+        File workTempDir = new File(workDir + File.separator + TEMP_DIR);
+        assertTrue(workTempDir.exists());
     }
 
     @Test
@@ -226,7 +235,7 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
             getClient(getAuthToken(admin.getEmail(), password))
                 .perform(multipart("/api/system/scripts/import/processes")
                         .file(bitstreamFile)
-                        .param("properties", new ObjectMapper().writeValueAsString(list)))
+                        .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                         ProcessMatcher.matchProcess("import",
@@ -246,15 +255,15 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
         assertNotNull(process.getBitstreams());
         assertEquals(3, process.getBitstreams().size());
         assertEquals(1, process.getBitstreams().stream()
-                .filter(b -> StringUtils.equals(b.getName(), ItemImport.MAPFILE_FILENAME))
+                .filter(b -> Strings.CS.equals(b.getName(), ItemImport.MAPFILE_FILENAME))
                 .count());
         assertEquals(1,
                 process.getBitstreams().stream()
-                .filter(b -> StringUtils.contains(b.getName(), ".log"))
+                .filter(b -> Strings.CS.contains(b.getName(), ".log"))
                 .count());
         assertEquals(1,
                 process.getBitstreams().stream()
-                .filter(b -> StringUtils.contains(b.getName(), ".zip"))
+                .filter(b -> Strings.CS.contains(b.getName(), ".zip"))
                 .count());
     }
 }

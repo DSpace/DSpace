@@ -8,10 +8,10 @@
 package org.dspace.checker.dao.impl;
 
 import java.sql.SQLException;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.dspace.checker.ChecksumResult;
 import org.dspace.checker.ChecksumResultCode;
 import org.dspace.checker.ChecksumResult_;

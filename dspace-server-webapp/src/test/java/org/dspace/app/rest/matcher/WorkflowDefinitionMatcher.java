@@ -30,7 +30,7 @@ public class WorkflowDefinitionMatcher {
     private static XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
 
     private static final String WORKFLOW_DEFINITIONS_ENDPOINT
-            = "/api/" + WorkflowDefinitionRest.CATEGORY + "/" + WorkflowDefinitionRest.NAME_PLURAL + "/";
+            = "/api/" + WorkflowDefinitionRest.CATEGORY + "/" + WorkflowDefinitionRest.PLURAL_NAME + "/";
 
     private WorkflowDefinitionMatcher() {
     }

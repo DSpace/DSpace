@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -47,7 +49,7 @@ import org.springframework.stereotype.Component;
 /**
  * The repository for the Process workload
  */
-@Component(ProcessRest.CATEGORY + "." + ProcessRest.NAME)
+@Component(ProcessRest.CATEGORY + "." + ProcessRest.PLURAL_NAME)
 public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Integer> {
 
     private static final Logger log = LogManager.getLogger();
@@ -65,6 +67,12 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     @Autowired
     private EPersonService epersonService;
 
+    @PostConstruct
+    public void init() throws SQLException, AuthorizeException, IOException {
+        Context context = new Context();
+        processService.failRunningProcesses(context);
+        context.complete();
+    }
 
     @Override
     @PreAuthorize("hasPermission(#id, 'PROCESS', 'READ')")
@@ -88,6 +96,22 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
             int total = processService.countTotal(context);
             List<Process> processes = processService.findAll(context, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
+            return converter.toRestPage(processes, pageable, total, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @SearchRestMethod(name = "own")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<ProcessRest> findByCurrentUser(Pageable pageable) {
+
+        try {
+            Context context = obtainContext();
+            long total = processService.countByUser(context, context.getCurrentUser());
+            List<Process> processes = processService.findByUser(context, context.getCurrentUser(),
+                                                                pageable.getPageSize(),
+                                                                Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(processes, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -208,11 +232,14 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
             Iterator<Sort.Order> iterator = sort.iterator();
             if (iterator.hasNext()) {
                 Sort.Order order = iterator.next();
-                if (StringUtils.equalsIgnoreCase(order.getProperty(), "startTime")) {
+                if (Strings.CI.equals(order.getProperty(), "startTime")) {
                     processQueryParameterContainer.setSortProperty(Process_.START_TIME);
                     processQueryParameterContainer.setSortOrder(order.getDirection().name());
-                } else if (StringUtils.equalsIgnoreCase(order.getProperty(), "endTime")) {
+                } else if (Strings.CI.equals(order.getProperty(), "endTime")) {
                     processQueryParameterContainer.setSortProperty(Process_.FINISHED_TIME);
+                    processQueryParameterContainer.setSortOrder(order.getDirection().name());
+                } else if (Strings.CI.equals(order.getProperty(), "creationTime")) {
+                    processQueryParameterContainer.setSortProperty(Process_.CREATION_TIME);
                     processQueryParameterContainer.setSortOrder(order.getDirection().name());
                 } else {
                     throw new DSpaceBadRequestException("The given sort option was invalid: " + order.getProperty());

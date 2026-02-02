@@ -7,17 +7,15 @@
  */
 package org.dspace.app.util;
 
-import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import java.time.Instant;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 
@@ -43,16 +41,15 @@ public class WebApp implements ReloadableEntity<Integer> {
     @Column(name = "url")
     private String url;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "started")
-    private Date started;
+    private Instant started;
 
     @Column(name = "isui")
     private Integer isui;
 
     /**
      * Protected constructor, create object using:
-     * {@link org.dspace.app.util.service.WebAppService#create(Context, String, String, Date, int)}
+     * {@link org.dspace.app.util.service.WebAppService#create(Context, String, String, Instant, int)}
      */
     protected WebApp() {
 
@@ -79,11 +76,11 @@ public class WebApp implements ReloadableEntity<Integer> {
         this.url = url;
     }
 
-    public Date getStarted() {
+    public Instant getStarted() {
         return started;
     }
 
-    public void setStarted(Date started) {
+    public void setStarted(Instant started) {
         this.started = started;
     }
 

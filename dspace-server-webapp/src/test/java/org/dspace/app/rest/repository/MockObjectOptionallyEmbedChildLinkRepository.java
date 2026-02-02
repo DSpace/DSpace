@@ -13,6 +13,6 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository used by {@link MockObjectRest} to test that optionally-embedded subresources work correctly.
  */
-@Component(MockObjectRest.CATEGORY + "." + MockObjectRest.NAME + "." + MockObjectRest.O_CHILDREN)
+@Component(MockObjectRest.CATEGORY + "." + MockObjectRest.PLURAL_NAME + "." + MockObjectRest.O_CHILDREN)
 public class MockObjectOptionallyEmbedChildLinkRepository extends AbstractMockObjectChildLinkRepository {
 }

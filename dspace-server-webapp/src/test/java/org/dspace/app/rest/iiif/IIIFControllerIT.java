@@ -11,13 +11,14 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
 import java.util.UUID;
-import javax.ws.rs.core.MediaType;
 
+import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -126,6 +127,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // Default canvas size and label.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.service.profile", is("http://iiif.io/api/search/0/search")))
                 .andExpect(jsonPath("$.thumbnail.@id", Matchers.containsString("/iiif/2/"
@@ -210,6 +212,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // Expect canvas label, width and height to match bitstream description.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
                         Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/"
@@ -226,6 +229,95 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.structures").doesNotExist())
                 .andExpect(jsonPath("$.service").exists());
     }
+
+    @Test
+    public void findOneWithExcludedBitstreamIT() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .build();
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .enableIIIF()
+                .build();
+
+        String bitstreamContent = "ThisIsSomeText";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Bitstream1.jpg")
+                    .withMimeType("image/jpeg")
+                    .withIIIFLabel("Custom Label")
+                    .build();
+        }
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Bitstream2.jpg")
+                    .withMimeType("image/jpeg")
+                    .withIIIFDisabled()
+                    .build();
+        }
+        context.restoreAuthSystemState();
+        // Expect canvas label, width and height to match bitstream description.
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.sequences[0].canvases", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Custom Label")));
+    }
+
+    @Test
+    public void findOneWithExcludedBitstreamBundleIT() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .build();
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .enableIIIF()
+                .build();
+
+        String bitstreamContent = "ThisIsSomeText";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Bitstream1.jpg")
+                    .withMimeType("image/jpeg")
+                    .withIIIFLabel("Custom Label")
+                    .build();
+        }
+        // Add bitstream
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, publicItem1, is, "ExcludedBundle", false)
+                    .withName("Bitstream2.jpg")
+                    .withMimeType("image/jpeg")
+                    .build();
+        }
+        context.restoreAuthSystemState();
+        // Expect canvas label, width and height to match bitstream description.
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.sequences[0].canvases", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Custom Label")));
+    }
+
 
     @Test
     public void findOneIIIFSearchableWithCustomBundleAndConfigIT() throws Exception {
@@ -260,6 +352,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // Expect canvas label, width and height to match bitstream description.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
                         Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/"
@@ -346,6 +439,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // The sequence viewing hint should be "individuals" in the item metadata.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.license", is("https://license.org")))
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.sequences[0].canvases", Matchers.hasSize(3)))
@@ -354,6 +448,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/iiif/" + publicItem2.getID() + "/manifest"))
             .andExpect(status().isOk())
+            .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
             .andExpect(jsonPath("$.license", is("https://license.org")))
             .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
             .andExpect(jsonPath("$.sequences[0].canvases", Matchers.hasSize(3)))
@@ -414,6 +509,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // expect structures elements with label and canvas id.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
                         Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/"
@@ -501,6 +597,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // that each Bundle exists in the manifest with Canvases corresponding to each bitstream.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                    .andExpect(status().isOk())
+                   .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                    .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                    // should contain 3 canvases, corresponding to each bitstream
                    .andExpect(jsonPath("$.sequences[0].canvases[*].label",
@@ -624,6 +721,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // expect structures elements with label and canvas id.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.sequences[0].canvases", Matchers.hasSize(8)))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
@@ -792,6 +890,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // Expected a rendering element and no structures (because all images are inside the toc excluded bundle)
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                    .andExpect(status().isOk())
+                   .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                    .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                    // should contain 3 canvases, corresponding to each bitstream
                    .andExpect(jsonPath("$.sequences[0].canvases[*].label",
@@ -841,6 +940,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.license", is("https://license.org")))
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
@@ -890,6 +990,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // Expect seeAlso annotation list.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.license", is("https://license.org")))
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.seeAlso.@type", is("sc:AnnotationList")))
@@ -946,6 +1047,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // Image in the ORIGINAL bundle added as canvas; MP4 ignored, PDF offered as rendering...
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.sequences[0].canvases", Matchers.hasSize(1)))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
@@ -1024,6 +1126,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         getClient(getAuthToken(staffEperson.getEmail(), password))
                 .perform(get("/iiif/" + restrictedItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
                         Matchers.containsString("/iiif/" + restrictedItem1.getID() + "/canvas/"
@@ -1217,6 +1320,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // Default canvas size and label.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                    .andExpect(status().isOk())
+                   .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                    .andExpect(jsonPath("$.metadata[0].label", is("Title")))
                    .andExpect(jsonPath("$.metadata[0].value", is("Public item 1")))
                    .andExpect(jsonPath("$.sequences[0].canvases[1].label", is("Original label")));
@@ -1232,6 +1336,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // Verify that the updated canvas label is in the manifest.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                    .andExpect(status().isOk())
+                   .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                    .andExpect(jsonPath("$.sequences[0].canvases[1].label", is("Test label")));
     }
 
@@ -1338,6 +1443,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // Default canvas size and label.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                    .andExpect(status().isOk())
+                   .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                    .andExpect(jsonPath("$.metadata[0].label", is("Title")))
                    .andExpect(jsonPath("$.metadata[0].value", is("Public item 1")));
 
@@ -1352,6 +1458,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // Verify that the updated title is in the manifest.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                    .andExpect(status().isOk())
+                   .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                    .andExpect(jsonPath("$.metadata[0].value", is("Public item (revised)")));
     }
 
@@ -1392,6 +1499,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         // canvas dimensions using bitstream in the custom bundle (no bitstreams in ORIGINAL)
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                    .andExpect(status().isOk())
+                   .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
                    .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(64)))
                    .andExpect(jsonPath("$.sequences[0].canvases[0].height", is(64)));
     }

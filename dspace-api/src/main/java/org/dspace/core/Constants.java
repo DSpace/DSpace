@@ -56,10 +56,15 @@ public class Constants {
     public static final int EPERSON = 7;
 
     /**
+     * Type of LDN MESSAGE objects
+     */
+    public static final int LDN_MESSAGE = 8;
+
+    /**
      * lets you look up type names from the type IDs
      */
     public static final String[] typeText = { "BITSTREAM", "BUNDLE", "ITEM", "COLLECTION", "COMMUNITY", "SITE", "GROUP",
-        "EPERSON"};
+        "EPERSON", "LDN_MESSAGE"};
 
     /**
      * Special Bundle and Bitstream Names:

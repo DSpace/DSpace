@@ -51,5 +51,10 @@ public class ConfigurationRestRepositoryIT extends AbstractControllerIntegration
     public void getAll() throws Exception {
         getClient().perform(get("/api/config/properties/"))
             .andExpect(status().isMethodNotAllowed());
+
+        // Sanity check - Verify same result with no trailing slash, as DSpace should not care whether this
+        // findAll endpoint ends in a slash or not.
+        getClient().perform(get("/api/config/properties"))
+                   .andExpect(status().isMethodNotAllowed());
     }
 }

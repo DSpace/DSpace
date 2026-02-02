@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.text.DateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -50,12 +50,12 @@ public class HTMLReport implements Report {
     /**
      * start date for report
      */
-    private Date start = null;
+    private LocalDate start = null;
 
     /**
      * end date for report
      */
-    private Date end = null;
+    private LocalDate end = null;
 
     /**
      * the output file to which to write aggregation data
@@ -190,8 +190,8 @@ public class HTMLReport implements Report {
      * @param start the start date for the report
      */
     @Override
-    public void setStartDate(Date start) {
-        this.start = (start == null ? null : new Date(start.getTime()));
+    public void setStartDate(LocalDate start) {
+        this.start = start;
     }
 
 
@@ -201,8 +201,8 @@ public class HTMLReport implements Report {
      * @param end the end date for the report
      */
     @Override
-    public void setEndDate(Date end) {
-        this.end = (end == null ? null : new Date(end.getTime()));
+    public void setEndDate(LocalDate end) {
+        this.end = end;
     }
 
 
@@ -451,7 +451,7 @@ public class HTMLReport implements Report {
     }
 
     /**
-     * Clean Stirngs for display in HTML
+     * Clean Strings for display in HTML
      *
      * @param s The String to clean
      * @return The cleaned String

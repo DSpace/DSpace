@@ -8,15 +8,17 @@
 
 package org.dspace.importer.external.pubmed.metadatamapping.contributor;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.DCDate;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
@@ -107,29 +109,43 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
             LinkedList<MetadatumDTO> dayList = (LinkedList<MetadatumDTO>) day.contributeMetadata(t);
 
             for (int i = 0; i < yearList.size(); i++) {
-                DCDate dcDate = null;
+                String resultDateString = "";
                 String dateString = "";
 
+                DateTimeFormatter resultFormatter;
+                String resultType;
                 if (monthList.size() > i && dayList.size() > i) {
                     dateString = yearList.get(i).getValue() + "-" + monthList.get(i).getValue() +
                         "-" + dayList.get(i).getValue();
+                    resultFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                    resultType = "DAY";
                 } else if (monthList.size() > i) {
                     dateString = yearList.get(i).getValue() + "-" + monthList.get(i).getValue();
+                    resultFormatter = DateTimeFormatter.ofPattern("yyyy-MM");
+                    resultType = "MONTH";
                 } else {
                     dateString = yearList.get(i).getValue();
+                    resultFormatter = DateTimeFormatter.ofPattern("yyyy");
+                    resultType = "YEAR";
                 }
 
                 int j = 0;
                 // Use the first dcDate that has been formatted (Config should go from most specific to most lenient)
-                while (j < dateFormatsToAttempt.size()) {
+                while (j < dateFormatsToAttempt.size() && StringUtils.isBlank(resultDateString)) {
                     String dateFormat = dateFormatsToAttempt.get(j);
                     try {
-                        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-                        Date date = formatter.parse(dateString);
-                        dcDate = new DCDate(date);
-                        values.add(metadataFieldMapping.toDCValue(field, formatter.format(date)));
-                        break;
-                    } catch (ParseException e) {
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat);
+                        if (resultType.equals("DAY")) {
+                            LocalDate parsedDate = LocalDate.parse(dateString, formatter);
+                            resultDateString = resultFormatter.format(parsedDate);
+                        } else if (resultType.equals("MONTH")) {
+                            YearMonth parsedMonth = YearMonth.parse(dateString, formatter);
+                            resultDateString = resultFormatter.format(parsedMonth);
+                        } else if (resultType.equals("YEAR")) {
+                            Year parsedYear = Year.parse(dateString, formatter);
+                            resultDateString = resultFormatter.format(parsedYear);
+                        }
+                    } catch (DateTimeParseException e) {
                         // Multiple dateformats can be configured, we don't want to print the entire stacktrace every
                         // time one of those formats fails.
                         log.debug(
@@ -138,7 +154,9 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
                     }
                     j++;
                 }
-                if (dcDate == null) {
+                if (StringUtils.isNotBlank(resultDateString)) {
+                    values.add(metadataFieldMapping.toDCValue(field, resultDateString));
+                } else {
                     log.info(
                             "Failed parsing " + dateString + ", check " +
                                 "the configured dataformats in config/spring/api/pubmed-integration.xml");

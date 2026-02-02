@@ -38,7 +38,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.app.rest.matcher.PageMatcher;
@@ -103,6 +103,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
     @Autowired
     MockSolrSearchCore mockSolrSearchCore;
+
+    @Autowired
+    private ObjectMapper mapper;
+
     protected Community parentCommunity;
     protected Community child1;
 
@@ -172,7 +176,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                              .withAuthor("Smith, Maria")
                              .withPersonIdentifierLastName("Smith")
                              .withPersonIdentifierFirstName("Maria")
-                             .withMetadata("dspace", "entity", "type", "Person")
                              .build();
 
         author3 = ItemBuilder.createItem(context, col1)
@@ -649,7 +652,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         Map<String, String> map = new HashMap<>();
         map.put("leftwardValue", leftwardValue);
-        String json = new ObjectMapper().writeValueAsString(map);
+        String json = mapper.writeValueAsString(map);
 
         // Add leftwardValue
         getClient(token).perform(put("/api/core/relationships/" + idRef)
@@ -709,7 +712,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Map<String, String> map = new HashMap<>();
         map.put("leftwardValue", leftwardValue);
         map.put("rightwardValue", rightwardValue);
-        String json = new ObjectMapper().writeValueAsString(map);
+        String json = mapper.writeValueAsString(map);
 
         // Add leftwardValue and rightwardValue
         getClient(token).perform(put("/api/core/relationships/" + idRef)
@@ -819,7 +822,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // Make sure we grab the latest instance of the Item from the database
         publication1 = itemService.find(context, publication1.getID());
         // Add a plain text dc.contributor.author value
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text");
         itemService.update(context, publication1);
 
         List<MetadataValue> list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
@@ -829,7 +832,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         for (MetadataValue mdv : list) {
             // Here we want to ensure that the "plain text" metadatavalue has place 1 because it was added later than
             // the Relationship, so the "Smith, Donald" should have place 0 and "plain text" should have place 1
-            if (StringUtils.equals(mdv.getValue(), "plain text")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text")) {
                 assertEquals(1, mdv.getPlace());
             }
         }
@@ -885,7 +888,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // Ensure we have the latest instance of the Item from the database
         publication1 = itemService.find(context, publication1.getID());
         // Add a fourth dc.contributor.author mdv
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text two");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text two");
         itemService.update(context, publication1);
 
         context.restoreAuthSystemState();
@@ -896,7 +899,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // "Smith, Donald", "plain text", "Smith, Maria", "plain text two"
         assertEquals(4, list.size());
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getValue(), "plain text two")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text two")) {
                 assertEquals(3, mdv.getPlace());
             }
         }
@@ -954,7 +957,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
         // The following additions of Metadata will perform the same sequence of logic and tests as described above
         publication1 = itemService.find(context, publication1.getID());
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text three");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text three");
         itemService.update(context, publication1);
 
         context.restoreAuthSystemState();
@@ -963,7 +966,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         assertEquals(6, list.size());
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getValue(), "plain text three")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text three")) {
                 assertEquals(5, mdv.getPlace());
             }
         }
@@ -984,10 +987,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         publication1 = itemService.find(context, publication1.getID());
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text four");
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text five");
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text six");
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text seven");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text four");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text five");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text six");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text seven");
         itemService.update(context, publication1);
 
         context.restoreAuthSystemState();
@@ -996,16 +999,16 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         assertEquals(10, list.size());
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getValue(), "plain text four")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text four")) {
                 assertEquals(6, mdv.getPlace());
             }
-            if (StringUtils.equals(mdv.getValue(), "plain text five")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text five")) {
                 assertEquals(7, mdv.getPlace());
             }
-            if (StringUtils.equals(mdv.getValue(), "plain text six")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text six")) {
                 assertEquals(8, mdv.getPlace());
             }
-            if (StringUtils.equals(mdv.getValue(), "plain text seven")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text seven")) {
                 assertEquals(9, mdv.getPlace());
             }
         }
@@ -1035,11 +1038,11 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         list = itemService.getMetadata(publication1, "dc", "contributor", Item.ANY, Item.ANY);
         assertEquals(10, list.size()); //same size as authors
         list = itemService.getMetadata(publication1, "dc", Item.ANY, Item.ANY, Item.ANY);
-        assertEquals(16, list.size()); //also includes title, 4 date fields, uri
+        assertEquals(15, list.size()); //also includes title, 3 date fields, uri
         list = itemService.getMetadata(publication1, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         // also includes type, 3 relation.isAuthorOfPublication and 3 relation.isAuthorOfPublication.latestForDiscovery
         // values
-        assertEquals(23, list.size());
+        assertEquals(22, list.size());
 
         } finally {
             RelationshipBuilder.deleteRelationship(idRef1.get());
@@ -1115,13 +1118,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         publication1 = itemService.find(context, publication1.getID());
         // Add a plain text metadatavalue to the publication
         // After this addition, the list of authors should like like "Donald Smith", "plain text"
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text");
         itemService.update(context, publication1);
         context.restoreAuthSystemState();
         List<MetadataValue> list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getValue(), "plain text")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text")) {
                 // Ensure that this is indeed the second metadatavalue in the list of authors for the publication
                 assertEquals(1, mdv.getPlace());
             }
@@ -1158,13 +1161,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // Get the publication from the DB again to ensure that we have the latest object
         publication1 = itemService.find(context, publication1.getID());
         // Add a fourth metadata value to the publication
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text two");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text two");
         itemService.update(context, publication1);
         context.restoreAuthSystemState();
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getValue(), "plain text two")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text two")) {
                 // Ensure that this plain text metadata value is on the fourth place (place 3) for the publication
                 assertEquals(3, mdv.getPlace());
             }
@@ -1196,13 +1199,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
         publication1 = itemService.find(context, publication1.getID());
         // Create another plain text metadata value on the publication
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text three");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text three");
         itemService.update(context, publication1);
         context.restoreAuthSystemState();
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getValue(), "plain text three")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text three")) {
                 // Verify that this plain text value is indeed the 6th author in the list (place 5)
                 assertEquals(5, mdv.getPlace());
             }
@@ -1213,7 +1216,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         List<MetadataValue> authors = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
         List<MetadataValue> listToRemove = new LinkedList<>();
         for (MetadataValue metadataValue : authors) {
-            if (StringUtils.equals(metadataValue.getValue(), "plain text two")) {
+            if (Strings.CS.equals(metadataValue.getValue(), "plain text two")) {
                 listToRemove.add(metadataValue);
             }
         }
@@ -1228,14 +1231,14 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getValue(), "plain text")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text")) {
                 assertEquals(1, mdv.getPlace());
             }
         }
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getValue(), "plain text three")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text three")) {
                 assertEquals(4, mdv.getPlace());
             }
         }
@@ -1324,13 +1327,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         publication1 = itemService.find(context, publication1.getID());
         // Add a plain text metadatavalue to the publication
         // After this addition, the list of authors should like like "Donald Smith", "plain text"
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text");
         itemService.update(context, publication1);
         context.restoreAuthSystemState();
         List<MetadataValue> list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getValue(), "plain text")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text")) {
                 // Ensure that this is indeed the second metadatavalue in the list of authors for the publication
                 assertEquals(1, mdv.getPlace());
             }
@@ -1368,13 +1371,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // Get the publication from the DB again to ensure that we have the latest object
         publication1 = itemService.find(context, publication1.getID());
         // Add a fourth metadata value to the publication
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text two");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text two");
         itemService.update(context, publication1);
         context.restoreAuthSystemState();
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getValue(), "plain text two")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text two")) {
                 // Ensure that this plain text metadata value is on the fourth place (place 3) for the publication
                 assertEquals(3, mdv.getPlace());
             }
@@ -1406,13 +1409,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
         publication1 = itemService.find(context, publication1.getID());
         // Create another plain text metadata value on the publication
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text three");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text three");
         itemService.update(context, publication1);
         context.restoreAuthSystemState();
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getValue(), "plain text three")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text three")) {
                 // Verify that this plain text value is indeed the 6th author in the list (place 5)
                 assertEquals(5, mdv.getPlace());
             }
@@ -1435,14 +1438,14 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getValue(), "plain text")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text")) {
                 assertEquals(1, mdv.getPlace());
             }
         }
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getValue(), "plain text two")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text two")) {
                 assertEquals(2, mdv.getPlace());
             }
         }
@@ -1451,7 +1454,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getValue(), "plain text three")) {
+            if (Strings.CS.equals(mdv.getValue(), "plain text three")) {
                 assertEquals(4, mdv.getPlace());
             }
         }
@@ -2305,7 +2308,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         ;
 
         // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isOrgUnitOfPerson
-        // We do not specificy a DSO param, which means ALL relationships of type isOrgUnitOfPerson should be returned
+        // We do not specify a DSO param, which means ALL relationships of type isOrgUnitOfPerson should be returned
         // Which is what we're checking for, both the first relationship and the one with a different author
         // should be returned
         getClient().perform(get("/api/core/relationships/search/byLabel")
@@ -2320,6 +2323,77 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                        RelationshipMatcher.matchRelationship(relationshipAuthorExtra),
                        RelationshipMatcher.matchRelationship(relationshipOrgunitExtra)
                    )))
+        ;
+    }
+
+    @Test
+    public void findRelationshipByLabelWithRelatedEntityTypeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        RelationshipType isAuthorOfPublicationRelationshipTypePublication = relationshipTypeService
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
+                                    entityTypeService.findByEntityType(context, "Person"),
+                                    "isAuthorOfPublication", "isPublicationOfAuthor");
+        RelationshipType isAuthorOfPublicationRelationshipTypeOrgUnit = relationshipTypeService
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
+                                    entityTypeService.findByEntityType(context, "OrgUnit"),
+                                    "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        // We're creating a Relationship of type isAuthorOfPublication between a Publication and a Person
+        Relationship relationship1 = RelationshipBuilder
+            .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipTypePublication)
+            .build();
+
+        // We're creating a Relationship of type isAuthorOfPublication between a Publication and an OrgUnit
+        Relationship relationship2 = RelationshipBuilder
+            .createRelationshipBuilder(context, publication1, orgUnit1, isAuthorOfPublicationRelationshipTypeOrgUnit)
+            .build();
+        context.restoreAuthSystemState();
+
+        // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isAuthorOfPublication
+        // With an extra parameter namely DSO which resolves to the publication used by both relationships.
+        // Both relationships should be returned if we don't specify the DSO's related entity type
+        getClient().perform(get("/api/core/relationships/search/byLabel")
+                                .param("label", "isAuthorOfPublication")
+                                .param("dso", publication1.getID().toString())
+                                .param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page", is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))))
+            .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
+                RelationshipMatcher.matchRelationship(relationship1),
+                RelationshipMatcher.matchRelationship(relationship2)
+            )))
+        ;
+
+        // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isAuthorOfPublication
+        // With an extra parameter namely DSO which resolves to the publication used by both relationships.
+        // Only the Person relationship should be returned if we specify the DSO's related entity type
+        getClient().perform(get("/api/core/relationships/search/byLabel")
+                                .param("label", "isAuthorOfPublication")
+                                .param("dso", publication1.getID().toString())
+                                .param("relatedEntityType", "Person")
+                                .param("projection", "full"))
+
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page", is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1))))
+            .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
+                RelationshipMatcher.matchRelationship(relationship1)
+            )))
+        ;
+
+        // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isAuthorOfPublication
+        // With an extra parameter namely DSO which resolves to the publication used by both relationships.
+        // Only the OrgUnit relationship should be returned if we specify the DSO's related entity type
+        getClient().perform(get("/api/core/relationships/search/byLabel")
+                                .param("label", "isAuthorOfPublication")
+                                .param("dso", publication1.getID().toString())
+                                .param("relatedEntityType", "OrgUnit")
+                                .param("projection", "full"))
+
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page", is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1))))
+            .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
+                RelationshipMatcher.matchRelationship(relationship2)
+            )))
         ;
     }
 
@@ -2571,7 +2645,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
-        ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
         Map<String, Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
@@ -2619,7 +2692,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                 .andExpect(status().isCreated())
                 .andReturn();
 
-            ObjectMapper mapper = new ObjectMapper();
             String content = mvcResult.getResponse().getContentAsString();
             Map<String, Object> map = mapper.readValue(content, Map.class);
             String id = String.valueOf(map.get("id"));
@@ -2632,7 +2704,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
             getClient(token).perform(patch("/api/core/items/" + publication1.getID())
                                          .content(getPatchContent(ops))
-                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON));
+                                         .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON));
 
             // Add another relationship
             mvcResult = getClient(token)
@@ -3236,7 +3308,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     @Test
-    public void findByItemsAndTypeEmptyResponceTest() throws Exception {
+    public void findByItemsAndTypeEmptyResponseTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
 

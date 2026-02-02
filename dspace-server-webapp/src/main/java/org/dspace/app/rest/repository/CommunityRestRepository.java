@@ -13,11 +13,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.UUID;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -61,7 +61,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME)
+@Component(CommunityRest.CATEGORY + "." + CommunityRest.PLURAL_NAME)
 public class CommunityRestRepository extends DSpaceObjectRestRepository<Community, CommunityRest> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager
@@ -81,6 +81,9 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
 
     @Autowired
     AuthorizeService authorizeService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     private CommunityService cs;
 
@@ -127,7 +130,6 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
 
     private Community createCommunity(Context context, Community parent) throws AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         CommunityRest communityRest;
         try {
             ServletInputStream input = req.getInputStream();
@@ -251,7 +253,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
         CommunityRest communityRest;
         try {
-            communityRest = new ObjectMapper().readValue(jsonNode.toString(), CommunityRest.class);
+            communityRest = mapper.readValue(jsonNode.toString(), CommunityRest.class);
         } catch (IOException e) {
             throw new UnprocessableEntityException("Error parsing community json: " + e.getMessage());
         }
@@ -327,7 +329,6 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         throws SQLException, AuthorizeException {
 
         Group group = cs.createAdministrators(context, community);
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         try {
             ServletInputStream input = request.getInputStream();

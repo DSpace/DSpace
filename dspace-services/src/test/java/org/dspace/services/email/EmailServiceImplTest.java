@@ -12,10 +12,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EmailService;
 import org.dspace.test.DSpaceAbstractKernelTest;

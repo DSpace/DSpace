@@ -25,7 +25,7 @@
  * {@code EventService}, as with the stock listeners.
  * </p>
  *
- * @see org.dspace.google.GoogleRecorderEventListener
+ * @see org.dspace.google.GoogleAsyncEventListener
  * @see org.dspace.statistics.SolrLoggerUsageEventListener
  */
 

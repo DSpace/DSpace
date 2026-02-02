@@ -18,8 +18,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.core.MediaType;
 
+import jakarta.ws.rs.core.MediaType;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -63,7 +63,7 @@ public class CCLicenseAddPatchOperationIT extends AbstractControllerIntegrationT
 
         List<Operation> ops = new ArrayList<>();
         AddOperation addOperation = new AddOperation("/sections/cclicense/uri",
-                                                     "http://creativecommons.org/licenses/by-nc-sa/4.0/");
+                                                     "https://creativecommons.org/licenses/by-nc-sa/4.0/");
 
         ops.add(addOperation);
         String patchBody = getPatchContent(ops);
@@ -74,7 +74,7 @@ public class CCLicenseAddPatchOperationIT extends AbstractControllerIntegrationT
                                               .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.sections.cclicense", allOf(
-                                     hasJsonPath("$.uri", is("http://creativecommons.org/licenses/by-nc-sa/4.0/")),
+                                     hasJsonPath("$.uri", is("https://creativecommons.org/licenses/by-nc-sa/4.0/")),
                                      hasJsonPath("$.rights",
                                                  is("Attribution-NonCommercial-ShareAlike 4.0 International")),
                                      hasJsonPath("$.file.name", is("license_rdf"))

@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
@@ -429,7 +429,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         context.turnOffAuthorisationSystem();
 
-        // Create a relationship with this item with a spcific place
+        // Create a relationship with this item with a specific place
         Relationship relationship = relationshipService.create(context, item, authorItem, isAuthorOfPublication, 1, -1);
 
         context.restoreAuthSystemState();
@@ -3320,9 +3320,9 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     private String getRelationshipTypeStringForEntity(RelationshipType relationshipType, Item item) {
         String entityType = itemService.getEntityTypeLabel(item);
 
-        if (StringUtils.equals(entityType, relationshipType.getLeftType().getLabel())) {
+        if (Strings.CS.equals(entityType, relationshipType.getLeftType().getLabel())) {
             return relationshipType.getLeftwardType();
-        } else if (StringUtils.equals(entityType, relationshipType.getRightType().getLabel())) {
+        } else if (Strings.CS.equals(entityType, relationshipType.getRightType().getLabel())) {
             return relationshipType.getRightwardType();
         } else {
             throw new IllegalArgumentException(

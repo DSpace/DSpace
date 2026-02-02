@@ -8,8 +8,8 @@
 package org.dspace.submit.model;
 
 import java.util.List;
-import javax.inject.Inject;
 
+import jakarta.inject.Inject;
 import org.dspace.services.ConfigurationService;
 
 /**

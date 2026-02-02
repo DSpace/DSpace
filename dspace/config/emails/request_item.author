@@ -11,7 +11,7 @@
 ##             8 corresponding author email
 ##             9 configuration property "dspace.name"
 ##             10 configuration property "mail.helpdesk"
-#set($subject = 'Request copy of document')
+#set($subject = "${config.get('dspace.name')}: Request copy of document")
 
 Dear ${params[7]},
 
@@ -21,10 +21,12 @@ This request came along with the following message:
 
 "${params[5]}"
 
-To answer, click ${params[6]}. Whether you choose to grant or deny the request, we think that it''s in your best interest to respond.
+To answer, click ${params[6]}. Whether you choose to grant or deny the request, we think that it's in your best interest to respond.
 
-IF YOU ARE NOT AN AUTHOR OF THIS DOCUMENT, and only submitted the document on the author''s behalf, PLEASE REDIRECT THIS MESSAGE TO THE AUTHOR(S).  Only the author(s) should answer the request to send a copy.
+IF YOU ARE NOT AN AUTHOR OF THIS DOCUMENT, and only submitted the document on the author's behalf, PLEASE REDIRECT THIS MESSAGE TO THE AUTHOR(S).  Only the author(s) should answer the request to send a copy.
 
 IF YOU ARE AN AUTHOR OF THE REQUESTED DOCUMENT, thank you for your cooperation!
 
 If you have any questions concerning this request, please contact ${params[10]}.
+
+The ${config.get('dspace.name')} Team

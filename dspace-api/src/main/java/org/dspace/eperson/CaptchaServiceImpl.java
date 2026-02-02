@@ -14,18 +14,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import javax.annotation.PostConstruct;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpResponse;
+import jakarta.annotation.PostConstruct;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,18 +82,17 @@ public class CaptchaServiceImpl implements CaptchaService {
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpResponse httpResponse;
-        GoogleCaptchaResponse googleResponse;
-        final ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            httpResponse = httpClient.execute(httpPost);
-            googleResponse = objectMapper.readValue(httpResponse.getEntity().getContent(), GoogleCaptchaResponse.class);
+        try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
+            final ObjectMapper objectMapper = new ObjectMapper();
+            try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
+                GoogleCaptchaResponse googleResponse = objectMapper.readValue(httpResponse.getEntity().getContent(),
+                        GoogleCaptchaResponse.class);
+                validateGoogleResponse(googleResponse, action);
+            }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException("Error during verify google recaptcha site", e);
         }
-        validateGoogleResponse(googleResponse, action);
     }
 
     private boolean responseSanityCheck(String response) {

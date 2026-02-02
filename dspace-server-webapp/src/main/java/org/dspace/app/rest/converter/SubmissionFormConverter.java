@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.ScopeEnum;
 import org.dspace.app.rest.model.SubmissionFormFieldRest;
 import org.dspace.app.rest.model.SubmissionFormInputTypeRest;
@@ -110,7 +111,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
 
         if (dcinput.isMetadataField()) {
             // only try to process the metadata input type if there's a metadata field
-            if (!StringUtils.equalsIgnoreCase(dcinput.getInputType(), "qualdrop_value")) {
+            if (!Strings.CI.equals(dcinput.getInputType(), "qualdrop_value")) {
 
                 // value-pair and vocabulary are a special kind of authorities
                 String inputType = dcinput.getInputType();
@@ -125,7 +126,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                                                         dcinput.getVocabulary()));
                     selMd.setClosed(
                             isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
-                                    dcinput.getPairsType(), dcinput.getVocabulary()));
+                                    dcinput.getPairsType(), dcinput.getVocabulary(), dcinput.isClosedVocabulary()));
                 } else {
                     inputRest.setType(inputType);
                 }
@@ -145,7 +146,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                         selMd.setControlledVocabulary(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
                                 pairs.get(idx + 1), dcinput.getPairsType(), dcinput.getVocabulary()));
                         selMd.setClosed(isClosed(dcinput.getSchema(), dcinput.getElement(),
-                                dcinput.getQualifier(), null, dcinput.getVocabulary()));
+                                dcinput.getQualifier(), null, dcinput.getVocabulary(), dcinput.isClosedVocabulary()));
                     }
                     selectableMetadata.add(selMd);
                 }
@@ -212,9 +213,11 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     }
 
     private boolean isClosed(String schema, String element, String qualifier, String valuePairsName,
-            String vocabularyName) {
-        if (StringUtils.isNotBlank(valuePairsName) || StringUtils.isNotBlank(vocabularyName)) {
+            String vocabularyName, boolean isClosedVocabulary) {
+        if (StringUtils.isNotBlank(valuePairsName)) {
             return true;
+        } else if (StringUtils.isNotBlank(vocabularyName)) {
+            return isClosedVocabulary;
         }
         return authorityUtils.isClosed(schema, element, qualifier);
     }

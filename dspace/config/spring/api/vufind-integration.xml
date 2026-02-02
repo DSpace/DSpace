@@ -99,10 +99,6 @@
         <constructor-arg value="dc.contributor.author"/>
     </bean>
 
-    <bean class="java.lang.Integer" id="maxRetry">
-        <constructor-arg value="3"/>
-    </bean>
-
     <!-- Below there are other mapping that apply to an extended configuration in use for instance at the vuFind installation
          of ALICIA https://alicia.concytec.gob.pe/vufind/Search/Results?type=AllFields -->
 

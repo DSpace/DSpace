@@ -132,7 +132,7 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
                 if (key.startsWith(CONFIG_PREFIX)) {
                     if (configurationService.getBooleanProperty(key, true)) {
                         String mdField = key.substring(CONFIG_PREFIX.length());
-                        String segment[] = mdField.split("\\.", 3);
+                        String[] segment = mdField.split("\\.", 3);
 
                         // got schema.element.qualifier
                         if (segment.length == 3) {

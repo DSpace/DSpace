@@ -49,12 +49,12 @@ public class AuthorizationFeatureServiceIT extends AbstractControllerIntegration
     @Autowired
     private AuthorizationFeatureService authzFeatureService;
 
-    @Test
     /**
-     * All the features available in the Sprint Context should be returned
+     * All the features available in the Sprint Context should be returned.
      *
      * @throws Exception
      */
+    @Test
     public void findAllTest() throws Exception {
         List<AuthorizationFeature> authzFeatureServiceFindAll = authzFeatureService.findAll();
 
@@ -70,12 +70,13 @@ public class AuthorizationFeatureServiceIT extends AbstractControllerIntegration
                 equalTo(featureNames.size()));
     }
 
-    @Test
     /**
-     * The find method should return existing feature and null in the case the feature doesn't exist
+     * The find method should return existing feature  or {@code null} in the
+     * case the feature doesn't exist.
      *
      * @throws Exception
      */
+    @Test
     public void findTest() throws Exception {
         AuthorizationFeature aFeature = authzFeatureService.find(AlwaysTrueFeature.NAME);
         assertThat("check that one of our mock feature is retrieved", aFeature.getName(),
@@ -85,12 +86,12 @@ public class AuthorizationFeatureServiceIT extends AbstractControllerIntegration
         assertThat("check that not existing feature name return null", aNotExistingFeature, equalTo(null));
     }
 
-    @Test
     /**
-     * The findByResourceType must return only features that support the specified type
+     * The findByResourceType must return only features that support the specified type.
      *
      * @throws Exception
      */
+    @Test
     public void findByResourceTypeTest() throws Exception {
         // we have at least one feature that support the Site object
         final String siteUniqueType = SiteRest.CATEGORY + "." + SiteRest.NAME;
@@ -119,12 +120,13 @@ public class AuthorizationFeatureServiceIT extends AbstractControllerIntegration
         assertThat(notExistingTypeFeatures.size(), equalTo(0));
     }
 
-    @Test
     /**
-     * The isAuthorized must return true for authorized feature and false for not authorized feature
+     * The isAuthorized must return {@code true} for authorized feature and
+     * {@code false} for not authorized feature.
      *
      * @throws Exception
      */
+    @Test
     public void isAuthorizedTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);

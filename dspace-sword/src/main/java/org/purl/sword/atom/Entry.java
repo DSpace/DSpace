@@ -162,7 +162,7 @@ public class Entry extends XmlElement implements SwordElementInterface {
     }
 
     /**
-     * Create a new instance of the class an initalise it, setting the
+     * Create a new instance of the class an initialise it, setting the
      * element namespace and name.
      *
      * @param prefix  The namespace prefix of the element

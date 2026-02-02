@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
@@ -70,7 +70,7 @@ public class SubmissionDefinitionConverter implements DSpaceConverter<Submission
                 }
             } catch (ClassNotFoundException e) {
                 throw new IllegalStateException(
-                        "The submission configration is invalid the processing class for the step " + step.getId()
+                        "The submission configuration is invalid the processing class for the step " + step.getId()
                                 + " is not found",
                         e);
             }
@@ -80,7 +80,7 @@ public class SubmissionDefinitionConverter implements DSpaceConverter<Submission
         Context context = null;
         try {
             context = ContextUtil.obtainContext(request);
-            List<Collection> collections = panelConverter.getSubmissionConfigReader()
+            List<Collection> collections = panelConverter.getSubmissionConfigService()
                                                          .getCollectionsBySubmissionConfig(context,
                                                                                            obj.getSubmissionName());
             DSpaceConverter<Collection, CollectionRest> cc = converter.getConverter(Collection.class);

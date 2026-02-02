@@ -1,0 +1,13 @@
+## E-mail sent to notify Administrator of new Withdrawn/Reinstate request
+##
+## Parameters: {0} Type of request 'topic'
+##             {1} resource id
+##             {2} reason
+##
+#set($subject = "Notification about ${params[0]} Request")
+
+Item Details:
+
+Type of request: ${params[0]}
+Relatem to item: ${params[1]}
+Reason: ${params[2]}

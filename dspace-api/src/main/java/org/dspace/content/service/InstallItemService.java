@@ -83,4 +83,15 @@ public interface InstallItemService {
     public String getBitstreamProvenanceMessage(Context context, Item myitem)
         throws SQLException;
 
+    /**
+     * Generate provenance description of direct item submission (not through workflow).
+     *
+     * @param context context
+     * @param item  the item to generate description for
+     * @return provenance description
+     * @throws SQLException if database error
+     */
+    public String getSubmittedByProvenanceMessage(Context context, Item item)
+        throws SQLException;;
+
 }

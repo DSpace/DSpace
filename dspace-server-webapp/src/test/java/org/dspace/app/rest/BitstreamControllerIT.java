@@ -302,25 +302,25 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                                 .withPassword("test")
                                                 .withNameInMetadata("Bundle", "Put").build();
 
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.REMOVE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.ADD)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bitstream).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(publicItem1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetItem).build();
 
@@ -471,31 +471,31 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                                 .withPassword("test")
                                                 .withNameInMetadata("Bundle", "Put").build();
 
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.REMOVE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.REMOVE)
                              .withDspaceObject(bundle2).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bundle2).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.ADD)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bitstream).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(publicItem1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetItem).build();
 
@@ -592,25 +592,25 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                                 .withPassword("test")
                                                 .withNameInMetadata("Bundle", "Put").build();
 
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.REMOVE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.ADD)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bitstream).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(publicItem1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetItem).build();
 
@@ -708,22 +708,22 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                                 .withPassword("test")
                                                 .withNameInMetadata("Bundle", "Put").build();
 
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.ADD)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bitstream).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(publicItem1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetItem).build();
 
@@ -810,22 +810,22 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                                 .withPassword("test")
                                                 .withNameInMetadata("Bundle", "Put").build();
 
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.REMOVE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.ADD)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bitstream).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(publicItem1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetItem).build();
 
@@ -913,22 +913,22 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                                 .withPassword("test")
                                                 .withNameInMetadata("Bundle", "Put").build();
 
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.REMOVE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.ADD)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bitstream).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(publicItem1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetItem).build();
 
@@ -1015,22 +1015,22 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                                 .withPassword("test")
                                                 .withNameInMetadata("Bundle", "Put").build();
 
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.REMOVE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bitstream).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(publicItem1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetItem).build();
 
@@ -1117,22 +1117,22 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                                 .withPassword("test")
                                                 .withNameInMetadata("Bundle", "Put").build();
 
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.REMOVE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.ADD)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(publicItem1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetItem).build();
 
@@ -1220,22 +1220,22 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                                 .withPassword("test")
                                                 .withNameInMetadata("Bundle", "Put").build();
 
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.REMOVE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.ADD)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bitstream).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetItem).build();
 
@@ -1322,22 +1322,22 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                                 .withPassword("test")
                                                 .withNameInMetadata("Bundle", "Put").build();
 
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.REMOVE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bundle1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.ADD)
                              .withDspaceObject(targetBundle).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(bitstream).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(putBundlePerson)
+        ResourcePolicyBuilder.createResourcePolicy(context, putBundlePerson, null)
                              .withAction(Constants.WRITE)
                              .withDspaceObject(publicItem1).build();
 

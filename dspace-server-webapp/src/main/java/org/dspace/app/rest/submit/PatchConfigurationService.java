@@ -12,7 +12,7 @@ import java.util.Map;
 import org.dspace.app.rest.submit.factory.impl.PatchOperation;
 
 /**
- * Class to mantain mapping configuration for PATCH operation needed by the Submission process
+ * Class to maintain mapping configuration for PATCH operation needed by the Submission process
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */

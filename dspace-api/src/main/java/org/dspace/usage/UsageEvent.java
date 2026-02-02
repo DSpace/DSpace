@@ -7,8 +7,7 @@
  */
 package org.dspace.usage;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -64,6 +63,8 @@ public class UsageEvent extends Event {
     private DSpaceObject object;
 
     private Action action;
+
+    private String referrer;
 
     private static String checkParams(Action action, HttpServletRequest request, Context context, DSpaceObject object) {
         StringBuilder eventName = new StringBuilder();
@@ -187,6 +188,12 @@ public class UsageEvent extends Event {
         this.object = object;
     }
 
+    public UsageEvent(Action action, HttpServletRequest request, Context context, DSpaceObject object,
+                      String referrer) {
+        this(action, request, context, object);
+        setReferrer(referrer);
+    }
+
 
     public HttpServletRequest getRequest() {
         return request;
@@ -240,4 +247,11 @@ public class UsageEvent extends Event {
         return this.action;
     }
 
+    public String getReferrer() {
+        return referrer;
+    }
+
+    public void setReferrer(String referrer) {
+        this.referrer = referrer;
+    }
 }

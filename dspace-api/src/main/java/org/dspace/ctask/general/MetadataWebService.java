@@ -30,13 +30,14 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -176,7 +177,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
         fieldSeparator = (fldSep != null) ? fldSep : " ";
         urlTemplate = taskProperty("template");
         templateParam = urlTemplate.substring(urlTemplate.indexOf("{") + 1,
-                                              urlTemplate.indexOf("}"));
+                urlTemplate.indexOf("}"));
         String[] parsed = parseTransform(templateParam);
         lookupField = parsed[0];
         lookupTransform = parsed[1];
@@ -204,12 +205,9 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
             }
         }
         // initialize response document parser
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
         try {
-            // disallow DTD parsing to ensure no XXE attacks can occur.
-            // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            DocumentBuilderFactory factory = XMLUtils.getDocumentBuilderFactory();
+            factory.setNamespaceAware(true);
             docBuilder = factory.newDocumentBuilder();
         } catch (ParserConfigurationException pcE) {
             log.error("caught exception: " + pcE);
@@ -254,53 +252,50 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     }
 
     protected int callService(String value, Item item, StringBuilder resultSb) throws IOException {
-
         String callUrl = urlTemplate.replaceAll("\\{" + templateParam + "\\}", value);
-        CloseableHttpClient client = HttpClientBuilder.create().build();
-        HttpGet req = new HttpGet(callUrl);
-        for (Map.Entry<String, String> entry : headers.entrySet()) {
-            req.addHeader(entry.getKey(), entry.getValue());
-        }
-        HttpResponse resp = client.execute(req);
-        int status = Curator.CURATE_ERROR;
-        int statusCode = resp.getStatusLine().getStatusCode();
-        if (statusCode == HttpStatus.SC_OK) {
-            HttpEntity entity = resp.getEntity();
-            if (entity != null) {
-                // boiler-plate handling taken from Apache 4.1 javadoc
-                InputStream instream = entity.getContent();
-                try {
-                    // This next line triggers a false-positive XXE warning from LGTM, even though we disallow DTD
-                    // parsing during initialization of docBuilder in init()
-                    Document doc = docBuilder.parse(instream);  // lgtm [java/xxe]
-                    status = processResponse(doc, item, resultSb);
-                } catch (SAXException saxE) {
-                    log.error("caught exception: " + saxE);
-                    resultSb.append(" unable to read response document");
-                } catch (RuntimeException ex) {
-                    // In case of an unexpected exception you may want to abort
-                    // the HTTP request in order to shut down the underlying
-                    // connection and release it back to the connection manager.
-                    req.abort();
-                    log.error("caught exception: " + ex);
-                    throw ex;
-                } finally {
-                    // Closing the input stream will trigger connection release
-                    instream.close();
-                }
-                // When HttpClient instance is no longer needed,
-                // shut down the connection manager to ensure
-                // immediate deallocation of all system resources
-                client.close();
-            } else {
-                log.error(" obtained no valid service response");
-                resultSb.append("no service response");
+        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
+            HttpGet req = new HttpGet(callUrl);
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                req.addHeader(entry.getKey(), entry.getValue());
             }
-        } else {
-            log.error("service returned non-OK status: " + statusCode);
-            resultSb.append("no service response");
+            try (CloseableHttpResponse resp = client.execute(req)) {
+                int status = Curator.CURATE_ERROR;
+                int statusCode = resp.getStatusLine().getStatusCode();
+                if (statusCode == HttpStatus.SC_OK) {
+                    HttpEntity entity = resp.getEntity();
+                    if (entity != null) {
+                        // boiler-plate handling taken from Apache 4.1 javadoc
+                        InputStream instream = entity.getContent();
+                        try {
+                            // This next line triggers a false-positive XXE warning from LGTM, even though
+                            // we disallow DTD parsing during initialization of docBuilder in init()
+                            Document doc = docBuilder.parse(instream);  // lgtm [java/xxe]
+                            status = processResponse(doc, item, resultSb);
+                        } catch (SAXException saxE) {
+                            log.error("caught exception: " + saxE);
+                            resultSb.append(" unable to read response document");
+                        } catch (RuntimeException ex) {
+                            // In case of an unexpected exception you may want to abort
+                            // the HTTP request in order to shut down the underlying
+                            // connection and release it back to the connection manager.
+                            req.abort();
+                            log.error("caught exception: " + ex);
+                            throw ex;
+                        } finally {
+                            // Closing the input stream will trigger connection release
+                            instream.close();
+                        }
+                    } else {
+                        log.error(" obtained no valid service response");
+                        resultSb.append("no service response");
+                    }
+                } else {
+                    log.error("service returned non-OK status: " + statusCode);
+                    resultSb.append("no service response");
+                }
+                return status;
+            }
         }
-        return status;
     }
 
     protected int processResponse(Document doc, Item item, StringBuilder resultSb) throws IOException {

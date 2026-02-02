@@ -9,12 +9,12 @@ package org.dspace.app.iiif.model.generator;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.constraints.NotNull;
 
 import de.digitalcollections.iiif.model.enums.ViewingHint;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
 import de.digitalcollections.iiif.model.sharedcanvas.Range;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
+import jakarta.validation.constraints.NotNull;
 import org.dspace.app.iiif.service.RangeService;
 
 /**

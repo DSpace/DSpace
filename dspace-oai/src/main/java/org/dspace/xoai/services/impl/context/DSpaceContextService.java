@@ -7,8 +7,7 @@
  */
 package org.dspace.xoai.services.impl.context;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.core.Context;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;

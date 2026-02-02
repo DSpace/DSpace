@@ -173,7 +173,7 @@ public class IIIFUtils {
     }
 
     /**
-     * Retrives a bitstream based on its canvas identifier (the bitstream UUID).
+     * Retrieves a bitstream based on its canvas identifier (the bitstream UUID).
      *
      * @param context        DSpace Context
      * @param item           DSpace Item
@@ -351,7 +351,7 @@ public class IIIFUtils {
      * 
      * @param item        the dspace item
      * @param defaultHint the default hint to apply if nothing else is defined at
-     *                    the item leve
+     *                    the item level
      * @return the iiif viewing hint for the item
      */
     public String getIIIFViewingHint(Item item, String defaultHint) {

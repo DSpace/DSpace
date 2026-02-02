@@ -8,9 +8,9 @@
 package org.dspace.app.rest;
 
 import java.sql.SQLException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.EntityTypeRest;
 import org.dspace.app.rest.model.hateoas.EntityTypeResource;
@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Maria Verdonck (Atmire) on 2019-12-13
  */
 @RestController
-@RequestMapping("/api/" + EntityTypeRest.CATEGORY + "/" + EntityTypeRest.NAME_PLURAL)
+@RequestMapping("/api/" + EntityTypeRest.CATEGORY + "/" + EntityTypeRest.PLURAL_NAME)
 public class EntityTypeLabelRestController {
 
     protected final EntityTypeService entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();

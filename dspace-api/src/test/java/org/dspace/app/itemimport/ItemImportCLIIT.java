@@ -8,6 +8,7 @@
 package org.dspace.app.itemimport;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -33,19 +34,21 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.flywaydb.core.internal.util.ExceptionUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Basic integration testing for the SAF Import feature via CLI {@link ItemImportCLI}.
- * https://wiki.lyrasis.org/display/DSDOC7x/Importing+and+Exporting+Items+via+Simple+Archive+Format
+ * https://wiki.lyrasis.org/display/DSDOC9x/Importing+and+Exporting+Items+via+Simple+Archive+Format
  *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
 public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
 
     private static final String ZIP_NAME = "saf.zip";
+    private static final String PDF_NAME = "test.pdf";
     private static final String publicationTitle = "A Tale of Two Cities";
     private static final String personTitle = "Person Test";
 
@@ -55,6 +58,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     private Collection collection;
     private Path tempDir;
     private Path workDir;
+    private static final String TEMP_DIR = ItemImport.TEMP_DIR;
 
     @Before
     @Override
@@ -88,9 +92,9 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     @After
     @Override
     public void destroy() throws Exception {
-        PathUtils.deleteDirectory(tempDir);
+        PathUtils.deleteOnExit(tempDir);
         for (Path path : Files.list(workDir).collect(Collectors.toList())) {
-            PathUtils.delete(path);
+            PathUtils.deleteOnExit(path);
         }
         super.destroy();
     }
@@ -226,6 +230,10 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
         checkMetadata();
         checkMetadataWithAnotherSchema();
         checkBitstream();
+
+        // confirm that TEMP_DIR still exists
+        File workTempDir = new File(workDir + File.separator + TEMP_DIR);
+        assertTrue(workTempDir.exists());
     }
 
     @Test
@@ -252,6 +260,23 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
 
         checkMetadata();
         checkRelationship();
+    }
+
+    @Test
+    public void importItemByZipSafInvalidMimetype() throws Exception {
+        // use sample PDF file
+        Files.copy(getClass().getResourceAsStream("test.pdf"),
+                   Path.of(tempDir.toString() + "/" + PDF_NAME));
+
+        String[] args = new String[] { "import", "-a", "-e", admin.getEmail(), "-c", collection.getID().toString(),
+                                       "-s", tempDir.toString(), "-z", PDF_NAME, "-m", tempDir.toString()
+                                                                                       + "/mapfile.out" };
+        try {
+            perfomImportScript(args);
+        } catch (Exception e) {
+            // should throw an exception due to invalid mimetype
+            assertEquals(UnsupportedOperationException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
     }
 
     @Test

@@ -75,7 +75,6 @@ public class DatabaseUtils {
 
     // Types of databases supported by DSpace. See getDbType()
     public static final String DBMS_POSTGRES = "postgres";
-    public static final String DBMS_ORACLE = "oracle";
     public static final String DBMS_H2 = "h2";
 
     // Name of the table that Flyway uses for its migration history
@@ -124,16 +123,6 @@ public class DatabaseUtils {
 
                         // Print basic database connection information
                         printDBInfo(connection);
-
-                        // Print any database warnings/errors found (if any)
-                        boolean issueFound = printDBIssues(connection);
-
-                        // If issues found, exit with an error status (even if connection succeeded).
-                        if (issueFound) {
-                            System.exit(1);
-                        } else {
-                            System.exit(0);
-                        }
                     } catch (SQLException sqle) {
                         System.err.println("\nError running 'test': ");
                         System.err.println(" - " + sqle);
@@ -170,16 +159,6 @@ public class DatabaseUtils {
                                 System.out.println("\nIf you'd like to upgrade now, simply run 'dspace database " +
                                                        "migrate'.");
                             }
-                        }
-
-                        // Print any database warnings/errors found (if any)
-                        boolean issueFound = printDBIssues(connection);
-
-                        // If issues found, exit with an error status
-                        if (issueFound) {
-                            System.exit(1);
-                        } else {
-                            System.exit(0);
                         }
                     } catch (SQLException e) {
                         System.err.println("Info exception:");
@@ -336,31 +315,6 @@ public class DatabaseUtils {
                     }
 
                     try (Connection connection = dataSource.getConnection()) {
-                        String dbType = getDbType(connection);
-
-                        // Not all Postgres user accounts will be able to run a 'clean',
-                        // as only 'superuser' accounts can remove the 'pgcrypto' extension.
-                        if (dbType.equals(DBMS_POSTGRES)) {
-                            // Check if database user has permissions suitable to run a clean
-                            if (!PostgresUtils.checkCleanPermissions(connection)) {
-                                String username = connection.getMetaData().getUserName();
-                                // Exit immediately, providing a descriptive error message
-                                System.out.println(
-                                    "\nERROR: The database user '" + username + "' does not have sufficient " +
-                                        "privileges to run a 'database clean' (via Flyway).");
-                                System.out.println(
-                                    "\nIn order to run a 'clean', the database user MUST have 'superuser' privileges");
-                                System.out.println(
-                                    "OR the '" + PostgresUtils.PGCRYPTO + "' extension must be installed in a " +
-                                        "separate schema (see documentation).");
-                                System.out.println(
-                                    "\nOptionally, you could also manually remove the '" + PostgresUtils.PGCRYPTO +
-                                        "' extension first (DROP EXTENSION " + PostgresUtils.PGCRYPTO +
-                                        " CASCADE;), then rerun the 'clean'");
-                                System.exit(1);
-                            }
-                        }
-
                         BufferedReader input = new BufferedReader(new InputStreamReader(System.in,
                                                                                         StandardCharsets.UTF_8));
 
@@ -369,13 +323,6 @@ public class DatabaseUtils {
                             .println("\nWARNING: ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED.\n");
                         System.out.println("There is NO turning back from this action. Backup your DB before " +
                                                "continuing.");
-                        if (dbType.equals(DBMS_ORACLE)) {
-                            System.out.println("\nORACLE WARNING: your RECYCLEBIN will also be PURGED.\n");
-                        } else if (dbType.equals(DBMS_POSTGRES)) {
-                            System.out.println(
-                                "\nPOSTGRES WARNING: the '" + PostgresUtils.PGCRYPTO + "' extension will be dropped " +
-                                "if it is in the same schema as the DSpace database.\n");
-                        }
                         System.out.print("Do you want to PERMANENTLY DELETE everything from your database? [y/n]: ");
                         String choiceString = input.readLine();
                         input.close();
@@ -467,11 +414,10 @@ public class DatabaseUtils {
         DatabaseMetaData meta = connection.getMetaData();
         String dbType = getDbType(connection);
         System.out.println("\nDatabase Type: " + dbType);
-        if (dbType.equals(DBMS_ORACLE)) {
-            System.out.println("====================================");
-            System.out.println("WARNING: Oracle support is deprecated!");
-            System.out.println("See https://github.com/DSpace/DSpace/issues/8214");
-            System.out.println("=====================================");
+        if (!dbType.equals(DBMS_POSTGRES) && !dbType.equals(DBMS_H2)) {
+            System.err.println("====================================");
+            System.err.println("ERROR: Database type " + dbType + " is UNSUPPORTED!");
+            System.err.println("=====================================");
         }
         System.out.println("Database URL: " + meta.getURL());
         System.out.println("Database Schema: " + getSchemaName(connection));
@@ -480,106 +426,8 @@ public class DatabaseUtils {
             "Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
         System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
 
-        // For Postgres, report whether pgcrypto is installed
-        // (If it isn't, we'll also write out warnings...see below)
-        if (dbType.equals(DBMS_POSTGRES)) {
-            boolean pgcryptoUpToDate = PostgresUtils.isPgcryptoUpToDate();
-            Double pgcryptoVersion = PostgresUtils.getPgcryptoInstalledVersion(connection);
-            System.out.println(
-                "PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension installed/up-to-date? " + pgcryptoUpToDate + "" +
-                    " " + ((pgcryptoVersion != null) ? "(version=" + pgcryptoVersion + ")" : "(not installed)"));
-        }
         // Finally, print out our version of Flyway
         System.out.println("FlywayDB Version: " + VersionPrinter.getVersion());
-    }
-
-    /**
-     * Print any warnings about current database setup to System.err (if any).
-     * This is utilized by both the 'test' and 'info' commandline options.
-     *
-     * @param connection current database connection
-     * @return boolean true if database issues found, false otherwise
-     * @throws SQLException if database error occurs
-     */
-    private static boolean printDBIssues(Connection connection) throws SQLException {
-        boolean issueFound = false;
-
-        // Get the DB Type
-        String dbType = getDbType(connection);
-
-        // For PostgreSQL databases, we need to check for the 'pgcrypto' extension.
-        // If it is NOT properly installed, we'll need to warn the user, as DSpace will be unable to proceed.
-        if (dbType.equals(DBMS_POSTGRES)) {
-            // Get version of pgcrypto available in this postgres instance
-            Double pgcryptoAvailable = PostgresUtils.getPgcryptoAvailableVersion(connection);
-
-            // Generic requirements message
-            String requirementsMsg = "\n** DSpace REQUIRES PostgreSQL >= " + PostgresUtils.POSTGRES_VERSION + " AND "
-                + PostgresUtils.PGCRYPTO + " extension >= " + PostgresUtils.PGCRYPTO_VERSION + " **\n";
-
-            // Check if installed in PostgreSQL & a supported version
-            if (pgcryptoAvailable != null && pgcryptoAvailable.compareTo(PostgresUtils.PGCRYPTO_VERSION) >= 0) {
-                // We now know it's available in this Postgres. Let's see if it is installed in this database.
-                Double pgcryptoInstalled = PostgresUtils.getPgcryptoInstalledVersion(connection);
-
-                // Check if installed in database, but outdated version
-                if (pgcryptoInstalled != null && pgcryptoInstalled.compareTo(PostgresUtils.PGCRYPTO_VERSION) < 0) {
-                    System.out.println(
-                        "\nWARNING: Required PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is OUTDATED " +
-                            "(installed version=" + pgcryptoInstalled + ", available version = " + pgcryptoAvailable
-                            + ").");
-                    System.out.println(requirementsMsg);
-                    System.out.println(
-                        "To update it, please connect to your DSpace database as a 'superuser' and manually run the " +
-                            "following command: ");
-                    System.out.println(
-                        "\n  ALTER EXTENSION " + PostgresUtils.PGCRYPTO + " UPDATE TO '" + pgcryptoAvailable + "';\n");
-                    issueFound = true;
-                } else if (pgcryptoInstalled == null) {
-                    // If it's not installed in database
-
-                    System.out.println(
-                        "\nWARNING: Required PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT INSTALLED " +
-                            "on this database.");
-                    System.out.println(requirementsMsg);
-                    System.out.println(
-                        "To install it, please connect to your DSpace database as a 'superuser' and manually run the " +
-                            "following command: ");
-                    System.out.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
-                    issueFound = true;
-                }
-            } else if (pgcryptoAvailable != null && pgcryptoAvailable.compareTo(PostgresUtils.PGCRYPTO_VERSION) < 0) {
-                // If installed in Postgres, but an unsupported version
-
-                System.out.println(
-                    "\nWARNING: UNSUPPORTED version of PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension found " +
-                        "(version=" + pgcryptoAvailable + ").");
-                System.out.println(requirementsMsg);
-                System.out.println(
-                    "Make sure you are running a supported version of PostgreSQL, and then install " + PostgresUtils
-                        .PGCRYPTO + " version >= " + PostgresUtils.PGCRYPTO_VERSION);
-                System.out.println(
-                    "The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' " +
-                        "package for your operating system.");
-                issueFound = true;
-            } else if (pgcryptoAvailable == null) {
-                // If it's not installed in Postgres
-
-                System.out.println(
-                    "\nWARNING: PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT AVAILABLE. Please " +
-                        "install it into this PostgreSQL instance.");
-                System.out.println(requirementsMsg);
-                System.out.println(
-                    "The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' " +
-                        "package for your operating system.");
-                System.out.println(
-                    "Once the extension is installed globally, please connect to your DSpace database as a " +
-                        "'superuser' and manually run the following command: ");
-                System.out.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
-                issueFound = true;
-            }
-        }
-        return issueFound;
     }
 
     /**
@@ -605,10 +453,6 @@ public class DatabaseUtils {
             // Migration scripts are based on DBMS Keyword (see full path below)
             String dbType = getDbType(connection);
             connection.close();
-
-            if (dbType.equals(DBMS_ORACLE)) {
-                log.warn("ORACLE SUPPORT IS DEPRECATED! See https://github.com/DSpace/DSpace/issues/8214");
-            }
 
             // Determine location(s) where Flyway will load all DB migrations
             ArrayList<String> scriptLocations = new ArrayList<>();
@@ -643,7 +487,7 @@ public class DatabaseUtils {
             // For DSpace, we sometimes have to insert "old" migrations in after a major release
             // if further development/bug fixes are needed in older versions. So, "Ignored" migrations are
             // nothing to worry about...you can always trigger them to run using "database migrate ignored" from CLI
-            flywayConfiguration.ignoreIgnoredMigrations(true);
+            flywayConfiguration.ignoreMigrationPatterns("*:ignored");
 
             // Set Flyway callbacks (i.e. classes which are called post-DB migration and similar)
             List<Callback> flywayCallbacks = DSpaceServicesFactory.getInstance().getServiceManager()
@@ -946,26 +790,6 @@ public class DatabaseUtils {
             // First, run Flyway's clean command on database.
             // For MOST database types, this takes care of everything
             flyway.clean();
-
-            try (Connection connection = dataSource.getConnection()) {
-                // Get info about which database type we are using
-                String dbType = getDbType(connection);
-
-                // If this is Oracle, the only way to entirely clean the database
-                // is to also purge the "Recyclebin". See:
-                // http://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_9018.htm
-                if (dbType.equals(DBMS_ORACLE)) {
-                    PreparedStatement statement = null;
-                    try {
-                        statement = connection.prepareStatement("PURGE RECYCLEBIN");
-                        statement.executeQuery();
-                    } finally {
-                        if (statement != null && !statement.isClosed()) {
-                            statement.close();
-                        }
-                    }
-                }
-            }
         } catch (FlywayException fe) {
             // If any FlywayException (Runtime) is thrown, change it to a SQLException
             throw new SQLException("Flyway clean error occurred", fe);
@@ -1214,11 +1038,6 @@ public class DatabaseUtils {
                     // We need to filter by schema in PostgreSQL
                     schemaFilter = true;
                     break;
-                case DBMS_ORACLE:
-                    // Oracle specific query for a sequence owned by our current DSpace user
-                    // NOTE: No need to filter by schema for Oracle, as Schema = User
-                    sequenceSQL = "SELECT COUNT(1) FROM user_sequences WHERE sequence_name=?";
-                    break;
                 case DBMS_H2:
                     // In H2, sequences are listed in the "information_schema.sequences" table
                     // SEE: http://www.h2database.com/html/grammar.html#information_schema
@@ -1322,11 +1141,6 @@ public class DatabaseUtils {
                 // For PostgreSQL, the default schema is named "public"
                 // See: http://www.postgresql.org/docs/9.0/static/ddl-schemas.html
                 schema = "public";
-            } else if (dbType.equals(DBMS_ORACLE)) {
-                // For Oracle, default schema is actually the user account
-                // See: http://stackoverflow.com/a/13341390
-                DatabaseMetaData meta = connection.getMetaData();
-                schema = meta.getUserName();
             } else {
                 // For H2 (in memory), there is no such thing as a schema
                 schema = null;
@@ -1503,6 +1317,7 @@ public class DatabaseUtils {
                     Context context = null;
                     try {
                         context = new Context();
+                        context.setMode(Context.Mode.READ_ONLY);
                         context.turnOffAuthorisationSystem();
                         log.info(
                             "Post database migration, reindexing all content in Discovery search and browse engine");
@@ -1552,8 +1367,6 @@ public class DatabaseUtils {
         String dbms_lc = prodName.toLowerCase(Locale.ROOT);
         if (dbms_lc.contains("postgresql")) {
             return DBMS_POSTGRES;
-        } else if (dbms_lc.contains("oracle")) {
-            return DBMS_ORACLE;
         } else if (dbms_lc.contains("h2")) {
             // Used for unit testing only
             return DBMS_H2;

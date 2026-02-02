@@ -14,15 +14,18 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tika.Tika;
 import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.authorize.AuthorizeException;
@@ -77,6 +80,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     protected boolean zip = false;
     protected boolean remoteUrl = false;
     protected String zipfilename = null;
+    protected boolean zipvalid = false;
     protected boolean help = false;
     protected File workDir = null;
     protected File workFile = null;
@@ -154,7 +158,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             return;
         }
 
-        Date startTime = new Date();
+        Instant startTime = Instant.now();
         Context context = new Context(Context.Mode.BATCH_EDIT);
 
         setMapFile();
@@ -235,21 +239,29 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                 handler.logInfo("***End of Test Run***");
             }
         } finally {
-            // clean work dir
             if (zip) {
-                FileUtils.deleteDirectory(new File(sourcedir));
-                FileUtils.deleteDirectory(workDir);
-                if (remoteUrl && workFile != null && workFile.exists()) {
+                // if zip file was valid then clean sourcedir
+                if (zipvalid && sourcedir != null && new File(sourcedir).exists()) {
+                    FileUtils.deleteDirectory(new File(sourcedir));
+                }
+
+                // clean workdir
+                if (workDir != null && workDir.exists()) {
+                    FileUtils.deleteDirectory(workDir);
+                }
+
+                // conditionally clean workFile if import was done in the UI or via a URL and it still exists
+                if (workFile != null && workFile.exists()) {
                     workFile.delete();
                 }
             }
 
-            Date endTime = new Date();
-            handler.logInfo("Started: " + startTime.getTime());
-            handler.logInfo("Ended: " + endTime.getTime());
+            Instant endTime = Instant.now();
+            handler.logInfo("Started: " + DateTimeFormatter.ISO_INSTANT.format(startTime));
+            handler.logInfo("Ended: " + DateTimeFormatter.ISO_INSTANT.format(endTime));
             handler.logInfo(
-                "Elapsed time: " + ((endTime.getTime() - startTime.getTime()) / 1000) + " secs (" + (endTime
-                    .getTime() - startTime.getTime()) + " msecs)");
+                "Elapsed time: " + ((endTime.toEpochMilli() - startTime.toEpochMilli()) / 1000) + " secs (" +
+                    (endTime.toEpochMilli() - startTime.toEpochMilli()) + " msecs)");
         }
     }
 
@@ -322,23 +334,59 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
      */
     protected void readZip(Context context, ItemImportService itemImportService) throws Exception {
         Optional<InputStream> optionalFileStream = Optional.empty();
-        if (!remoteUrl) {
-            // manage zip via upload
-            optionalFileStream = handler.getFileStream(context, zipfilename);
-        } else {
-            // manage zip via remote url
-            optionalFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
+        Optional<InputStream> validationFileStream = Optional.empty();
+        try {
+            if (!remoteUrl) {
+                // manage zip via upload
+                optionalFileStream = handler.getFileStream(context, zipfilename);
+                validationFileStream = handler.getFileStream(context, zipfilename);
+            } else {
+                // manage zip via remote url
+                optionalFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
+                validationFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
+            }
+
+            if (validationFileStream.isPresent()) {
+                // validate zip file
+                if (validationFileStream.isPresent()) {
+                    validateZip(validationFileStream.get());
+                }
+
+                workFile = new File(itemImportService.getTempWorkDir() + File.separator
+                        + zipfilename + "-" + context.getCurrentUser().getID());
+                FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
+            } else {
+                throw new IllegalArgumentException(
+                        "Error reading file, the file couldn't be found for filename: " + zipfilename);
+            }
+
+            workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
+                    + File.separator + context.getCurrentUser().getID());
+            sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
+        } finally {
+            optionalFileStream.ifPresent(IOUtils::closeQuietly);
+            validationFileStream.ifPresent(IOUtils::closeQuietly);
         }
-        if (optionalFileStream.isPresent()) {
-            workFile = new File(itemImportService.getTempWorkDir() + File.separator
-                    + zipfilename + "-" + context.getCurrentUser().getID());
-            FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
-        } else {
+    }
+
+    /**
+     * Confirm that the zip file has the correct MIME type
+     * @param inputStream
+     */
+    protected void validateZip(InputStream inputStream) {
+        Tika tika = new Tika();
+        try {
+            String mimeType = tika.detect(inputStream);
+            if (mimeType.equals("application/zip")) {
+                zipvalid = true;
+            } else {
+                handler.logError("A valid zip file must be supplied. The provided file has mimetype: " + mimeType);
+                throw new UnsupportedOperationException("A valid zip file must be supplied");
+            }
+        } catch (IOException e) {
             throw new IllegalArgumentException(
-                    "Error reading file, the file couldn't be found for filename: " + zipfilename);
+                "There was an error while reading the zip file: " + zipfilename);
         }
-        workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR);
-        sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
     }
 
     /**

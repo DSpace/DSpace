@@ -7,8 +7,7 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;

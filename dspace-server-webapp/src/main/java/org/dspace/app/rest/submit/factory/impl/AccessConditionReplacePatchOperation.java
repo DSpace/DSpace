@@ -6,16 +6,19 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.submit.factory.impl;
+
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.app.rest.model.patch.JsonValueEvaluator;
@@ -29,8 +32,6 @@ import org.dspace.core.Context;
 import org.dspace.submit.model.AccessConditionConfiguration;
 import org.dspace.submit.model.AccessConditionConfigurationService;
 import org.dspace.submit.model.AccessConditionOption;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -40,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<AccessConditionDTO> {
 
-    private static final Logger log = LoggerFactory.getLogger(AccessConditionReplacePatchOperation.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private ResourcePolicyService resourcePolicyService;
@@ -106,21 +107,20 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
         return null;
     }
 
-    private AccessConditionDTO createDTO(ResourcePolicy rpToReplace, String attributeReplace, String valueToReplare)
-            throws ParseException {
+    private AccessConditionDTO createDTO(ResourcePolicy rpToReplace, String attributeReplace, String valueToReplace) {
         AccessConditionDTO accessCondition = new AccessConditionDTO();
         accessCondition.setName(rpToReplace.getRpName());
         accessCondition.setStartDate(rpToReplace.getStartDate());
         accessCondition.setEndDate(rpToReplace.getEndDate());
         switch (attributeReplace) {
             case "name":
-                accessCondition.setName(valueToReplare);
+                accessCondition.setName(valueToReplace);
                 return accessCondition;
             case "startDate":
-                accessCondition.setStartDate(parseDate(valueToReplare));
+                accessCondition.setStartDate(parseDate(valueToReplace));
                 return accessCondition;
             case "endDate":
-                accessCondition.setEndDate(parseDate(valueToReplare));
+                accessCondition.setEndDate(parseDate(valueToReplace));
                 return accessCondition;
             default:
                 throw new UnprocessableEntityException("The provided attribute: "
@@ -128,34 +128,34 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
         }
     }
 
-    private void updatePolicy(Context context, String valueToReplare, String attributeReplace,
+    private void updatePolicy(Context context, String valueToReplace, String attributeReplace,
             ResourcePolicy rpToReplace) throws SQLException, AuthorizeException {
         switch (attributeReplace) {
             case "name":
-                rpToReplace.setRpName(valueToReplare);
+                rpToReplace.setRpName(valueToReplace);
                 break;
             case "startDate":
-                rpToReplace.setStartDate(parseDate(valueToReplare));
+                rpToReplace.setStartDate(parseDate(valueToReplace));
                 break;
             case "endDate":
-                rpToReplace.setEndDate(parseDate(valueToReplare));
+                rpToReplace.setEndDate(parseDate(valueToReplace));
                 break;
             default:
                 throw new IllegalArgumentException("Attribute to replace is not valid:" + attributeReplace);
         }
     }
 
-    private Date parseDate(String date) {
-        List<SimpleDateFormat> knownPatterns = Arrays.asList(
-                                new SimpleDateFormat("yyyy-MM-dd"),
-                                new SimpleDateFormat("dd-MM-yyyy"),
-                                new SimpleDateFormat("yyyy/MM/dd"),
-                                new SimpleDateFormat("dd/MM/yyyy"));
-        for (SimpleDateFormat pattern : knownPatterns) {
+    private LocalDate parseDate(String date) {
+        List<DateTimeFormatter> knownPatterns = Arrays.asList(
+                                DateTimeFormatter.ISO_LOCAL_DATE,
+                                DateTimeFormatter.ofPattern("dd-MM-yyyy"),
+                                DateTimeFormatter.ofPattern("yyyy/MM/dd"),
+                                DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        for (DateTimeFormatter pattern : knownPatterns) {
             try {
-                return pattern.parse(date);
-            } catch (ParseException e) {
-                log.error(e.getMessage(), e);
+                return LocalDate.parse(date, pattern);
+            } catch (DateTimeParseException e) {
+                log.error(e::getMessage, e);
             }
         }
         throw new UnprocessableEntityException("Provided format of date:" + date + " is not supported!");

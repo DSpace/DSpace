@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * This Processor allows to extract attribute values of an array.
- * For exaple to extract all values of secondAttribute,
+ * For example to extract all values of secondAttribute,
  * "array":[
  *       {
  *        "firstAttribute":"first value",

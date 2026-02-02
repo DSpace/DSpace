@@ -206,6 +206,28 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
     }
 
     /**
+     * Test of uncacheEntities method
+     */
+    @Test
+    public void testUncacheEntities() throws SQLException {
+        // Get DBConnection associated with DSpace Context
+        HibernateDBConnection dbConnection = (HibernateDBConnection) context.getDBConnection();
+        EPerson person = context.getCurrentUser();
+
+        assertTrue("Current user should be cached in session", dbConnection.getSession()
+                .contains(person));
+
+        dbConnection.uncacheEntities();
+        assertFalse("Current user should be gone from cache", dbConnection.getSession()
+                .contains(person));
+
+        // Test ability to reload an uncached entity
+        person = dbConnection.reloadEntity(person);
+        assertTrue("Current user should be cached back in session", dbConnection.getSession()
+                .contains(person));
+    }
+
+    /**
      * Test of uncacheEntity method
      */
     @Test

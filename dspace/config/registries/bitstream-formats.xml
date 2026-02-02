@@ -827,4 +827,13 @@
         <extension>avif</extension>
     </bitstream-type>
 
+    <bitstream-type>
+        <mimetype>text/javascript</mimetype>
+        <short_description>JavaScript</short_description>
+        <description>JavaScript</description>
+        <support_level>1</support_level>
+        <internal>false</internal>
+        <extension>js</extension>
+    </bitstream-type>
+
 </dspace-bitstream-types>

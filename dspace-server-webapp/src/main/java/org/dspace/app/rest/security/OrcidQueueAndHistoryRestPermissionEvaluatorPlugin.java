@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
@@ -22,21 +24,19 @@ import org.dspace.orcid.service.OrcidHistoryService;
 import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
  * Class that evaluate DELETE and READ permissions
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component
 public class OrcidQueueAndHistoryRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(OrcidQueueAndHistoryRestPermissionEvaluatorPlugin.class);
+    private static final Logger log = LogManager.getLogger();
 
     public static final String ORCID_QUEUE = "ORCID_QUEUE";
     public static final String ORCID_HISTORY = "ORCID_HISTORY";
@@ -97,7 +97,7 @@ public class OrcidQueueAndHistoryRestPermissionEvaluatorPlugin extends RestObjec
                 .anyMatch(authority -> currentUser.getID().toString().equals(authority));
 
         } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+            log.error(e::getMessage, e);
         }
 
         return false;

@@ -7,8 +7,7 @@
  */
 package org.dspace.app.rest;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.hateoas.RootResource;
@@ -44,6 +43,6 @@ public class RootRestResourceController {
 
     @RequestMapping(method = RequestMethod.GET)
     public RootResource listDefinedEndpoint(HttpServletRequest request) {
-        return converter.toResource(rootRestRepository.getRoot());
+        return converter.toResource(rootRestRepository.getRoot(request));
     }
 }

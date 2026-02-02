@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link PasswordValidatorService} that verifies if the given
- * passowrd matches the configured pattern.
+ * password matches the configured pattern.
  * 
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */

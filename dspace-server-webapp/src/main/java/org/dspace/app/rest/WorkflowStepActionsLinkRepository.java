@@ -8,9 +8,9 @@
 package org.dspace.app.rest;
 
 import java.util.List;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.WorkflowActionRest;
 import org.dspace.app.rest.model.WorkflowStepRest;
 import org.dspace.app.rest.projection.Projection;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Maria Verdonck (Atmire) on 24/02/2020
  */
-@Component(WorkflowStepRest.CATEGORY + "." + WorkflowStepRest.NAME + "."
+@Component(WorkflowStepRest.CATEGORY + "." + WorkflowStepRest.PLURAL_NAME + "."
     + WorkflowStepRest.ACTIONS)
 public class WorkflowStepActionsLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {

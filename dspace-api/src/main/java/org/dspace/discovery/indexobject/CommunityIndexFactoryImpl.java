@@ -69,7 +69,7 @@ public class CommunityIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Inde
         final Community community = indexableObject.getIndexedObject();
 
         // Retrieve configuration
-        DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(community);
+        DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(context, community);
         DiscoveryHitHighlightingConfiguration highlightingConfiguration = discoveryConfiguration
             .getHitHighlightingConfiguration();
         List<String> highlightedMetadataFields = new ArrayList<>();

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -32,7 +32,9 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.event.EventDetail;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
@@ -198,9 +200,10 @@ public class RDFConsumer implements Consumer {
             return;
         }
 
-        if (event.getEventType() == Event.DELETE) {
+        EventDetail detail = event.getDetail();
+        if (event.getEventType() == Event.DELETE && detail.getDetailType().equals(DetailType.HANDLE)) {
             DSOIdentifier id = new DSOIdentifier(event.getSubjectType(),
-                                                 event.getSubjectID(), event.getDetail(), event.getIdentifiers());
+                event.getSubjectID(), (String)detail.getDetailObject(), event.getIdentifiers());
 
             if (this.toConvert.contains(id)) {
                 this.toConvert.remove(id);
@@ -241,9 +244,9 @@ public class RDFConsumer implements Consumer {
             }
 
             DSOIdentifier id = new DSOIdentifier(dso, ctx);
-            // If an item gets withdrawn, a MODIFIY event is fired. We have to
+            // If an item gets withdrawn, a MODIFY event is fired. We have to
             // delete the item from the triple store instead of converting it.
-            // we don't have to take care for reinstantions of items as they can
+            // we don't have to take care for reinstate events on items as they can
             // be processed as normal modify events.
             if (dso instanceof Item
                 && event.getDetail() != null

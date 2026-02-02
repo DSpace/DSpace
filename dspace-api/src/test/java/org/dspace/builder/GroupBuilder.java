@@ -12,6 +12,9 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -51,10 +54,85 @@ public class GroupBuilder extends AbstractDSpaceObjectBuilder<Group> {
         return builder.create(context);
     }
 
+    public static GroupBuilder createCollectionAdminGroup(final Context context, Collection collection) {
+        GroupBuilder builder = new GroupBuilder(context);
+        return builder.createAdminGroup(context, collection);
+    }
+
+    public static GroupBuilder createCollectionSubmitterGroup(final Context context, Collection collection) {
+        GroupBuilder builder = new GroupBuilder(context);
+        return builder.createSubmitterGroup(context, collection);
+    }
+
+    public static GroupBuilder createCollectionDefaultReadGroup(final Context context, Collection collection,
+                                                                String typeOfGroupString, int defaultRead) {
+        GroupBuilder builder = new GroupBuilder(context);
+        return builder.createDefaultReadGroup(context, collection, typeOfGroupString, defaultRead);
+    }
+
+    public static GroupBuilder createCollectionWorkflowRoleGroup(final Context context, Collection collection,
+                                                                String roleName) {
+        GroupBuilder builder = new GroupBuilder(context);
+        return builder.createWorkflowRoleGroup(context, collection, roleName);
+    }
+
+    public static GroupBuilder createCommunityAdminGroup(final Context context, Community community) {
+        GroupBuilder builder = new GroupBuilder(context);
+        return builder.createAdminGroup(context, community);
+    }
+
     private GroupBuilder create(final Context context) {
         this.context = context;
         try {
             group = groupService.create(context);
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return this;
+    }
+
+    private GroupBuilder createAdminGroup(final Context context, DSpaceObject container) {
+        this.context = context;
+        try {
+            if (container instanceof Collection) {
+                group = collectionService.createAdministrators(context, (Collection) container);
+            } else if (container instanceof Community) {
+                group = communityService.createAdministrators(context, (Community) container);
+            } else {
+                handleException(new IllegalArgumentException("DSpaceObject must be collection or community. " +
+                        "Type: " + container.getType()));
+            }
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return this;
+    }
+
+    private GroupBuilder createSubmitterGroup(final Context context, Collection collection) {
+        this.context = context;
+        try {
+            group = collectionService.createSubmitters(context, collection);
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return this;
+    }
+
+    private GroupBuilder createDefaultReadGroup(final Context context, Collection collection,
+                                                String typeOfGroupString, int defaultRead) {
+        this.context = context;
+        try {
+            group = collectionService.createDefaultReadGroup(context, collection, typeOfGroupString, defaultRead);
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return this;
+    }
+
+    private GroupBuilder createWorkflowRoleGroup(final Context context, Collection collection, String roleName) {
+        this.context = context;
+        try {
+            group = workflowService.createWorkflowRoleGroup(context, collection, roleName);
         } catch (Exception e) {
             return handleException(e);
         }

@@ -7,7 +7,7 @@
 ## {4}  Task result
 ## {5}  Workflow action taken
 ##
-#set($subject = 'DSpace: Curation Task Report')
+#set($subject = "${config.get('dspace.name')}: Curation Task Report")
 
 Title:         ${params[0]}
 Collection:    ${params[1]}
@@ -20,4 +20,4 @@ ${params[4]}
 
 Action taken on the submission: ${params[5]}
 
-DSpace
+The ${config.get('dspace.name')} Team

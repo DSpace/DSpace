@@ -21,6 +21,7 @@ public class IdentifierRest extends BaseObjectRest<String> implements RestModel 
     // Set names used in component wiring
     public static final String NAME = "identifier";
     public static final String PLURAL_NAME = "identifiers";
+    public static final String CATEGORY = RestModel.PID;
     private String value;
     private String identifierType;
     private String identifierStatus;

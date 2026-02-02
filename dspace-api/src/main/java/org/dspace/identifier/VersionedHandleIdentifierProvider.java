@@ -9,7 +9,7 @@ package org.dspace.identifier;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,8 +35,8 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Fabio Bolognesi (fabio at atmire dot com)
@@ -44,8 +44,7 @@ import org.springframework.stereotype.Component;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Pascal-Nicolas Becker (dspace at pascal dash becker dot de)
  */
-@Component
-public class VersionedHandleIdentifierProvider extends IdentifierProvider {
+public class VersionedHandleIdentifierProvider extends IdentifierProvider implements InitializingBean {
     /**
      * log4j category
      */
@@ -70,6 +69,19 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
+
+    /**
+     * After all the properties are set check that the versioning is enabled
+     *
+     * @throws Exception throws an exception if this isn't the case
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (!configurationService.getBooleanProperty("versioning.enabled", true)) {
+            throw new RuntimeException("the " + VersionedHandleIdentifierProvider.class.getName() +
+                    " is enabled, but the versioning is disabled.");
+        }
+    }
 
     @Override
     public boolean supports(Class<? extends Identifier> identifier) {
@@ -115,7 +127,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
                 try {
                     versionNumber = Integer.valueOf(versionHandleMatcher.group(1));
                 } catch (NumberFormatException ex) {
-                    throw new IllegalStateException("Cannot detect the interger value of a digit.", ex);
+                    throw new IllegalStateException("Cannot detect the integer value of a digit.", ex);
                 }
 
                 // get history
@@ -136,7 +148,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
                     try {
                         versionHistoryService.getVersion(context, history, item);
                     } catch (SQLException ex) {
-                        throw new RuntimeException("Problem with the database connection occurd.", ex);
+                        throw new RuntimeException("Problem with the database connection occurred.", ex);
                     }
 
                     // did we found a version?
@@ -172,11 +184,11 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
                     } catch (SQLException | IOException ex) {
                         throw new RuntimeException("Unable to restore a versioned "
                                                        + "handle as there was a problem in creating a "
-                                                       + "neccessary item version: ", ex);
+                                                       + "necessary item version: ", ex);
                     } catch (AuthorizeException ex) {
                         throw new RuntimeException("Unable to restore a versioned "
                                                        + "handle as the current user was not allowed to "
-                                                       + "create a neccessary item version: ", ex);
+                                                       + "create a necessary item version: ", ex);
                     }
                     return;
                 }
@@ -230,7 +242,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         Version version = versionHistoryService.getVersion(context, vh, item);
         if (version == null) {
             version = versionService
-                .createNewVersion(context, vh, item, "Restoring from AIP Service", new Date(), versionNumber);
+                .createNewVersion(context, vh, item, "Restoring from AIP Service", Instant.now(), versionNumber);
         }
         versionHistoryService.update(context, vh);
     }

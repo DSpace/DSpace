@@ -22,7 +22,9 @@ public class ImageMagickPdfThumbnailFilter extends ImageMagickThumbnailFilter {
         File f2 = null;
         File f3 = null;
         try {
-            f2 = getImageFile(f, 0, verbose);
+            // Step 1: get an image from our PDF file, with PDF-specific processing options
+            f2 = getImageFile(f, verbose);
+            // Step 2: use the image above to create the final resized and rotated thumbnail
             f3 = getThumbnailFile(f2, verbose);
             byte[] bytes = Files.readAllBytes(f3.toPath());
             return new ByteArrayInputStream(bytes);

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -27,13 +28,14 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Marsa Haoua
  * @author Pascal-Nicolas Becker (dspace at pascal dash becker dot de)
  */
-public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
+public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider implements InitializingBean {
     /**
      * log4j category
      */
@@ -48,6 +50,19 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
     protected VersioningService versioningService;
     @Autowired(required = true)
     protected VersionHistoryService versionHistoryService;
+
+    /**
+     * After all the properties are set check that the versioning is enabled
+     *
+     * @throws Exception throws an exception if this isn't the case
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (!configurationService.getBooleanProperty("versioning.enabled", true)) {
+            throw new RuntimeException("the " + VersionedDOIIdentifierProvider.class.getName() +
+                    " is enabled, but the versioning is disabled.");
+        }
+    }
 
     @Override
     public String mint(Context context, DSpaceObject dso) throws IdentifierException {
@@ -66,7 +81,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
         try {
             history = versionHistoryService.findByItem(context, item);
         } catch (SQLException ex) {
-            throw new RuntimeException("A problem occured while accessing the database.", ex);
+            throw new RuntimeException("A problem occurred while accessing the database.", ex);
         }
 
         String doi = null;
@@ -76,7 +91,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
                 return doi;
             }
         } catch (SQLException ex) {
-            log.error("Error while attemping to retrieve information about a DOI for "
+            log.error("Error while attempting to retrieve information about a DOI for "
                           + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso)
                           + " with ID " + dso.getID() + ".", ex);
             throw new RuntimeException("Error while attempting to retrieve "
@@ -123,8 +138,9 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
                     loadOrCreateDOI(context, dso, versionedDOI, filter);
                 } catch (SQLException ex) {
                     log.error(
-                        "A problem with the database connection occurd while processing DOI " + versionedDOI + ".", ex);
-                    throw new RuntimeException("A problem with the database connection occured.", ex);
+                        "A problem with the database connection occurred while processing DOI " + versionedDOI + ".",
+                        ex);
+                    throw new RuntimeException("A problem with the database connection occurred.", ex);
                 }
                 return versionedDOI;
             }
@@ -134,7 +150,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
             if (history != null) {
                 // versioning is currently supported for items only
                 // if we have a history, we have a item
-                doi = makeIdentifierBasedOnHistory(context, dso, history);
+                doi = makeIdentifierBasedOnHistory(context, dso, history, filter);
             } else {
                 doi = loadOrCreateDOI(context, dso, null, filter).getDoi();
             }
@@ -145,12 +161,27 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
             log.error("AuthorizationException while creating a new DOI: ", ex);
             throw new IdentifierException(ex);
         }
-        return doi;
+        return doi.startsWith(DOI.SCHEME) ? doi : DOI.SCHEME + doi;
     }
 
     @Override
     public void register(Context context, DSpaceObject dso, String identifier) throws IdentifierException {
         register(context, dso, identifier, this.filter);
+    }
+
+    @Override
+    public String register(Context context, DSpaceObject dso, Filter filter)
+            throws IdentifierException {
+        if (!(dso instanceof Item)) {
+            // DOIs are currently assigned only to Items
+            return null;
+        }
+
+        String doi = mint(context, dso, filter);
+
+        register(context, dso, doi, filter);
+
+        return doi;
     }
 
     @Override
@@ -162,7 +193,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
         Item item = (Item) dso;
 
         if (StringUtils.isEmpty(identifier)) {
-            identifier = mint(context, dso);
+            identifier = mint(context, dso, filter);
         }
         String doiIdentifier = doiService.formatIdentifier(identifier);
 
@@ -170,10 +201,10 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
 
         // search DOI in our db
         try {
-            doi = loadOrCreateDOI(context, dso, doiIdentifier);
+            doi = loadOrCreateDOI(context, dso, doiIdentifier, filter);
         } catch (SQLException ex) {
-            log.error("Error in databse connection: " + ex.getMessage(), ex);
-            throw new RuntimeException("Error in database conncetion.", ex);
+            log.error("Error in database connection: " + ex.getMessage(), ex);
+            throw new RuntimeException("Error in database connection.", ex);
         }
 
         if (DELETED.equals(doi.getStatus()) ||
@@ -315,20 +346,23 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
         ArrayList<String> newIdentifiers = new ArrayList<>(identifiers.size());
         boolean changed = false;
         for (MetadataValue identifier : identifiers) {
-            if (!StringUtils.startsWithIgnoreCase(identifier.getValue(), bareDoiRef)) {
+            if (!Strings.CI.startsWith(identifier.getValue(), bareDoiRef)) {
                 newIdentifiers.add(identifier.getValue());
             } else {
                 changed = true;
             }
         }
-        // reset the metadata if neccessary.
+        // reset the metadata if necessary.
         if (changed) {
             try {
                 itemService.clearMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, Item.ANY);
-                itemService.addMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, newIdentifiers);
+                // Checks if Array newIdentifiers is empty to avoid adding null values to the metadata field.
+                if (!newIdentifiers.isEmpty()) {
+                    itemService.addMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, newIdentifiers);
+                }
                 itemService.update(c, item);
             } catch (SQLException ex) {
-                throw new RuntimeException("A problem with the database connection occured.", ex);
+                throw new RuntimeException("A problem with the database connection occurred.", ex);
             }
         }
     }

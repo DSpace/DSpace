@@ -9,7 +9,7 @@ package org.dspace.builder;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -110,28 +110,20 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
         indexingService.commit();
     }
 
-    public static ResourcePolicyBuilder createResourcePolicy(Context context)
+    public static ResourcePolicyBuilder createResourcePolicy(Context context, EPerson ePerson,
+                                                             Group group)
             throws SQLException, AuthorizeException {
         ResourcePolicyBuilder resourcePolicyBuilder = new ResourcePolicyBuilder(context);
-        return resourcePolicyBuilder.create(context);
+        return resourcePolicyBuilder.create(context, ePerson, group);
     }
 
-    private ResourcePolicyBuilder create(Context context)
+    private ResourcePolicyBuilder create(Context context, final EPerson ePerson,
+                                         final Group epersonGroup)
             throws SQLException, AuthorizeException {
         this.context = context;
 
-        resourcePolicy = resourcePolicyService.create(context);
+        resourcePolicy = resourcePolicyService.create(context, ePerson, epersonGroup);
 
-        return this;
-    }
-
-    public ResourcePolicyBuilder withUser(EPerson ePerson) throws SQLException {
-        resourcePolicy.setEPerson(ePerson);
-        return this;
-    }
-
-    public ResourcePolicyBuilder withGroup(Group epersonGroup) throws SQLException {
-        resourcePolicy.setGroup(epersonGroup);
         return this;
     }
 
@@ -150,12 +142,12 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
         return this;
     }
 
-    public ResourcePolicyBuilder withStartDate(Date data) throws SQLException {
+    public ResourcePolicyBuilder withStartDate(LocalDate data) throws SQLException {
         resourcePolicy.setStartDate(data);
         return this;
     }
 
-    public ResourcePolicyBuilder withEndDate(Date data) throws SQLException {
+    public ResourcePolicyBuilder withEndDate(LocalDate data) throws SQLException {
         resourcePolicy.setEndDate(data);
         return this;
     }

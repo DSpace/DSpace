@@ -44,6 +44,23 @@ public interface DOIService {
     public DOI create(Context context) throws SQLException;
 
     /**
+     * Deletes the given {@link DOI}.
+     *
+     * @param context current DSpace session.
+     * @throws SQLException passed through.
+     */
+    void delete(Context context, DOI doi) throws SQLException;
+
+    /**
+     * Retrieves the full list of {@link DOI}s currently in storage.
+     *
+     * @param context current DSpace session.
+     * @return The list of all DOIs currently in storage.
+     * @throws SQLException passed through.
+     */
+    List<DOI> findAll(Context context) throws SQLException;
+
+    /**
      * Find a specific DOI in storage.
      *
      * @param context current DSpace session.

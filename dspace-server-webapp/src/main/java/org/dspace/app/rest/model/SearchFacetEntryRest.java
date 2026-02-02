@@ -13,6 +13,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
 /**
@@ -21,6 +22,7 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 public class SearchFacetEntryRest extends RestAddressableModel {
 
     public static final String NAME = "discover";
+    public static final String PLURAL_NAME = NAME;
     public static final String CATEGORY = RestModel.DISCOVER;
 
     private String name;
@@ -29,6 +31,9 @@ public class SearchFacetEntryRest extends RestAddressableModel {
     @JsonIgnore
     private Boolean hasMore = null;
     private int facetLimit;
+
+    @JsonIgnore
+    private Boolean isOpenByDefault;
 
     @JsonIgnore
     private boolean exposeMinMax = false;
@@ -52,6 +57,14 @@ public class SearchFacetEntryRest extends RestAddressableModel {
     @JsonIgnore
     public String getType() {
         return NAME;
+    }
+
+    /**
+     * The plural name is the same as the singular name
+     */
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public Class getController() {
@@ -96,6 +109,16 @@ public class SearchFacetEntryRest extends RestAddressableModel {
 
     public void setFacetLimit(final int facetLimit) {
         this.facetLimit = facetLimit;
+    }
+
+    public void setOpenByDefault(boolean isOpenByDefault) {
+        this.isOpenByDefault = Boolean.valueOf(isOpenByDefault);
+    }
+    /**
+     * See documentation at {@link DiscoverySearchFilter#isOpenByDefault()}
+     */
+    public Boolean isOpenByDefault() {
+        return this.isOpenByDefault;
     }
 
     /**

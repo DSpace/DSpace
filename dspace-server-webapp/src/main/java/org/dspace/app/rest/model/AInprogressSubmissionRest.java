@@ -8,7 +8,7 @@
 package org.dspace.app.rest.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,31 +22,18 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public abstract class AInprogressSubmissionRest extends BaseObjectRest<Integer> {
 
-    private Date lastModified = new Date();
+
+    private Instant lastModified = Instant.now();
     private Map<String, Serializable> sections;
     @JsonIgnore
-    private CollectionRest collection;
-    @JsonIgnore
-    private ItemRest item;
-    @JsonIgnore
     private SubmissionDefinitionRest submissionDefinition;
-    @JsonIgnore
-    private EPersonRest submitter;
 
-    public Date getLastModified() {
+    public Instant getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(Date lastModified) {
+    public void setLastModified(Instant lastModified) {
         this.lastModified = lastModified;
-    }
-
-    public ItemRest getItem() {
-        return item;
-    }
-
-    public void setItem(ItemRest item) {
-        this.item = item;
     }
 
     public SubmissionDefinitionRest getSubmissionDefinition() {
@@ -55,14 +42,6 @@ public abstract class AInprogressSubmissionRest extends BaseObjectRest<Integer> 
 
     public void setSubmissionDefinition(SubmissionDefinitionRest submissionDefinition) {
         this.submissionDefinition = submissionDefinition;
-    }
-
-    public EPersonRest getSubmitter() {
-        return submitter;
-    }
-
-    public void setSubmitter(EPersonRest submitter) {
-        this.submitter = submitter;
     }
 
     public Map<String, Serializable> getSections() {
@@ -76,12 +55,6 @@ public abstract class AInprogressSubmissionRest extends BaseObjectRest<Integer> 
         this.sections = sections;
     }
 
-    public CollectionRest getCollection() {
-        return collection;
-    }
 
-    public void setCollection(CollectionRest collection) {
-        this.collection = collection;
-    }
 
 }

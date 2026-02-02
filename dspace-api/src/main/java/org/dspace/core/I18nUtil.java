@@ -96,14 +96,14 @@ public class I18nUtil {
      */
     public static Locale getEPersonLocale(EPerson ep) {
         if (ep == null) {
-            log.error("No EPerson specified, returning default locale");
+            log.info("No EPerson specified, returning default locale");
             return I18nUtil.getDefaultLocale();
         }
 
         String lang = ep.getLanguage();
 
         if (StringUtils.isBlank(lang)) {
-            log.error("No language specified for EPerson " + ep.getID());
+            log.info("No language specified for EPerson " + ep.getID() + ", returning default locale");
             return I18nUtil.getDefaultLocale();
         }
 
@@ -257,7 +257,7 @@ public class I18nUtil {
             String message = messages.getString(key.trim());
             return message;
         } catch (MissingResourceException e) {
-            log.error("'" + key + "' translation undefined in locale '"
+            log.warn("'" + key + "' translation undefined in locale '"
                           + locale.toString() + "'");
             return key;
         }
@@ -375,6 +375,22 @@ public class I18nUtil {
 
         String templateName = getFilename(locale, templateFile, "");
         return templateName;
+    }
+
+    /**
+     * Get the appropriate localized version of a ldn template according to language settings
+     *
+     * @param locale Locale for this request
+     * @param name   String - base name of the ldn template
+     * @return templateName
+     * String - localized filename of a ldn template
+     */
+    public static String getLDNFilename(Locale locale, String name) {
+        String templateFile =
+            DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir") +
+                File.separator + "config" + File.separator + "ldn" + File.separator + name;
+
+        return getFilename(locale, templateFile, "");
     }
 
     /**

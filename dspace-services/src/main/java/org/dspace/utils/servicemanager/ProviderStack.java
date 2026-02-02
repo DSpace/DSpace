@@ -35,7 +35,7 @@ public final class ProviderStack<T> {
      * Default empty constructor.
      * <p>
      * This is mostly only useful if you are planning to add new
-     * providers later.  You should probably use the other contructors.
+     * providers later.  You should probably use the other constructors.
      */
     public ProviderStack() {
         providers = Collections.synchronizedList(new ArrayList<ProviderHolder<T>>());

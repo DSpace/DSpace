@@ -202,8 +202,10 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
         Community com = CommunityBuilder.createCommunity(context).withName("A community").build();
         Collection col = CollectionBuilder.createCollection(context, com).withName("A collection").build();
         Item item = ItemBuilder.createItem(context, col).withTitle("Item to withdraw").build();
-        ResourcePolicy resource = ResourcePolicyBuilder.createResourcePolicy(context).withAction(Constants.ADMIN)
-                .withUser(eperson).withDspaceObject(item).build();
+        ResourcePolicy resource = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
+                                                       .withAction(Constants.ADMIN)
+                                                       .withDspaceObject(item)
+                                                       .build();
         context.restoreAuthSystemState();
 
         ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);

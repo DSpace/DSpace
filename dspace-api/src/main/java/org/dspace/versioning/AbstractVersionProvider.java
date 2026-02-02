@@ -84,8 +84,8 @@ public abstract class AbstractVersionProvider {
             // DSpace knows several types of resource policies (see the class
             // org.dspace.authorize.ResourcePolicy): Submission, Workflow, Custom
             // and inherited. Submission, Workflow and Inherited policies will be
-            // set automatically as neccessary. We need to copy the custom policies
-            // only to preserve customly set policies and embargos (which are
+            // set automatically as necessary. We need to copy the custom policies
+            // only to preserve customly set policies and embargoes (which are
             // realized by custom policies with a start date).
             List<ResourcePolicy> bundlePolicies =
                 authorizeService.findPoliciesByDSOAndType(c, nativeBundle, ResourcePolicy.TYPE_CUSTOM);

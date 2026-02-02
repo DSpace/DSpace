@@ -18,7 +18,7 @@
     -->
 	
 	<!--
-	  OpenAIRE4 Guidelines
+	  Openaire4 Guidelines
       4.2.2. Subproperty funderName (M)
       Name of the funding provider (occurrence: 1). Mandatory if FundingReference is used. -->
     <dc-type>
@@ -29,7 +29,7 @@
     </dc-type>
 	
 	<!--
-	  OpenAIRE4 Guidelines
+	  Openaire4 Guidelines
       4.2.3. Subproperty funderIdentifier (R)
       Unique identifier of the funding entity (occurrence: 0-1). 
     -->

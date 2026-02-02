@@ -8,8 +8,8 @@
 package org.dspace.health;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 import org.apache.commons.io.FileUtils;
 import org.dspace.services.ConfigurationService;
@@ -27,13 +27,13 @@ public class InfoCheck extends Check {
             = new DSpace().getConfigurationService();
         StringBuilder sb = new StringBuilder();
         sb.append("Generated: ").append(
-            new Date().toString()
+            Instant.now().toString()
         ).append("\n");
 
         sb.append("From - Till: ").append(
-            new SimpleDateFormat("yyyy-MM-dd").format(ri.from().getTime())
+            DateTimeFormatter.ISO_LOCAL_DATE.format(ri.from())
         ).append(" - ").append(
-            new SimpleDateFormat("yyyy-MM-dd").format(ri.till().getTime())
+            DateTimeFormatter.ISO_LOCAL_DATE.format(ri.till())
         ).append("\n");
 
         sb.append("Url: ").append(
