@@ -143,6 +143,7 @@ public class CustomUrlServiceImpl implements CustomUrlService {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.addDSpaceObjectFilter(IndexableItem.TYPE);
         discoverQuery.addFilterQueries("customurl:" + searchService.escapeQueryChars(customUrl));
+        discoverQuery.addFilterQueries("latestVersion:true");
         discoverQuery.setIncludeNotDiscoverableOrWithdrawn(true);
 
         List<IndexableObject> indexableObjects = findIndexableObjects(context, discoverQuery);
@@ -234,16 +235,18 @@ public class CustomUrlServiceImpl implements CustomUrlService {
     /**
      * Searches for all custom URLs that start with the given base pattern.
      * This method is optimized to fetch only the URLs from Solr without retrieving full Item objects.
+     * Only considers the latest versions of items.
      *
      * @param context     DSpace context
      * @param basePattern the base pattern to search for
-     * @return list of matching custom URLs
+     * @return list of matching custom URLs from latest versions
      */
     private List<String> findCustomUrlsWithPattern(Context context, String basePattern) {
         try {
             DiscoverQuery discoverQuery = new DiscoverQuery();
             discoverQuery.addDSpaceObjectFilter(IndexableItem.TYPE);
             discoverQuery.addFilterQueries("customurl:" + searchService.escapeQueryChars(basePattern) + "*");
+            discoverQuery.addFilterQueries("latestVersion:true");
             discoverQuery.setIncludeNotDiscoverableOrWithdrawn(true);
 
             List<IndexableObject> indexableObjects = searchService.search(context, discoverQuery)
@@ -306,16 +309,18 @@ public class CustomUrlServiceImpl implements CustomUrlService {
 
     /**
      * Checks if a custom URL already exists without retrieving the full item.
+     * Only checks against the latest versions of items.
      *
      * @param context   DSpace context
      * @param customUrl the custom URL to check
-     * @return true if the URL exists, false otherwise
+     * @return true if the URL exists on a latest version, false otherwise
      */
     private boolean customUrlExists(Context context, String customUrl) {
         try {
             DiscoverQuery discoverQuery = new DiscoverQuery();
             discoverQuery.addDSpaceObjectFilter(IndexableItem.TYPE);
             discoverQuery.addFilterQueries("customurl:" + searchService.escapeQueryChars(customUrl));
+            discoverQuery.addFilterQueries("latestVersion:true");
             discoverQuery.setIncludeNotDiscoverableOrWithdrawn(true);
             discoverQuery.setMaxResults(1); // We only need to know if any exist
 

@@ -12,10 +12,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
+import java.util.Optional;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.app.customurl.CustomUrlService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -23,6 +27,7 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.VersionBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -56,6 +61,8 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
 
     private CustomUrlConsumerConfig customUrlConsumerConfig = new DSpace()
         .getSingletonService(CustomUrlConsumerConfig.class);
+
+    private final CustomUrlService customUrlService = new DSpace().getSingletonService(CustomUrlService.class);
 
 
     private Collection collection;
@@ -580,5 +587,65 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(item1.getMetadata(), hasItem(with("dspace.customurl", "data-mining-techniques")));
         assertThat(item2.getMetadata(), hasItem(with("dspace.customurl", "data-mining-techniques-1")));
         assertThat(item3.getMetadata(), hasItem(with("dspace.customurl", "data-mining-techniques-2")));
+    }
+
+    @Test
+    public void testItemVersioningCausesCustomUrlSearch() throws SQLException, AuthorizeException {
+
+        context.turnOffAuthorisationSystem();
+
+        // Create a publication collection
+        Collection publications = CollectionBuilder.createCollection(context, parentCommunity)
+                                                   .withName("Publications Collection")
+                                                   .withEntityType("Publication")
+                                                   .build();
+
+        // Configure Publication entity type to use dc.title
+        configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Publication");
+        configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Publication", "dc.title");
+        customUrlConsumerConfig.reload();
+
+        // Create original item with custom URL
+        Item originalItem = ItemBuilder.createItem(context, publications)
+                                       .withTitle("Versioned Publication")
+                                       .build();
+
+        originalItem = context.reloadEntity(originalItem);
+
+        // Verify original item has the custom URL
+        assertThat(originalItem.getMetadata(), hasItem(with("dspace.customurl", "versioned-publication")));
+        String customUrl = "versioned-publication";
+
+        // Verify we can find the item by custom URL before versioning
+        Optional<Item> foundBeforeVersioning = customUrlService.findItemByCustomUrl(context, customUrl);
+        assertTrue("Should find item by custom URL before versioning", foundBeforeVersioning.isPresent());
+        assertEquals("Found item should be the original item", originalItem.getID(),
+                     foundBeforeVersioning.get().getID());
+
+        // Now create a new version
+        Version newVersion = VersionBuilder.createVersion(context, originalItem, "Second version").build();
+        Item versionedItem = newVersion.getItem();
+
+        // The versioned item is initially a workspace item, we need to archive it to trigger consumers
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, versionedItem);
+        if (workspaceItem != null) {
+            installItemService.installItem(context, workspaceItem);
+        }
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        // Reload both items to get latest state
+        originalItem = context.reloadEntity(originalItem);
+        versionedItem = context.reloadEntity(versionedItem);
+
+        // Verify the versioned item has the same custom URL
+        assertThat(versionedItem.getMetadata(), hasItem(with("dspace.customurl", "versioned-publication")));
+        // Verify the original item's custom URL was moved to old
+        assertThat(originalItem.getMetadata(), hasItem(with("dspace.customurl.old", "versioned-publication")));
+        assertThat(itemService.getMetadataByMetadataString(originalItem, "dspace.customurl"), empty());
+
+        assertEquals(versionedItem.getID(),
+                     customUrlService.findItemByCustomUrl(context, customUrl).map(DSpaceObject::getID).orElse(null));
     }
 }

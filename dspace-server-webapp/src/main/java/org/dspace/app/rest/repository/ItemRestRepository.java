@@ -274,9 +274,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     @SearchRestMethod(name = "findByCustomURL")
     public ItemRest findByCustomUrl(@Parameter(value = "q", required = true) String customUrl) {
-        return findItemByUuidOrCustomUrl(obtainContext(), customUrl)
-            .map(item -> (ItemRest) converter.toRest(item, utils.obtainProjection()))
-            .orElse(null);
+        Item item = findItemByUuidOrCustomUrl(obtainContext(), customUrl)
+            .orElseThrow(() -> new ResourceNotFoundException("Item with custom URL '" + customUrl + "' not found"));
+        return converter.toRest(item, utils.obtainProjection());
     }
 
     private Optional<Item> findItemByUuidOrCustomUrl(Context context, String customUrl) {

@@ -4981,11 +4981,11 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token).perform(get("/api/core/items/search/findByCustomURL")
                                      .param("q", "unknown"))
-                        .andExpect(status().isNoContent());
+                        .andExpect(status().isNotFound());
 
         getClient(token).perform(get("/api/core/items/search/findByCustomURL")
                                      .param("q", UUID.randomUUID().toString()))
-                        .andExpect(status().isNoContent());
+                        .andExpect(status().isNotFound());
 
     }
 
@@ -5082,7 +5082,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         // Anonymous user should not find the item
         getClient().perform(get("/api/core/items/search/findByCustomURL")
                                      .param("q", "private-custom-url"))
-                        .andExpect(status().isNoContent());
+                        .andExpect(status().isNotFound());
 
         String token = getAuthToken(admin.getEmail(), password);
 
