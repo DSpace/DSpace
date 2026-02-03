@@ -22,7 +22,7 @@
                                 ADMIN
                               </value>
                             </property>
-                            <property name="submissionDefinition" value="traditional-cris" />
+                            <property name="submissionDefinition" value="traditional" />
                         </bean>
                         <bean class="org.dspace.content.edit.EditItemMode">
                             <property name="name" value="FIRST" />
@@ -58,7 +58,7 @@
                                 OWNER
                               </value>
                             </property>
-                            <property name="submissionDefinition" value="traditional-cris" />
+                            <property name="submissionDefinition" value="traditional" />
                         </bean>
                         <bean class="org.dspace.content.edit.EditItemMode">
                             <property name="name" value="FIRST-CUSTOM" />
@@ -123,7 +123,7 @@
                               </list>
                             </property>
                             <property name="items" ref="itemsMetadata" />
-                            <property name="submissionDefinition" value="traditional-cris" />
+                            <property name="submissionDefinition" value="traditional" />
                         </bean>
                         <bean class="org.dspace.content.edit.EditItemMode">
                             <property name="name" value="MODE-VOC" />
