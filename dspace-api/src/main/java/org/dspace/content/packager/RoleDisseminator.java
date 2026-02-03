@@ -103,12 +103,13 @@ public class RoleDisseminator implements PackageDisseminator {
         throws PackageException, CrosswalkException,
         AuthorizeException, SQLException, IOException {
         boolean emitPasswords = params.containsKey("passwords");
+        boolean includeMembers = params.containsKey("includeMembers");
 
         FileOutputStream fileOut = null;
         try {
             //open file stream for writing
             fileOut = new FileOutputStream(pkgFile);
-            writeToStream(context, object, fileOut, emitPasswords);
+            writeToStream(context, object, fileOut, emitPasswords, includeMembers);
         } finally {
             //close file stream & save
             if (fileOut != null) {
@@ -122,11 +123,12 @@ public class RoleDisseminator implements PackageDisseminator {
      * which wants to read one.
      *
      * @param emitPasswords true if password hashes should be included.
+     * @param includeMembers true if access member groups should be included.
      * @return the stream of XML representing users and groups.
      * @throws IOException if IO error
      *                     if a PipedOutputStream or PipedInputStream cannot be created.
      */
-    InputStream asStream(Context context, DSpaceObject object, boolean emitPasswords)
+    InputStream asStream(Context context, DSpaceObject object, boolean emitPasswords, boolean includeMembers)
         throws IOException {
         // Create a PipedOutputStream to which to write some XML
         PipedOutputStream outStream = new PipedOutputStream();
@@ -134,7 +136,7 @@ public class RoleDisseminator implements PackageDisseminator {
 
         // Create a new Thread to push serialized objects into the pipe
         Serializer serializer = new Serializer(context, object, outStream,
-                                               emitPasswords);
+                                               emitPasswords, includeMembers);
         new Thread(serializer).start();
 
         return inStream;
@@ -150,6 +152,7 @@ public class RoleDisseminator implements PackageDisseminator {
         private DSpaceObject object;
         private OutputStream stream;
         private boolean emitPasswords;
+        private boolean includeMembers;
 
         @SuppressWarnings("unused")
         private Serializer() {
@@ -162,17 +165,19 @@ public class RoleDisseminator implements PackageDisseminator {
          *                      closed when serialization is complete.
          * @param emitPasswords true if password hashes should be included.
          */
-        Serializer(Context context, DSpaceObject object, OutputStream stream, boolean emitPasswords) {
+        Serializer(Context context, DSpaceObject object, OutputStream stream, boolean emitPasswords,
+                   boolean includeMembers) {
             this.context = context;
             this.object = object;
             this.stream = stream;
             this.emitPasswords = emitPasswords;
+            this.includeMembers = includeMembers;
         }
 
         @Override
         public void run() {
             try {
-                writeToStream(context, object, stream, emitPasswords);
+                writeToStream(context, object, stream, emitPasswords, includeMembers);
                 stream.close();
             } catch (IOException e) {
                 log.error(e);
@@ -189,15 +194,16 @@ public class RoleDisseminator implements PackageDisseminator {
      * @param object        DSpaceObject
      * @param stream        receives the output.  Is not closed by this method.
      * @param emitPasswords true if password hashes should be included.
+     * @param includeMembers true if access member groups should be included.
      * @throws PackageException if error
      */
     protected void writeToStream(Context context, DSpaceObject object, OutputStream stream,
-                                 boolean emitPasswords)
+                                 boolean emitPasswords, boolean includeMembers)
         throws PackageException {
         try {
             //First, find all Groups/People associated with our current Object
-            List<Group> groups = findAssociatedGroups(context, object);
-            List<EPerson> people = findAssociatedPeople(context, object);
+            List<Group> groups = findAssociatedGroups(context, object, includeMembers);
+            List<EPerson> people = findAssociatedPeople(context, object, includeMembers);
 
             //Only continue if we've found Groups or People which we need to disseminate
             if ((groups.size() > 0) ||
@@ -476,10 +482,11 @@ public class RoleDisseminator implements PackageDisseminator {
      *
      * @param context The DSpace context
      * @param object  the DSpace object
+     * @param includeMembers true is including access member groups
      * @return array of all associated groups
      * @throws SQLException if database error
      */
-    protected List<Group> findAssociatedGroups(Context context, DSpaceObject object)
+    protected List<Group> findAssociatedGroups(Context context, DSpaceObject object, boolean includeMembers)
         throws SQLException {
         List<Group> list = new ArrayList<Group>();
         if (object.getType() == Constants.SITE) {
@@ -537,7 +544,7 @@ public class RoleDisseminator implements PackageDisseminator {
         }
 
         // Add any memberGroups associated with discovered groups
-        if (list.size() > 0) {
+        if (includeMembers && list.size() > 0) {
             List<Group> memberList = new ArrayList<Group>();
             for (Group group : list) {
                 for (Group memberGroup : group.getMemberGroups()) {
@@ -568,13 +575,13 @@ public class RoleDisseminator implements PackageDisseminator {
      * @return array of all associated EPerson objects
      * @throws SQLException if database error
      */
-    protected List<EPerson> findAssociatedPeople(Context context, DSpaceObject object)
+    protected List<EPerson> findAssociatedPeople(Context context, DSpaceObject object, boolean includeMembers)
         throws SQLException {
         List<EPerson> personList = new ArrayList<EPerson>();
         if (object.getType() == Constants.SITE) {
             personList = ePersonService.findAll(context, EPerson.EMAIL);
-        } else {
-            List<Group> groups = findAssociatedGroups(context, object);
+        } else if (includeMembers) {
+            List<Group> groups = findAssociatedGroups(context, object, includeMembers);
             for (Group group : groups) {
                 for (EPerson person : group.getMembers()) {
                     if (!personList.contains(person)) {
@@ -598,8 +605,11 @@ public class RoleDisseminator implements PackageDisseminator {
     @Override
     public String getParameterHelp() {
         return "* passwords=[boolean]      " +
-            "If true, user password hashes are also exported (so that they can be later restored).  If false, user " +
-            "passwords are not exported. (Default is false)";
+                "If true, user password hashes are also exported (so that they can be later restored). " +
+                "If false, user passwords are not exported. (Default is false)" + "\n\n" +
+                "*  includeMembers=[boolean]      " +
+                "If true, access control member groups (and their EPerson members) are also exported. " +
+                "(Default is false)";
     }
 
 }

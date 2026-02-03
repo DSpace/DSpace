@@ -477,7 +477,9 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
         // Export collection AIP
         log.info("testRestoreCommunityGroups() - CREATE Community AIP");
-        File aipFile = createAIP(community, null, true);
+        PackageParameters pkgParams = new PackageParameters();
+        pkgParams.addProperty("includeMembers", "true");
+        File aipFile = createAIP(community, pkgParams, true);
 
         // Now, delete that Collection
         log.info("testRestoreCommunityGroups() - DELETE Community");
