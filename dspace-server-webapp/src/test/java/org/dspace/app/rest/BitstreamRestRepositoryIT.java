@@ -75,6 +75,7 @@ import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -103,6 +104,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
     private GroupService groupService;
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Test
     public void findAllTest() throws Exception {
@@ -2886,6 +2889,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
     public void replaceBitstreamsTest() throws Exception {
         // We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
+        configurationService.setProperty("replace-bitstream.enabled", true);
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
@@ -3160,6 +3164,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
     @Test
     public void replaceBitstreamWithNameParamTest() throws Exception {
+        configurationService.setProperty("replace-bitstream.enabled", true);
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity).build();
@@ -3227,6 +3232,62 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 matchMetadata("dc.title", newFile.getOriginalFilename())))
             .andExpect(jsonPath("$.metadata.['dc.title']", hasSize(1)));
     }
+
+    @Test
+    public void replaceBitstreamsTestWhenFeatureDisabled() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Set the replace feature to false to test the failure case
+        configurationService.setProperty("replace-bitstream.enabled", false);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2022-02-10")
+                                      .withAuthor("Jens, Vannerum")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        String bitstreamContent1 = "ThisIsSomeDummyText1";
+        // Add a bitstream to an item
+        Bitstream bitstream = null;
+        try (InputStream is1 = IOUtils.toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                    createBitstream(context, publicItem1, is1)
+                    .withName("Bitstream1")
+                    .withDescription("description1")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        String input = "Hello, World!";
+        MockMultipartFile newFile =
+                new MockMultipartFile("file", "hello.txt",
+                        org.springframework.http.MediaType.TEXT_PLAIN_VALUE, input.getBytes());
+
+        // Attempt to replace the bitstream when the feature is disabled
+        // This should fail with a 400 Bad Request because IllegalStateException is thrown
+        getClient(token)
+                .perform(MockMvcRequestBuilders
+                        .multipart("/api/core/bitstreams/{id}/content", bitstream.getID())
+                        .file(newFile)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        }))
+                .andExpect(status().isBadRequest());
+    }
+
 
     public boolean bitstreamExists(String token, Bitstream... bitstreams) throws Exception {
         for (Bitstream bitstream : bitstreams) {
