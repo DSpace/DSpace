@@ -1166,98 +1166,135 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         //We only have one range query !
         List<RangeFacet.Count> yearResults = queryResponse.getFacetRanges().get(0).getCounts();
         for (RangeFacet.Count count : yearResults) {
-            long totalRecords = count.getCount();
-
             //Create a range query from this !
-            //We start with out current year
-            DCDate dcStart = new DCDate(count.getValue());
-            //Advance one year for the start of the next one !
-            DCDate dcEndDate = new DCDate(dcStart.toDate().plus(1, ChronoUnit.YEARS));
+            //We start without current year
+            DCDate dcStartYear = new DCDate(count.getValue());
+            int year = dcStartYear.getYearUTC();
 
-            StringBuilder filterQuery = new StringBuilder();
-            filterQuery.append("time:([");
-            filterQuery.append(ClientUtils.escapeQueryChars(dcStart.toString()));
-            filterQuery.append(" TO ");
-            filterQuery.append(ClientUtils.escapeQueryChars(dcEndDate.toString()));
-            filterQuery.append("]");
-            //The next part of the filter query excludes the content from midnight of the next year !
-            filterQuery.append(" NOT ").append(ClientUtils.escapeQueryChars(dcEndDate.toString()));
-            filterQuery.append(")");
-
-
-            Map<String, String> yearQueryParams = new HashMap<>();
-            yearQueryParams.put(CommonParams.Q, "*:*");
-            yearQueryParams.put(CommonParams.ROWS, String.valueOf(10000));
-            yearQueryParams.put(CommonParams.FQ, filterQuery.toString());
-            yearQueryParams.put(CommonParams.WT, "csv");
-
-            //Tell SOLR how to escape and separate the values of multi-valued fields
-            yearQueryParams.put("csv.escape", "\\");
-            yearQueryParams.put("csv.mv.separator", MULTIPLE_VALUES_SPLITTER);
-
-            //Start by creating a new core
-            String coreName = statisticsCoreBase + "-" + dcStart.getYearUTC();
+            //Start by creating a new core for the year
+            String coreName = statisticsCoreBase + "-" + year;
             HttpSolrClient statisticsYearServer = createCore((HttpSolrClient) solr, coreName);
-
-            System.out.println("Moving: " + totalRecords + " into core " + coreName);
-            log.info("Moving: " + totalRecords + " records into core " + coreName);
-
-            List<File> filesToUpload = new ArrayList<>();
-            for (int i = 0; i < totalRecords; i += 10000) {
-                String solrRequestUrl = ((HttpSolrClient) solr).getBaseURL() + "/select";
-                solrRequestUrl = generateURL(solrRequestUrl, yearQueryParams);
-
-                HttpGet get = new HttpGet(solrRequestUrl);
-                InputStream csvInputstream;
-                File csvFile = new File(tempDirectory.getPath()
-                        + File.separatorChar
-                        + "temp."
-                        + dcStart.getYearUTC()
-                        + "."
-                        + i
-                        + ".csv");
-                try (CloseableHttpClient hc = DSpaceHttpClientFactory.getInstance().buildWithoutProxy()) {
-                    HttpResponse response = hc.execute(get);
-                    csvInputstream = response.getEntity().getContent();
-                    //Write the csv output to a file !
-                    FileUtils.copyInputStreamToFile(csvInputstream, csvFile);
-                }
-                filesToUpload.add(csvFile);
-
-                //Add 10000 & start over again
-                yearQueryParams.put(CommonParams.START, String.valueOf((i + 10000)));
-            }
 
             Set<String> multivaluedFields = getMultivaluedFieldNames();
 
-            for (File tempCsv : filesToUpload) {
-                //Upload the data in the csv files to our new solr core
-                ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update");
-                contentStreamUpdateRequest.setParam("stream.contentType", "text/csv;charset=utf-8");
-                contentStreamUpdateRequest.setParam("escape", "\\");
-                contentStreamUpdateRequest.setParam("skip", "_version_");
-                contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
-                contentStreamUpdateRequest.addFile(tempCsv, "text/csv;charset=utf-8");
+            //For each year, commits will be done month-by-month, by doing:
+            // - copies data from a single month of a year from 'statistics' core to a temp csv file
+            // - uploads the csv data to the new 'statistics-<year>' core
+            // - commits the new data to 'statistics-<year>'
+            // - deletes the copied data from 'statistics' and commits
+            for (int month = 1; month <= 12; month++) {
+                //Range for the current month
+                ZonedDateTime monthStart = ZonedDateTime.of(
+                    year, month, 1, 0, 0, 0, 0, ZoneOffset.UTC
+                );
+                ZonedDateTime monthEnd = monthStart.plusMonths(1);
+                DCDate dcStartMonth = new DCDate(monthStart.toInstant().toString());
+                DCDate dcEndMonth = new DCDate(monthEnd.toInstant().toString());
 
-                //Add parsing directives for the multivalued fields so that they are stored as separate values
-                // instead of one value
-                for (String multivaluedField : multivaluedFields) {
-                    contentStreamUpdateRequest.setParam("f." + multivaluedField + ".split", Boolean.TRUE.toString());
-                    contentStreamUpdateRequest
-                        .setParam("f." + multivaluedField + ".separator", MULTIPLE_VALUES_SPLITTER);
+                //Filters that for the current month
+                StringBuilder filterQuery = new StringBuilder();
+                filterQuery.append("time:([");
+                filterQuery.append(ClientUtils.escapeQueryChars(dcStartMonth.toString()));
+                filterQuery.append(" TO ");
+                filterQuery.append(ClientUtils.escapeQueryChars(dcEndMonth.toString()));
+                filterQuery.append("]");
+                //The next part of the filter query excludes the content from midnight of the next month !
+                filterQuery.append(" NOT ").append(ClientUtils.escapeQueryChars(dcEndMonth.toString()));
+                filterQuery.append(")");
+
+                //Counts total documents in the month
+                SolrQuery monthCountQuery = new SolrQuery();
+                monthCountQuery.setQuery("*:*");
+                monthCountQuery.setRows(0);
+                monthCountQuery.addFilterQuery(filterQuery.toString());
+                long totalRecords = solr.query(monthCountQuery).getResults().getNumFound();
+                if (totalRecords == 0) {
+                    continue;
                 }
 
-                statisticsYearServer.request(contentStreamUpdateRequest);
+                String movingMessage = String.format(
+                    "Moving: %s records into core %s for month %s",
+                    totalRecords,
+                    coreName,
+                    month
+                );
+                System.out.println(movingMessage);
+                log.info(movingMessage);
+
+                //Query to list batches of 10000 documents for the month
+                final int batchSize = 10000;
+                Map<String, String> monthQueryParams = new HashMap<>();
+                monthQueryParams.put(CommonParams.Q, "*:*");
+                monthQueryParams.put(CommonParams.ROWS, String.valueOf(batchSize));
+                monthQueryParams.put(CommonParams.FQ, filterQuery.toString());
+                monthQueryParams.put(CommonParams.WT, "csv");
+
+                //Tell Solr how to escape and separate the values of multivalued fields
+                monthQueryParams.put("csv.escape", "\\");
+                monthQueryParams.put("csv.mv.separator", MULTIPLE_VALUES_SPLITTER);
+
+                //Process the current month data in batches of 10000
+                for (int i = 0; i < totalRecords; i += batchSize) {
+                    //Queries for a batch and saves results to a temporary csv
+                    monthQueryParams.put(CommonParams.START, String.valueOf(i));
+                    String solrRequestUrl = ((HttpSolrClient) solr).getBaseURL() + "/select";
+                    solrRequestUrl = generateURL(solrRequestUrl, monthQueryParams);
+                    HttpGet get = new HttpGet(solrRequestUrl);
+                    File csvFile = new File(tempDirectory.getPath()
+                        + File.separatorChar
+                        + "temp."
+                        + year
+                        + "."
+                        + month
+                        + "."
+                        + i
+                        + ".csv");
+                    try (CloseableHttpClient hc = DSpaceHttpClientFactory.getInstance().buildWithoutProxy()) {
+                        HttpResponse response = hc.execute(get);
+                        InputStream csvInputstream = response.getEntity().getContent();
+                        FileUtils.copyInputStreamToFile(csvInputstream, csvFile);
+                    }
+
+                    //Upload the data in the csv file to our new solr core
+                    ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update");
+                    contentStreamUpdateRequest.setParam("stream.contentType", "text/csv;charset=utf-8");
+                    contentStreamUpdateRequest.setParam("escape", "\\");
+                    contentStreamUpdateRequest.setParam("skip", "_version_");
+                    //Already commits the new data of this month and year on requesting
+                    contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
+                    contentStreamUpdateRequest.addFile(csvFile, "text/csv;charset=utf-8");
+
+                    //Add parsing directives for the multivalued fields so that they are stored as separate values
+                    // instead of one value
+                    for (String multivaluedField : multivaluedFields) {
+                        contentStreamUpdateRequest.setParam(
+                            "f." + multivaluedField + ".split", Boolean.TRUE.toString()
+                        );
+                        contentStreamUpdateRequest.setParam(
+                            "f." + multivaluedField + ".separator", MULTIPLE_VALUES_SPLITTER
+                        );
+                    }
+
+                    //Sends the month data to the new core
+                    statisticsYearServer.request(contentStreamUpdateRequest);
+                    csvFile.delete();
+                }
+
+                statisticsYearServer.commit(true, true);
+
+                //Delete contents of this month from our year query
+                solr.deleteByQuery(filterQuery.toString());
+                solr.commit(true, true);
+
+                String doneMessage = String.format(
+                    "Moved %s records into core: %s for month %s",
+                    totalRecords,
+                    coreName,
+                    month
+                );
+                System.out.println(doneMessage);
+                log.info(doneMessage);
             }
-
-            statisticsYearServer.commit(true, true);
-
-
-            //Delete contents of this year from our year query !
-            solr.deleteByQuery(filterQuery.toString());
-            solr.commit(true, true);
-
-            log.info("Moved {} records into core: {}", totalRecords, coreName);
         }
 
         FileUtils.deleteDirectory(tempDirectory);
