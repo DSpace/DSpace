@@ -55,11 +55,16 @@ public class Cleanup {
             Options options = new Options();
 
             boolean versioning = new DSpace().getConfigurationService().getBooleanProperty("versioning.enabled", true);
-            String defaultSuffix = String.format(" (default due to versioning.enabled=%b)", versioning);
+            boolean replaceBitstream = new DSpace().getConfigurationService()
+                    .getBooleanProperty("replace-bitstream.enabled", false);
+            boolean defaultLeave = versioning || replaceBitstream;
+            String defaultSuffix = String.format(" (default due to versioning.enabled=%b or " +
+                            "replace-bitstream.enabled=%b)",
+                    versioning, replaceBitstream);
             options.addOption("l", "leave", false, "Leave database records but delete file " +
-                    "from assetstore" + (versioning ? defaultSuffix : ""));
+                    "from assetstore" + (defaultLeave ? defaultSuffix : ""));
             options.addOption("d", "delete", false, "Delete database records as well as " +
-                    "assetstore files" + (!versioning ? defaultSuffix : ""));
+                    "assetstore files" + (!defaultLeave ? defaultSuffix : ""));
             options.addOption("v", "verbose", false, "Provide verbose output");
             options.addOption("h", "help", false, "Help");
 
@@ -76,7 +81,7 @@ public class Cleanup {
                 System.exit(0);
             }
 
-            boolean deleteDbRecords = !versioning;
+            boolean deleteDbRecords = !defaultLeave;
             // Prune stage
             if (line.hasOption('l')) {
                 log.debug("option l used setting flag to leave db records");
