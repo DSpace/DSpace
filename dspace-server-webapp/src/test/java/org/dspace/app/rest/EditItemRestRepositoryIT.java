@@ -49,10 +49,15 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.edit.EditItem;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
@@ -84,6 +89,15 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private PluginService pluginService;
+
+    @Autowired
+    private ChoiceAuthorityService choiceAuthorityService;
+
+    @Autowired
+    private MetadataAuthorityService metadataAuthorityService;
 
     @Test
     public void findOneTest() throws Exception {
@@ -747,6 +761,16 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
 
     @Test
     public void testFindOneWithModeWithManySecurities() throws Exception {
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] { "org.dspace.content.authority.OrcidAuthority = AuthorAuthority" });
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        configurationService.setProperty("cris.ItemAuthority.AuthorAuthority.entityType", "Person");
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
 
         context.turnOffAuthorisationSystem();
 
@@ -909,6 +933,26 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
     @Test
     public void findOneAuthorCustomSecurityModeTest() throws Exception {
 
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] {
+                                             "org.dspace.content.authority.OrcidAuthority = AuthorAuthority",
+                                             "org.dspace.content.authority.OrcidAuthority = EditorAuthority"
+                                         });
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        configurationService.setProperty("cris.ItemAuthority.AuthorAuthority.entityType", "Person");
+
+        configurationService.setProperty("choices.plugin.dc.contributor.editor", "EditorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.editor", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.editor", "true");
+        configurationService.setProperty("cris.ItemAuthority.EditorAuthority.entityType", "Person");
+
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
         context.turnOffAuthorisationSystem();
 
         EPerson firstUser = EPersonBuilder.createEPerson(context)
@@ -1065,6 +1109,24 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
 
     @Test
     public void patchAddMetadataUsingSecurityConfigurationCustomTest() throws Exception {
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] {
+                                             "org.dspace.content.authority.EPersonAuthority = EPersonAuthority",
+                                             "org.dspace.content.authority.GroupAuthority = GroupAuthority"
+                                         });
+
+        configurationService.setProperty("choices.plugin.cris.policy.eperson", "EPersonAuthority");
+        configurationService.setProperty("cchoices.presentation.cris.policy.eperson", "suggest");
+        configurationService.setProperty("authority.controlled.cris.policy.eperson", "true");
+
+        configurationService.setProperty("choices.plugin.cris.policy.group", "GroupAuthority");
+        configurationService.setProperty("cchoices.presentation.cris.policy.group", "suggest");
+        configurationService.setProperty("authority.controlled.cris.policy.group", "true");
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
         context.turnOffAuthorisationSystem();
 
         EPerson userA = EPersonBuilder.createEPerson(context)
@@ -1131,6 +1193,24 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
 
     @Test
     public void patchAddMetadataUsingSecurityConfigurationCustomForbiddenTest() throws Exception {
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] {
+                                             "org.dspace.content.authority.EPersonAuthority = EPersonAuthority",
+                                             "org.dspace.content.authority.GroupAuthority = GroupAuthority"
+                                         });
+
+        configurationService.setProperty("choices.plugin.cris.policy.eperson", "EPersonAuthority");
+        configurationService.setProperty("cchoices.presentation.cris.policy.eperson", "suggest");
+        configurationService.setProperty("authority.controlled.cris.policy.eperson", "true");
+
+        configurationService.setProperty("choices.plugin.cris.policy.group", "GroupAuthority");
+        configurationService.setProperty("cchoices.presentation.cris.policy.group", "suggest");
+        configurationService.setProperty("authority.controlled.cris.policy.group", "true");
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
         context.turnOffAuthorisationSystem();
 
         EPerson userA = EPersonBuilder.createEPerson(context)
@@ -1467,7 +1547,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
                 .withEntityType("Publication")
-                .withSubmissionDefinition("traditional-cris")
+                .withSubmissionDefinition("traditional")
                 .withName("Collection 1")
                 .build();
 
