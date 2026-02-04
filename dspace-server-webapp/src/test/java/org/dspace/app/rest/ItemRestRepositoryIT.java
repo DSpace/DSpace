@@ -4984,8 +4984,16 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isNotFound());
 
         getClient(token).perform(get("/api/core/items/search/findByCustomURL")
-                                     .param("q", UUID.randomUUID().toString()))
-                        .andExpect(status().isNotFound());
+            .param("q", UUID.randomUUID().toString()))
+            .andExpect(status().isNotFound());
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                .param("q", "http://example.com/sample"))
+                .andExpect(status().isNotFound());
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                .param("q", ""))
+                .andExpect(status().isNotFound());
 
     }
 
@@ -5091,6 +5099,79 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                      .param("q", "private-custom-url"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.uuid", is(item.getID().toString())));
+    }
+
+    @Test
+    public void testSearchItemByCustomUrlWithSimilarUrls() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item firstItem = ItemBuilder.createItem(context, col1)
+                                    .withTitle("Item 1")
+                                    .withCustomUrl("ThomasAlexander_Zimmermann")
+                                    .withOldCustomUrl("Zimmermann")
+                                    .build();
+
+        Item secondItem = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Item 2")
+                                     .withCustomUrl("Alexander_Zimmermann")
+                                     .build();
+
+        Item thirdItem = ItemBuilder.createItem(context, col1)
+                                    .withTitle("Item 3")
+                                    .withCustomUrl("Alexander")
+                                    .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "Alexander_Zimmermann"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", is(secondItem.getID().toString())));
+
+    }
+
+    @Test
+    public void testSearchNotDiscoverableItemByCustomUrl() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Item 1")
+                               .withCustomUrl("my-custom-url")
+                               .makeUnDiscoverable()
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "my-custom-url"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", is(item.getID().toString())));
+
+        getClient().perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "my-custom-url"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.uuid", is(item.getID().toString())));
+
     }
 
 }
