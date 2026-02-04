@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.FactoryConfigurationError;
 
@@ -221,60 +222,161 @@ public class SubmissionConfigReader {
     }
 
     /**
-     * Returns the Item Submission process config used for a particular
-     * collection, or the default if none is defined for the collection
+     * Returns the Item Submission process config used for a particular collection,
+     * or the default if none is defined for the collection
      *
-     * @param col collection for which search Submission process config
-     * @return the SubmissionConfig representing the item submission config
-     * @throws IllegalStateException if no default submission process configuration defined
+     * @param  collectionHandle                collection's unique Handle
+     * @return                                 the SubmissionConfig representing the
+     *                                         item submission config
+     * @throws SubmissionConfigReaderException if no default submission process
+     *                                         configuration defined
      */
-    public SubmissionConfig getSubmissionConfigByCollection(Collection col) {
-
-        String submitName;
-
-        if (col != null) {
-
-            // get the name of the submission process config for this collection
+    public SubmissionConfig getSubmissionConfigByCollection(String collectionHandle) {
+        // get the name of the submission process config for this collection
+        String submitName = collectionToSubmissionConfig
+            .get(collectionHandle);
+        if (submitName == null) {
             submitName = collectionToSubmissionConfig
-                .get(col.getHandle());
-            if (submitName != null) {
-                return getSubmissionConfigByName(submitName);
-            }
-
-            // get the name of the submission process based on the entity type of this collections
-            if (!entityTypeToSubmissionConfig.isEmpty()) {
-                String entityType = collectionService.getMetadataFirstValue(col, "dspace", "entity", "type", Item.ANY);
-                submitName = entityTypeToSubmissionConfig
-                    .get(entityType);
-                if (submitName != null) {
-                    return getSubmissionConfigByName(submitName);
-                }
-            }
-
-            if (!communityToSubmissionConfig.isEmpty()) {
-                try {
-                    List<Community> communities = col.getCommunities();
-                    for (Community com : communities) {
-                        submitName = getSubmissionConfigByCommunity(com);
-                        if (submitName != null) {
-                            return getSubmissionConfigByName(submitName);
-                        }
-                    }
-                } catch (SQLException sqle) {
-                    throw new IllegalStateException("Error occurred while getting item submission configured " +
-                                                    "by community", sqle);
-                }
-            }
+                .get(DEFAULT_COLLECTION);
         }
-
-        submitName = collectionToSubmissionConfig.get(DEFAULT_COLLECTION);
-
         if (submitName == null) {
             throw new IllegalStateException(
                 "No item submission process configuration designated as 'default' in 'submission-map' section of " +
                     "'item-submission.xml'.");
         }
         return getSubmissionConfigByName(submitName);
+    }
+
+
+    public SubmissionConfig getCorrectionSubmissionConfigByCollection(Collection collection) {
+        CollectionService collService = ContentServiceFactory.getInstance().getCollectionService();
+
+        String submitName =
+            collService.getMetadataFirstValue(
+                collection, "cris", "submission", "definition-correction", Item.ANY
+            );
+
+        if (submitName != null) {
+            SubmissionConfig subConfig = getSubmissionConfigByName(submitName);
+            if (subConfig != null) {
+                return subConfig;
+            }
+        }
+
+        return getSubmissionConfigByCollection(collection);
+    }
+
+    /**
+     * Returns the Item Submission process config used for a particular collection,
+     * or the default if none is defined for the collection
+     *
+     * @param collection the collection
+     * @return the SubmissionConfig representing the item submission config
+     * @throws SubmissionConfigReaderException if no default submission process
+     *                                         configuration defined
+     */
+    public SubmissionConfig getSubmissionConfigByCollection(Collection collection) {
+
+        CollectionService collService = ContentServiceFactory.getInstance().getCollectionService();
+
+        // FIXME: This metadata lookup for cris.submission.definition was ported from DSpace-CRIS (CST-3062)
+        // to fix the test patchRemoveMandatoryMetadataTest. It allows binding a submission definition
+        // to a collection via the cris.submission.definition metadata field.
+        // It is unclear if this feature should be kept in the DSpace core alignment or if the tests
+        // should be refactored to use handle-based or entity-type mappings instead.
+        // See: https://4science.atlassian.net/browse/CST-3062
+        String submitName = collService.getMetadataFirstValue(collection, "cris", "submission", "definition", null);
+        if (submitName != null) {
+            try {
+                SubmissionConfig subConfig = getSubmissionConfigByName(submitName);
+                if (subConfig != null) {
+                    return subConfig;
+                }
+            } catch (IllegalStateException e) {
+                log.error("The collection {} has an invalid cris.submission.definition value {}",
+                          collection.getID().toString(), submitName, e);
+            }
+        }
+
+        // get the name of the submission process config for this collection
+        submitName = collectionToSubmissionConfig.get(collection.getHandle());
+        if (submitName != null) {
+            try {
+                SubmissionConfig subConfig = getSubmissionConfigByName(submitName);
+                if (subConfig != null) {
+                    return subConfig;
+                }
+            } catch (IllegalStateException e) {
+                log.error("The collection {} has an invalid mapping by handle {} in the item-submission.xml {}",
+                          collection.getID().toString(), collection.getHandle(), submitName, e);
+            }
+        }
+
+        // get entity-type based configuration
+        submitName = getEntityTypeSubmission(collection, collService);
+        if (submitName != null) {
+            try {
+                SubmissionConfig subConfig = getSubmissionConfigByName(submitName);
+                if (subConfig != null) {
+                    return subConfig;
+                }
+            } catch (IllegalStateException e) {
+                log.warn("The collection {} has an entity type {} without an explicit mapping, fallback to the default",
+                         collection.getID().toString(), submitName);
+            }
+        }
+
+        if (!communityToSubmissionConfig.isEmpty()) {
+            try {
+                List<Community> communities = collection.getCommunities();
+                for (Community com : communities) {
+                    submitName = getSubmissionConfigByCommunity(com);
+                    if (submitName != null) {
+                        SubmissionConfig subConfig = getSubmissionConfigByName(submitName);
+                        if (subConfig != null) {
+                            return subConfig;
+                        }
+                    }
+                }
+            } catch (SQLException sqle) {
+                throw new IllegalStateException(
+                    "Error occurred while getting item submission configured by community",
+                    sqle
+                );
+            }
+        }
+
+        submitName = getDefaultSubmissionConfigName();
+        if (submitName != null) {
+            SubmissionConfig subConfig = getSubmissionConfigByName(submitName);
+            if (subConfig != null) {
+                return subConfig;
+            }
+        }
+
+        throw new IllegalStateException("No item submission process configuration designated as 'default' "
+                                            + "in 'submission-map' section of 'item-submission.xml'.");
+    }
+
+    /**
+     * Returns the submission name for the given collection based on the entity type.
+     * It checks for the {@code collection-entity-type} configuration (standard DSpace), otherwise defaults to the
+     * {@code entityType} in lowercase (standard CRIS).
+     *
+     * @param collection Collection of which check the submission configuration
+     * @param collService CollectionService
+     * @return Submission Definition found.
+     */
+    private String getEntityTypeSubmission(Collection collection, CollectionService collService) {
+        String submitName = null;
+        String entityType = collService.getMetadataFirstValue(collection, "dspace", "entity", "type", Item.ANY);
+        if (entityType != null) {
+            // collection-entity-type configuration (DSpace configuration)
+            submitName = Optional.ofNullable(entityTypeToSubmissionConfig.get(entityType))
+                                 // entity-type lowercase configuration (CRIS configuration)
+                                 .orElseGet(entityType::toLowerCase);
+        }
+        return submitName;
     }
 
     /**
