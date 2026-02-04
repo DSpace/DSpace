@@ -1605,6 +1605,27 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     }
 
     /**
+     * Test of move with inherit default policies method, of class Item, where both Collections are the same.
+     */
+    @Test
+    public void testMoveSameCollectionWithInheritDefaultPolicies() throws Exception {
+        context.turnOffAuthorisationSystem();
+        while (it.getCollections().size() > 1) {
+            it.removeCollection(it.getCollections().get(0));
+        }
+
+        Collection collection = it.getCollections().get(0);
+        it.setOwningCollection(collection);
+        ItemService itemServiceSpy = spy(itemService);
+
+        itemService.move(context, it, collection, collection, true);
+        context.restoreAuthSystemState();
+        assertThat("testMoveSameCollection 0", it.getOwningCollection(), notNullValue());
+        assertThat("testMoveSameCollection 1", it.getOwningCollection(), equalTo(collection));
+        verify(itemServiceSpy, times(0)).delete(context, it);
+    }
+
+    /**
      * Test of hasUploadedFiles method, of class Item.
      */
     @Test
