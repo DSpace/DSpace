@@ -28,6 +28,8 @@
  <!ELEMENT heading (#PCDATA) >
  <!ELEMENT processing-class (#PCDATA)>
  <!ELEMENT type (#PCDATA)>
+ <!ATTLIST type
+		   extends NMTOKEN #IMPLIED>
  <!ELEMENT scope (#PCDATA)>
  <!ATTLIST scope 
  		   visibility NMTOKEN #IMPLIED 
