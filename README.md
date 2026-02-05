@@ -65,7 +65,7 @@ Additional support options are at https://wiki.lyrasis.org/display/DSPACE/Suppor
 
 DSpace also has an active service provider network. If you'd rather hire a service provider to
 install, upgrade, customize, or host DSpace, then we recommend getting in touch with one of our
-[Registered Service Providers](http://www.dspace.org/service-providers).
+[Registered Service Providers](https://dspace.org/registered-service-providers/).
 
 ## Issue Tracker
 
