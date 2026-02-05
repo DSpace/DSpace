@@ -18,6 +18,8 @@
     <!-- for handle "default". -->
     <submission-map>
         <name-map collection-handle="default" submission-name="traditional"/>
+        <name-map collection-handle="123456789/traditional-with-custom-url"
+                  submission-name="traditional-with-custom-url"/>
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
         <name-map collection-handle="123456789/extraction-test" submission-name="extractiontestprocess"/>
         <name-map collection-handle="123456789/qualdrop-test" submission-name="qualdroptest"/>
@@ -83,6 +85,12 @@
             <processing-class>org.dspace.app.rest.submit.step.LicenseStep</processing-class>
             <type>license</type>
             <scope visibilityOutside="read-only">submission</scope>
+        </step-definition>
+        <step-definition id="extraction">
+            <heading/>
+            <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
+            <type>utils</type>
+            <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
         </step-definition>
 
         <step-definition id="qualdroptest">
@@ -208,6 +216,12 @@
             <type>submission-form</type>
         </step-definition>
 
+        <step-definition id="custom-url">
+            <heading>submit.progressbar.CustomUrlStep</heading>
+            <processing-class>org.dspace.app.rest.submit.step.CustomUrlStep</processing-class>
+            <type>custom-url</type>
+        </step-definition>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -253,6 +267,14 @@
             <!--Step will be to Sign off on the License -->
             <step id="license"/>
             <step id="cclicense"/>
+        </submission-process>
+
+        <submission-process name="traditional-with-custom-url">
+            <step id="collection"/>
+            <step id="extraction"/>
+            <step id="traditionalpageone"/>
+            <step id="traditionalpagetwo"/>
+            <step id="custom-url"/>
         </submission-process>
 
         <submission-process name="languagetestprocess">
