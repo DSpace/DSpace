@@ -1813,7 +1813,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String qualifier = "author";
         String value = "value";
 
-        Iterator<Item> result = itemService.findByMetadataField(context, schema, element, qualifier, value);
+        Iterator<Item> result = itemService.findArchivedByMetadataField(context, schema, element, qualifier, value);
         assertThat("testFindByMetadataField 0", result, notNullValue());
         assertFalse("testFindByMetadataField 1", result.hasNext());
 
@@ -1823,7 +1823,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         itemService.update(context, it);
         context.restoreAuthSystemState();
 
-        result = itemService.findByMetadataField(context, schema, element, qualifier, value);
+        result = itemService.findArchivedByMetadataField(context, schema, element, qualifier, value);
         assertThat("testFindByMetadataField 3", result, notNullValue());
         assertTrue("testFindByMetadataField 4", result.hasNext());
         assertTrue("testFindByMetadataField 5", result.next().equals(it));
