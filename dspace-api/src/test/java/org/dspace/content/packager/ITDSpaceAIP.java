@@ -1032,7 +1032,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
             // Actually disseminate the object(s) to AIPs
             if (recursive) {
-                dip.disseminateAll(context, dso, pkgParams, exportAIPFile);
+                dip.disseminateAll(context, dso, pkgParams, exportAIPFile, null);
             } else {
                 dip.disseminate(context, dso, pkgParams, exportAIPFile);
             }

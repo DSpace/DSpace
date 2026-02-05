@@ -105,6 +105,9 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     protected Collection() {
 
     }
+    protected Collection(UUID uuid) {
+        this.predefinedUUID = uuid;
+    }
 
     /**
      * Takes a pre-determined UUID to be passed to the object to allow for the
