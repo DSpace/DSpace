@@ -174,5 +174,6 @@
 
     <bean class="org.dspace.correctiontype.service.impl.CorrectionTypeServiceImpl"/>
 
+    <bean class="org.dspace.discovery.SolrSuggestService" autowire-candidate="true" />
 </beans>
 
