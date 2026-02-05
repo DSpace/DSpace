@@ -973,15 +973,11 @@ public class Packager {
                         isParentLeft = true;
                     }
                     if (isParentLeft) {
-                        int leftPlace = relationshipService.findNextLeftPlaceByLeftItem(context, parentItem);
-                        int rightPlace = relationshipService.findNextRightPlaceByRightItem(context, childItem);
                         persistedRelationship = relationshipService.create(context, parentItem, childItem,
-                                relationshipType, leftPlace, rightPlace);
+                                relationshipType, -1, -1);
                     } else {
-                        int leftPlace = relationshipService.findNextLeftPlaceByLeftItem(context, childItem);
-                        int rightPlace = relationshipService.findNextRightPlaceByRightItem(context, parentItem);
                         persistedRelationship = relationshipService.create(context, childItem, parentItem,
-                                relationshipType, leftPlace, rightPlace);
+                                relationshipType, -1, -1);
                     }
                     relationshipService.update(context, persistedRelationship);
                 }
