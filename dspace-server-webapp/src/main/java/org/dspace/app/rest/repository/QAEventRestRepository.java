@@ -8,15 +8,16 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;

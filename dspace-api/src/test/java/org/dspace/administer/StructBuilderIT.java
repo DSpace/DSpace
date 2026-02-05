@@ -7,9 +7,9 @@
  */
 package org.dspace.administer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,10 +35,10 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.handle.Handle;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Node;
 import org.xmlunit.builder.DiffBuilder;
@@ -65,11 +65,11 @@ public class StructBuilderIT
     public StructBuilderIT() {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
     }
 
@@ -80,7 +80,7 @@ public class StructBuilderIT
      * @throws AuthorizeException passed through.
      * @throws IOException        passed through.
      */
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         // Clear out all communities and collections.
@@ -145,17 +145,19 @@ public class StructBuilderIT
                     "</import_structure>\n";
 
     private static final String EXPORT_DOCUMENT =
-            "<?xml version='1.0' encoding='UTF-8'?>\n" +
-                    "<import_structure>\n" +
-                    "  <community>\n" +
-                    "    <name>Top Community 0</name>\n" +
-                    "    <description/><intro/><copyright/><sidebar/>\n" +
-                    "    <collection>\n" +
-                    "      <name>Collection 0.0</name>\n" +
-                    "      <description/><intro/><copyright/><sidebar/><license/>\n" +
-                    "    </collection>\n" +
-                    "  </community>\n" +
-                    "</import_structure>\n";
+            """
+            <?xml version='1.0' encoding='UTF-8'?>
+            <import_structure>
+              <community>
+                <name>Top Community 0</name>
+                <description/><intro/><copyright/><sidebar/>
+                <collection>
+                  <name>Collection 0.0</name>
+                  <description/><intro/><copyright/><sidebar/><license/>
+                </collection>
+              </community>
+            </import_structure>
+            """;
 
     /**
      * Test of importStructure method, of class StructBuilder.
@@ -201,7 +203,7 @@ public class StructBuilderIT
             System.err.println(difference.toString(formatter));
         }
         // Test for *significant* differences.
-        assertFalse("Output does not match input.", isDifferent(myDiff));
+        assertFalse(isDifferent(myDiff), "Output does not match input.");
 
         // TODO spot-check some objects.
     }
@@ -239,7 +241,7 @@ public class StructBuilderIT
                 }
             }
         }
-        assertTrue("A community should have its specified handle", found);
+        assertTrue(found, "A community should have its specified handle");
 
         // Check a chosen Collection for the right Handle.
         found = false;
@@ -251,7 +253,7 @@ public class StructBuilderIT
                 }
             }
         }
-        assertTrue("A collection should have its specified handle", found);
+        assertTrue(found, "A collection should have its specified handle");
 
         // Compare import's output with its input.
         // N.B. here we rely on StructBuilder to emit communities and
@@ -276,7 +278,7 @@ public class StructBuilderIT
             System.err.println(difference.toString(formatter));
         }
         // Test for *significant* differences.
-        assertFalse("Output does not match input.", isDifferent(myDiff));
+        assertFalse(isDifferent(myDiff), "Output does not match input.");
 
         // TODO spot-check some objects.
     }
@@ -335,7 +337,7 @@ public class StructBuilderIT
             System.err.println(difference.toString(formatter));
         }
         // Test for *significant* differences.
-        assertFalse("Output does not match input.", isDifferent(myDiff));
+        assertFalse(isDifferent(myDiff), "Output does not match input.");
 
         // Does the "top" community sit beneath the new parent?
         assertEquals("Top Community 0", parent.getSubcommunities().get(0).getName());
@@ -388,7 +390,7 @@ public class StructBuilderIT
             System.err.println(difference.toString(formatter));
         }
         // Test for *significant* differences.
-        assertFalse("Output does not match input.", myDiff.hasDifferences());
+        assertFalse(myDiff.hasDifferences(), "Output does not match input.");
     }
 
     /**

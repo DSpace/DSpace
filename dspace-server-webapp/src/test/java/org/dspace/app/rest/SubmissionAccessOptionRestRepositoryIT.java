@@ -16,7 +16,7 @@ import java.util.UUID;
 import org.dspace.app.rest.matcher.AccessConditionOptionMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration test class for the submissionAccessOptions endpoint.

@@ -56,17 +56,17 @@ public class InfoCheck extends Check {
                     File dir = new File(ss[0]);
                     if (dir.exists()) {
                         long dir_size = FileUtils.sizeOfDirectory(dir);
-                        sb.append(String.format("%-20s: %s\n", ss[1],
-                                                FileUtils.byteCountToDisplaySize(dir_size))
+                        sb.append("%-20s: %s\n".formatted(ss[1],
+                            FileUtils.byteCountToDisplaySize(dir_size))
                         );
                     } else {
-                        sb.append(String.format("Directory [%s] does not exist!\n", ss[0]));
+                        sb.append("Directory [%s] does not exist!\n".formatted(ss[0]));
                     }
                 } catch (Exception e) {
                     error(e, "directory - " + ss[0]);
                 }
             } else { // cannot read property for some reason
-                sb.append(String.format("Could not get information for %s!\n", ss[1]));
+                sb.append("Could not get information for %s!\n".formatted(ss[1]));
             }
         }
 

@@ -61,10 +61,10 @@ public class Base {
      * @param type
      */
     public void setType(java.lang.Object type) {
-        if (type instanceof String) {
-            this.type.add((String) type);
-        } else if (type instanceof Collection) {
-            this.type.addAll((Collection) type);
+        if (type instanceof String string) {
+            this.type.add(string);
+        } else if (type instanceof Collection collection) {
+            this.type.addAll(collection);
         }
     }
 

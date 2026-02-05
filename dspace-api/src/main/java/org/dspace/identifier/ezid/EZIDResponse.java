@@ -15,10 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.identifier.IdentifierException;
@@ -37,9 +37,9 @@ public class EZIDResponse {
 
     private final Map<String, String> attributes = new HashMap<>();
 
-    private final HttpResponse response;
+    private final ClassicHttpResponse response;
 
-    public EZIDResponse(HttpResponse response)
+    public EZIDResponse(ClassicHttpResponse response)
         throws IdentifierException {
         this.response = response;
 
@@ -141,13 +141,13 @@ public class EZIDResponse {
      * @return status of the HTTP request.
      */
     public int getHttpStatusCode() {
-        return response.getStatusLine().getStatusCode();
+        return response.getCode();
     }
 
     /**
      * @return reason for status of the HTTP request.
      */
     public String getHttpReasonPhrase() {
-        return response.getStatusLine().getReasonPhrase();
+        return response.getReasonPhrase();
     }
 }

@@ -17,9 +17,9 @@ import jakarta.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
@@ -60,10 +60,9 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
 
             log.debug("Solr authority URL: " + solrService);
 
-            HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService)
-                    .withHttpClient(httpConnectionPoolService.getClient())
+            // Note: In Solr 10, base URL is set via builder
+            HttpJettySolrClient solrServer = new HttpJettySolrClient.Builder(solrService)
                     .build();
-            solrServer.setBaseURL(solrService);
 
             SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
 

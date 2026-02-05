@@ -8,7 +8,7 @@
 package org.dspace.content.authority;
 
 import java.io.File;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -147,7 +147,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             String filename = vocabulariesPath + vocabularyName + ".xml";
             if (StringUtils.isNotEmpty(locale)) {
                 String localizedFilename = vocabulariesPath + vocabularyName + "_" + locale + ".xml";
-                if (Paths.get(localizedFilename).toFile().exists()) {
+                if (Path.of(localizedFilename).toFile().exists()) {
                     filename = localizedFilename;
                 }
             }
@@ -184,7 +184,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
         StringBuilder xpathExpressionBuilder = new StringBuilder();
         for (int i = 0; i < textHierarchy.length; i++) {
-            xpathExpressionBuilder.append(String.format(xpathTemplate, "$var" + i));
+            xpathExpressionBuilder.append(xpathTemplate.formatted("$var" + i));
         }
         String xpathExpression = xpathExpressionBuilder.toString();
         XPath xpath = XPathFactory.newInstance().newXPath();
@@ -217,7 +217,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
         StringBuilder xpathExpressionBuilder = new StringBuilder();
         for (int i = 0; i < textHierarchy.length; i++) {
-            xpathExpressionBuilder.append(String.format(valueTemplate, "$var" + i));
+            xpathExpressionBuilder.append(valueTemplate.formatted("$var" + i));
         }
         String xpathExpression = xpathExpressionBuilder.toString();
         XPath xpath = XPathFactory.newInstance().newXPath();
@@ -277,7 +277,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     @Override
     public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale) {
         init(locale);
-        String xpathExpression = String.format(idTemplateQuoted, parentId);
+        String xpathExpression = idTemplateQuoted.formatted(parentId);
         return getChoicesByXpath(xpathExpression, start, limit);
     }
 
@@ -285,7 +285,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     public Choice getParentChoice(String authorityName, String childId, String locale) {
         init(locale);
         try {
-            String xpathExpression = String.format(idParentTemplate, childId);
+            String xpathExpression = idParentTemplate.formatted(childId);
             Choice choice = createChoiceFromNode(getNodeFromXPath(xpathExpression));
             return choice;
         } catch (XPathExpressionException e) {
@@ -306,7 +306,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
 
     private Node getNode(String key, String locale) throws XPathExpressionException {
         init(locale);
-        String xpathExpression = String.format(idTemplateQuoted, key);
+        String xpathExpression = idTemplateQuoted.formatted(key);
         Node node = getNodeFromXPath(xpathExpression);
         return node;
     }

@@ -401,9 +401,9 @@ public class OAIHarvester {
                 try {
                     collectionService.update(ourContext, targetCollection);
 
-                    harvestRow.setHarvestMessage(String
-                                                     .format("Collection is currently being harvested (item %d of %d)",
-                                                             currentRecord, totalListSize));
+                    harvestRow.setHarvestMessage("Collection is currently being harvested (item %d of %d)"
+                        .formatted(
+                            currentRecord, totalListSize));
                     harvestedCollectionService.update(ourContext, harvestRow);
                 } finally {
                     //In case of an exception, make sure to restore our authentication state to the previous state
@@ -650,8 +650,8 @@ public class OAIHarvester {
         itemService.update(ourContext, item);
         harvestedItemService.update(ourContext, hi);
         long timeTaken = Instant.now().toEpochMilli() - timeStart.toEpochMilli();
-        log.info(String.format("Item %s (%s) has been ingested (item %d of %d). The whole process took: %d ms.",
-                               item.getHandle(), item.getID(), currentRecord, totalListSize, timeTaken));
+        log.info("Item %s (%s) has been ingested (item %d of %d). The whole process took: %d ms.".formatted(
+            item.getHandle(), item.getID(), currentRecord, totalListSize, timeTaken));
 
         //Clear the context cache
         ourContext.uncacheEntity(wi);

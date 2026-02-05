@@ -19,26 +19,32 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>21</java.version>
-        <spring.version>6.2.14</spring.version>
-        <spring-boot.version>3.5.8</spring-boot.version>
-        <spring-security.version>6.5.7</spring-security.version> <!-- sync with version used by spring-boot-->
-        <hibernate.version>6.4.10.Final</hibernate.version>
-        <hibernate-validator.version>8.0.3.Final</hibernate-validator.version>
+        <spring.version>7.0.2</spring.version>
+        <spring-boot.version>4.0.1</spring-boot.version>
+        <spring-security.version>7.0.2</spring-security.version> <!-- sync with version used by spring-boot-->
+        <hibernate.version>7.1.13.Final</hibernate.version>
+        <hibernate-validator.version>9.1.0.Final</hibernate-validator.version>
+        <expressly.version>6.0.0</expressly.version>
         <postgresql.driver.version>42.7.8</postgresql.driver.version>
         <flyway.version>10.22.0</flyway.version>
-        <solr.client.version>8.11.4</solr.client.version>
+        <!-- Solr 10.0.0 RC3 - artifacts must be installed locally until official release
+             TODO: Update to official Solr 10.0.0 release when available on Maven Central -->
+        <solr.client.version>10.0.0</solr.client.version>
+        <lucene.version>10.3.2</lucene.version>
+        <!-- ZooKeeper version matching Solr 10.0.0 -->
+        <zookeeper.version>3.9.4</zookeeper.version>
 
         <ehcache.version>3.11.1</ehcache.version>
         <errorprone.version>2.42.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-annotations.version below -->
-        <jackson.version>2.20.1</jackson.version>
+        <jackson.version>3.0.3</jackson.version>
         <jackson-annotations.version>2.20</jackson-annotations.version>
         <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
         <jaxb-api.version>4.0.4</jaxb-api.version>
         <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
         <jcache-version>1.1.1</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
-        <jetty.version>9.4.58.v20250814</jetty.version>
+        <jetty.version>12.0.31</jetty.version>
         <log4j.version>2.25.3</log4j.version>
         <pdfbox-version>3.0.6</pdfbox-version>
         <rome.version>1.19.0</rome.version>
@@ -83,6 +89,14 @@
                      as it is used to reference the LICENSE.header and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
     </properties>
+ <dependencies>
+  <dependency>
+   <groupId>org.hamcrest</groupId>
+   <artifactId>hamcrest-junit</artifactId>
+   <version>2.0.0.0</version>
+   <scope>test</scope>
+  </dependency>
+ </dependencies>
 
     <build>
         <!-- Define Maven Plugin Settings that should be inherited to ALL submodule POMs.
@@ -1125,7 +1139,7 @@
 
             <dependency>
                 <groupId>org.hibernate.orm</groupId>
-                <artifactId>hibernate-jpamodelgen</artifactId>
+                <artifactId>hibernate-processor</artifactId>
                 <version>${hibernate.version}</version>
             </dependency>
 
@@ -1146,6 +1160,13 @@
                 <artifactId>hibernate-validator</artifactId>
                 <!-- This artifact doesn't track the main Hibernate version. -->
                 <version>${hibernate-validator.version}</version>
+            </dependency>
+
+            <!-- Jakarta Expression Language implementation required by Hibernate Validator 9.x -->
+            <dependency>
+                <groupId>org.glassfish.expressly</groupId>
+                <artifactId>expressly</artifactId>
+                <version>${expressly.version}</version>
             </dependency>
 
             <!-- Hibernate introduces multiple versions of jboss-logging. So, specify version we want -->
@@ -1265,26 +1286,7 @@
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring-boot.version}</version>
                 <scope>test</scope>
-                <exclusions>
-                    <!-- We are still using JUnit 4, while Spring Boot defaults to JUnit 5 -->
-                    <exclusion>
-                        <groupId>org.junit.jupiter</groupId>
-                        <artifactId>junit-jupiter</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.junit.vintage</groupId>
-                        <artifactId>junit-vintage-engine</artifactId>
-                    </exclusion>
-                    <!-- We use a later version of Mockito -->
-                    <exclusion>
-                        <groupId>org.mockito</groupId>
-                        <artifactId>mockito-junit-jupiter</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.mockito</groupId>
-                        <artifactId>mockito-core</artifactId>
-                    </exclusion>
-                </exclusions>
+                <!-- Spring Boot 4 manages JUnit Jupiter 5.14.x and Mockito 5.14.x -->
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
@@ -1308,10 +1310,39 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <!-- solr-api is a new module in Solr 10.x containing core API classes -->
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-api</artifactId>
+                <version>${solr.client.version}</version>
+            </dependency>
+            <!-- solr-solrj-zookeeper is a separate module in Solr 10.x for ZooKeeper support -->
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-solrj-zookeeper</artifactId>
+                <version>${solr.client.version}</version>
+            </dependency>
+            <!-- solr-solrj-jetty provides HttpJettySolrClient, split from solr-solrj in 10.0.0 -->
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-solrj-jetty</artifactId>
+                <version>${solr.client.version}</version>
+            </dependency>
+            <!-- ZooKeeper dependencies required by Solr 10.x -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>${zookeeper.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper-jute</artifactId>
+                <version>${zookeeper.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-core</artifactId>
-                <version>${solr.client.version}</version>
+                <version>${lucene.version}</version>
             </dependency>
 
             <!-- Tika is used to extract full text from documents in order to index in Solr -->
@@ -1398,27 +1429,34 @@
                 <version>2.13.2</version>
             </dependency>
 
-            <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
-             otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
+            <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analysis-icu below,
+             otherwise ICUFoldingFilterFactory may throw errors in tests.
+             NOTE: In Lucene 9.x, analyzer modules were renamed from lucene-analyzers-* to lucene-analysis-* -->
             <dependency>
                 <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-analyzers-icu</artifactId>
-                <version>${solr.client.version}</version>
+                <artifactId>lucene-analysis-icu</artifactId>
+                <version>${lucene.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-analyzers-smartcn</artifactId>
-                <version>${solr.client.version}</version>
+                <artifactId>lucene-analysis-smartcn</artifactId>
+                <version>${lucene.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-analyzers-stempel</artifactId>
-                <version>${solr.client.version}</version>
+                <artifactId>lucene-analysis-stempel</artifactId>
+                <version>${lucene.version}</version>
                 <scope>test</scope>
             </dependency>
 
+            <!-- Swagger version management to resolve convergence between Solr and ORCID dependencies -->
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>2.2.22</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.ant</groupId>
@@ -1471,8 +1509,8 @@
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-servlet</artifactId>
+                <groupId>org.eclipse.jetty.ee9</groupId>
+                <artifactId>jetty-ee9-servlet</artifactId>
                 <version>${jetty.version}</version>
                 <scope>runtime</scope>
             </dependency>
@@ -1483,14 +1521,14 @@
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-webapp</artifactId>
+                <groupId>org.eclipse.jetty.ee9</groupId>
+                <artifactId>jetty-ee9-webapp</artifactId>
                 <version>${jetty.version}</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty.http2</groupId>
-                <artifactId>http2-common</artifactId>
+                <artifactId>jetty-http2-common</artifactId>
                 <version>${jetty.version}</version>
                 <scope>runtime</scope>
             </dependency>
@@ -1663,11 +1701,11 @@
                 <version>1.4.01</version>
             </dependency>
 
-            <!-- Keep icu4j synced with version used by lucene-analyzers-icu (Solr) -->
+            <!-- Keep icu4j synced with version used by lucene-analysis-icu (Lucene 10.x / Solr 10.x) -->
             <dependency>
                 <groupId>com.ibm.icu</groupId>
                 <artifactId>icu4j</artifactId>
-                <version>62.2</version>
+                <version>77.1</version>
             </dependency>
             <!-- Codebase at https://github.com/DSpace/oclc-harvester2 -->
             <dependency>
@@ -1732,11 +1770,60 @@
                 <version>4.13.2</version>
                 <scope>test</scope>
             </dependency>
+            <!-- JUnit 5.12+ required for Spring 7 compatibility -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>5.12.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>5.12.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-params</artifactId>
+                <version>5.12.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>5.12.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-engine</artifactId>
+                <version>1.12.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-launcher</artifactId>
+                <version>1.12.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-commons</artifactId>
+                <version>1.12.0</version>
+                <scope>test</scope>
+            </dependency>
             <!-- Mockito 5.x is required for Java 21 compatibility (mockito-inline is now merged into mockito-core) -->
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.21.0</version>
+                <version>5.14.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>5.14.2</version>
                 <scope>test</scope>
             </dependency>
             <!-- H2 is an in-memory database used for Unit/Integration tests -->
@@ -1748,8 +1835,8 @@
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>mockwebserver</artifactId>
-                <version>4.12.0</version>
+                <artifactId>mockwebserver3-junit5</artifactId>
+                <version>5.3.2</version>
                 <scope>test</scope>
             </dependency>
 
@@ -1768,24 +1855,30 @@
             </dependency>
 
             <!-- Converge miscellaneous transitive dependencies. -->
+            <!-- Jackson 2.x versions for third-party dependencies (Solr, IIIF, etc.) -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>2.18.0</version>
+            </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
                 <version>${jackson-annotations.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
+                <groupId>tools.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
+                <groupId>tools.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.datatype</groupId>
-                <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
 
@@ -1977,6 +2070,19 @@
             <url>https://handle.net/maven</url>
             <snapshots>
                 <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <!-- Apache Snapshot Repository for Solr 10.0.0-SNAPSHOT
+             NOTE: Track Solr 10 GA release progress and update to stable version before DSpace 10 release (May/June 2026) -->
+        <repository>
+            <id>apache.snapshots</id>
+            <name>Apache Snapshot Repository</name>
+            <url>https://repository.apache.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
             </snapshots>
         </repository>
     </repositories>

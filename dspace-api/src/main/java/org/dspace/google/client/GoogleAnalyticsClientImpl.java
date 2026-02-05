@@ -13,11 +13,11 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Strings;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
@@ -86,20 +86,20 @@ public class GoogleAnalyticsClientImpl implements GoogleAnalyticsClient {
 
     }
 
-    private boolean isNotSuccessfull(HttpResponse response) {
+    private boolean isNotSuccessfull(ClassicHttpResponse response) {
         int statusCode = getStatusCode(response);
         return statusCode < 200 || statusCode > 299;
     }
 
-    private int getStatusCode(HttpResponse response) {
-        return response.getStatusLine().getStatusCode();
+    private int getStatusCode(ClassicHttpResponse response) {
+        return response.getCode();
     }
 
-    private String formatErrorMessage(HttpResponse response) {
+    private String formatErrorMessage(ClassicHttpResponse response) {
         return "Status " + getStatusCode(response) + ". Content: " + getResponseContent(response);
     }
 
-    private String getResponseContent(HttpResponse response) {
+    private String getResponseContent(ClassicHttpResponse response) {
         try {
             return IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset());
         } catch (UnsupportedOperationException | IOException e) {

@@ -222,8 +222,8 @@ public class ItemArchive {
         String handle = uri.substring(ItemUpdate.HANDLE_PREFIX.length());
 
         DSpaceObject dso = handleService.resolveToObject(context, handle);
-        if (dso instanceof Item) {
-            item = (Item) dso;
+        if (dso instanceof Item item1) {
+            item = item1;
         } else {
             ItemUpdate.pr("Warning: item not instantiated");
             throw new IllegalArgumentException("Item " + handle + " not instantiated.");

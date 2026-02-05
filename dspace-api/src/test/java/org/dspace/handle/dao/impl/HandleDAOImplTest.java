@@ -7,8 +7,8 @@
  */
 package org.dspace.handle.dao.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -30,13 +30,14 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.handle.Handle;
 import org.dspace.handle.dao.HandleDAO;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersioningService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class for the Handle DAO
@@ -76,7 +77,7 @@ public class HandleDAOImplTest extends AbstractUnitTest {
     private static final String SUFFIX_3 = "303";
     private static final String SUFFIX_4 = "404";
 
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -117,7 +118,7 @@ public class HandleDAOImplTest extends AbstractUnitTest {
         }
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         try {
@@ -128,6 +129,16 @@ public class HandleDAOImplTest extends AbstractUnitTest {
             owningCommunity = context.reloadEntity(owningCommunity);
             ContentServiceFactory.getInstance().getCommunityService().delete(context, owningCommunity);
             owningCommunity = null;
+
+            // Restore the Site handle if it was changed by the test.
+            // The test updates ALL handles from 123456789 to 987654321, including the Site handle.
+            // We need to restore the Site handle back to its original prefix.
+            // Use findByHandle to get ONLY the Site handle (suffix /0) and update it specifically.
+            Handle siteHandle = handleDAO.findByHandle(context, "987654321/0");
+            if (siteHandle != null) {
+                siteHandle.setHandle(HANDLE_PREFIX + "/0");
+            }
+            context.commit();
         } catch (Exception e) {
             throw new AssertionError("Error occurred in destroy()", e);
         }

@@ -16,11 +16,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
@@ -31,6 +28,9 @@ import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Implements a data source for querying VuFind
@@ -300,7 +300,7 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
         JsonNode body = null;
         try {
             body = mapper.readTree(json);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Unable to process json response.", e);
         }
         return body;

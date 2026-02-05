@@ -24,7 +24,7 @@ import java.util.concurrent.Callable;
 
 import com.google.common.io.CharStreams;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;

@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.dspace.app.rest.matcher.EPersonMatcher;
@@ -43,8 +43,8 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.http.MediaType;
@@ -61,7 +61,7 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
     @Autowired
     private ObjectMapper mapper;
 
-    @Before
+    @BeforeEach
     public void setup() {
         configurationService.setProperty("webui.user.assumelogin", true);
     }

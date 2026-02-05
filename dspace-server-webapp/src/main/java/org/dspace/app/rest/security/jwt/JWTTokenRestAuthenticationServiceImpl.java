@@ -267,7 +267,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             // This forces the token to change when login process doesn't rely on auth cookie.
             resetCSRFToken(request, response);
         }
-        response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));
+        response.setHeader(AUTHORIZATION_HEADER, "%s %s".formatted(AUTHORIZATION_TYPE, token));
     }
 
     /**

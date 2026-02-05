@@ -7,6 +7,7 @@
  */
 package org.dspace.app.sherpa.v2;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import java.util.List;
  */
 public class SHERPAPermittedVersion implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 4992181606327727442L;
 
     // Version (submitted, accepted, published)

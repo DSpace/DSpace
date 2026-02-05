@@ -8,10 +8,11 @@
 package org.dspace.app.rest.repository.patch.operation;
 
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -69,7 +70,7 @@ public final class DSpaceObjectMetadataPatchUtils {
                     metadataValue.setValue(valueString);
                 }
             }
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new DSpaceBadRequestException("IOException in " +
                     "DspaceObjectMetadataOperation.extractMetadataValueFromOperation trying to map json from " +
                     "operation.value to MetadataValue class.", e);

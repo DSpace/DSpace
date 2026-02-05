@@ -31,9 +31,8 @@ public class WorkflowReportTest
             throws IOException {
         LOG.info("Class {} as task {} received 'perform' for object {}",
                 WorkflowReportTest.class::getSimpleName, () -> taskId, () -> dso);
-        curator.report(String.format(
-                "Class %s as task %s received 'perform' for object %s%n",
-                WorkflowReportTest.class.getSimpleName(), taskId, dso));
+        curator.report("Class %s as task %s received 'perform' for object %s%n".formatted(
+            WorkflowReportTest.class.getSimpleName(), taskId, dso));
         return Curator.CURATE_SUCCESS;
     }
 }

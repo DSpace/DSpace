@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.model.TemplateItemRest;
 import org.dspace.app.rest.model.patch.Patch;

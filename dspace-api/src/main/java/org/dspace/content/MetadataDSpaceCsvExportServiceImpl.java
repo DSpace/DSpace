@@ -75,7 +75,7 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
                 toExport = buildFromCommunity(context, (Community) dso);
             } else {
                 throw new IllegalArgumentException(
-                    String.format("DSO with id '%s' (type: %s) can't be exported. Supported types: %s", identifier,
+                    "DSO with id '%s' (type: %s) can't be exported. Supported types: %s".formatted(identifier,
                         Constants.typeText[dso.getType()], "Item | Collection | Community"));
             }
         }

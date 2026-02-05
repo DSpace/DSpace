@@ -19,20 +19,15 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
+import org.apache.solr.client.solrj.request.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -47,6 +42,10 @@ import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 
 /**
@@ -74,7 +73,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
         if (solrSuggestionClient == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
                     .getProperty("suggestion.solr.server", "http://localhost:8983/solr/suggestion");
-            solrSuggestionClient = new HttpSolrClient.Builder(solrService).build();
+            solrSuggestionClient = new HttpJettySolrClient.Builder(solrService).build();
         }
         return solrSuggestionClient;
     }
@@ -84,7 +83,6 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
             throws SolrServerException, IOException {
         if (force || !exist(suggestion)) {
             ObjectMapper jsonMapper = new JsonMapper();
-            jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             SolrInputDocument document = new SolrInputDocument();
             document.addField(SOURCE, suggestion.getSource());
             // suggestion id is written as concatenation of
@@ -337,11 +335,10 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
         }
         String evidencesJson = (String) solrDoc.getFieldValue(EVIDENCES);
         ObjectMapper jsonMapper = new JsonMapper();
-        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         List<SuggestionEvidence> evidences = new LinkedList<SuggestionEvidence>();
         try {
             evidences = jsonMapper.readValue(evidencesJson, new TypeReference<List<SuggestionEvidence>>() {});
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error(e);
         }
         suggestion.getEvidences().addAll(evidences);

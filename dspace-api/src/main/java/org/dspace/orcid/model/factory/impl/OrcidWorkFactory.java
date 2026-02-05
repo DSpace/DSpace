@@ -96,8 +96,7 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
         Map<String, ContributorRole> contributorFields = fieldMapping.getContributorFields();
         List<Contributor> contributors = getMetadataValues(context, item, contributorFields.keySet()).stream()
             .map(metadataValue -> getContributor(context, metadataValue))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+            .flatMap(Optional::stream)
             .collect(Collectors.toList());
         return new WorkContributors(contributors);
     }

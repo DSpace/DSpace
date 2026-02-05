@@ -61,12 +61,10 @@ public class InCommunityCondition extends AbstractCondition {
         // may return null, even though the item itself does have a parent object, at the point of archival
         try {
             DSpaceObject parent = itemService.getParentObject(context, item);
-            if (parent instanceof Collection) {
+            if (parent instanceof Collection collection) {
                 log.debug("Got parent DSO for item: " + parent.getID().toString());
                 log.debug("Parent DSO handle: " + parent.getHandle());
                 try {
-                    // Now iterate communities of this parent collection
-                    Collection collection = (Collection)parent;
                     List<Community> communities = collection.getCommunities();
                     for (Community community : communities) {
                         if (communityHandles.contains(community.getHandle())) {

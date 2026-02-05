@@ -7,8 +7,8 @@
  */
 package org.dspace.google.client;
 
-import static org.apache.commons.lang.StringUtils.startsWith;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

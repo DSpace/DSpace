@@ -6,10 +6,10 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.assertThat;
 
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +29,7 @@ import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 

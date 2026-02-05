@@ -274,8 +274,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         // In case the dso is an item and a corresponding workspace or workflow
         // item exist, we have to ignore custom policies (see DS-2614).
         boolean ignoreCustomPolicies = false;
-        if (o instanceof Bitstream) {
-            Bitstream b = (Bitstream) o;
+        if (o instanceof Bitstream b) {
 
             // Ensure that this is not a collection or community logo
             DSpaceObject parent = bitstreamService.getParentObject(c, b);
@@ -283,15 +282,15 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                 ignoreCustomPolicies = !isAnyItemInstalled(c, b.getBundles());
             }
         }
-        if (o instanceof Bundle) {
-            ignoreCustomPolicies = !isAnyItemInstalled(c, Arrays.asList(((Bundle) o)));
+        if (o instanceof Bundle bundle) {
+            ignoreCustomPolicies = !isAnyItemInstalled(c, Arrays.asList(bundle));
         }
-        if (o instanceof Item) {
+        if (o instanceof Item item) {
             // the isArchived check is fast and would exclude the possibility that the item
             // is a workspace or workflow without further queries
-            if (!((Item) o).isArchived() &&
-                    (workspaceItemService.findByItem(c, (Item) o) != null ||
-                    workflowItemService.findByItem(c, (Item) o) != null)) {
+            if (!item.isArchived() &&
+                    (workspaceItemService.findByItem(c, item) != null ||
+                    workflowItemService.findByItem(c, item) != null)) {
                 ignoreCustomPolicies = true;
             }
         }

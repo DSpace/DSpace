@@ -7,7 +7,7 @@
  */
 package org.dspace.core;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CommunityBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ContextIT extends AbstractIntegrationTestWithDatabase {
 
@@ -41,7 +41,7 @@ public class ContextIT extends AbstractIntegrationTestWithDatabase {
         List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, parentCommunity,
             Constants.READ);
 
-        assertEquals("Should return the default anonymous group read policy", 1, policies.size());
+        assertEquals(1, policies.size(), "Should return the default anonymous group read policy");
     }
 
 }

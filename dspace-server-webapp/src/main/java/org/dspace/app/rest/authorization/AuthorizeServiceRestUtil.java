@@ -57,8 +57,7 @@ public class AuthorizeServiceRestUtil {
 
         // If the item is still inprogress we can process here only the READ permission.
         // Other actions need to be evaluated against the wrapper object (workspace or workflow item)
-        if (dSpaceObject instanceof Item) {
-            Item item = (Item) dSpaceObject;
+        if (dSpaceObject instanceof Item item) {
             if (!DSpaceRestPermission.READ.equals(dSpaceRestPermission)
                 && (itemService.isInProgressSubmission(context, item) || Objects.nonNull(item.getTemplateItemOf()))) {
                 return false;

@@ -146,8 +146,10 @@ public class DatabaseUtils {
                         // See: http://flywaydb.org/documentation/faq.html#case-sensitive
                         if (!tableExists(connection, flyway.getConfiguration().getTable(), true)) {
                             System.out
-                                .println("\nNOTE: This database is NOT yet initialized for auto-migrations " +
-                                             "(via Flyway).");
+                                .println("""
+                                             
+                                             NOTE: This database is NOT yet initialized for auto-migrations \
+                                             (via Flyway).""");
                             // Determine which version of DSpace this looks like
                             String dbVersion = determineDBVersion(connection);
                             if (dbVersion != null) {
@@ -156,8 +158,10 @@ public class DatabaseUtils {
                                 System.out.println(
                                     "All upgrades *after* version " + dbVersion + " will be run during the next " +
                                         "migration.");
-                                System.out.println("\nIf you'd like to upgrade now, simply run 'dspace database " +
-                                                       "migrate'.");
+                                System.out.println("""
+                                                       
+                                                       If you'd like to upgrade now, simply run 'dspace database \
+                                                       migrate'.""");
                             }
                         }
                     } catch (SQLException e) {
@@ -306,11 +310,16 @@ public class DatabaseUtils {
                     // If clean is disabled, return immediately
                     if (flyway.getConfiguration().isCleanDisabled()) {
                         System.out.println(
-                            "\nWARNING: 'clean' command is currently disabled, as it is dangerous to run in " +
-                                "Production scenarios!");
+                            """
+                            
+                            WARNING: 'clean' command is currently disabled, as it is dangerous to run in \
+                            Production scenarios!""");
                         System.out.println(
-                            "\nIn order to run a 'clean' you first must enable it in your DSpace config by " +
-                                "specifying 'db.cleanDisabled=false'.\n");
+                            """
+                            
+                            In order to run a 'clean' you first must enable it in your DSpace config by \
+                            specifying 'db.cleanDisabled=false'.
+                            """);
                         System.exit(1);
                     }
 

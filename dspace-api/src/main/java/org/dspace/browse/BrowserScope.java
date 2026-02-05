@@ -138,10 +138,10 @@ public class BrowserScope {
      */
     public void setBrowseContainer(IndexableObject dso)
         throws BrowseException {
-        if (dso instanceof IndexableCollection) {
-            this.collection = ((IndexableCollection) dso).getIndexedObject();
-        } else if (dso instanceof IndexableCommunity) {
-            this.community = ((IndexableCommunity) dso).getIndexedObject();
+        if (dso instanceof IndexableCollection indexableCollection) {
+            this.collection = indexableCollection.getIndexedObject();
+        } else if (dso instanceof IndexableCommunity indexableCommunity) {
+            this.community = indexableCommunity.getIndexedObject();
         } else {
             throw new BrowseException("The container must be a community or a collection");
         }

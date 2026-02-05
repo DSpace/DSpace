@@ -7,7 +7,7 @@
  */
 package org.dspace.app.requestitem;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
@@ -55,8 +55,8 @@ public class CollectionAdministratorsRequestItemStrategyTest {
         CollectionAdministratorsRequestItemStrategy instance = new CollectionAdministratorsRequestItemStrategy();
         List<RequestItemAuthor> result = instance.getRequestItemAuthor(context,
                 item);
-        assertEquals("Should be one author", 1, result.size());
-        assertEquals("Name should match " + NAME, NAME, result.get(0).getFullName());
-        assertEquals("Email should match " + EMAIL, EMAIL, result.get(0).getEmail());
+        assertEquals(1, result.size(), "Should be one author");
+        assertEquals(NAME, result.get(0).getFullName(), "Name should match " + NAME);
+        assertEquals(EMAIL, result.get(0).getEmail(), "Email should match " + EMAIL);
     }
 }

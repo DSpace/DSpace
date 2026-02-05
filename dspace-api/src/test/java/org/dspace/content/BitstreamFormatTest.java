@@ -12,13 +12,12 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -31,10 +30,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.test.util.AopTestUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -71,13 +69,18 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     private AuthorizeService authorizeServiceSpy;
 
     /**
+     * Original AuthorizeService (saved before spying for restoration in @After)
+     */
+    private AuthorizeService originalAuthorizeService;
+
+    /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
      *
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -85,11 +88,12 @@ public class BitstreamFormatTest extends AbstractUnitTest {
             bf = bitstreamFormatService.find(context, 5);
             bunknown = bitstreamFormatService.findUnknown(context);
 
+            // Save the original authorizeService before spying (for restoration in @After)
+            originalAuthorizeService = authorizeService;
+
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
-            Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
-            authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
-                withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
+            authorizeServiceSpy = spy(originalAuthorizeService);
             // "Wire" our spy to be used by the current loaded bitstreamFormatService
             // (To ensure it uses the spy instead of the real service)
             ReflectionTestUtils.setField(bitstreamFormatService, "authorizeService", authorizeServiceSpy);
@@ -106,11 +110,17 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         bf = null;
         bunknown = null;
+
+        // Restore the original authorizeService to prevent test pollution
+        if (originalAuthorizeService != null) {
+            ReflectionTestUtils.setField(bitstreamFormatService, "authorizeService", originalAuthorizeService);
+        }
+
         super.destroy();
     }
 
@@ -126,7 +136,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         found = bitstreamFormatService.find(context, 2);
         assertThat("testFind 2", found, notNullValue());
         assertThat("testFind 3", found.getShortDescription(), equalTo("License"));
-        assertTrue("testFind 4", found.isInternal());
+        assertTrue(found.isInternal(), "testFind 4");
     }
 
     /**
@@ -137,12 +147,12 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         BitstreamFormat found = bitstreamFormatService.findByMIMEType(context, "text/plain");
         assertThat("testFindByMIMEType 0", found, notNullValue());
         assertThat("testFindByMIMEType 1", found.getMIMEType(), equalTo("text/plain"));
-        assertFalse("testFindByMIMEType 2", found.isInternal());
+        assertFalse(found.isInternal(), "testFindByMIMEType 2");
 
         found = bitstreamFormatService.findByMIMEType(context, "text/xml");
         assertThat("testFindByMIMEType 3", found, notNullValue());
         assertThat("testFindByMIMEType 4", found.getMIMEType(), equalTo("text/xml"));
-        assertFalse("testFindByMIMEType 5", found.isInternal());
+        assertFalse(found.isInternal(), "testFindByMIMEType 5");
     }
 
     /**
@@ -153,12 +163,12 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         BitstreamFormat found = bitstreamFormatService.findByShortDescription(context, "Adobe PDF");
         assertThat("testFindByShortDescription 0", found, notNullValue());
         assertThat("testFindByShortDescription 1", found.getShortDescription(), equalTo("Adobe PDF"));
-        assertFalse("testFindByShortDescription 2", found.isInternal());
+        assertFalse(found.isInternal(), "testFindByShortDescription 2");
 
         found = bitstreamFormatService.findByShortDescription(context, "XML");
         assertThat("testFindByShortDescription 3", found, notNullValue());
         assertThat("testFindByShortDescription 4", found.getShortDescription(), equalTo("XML"));
-        assertFalse("testFindByShortDescription 5", found.isInternal());
+        assertFalse(found.isInternal(), "testFindByShortDescription 5");
     }
 
     /**
@@ -170,7 +180,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         BitstreamFormat found = bitstreamFormatService.findUnknown(context);
         assertThat("testFindUnknown 0", found, notNullValue());
         assertThat("testFindUnknown 1", found.getShortDescription(), equalTo("Unknown"));
-        assertFalse("testFindUnknown 2", found.isInternal());
+        assertFalse(found.isInternal(), "testFindUnknown 2");
         assertThat("testFindUnknown 3", found.getSupportLevel(), equalTo(0));
     }
 
@@ -185,7 +195,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
 
         //check pos 0 is Unknown
         assertThat("testFindAll 1", found.get(0).getShortDescription(), equalTo("Unknown"));
-        assertFalse("testFindAll 2", found.get(0).isInternal());
+        assertFalse(found.get(0).isInternal(), "testFindAll 2");
         assertThat("testFindAll 3", found.get(0).getSupportLevel(), equalTo(0));
 
         boolean added = false;
@@ -194,7 +204,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
                 added = true;
             }
         }
-        assertTrue("testFindAll 4", added);
+        assertTrue(added, "testFindAll 4");
     }
 
     /**
@@ -208,7 +218,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         int i = 0;
         for (BitstreamFormat b : found) {
             i++;
-            assertFalse("testFindNonInternal " + i + " (" + b.getShortDescription() + ")", b.isInternal());
+            assertFalse(b.isInternal(), "testFindNonInternal " + i + " (" + b.getShortDescription() + ")");
         }
     }
 
@@ -225,7 +235,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         assertThat("testCreate 1", found.getDescription(), nullValue());
         assertThat("testCreate 2", found.getMIMEType(), nullValue());
         assertThat("testCreate 3", found.getSupportLevel(), equalTo(-1));
-        assertFalse("testCreate 4", found.isInternal());
+        assertFalse(found.isInternal(), "testCreate 4");
         bitstreamFormatService.delete(context, found);
         context.commit();
     }
@@ -233,13 +243,15 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     /**
      * Test of create method, of class BitstreamFormat.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testCreateNotAdmin() throws SQLException, AuthorizeException {
-        // Disallow full Admin perms
-        when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
+    @Test
+    public void testCreateNotAdmin() throws SQLException {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow full Admin perms
+            when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
 
-        bitstreamFormatService.create(context);
-        fail("Exception should have been thrown");
+            bitstreamFormatService.create(context);
+            fail("Exception should have been thrown");
+        });
     }
 
     /**
@@ -247,8 +259,8 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test
     public void testGetID() {
-        assertTrue("testGetID 0", bf.getID() == 5);
-        assertTrue("testGetID 1", bunknown.getID() == 1);
+        assertTrue(bf.getID() == 5, "testGetID 0");
+        assertTrue(bunknown.getID() == 1, "testGetID 1");
     }
 
     /**
@@ -351,38 +363,42 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     @Test
     public void testGetSupportLevel() throws SQLException {
 
-        assertTrue("testGetSupportLevel 0", bf.getSupportLevel() >= 0);
-        assertTrue("testGetSupportLevel 1", bf.getSupportLevel() <= 2);
+        assertTrue(bf.getSupportLevel() >= 0, "testGetSupportLevel 0");
+        assertTrue(bf.getSupportLevel() <= 2, "testGetSupportLevel 1");
 
-        assertTrue("testGetSupportLevel 2", bunknown.getSupportLevel() >= 0);
-        assertTrue("testGetSupportLevel 3", bunknown.getSupportLevel() <= 2);
+        assertTrue(bunknown.getSupportLevel() >= 0, "testGetSupportLevel 2");
+        assertTrue(bunknown.getSupportLevel() <= 2, "testGetSupportLevel 3");
 
         List<BitstreamFormat> found = bitstreamFormatService.findAll(context);
         int i = 0;
         for (BitstreamFormat b : found) {
             i++;
-            assertTrue("testGetSupportLevel " + i + " (" + b.getMIMEType() + ")", b.getSupportLevel() >= 0);
+            assertTrue(b.getSupportLevel() >= 0, "testGetSupportLevel " + i + " (" + b.getMIMEType() + ")");
             i++;
-            assertTrue("testGetSupportLevel " + i + " (" + b.getMIMEType() + ")", b.getSupportLevel() <= 2);
+            assertTrue(b.getSupportLevel() <= 2, "testGetSupportLevel " + i + " (" + b.getMIMEType() + ")");
         }
     }
 
     /**
      * Test of setSupportLevel method, of class BitstreamFormat.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSetSupportLevelInvalidValue() {
-        bf.setSupportLevel(5);
-        fail("Exception should be thrown");
+        assertThrows(IllegalArgumentException.class, () -> {
+            bf.setSupportLevel(5);
+            fail("Exception should be thrown");
+        });
     }
 
     /**
      * Test of setSupportLevel method, of class BitstreamFormat.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSetSupportLevelNegativeValue() {
-        bf.setSupportLevel(-1);
-        fail("Exception should be thrown");
+        assertThrows(IllegalArgumentException.class, () -> {
+            bf.setSupportLevel(-1);
+            fail("Exception should be thrown");
+        });
     }
 
     /**
@@ -443,7 +459,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test
     public void testSetInternal() {
-        assertFalse("testSetInternal 0", bf.isInternal());
+        assertFalse(bf.isInternal(), "testSetInternal 0");
 
         bf.setInternal(true);
 
@@ -453,13 +469,15 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     /**
      * Test of update method, of class BitstreamFormat.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testUpdateNotAdmin() throws SQLException, AuthorizeException {
-        // Disallow full Admin perms
-        when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
+    @Test
+    public void testUpdateNotAdmin() throws SQLException {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow full Admin perms
+            when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
 
-        bitstreamFormatService.update(context, bf);
-        fail("Exception should have been thrown");
+            bitstreamFormatService.update(context, bf);
+            fail("Exception should have been thrown");
+        });
     }
 
     /**
@@ -483,13 +501,15 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     /**
      * Test of delete method, of class BitstreamFormat.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testDeleteNotAdmin() throws SQLException, AuthorizeException {
-        // Disallow full Admin perms
-        when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
+    @Test
+    public void testDeleteNotAdmin() throws SQLException {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow full Admin perms
+            when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
 
-        bitstreamFormatService.delete(context, bf);
-        fail("Exception should have been thrown");
+            bitstreamFormatService.delete(context, bf);
+            fail("Exception should have been thrown");
+        });
     }
 
     /**
@@ -511,13 +531,15 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     /**
      * Test of delete method, of class BitstreamFormat.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testDeleteUnknown() throws SQLException, AuthorizeException {
-        // Allow full Admin perms
-        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
+        assertThrows(IllegalArgumentException.class, () -> {
+            // Allow full Admin perms
+            when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
-        bitstreamFormatService.delete(context, bunknown);
-        fail("Exception should have been thrown");
+            bitstreamFormatService.delete(context, bunknown);
+            fail("Exception should have been thrown");
+        });
     }
 
     /**
@@ -526,7 +548,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     @Test
     public void testGetExtensions() {
         assertThat("testGetExtensions 0", bf.getExtensions(), notNullValue());
-        assertTrue("testGetExtensions 1", bf.getExtensions().size() == 1);
+        assertTrue(bf.getExtensions().size() == 1, "testGetExtensions 1");
         assertThat("testGetExtensions 2", bf.getExtensions().get(0), equalTo("xml"));
     }
 
@@ -540,14 +562,14 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         String[] values = {"1", "2", "3"};
         bf.setExtensions(Arrays.asList(values));
         assertThat("setExtensions 1", bf.getExtensions(), notNullValue());
-        assertTrue("setExtensions 2", bf.getExtensions().size() == 3);
+        assertTrue(bf.getExtensions().size() == 3, "setExtensions 2");
         assertThat("setExtensions 3", bf.getExtensions().get(0), equalTo("1"));
         assertThat("setExtensions 4", bf.getExtensions().get(1), equalTo("2"));
         assertThat("setExtensions 5", bf.getExtensions().get(2), equalTo("3"));
 
         bf.setExtensions(Collections.EMPTY_LIST);
         assertThat("setExtensions 6", bf.getExtensions(), notNullValue());
-        assertTrue("setExtensions 7", bf.getExtensions().size() == 0);
+        assertTrue(bf.getExtensions().size() == 0, "setExtensions 7");
         bf.setExtensions(backupExtensions);
     }
 }

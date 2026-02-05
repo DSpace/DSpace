@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -37,10 +37,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -82,7 +84,7 @@ public class ItemTemplateRestController {
      * @return The template item corresponding to the UUID above
      */
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public TemplateItemResource getTemplateItem(HttpServletRequest request, @PathVariable UUID uuid) {
 
         Context context = ContextUtil.obtainContext(request);
@@ -121,7 +123,7 @@ public class ItemTemplateRestController {
      * @throws AuthorizeException
      */
     @PreAuthorize("hasPermission(#uuid, 'ITEMTEMPLATE', 'WRITE')")
-    @RequestMapping(method = RequestMethod.PATCH)
+    @PatchMapping
     public ResponseEntity<RepresentationModel<?>> patch(HttpServletRequest request, @PathVariable UUID uuid,
                                                         @RequestBody(required = true) JsonNode jsonNode)
         throws SQLException, AuthorizeException {
@@ -154,7 +156,7 @@ public class ItemTemplateRestController {
      * @throws IOException
      */
     @PreAuthorize("hasPermission(#uuid, 'ITEMTEMPLATE', 'DELETE')")
-    @RequestMapping(method = RequestMethod.DELETE)
+    @DeleteMapping
     public ResponseEntity<RepresentationModel<?>> deleteTemplateItem(HttpServletRequest request,
                                                                      @PathVariable UUID uuid)
         throws SQLException, AuthorizeException, IOException {

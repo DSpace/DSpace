@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * A ROR JsonPath Metadata processor that should be configured inside the {@code ror-integration.xml} file.
@@ -72,8 +72,8 @@ public class RorParentOrgUnitMetadataContributor extends SimpleJsonPathMetadataC
                 continue;
             }
 
-            String type = node.has(typeField) ? node.get(typeField).asText() : null;
-            String label = node.get(labelField).asText();
+            String type = node.has(typeField) ? node.get(typeField).asString() : null;
+            String label = node.get(labelField).asString();
 
             if (parentType.equalsIgnoreCase(type)) {
                 metadataValue.add(label);
@@ -97,7 +97,7 @@ public class RorParentOrgUnitMetadataContributor extends SimpleJsonPathMetadataC
         JsonNode body = null;
         try {
             body = mapper.readTree(json);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
         return body;

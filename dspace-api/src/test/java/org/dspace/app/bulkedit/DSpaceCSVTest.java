@@ -9,7 +9,7 @@ package org.dspace.app.bulkedit;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,7 +21,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -49,12 +49,23 @@ public class DSpaceCSVTest extends AbstractUnitTest {
                 "+,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,Three authors,\"Lewis, Stuart||Bloggs, Joe||Loaf, Meat\"," +
                     "Three people wrote this item",
                 "+,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,\"Two line\n\ntitle\",\"Lewis, Stuart\",abstract",
-                "+,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,\"Empty lines\n\nshould work too (DS-3245).\",\"Lewis, " +
-                    "Stuart\",abstract",
-                "+,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,\"\"\"Embedded quotes\"\" here\",\"Lewis, Stuart\",\"Abstract" +
-                    " with\ntwo\nnew lines\"",
-                "+,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,\"\"\"Unbalanced embedded\"\" quotes\"\" here\",\"Lewis, " +
-                    "Stuart\",\"Abstract with\ntwo\nnew lines\"",};
+                """
+                +,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,"Empty lines
+                
+                should work too (DS-3245).","Lewis, \
+                Stuart",abstract""",
+                """
+                +,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,""\"Embedded quotes"" here","Lewis, Stuart","Abstract\
+                 with
+                two
+                new lines"\
+                """,
+                """
+                +,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,""\"Unbalanced embedded"" quotes"" here","Lewis, \
+                Stuart","Abstract with
+                two
+                new lines"\
+                """,};
             // Write the string to a file
             String filename = "test.csv";
             BufferedWriter out = new BufferedWriter(

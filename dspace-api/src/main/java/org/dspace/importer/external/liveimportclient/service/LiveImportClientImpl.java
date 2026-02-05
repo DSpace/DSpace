@@ -13,17 +13,18 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
@@ -51,9 +52,9 @@ public class LiveImportClientImpl implements LiveImportClient {
     public String executeHttpGetRequest(int timeout, String URL, Map<String, Map<String, String>> params) {
         HttpGet method = null;
         RequestConfig config = RequestConfig.custom()
-            .setConnectionRequestTimeout(timeout)
-            .setConnectTimeout(timeout)
-            .setSocketTimeout(timeout)
+            .setConnectionRequestTimeout(timeout, TimeUnit.MILLISECONDS)
+            .setConnectTimeout(timeout, TimeUnit.MILLISECONDS)
+            .setResponseTimeout(timeout, TimeUnit.MILLISECONDS)
             .build();
         try (CloseableHttpClient httpClient = Optional.ofNullable(this.httpClient)
                                         .orElse(DSpaceHttpClientFactory.getInstance().buildWithRequestConfig(config))) {
@@ -70,10 +71,10 @@ public class LiveImportClientImpl implements LiveImportClient {
             if (log.isDebugEnabled()) {
                 log.debug("Performing GET request to \"" + uri + "\"...");
             }
-            HttpResponse httpResponse = httpClient.execute(method);
+            ClassicHttpResponse httpResponse = httpClient.execute(method);
             if (isNotSuccessfull(httpResponse)) {
                 throw new RuntimeException("The request failed with: " + getStatusCode(httpResponse) + " code, reason= "
-                                           + httpResponse.getStatusLine().getReasonPhrase());
+                                           + httpResponse.getReasonPhrase());
             }
             InputStream inputStream = httpResponse.getEntity().getContent();
             return IOUtils.toString(inputStream, Charset.defaultCharset());
@@ -81,7 +82,7 @@ public class LiveImportClientImpl implements LiveImportClient {
             log.error(e1.getMessage(), e1);
         } finally {
             if (Objects.nonNull(method)) {
-                method.releaseConnection();
+                method.reset();
             }
         }
         return StringUtils.EMPTY;
@@ -104,7 +105,7 @@ public class LiveImportClientImpl implements LiveImportClient {
             if (log.isDebugEnabled()) {
                 log.debug("Performing POST request to \"" + uri + "\"..." );
             }
-            HttpResponse httpResponse = httpClient.execute(method);
+            ClassicHttpResponse httpResponse = httpClient.execute(method);
             if (isNotSuccessfull(httpResponse)) {
                 throw new RuntimeException();
             }
@@ -114,7 +115,7 @@ public class LiveImportClientImpl implements LiveImportClient {
             log.error(e1.getMessage(), e1);
         } finally {
             if (Objects.nonNull(method)) {
-                method.releaseConnection();
+                method.reset();
             }
         }
         return StringUtils.EMPTY;
@@ -154,13 +155,13 @@ public class LiveImportClientImpl implements LiveImportClient {
         return uriBuilder.toString();
     }
 
-    private boolean isNotSuccessfull(HttpResponse response) {
+    private boolean isNotSuccessfull(ClassicHttpResponse response) {
         int statusCode = getStatusCode(response);
         return statusCode < 200 || statusCode > 299;
     }
 
-    private int getStatusCode(HttpResponse response) {
-        return response.getStatusLine().getStatusCode();
+    private int getStatusCode(ClassicHttpResponse response) {
+        return response.getCode();
     }
 
     public CloseableHttpClient getHttpClient() {

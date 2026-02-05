@@ -34,8 +34,8 @@ import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -61,7 +61,7 @@ public class SubmitFeatureIT extends AbstractControllerIntegrationTest {
     private Collection collectionA2;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
 
@@ -235,13 +235,11 @@ public class SubmitFeatureIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void testCollectionAdminOnCollection() throws Exception {
-        Collection col = withSuppressedAuthorization(() -> {
-            return CollectionBuilder
+        Collection col = withSuppressedAuthorization(() -> CollectionBuilder
                 .createCollection(context, communityA)
                 .withName("this is another test collection")
                 .withAdminGroup(eperson)
-                .build();
-        });
+                .build());
         expectSomeResults(requestSubmitFeature(getCollectionUri(col)));
         expectZeroResults(requestSubmitFeature(getCollectionUri(collectionA1)));
     }

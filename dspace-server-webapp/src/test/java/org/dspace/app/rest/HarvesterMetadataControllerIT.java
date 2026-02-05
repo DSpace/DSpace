@@ -19,7 +19,7 @@ import org.dspace.app.rest.matcher.MetadataConfigsMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.harvest.OAIHarvester;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration test for harvester metadata controller

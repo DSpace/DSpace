@@ -78,15 +78,15 @@ public class CreateMissingIdentifiers
             identifierService.register(context, dso);
         } catch (AuthorizeException | IdentifierException | SQLException ex) {
             String message = ex.getMessage();
-            report(String.format("Identifier(s) not minted for %s %s:  %s%n",
-                    typeText, dso.getID().toString(), message));
+            report("Identifier(s) not minted for %s %s:  %s%n".formatted(
+                typeText, dso.getID().toString(), message));
             LOG.error("Identifier(s) not minted:  {}", message);
             return Curator.CURATE_ERROR;
         }
 
         // Success!
-        report(String.format("%s %s registered.%n",
-                typeText, dso.getID().toString()));
+        report("%s %s registered.%n".formatted(
+            typeText, dso.getID().toString()));
         return Curator.CURATE_SUCCESS;
     }
 }

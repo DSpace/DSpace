@@ -7,16 +7,16 @@
  */
 package org.dspace.services.events;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Event;
 import org.dspace.test.DSpaceAbstractKernelTest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Event service testing (not wrapped in requests)
@@ -31,7 +31,7 @@ public class EventServiceTest extends DSpaceAbstractKernelTest {
     private EventListenerNameFilter listenerNameFilter;
     private EventListenerBothFilters listenerBothFilters;
 
-    @Before
+    @BeforeEach
     public void init() {
         eventService = getService(SystemEventService.class);
         requestService = getService(RequestService.class);
@@ -45,7 +45,7 @@ public class EventServiceTest extends DSpaceAbstractKernelTest {
         eventService.registerEventListener(listenerBothFilters);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         // need to do this to ensure the resources are freed up by junit
         eventService = null;

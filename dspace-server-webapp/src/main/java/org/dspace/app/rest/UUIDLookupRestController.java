@@ -36,8 +36,8 @@ import org.springframework.hateoas.TemplateVariable;
 import org.springframework.hateoas.TemplateVariable.VariableType;
 import org.springframework.hateoas.TemplateVariables;
 import org.springframework.hateoas.UriTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -85,7 +85,7 @@ public class UUIDLookupRestController implements InitializingBean {
                                     CATEGORY)));
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = ACTION, params = PARAM)
+    @GetMapping( value = ACTION, params = PARAM)
     @SuppressWarnings("unchecked")
     public void getDSObyIdentifier(HttpServletRequest request,
                                    HttpServletResponse response,

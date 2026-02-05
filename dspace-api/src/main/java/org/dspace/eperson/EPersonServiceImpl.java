@@ -461,6 +461,9 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                     } else if (Strings.CS.equals(tableName, "resourcepolicy")) {
                         // we delete the EPerson, it won't need any rights anymore.
                         authorizeService.removeAllEPersonPolicies(context, ePerson);
+                        // Flush to ensure ResourcePolicy deletions are executed before EPerson deletion
+                        // (Required for Hibernate 7 which may not auto-flush in correct FK order)
+                        context.flush();
                     } else if (Strings.CS.equals(tableName, "cwf_pooltask")) {
                         PoolTaskService poolTaskService = XmlWorkflowServiceFactory.getInstance().getPoolTaskService();
                         poolTaskService.deleteByEperson(context, ePerson);

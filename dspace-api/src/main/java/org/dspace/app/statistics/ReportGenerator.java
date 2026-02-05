@@ -810,26 +810,28 @@ public class ReportGenerator {
      * output the usage information to the terminal
      */
     public static void usage() {
-        String usage = "Usage Information:\n" +
-            "ReportGenerator [options [parameters]]\n" +
-            "-format [output format]\n" +
-            "\tRequired\n" +
-            "\tSpecify the format that you would like the output in\n" +
-            "\tOptions:\n" +
-            "\t\thtml\n" +
-            "-in [aggregation file]\n" +
-            "\tRequired\n" +
-            "\tSpecify the aggregation data file to display\n" +
-            "-out [output file]\n" +
-            "\tOptional\n" +
-            "\tSpecify the file to output the report to\n" +
-            "\tDefault uses [dspace log directory]/report\n" +
-            "-map [map file]\n" +
-            "\tOptional\n" +
-            "\tSpecify the map file to translate log file actions into human readable actions\n" +
-            "\tDefault uses [dspace config directory]/dstat.map\n" +
-            "-help\n" +
-            "\tdisplay this usage information\n";
+        String usage = """
+            Usage Information:
+            ReportGenerator [options [parameters]]
+            -format [output format]
+            	Required
+            	Specify the format that you would like the output in
+            	Options:
+            		html
+            -in [aggregation file]
+            	Required
+            	Specify the aggregation data file to display
+            -out [output file]
+            	Optional
+            	Specify the file to output the report to
+            	Default uses [dspace log directory]/report
+            -map [map file]
+            	Optional
+            	Specify the map file to translate log file actions into human readable actions
+            	Default uses [dspace config directory]/dstat.map
+            -help
+            	display this usage information
+            """;
 
         System.out.println(usage);
     }

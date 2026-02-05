@@ -8,22 +8,24 @@
 package org.dspace.app.ldn.action;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.Header;
-import org.apache.http.HttpException;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Action to send LDN Message
@@ -52,7 +54,8 @@ public class SendLDNMessageAction implements LDNAction {
         HttpPost httpPost = new HttpPost(url);
         httpPost.addHeader("Content-Type", "application/ld+json");
         ObjectMapper mapper = new ObjectMapper();
-        httpPost.setEntity(new StringEntity(mapper.writeValueAsString(notification), "UTF-8"));
+        httpPost.setEntity(new StringEntity(mapper.writeValueAsString(notification),
+                ContentType.create("application/ld+json", StandardCharsets.UTF_8)));
 
         LDNActionStatus result = LDNActionStatus.ABORT;
         // NOTE: Github believes there is a "Potential server-side request forgery due to a user-provided value"
@@ -62,9 +65,9 @@ public class SendLDNMessageAction implements LDNAction {
             client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5);
         }
         try (CloseableHttpResponse response = client.execute(httpPost)) {
-            if (isSuccessful(response.getStatusLine().getStatusCode())) {
+            if (isSuccessful(response.getCode())) {
                 result = LDNActionStatus.CONTINUE;
-            } else if (isRedirect(response.getStatusLine().getStatusCode())) {
+            } else if (isRedirect(response.getCode())) {
                 result = handleRedirect(response, httpPost);
             }
         } catch (Exception e) {
@@ -86,7 +89,7 @@ public class SendLDNMessageAction implements LDNAction {
     }
 
     private LDNActionStatus handleRedirect(CloseableHttpResponse oldResponse,
-                                        HttpPost request) throws HttpException {
+                                        HttpPost originalRequest) throws HttpException {
         Header[] urls = oldResponse.getHeaders(HttpHeaders.LOCATION);
         String url = urls.length > 0 && urls[0] != null ? urls[0].getValue() : null;
         if (url == null) {
@@ -95,9 +98,12 @@ public class SendLDNMessageAction implements LDNAction {
         }
         LDNActionStatus result = LDNActionStatus.ABORT;
         try {
-            request.setURI(new URI(url));
-            try (CloseableHttpResponse response = client.execute(request)) {
-                if (isSuccessful(response.getStatusLine().getStatusCode())) {
+            // Create new request with redirect URL, copying headers and entity from original
+            HttpPost redirectRequest = new HttpPost(new URI(url));
+            redirectRequest.addHeader("Content-Type", "application/ld+json");
+            redirectRequest.setEntity(originalRequest.getEntity());
+            try (CloseableHttpResponse response = client.execute(redirectRequest)) {
+                if (isSuccessful(response.getCode())) {
                     result = LDNActionStatus.CONTINUE;
                 }
             }

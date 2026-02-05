@@ -41,9 +41,9 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -79,7 +79,7 @@ public class OidcAuthenticationRestControllerIT extends AbstractControllerIntegr
     @Autowired
     private EPersonService ePersonService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         originalOidcClient = oidcAuthentication.getOidcClient();
         oidcAuthentication.setOidcClient(oidcClientMock);
@@ -92,7 +92,7 @@ public class OidcAuthenticationRestControllerIT extends AbstractControllerIntegr
             asList("org.dspace.authenticate.OidcAuthentication", "org.dspace.authenticate.PasswordAuthentication"));
     }
 
-    @After
+    @AfterEach
     public void after() throws Exception {
         oidcAuthentication.setOidcClient(originalOidcClient);
         if (createdEperson != null) {

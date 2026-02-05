@@ -19,8 +19,8 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -37,9 +37,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.Strings;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.RelationshipMatcher;
@@ -75,8 +75,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 import org.dspace.discovery.MockSolrSearchCore;
 import org.dspace.eperson.EPerson;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -134,7 +134,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     protected RelationshipType isOrgUnitOfPersonRelationshipType;
     protected EPerson user1;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
 
@@ -3113,7 +3113,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.metadata", matchMetadata(
-                String.format("%s.isPublicationOfAuthor", MetadataSchemaEnum.RELATION.getName()),
+            "%s.isPublicationOfAuthor".formatted(MetadataSchemaEnum.RELATION.getName()),
                 publication1.getID().toString()
             )));
 
@@ -3124,7 +3124,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.metadata", matchMetadata(
-                String.format("%s.isAuthorOfPublication", MetadataSchemaEnum.RELATION.getName()),
+            "%s.isAuthorOfPublication".formatted(MetadataSchemaEnum.RELATION.getName()),
                 author1.getID().toString()
             )));
     }
@@ -3153,7 +3153,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.metadata", matchMetadata(
-                String.format("%s.isOrgUnitOfPerson", MetadataSchemaEnum.RELATION.getName()),
+            "%s.isOrgUnitOfPerson".formatted(MetadataSchemaEnum.RELATION.getName()),
                 orgUnit1.getID().toString()
             )));
 
@@ -3164,7 +3164,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.metadata", matchMetadata(
-                String.format("%s.isPersonOfOrgUnit", MetadataSchemaEnum.RELATION.getName()),
+            "%s.isPersonOfOrgUnit".formatted(MetadataSchemaEnum.RELATION.getName()),
                 author1.getID().toString()
             )));
     }

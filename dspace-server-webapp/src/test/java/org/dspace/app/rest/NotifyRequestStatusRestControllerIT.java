@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -17,7 +17,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.model.Notification;
@@ -32,7 +32,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 

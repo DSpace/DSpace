@@ -31,9 +31,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -65,7 +67,7 @@ public class PrimaryBitstreamController {
      * @return          The Bundle on which the primaryBitstream was set
      */
     @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'WRITE')")
-    @RequestMapping(method = RequestMethod.POST, consumes = {"text/uri-list"})
+    @PostMapping( consumes = {"text/uri-list"})
     public ResponseEntity<RepresentationModel<?>> createPrimaryBitstream(@PathVariable UUID uuid,
                                                                          HttpServletRequest request) {
         Context context = ContextUtil.obtainContext(request);
@@ -89,7 +91,7 @@ public class PrimaryBitstreamController {
      * @return          The Bundle of which the primaryBitstream was updated
      */
     @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'WRITE')")
-    @RequestMapping(method = RequestMethod.PUT, consumes = {"text/uri-list"})
+    @PutMapping( consumes = {"text/uri-list"})
     public BundleResource updatePrimaryBitstream(@PathVariable UUID uuid,
                                                  HttpServletRequest request) {
         Context context = ContextUtil.obtainContext(request);
@@ -110,7 +112,7 @@ public class PrimaryBitstreamController {
      * @return          The Bundle of which the primaryBitstream was deleted
      */
     @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'WRITE')")
-    @RequestMapping(method = RequestMethod.DELETE)
+    @DeleteMapping
     public ResponseEntity<RepresentationModel<?>> deletePrimaryBitstream(@PathVariable UUID uuid,
                                                                          HttpServletRequest request) {
         Context context = ContextUtil.obtainContext(request);

@@ -6,6 +6,9 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.model;
+import java.io.Serial;
+
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.dspace.app.rest.RestResourceController;
 
@@ -18,6 +21,7 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class VersionHistoryRest extends BaseObjectRest<Integer> {
 
+    @Serial
     private static final long serialVersionUID = -6466315011690554740L;
 
     private Integer id;

@@ -8,11 +8,12 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -77,7 +78,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         try {
             ServletInputStream input = req.getInputStream();
             bitstreamFormatRest = mapper.readValue(input, BitstreamFormatRest.class);
-        } catch (IOException e1) {
+        } catch (IOException | JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
@@ -101,7 +102,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         BitstreamFormatRest bitstreamFormatRest = null;
         try {
             bitstreamFormatRest = mapper.readValue(jsonNode.toString(), BitstreamFormatRest.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new UnprocessableEntityException("Error parsing collection json: " + e.getMessage());
         }
         BitstreamFormat bitstreamFormat = null;

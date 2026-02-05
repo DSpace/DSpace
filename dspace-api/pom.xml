@@ -55,7 +55,7 @@
                              (ending in _ suffix) for more type-safe Criteria queries -->
                         <path>
                             <groupId>org.hibernate.orm</groupId>
-                            <artifactId>hibernate-jpamodelgen</artifactId>
+                            <artifactId>hibernate-processor</artifactId>
                             <version>${hibernate.version}</version>
                         </path>
                         <!-- Enable JAXB -->
@@ -163,7 +163,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>4.0.0</version>
                 <executions>
                     <execution>
                         <id>workflow-curation</id>
@@ -341,7 +341,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-jpamodelgen</artifactId>
+            <artifactId>hibernate-processor</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate.orm</groupId>
@@ -351,6 +351,7 @@
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <version>${ehcache.version}</version>
+   <classifier>jakarta</classifier>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
              Caching dependencies for sherpa service. -->
@@ -366,8 +367,19 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+        <!-- Jackson 2 annotations - required for Jackson 3 backwards compatibility -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <!-- Jackson 2 databind - required by Flyway which hasn't migrated to Jackson 3 yet -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.cache</groupId>
@@ -377,6 +389,23 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator-cdi</artifactId>
             <version>${hibernate-validator.version}</version>
+            <exclusions>
+                <!-- Exclude old classmate version - use the one from hibernate-core -->
+                <exclusion>
+                    <groupId>com.fasterxml</groupId>
+                    <artifactId>classmate</artifactId>
+                </exclusion>
+                <!-- Exclude old jakarta.validation-api - use the one from hibernate-processor -->
+                <exclusion>
+                    <groupId>jakarta.validation</groupId>
+                    <artifactId>jakarta.validation-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Jakarta Expression Language implementation required by Hibernate Validator 9.x -->
+        <dependency>
+            <groupId>org.glassfish.expressly</groupId>
+            <artifactId>expressly</artifactId>
         </dependency>
 
         <dependency>
@@ -417,6 +446,15 @@
                     <groupId>org.bouncycastle</groupId>
                     <artifactId>bcprov-jdk15on</artifactId>
                 </exclusion>
+                <!-- Exclude old Jetty 9.4 - we use Jetty 12 -->
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty.http2</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -434,6 +472,13 @@
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
             <type>pom</type>
+            <exclusions>
+                <!-- Exclude Jackson 2 - we use Jackson 3 -->
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -485,6 +530,7 @@
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
+   <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>
@@ -512,13 +558,24 @@
             <artifactId>dspace-services</artifactId>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <scope>test</scope>
+        </dependency>
+  <dependency>
+   <groupId>org.hamcrest</groupId>
+   <artifactId>hamcrest-junit</artifactId>
+   <version>2.0.0.0</version>
+   <scope>test</scope>
+  </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -529,6 +586,11 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -550,24 +612,46 @@
             <artifactId>jbibtex</artifactId>
             <version>1.0.20</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
-        </dependency>
+  <dependency>
+   <groupId>org.apache.httpcomponents.client5</groupId>
+   <artifactId>httpclient5</artifactId>
+   <version>5.4.4</version>
+  </dependency>
 
         <!-- SolrJ is used to communicate with Solr throughout the dspace-api -->
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
             <version>${solr.client.version}</version>
+        </dependency>
+        <!-- solr-api is a new module in Solr 10.x containing core API classes -->
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-api</artifactId>
+            <version>${solr.client.version}</version>
+        </dependency>
+        <!-- solr-solrj-zookeeper is a separate module in Solr 10.x for ZooKeeper support -->
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj-zookeeper</artifactId>
+            <version>${solr.client.version}</version>
+        </dependency>
+        <!-- solr-solrj-jetty provides HttpJettySolrClient, split from solr-solrj in 10.0.0 -->
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj-jetty</artifactId>
+        </dependency>
+        <!-- solr-solrj-streaming is needed for Solr 10.x EmbeddedSolrServer -->
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj-streaming</artifactId>
+            <version>${solr.client.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- ZooKeeper is required by Solr 10.x EmbeddedSolrServer -->
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
         </dependency>
         <!-- Solr Core is only needed for Integration Tests (to run a MockSolrServer) -->
         <!-- The following Solr / Lucene dependencies also support integration tests -->
@@ -588,23 +672,189 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- Jersey dependencies required by Solr 10.x EmbeddedSolrServer -->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>3.1.11</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>3.1.11</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- OpenTelemetry is required by Solr 10.x EmbeddedSolrServer -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
+            <version>1.56.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk</artifactId>
+            <version>1.56.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk-metrics</artifactId>
+            <version>1.56.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk-common</artifactId>
+            <version>1.56.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-runtime-telemetry-java17</artifactId>
+            <version>2.22.0-alpha</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-runtime-telemetry-java8</artifactId>
+            <version>2.22.0-alpha</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.semconv</groupId>
+            <artifactId>opentelemetry-semconv</artifactId>
+            <version>1.37.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-exporter-prometheus</artifactId>
+            <version>1.56.0-alpha</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Jetty dependencies required by Solr 10.x HttpJettySolrClient -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-client</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.http2</groupId>
+            <artifactId>jetty-http2-client</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.http2</groupId>
+            <artifactId>jetty-http2-client-transport</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <!-- Curator framework is required by Solr 10.x EmbeddedSolrServer for ZooKeeper coordination -->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>5.9.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-client</artifactId>
+            <version>5.9.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Jackson 2 dataformat-cbor is used by Solr 10's CborResponseWriter -->
+        <!-- Note: Jackson 2 (com.fasterxml) coexists with Jackson 3 (tools.jackson) in different packages -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-cbor</artifactId>
+            <version>2.20.1</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-icu</artifactId>
+            <artifactId>lucene-analysis-icu</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-smartcn</artifactId>
+            <artifactId>lucene-analysis-smartcn</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-stempel</artifactId>
+            <artifactId>lucene-analysis-stempel</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queries</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-suggest</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-misc</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-join</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-highlighter</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-grouping</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-facet</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-spatial-extras</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-sandbox</artifactId>
+            <version>${lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- HPPC is required by Solr 10.x EmbeddedSolrServer -->
+        <dependency>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>hppc</artifactId>
+            <version>0.10.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -616,12 +866,30 @@
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers-standard-package</artifactId>
+            <exclusions>
+                <!-- Exclude Jackson 2 - we use Jackson 3 -->
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>com.maxmind.geoip2</groupId>
             <artifactId>geoip2</artifactId>
             <version>2.17.0</version>
+            <exclusions>
+                <!-- Exclude Jackson 2 - we use Jackson 3 -->
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
@@ -674,6 +942,21 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>${flyway.version}</version>
+            <exclusions>
+                <!-- Exclude Jackson 2 - we use Jackson 3 -->
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.dataformat</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -760,6 +1043,32 @@
                     <groupId>org.yaml</groupId>
                     <artifactId>snakeyaml</artifactId>
                 </exclusion>
+                <!-- Exclude Jackson 2 - we use Jackson 3 -->
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.dataformat</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.module</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <!-- Exclude old jakarta.validation-api - use the one from hibernate-processor -->
+                <exclusion>
+                    <groupId>jakarta.validation</groupId>
+                    <artifactId>jakarta.validation-api</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -768,6 +1077,11 @@
             <artifactId>json</artifactId>
             <version>20231013</version>
         </dependency>
+  <dependency>
+   <groupId>org.jspecify</groupId>
+   <artifactId>jspecify</artifactId>
+   <version>1.0.0</version>
+  </dependency>
 
         <!-- Useful for testing command-line tools that call System.exit() -->
         <!-- Note: system-lambda replaces system-rules for Java 21 compatibility -->
@@ -829,7 +1143,7 @@
 
         <dependency>
             <groupId>org.mock-server</groupId>
-            <artifactId>mockserver-junit-rule</artifactId>
+            <artifactId>mockserver-junit-jupiter</artifactId>
             <version>5.15.0</version>
             <scope>test</scope>
             <exclusions>
@@ -853,6 +1167,13 @@
                     <artifactId>javax.servlet-api</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <!-- Jackson datatype for Java time - required by MockServer -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.20.1</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -939,8 +1260,9 @@
 
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>mockwebserver</artifactId>
+            <artifactId>mockwebserver3-junit5</artifactId>
             <scope>test</scope>
+   <version>5.3.2</version>
         </dependency>
     </dependencies>
 </project>

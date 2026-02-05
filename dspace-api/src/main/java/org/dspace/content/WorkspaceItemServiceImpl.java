@@ -180,8 +180,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     public WorkspaceItem create(Context c, WorkflowItem workflowItem) throws SQLException, AuthorizeException {
         WorkspaceItem potentialDuplicate = findByItem(c, workflowItem.getItem());
         if (potentialDuplicate != null) {
-            throw new IllegalArgumentException(String.format(
-                "A workspace item referring to item %s already exists (%d)",
+            throw new IllegalArgumentException("A workspace item referring to item %s already exists (%d)".formatted(
                 workflowItem.getItem().getID(),
                 potentialDuplicate.getID()
             ));

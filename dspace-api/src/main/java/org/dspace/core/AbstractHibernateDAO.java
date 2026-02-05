@@ -7,13 +7,11 @@
  */
 package org.dspace.core;
 
-import java.lang.ref.Cleaner;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import com.google.common.collect.AbstractIterator;
@@ -23,7 +21,12 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Root;
 import org.apache.commons.collections.CollectionUtils;
+import org.dspace.content.DSpaceObject;
 import org.hibernate.Session;
+import org.hibernate.engine.spi.EntityEntry;
+import org.hibernate.engine.spi.PersistenceContext;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.Status;
 
 /**
  * Hibernate implementation for generic DAO interface.  Also includes additional
@@ -35,19 +38,33 @@ import org.hibernate.Session;
  */
 public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
-    /**
-     * Cleaner for Java 21+ compatibility (replaces deprecated finalize() method).
-     * Used to close streams if iterators are garbage-collected without being exhausted.
-     */
-    private static final Cleaner cleaner = Cleaner.create();
-
     protected AbstractHibernateDAO() {
 
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T create(Context context, T t) throws SQLException {
-        getHibernateSession(context).persist(t);
+        Session session = getHibernateSession(context);
+
+        // In Hibernate 7, if an entity with the same UUID exists in the session
+        // (even if marked for deletion), persist() will fail with EntityExistsException.
+        // For DSpaceObject entities with a predefined UUID, we need to handle this case.
+        if (t instanceof DSpaceObject dso) {
+            UUID uuid = dso.getPredefinedUUID();
+            if (uuid != null) {
+                // Check if there's an entity with this UUID already in the session.
+                Object existingEntity = session.get(DSpaceObject.class, uuid);
+                if (existingEntity != null) {
+                    // An entity with this UUID exists in the session.
+                    // Use merge() to associate the new entity state with the session,
+                    // which will replace the existing entity.
+                    return (T) session.merge(t);
+                }
+            }
+        }
+
+        session.persist(t);
         return t;
     }
 
@@ -69,7 +86,16 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
     @Override
     public void delete(Context context, T t) throws SQLException {
-        getHibernateSession(context).delete(t);
+        // Track the deleted entity's UUID in the context for Hibernate 7 compatibility.
+        // This is needed because Hibernate 7 may return deleted entities from session.get()
+        // even after they've been scheduled for removal.
+        if (t instanceof ReloadableEntity) {
+            Object id = ((ReloadableEntity<?>) t).getID();
+            if (id instanceof UUID) {
+                context.markEntityDeleted((UUID) id);
+            }
+        }
+        getHibernateSession(context).remove(t);
     }
 
     @Override
@@ -98,16 +124,21 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         if (id == null) {
             return null;
         }
+        // First check if this entity was deleted in this context (Hibernate 7 compatibility)
+        if (context.isEntityDeleted(id)) {
+            return null;
+        }
         @SuppressWarnings("unchecked")
         T result = (T) getHibernateSession(context).get(clazz, id);
-        return result;
+        // Also check the persistence context status as a fallback
+        return isEntityRemoved(context, result) ? null : result;
     }
 
     @Override
     public T findByID(Context context, Class clazz, int id) throws SQLException {
         @SuppressWarnings("unchecked")
         T result = (T) getHibernateSession(context).get(clazz, id);
-        return result;
+        return isEntityRemoved(context, result) ? null : result;
     }
 
     @Override
@@ -117,7 +148,32 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         }
         @SuppressWarnings("unchecked")
         T result = (T) getHibernateSession(context).get(clazz, id);
-        return result;
+        return isEntityRemoved(context, result) ? null : result;
+    }
+
+    /**
+     * Check if an entity is scheduled for removal (DELETED or GONE status).
+     * In Hibernate 7, session.get() returns entities from the persistence context
+     * even if they've been scheduled for removal. This method allows callers
+     * to filter out such entities.
+     *
+     * @param context the DSpace context
+     * @param entity the entity to check
+     * @return true if the entity is scheduled for removal, false otherwise
+     * @throws SQLException if a database error occurs
+     */
+    protected boolean isEntityRemoved(Context context, Object entity) throws SQLException {
+        if (entity == null) {
+            return false;
+        }
+        Session session = getHibernateSession(context);
+        PersistenceContext persistenceContext = ((SessionImplementor) session).getPersistenceContext();
+        EntityEntry entry = persistenceContext.getEntry(entity);
+        if (entry != null) {
+            Status status = entry.getStatus();
+            return status == Status.DELETED || status == Status.GONE;
+        }
+        return false;
     }
 
     @Override
@@ -321,71 +377,20 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         org.hibernate.query.Query hquery = query.unwrap(org.hibernate.query.Query.class);
         Stream<T> stream = hquery.stream();
         Iterator<T> iter = stream.iterator();
-        return new CleanableStreamIterator<>(iter, stream, cleaner);
-    }
-
-    /**
-     * Static iterator class that wraps a Stream-backed Iterator and ensures the stream is closed.
-     * Uses java.lang.ref.Cleaner (Java 21+ replacement for finalize()) to close the stream
-     * if the iterator is garbage-collected before being exhausted.
-     *
-     * @param <E> The type of elements returned by this iterator
-     */
-    private static class CleanableStreamIterator<E> extends AbstractIterator<E> {
-        private final Iterator<E> delegate;
-        private final AtomicReference<Stream<E>> streamRef;
-        private final Cleaner.Cleanable cleanable;
-
-        CleanableStreamIterator(Iterator<E> delegate, Stream<E> stream, Cleaner cleaner) {
-            this.delegate = delegate;
-            // Store stream in AtomicReference so cleanup action can close it
-            this.streamRef = new AtomicReference<>(stream);
-            // Register cleanup action with Cleaner
-            this.cleanable = cleaner.register(this, new StreamCleanup<>(streamRef));
-        }
-
-        @Override
-        protected E computeNext() {
-            if (delegate.hasNext()) {
-                return delegate.next();
-            } else {
-                // Stream exhausted - close it now and unregister the Cleaner
-                closeStream();
-                return endOfData();
+        return new AbstractIterator<T>() {
+            @Override
+            protected T computeNext() {
+                if (iter.hasNext()) {
+                    return iter.next();
+                } else {
+                    // Close the stream when iteration is complete
+                    stream.close();
+                    return endOfData();
+                }
             }
-        }
-
-        private void closeStream() {
-            Stream<E> stream = streamRef.getAndSet(null);
-            if (stream != null) {
-                stream.close();
-            }
-            // Unregister the Cleaner since we've already cleaned up
-            if (cleanable != null) {
-                cleanable.clean();
-            }
-        }
-    }
-
-    /**
-     * Static cleanup class for use with java.lang.ref.Cleaner.
-     * This class must be static to avoid preventing garbage collection of the iterator.
-     */
-    private static class StreamCleanup<E> implements Runnable {
-        private final AtomicReference<Stream<E>> streamRef;
-
-        StreamCleanup(AtomicReference<Stream<E>> streamRef) {
-            this.streamRef = streamRef;
-        }
-
-        @Override
-        public void run() {
-            // Get and clear the reference atomically
-            Stream<E> stream = streamRef.getAndSet(null);
-            if (stream != null) {
-                stream.close();
-            }
-        }
+            // Note: finalize() method removed for Java 21 compatibility.
+            // The stream is now closed when iteration completes (when endOfData() is reached).
+        };
     }
 
     /**

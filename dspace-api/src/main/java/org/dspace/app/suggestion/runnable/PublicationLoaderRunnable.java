@@ -184,7 +184,7 @@ public class PublicationLoaderRunnable
     private void setLastImportMetadataValue(Item item) {
         try {
             item = context.reloadEntity(item);
-            String metadataField = String.format("dspace.%s.lastimport", loader);
+            String metadataField = "dspace.%s.lastimport".formatted(loader);
             String currentDate = DCDate.getCurrent().toString();
             itemService.setMetadataSingleValue(context, item, new MetadataFieldName(metadataField), null, currentDate);
             itemService.update(context, item);

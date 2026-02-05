@@ -21,8 +21,8 @@ public class PredefinedUUIDGenerator extends UUIDGenerator {
 
     @Override
     public Object generate(SharedSessionContractImplementor session, Object object) {
-        if (object instanceof DSpaceObject) {
-            UUID uuid = ((DSpaceObject) object).getPredefinedUUID();
+        if (object instanceof DSpaceObject spaceObject) {
+            UUID uuid = spaceObject.getPredefinedUUID();
             if (uuid != null) {
                 return uuid;
             }

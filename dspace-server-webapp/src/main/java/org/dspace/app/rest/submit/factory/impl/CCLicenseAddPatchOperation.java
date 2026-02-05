@@ -47,8 +47,8 @@ public class CCLicenseAddPatchOperation extends AddPatchOperation<String> {
     void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object value)
             throws Exception {
         String licenseUri = null;
-        if (value instanceof String) {
-            licenseUri = (String) value;
+        if (value instanceof String string) {
+            licenseUri = string;
         }
 
         if (StringUtils.isBlank(licenseUri)) {

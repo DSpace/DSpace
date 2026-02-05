@@ -7,9 +7,8 @@
  */
 package org.dspace.app.rest.signposting.converter;
 
-import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.List;
 
@@ -33,19 +32,19 @@ public class LinksetRestMessageConverter {
         StringBuilder responseBody = new StringBuilder();
         linksetNodes.stream().flatMap(List::stream).forEach(linksetNode -> {
             if (isNotBlank(linksetNode.getLink())) {
-                responseBody.append(format("<%s> ", linksetNode.getLink()));
+                responseBody.append("<%s> ".formatted(linksetNode.getLink()));
             }
             if (nonNull(linksetNode.getRelation())) {
-                responseBody.append(format("; rel=\"%s\" ", linksetNode.getRelation().getName()));
+                responseBody.append("; rel=\"%s\" ".formatted(linksetNode.getRelation().getName()));
             }
             if (isNotBlank(linksetNode.getType())) {
-                responseBody.append(format("; type=\"%s\" ", linksetNode.getType()));
+                responseBody.append("; type=\"%s\" ".formatted(linksetNode.getType()));
             }
             if (isNotBlank(linksetNode.getAnchor())) {
-                responseBody.append(format("; anchor=\"%s\" ", linksetNode.getAnchor()));
+                responseBody.append("; anchor=\"%s\" ".formatted(linksetNode.getAnchor()));
             }
             if (isNotBlank(linksetNode.getProfile())) {
-                responseBody.append(format("; profile=\"%s\" ", linksetNode.getProfile()));
+                responseBody.append("; profile=\"%s\" ".formatted(linksetNode.getProfile()));
             }
             responseBody.append(", ");
         });

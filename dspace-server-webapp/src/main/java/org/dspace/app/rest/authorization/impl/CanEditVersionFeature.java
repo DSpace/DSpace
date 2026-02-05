@@ -44,12 +44,12 @@ public class CanEditVersionFeature implements AuthorizationFeature {
     @Override
     @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
-        if (object instanceof VersionRest) {
+        if (object instanceof VersionRest rest) {
             boolean isEnabled = configurationService.getBooleanProperty("versioning.enabled", true);
             if (Objects.isNull(context.getCurrentUser()) || !isEnabled) {
                 return false;
             }
-            Version version = versioningService.getVersion(context, (((VersionRest) object).getId()));
+            Version version = versioningService.getVersion(context, (rest.getId()));
             if (Objects.nonNull(version) && Objects.nonNull(version.getItem())) {
                 return authorizeService.isAdmin(context, version.getItem());
             }

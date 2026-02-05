@@ -8,12 +8,13 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;

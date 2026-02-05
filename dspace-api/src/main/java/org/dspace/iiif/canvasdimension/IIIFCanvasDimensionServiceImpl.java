@@ -119,6 +119,9 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
                 if (processItemBundles(context, item)) {
                     ++processed;
                 }
+                // Flush before uncaching to ensure all operations complete while entity is attached
+                // (Required for Hibernate 7 which is stricter about detached entity references)
+                context.flush();
                 context.uncacheEntity(item);
             }
         }
@@ -138,6 +141,9 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
             List<Bitstream> bitstreams = bundle.getBitstreams();
             for (Bitstream bit : bitstreams) {
                 done |= processBitstream(context, bit);
+                // Flush before uncaching to ensure all operations complete while entity is attached
+                // (Required for Hibernate 7 which is stricter about detached entity references)
+                context.flush();
                 context.uncacheEntity(bit);
             }
         }

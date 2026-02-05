@@ -74,8 +74,7 @@ public abstract class AbstractTranslator extends AbstractCurationTask {
     @Override
     public int perform(DSpaceObject dso) throws IOException {
 
-        if (dso instanceof Item) {
-            Item item = (Item) dso;
+        if (dso instanceof Item item) {
 
             /*
              * We lazily set success here because our success or failure
