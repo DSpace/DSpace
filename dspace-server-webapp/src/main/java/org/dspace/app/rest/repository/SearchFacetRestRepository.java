@@ -16,6 +16,7 @@ import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,9 +41,13 @@ public class SearchFacetRestRepository extends DSpaceRestRepository<SearchFacetE
         SearchFacetInformation information = SearchFacetInformation.fromRequest(request, facetName);
         DiscoveryConfiguration discoveryConfiguration =
             getConfiguration(context, information.getConfiguration(), information.getScope());
+        DiscoverySearchFilterFacet discoveryFacet = discoveryConfiguration.getSidebarFacet(facetName);
+        if (discoveryFacet == null) {
+            return null;
+        }
 
         SearchFacetEntryRest facet =
-            converter.toRest(discoveryConfiguration.getSidebarFacet(facetName), utils.obtainProjection());
+            converter.toRest(discoveryFacet, utils.obtainProjection());
         facet.setFacetInformation(information);
         return facet;
     }

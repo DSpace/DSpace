@@ -10,9 +10,10 @@ package org.dspace.app.rest.repository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.DiscoveryConfigurationRest;
+import org.dspace.app.rest.model.SearchConfigInformation;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,21 +37,10 @@ public class DiscoveryConfigurationRestRepository extends DSpaceRestRepository<D
     @Override
     @PreAuthorize("permitAll()")
     public DiscoveryConfigurationRest findOne(Context context, String id) {
-        DiscoveryConfiguration discoveryConfiguration = null;
-
-        if (id.equals("scope")) {
-            HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-            String uuid = request.getParameter("uuid");
-            IndexableObject scopeObject = scopeResolver.resolveScope(context, uuid);
-            discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration(context, scopeObject);
-        } else {
-            discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration(id);
-        }
-
-        // Fall back to the default configuration in case nothing could be found.
-        if (discoveryConfiguration == null) {
-            discoveryConfiguration = searchConfigurationService.getDiscoveryConfiguration("default");
-        }
+        HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
+        SearchConfigInformation information = SearchConfigInformation.fromRequest(request);
+        DiscoveryConfiguration discoveryConfiguration = information
+            .getConfiguration(ContextUtil.obtainContext(request), scopeResolver, searchConfigurationService);
 
         return converter.toRest(discoveryConfiguration, utils.obtainProjection());
     }

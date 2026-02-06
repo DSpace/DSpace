@@ -56,6 +56,19 @@ public class SearchFacetRestRepositoryIT extends AbstractControllerIntegrationTe
     ChoiceAuthorityService choiceAuthorityService;
 
     @Test
+    public void discoverFacetsTestNonExistentNotFound() throws Exception {
+        getClient().perform(get("/api/discover/facets/nonexistentfacet"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void discoverFacetsTestFacetFromOtherConfigurationNotFound() throws Exception {
+        getClient().perform(get("/api/discover/facets/author")
+                .param("configuration", "person"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void discoverFacetsTestWithoutParameters() throws Exception {
 
         //When we call this facets endpoint
