@@ -43,6 +43,7 @@ import org.dspace.core.LogHelper;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.dspace.event.EventDetail;
+import org.dspace.services.ConfigurationService;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -80,6 +81,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     protected BitstreamLinkingService bitstreamLinkingService;
     @Autowired(required = true)
     protected RequestItemService requestItemService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     protected BitstreamServiceImpl() {
         super();
@@ -180,6 +183,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public Bitstream replace(Context context, Bitstream oldBitstream, Bitstream newBitstream, boolean replaceName)
         throws SQLException, AuthorizeException, IOException {
+
+        if (!configurationService.getBooleanProperty("replace-bitstream.enabled", false)) {
+            throw new IllegalStateException("Bitstream replacement is not enabled");
+        }
 
         Bundle firstBundle = oldBitstream.getBundles().get(0);
         if (firstBundle == null) {
