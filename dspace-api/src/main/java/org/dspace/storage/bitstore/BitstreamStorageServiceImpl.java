@@ -458,9 +458,8 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         }
 
         // Less than one hour old
-        return (now - lastModified) < (
-            configurationService.getLongProperty("bitstream.cleanup.isRecent.hours", 1L) * 60 * 1000
-        );
+        return (now - lastModified) <
+            (configurationService.getLongProperty("bitstream.cleanup.isRecent.hours", 1L) * 60 * 1000);
     }
 
     protected BitStoreService getStore(int position) throws IOException {

@@ -8,38 +8,47 @@
     http://www.dspace.org/license/
 
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-    <bean name="metadataValidation" class="org.dspace.app.rest.submit.step.validation.MetadataValidation"
-          scope="prototype">
+    <bean name="org.dspace.validation.service.impl.ValidationServiceImpl"
+          class="org.dspace.validation.service.impl.ValidationServiceImpl"/>
+    <bean name="validationServiceFactory"
+          class="org.dspace.validation.service.factory.impl.ValidationServiceFactoryImpl"/>
+
+    <bean name="metadataValidation" class="org.dspace.validation.MetadataValidator">
         <property name="name" value="submission-form"/>
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
         <property name="itemService" ref="org.dspace.content.ItemServiceImpl"/>
         <property name="metadataAuthorityService" ref="org.dspace.content.authority.MetadataAuthorityServiceImpl"/>
     </bean>
 
-    <bean name="uploadValidation" class="org.dspace.app.rest.submit.step.validation.UploadValidation" scope="prototype">
+    <bean name="uploadValidation" class="org.dspace.validation.UploadValidator">
         <property name="name" value="upload"/>
         <property name="itemService" ref="org.dspace.content.ItemServiceImpl"/>
         <property name="uploadConfigurationService" ref="uploadConfigurationService"/>
     </bean>
 
-    <bean name="cclicenseValidation" class="org.dspace.app.rest.submit.step.validation.CclicenseValidator">
+    <bean name="cclicenseValidation" class="org.dspace.validation.CclicenseValidator">
         <property name="itemService" ref="org.dspace.content.ItemServiceImpl"/>
         <property name="name" value="cclicense"/>
     </bean>
 
-    <bean name="licenseValidation" class="org.dspace.app.rest.submit.step.validation.LicenseValidation">
+    <bean name="licenseValidation" class="org.dspace.validation.LicenseValidator">
         <property name="name" value="license"/>
     </bean>
 
-    <bean name="COARNotifyValidation" class="org.dspace.app.rest.submit.step.validation.NotifyValidation" scope="prototype">
+    <bean name="COARNotifyValidation" class="org.dspace.validation.NotifyValidation" scope="prototype">
         <property name="name" value="coarnotify"/>
         <property name="coarNotifyConfigurationService" ref="org.dspace.coarnotify.NotifyConfigurationService"/>
-        <property name="notifyPatternToTriggerService" ref="org.dspace.app.ldn.service.impl.NotifyPatternToTriggerImpl"/>
+        <property name="notifyPatternToTriggerService"
+                  ref="org.dspace.app.ldn.service.impl.NotifyPatternToTriggerImpl"/>
+    </bean>
+
+    <bean name="customUrlValidation" class="org.dspace.validation.CustomUrlValidator">
+        <property name="name" value="custom-url"/>
     </bean>
 
 </beans>

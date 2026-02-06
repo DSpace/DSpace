@@ -2182,7 +2182,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         idRef = UUID.fromString(itemUuidString);
         //TODO Refactor this to use the converter to Item instead of checking every property separately
-        getClient(token).perform(get("/api/core/items/" + idRef.toString()))
+            getClient(token).perform(get("/api/core/items/" + idRef))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", Matchers.allOf(
                             hasJsonPath("$.id", is(itemUuidString)),
@@ -4900,6 +4900,278 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/core/items/" + publicItem.getID() + "/submitter"))
                 .andExpect(status().isNoContent());
+    }
+
+
+    @Test
+    public void testSearchItemByCustomUrl() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                            .withTitle("WorkspaceItem")
+                            .withCustomUrl("my-custom-url")
+                            .withOldCustomUrl("old-url-2")
+                            .build();
+
+        Item firstItem = ItemBuilder.createItem(context, col1)
+                                    .withTitle("Item 1")
+                                    .withCustomUrl("my-custom-url")
+                                    .withOldCustomUrl("old-url")
+                                    .build();
+
+        Item secondItem = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Item 2")
+                                     .withCustomUrl("my-custom-url-2")
+                                     .withOldCustomUrl("old-url-2")
+                                     .withOldCustomUrl("old-url-3")
+                                     .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", firstItem.getID().toString()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", is(firstItem.getID().toString())));
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", secondItem.getID().toString()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", is(secondItem.getID().toString())));
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "my-custom-url"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", is(firstItem.getID().toString())));
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "my-custom-url-2"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", is(secondItem.getID().toString())));
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "old-url"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", is(firstItem.getID().toString())));
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "old-url-2"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", is(secondItem.getID().toString())));
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "old-url-3"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", is(secondItem.getID().toString())));
+
+    }
+
+    @Test
+    public void testSearchItemByCustomUrlWithoutResult() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "unknown"))
+                        .andExpect(status().isNotFound());
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+            .param("q", UUID.randomUUID().toString()))
+            .andExpect(status().isNotFound());
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                .param("q", "http://example.com/sample"))
+                .andExpect(status().isNotFound());
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                .param("q", ""))
+                .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void testSearchItemByCustomUrlWithManyItemWithTheSameUrl() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item firstItem = ItemBuilder.createItem(context, col1)
+                                    .withTitle("Item 1")
+                                    .withCustomUrl("my-custom-url")
+                                    .withOldCustomUrl("old-url")
+                                    .build();
+
+        Item secondItem = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Item 2")
+                                     .withCustomUrl("my-custom-url")
+                                     .withOldCustomUrl("old-url-2")
+                                     .withOldCustomUrl("old-url-3")
+                                     .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "my-custom-url"))
+                        .andExpect(status().isInternalServerError());
+
+    }
+
+    @Test
+    public void testSearchWithdrawnItemByCustomUrl() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create parent community and collection
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        // Create an item with a custom URL and withdraw it
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Withdrawn Item")
+                               .withCustomUrl("withdrawn-custom-url")
+                               .withdrawn()
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Search for the item by its custom URL
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "withdrawn-custom-url"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", is(item.getID().toString())))
+                        .andExpect(jsonPath("$.withdrawn", is(true)));
+    }
+
+    @Test
+    public void testSearchPrivateItemByCustomUrl() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create parent community and collection
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        // Retrieve the Administrator group explicitly
+        Group restrictedGroup = GroupBuilder.createGroup(context)
+                                            .build();
+        // Create a private item with a custom URL, readable only by admins
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Private Item")
+                               .withCustomUrl("private-custom-url")
+                               .withReaderGroup(restrictedGroup)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        // Anonymous user should not find the item
+        getClient().perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "private-custom-url"))
+                        .andExpect(status().isNotFound());
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Admin user should find the item
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "private-custom-url"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", is(item.getID().toString())));
+    }
+
+    @Test
+    public void testSearchItemByCustomUrlWithSimilarUrls() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item firstItem = ItemBuilder.createItem(context, col1)
+                                    .withTitle("Item 1")
+                                    .withCustomUrl("ThomasAlexander_Zimmermann")
+                                    .withOldCustomUrl("Zimmermann")
+                                    .build();
+
+        Item secondItem = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Item 2")
+                                     .withCustomUrl("Alexander_Zimmermann")
+                                     .build();
+
+        Item thirdItem = ItemBuilder.createItem(context, col1)
+                                    .withTitle("Item 3")
+                                    .withCustomUrl("Alexander")
+                                    .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "Alexander_Zimmermann"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", is(secondItem.getID().toString())));
+
+    }
+
+    @Test
+    public void testSearchNotDiscoverableItemByCustomUrl() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Item 1")
+                               .withCustomUrl("my-custom-url")
+                               .makeUnDiscoverable()
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "my-custom-url"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", is(item.getID().toString())));
+
+        getClient().perform(get("/api/core/items/search/findByCustomURL")
+                                     .param("q", "my-custom-url"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.uuid", is(item.getID().toString())));
+
     }
 
 }

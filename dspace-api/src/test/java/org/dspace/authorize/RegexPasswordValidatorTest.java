@@ -11,22 +11,19 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
-import org.dspace.AbstractIntegrationTest;
+import org.dspace.AbstractUnitTest;
 import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * Unit tests for {@link RegexPasswordValidator}.
  * 
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
-@RunWith(MockitoJUnitRunner.class)
-public class RegexPasswordValidatorIT extends AbstractIntegrationTest {
+public class RegexPasswordValidatorTest extends AbstractUnitTest {
 
     @Mock
     private ConfigurationService configurationService;

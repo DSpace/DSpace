@@ -18,11 +18,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 /**
  * This class will filter /api/authn/login requests to try and authenticate them. Keep in mind, this filter runs *after*
@@ -57,7 +58,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
     public StatelessLoginFilter(String url, String httpMethod, AuthenticationManager authenticationManager,
                                 RestAuthenticationService restAuthenticationService) {
         // NOTE: attemptAuthentication() below will only be triggered by requests that match both this URL and method
-        super(new AntPathRequestMatcher(url, httpMethod));
+        super(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.valueOf(httpMethod),url));
         this.authenticationManager = authenticationManager;
         this.restAuthenticationService = restAuthenticationService;
     }

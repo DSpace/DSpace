@@ -98,10 +98,9 @@ public class CanReplaceBitstreamFeatureIT extends AbstractControllerIntegrationT
                                         .withPassword(password)
                                         .build();
 
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, userWithWrite, null)
                             .withDspaceObject(bitstream)
                             .withAction(Constants.WRITE)
-                            .withUser(userWithWrite)
                             .build();
 
         context.restoreAuthSystemState();
