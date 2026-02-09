@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -84,6 +85,10 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
                     //If the dso is null then we give permission so we can throw another status code instead
                     if (dSpaceObject == null) {
                         return true;
+                    }
+
+                    if (dSpaceObject instanceof Bitstream && ((Bitstream) dSpaceObject).isDeleted()) {
+                        return true; // Let downstream REST layer handle with 404
                     }
 
 
