@@ -110,7 +110,7 @@ public class BitstreamRestController {
         Bitstream bit = bitstreamService.find(context, uuid);
         EPerson currentUser = context.getCurrentUser();
 
-        if (bit == null) {
+        if (bit == null || bit.isDeleted()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
