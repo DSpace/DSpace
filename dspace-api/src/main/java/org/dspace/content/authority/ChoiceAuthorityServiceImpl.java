@@ -188,9 +188,41 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     }
 
     @Override
+    @Deprecated
+    public Choices getBestMatch(String fieldKey, String query, Collection collection, String locale) {
+        return getBestMatch(fieldKey, query, Constants.ITEM, collection, locale);
+    }
+
+    @Override
+    @Deprecated
+    public Choices getMatches(String schema, String element, String qualifier,
+                              String query, Collection collection, int start, int limit, String locale) {
+        return getMatches(makeFieldKey(schema, element, qualifier), query, collection, start, limit, locale);
+    }
+
+    @Override
+    @Deprecated
+    public Choices getMatches(String fieldKey, String query, Collection collection,
+                              int start, int limit, String locale) {
+        ChoiceAuthority ma = getAuthorityByFieldKeyCollection(fieldKey, Constants.ITEM, collection);
+        if (ma == null) {
+            throw new IllegalArgumentException(
+                "No choices plugin was configured for  field \"" + fieldKey
+                    + "\", collection=" + collection.getID().toString() + ".");
+        }
+        return ma.getMatches(query, start, limit, locale);
+    }
+
+    @Override
     public String getLabel(MetadataValue metadataValue, int dsoType, Collection collection, String locale) {
         return getLabel(metadataValue.getMetadataField().toString(), dsoType, collection, metadataValue.getAuthority(),
                 locale);
+    }
+
+    @Override
+    @Deprecated
+    public String getLabel(MetadataValue metadataValue, Collection collection, String locale) {
+        return getLabel(metadataValue, Constants.ITEM, collection, locale);
     }
 
     @Override
@@ -272,6 +304,12 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             }
         }
         return null;
+    }
+
+    @Override
+    @Deprecated
+    public String getChoiceAuthorityName(String schema, String element, String qualifier, Collection collection) {
+        return getChoiceAuthorityName(schema, element, qualifier, Constants.ITEM, collection);
     }
 
     @Override

@@ -8,6 +8,7 @@
 package org.dspace.content.authority;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -291,6 +292,13 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
     }
 
     @Override
+    @Deprecated
+    public boolean isAuthorityControlled(MetadataField metadataField) {
+        init();
+        return isAuthorityControlled(makeFieldKey(metadataField));
+    }
+
+    @Override
     public boolean isAuthorityRequired(MetadataField metadataField) {
         init();
         return isAuthorityRequired(makeFieldKey(metadataField));
@@ -331,6 +339,17 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
         init();
         Integer result = minConfidence.get(makeFieldKey(metadataField));
         return result == null ? defaultMinConfidence : result;
+    }
+
+    @Override
+    @Deprecated
+    public List<String> getAuthorityMetadata() {
+        init();
+        List<String> copy = new ArrayList<>();
+        for (String s : controlled.keySet()) {
+            copy.add(s.replaceAll("_", "."));
+        }
+        return copy;
     }
 
     @Override
