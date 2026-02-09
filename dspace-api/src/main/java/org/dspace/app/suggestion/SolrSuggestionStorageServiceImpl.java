@@ -83,35 +83,31 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
     @Override
     public void addSuggestion(Suggestion suggestion, boolean force, boolean commit)
             throws SolrServerException, IOException {
-        try {
-            if (force || !exist(suggestion)) {
-                ObjectMapper jsonMapper = new JsonMapper();
-                jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                SolrInputDocument document = new SolrInputDocument();
-                document.addField(SOURCE, suggestion.getSource());
-                // suggestion id is written as concatenation of
-                // source + ":" + targetID + ":" + idPart (of externalDataObj)
-                String suggestionFullID = suggestion.getID();
-                document.addField(SUGGESTION_FULLID, suggestionFullID);
-                document.addField(SUGGESTION_ID, suggestionFullID.split(":", 3)[2]);
-                document.addField(TARGET_ID, suggestion.getTarget().getID().toString());
-                document.addField(DISPLAY, suggestion.getDisplay());
-                document.addField(TITLE, getFirstValue(suggestion, "dc", "title", null));
-                document.addField(DATE, getFirstValue(suggestion, "dc", "date", "issued"));
-                document.addField(CONTRIBUTORS, getAllValues(suggestion, "dc", "contributor", "author"));
-                document.addField(ABSTRACT, getFirstValue(suggestion, "dc", "description", "abstract"));
-                document.addField(CATEGORY, getAllValues(suggestion, "dc", "source", null));
-                document.addField(EXTERNAL_URI, suggestion.getExternalSourceUri());
-                document.addField(SCORE, suggestion.getScore());
-                document.addField(PROCESSED, false);
-                document.addField(EVIDENCES, jsonMapper.writeValueAsString(suggestion.getEvidences()));
-                getSolr().add(document);
-                if (commit) {
-                    getSolr().commit();
-                }
+        if (force || !exist(suggestion)) {
+            ObjectMapper jsonMapper = new JsonMapper();
+            jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            SolrInputDocument document = new SolrInputDocument();
+            document.addField(SOURCE, suggestion.getSource());
+            // suggestion id is written as concatenation of
+            // source + ":" + targetID + ":" + idPart (of externalDataObj)
+            String suggestionFullID = suggestion.getID();
+            document.addField(SUGGESTION_FULLID, suggestionFullID);
+            document.addField(SUGGESTION_ID, suggestionFullID.split(":", 3)[2]);
+            document.addField(TARGET_ID, suggestion.getTarget().getID().toString());
+            document.addField(DISPLAY, suggestion.getDisplay());
+            document.addField(TITLE, getFirstValue(suggestion, "dc", "title", null));
+            document.addField(DATE, getFirstValue(suggestion, "dc", "date", "issued"));
+            document.addField(CONTRIBUTORS, getAllValues(suggestion, "dc", "contributor", "author"));
+            document.addField(ABSTRACT, getFirstValue(suggestion, "dc", "description", "abstract"));
+            document.addField(CATEGORY, getAllValues(suggestion, "dc", "source", null));
+            document.addField(EXTERNAL_URI, suggestion.getExternalSourceUri());
+            document.addField(SCORE, suggestion.getScore());
+            document.addField(PROCESSED, false);
+            document.addField(EVIDENCES, jsonMapper.writeValueAsString(suggestion.getEvidences()));
+            getSolr().add(document);
+            if (commit) {
+                getSolr().commit();
             }
-        } catch (Exception e) {
-            log.error(e);
         }
     }
 
