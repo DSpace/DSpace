@@ -2105,6 +2105,35 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                 ItemMatcher.matchItemWithTitleAndDateIssued(item2,
                                         "Blade Runner", "1982-06-25")
                         )));
+
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990&sort=default,DESC")
+                        .param("size", "1").param("page", "0"))
+                //Verify that the returned item is the one closest to 1990 but below its upperBound (1990-12-31)
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item5,
+                                        "Python", "1990")
+                        )));
+
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990&sort=default,DESC")
+                        .param("size", "3").param("page", "0"))
+                //Verify that the 3 returned items are from 1990 and below dates,
+                // with closest to upperBound 1990-12-31 as first
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item5,
+                                        "Python", "1990"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                                        "Blade Runner", "1982-06-25"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item1,
+                                        "Alan Turing", "1912-06-23")
+                        )));
+
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1982-06&sort=default,DESC")
+                        .param("size", "1").param("page", "0"))
+                //Verify that the returned item is the one closest to 1982-06 but below its upperBound (1982-06-30)
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                                        "Blade Runner", "1982-06-25")
+                        )));
     }
 
 
