@@ -605,4 +605,11 @@
         <scope_note></scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>openalex</qualifier>
+        <scope_note>The OpenAlex identifier</scope_note>
+    </dc-type>
+
 </dspace-dc-types>

@@ -163,7 +163,7 @@ public class DCInput {
      * The scope of the input sets, this restricts hidden metadata fields from
      * view by the end user during submission.
      */
-    public static final String SUBMISSION_SCOPE = "submit";
+    public static final String SUBMISSION_SCOPE = "submission";
 
     /**
      * Class constructor for creating a DCInput object based on the contents of
@@ -262,7 +262,7 @@ public class DCInput {
 
     /**
      * Is this DCInput for display in the given scope? The scope should be
-     * either "workflow" or "submit", as per the input forms definition. If the
+     * either "workflow" or "submission", as per the input forms definition. If the
      * internal visibility is set to "null" then this will always return true.
      *
      * @param scope String identifying the scope that this input's visibility

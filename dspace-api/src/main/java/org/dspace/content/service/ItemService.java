@@ -10,7 +10,7 @@ package org.dspace.content.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -246,7 +246,7 @@ public interface ItemService
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
+    Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Instant since)
         throws SQLException;
 
     /**
@@ -256,7 +256,7 @@ public interface ItemService
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
+    Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Instant since)
         throws SQLException;
 
     /**
@@ -743,6 +743,24 @@ public interface ItemService
             throws SQLException, AuthorizeException;
 
     /**
+     * Returns an iterator of in archive items possessing the passed metadata field, or only
+     * those matching the passed value, if value is not Item.ANY. This method excludes items
+     * that are not the latest version in their version history (old versions of versioned items).
+     *
+     * @param context   DSpace context object
+     * @param schema    metadata field schema
+     * @param element   metadata field element
+     * @param qualifier metadata field qualifier
+     * @param value     field value or Item.ANY to match any value
+     * @return an iterator over the items matching that authority value, excluding old versions
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     */
+    Iterator<Item> findArchivedByMetadataFieldExcludingOldVersions(Context context, String schema, String element,
+                                                                   String qualifier, String value)
+        throws SQLException, AuthorizeException;
+
+    /**
      * Returns an iterator of Items possessing the passed metadata field, or only
      * those matching the passed value, if value is not Item.ANY
      *
@@ -853,7 +871,7 @@ public interface ItemService
      * @return iterator over items
      * @throws SQLException if database error
      */
-    Iterator<Item> findByLastModifiedSince(Context context, Date last)
+    Iterator<Item> findByLastModifiedSince(Context context, Instant last)
         throws SQLException;
 
     /**
@@ -1009,4 +1027,14 @@ public interface ItemService
      */
     EntityType getEntityType(Context context, Item item) throws SQLException;
 
+
+    /**
+     * Check whether the given item is the latest version. If the latest item cannot
+     * be determined, because either the version history or the latest version is
+     * not present, assume the item is latest.
+     * @param  context the DSpace context.
+     * @param  item    the item that should be checked.
+     * @return         true if the item is the latest version, false otherwise.
+     */
+    public boolean isLatestVersion(Context context, Item item) throws SQLException;
 }

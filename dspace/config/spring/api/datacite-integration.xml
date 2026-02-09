@@ -18,10 +18,35 @@
             only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
             what metadatafield is generated.
         </description>
+        <!-- Mandatory Fields -->
         <entry key-ref="datacite.title" value-ref="dataciteTitleContrib"/>
         <entry key-ref="datacite.id" value-ref="dataciteIDContrib"/>
         <entry key-ref="datacite.author" value-ref="dataciteAuthorContrib"/>
+        <entry key-ref="datacite.publicationyear" value-ref="datacitePublicationYearContrib"/>
+        <entry key-ref="datacite.publisher" value-ref="datacitePublisherContrib"/>
+        <entry key-ref="datacite.resourcetype" value-ref="dataciteResourceTypeContrib"/>
+        <!-- Optional Fields -->
+        <entry key-ref="datacite.abstract" value-ref="dataciteAbstractContrib"/>
+        <entry key-ref="datacite.description" value-ref="dataciteDescriptionContrib"/>
+        <entry key-ref="datacite.language" value-ref="dataciteLanguageContrib"/>
         <!-- TODO: Further Mappings here! querys are applied among the data.attributes object containing the informations -->
+
+    </util:map>
+
+    <!-- beans and mapping for project import-->
+    <util:map id="dataciteProjectMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="datacite.title" value-ref="dataciteTitleContrib"/>
+        <entry key-ref="datacite.id.import" value-ref="dataciteIDImportContrib"/>
+        <entry key-ref="datacite.project.investigator" value-ref="dataciteProjectInvestigatorContrib"/>
+        <entry key-ref="datacite.project.description" value-ref="dataciteProjectDescriptionContrib"/>
+        <entry key-ref="datacite.project.subject" value-ref="dataciteProjectSubjectContrib"/>
+        <!-- TODO: extend your datacite project import mapping with additional MetadataContributor beans
+        matching your submission configuration here  -->
     </util:map>
 
     <bean id="dataciteAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
@@ -57,6 +82,115 @@
     </bean>
     <bean id="datacite.id" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.doi"/>
+    </bean>
+
+    <!-- must be present to be imported, since it's used as the recordId.
+    Project identifier does not use the dc.identifier.doi field -->
+    <bean id="dataciteIDImportContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="datacite.id.import"/>
+        <property name="query" value="/doi"/>
+    </bean>
+    <bean id="datacite.id.import" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier"/>
+    </bean>
+
+    <bean id="dataciteProjectInvestigatorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="metadataProcessor">
+            <bean class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+                <property name="pathToArray" value="/creators"/>
+                <property name="elementAttribute" value="/name"/>
+            </bean>
+        </property>
+        <property name="field" ref="datacite.project.investigator"/>
+    </bean>
+    <bean id="datacite.project.investigator" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="project.investigator"/>
+    </bean>
+
+    <bean id="dataciteProjectDescriptionContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="metadataProcessor">
+            <bean class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+                <property name="pathToArray" value="/descriptions"/>
+                <property name="elementAttribute" value="/description"/>
+            </bean>
+        </property>
+        <property name="field" ref="datacite.project.description"/>
+    </bean>
+    <bean id="datacite.project.description" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.description"/>
+    </bean>
+
+    <bean id="dataciteProjectSubjectContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="metadataProcessor">
+            <bean class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+                <property name="pathToArray" value="/subjects"/>
+                <property name="elementAttribute" value="/subject"/>
+            </bean>
+        </property>
+        <property name="field" ref="datacite.project.subject"/>
+    </bean>
+    <bean id="datacite.project.subject" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.subject"/>
+    </bean>
+
+    <bean id="datacitePublicationYearContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="datacite.publicationyear"/>
+        <property name="query" value="/publicationYear"/>
+    </bean>
+    <bean id="datacite.publicationyear" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.date.issued"/>
+    </bean>
+    <bean id="datacitePublisherContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="datacite.publisher"/>
+        <property name="query" value="/publisher"/>
+    </bean>
+    <bean id="datacite.publisher" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.publisher"/>
+    </bean>
+    <bean id="dataciteResourceTypeContrib" class="org.dspace.importer.external.metadatamapping.contributor.EnhancedJsonPathAttributeConditionMetadataContributor">
+        <property name="field" ref="datacite.resourcetype"/>
+        <property name="query" value="/types"/>
+        <property name="elementAttribute" value="resourceTypeGeneral"/>
+        <property name="metadataPostProcessor" ref="dataciteImportMappingConverter" />
+    </bean>
+    <bean id="datacite.resourcetype" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.type"/>
+    </bean>
+    <bean id="dataciteImportMappingConverter" class="org.dspace.importer.external.metadatamapping.contributor.MappingValueProcessor">
+        <property name="converter" ref="mapConverterDataCiteToDSpacePublicationType" />
+    </bean>
+    <bean name="mapConverterDataCiteToDSpacePublicationType" class="org.dspace.util.SimpleMapConverter" init-method="init">
+        <property name="converterNameFile" value="datacite/mapConverter-datacite-to-dspace-resourcetypes.properties" />
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+        <property name="defaultValue" value="Other"/>
+    </bean>
+
+    <bean id="dataciteAbstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.EnhancedJsonPathAttributeConditionMetadataContributor">
+        <property name="field" ref="datacite.abstract"/>
+        <property name="query" value="/descriptions"/>
+        <property name="elementAttribute" value="description"/>
+        <property name="conditionKey" value="descriptionType" />
+        <property name="conditionValue" value=".*Abstract.*" />
+    </bean>
+    <bean id="datacite.abstract" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.description.abstract"/>
+    </bean>
+    <bean id="dataciteDescriptionContrib" class="org.dspace.importer.external.metadatamapping.contributor.EnhancedJsonPathAttributeConditionMetadataContributor">
+        <property name="field" ref="datacite.description"/>
+        <property name="query" value="/descriptions"/>
+        <property name="elementAttribute" value="description"/>
+        <property name="conditionKey" value="descriptionType" />
+        <property name="conditionValue" value="^((?!Abstract).)*$" />
+    </bean>
+    <bean id="datacite.description" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.description"/>
+    </bean>
+    <bean id="dataciteLanguageContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="datacite.language"/>
+        <property name="query" value="/language"/>
+    </bean>
+    <bean id="datacite.language" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.language.iso"/>
     </bean>
 
 </beans>

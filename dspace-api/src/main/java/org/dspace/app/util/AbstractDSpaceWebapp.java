@@ -9,8 +9,7 @@
 package org.dspace.app.util;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Date;
+import java.time.Instant;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +34,7 @@ abstract public class AbstractDSpaceWebapp
 
     protected String kind;
 
-    protected Date started;
+    protected Instant started;
 
     protected String url;
 
@@ -55,7 +54,7 @@ abstract public class AbstractDSpaceWebapp
     public AbstractDSpaceWebapp(String kind) {
         this.kind = kind;
 
-        started = new Date();
+        started = Instant.now();
 
         ConfigurationService configurationService
                 = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -70,10 +69,9 @@ abstract public class AbstractDSpaceWebapp
      */
     public void register() {
         // Create the database entry
-        Timestamp now = new Timestamp(started.getTime());
         try {
             Context context = new Context();
-            webApp = webAppService.create(context, kind, url, now, isUI() ? 1 : 0);
+            webApp = webAppService.create(context, kind, url, started, isUI() ? 1 : 0);
             context.complete();
         } catch (SQLException e) {
             log.error("Failed to record startup in Webapp table.", e);

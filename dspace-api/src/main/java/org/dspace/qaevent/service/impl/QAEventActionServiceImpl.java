@@ -22,9 +22,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
@@ -114,20 +114,19 @@ public class QAEventActionServiceImpl implements QAEventActionService {
      * Make acknowledgement to the configured urls for the event status.
      */
     private void makeAcknowledgement(String eventId, String source, String status) {
-        String[] ackwnoledgeCallbacks = configurationService
+        String[] acknowledgeCallbacks = configurationService
             .getArrayProperty("qaevents." + source + ".acknowledge-url");
-        if (ackwnoledgeCallbacks != null) {
-            for (String ackwnoledgeCallback : ackwnoledgeCallbacks) {
-                if (StringUtils.isNotBlank(ackwnoledgeCallback)) {
+        if (acknowledgeCallbacks != null) {
+            for (String acknowledgeCallback : acknowledgeCallbacks) {
+                if (StringUtils.isNotBlank(acknowledgeCallback)) {
                     ObjectNode node = jsonMapper.createObjectNode();
                     node.put("eventId", eventId);
                     node.put("status", status);
                     StringEntity requestEntity = new StringEntity(node.toString(), ContentType.APPLICATION_JSON);
-                    CloseableHttpClient httpclient = HttpClients.createDefault();
-                    HttpPost postMethod = new HttpPost(ackwnoledgeCallback);
-                    postMethod.setEntity(requestEntity);
-                    try {
-                        httpclient.execute(postMethod);
+                    try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().buildWithoutProxy()) {
+                        HttpPost postMethod = new HttpPost(acknowledgeCallback);
+                        postMethod.setEntity(requestEntity);
+                        httpClient.execute(postMethod);
                     } catch (IOException e) {
                         log.error(e.getMessage(), e);
                     }

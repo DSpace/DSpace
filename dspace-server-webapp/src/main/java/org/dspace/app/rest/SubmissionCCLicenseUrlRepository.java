@@ -13,6 +13,7 @@ import java.util.Map;
 
 import jakarta.servlet.ServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -79,7 +80,7 @@ public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<Submi
         // Loop through parameters to find answer parameters, adding them to the parameterMap. Zero or more answers
         // may exist, as some CC licenses do not require answers
         for (String parameter : requestParameterMap.keySet()) {
-            if (StringUtils.startsWith(parameter, "answer_")) {
+            if (Strings.CS.startsWith(parameter, "answer_")) {
                 String field = StringUtils.substringAfter(parameter, "answer_");
                 String answer = "";
                 if (requestParameterMap.get(parameter).length > 0) {

@@ -75,6 +75,60 @@ public abstract class AbstractVersionProvider {
                 aMd.getPlace()
             );
         }
+
+        rotateCustomUrl(context, itemNew, nativeItem);
+    }
+
+    /**
+     * Handles the rotation of custom URL metadata during the versioning process.
+     * <p>
+     * This method ensures that the previous version of an item preserves its custom URL
+     * history by moving the current 'dspace.customurl' values to the 'dspace.customurl.old'
+     * field. It then clears the active 'dspace.customurl' from the old item.
+     * </p>
+     * <p>
+     * The new item (already containing the copied metadata) retains the custom URL,
+     * making it the primary target for that URL. The authorization system is temporarily
+     * bypassed to allow modification of the archived old item, provided the user
+     * has the initial permission to create a new version.
+     * </p>
+     *
+     * @param context the DSpace context
+     * @param newItem the newly created version of the item
+     * @param oldItem the previous version of the item
+     * @throws SQLException     if a database error occurs
+     * @throws RuntimeException if an unexpected authorization error occurs during bypass
+     */
+    private void rotateCustomUrl(Context context, Item newItem, Item oldItem) throws SQLException {
+        // Only proceed if the user is authorized to be versioning this item
+        if (!itemService.canCreateNewVersion(context, oldItem)) {
+            return;
+        }
+
+        try {
+            context.turnOffAuthorisationSystem();
+
+            // Find the current URL on the OLD item
+            List<MetadataValue> urls = itemService.getMetadata(oldItem, "dspace", "customurl", null, Item.ANY);
+
+            if (urls != null && !urls.isEmpty()) {
+                for (MetadataValue mv : urls) {
+                    // Move to .old on the OLD item
+                    itemService.addMetadata(context, oldItem, "dspace", "customurl", "old",
+                                            mv.getLanguage(), mv.getValue());
+                }
+
+                // Clear from the OLD item
+                itemService.clearMetadata(context, oldItem, "dspace", "customurl", null, Item.ANY);
+
+                itemService.update(context, oldItem);
+                itemService.update(context, newItem);
+            }
+        } catch (AuthorizeException e) {
+            throw new RuntimeException("Auth error during URL rotation", e);
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 
     protected void createBundlesAndAddBitstreams(Context c, Item itemNew, Item nativeItem)

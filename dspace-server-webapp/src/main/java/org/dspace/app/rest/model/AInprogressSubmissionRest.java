@@ -8,7 +8,7 @@
 package org.dspace.app.rest.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,19 +20,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public abstract class AInprogressSubmissionRest extends BaseObjectRest<Integer> {
+public abstract class AInprogressSubmissionRest<ID extends Serializable> extends BaseObjectRest<ID> {
 
 
-    private Date lastModified = new Date();
+    private Instant lastModified = Instant.now();
     private Map<String, Serializable> sections;
     @JsonIgnore
     private SubmissionDefinitionRest submissionDefinition;
 
-    public Date getLastModified() {
+    public Instant getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(Date lastModified) {
+    public void setLastModified(Instant lastModified) {
         this.lastModified = lastModified;
     }
 

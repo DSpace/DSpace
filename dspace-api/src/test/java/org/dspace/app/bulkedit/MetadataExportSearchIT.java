@@ -74,20 +74,27 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         filename = configurationService.getProperty("dspace.dir")
             + testProps.get("test.exportcsv").toString();
 
-
         for (int i = 0; i < numberItemsSubject1; i++) {
+            // Create different issue dates for each Item, all in month of Sept 2020
+            String issueDate = "2020-09-";
+            int dayOfMonth = i + 1;
+            issueDate += (dayOfMonth < 10 ? "0" + dayOfMonth : dayOfMonth);
             itemsSubject1[i] = ItemBuilder.createItem(context, collection)
                 .withTitle(String.format("%s item %d", subject1, i))
                 .withSubject(subject1)
-                .withIssueDate("2020-09-" + i)
+                .withIssueDate(issueDate)
                 .build();
         }
 
         for (int i = 0; i < numberItemsSubject2; i++) {
+            // Create different issue dates for each Item, all in month of Sept 2021
+            String issueDate = "2021-09-";
+            int dayOfMonth = i + 1;
+            issueDate += (dayOfMonth < 10 ? "0" + dayOfMonth : dayOfMonth);
             itemsSubject2[i] = ItemBuilder.createItem(context, collection)
                 .withTitle(String.format("%s item %d", subject2, i))
                 .withSubject(subject2)
-                .withIssueDate("2021-09-" + i)
+                .withIssueDate(issueDate)
                 .build();
         }
         context.restoreAuthSystemState();
@@ -124,7 +131,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         checkItemsPresentInFile(filename, itemsSubject1);
 
 
-        result = runDSpaceScript("metadata-export-search", "-q", "subject: " + subject2, "-n", filename);
+        result = runDSpaceScript("metadata-export-search", "-q", "subject:" + subject2, "-n", filename);
 
         assertEquals(0, result);
         checkItemsPresentInFile(filename, itemsSubject2);
@@ -250,5 +257,36 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         Exception exception = testDSpaceRunnableHandler.getException();
         assertNotNull(exception);
         assertEquals("nonExisting is not a valid search filter", exception.getMessage());
+    }
+
+    @Test
+    public void exportMetadataSearchDoubleQuotedArgumentTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item quotedItem1 = ItemBuilder.createItem(context, collection)
+                .withTitle("The Special Runnable Item")
+                .withSubject("quoted-subject")
+                .build();
+        Item quotedItem2 = ItemBuilder.createItem(context, collection)
+                .withTitle("The Special Item")
+                .withSubject("quoted-subject")
+                .build();
+        context.restoreAuthSystemState();
+
+        int result = runDSpaceScript(
+                "metadata-export-search",
+                "-q", "title:\"Special Runnable\"",
+                "-n", filename);
+
+        assertEquals(0, result);
+
+        Item[] expectedResult = new Item[] {quotedItem1};
+        checkItemsPresentInFile(filename, expectedResult);
+
+        File file = new File(filename);
+        try (Reader reader = Files.newReader(file, Charset.defaultCharset());
+             CSVReader csvReader = new CSVReader(reader)) {
+            List<String[]> lines = csvReader.readAll();
+            assertEquals("Unexpected extra items in export", 2, lines.size());
+        }
     }
 }

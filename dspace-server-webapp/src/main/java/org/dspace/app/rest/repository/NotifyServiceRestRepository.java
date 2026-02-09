@@ -57,6 +57,9 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
     @Autowired
     ResourcePatch<NotifyServiceEntity> resourcePatch;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Override
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public NotifyServiceRest findOne(Context context, Integer id) {
@@ -85,7 +88,6 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
     @PreAuthorize("hasAuthority('ADMIN')")
     protected NotifyServiceRest createAndReturn(Context context) throws AuthorizeException, SQLException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         NotifyServiceRest notifyServiceRest;
         try {
             ServletInputStream input = req.getInputStream();
@@ -112,6 +114,7 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
         notifyServiceEntity.setUrl(notifyServiceRest.getUrl());
         notifyServiceEntity.setLdnUrl(notifyServiceRest.getLdnUrl());
         notifyServiceEntity.setEnabled(notifyServiceRest.isEnabled());
+        notifyServiceEntity.setUsesActorEmailId(notifyServiceRest.isUsesActorEmailId());
         notifyServiceEntity.setLowerIp(notifyServiceRest.getLowerIp());
         notifyServiceEntity.setUpperIp(notifyServiceRest.getUpperIp());
 

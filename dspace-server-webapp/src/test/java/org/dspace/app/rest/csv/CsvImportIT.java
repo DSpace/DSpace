@@ -74,6 +74,9 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Test
     public void createRelationshipsWithCsvImportTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -285,7 +288,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
 
             getClient(token)
                 .perform(multipart("/api/system/scripts/metadata-import/processes").file(bitstreamFile)
-                                          .param("properties", new ObjectMapper().writeValueAsString(list)))
+                                          .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andDo(result -> idRef
                     .set(read(result.getResponse().getContentAsString(), "$.processId")));
@@ -344,7 +347,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
 
             getClient(token)
                 .perform(multipart("/api/system/scripts/metadata-import/processes").file(bitstreamFile)
-                                             .param("properties", new ObjectMapper().writeValueAsString(list)))
+                                             .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("metadata-import",

@@ -109,7 +109,7 @@ public class DSpaceAIPIngester
     public void crosswalkObjectDmd(Context context, DSpaceObject dso,
                                    METSManifest manifest,
                                    MdrefManager callback,
-                                   Element dmds[], PackageParameters params)
+                                   Element[] dmds, PackageParameters params)
         throws CrosswalkException, PackageValidationException,
         AuthorizeException, SQLException, IOException {
         int found = -1;

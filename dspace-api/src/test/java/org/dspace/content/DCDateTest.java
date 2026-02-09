@@ -10,15 +10,15 @@ package org.dspace.content;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class DCDateTest {
     /**
      * Object to use in the tests
      */
-    private Calendar c;
+    private ZonedDateTime zdt;
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -46,6 +46,8 @@ public class DCDateTest {
      */
     @Before
     public void init() {
+        // Set the default timezone for all tests to GMT-8
+        // This will also ensure ZoneId.systemDefault() returns GMT-8
         TimeZone.setDefault(TimeZone.getTimeZone("GMT-8"));
     }
 
@@ -59,7 +61,7 @@ public class DCDateTest {
     @After
     public void destroy() {
         dc = null;
-        c = null;
+        zdt = null;
     }
 
     /**
@@ -82,9 +84,10 @@ public class DCDateTest {
         assertThat("testDCDateDate 11", dc.getMinuteUTC(), equalTo(-1));
         assertThat("testDCDateDate 12", dc.getSecondUTC(), equalTo(-1));
 
-        // NB. Months begin at 0 in GregorianCalendar so 0 is January.
-        c = new GregorianCalendar(2010, 0, 1);
-        dc = new DCDate(c.getTime());
+        // NOTE: In "init()" the default timezone is set to GMT-8 to ensure the getHour() and getHourUTC() tests
+        // below will result in an 8-hour time difference.
+        zdt = ZonedDateTime.of(2010, 1, 1, 0, 0, 0, 0, ZoneId.systemDefault());
+        dc = new DCDate(zdt);
 
         assertThat("testDCDateDate 1 ", dc.getYear(), equalTo(2010));
         assertThat("testDCDateDate 2 ", dc.getMonth(), equalTo(1));
@@ -100,8 +103,10 @@ public class DCDateTest {
         assertThat("testDCDateDate 11 ", dc.getMinuteUTC(), equalTo(0));
         assertThat("testDCDateDate 12 ", dc.getSecondUTC(), equalTo(0));
 
-        c = new GregorianCalendar(2009, 11, 31, 18, 30);
-        dc = new DCDate(c.getTime());
+        // NOTE: In "init()" the default timezone is set to GMT-8 to ensure the getHour() and getHourUTC() tests
+        // below will result in an 8-hour time difference.
+        zdt = ZonedDateTime.of(2009, 12, 31, 18, 30, 0, 0, ZoneId.systemDefault());
+        dc = new DCDate(zdt);
 
         assertThat("testDCDateDate 13 ", dc.getYear(), equalTo(2009));
         assertThat("testDCDateDate 14 ", dc.getMonth(), equalTo(12));
@@ -162,6 +167,7 @@ public class DCDateTest {
      */
     @Test
     public void testDCDateString() {
+        // Verify null returns empty date
         dc = new DCDate((String) null);
         assertThat("testDCDateString 1", dc.getYear(), equalTo(-1));
         assertThat("testDCDateString 2", dc.getMonth(), equalTo(-1));
@@ -177,6 +183,7 @@ public class DCDateTest {
         assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(-1));
         assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(-1));
 
+        // Verify empty string returns empty date
         dc = new DCDate("");
         assertThat("testDCDateString 1", dc.getYear(), equalTo(-1));
         assertThat("testDCDateString 2", dc.getMonth(), equalTo(-1));
@@ -192,6 +199,7 @@ public class DCDateTest {
         assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(-1));
         assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(-1));
 
+        // Verify only year is set when date is a year
         dc = new DCDate("2010");
         assertThat("testDCDateString 1", dc.getYear(), equalTo(2010));
         assertThat("testDCDateString 2", dc.getMonth(), equalTo(-1));
@@ -207,6 +215,7 @@ public class DCDateTest {
         assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(-1));
         assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(-1));
 
+        // Verify only month & year is set when date is a month.
         dc = new DCDate("2010-04");
         assertThat("testDCDateString 1", dc.getYear(), equalTo(2010));
         assertThat("testDCDateString 2", dc.getMonth(), equalTo(04));
@@ -222,6 +231,7 @@ public class DCDateTest {
         assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(-1));
         assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(-1));
 
+        // Verify only month, day, and year is set when date is a day.
         dc = new DCDate("2010-04-14");
         assertThat("testDCDateString 1", dc.getYear(), equalTo(2010));
         assertThat("testDCDateString 2", dc.getMonth(), equalTo(04));
@@ -237,6 +247,7 @@ public class DCDateTest {
         assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(-1));
         assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(-1));
 
+        // Verify hour is also set when date includes hour.  Verify 8-hour difference with UTC
         dc = new DCDate("2010-04-14T01");
         assertThat("testDCDateString 1", dc.getYear(), equalTo(2010));
         assertThat("testDCDateString 2", dc.getMonth(), equalTo(04));
@@ -252,6 +263,7 @@ public class DCDateTest {
         assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(0));
         assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(0));
 
+        // Verify minute is also set when date includes minute.  Verify 8-hour difference with UTC
         dc = new DCDate("2010-04-14T00:01");
         assertThat("testDCDateString 1", dc.getYear(), equalTo(2010));
         assertThat("testDCDateString 2", dc.getMonth(), equalTo(04));
@@ -267,6 +279,7 @@ public class DCDateTest {
         assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(1));
         assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(0));
 
+        // Verify full UTC time is parse correctly.  Verify NO difference with UTC (as "Z" is a zero timezone)
         dc = new DCDate("2010-04-14T00:00:01Z");
         assertThat("testDCDateString 1", dc.getYear(), equalTo(2010));
         assertThat("testDCDateString 2", dc.getMonth(), equalTo(04));
@@ -282,7 +295,7 @@ public class DCDateTest {
         assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(0));
         assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(1));
 
-        // test additional ISO format
+        // Verify millisecond can be parsed.  Verify 8-hour difference with UTC
         dc = new DCDate("2010-04-14T00:00:01.000");
         assertThat("testDCDateString 1", dc.getYear(), equalTo(2010));
         assertThat("testDCDateString 2", dc.getMonth(), equalTo(04));
@@ -297,7 +310,6 @@ public class DCDateTest {
         assertThat("testDCDateString 10", dc.getHourUTC(), equalTo(0));
         assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(0));
         assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(1));
-
     }
 
 
@@ -338,24 +350,24 @@ public class DCDateTest {
      */
     @Test
     public void testToDate() {
-        dc = new DCDate((Date) null);
+        dc = new DCDate((ZonedDateTime) null);
         assertThat("testToDate 0", dc.toDate(), nullValue());
 
-        c = new GregorianCalendar(2010, 0, 0);
-        dc = new DCDate(c.getTime());
-        assertThat("testToDate 1", dc.toDate(), equalTo(c.getTime()));
+        zdt = ZonedDateTime.of(2010, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        dc = new DCDate(zdt);
+        assertThat("testToDate 1", dc.toDate(), equalTo(zdt));
 
-        c = new GregorianCalendar(2010, 4, 0);
-        dc = new DCDate(c.getTime());
-        assertThat("testToDate 2", dc.toDate(), equalTo(c.getTime()));
+        zdt = ZonedDateTime.of(2010, 5, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        dc = new DCDate(zdt);
+        assertThat("testToDate 2", dc.toDate(), equalTo(zdt));
 
-        c = new GregorianCalendar(2010, 4, 14);
-        dc = new DCDate(c.getTime());
-        assertThat("testToDate 3", dc.toDate(), equalTo(c.getTime()));
+        zdt = ZonedDateTime.of(2010, 5, 15, 0, 0, 0, 0, ZoneOffset.UTC);
+        dc = new DCDate(zdt);
+        assertThat("testToDate 3", dc.toDate(), equalTo(zdt));
 
-        c = new GregorianCalendar(2010, 4, 14, 0, 0, 1);
-        dc = new DCDate(c.getTime());
-        assertThat("testToDate 4", dc.toDate(), equalTo(c.getTime()));
+        zdt = ZonedDateTime.of(2010, 5, 15, 0, 0, 1, 0, ZoneOffset.UTC);
+        dc = new DCDate(zdt);
+        assertThat("testToDate 4", dc.toDate(), equalTo(zdt));
     }
 
 
@@ -366,42 +378,42 @@ public class DCDateTest {
     public void testDisplayDate() {
         dc = new DCDate("2010");
         assertThat("testDisplayDate 1 ", dc.displayDate(true, true,
-                                                        new Locale("en_GB")),
+                                                        Locale.of("en", "GB")),
                    equalTo("2010"));
 
         dc = new DCDate("2010-04");
         assertThat("testDisplayDate 2 ", dc.displayDate(true, true,
-                                                        new Locale("en_GB")),
+                                                        Locale.of("en", "GB")),
                    equalTo("Apr-2010"));
 
         dc = new DCDate("2010-04-14");
         assertThat("testDisplayDate 3 ", dc.displayDate(true, true,
-                                                        new Locale("en_GB")),
+                                                        Locale.of("en", "GB")),
                    equalTo("14-Apr-2010"));
 
         dc = new DCDate("2010-04-14T00:00:01Z");
         assertThat("testDisplayDate 4 ", dc.displayDate(true, true,
-                                                        new Locale("en_GB")),
+                                                        Locale.of("en", "GB")),
                    equalTo("13-Apr-2010 16:00:01"));
 
         dc = new DCDate("2010-04-14T00:00:01Z");
         assertThat("testDisplayDate 5 ", dc.displayDate(false, true,
-                                                        new Locale("en_GB")),
+                                                        Locale.of("en", "GB")),
                    equalTo("13-Apr-2010"));
 
         dc = new DCDate("2010-04-14T00:00:01Z");
         assertThat("testDisplayDate 6 ", dc.displayDate(true, false,
-                                                        new Locale("es")),
+                                                        Locale.of("es")),
                    equalTo("14-abr-2010 00:00:01"));
 
         dc = new DCDate("2010-04-14T00:00:01Z");
         assertThat("testDisplayDate 7 ", dc.displayDate(false, false,
-                                                        new Locale("en_GB")),
+                                                        Locale.of("en", "GB")),
                    equalTo("14-Apr-2010"));
 
         dc = new DCDate("2010-04-14T00:00:01.000");
         assertThat("testDisplayDate 8 ", dc.displayDate(false, false,
-                        new Locale("en_GB")),
+                        Locale.of("en", "GB")),
                 equalTo("14-Apr-2010"));
     }
 
@@ -410,10 +422,9 @@ public class DCDateTest {
      */
     @Test
     public void testGetCurrent() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-        assertTrue("testGetCurrent 0", DateUtils.isSameDay(DCDate.getCurrent().toDate(), calendar.getTime()));
+        ZonedDateTime todayDateTimeUTC = ZonedDateTime.now(ZoneId.of("UTC"));
+        LocalDate today = todayDateTimeUTC.toLocalDate();
+        assertEquals("testGetCurrent 0", DCDate.getCurrent().toDate().toLocalDate(), today);
     }
 
 
@@ -422,63 +433,63 @@ public class DCDateTest {
      */
     @Test
     public void testGetMonthName() {
-        assertThat("testGetMonthName 0", DCDate.getMonthName(-1, new Locale("en")),
+        assertThat("testGetMonthName 0", DCDate.getMonthName(-1, Locale.of("en")),
                    equalTo("Unspecified"));
-        assertThat("testGetMonthName 1", DCDate.getMonthName(0, new Locale("en")),
+        assertThat("testGetMonthName 1", DCDate.getMonthName(0, Locale.of("en")),
                    equalTo("Unspecified"));
-        assertThat("testGetMonthName 2", DCDate.getMonthName(13, new Locale("en")),
+        assertThat("testGetMonthName 2", DCDate.getMonthName(13, Locale.of("en")),
                    equalTo("Unspecified"));
-        assertThat("testGetMonthName 3", DCDate.getMonthName(14, new Locale("en")),
+        assertThat("testGetMonthName 3", DCDate.getMonthName(14, Locale.of("en")),
                    equalTo("Unspecified"));
 
-        assertThat("testGetMonthName 4", DCDate.getMonthName(1, new Locale("en")),
+        assertThat("testGetMonthName 4", DCDate.getMonthName(1, Locale.of("en")),
                    equalTo("January"));
-        assertThat("testGetMonthName 5", DCDate.getMonthName(2, new Locale("en")),
+        assertThat("testGetMonthName 5", DCDate.getMonthName(2, Locale.of("en")),
                    equalTo("February"));
-        assertThat("testGetMonthName 6", DCDate.getMonthName(3, new Locale("en")),
+        assertThat("testGetMonthName 6", DCDate.getMonthName(3, Locale.of("en")),
                    equalTo("March"));
-        assertThat("testGetMonthName 7", DCDate.getMonthName(4, new Locale("en")),
+        assertThat("testGetMonthName 7", DCDate.getMonthName(4, Locale.of("en")),
                    equalTo("April"));
-        assertThat("testGetMonthName 8", DCDate.getMonthName(5, new Locale("en")),
+        assertThat("testGetMonthName 8", DCDate.getMonthName(5, Locale.of("en")),
                    equalTo("May"));
-        assertThat("testGetMonthName 9", DCDate.getMonthName(6, new Locale("en")),
+        assertThat("testGetMonthName 9", DCDate.getMonthName(6, Locale.of("en")),
                    equalTo("June"));
-        assertThat("testGetMonthName 10", DCDate.getMonthName(7, new Locale("en")),
+        assertThat("testGetMonthName 10", DCDate.getMonthName(7, Locale.of("en")),
                    equalTo("July"));
-        assertThat("testGetMonthName 11", DCDate.getMonthName(8, new Locale("en")),
+        assertThat("testGetMonthName 11", DCDate.getMonthName(8, Locale.of("en")),
                    equalTo("August"));
-        assertThat("testGetMonthName 12", DCDate.getMonthName(9, new Locale("en")),
+        assertThat("testGetMonthName 12", DCDate.getMonthName(9, Locale.of("en")),
                    equalTo("September"));
-        assertThat("testGetMonthName 13", DCDate.getMonthName(10, new Locale("en")),
+        assertThat("testGetMonthName 13", DCDate.getMonthName(10, Locale.of("en")),
                    equalTo("October"));
-        assertThat("testGetMonthName 14", DCDate.getMonthName(11, new Locale("en")),
+        assertThat("testGetMonthName 14", DCDate.getMonthName(11, Locale.of("en")),
                    equalTo("November"));
-        assertThat("testGetMonthName 15", DCDate.getMonthName(12, new Locale("en")),
+        assertThat("testGetMonthName 15", DCDate.getMonthName(12, Locale.of("en")),
                    equalTo("December"));
 
-        assertThat("testGetMonthName 16", DCDate.getMonthName(1, new Locale("es")),
+        assertThat("testGetMonthName 16", DCDate.getMonthName(1, Locale.of("es")),
                    equalTo("enero"));
-        assertThat("testGetMonthName 17", DCDate.getMonthName(2, new Locale("es")),
+        assertThat("testGetMonthName 17", DCDate.getMonthName(2, Locale.of("es")),
                    equalTo("febrero"));
-        assertThat("testGetMonthName 18", DCDate.getMonthName(3, new Locale("es")),
+        assertThat("testGetMonthName 18", DCDate.getMonthName(3, Locale.of("es")),
                    equalTo("marzo"));
-        assertThat("testGetMonthName 19", DCDate.getMonthName(4, new Locale("es")),
+        assertThat("testGetMonthName 19", DCDate.getMonthName(4, Locale.of("es")),
                    equalTo("abril"));
-        assertThat("testGetMonthName 20", DCDate.getMonthName(5, new Locale("es")),
+        assertThat("testGetMonthName 20", DCDate.getMonthName(5, Locale.of("es")),
                    equalTo("mayo"));
-        assertThat("testGetMonthName 21", DCDate.getMonthName(6, new Locale("es")),
+        assertThat("testGetMonthName 21", DCDate.getMonthName(6, Locale.of("es")),
                    equalTo("junio"));
-        assertThat("testGetMonthName 22", DCDate.getMonthName(7, new Locale("es")),
+        assertThat("testGetMonthName 22", DCDate.getMonthName(7, Locale.of("es")),
                    equalTo("julio"));
-        assertThat("testGetMonthName 23", DCDate.getMonthName(8, new Locale("es")),
+        assertThat("testGetMonthName 23", DCDate.getMonthName(8, Locale.of("es")),
                    equalTo("agosto"));
-        assertThat("testGetMonthName 24", DCDate.getMonthName(9, new Locale("es")),
+        assertThat("testGetMonthName 24", DCDate.getMonthName(9, Locale.of("es")),
                    equalTo("septiembre"));
-        assertThat("testGetMonthName 25", DCDate.getMonthName(10, new Locale("es")),
+        assertThat("testGetMonthName 25", DCDate.getMonthName(10, Locale.of("es")),
                    equalTo("octubre"));
-        assertThat("testGetMonthName 26", DCDate.getMonthName(11, new Locale("es")),
+        assertThat("testGetMonthName 26", DCDate.getMonthName(11, Locale.of("es")),
                    equalTo("noviembre"));
-        assertThat("testGetMonthName 27", DCDate.getMonthName(12, new Locale("es")),
+        assertThat("testGetMonthName 27", DCDate.getMonthName(12, Locale.of("es")),
                    equalTo("diciembre"));
     }
 

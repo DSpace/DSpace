@@ -54,6 +54,9 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
     @Column(name = "enabled")
     private boolean enabled = false;
 
+    @Column(name = "uses_actor_email_id")
+    private boolean usesActorEmailId = false;
+
     @Column(name = "score")
     private BigDecimal score;
 
@@ -127,6 +130,14 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isUsesActorEmailId() {
+        return usesActorEmailId;
+    }
+
+    public void setUsesActorEmailId(boolean usesActorEmailId) {
+        this.usesActorEmailId = usesActorEmailId;
     }
 
     public BigDecimal getScore() {

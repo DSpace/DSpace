@@ -43,6 +43,6 @@ public class RootRestResourceController {
 
     @RequestMapping(method = RequestMethod.GET)
     public RootResource listDefinedEndpoint(HttpServletRequest request) {
-        return converter.toResource(rootRestRepository.getRoot());
+        return converter.toResource(rootRestRepository.getRoot(request));
     }
 }

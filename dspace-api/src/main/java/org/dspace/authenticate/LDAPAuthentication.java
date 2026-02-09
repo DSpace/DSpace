@@ -34,6 +34,7 @@ import javax.naming.ldap.StartTlsResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
@@ -203,7 +204,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
      * <p>Meaning:
      * <br>SUCCESS         - authenticated OK.
      * <br>BAD_CREDENTIALS - user exists, but credentials (e.g. passwd) don't match
-     * <br>CERT_REQUIRED   - not allowed to login this way without X.509 cert.
+     * <br>CERT_REQUIRED   - not allowed to login this way without a cert.
      * <br>NO_SUCH_USER    - user not found using this method.
      * <br>BAD_ARGS        - user/pw not appropriate for this method
      */
@@ -535,7 +536,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
                             resultDN = (sr.getName() + "," + ldap_search_context);
                         }
 
-                        String attlist[] = {ldap_email_field, ldap_givenname_field,
+                        String[] attlist = {ldap_email_field, ldap_givenname_field,
                             ldap_surname_field, ldap_phone_field, ldap_group_field};
                         Attributes atts = sr.getAttributes();
                         Attribute att;
@@ -743,12 +744,12 @@ public class LDAPAuthentication implements AuthenticationMethod {
             // groupmap contains the mapping of LDAP groups to DSpace groups
             // outer loop with the DSpace groups
             while (groupMap != null) {
-                String t[] = groupMap.split(":");
+                String[] t = groupMap.split(":");
                 String ldapSearchString = t[0];
                 String dspaceGroupName = t[1];
 
                 if (group == null) {
-                    cmp = StringUtils.containsIgnoreCase(dn, ldapSearchString + ",");
+                    cmp = Strings.CI.contains(dn, ldapSearchString + ",");
 
                     if (cmp) {
                         assignGroup(context, groupmapIndex, dspaceGroupName);
@@ -764,9 +765,9 @@ public class LDAPAuthentication implements AuthenticationMethod {
 
                         // very much the old code from DSpace <= 7.5
                         if (currentGroup == null) {
-                            cmp = StringUtils.containsIgnoreCase(dn, ldapSearchString + ",");
+                            cmp = Strings.CI.contains(dn, ldapSearchString + ",");
                         } else {
-                            cmp = StringUtils.equalsIgnoreCase(currentGroup, ldapSearchString);
+                            cmp = Strings.CI.equals(currentGroup, ldapSearchString);
                         }
 
                         if (cmp) {

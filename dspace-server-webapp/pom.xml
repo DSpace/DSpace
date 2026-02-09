@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>9.0-SNAPSHOT</version>
+        <version>10.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -330,7 +330,7 @@
             <artifactId>spring-boot-starter-aop</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
@@ -423,7 +423,7 @@
         <dependency>
             <groupId>org.webjars.npm</groupId>
             <artifactId>json-editor__json-editor</artifactId>
-            <version>2.15.1</version>
+            <version>2.15.2</version>
         </dependency>
         <!-- Also pull in current version of Bootstrap via WebJars.
              This is used by BOTH our HAL Browser and our OAI-PMH interface.
@@ -481,6 +481,13 @@
         </dependency>
 
         <!-- DSpace dependencies -->
+
+        <!-- Moved here from optional modules list to ensure that iiif-apis mime.types resource is first in classpath -->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-iiif</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
@@ -502,11 +509,11 @@
         <!-- You may choose to comment out any of these modules if you do not want/need its features -->
         <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-iiif</artifactId>
+            <artifactId>dspace-oai</artifactId>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-oai</artifactId>
+            <artifactId>dspace-saml2</artifactId>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
@@ -552,7 +559,7 @@
         <dependency>
             <groupId>net.minidev</groupId>
             <artifactId>json-smart</artifactId>
-            <version>2.5.1</version>
+            <version>2.6.0</version>
         </dependency>
 
         <dependency>
@@ -590,7 +597,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.4.1</version>
+            <version>5.5.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -631,7 +638,7 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
+            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- Solr Core is needed for Integration Tests (to run a MockSolrServer)     -->
@@ -646,6 +653,10 @@
                 <exclusion>
                     <groupId>org.antlr</groupId>
                     <artifactId>antlr4-runtime</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

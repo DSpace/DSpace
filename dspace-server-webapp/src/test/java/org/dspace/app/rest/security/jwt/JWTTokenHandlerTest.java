@@ -12,9 +12,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -76,7 +77,7 @@ public class JWTTokenHandlerTest {
     @Before
     public void setUp() throws Exception {
         when(ePerson.getSessionSalt()).thenReturn("01234567890123456789012345678901");
-        when(ePerson.getLastActive()).thenReturn(new Date());
+        when(ePerson.getLastActive()).thenReturn(Instant.now());
         when(context.getCurrentUser()).thenReturn(ePerson);
         when(clientInfoService.getClientIp(any())).thenReturn("123.123.123.123");
         when(ePersonClaimProvider.getKey()).thenReturn("eid");
@@ -90,7 +91,7 @@ public class JWTTokenHandlerTest {
 
     @Test
     public void testJWTNoEncryption() throws Exception {
-        Date previous = new Date(System.currentTimeMillis() - 10000000000L);
+        Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
         String token = loginJWTTokenHandler
             .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
         SignedJWT signedJWT = SignedJWT.parse(token);
@@ -101,7 +102,7 @@ public class JWTTokenHandlerTest {
     @Test(expected = ParseException.class)
     public void testJWTEncrypted() throws Exception {
         when(loginJWTTokenHandler.isEncryptionEnabled()).thenReturn(true);
-        Date previous = new Date(System.currentTimeMillis() - 10000000000L);
+        Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
         StringKeyGenerator keyGenerator = KeyGenerators.string();
         when(configurationService.getProperty("jwt.login.encryption.secret")).thenReturn(keyGenerator.generateKey());
         String token = loginJWTTokenHandler
@@ -114,7 +115,7 @@ public class JWTTokenHandlerTest {
     public void testExpiredToken() throws Exception {
         when(configurationService.getLongProperty("jwt.login.token.expiration", 1800000)).thenReturn(-99999999L);
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
-        Date previous = new Date(new Date().getTime() - 10000000000L);
+        Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
         String token = loginJWTTokenHandler
             .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
         EPerson parsed = loginJWTTokenHandler.parseEPersonFromToken(token, httpServletRequest, context);
@@ -127,11 +128,11 @@ public class JWTTokenHandlerTest {
     public void testTokenTampering() throws Exception {
         when(loginJWTTokenHandler.getExpirationPeriod()).thenReturn(-99999999L);
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
-        Date previous = new Date(new Date().getTime() - 10000000000L);
+        Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
         String token = loginJWTTokenHandler
             .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder().claim("eid", "epersonID").expirationTime(
-            new Date(System.currentTimeMillis() + 99999999)).build();
+            java.util.Date.from(Instant.now().plus(99999999, ChronoUnit.MILLIS))).build();
         String tamperedPayload = new String(Base64.getUrlEncoder().encode(jwtClaimsSet.toString().getBytes()));
         String[] splitToken = token.split("\\.");
         String tamperedToken = splitToken[0] + "." + tamperedPayload + "." + splitToken[2];
@@ -141,7 +142,7 @@ public class JWTTokenHandlerTest {
 
     @Test
     public void testInvalidatedToken() throws Exception {
-        Date previous = new Date(System.currentTimeMillis() - 10000000000L);
+        Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
         // create a new token
         String token = loginJWTTokenHandler
             .createTokenForEPerson(context, new MockHttpServletRequest(), previous);

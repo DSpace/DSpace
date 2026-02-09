@@ -36,6 +36,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.Group;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -113,7 +114,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         // if we ever use the identifier service for bundles, we should
         // create the bundle before we create the Event and should add all
         // identifiers to it.
-        context.addEvent(new Event(Event.CREATE, Constants.BUNDLE, bundle.getID(), null));
+        context.addEvent(new Event(Event.CREATE, Constants.BUNDLE,
+            bundle.getID(), Constants.ITEM, item.getID(),
+            bundle.getMetadataEventDetails(), DetailType.DSO_SUMMARY,
+            getIdentifiers(context, bundle)));
 
         return bundle;
     }
@@ -157,6 +161,11 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         if (owningItem != null) {
             itemService.updateLastModified(context, owningItem);
             itemService.update(context, owningItem);
+            context.addEvent(new Event(Event.ADD, Constants.BUNDLE, bundle.getID(),
+                Constants.ITEM, owningItem.getID(),
+                String.valueOf(bitstream.getSequenceID()), DetailType.BITSTREAM_SEQUENCE_ID,
+                getIdentifiers(context, bundle)));
+
         }
 
         bundle.addBitstream(bitstream);
@@ -169,7 +178,8 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
 
         context.addEvent(new Event(Event.ADD, Constants.BUNDLE, bundle.getID(),
-                Constants.BITSTREAM, bitstream.getID(), String.valueOf(bitstream.getSequenceID()),
+                Constants.BITSTREAM, bitstream.getID(),
+                String.valueOf(bitstream.getSequenceID()), DetailType.BITSTREAM_SEQUENCE_ID,
                 getIdentifiers(context, bundle)));
 
         // copy authorization policies from bundle to bitstream
@@ -221,7 +231,8 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
 
         context.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, bundle.getID(),
-                Constants.BITSTREAM, bitstream.getID(), String.valueOf(bitstream.getSequenceID()),
+            Constants.BITSTREAM, bitstream.getID(),
+            String.valueOf(bitstream.getSequenceID()), DetailType.BITSTREAM_SEQUENCE_ID,
                 getIdentifiers(context, bundle)));
 
         //Ensure that the last modified from the item is triggered !
@@ -229,6 +240,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         if (owningItem != null) {
             itemService.updateLastModified(context, owningItem);
             itemService.update(context, owningItem);
+            context.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, bundle.getID(),
+                Constants.ITEM, owningItem.getID(),
+                String.valueOf(bitstream.getSequenceID()), DetailType.BITSTREAM_SEQUENCE_ID,
+                getIdentifiers(context, bundle)));
         }
 
         // In the event that the bitstream to remove is actually
@@ -518,7 +533,8 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
         if (bundle.isModified() || bundle.isMetadataModified()) {
             if (bundle.isMetadataModified()) {
-                context.addEvent(new Event(Event.MODIFY_METADATA, bundle.getType(), bundle.getID(), bundle.getDetails(),
+                context.addEvent(new Event(Event.MODIFY_METADATA, bundle.getType(), bundle.getID(),
+                        bundle.getMetadataEventDetails(), DetailType.DSO_SUMMARY,
                         getIdentifiers(context, bundle)));
             }
             context.addEvent(new Event(Event.MODIFY, Constants.BUNDLE, bundle.getID(),
@@ -536,7 +552,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         authorizeService.authorizeAction(context, bundle, Constants.DELETE);
 
         context.addEvent(new Event(Event.DELETE, Constants.BUNDLE, bundle.getID(),
-                bundle.getName(), getIdentifiers(context, bundle)));
+                bundle.getName(), DetailType.DSO_NAME, getIdentifiers(context, bundle)));
 
         // Remove bitstreams
         List<Bitstream> bitstreams = bundle.getBitstreams();

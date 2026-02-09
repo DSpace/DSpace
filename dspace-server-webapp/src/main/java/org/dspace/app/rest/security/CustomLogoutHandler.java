@@ -45,7 +45,7 @@ public class CustomLogoutHandler implements LogoutHandler {
         try {
             Context context = ContextUtil.obtainContext(httpServletRequest);
             restAuthenticationService.invalidateAuthenticationData(httpServletRequest, httpServletResponse, context);
-            context.commit();
+            context.complete();
 
         } catch (Exception e) {
             log.error("Unable to logout", e);

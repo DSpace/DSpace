@@ -7,9 +7,9 @@
  */
 package org.dspace.authority.orcid;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +17,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authority.AuthorityValue;
@@ -84,7 +85,7 @@ public class Orcidv3AuthorityValue extends PersonAuthorityValue {
         Orcidv3AuthorityValue orcidAuthorityValue = new Orcidv3AuthorityValue();
         orcidAuthorityValue.setId(UUID.randomUUID().toString());
         orcidAuthorityValue.updateLastModifiedDate();
-        orcidAuthorityValue.setCreationDate(new Date());
+        orcidAuthorityValue.setCreationDate(Instant.now());
         return orcidAuthorityValue;
     }
 
@@ -110,15 +111,15 @@ public class Orcidv3AuthorityValue extends PersonAuthorityValue {
     protected void setValues(Person person) {
         Name name = person.getName();
 
-        if (!StringUtils.equals(name.getPath(), this.getOrcid_id())) {
+        if (!Strings.CS.equals(name.getPath(), this.getOrcid_id())) {
             this.setOrcid_id(name.getPath());
         }
 
-        if (!StringUtils.equals(name.getFamilyName().getContent(), this.getLastName())) {
+        if (!Strings.CS.equals(name.getFamilyName().getContent(), this.getLastName())) {
             this.setLastName(name.getFamilyName().getContent());
         }
 
-        if (!StringUtils.equals(name.getGivenNames().getContent(), this.getFirstName())) {
+        if (!Strings.CS.equals(name.getGivenNames().getContent(), this.getFirstName())) {
             this.setFirstName(name.getGivenNames().getContent());
         }
 
