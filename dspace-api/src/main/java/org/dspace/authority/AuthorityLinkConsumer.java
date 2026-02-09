@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.itemupdate.MetadataUtilities;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputsReader;
@@ -38,9 +40,13 @@ import org.dspace.event.Event;
  */
 public class AuthorityLinkConsumer implements Consumer {
 
+    private static final Logger log = LogManager.getLogger(AuthorityLinkConsumer.class);
+
     public static final String CONSUMER_NAME = "authoritylink";
 
     private ItemService itemService;
+
+    private DCInputsReader inputsReader;
 
     /**
      * Set to track items that have been modified during this consumer's execution.
@@ -54,6 +60,7 @@ public class AuthorityLinkConsumer implements Consumer {
     public void initialize() throws Exception {
         itemService = ContentServiceFactory.getInstance().getItemService();
         modifiedItems = new HashSet<>();
+        inputsReader = new DCInputsReader();
     }
 
     @Override
@@ -88,15 +95,17 @@ public class AuthorityLinkConsumer implements Consumer {
                     return itemService.getMetadata(item, splittedMetadata[0], splittedMetadata[1],
                         splittedMetadata.length > 2 ? splittedMetadata[2] : null, Item.ANY).stream();
                 } catch (Exception e) {
+                    log.warn("Failed to parse metadata field '{}' for item {}: {}",
+                            metadata, item.getID(), e.getMessage());
                     return Stream.of();
                 }
 
             })
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
-        
+
         boolean itemModified = false;
-        
+
         // Set authority to value if authority is blank
         for (MetadataValue metadataVal : metadataValues) {
             if (StringUtils.isBlank(metadataVal.getAuthority())) {
@@ -105,7 +114,7 @@ public class AuthorityLinkConsumer implements Consumer {
                 itemModified = true;
             }
         }
-        
+
         // Set value to authority if value is blank
         for (MetadataValue metadataVal : metadataValues) {
             if (StringUtils.isBlank(metadataVal.getValue())) {
@@ -114,7 +123,7 @@ public class AuthorityLinkConsumer implements Consumer {
                 itemModified = true;
             }
         }
-        
+
         // Track this item if it was modified
         if (itemModified) {
             modifiedItems.add(item);
@@ -133,7 +142,6 @@ public class AuthorityLinkConsumer implements Consumer {
     }
 
     private List<DCInput> getAllInputsByCollection(Collection collection) throws DCInputsReaderException {
-        DCInputsReader inputsReader = new DCInputsReader();
         return inputsReader.getInputsByCollection(collection).stream()
             .flatMap(dcInputSet -> Arrays.stream(dcInputSet.getFields()))
             .flatMap(dcInputs -> Arrays.stream(dcInputs))
