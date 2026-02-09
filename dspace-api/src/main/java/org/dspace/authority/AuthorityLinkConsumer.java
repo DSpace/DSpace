@@ -9,8 +9,10 @@
 package org.dspace.authority;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,10 +42,18 @@ public class AuthorityLinkConsumer implements Consumer {
 
     private ItemService itemService;
 
+    /**
+     * Set to track items that have been modified during this consumer's execution.
+     * These items will be updated in the end() method to ensure changes are persisted
+     * and properly indexed.
+     */
+    private Set<Item> modifiedItems;
+
     @Override
     @SuppressWarnings("unchecked")
     public void initialize() throws Exception {
         itemService = ContentServiceFactory.getInstance().getItemService();
+        modifiedItems = new HashSet<>();
     }
 
     @Override
@@ -84,20 +94,31 @@ public class AuthorityLinkConsumer implements Consumer {
             })
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
-        metadataValues
-            .stream()
-            .filter(metadataVal -> StringUtils.isBlank(metadataVal.getAuthority()))
-            .forEach(metadataVal -> {
+        
+        boolean itemModified = false;
+        
+        // Set authority to value if authority is blank
+        for (MetadataValue metadataVal : metadataValues) {
+            if (StringUtils.isBlank(metadataVal.getAuthority())) {
                 metadataVal.setAuthority(metadataVal.getValue());
                 metadataVal.setConfidence(Choices.CF_ACCEPTED);
-            });
-        metadataValues
-            .stream()
-            .filter(metadataVal -> StringUtils.isBlank(metadataVal.getValue()))
-            .forEach(metadataVal -> {
+                itemModified = true;
+            }
+        }
+        
+        // Set value to authority if value is blank
+        for (MetadataValue metadataVal : metadataValues) {
+            if (StringUtils.isBlank(metadataVal.getValue())) {
                 metadataVal.setValue(metadataVal.getAuthority());
                 metadataVal.setConfidence(Choices.CF_ACCEPTED);
-            });
+                itemModified = true;
+            }
+        }
+        
+        // Track this item if it was modified
+        if (itemModified) {
+            modifiedItems.add(item);
+        }
 
     }
 
@@ -121,6 +142,14 @@ public class AuthorityLinkConsumer implements Consumer {
 
     @Override
     public void end(Context context) throws Exception {
+        // Update all modified items to ensure changes are persisted and properly indexed
+        for (Item item : modifiedItems) {
+            itemService.update(context, item);
+            // Uncache the entity to prevent Hibernate memory exhaustion when processing large numbers of items
+            context.uncacheEntity(item);
+        }
+        // Clear the set for the next batch
+        modifiedItems.clear();
     }
 
 }
