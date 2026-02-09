@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
 
+import org.dspace.external.OrcidConnectionException;
 import org.dspace.external.OrcidRestConnector;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -38,7 +39,7 @@ public class MockOrcid extends Orcidv3SolrAuthorityImpl {
      * Call this to set up mocking for any test classes that need it. We don't set it in init()
      * or other AbstractIntegrationTest implementations will complain of unnecessary Mockito stubbing
      */
-    public void setupNoResultsSearch() {
+    public void setupNoResultsSearch() throws OrcidConnectionException {
         when(orcidRestConnector.get(ArgumentMatchers.startsWith("search?"), ArgumentMatchers.any()))
                 .thenAnswer(new Answer<InputStream>() {
                     @Override
@@ -51,7 +52,7 @@ public class MockOrcid extends Orcidv3SolrAuthorityImpl {
      * Call this to set up mocking for any test classes that need it. We don't set it in init()
      * or other AbstractIntegrationTest implementations will complain of unnecessary Mockito stubbing
      */
-    public void setupSingleSearch() {
+    public void setupSingleSearch() throws OrcidConnectionException {
         when(orcidRestConnector.get(ArgumentMatchers.startsWith("search?q=Bollini"), ArgumentMatchers.any()))
                 .thenAnswer(new Answer<InputStream>() {
                     @Override
@@ -64,7 +65,7 @@ public class MockOrcid extends Orcidv3SolrAuthorityImpl {
      * Call this to set up mocking for any test classes that need it. We don't set it in init()
      * or other AbstractIntegrationTest implementations will complain of unnecessary Mockito stubbing
      */
-    public void setupSearchWithResults() {
+    public void setupSearchWithResults() throws OrcidConnectionException {
         when(orcidRestConnector.get(ArgumentMatchers.endsWith("/person"), ArgumentMatchers.any()))
                 .thenAnswer(new Answer<InputStream>() {
                     @Override

@@ -7,11 +7,13 @@
  */
 package org.dspace.app.rest.utils;
 
-import static jakarta.mail.internet.MimeUtility.encodeText;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -172,9 +174,16 @@ public class HttpHeadersInitializer {
 
         // distposition may be null here if contentType is null
         if (!isNullOrEmpty(disposition)) {
-            httpHeaders.put(CONTENT_DISPOSITION, Collections.singletonList(String.format(CONTENT_DISPOSITION_FORMAT,
-                                                                                         disposition,
-                                                                                         encodeText(fileName))));
+            String fallbackAsciiName = createFallbackAsciiName(this.fileName);
+            String encodedUtf8Name = createEncodedUtf8Name(this.fileName);
+
+            String headerValue = String.format(
+                "%s; filename=\"%s\"; filename*=UTF-8''%s",
+                disposition,
+                fallbackAsciiName,
+                encodedUtf8Name
+            );
+            httpHeaders.put(CONTENT_DISPOSITION, Collections.singletonList(headerValue));
         }
         log.debug("Content-Disposition : {}", disposition);
 
@@ -260,6 +269,43 @@ public class HttpHeadersInitializer {
         String[] matchValues = matchHeader.split("\\s*,\\s*");
         Arrays.sort(matchValues);
         return Arrays.binarySearch(matchValues, toMatch) > -1 || Arrays.binarySearch(matchValues, "*") > -1;
+    }
+
+    /**
+     * Creates a safe ASCII-only fallback filename by removing diacritics (accents)
+     * and replacing any remaining non-ASCII characters.
+     * E.g., "ä-ö-é.pdf" becomes "a-o-e.pdf".
+     * @param originalFilename The original filename.
+     * @return A string containing only ASCII characters.
+     */
+    private String createFallbackAsciiName(String originalFilename) {
+        if (originalFilename == null) {
+            return "";
+        }
+        String normalized = Normalizer.normalize(originalFilename, Normalizer.Form.NFD);
+        String withoutAccents = normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        return withoutAccents.replaceAll("[^\\x00-\\x7F]", "");
+    }
+
+    /**
+     * Creates a percent-encoded UTF-8 filename according to RFC 5987.
+     * This is for the `filename*` parameter.
+     * E.g., "ä ö é.pdf" becomes "%C3%A4%20%C3%B6%20%C3%A9.pdf".
+     * @param originalFilename The original filename.
+     * @return A percent-encoded string.
+     */
+    private String createEncodedUtf8Name(String originalFilename) {
+        if (originalFilename == null) {
+            return "";
+        }
+        try {
+            String encoded = URLEncoder.encode(originalFilename, StandardCharsets.UTF_8.toString());
+            return encoded.replace("+", "%20");
+        } catch (java.io.UnsupportedEncodingException e) {
+            // Fallback to a simple ASCII name if encoding fails.
+            log.error("UTF-8 encoding not supported, which should not happen.", e);
+            return createFallbackAsciiName(originalFilename);
+        }
     }
 
 }

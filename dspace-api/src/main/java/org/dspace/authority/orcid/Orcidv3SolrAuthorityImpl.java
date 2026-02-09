@@ -10,6 +10,7 @@ package org.dspace.authority.orcid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -20,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.SolrAuthorityInterface;
+import org.dspace.external.OrcidConnectionException;
 import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
 import org.dspace.orcid.model.factory.OrcidFactoryUtils;
@@ -142,9 +144,15 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
             return null;
         }
         initializeAccessToken();
-        InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"), accessToken);
-        XMLtoBio converter = new XMLtoBio();
-        return converter.convertSinglePerson(bioDocument);
+        try {
+            InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"),
+                                                             accessToken);
+            XMLtoBio converter = new XMLtoBio();
+            return converter.convertSinglePerson(bioDocument);
+        } catch (OrcidConnectionException e) {
+            log.error("Error retrieving ORCID bio for ID=" + id, e);
+            return null;
+        }
     }
 
 
@@ -167,29 +175,35 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
         // Check / init access token
         initializeAccessToken();
 
-        String searchPath = "search?q=" + URLEncoder.encode(text) + "&start=" + start + "&rows=" + rows;
+        String searchPath = "search?q=" + URLEncoder.encode(text, StandardCharsets.UTF_8) + "&start=" + start +
+                                                                                            "&rows=" + rows;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
-        InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
-        XMLtoBio converter = new XMLtoBio();
-        List<Result> results = converter.convert(bioDocument);
-        List<Person> bios = new LinkedList<>();
-        for (Result result : results) {
-            OrcidIdentifier orcidIdentifier = result.getOrcidIdentifier();
-            if (orcidIdentifier != null) {
-                log.debug("Found OrcidId=" + orcidIdentifier.toString());
-                String orcid = orcidIdentifier.getPath();
-                Person bio = getBio(orcid);
-                if (bio != null) {
-                    bios.add(bio);
+        try {
+            InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
+            XMLtoBio converter = new XMLtoBio();
+            List<Result> results = converter.convert(bioDocument);
+            List<Person> bios = new LinkedList<>();
+            for (Result result : results) {
+                OrcidIdentifier orcidIdentifier = result.getOrcidIdentifier();
+                if (orcidIdentifier != null) {
+                    log.debug("Found OrcidId=" + orcidIdentifier);
+                    String orcid = orcidIdentifier.getPath();
+                    Person bio = getBio(orcid);
+                    if (bio != null) {
+                        bios.add(bio);
+                    }
                 }
             }
+            try {
+                bioDocument.close();
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+            return bios;
+        } catch (OrcidConnectionException e) {
+            log.error("Error searching ORCID for query=" + text, e);
+            return Collections.emptyList();
         }
-        try {
-            bioDocument.close();
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
-        return bios;
     }
 
     /**

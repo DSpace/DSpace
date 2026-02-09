@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   port_pr:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     # Don't run on closed *unmerged* pull requests
     if: github.event.pull_request.merged
     steps:

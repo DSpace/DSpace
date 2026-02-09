@@ -35,6 +35,7 @@ import java.util.zip.ZipOutputStream;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.content.Bitstream;
@@ -353,7 +354,7 @@ public class ItemExportServiceImpl implements ItemExportService {
 
     /**
      * Create the 'collections' file.  List handles of all Collections which
-     * contain this Item.  The "owning" Collection is listed first.
+     * contain this Item. The "owning" Collection is listed first.
      *
      * @param item list collections holding this Item.
      * @param destDir write the file here.
@@ -364,12 +365,14 @@ public class ItemExportServiceImpl implements ItemExportService {
         File outFile = new File(destDir, "collections");
         if (outFile.createNewFile()) {
             try (PrintWriter out = new PrintWriter(new FileWriter(outFile))) {
-                String ownerHandle = item.getOwningCollection().getHandle();
-                out.println(ownerHandle);
+                Collection owningCollection = item.getOwningCollection();
+                // The owning collection is null for workspace and workflow items
+                if (owningCollection != null) {
+                    out.println(owningCollection.getHandle());
+                }
                 for (Collection collection : item.getCollections()) {
-                    String collectionHandle = collection.getHandle();
-                    if (!collectionHandle.equals(ownerHandle)) {
-                        out.println(collectionHandle);
+                    if (!collection.equals(owningCollection)) {
+                        out.println(collection.getHandle());
                     }
                 }
             }
@@ -797,7 +800,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 "A dspace.cfg entry for 'org.dspace.app.itemexport.work.dir' does not exist.");
         }
         // clean work dir path from duplicate separators
-        return StringUtils.replace(exportDir, File.separator + File.separator, File.separator);
+        return Strings.CS.replace(exportDir, File.separator + File.separator, File.separator);
     }
 
     @Override
@@ -1056,7 +1059,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 }
                 String strAbsPath = cpFile.getPath();
                 int startIndex = strSource.length();
-                if (!StringUtils.endsWith(strSource, File.separator)) {
+                if (!Strings.CS.endsWith(strSource, File.separator)) {
                     startIndex++;
                 }
                 String strZipEntryName = strAbsPath.substring(startIndex, strAbsPath.length());

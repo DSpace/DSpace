@@ -11,7 +11,7 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 
 import java.sql.SQLException;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.dspace.authorize.service.AuthorizeService;
@@ -38,10 +38,10 @@ public class SolrServicePrivateItemPlugin implements SolrServiceSearchPlugin {
         try {
             // Prevents access if user has no administrative rights on the community or collection.
             // NOTE: the resource restriction plugin adds location filters for community and collection admins.
-            if (authorizeService.isAdmin(context)) {
+            if (discoveryQuery.isIncludeNotDiscoverableOrWithdrawn() || authorizeService.isAdmin(context)) {
                 return;
             }
-            if (!StringUtils.equalsIgnoreCase(discoveryQuery.getDiscoveryConfigurationName(), "administrativeView")) {
+            if (!Strings.CI.equals(discoveryQuery.getDiscoveryConfigurationName(), "administrativeView")) {
                 solrQuery.addFilterQuery("NOT(discoverable:false)");
                 return;
             }

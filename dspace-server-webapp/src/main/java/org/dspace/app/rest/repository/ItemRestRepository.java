@@ -7,21 +7,24 @@
  */
 package org.dspace.app.rest.repository;
 
+import static org.dspace.content.service.RelationshipService.REQUESTPARAMETER_COPYVIRTUALMETADATA;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.commons.lang3.Strings;
+import org.dspace.app.customurl.CustomUrlService;
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -31,20 +34,19 @@ import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.BadVirtualMetadataTypeException;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.content.Relationship;
-import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
-import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -61,12 +63,6 @@ import org.springframework.stereotype.Component;
 
 @Component(ItemRest.CATEGORY + "." + ItemRest.PLURAL_NAME)
 public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRest> {
-
-    private static final Logger log = LogManager.getLogger(ItemRestRepository.class);
-
-    public static final String[] COPYVIRTUAL_ALL = {"all"};
-    public static final String[] COPYVIRTUAL_CONFIGURED = {"configured"};
-    public static final String REQUESTPARAMETER_COPYVIRTUALMETADATA = "copyVirtualMetadata";
 
     @Autowired
     MetadataConverter metadataConverter;
@@ -90,10 +86,10 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     RelationshipService relationshipService;
 
     @Autowired
-    RelationshipTypeService relationshipTypeService;
+    private UriListHandlerService uriListHandlerService;
 
     @Autowired
-    private UriListHandlerService uriListHandlerService;
+    private CustomUrlService customUrlService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -153,13 +149,11 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @Override
     @PreAuthorize("hasPermission(#id, 'ITEM', 'DELETE')")
     protected void delete(Context context, UUID id) throws AuthorizeException {
-        String[] copyVirtual =
-            requestService.getCurrentRequest().getServletRequest()
-                .getParameterValues(REQUESTPARAMETER_COPYVIRTUALMETADATA);
-
-        Item item = null;
+        String[] copyVirtual = requestService.getCurrentRequest()
+                                             .getServletRequest()
+                                             .getParameterValues(REQUESTPARAMETER_COPYVIRTUALMETADATA);
         try {
-            item = itemService.find(context, id);
+            Item item = itemService.find(context, id);
             if (item == null) {
                 throw new ResourceNotFoundException(ItemRest.CATEGORY + "." + ItemRest.NAME +
                     " with id: " + id + " not found");
@@ -172,103 +166,13 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
                 throw new UnprocessableEntityException("The item cannot be deleted. "
                     + "It's a template for a collection");
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        try {
-            deleteMultipleRelationshipsCopyVirtualMetadata(context, copyVirtual, item);
+            relationshipService.deleteMultipleRelationshipsCopyVirtualMetadata(context, copyVirtual, item);
             itemService.delete(context, item);
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
+        } catch (BadVirtualMetadataTypeException e) {
+            throw new DSpaceBadRequestException(e.getMessage(), e);
+        } catch (SQLException | IOException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
         }
-    }
-
-    /**
-     * Deletes relationships of an item which need virtual metadata to be copied to actual metadata
-     * This ensures a delete call is used which can copy the metadata prior to deleting the item
-     *
-     * @param context     The relevant DSpace context
-     * @param copyVirtual The value(s) of the copyVirtualMetadata parameter
-     * @param item        The item to be deleted
-     */
-    private void deleteMultipleRelationshipsCopyVirtualMetadata(Context context, String[] copyVirtual, Item item)
-        throws SQLException, AuthorizeException {
-
-        if (copyVirtual == null || copyVirtual.length == 0) {
-            // Don't delete nor copy any metadata here if the "copyVirtualMetadata" parameter wasn't passed. The
-            // relationships not deleted in this method will be deleted implicitly by the this.delete() method
-            // without copying the metadata anyway.
-            return;
-        }
-        if (Objects.deepEquals(copyVirtual, COPYVIRTUAL_ALL)) {
-            // Option 1: Copy all virtual metadata of this item to its related items. Iterate over all of the item's
-            //           relationships and copy their data.
-            for (Relationship relationship : relationshipService.findByItem(context, item)) {
-                deleteRelationshipCopyVirtualMetadata(item, relationship);
-            }
-        } else if (Objects.deepEquals(copyVirtual, COPYVIRTUAL_CONFIGURED)) {
-            // Option 2: Use a configuration value to determine if virtual metadata needs to be copied. Iterate over all
-            //           of the item's relationships and copy their data depending on the
-            //           configuration.
-            for (Relationship relationship : relationshipService.findByItem(context, item)) {
-                boolean copyToLeft = relationship.getRelationshipType().isCopyToLeft();
-                boolean copyToRight = relationship.getRelationshipType().isCopyToRight();
-                if (relationship.getLeftItem().getID().equals(item.getID())) {
-                    copyToLeft = false;
-                } else {
-                    copyToRight = false;
-                }
-                relationshipService.forceDelete(obtainContext(), relationship, copyToLeft, copyToRight);
-            }
-        } else {
-            // Option 3: Copy the virtual metadata of selected types of this item to its related items. The copyVirtual
-            //           array should only contain numeric values at this point. These values are used to select the
-            //           types. Iterate over all selected types and copy the corresponding values to this item's
-            //           relatives.
-            List<Integer> relationshipIds = parseVirtualMetadataTypes(copyVirtual);
-            for (Integer relationshipId : relationshipIds) {
-                RelationshipType relationshipType = relationshipTypeService.find(context, relationshipId);
-                for (Relationship relationship : relationshipService
-                    .findByItemAndRelationshipType(context, item, relationshipType)) {
-
-                    deleteRelationshipCopyVirtualMetadata(item, relationship);
-                }
-            }
-        }
-    }
-
-    private List<Integer> parseVirtualMetadataTypes(String[] copyVirtual) {
-        List<Integer> types = new ArrayList<>();
-        for (String typeString : copyVirtual) {
-            if (!StringUtils.isNumeric(typeString)) {
-                throw new DSpaceBadRequestException("parameter " + REQUESTPARAMETER_COPYVIRTUALMETADATA
-                    + " should only contain a single value '" + COPYVIRTUAL_ALL[0] + "', '" + COPYVIRTUAL_CONFIGURED[0]
-                    + "' or a list of numbers.");
-            }
-            types.add(Integer.parseInt(typeString));
-        }
-        return types;
-    }
-
-    /**
-     * Deletes the relationship while copying the virtual metadata to the item which is **NOT** deleted
-     *
-     * @param itemToDelete         The item to be deleted
-     * @param relationshipToDelete The relationship to be deleted
-     */
-    private void deleteRelationshipCopyVirtualMetadata(Item itemToDelete, Relationship relationshipToDelete)
-        throws SQLException, AuthorizeException {
-
-        boolean copyToLeft = relationshipToDelete.getRightItem().equals(itemToDelete);
-        boolean copyToRight = relationshipToDelete.getLeftItem().equals(itemToDelete);
-
-        if (copyToLeft && copyToRight) {
-            //The item has a relationship with itself. Copying metadata is useless since the item will be deleted
-            copyToLeft = false;
-            copyToRight = false;
-        }
-
-        relationshipService.forceDelete(obtainContext(), relationshipToDelete, copyToLeft, copyToRight);
     }
 
     @Override
@@ -284,7 +188,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
-        if (itemRest.getInArchive() == false) {
+        if (!itemRest.getInArchive()) {
             throw new DSpaceBadRequestException("InArchive attribute should not be set to false for the create");
         }
         UUID owningCollectionUuid = UUIDUtils.fromString(owningCollectionUuidString);
@@ -324,7 +228,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
         }
 
-        if (StringUtils.equals(uuid.toString(), itemRest.getId())) {
+        if (Strings.CS.equals(uuid.toString(), itemRest.getId())) {
             metadataConverter.setMetadata(context, item, itemRest.getMetadata());
         } else {
             throw new IllegalArgumentException("The UUID in the Json and the UUID in the url do not match: "
@@ -365,6 +269,31 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         Item item = uriListHandlerService.handle(context, req, stringList, Item.class);
         return converter.toRest(item, utils.obtainProjection());
+    }
+
+
+    @SearchRestMethod(name = "findByCustomURL")
+    public ItemRest findByCustomUrl(@Parameter(value = "q", required = true) String customUrl) {
+        Item item = findItemByUuidOrCustomUrl(obtainContext(), customUrl)
+            .orElseThrow(() -> new ResourceNotFoundException("Item with custom URL '" + customUrl + "' not found"));
+        return converter.toRest(item, utils.obtainProjection());
+    }
+
+    private Optional<Item> findItemByUuidOrCustomUrl(Context context, String customUrl) {
+
+        UUID uuid = UUIDUtils.fromString(customUrl);
+        if (uuid != null) {
+
+            try {
+                return Optional.ofNullable(itemService.find(context, uuid));
+            } catch (SQLException e) {
+                throw new SQLRuntimeException(e);
+            }
+
+        }
+
+        return customUrlService.findItemByCustomUrl(context, customUrl);
+
     }
 
 }

@@ -246,8 +246,8 @@ public class InstallItemTest extends AbstractUnitTest {
         //Make sure the string "today" was replaced with today's date
         List<MetadataValue> issuedDates = itemService.getMetadata(result, "dc", "date", "issued", Item.ANY);
 
-        assertThat("testInstallItem_todayAsIssuedDate 0", issuedDates.get(0).getValue(), equalTo(date));
-        assertThat("testInstallItem_todayAsIssuedDate 1", issuedDates.get(1).getValue(), equalTo("2011-01-01"));
+        assertThat("testInstallItem_todayAsIssuedDate 0", issuedDates.get(0).getValue(), equalTo("2011-01-01"));
+        assertThat("testInstallItem_todayAsIssuedDate 1", issuedDates.get(1).getValue(), equalTo(date));
     }
 
     /**
