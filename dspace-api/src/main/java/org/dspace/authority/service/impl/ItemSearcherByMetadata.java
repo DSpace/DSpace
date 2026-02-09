@@ -89,10 +89,10 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
                     UUID removedUUID = valuesToItemIds.get().remove(searchParam);
                     log.info("No item with uuid: " + removedUUID + " was found");
                     log.info("Removing uuid: " + removedUUID + " from cache");
-                    return performSearchByMetadata(context, searchParam);
+                    return findFirstByMetadata(context, searchParam);
                 }
             } else {
-                return performSearchByMetadata(context, searchParam);
+                return findFirstByMetadata(context, searchParam);
             }
         } catch (SearchServiceException e) {
             throw new RuntimeException("An error occurs searching the item by metadata", e);
@@ -121,7 +121,7 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
     }
 
     @SuppressWarnings("rawtypes")
-    private Item performSearchByMetadata(Context context, String searchParam) throws SearchServiceException {
+    private Item findFirstByMetadata(Context context, String searchParam) throws SearchServiceException {
         String query = metadata + ":" +
             ClientUtils.escapeQueryChars(searchParam);
         DiscoverQuery discoverQuery = new DiscoverQuery();
