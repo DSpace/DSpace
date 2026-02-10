@@ -429,6 +429,9 @@
                     <contributorName>
                         <xsl:value-of select="." />
                     </contributorName>
+                    <xsl:call-template name="personOrcid">
+                        <xsl:with-param name="authority_value" select="$authority"/>
+                    </xsl:call-template>
                     <xsl:call-template name="organizationRor">
                         <xsl:with-param name="authority_value" select="$authority"/>
                     </xsl:call-template>
@@ -440,6 +443,9 @@
                     <contributorName>
                         <xsl:value-of select="." />
                     </contributorName>
+                    <xsl:call-template name="personOrcid">
+                        <xsl:with-param name="authority_value" select="$authority"/>
+                    </xsl:call-template>
                     <xsl:call-template name="organizationRor">
                         <xsl:with-param name="authority_value" select="$authority"/>
                     </xsl:call-template>
@@ -451,6 +457,9 @@
                     <contributorName>
                         <xsl:value-of select="." />
                     </contributorName>
+                    <xsl:call-template name="personOrcid">
+                        <xsl:with-param name="authority_value" select="$authority"/>
+                    </xsl:call-template>
                     <xsl:call-template name="organizationRor">
                         <xsl:with-param name="authority_value" select="$authority"/>
                     </xsl:call-template>
@@ -462,6 +471,9 @@
                     <contributorName>
                         <xsl:value-of select="." />
                     </contributorName>
+                    <xsl:call-template name="personOrcid">
+                        <xsl:with-param name="authority_value" select="$authority"/>
+                    </xsl:call-template>
                     <xsl:call-template name="organizationRor">
                         <xsl:with-param name="authority_value" select="$authority"/>
                     </xsl:call-template>
@@ -473,6 +485,9 @@
                     <contributorName>
                         <xsl:value-of select="." />
                     </contributorName>
+                    <xsl:call-template name="personOrcid">
+                        <xsl:with-param name="authority_value" select="$authority"/>
+                    </xsl:call-template>
                     <xsl:call-template name="organizationRor">
                         <xsl:with-param name="authority_value" select="$authority"/>
                     </xsl:call-template>
