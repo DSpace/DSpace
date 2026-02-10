@@ -417,8 +417,11 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         authorizeService.authorizeAction(context, parentCommunity, Constants.ADD);
 
         Community c;
-        c = create(parentCommunity, context, handle, uuid);
-
+        if (uuid != null) {
+            c = create(parentCommunity, context, handle, uuid);
+        } else {
+            c = create(parentCommunity, context, handle);
+        }
         addSubcommunity(context, parentCommunity, c);
 
         return c;

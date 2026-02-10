@@ -112,7 +112,11 @@ public class XSLTIngestionCrosswalk
             (sconf != null && sconf.length() > 0)) {
             int confidence = (sconf != null && sconf.length() > 0) ?
                 Choices.getConfidenceValue(sconf) : Choices.CF_UNSET;
-            itemService.addMetadata(context, item, metadataField, lang, field.getText(), authority, confidence);
+            if (authority == null) {
+                itemService.addMetadata(context, item, metadataField, lang, field.getText(), null, confidence);
+            } else if (!authority.startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+                itemService.addMetadata(context, item, metadataField, lang, field.getText(), authority, confidence);
+            }
         } else {
             itemService.addMetadata(context, item, metadataField, lang, field.getText());
         }
@@ -298,23 +302,27 @@ public class XSLTIngestionCrosswalk
         }
 
         SAXBuilder builder = new SAXBuilder();
-        Document inDoc = builder.build(new FileInputStream(argv[i + 1]));
-        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         List dimList;
-        if (list) {
-            JDOMSource source = new JDOMSource(inDoc.getRootElement().getChildren());
-            JDOMResult result = new JDOMResult();
-            xform.transform(source, result);
-            dimList = result.getResult();
-            outputter.output(dimList, System.out);
-        } else {
-            JDOMSource source = new JDOMSource(inDoc);
-            JDOMResult result = new JDOMResult();
-            xform.transform(source, result);
-            Document dimDoc = result.getDocument();
-            outputter.output(dimDoc, System.out);
-            dimList = dimDoc.getRootElement().getChildren();
+        try (FileInputStream is = new FileInputStream(argv[i + 1])) {
+            Document inDoc = builder.build(is);
+            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+
+            if (list) {
+                JDOMSource source = new JDOMSource(inDoc.getRootElement().getChildren());
+                JDOMResult result = new JDOMResult();
+                xform.transform(source, result);
+                dimList = result.getResult();
+                outputter.output(dimList, System.out);
+            } else {
+                JDOMSource source = new JDOMSource(inDoc);
+                JDOMResult result = new JDOMResult();
+                xform.transform(source, result);
+                Document dimDoc = result.getDocument();
+                outputter.output(dimDoc, System.out);
+                dimList = dimDoc.getRootElement().getChildren();
+            }
         }
+
 
         // Sanity-check the generated DIM, make sure it would load.
         Context context = new Context();
