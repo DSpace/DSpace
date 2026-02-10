@@ -168,7 +168,7 @@
     <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
 
     <bean class="org.dspace.content.ItemFilterServiceImpl"/>
-    
+
     <!-- Submission Config Service -->
     <bean class="org.dspace.submit.service.SubmissionConfigServiceImpl"/>
 
@@ -178,6 +178,8 @@
 
     <bean id="org.dspace.app.customurl.consumer.CustomUrlConsumerConfig"
           class="org.dspace.app.customurl.consumer.CustomUrlConsumerConfig"/>
+
+    <bean class="org.dspace.content.RelationshipTreeService"/>
 
 </beans>
 
