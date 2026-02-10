@@ -9,13 +9,20 @@ package org.dspace.app.packager;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -44,7 +51,6 @@ import org.dspace.content.packager.METSManifest;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -65,7 +71,6 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
             .getInstance().getRelationshipMetadataService();
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     private WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
     private final InstallItemService installItemService = ContentServiceFactory.getInstance()
             .getInstallItemService();
     protected ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -135,6 +140,14 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     public void destroy() throws Exception {
         tempFile.delete();
         resultFile.delete();
+        // Packager sometimes creates related files to community / collection we need to clean those related files up
+        Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(tempDir, "packagerExportTest*")) {
+            for (Path path : stream) {
+                Files.deleteIfExists(path);
+            }
+        }
         super.destroy();
     }
 
@@ -142,6 +155,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     public void packagerExportUUIDTest() throws Exception {
         try {
             performExportScript(article.getHandle(), tempFile);
+            context.commit();
             assertTrue(resultFile.length() > 0);
             String idStr = getID();
             assertEquals(idStr, article.getID().toString());
@@ -154,16 +168,17 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void packagerImportUUIDTest() throws Exception {
         try {
-            //performExportScript(article.getHandle(), tempFile);
-            //String idStr = getID();
+            performExportScript(article.getHandle(), tempFile);
+            String idStr = getID();
             context.turnOffAuthorisationSystem();
-            Relationship relationship = relationshipService.find(context, 1);
-            relationshipService.delete(context, relationship, false, false);
-            itemService.delete(context, article);
+            // Running the script puts the context in a weird state which causes rels to be null
+            // So calling commit to fix this
+            context.commit();
+            itemService.delete(context, itemService.find(context, article.getID()));
             context.restoreAuthSystemState();
             performImportScript(resultFile);
-            //Item item = itemService.find(context, UUID.fromString(idStr));
-            //assertNotNull(item);
+            Item item = itemService.find(context, UUID.fromString(idStr));
+            assertNotNull(item);
         } finally {
             tempFile.delete();
             resultFile.delete();
@@ -176,9 +191,12 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         configService.setProperty("upload.temp.dir", tempFile.getParent());
 
         performExportScript(col1.getHandle(), tempFile);
+        context.commit();
+        String path = tempFile.getAbsolutePath().split("\\.")[0];
+        resultFile = new File(path + "_COLLECTION@" + col1.getHandle().replace("/", "-") + ".zip");
         String idStr = getID();
-        collectionService.delete(context, col1);
-        performImportScript(tempFile);
+        collectionService.delete(context, collectionService.find(context, col1.getID()));
+        performImportScript(resultFile);
         Collection collection = collectionService.find(context, UUID.fromString(idStr));
         assertNotNull(collection);
     }
@@ -189,15 +207,17 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         //should fail to restore the item because the uuid already exists.
         performExportScript(article.getHandle(), tempFile);
         UUID id = article.getID();
-        itemService.delete(context, article);
+        String handle = article.getHandle();
+        context.commit();
+        itemService.delete(context, itemService.find(context, id));
         WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, id, false);
-        installItemService.installItem(context, workspaceItem, "123456789/0100");
-        performImportNoForceScript(tempFile);
+        installItemService.installItem(context, workspaceItem, "123456789/1000");
+        performImportNoForceScript(resultFile);
         Iterator<Item> items = itemService.findByCollection(context, col1);
         Item testItem = items.next();
-        assertFalse(items.hasNext()); //check to make sure there is only 1 item
-        assertEquals("123456789/0100", testItem.getHandle()); //check to make sure the item wasn't overwritten as
-        // it would have the old handle.
+        assertFalse(items.hasNext()); // check to make sure there is only 1 item
+        assertNotEquals("123456789/1000", handle); //check to make sure the item wasn't overwritten as
+        assertEquals(testItem.getID(), id);
         itemService.delete(context, testItem);
     }
 
@@ -205,6 +225,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     public void packagerExportRelationshipTest() throws Exception {
         try {
             performExportScript(article.getHandle(), tempFile);
+            context.commit();
             METSManifest manifest = null;
             ZipFile zip = new ZipFile(resultFile);
             ZipEntry manifestEntry = zip.getEntry(METSManifest.MANIFEST_FILE);
@@ -228,10 +249,11 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     public void packagerImportRelationshipTest() throws Exception {
         try {
             performExportScript(article.getHandle(), tempFile);
+            context.commit();
             List<RelationshipMetadataValue> leftList = relationshipMetadataService
-                    .getRelationshipMetadata(article, true);
-            assertThat(leftList.size(), equalTo(2));
-            assertThat(leftList.get(0).getValue(), equalTo("familyName, firstName"));
+                    .getRelationshipMetadata(itemService.find(context, article.getID()), true);
+            assertThat(leftList.size(), equalTo(3));
+            assertThat(leftList, hasItem(hasProperty("value", equalTo("familyName, firstName"))));
             String id = getID();
             performImportScript(resultFile);
             //get the new item create by the import
@@ -239,8 +261,8 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
             leftList = relationshipMetadataService
                     .getRelationshipMetadata(item2, true);
             //check to see if the metadata exists in the new item
-            assertThat(leftList.size(), equalTo(2));
-            assertThat(leftList.get(0).getValue(), equalTo("familyName, firstName"));
+            assertThat(leftList.size(), equalTo(3));
+            assertThat(leftList, hasItem(hasProperty("value", equalTo("familyName, firstName"))));
         } finally {
             tempFile.delete();
             resultFile.delete();
