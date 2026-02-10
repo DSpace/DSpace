@@ -8,8 +8,8 @@
 
 -- =======================================================================
 --  DSpace Database Migration (H2)
---  Version: 8.0
---  Date: 2025-09-29
+--  Version: 10.0
+--  Date: 2026-02-10
 --  Description: Create table to persist curation task queue entries migrated
 --               from previous file-based implementation (DBTaskQueue).
 --               Each row represents a TaskQueueEntry.
