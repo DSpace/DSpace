@@ -44,6 +44,17 @@ public class Cleanup {
      * @param argv the command line arguments given
      */
     public static void main(String[] argv) {
+        int exitCode = mainInternal(argv);
+        System.exit(exitCode);
+    }
+
+    /**
+     * Cleans up asset store (internal method that returns exit code instead of calling System.exit).
+     *
+     * @param argv the command line arguments given
+     * @return the exit code (0 for success, 1 for failure)
+     */
+    protected static int mainInternal(String[] argv) {
         try {
             log.info("Cleaning up asset store");
 
@@ -72,13 +83,13 @@ public class Cleanup {
                 line = parser.parse(options, argv);
             } catch (ParseException e) {
                 log.fatal(e);
-                System.exit(1);
+                return 1;
             }
 
             // user asks for help
             if (line.hasOption('h')) {
                 printHelp(options);
-                System.exit(0);
+                return 0;
             }
 
             boolean deleteDbRecords = !defaultLeave;
@@ -98,10 +109,10 @@ public class Cleanup {
             StorageServiceFactory.getInstance().getBitstreamStorageService()
                                  .cleanup(deleteDbRecords, line.hasOption('v'));
 
-            System.exit(0);
+            return 0;
         } catch (IOException | SQLException | AuthorizeException e) {
             log.fatal("Caught exception:", e);
-            System.exit(1);
+            return 1;
         }
     }
 

@@ -15,7 +15,6 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.CharEncoding;
@@ -136,15 +135,21 @@ public class BitstreamCleanupIT extends AbstractIntegrationTestWithDatabase {
 
     @Test
     public void testCleanupComplainIfConfusing() throws Exception {
-        runCleanupScript("--leave", "--delete");
-        // Note: the script will fail, but does not surface the exact Exception it fails with
+        assertThrows(
+            "Should throw IllegalArgumentException when both --leave and --delete are provided",
+            IllegalArgumentException.class,
+            () -> runCleanupScript("--leave", "--delete")
+        );
+
+        // Confirm that it did not affect the database or assetstore
+        remaining = ContentServiceFactory.getInstance().getBitstreamService().find(context, remaining.getID());
+        deleted = ContentServiceFactory.getInstance().getBitstreamService().find(context, deleted.getID());
 
         assertNotNull("Remaining Bitstream should remain in the database", remaining);
         assertFalse("Remaining Bitstream should still be marked deleted=false", remaining.isDeleted());
         assertNotNull("Deleted Bitstream should remain in the database", deleted);
         assertTrue("Deleted Bitstream should still be marked deleted=true", deleted.isDeleted());
 
-        // Instead, we can confirm that it did not affect the assetstore
         assertNotNull(
             "Deleted Bitstream content should not be removed from the assetstore",
             ContentServiceFactory.getInstance().getBitstreamService().retrieve(context, deleted)
@@ -152,10 +157,7 @@ public class BitstreamCleanupIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private void runCleanupScript(String... args) throws Exception {
-        runDSpaceScript(
-            Stream.concat(Stream.of("cleanup"), Stream.of(args))
-                  .toArray(String[]::new)
-        );
+        Cleanup.mainInternal(args);
 
         remaining = ContentServiceFactory.getInstance().getBitstreamService().find(context, remaining.getID());
         deleted = ContentServiceFactory.getInstance().getBitstreamService().find(context, deleted.getID());
