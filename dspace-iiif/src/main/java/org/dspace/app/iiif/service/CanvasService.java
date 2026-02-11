@@ -11,6 +11,7 @@ import static org.dspace.app.iiif.service.utils.IIIFUtils.METADATA_IMAGE_WIDTH;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -189,16 +190,14 @@ public class CanvasService extends AbstractResourceService {
     protected CanvasGenerator getCanvas(Context context, String manifestId, Bitstream bitstream, Bundle bundle,
             Item item, String canvasId, String mimeType, Integer index) {
         String canvasNaming = utils.getCanvasNaming(item, I18nUtil.getMessage("iiif.canvas.default-naming"));
-        String defaultLabel = "";
+        StringJoiner defaultLabel = new StringJoiner(" ");
         if (StringUtils.isNotBlank(canvasNaming)) {
-            defaultLabel = canvasNaming + " ";
+            defaultLabel.add(canvasNaming);
         }
         if (index != null) {
-            defaultLabel += index;
-        } else {
-            defaultLabel += canvasId;
+            defaultLabel.add("" + index);
         }
-        String label = utils.getIIIFLabel(bitstream, defaultLabel);
+        String label = utils.getIIIFLabel(bitstream, defaultLabel.toString());
 
         setCanvasDimensions(bitstream);
 
