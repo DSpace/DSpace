@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -37,6 +38,7 @@ import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -181,20 +183,20 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
     public WorkspaceItemRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
-                                    MultipartFile file) throws SQLException {
+                                    MultipartFile file) throws SQLException, AuthorizeException, IOException {
 
         Context context = obtainContext();
         WorkspaceItemRest wsi = findOne(context, id);
         WorkspaceItem source = wis.find(context, id);
         List<ErrorRest> errors = submissionService.uploadFileToInprogressSubmission(context, request, wsi, source,
                 file);
+        context.commit();
+        context.reloadEntity(source);
         wsi = converter.toRest(source, utils.obtainProjection());
 
         if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);
         }
-
-        context.commit();
         return wsi;
     }
 
@@ -299,10 +301,10 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                             if (UploadableStep.class.isAssignableFrom(stepClass)) {
                                 UploadableStep uploadableStep = (UploadableStep) stepInstance;
                                 for (MultipartFile mpFile : uploadfiles) {
-                                    ErrorRest err = uploadableStep.upload(context,
-                                        submissionService, stepConfig, wi, mpFile);
-                                    if (err != null) {
-                                        errors.add(err);
+                                    Pair<Bitstream, ErrorRest> bitstreamAndError =
+                                        uploadableStep.upload(context, submissionService, stepConfig, wi, mpFile);
+                                    if (bitstreamAndError.getRight() != null) {
+                                        errors.add(bitstreamAndError.getRight());
                                     }
                                 }
                             }

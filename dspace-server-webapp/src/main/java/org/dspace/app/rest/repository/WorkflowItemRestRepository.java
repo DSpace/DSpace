@@ -192,7 +192,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
 
     @Override
     public WorkflowItemRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
-                                   MultipartFile file) throws SQLException {
+                                   MultipartFile file) throws SQLException, AuthorizeException, IOException {
 
         Context context = obtainContext();
         WorkflowItemRest wsi = findOne(context, id);
@@ -201,13 +201,13 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         this.checkIfEditMetadataAllowedInCurrentStep(context, source);
         List<ErrorRest> errors = submissionService.uploadFileToInprogressSubmission(context, request, wsi, source,
                 file);
+        context.commit();
+        context.reloadEntity(source);
         wsi = converter.toRest(source, utils.obtainProjection());
 
         if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);
         }
-
-        context.commit();
         return wsi;
     }
 

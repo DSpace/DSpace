@@ -5028,7 +5028,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token).perform(get("/api/core/items/search/findByCustomURL")
                                      .param("q", "my-custom-url"))
-                        .andExpect(status().isInternalServerError());
+                        .andExpect(status().isBadRequest());
 
     }
 
