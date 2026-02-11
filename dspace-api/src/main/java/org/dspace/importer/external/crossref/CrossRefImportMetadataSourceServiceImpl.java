@@ -47,7 +47,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
     private String url;
 
-    private int timeout = 1000;
+    private int timeout = 5000;
 
     @Autowired
     private LiveImportClient liveImportClient;
