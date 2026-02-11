@@ -271,7 +271,9 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         closed.clear();
         controllerFormDefinitions.clear();
         authoritiesFormDefinitions.clear();
-        submissionConfigService.reload();
+        if (submissionConfigService != null) {
+            submissionConfigService.reload();
+        }
         initialized = false;
     }
 
@@ -377,7 +379,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     /**
      * Add the form/field to the cache map keeping track of which form/field are
      * associated with the specific authority name
-     * 
+     *
      * @param submissionName the form definition name
      * @param authorityName  the name of the authority plugin
      * @param fieldKey       the field key that use the authority
@@ -404,7 +406,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     /**
      * Add the authority plugin to the cache map keeping track of which authority is
      * used by a specific form/field
-     * 
+     *
      * @param submissionName the submission definition name
      * @param fieldKey       the field key that require the authority
      * @param ca             the authority plugin
