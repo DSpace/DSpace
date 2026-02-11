@@ -145,9 +145,9 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
     /**
      * Generates a Search API response from the word_highlighting solr query response.
      *
-     * The function assumes that the solr query responses contains canvas identifiers
+     * The function assumes that the solr query responses contain page IDs
      * (taken from the ALTO Page ID element) in the following format:
-     * Page.{canvasId0}, Page.{canvasId1}, Page.{canvasId2}....
+     * Page.{canvasId0}, Page.{canvasId1}, Page.{canvasId2}, etc.
      *
      * This convention must be followed when indexing ALTO files into the word_highlighting
      * solr index. If it is not followed, word highlights will not align canvases.
