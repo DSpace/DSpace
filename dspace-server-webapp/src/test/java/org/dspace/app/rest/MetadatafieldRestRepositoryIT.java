@@ -81,24 +81,29 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
     public void findAll() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        MetadataField metadataField = MetadataFieldBuilder
-            .createMetadataField(context, "AnElement", "AQualifier", "AScopeNote").build();
-        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/metadatafields")
-            .param("size", String.valueOf(100)))
+            .param("size", String.valueOf(9999)))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
                        MetadataFieldMatcher.matchMetadataFieldByKeys("dc", "title", null),
                        MetadataFieldMatcher.matchMetadataFieldByKeys("dc", "date", "issued"))
-                                      ))
+                                      ));
+    }
+
+    @Test
+    public void findAllPaginated() throws Exception {
+        getClient().perform(get("/api/core/metadatafields")
+                           .param("size", String.valueOf(2)))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.notNullValue()))
                    .andExpect(jsonPath("$._links.first.href", Matchers.containsString("/api/core/metadatafields")))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/metadatafields")))
                    .andExpect(jsonPath("$._links.next.href", Matchers.containsString("/api/core/metadatafields")))
                    .andExpect(jsonPath("$._links.last.href", Matchers.containsString("/api/core/metadatafields")))
-
-                   .andExpect(jsonPath("$.page.size", is(100)));
+                   .andExpect(jsonPath("$.page.size", is(2)));
     }
 
     @Test
