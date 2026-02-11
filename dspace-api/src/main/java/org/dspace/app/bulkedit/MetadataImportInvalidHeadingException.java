@@ -12,7 +12,7 @@ package org.dspace.app.bulkedit;
  *
  * @author Stuart Lewis
  */
-public class MetadataImportInvalidHeadingException extends Exception {
+public class MetadataImportInvalidHeadingException extends MetadataImportException {
     /**
      * The type of error (schema or element)
      */

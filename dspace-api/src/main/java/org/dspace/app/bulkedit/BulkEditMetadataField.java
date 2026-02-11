@@ -83,4 +83,12 @@ public class BulkEditMetadataField {
     public String getLanguage() {
         return language;
     }
+
+    public String getKey() {
+        return key(schema, element, qualifier, language);
+    }
+
+    public static String key(String schema, String element, String qualifier, String language) {
+        return schema + "." + element + "." + qualifier + "." + language;
+    }
 }

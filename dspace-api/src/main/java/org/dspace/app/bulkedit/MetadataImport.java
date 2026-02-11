@@ -19,13 +19,10 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.bulkedit.service.BulkEditParsingService;
 import org.dspace.app.bulkedit.service.BulkEditService;
 import org.dspace.app.bulkedit.service.BulkEditServiceFactory;
-import org.dspace.authority.factory.AuthorityServiceFactory;
-import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
@@ -77,13 +74,11 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                                                                      .getRelationshipTypeService();
     protected RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
     protected EntityTypeService entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
-    protected EntityService entityService = ContentServiceFactory.getInstance().getEntityService();
-    protected AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance()
-                                                                                   .getAuthorityValueService();
+
     protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    protected BulkEditParsingService<DSpaceCSV> bulkEditRegisterService =
+    protected BulkEditParsingService bulkEditRegisterService =
         BulkEditServiceFactory.getInstance().getCSVBulkEditParsingService();
     protected BulkEditService bulkEditImportService =
         BulkEditServiceFactory.getInstance().getBulkEditService();
@@ -103,17 +98,15 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         assignCurrentUserInContext(c);
 
         // Read commandLines from the CSV file
+        InputStream is;
         try {
-
             Optional<InputStream> optionalFileStream = handler.getFileStream(c, filename);
             if (optionalFileStream.isPresent()) {
-                csv = new DSpaceCSV(optionalFileStream.get(), c);
+                is = optionalFileStream.get();
             } else {
                 throw new IllegalArgumentException("Error reading file, the file couldn't be found for filename: " +
                                                        filename);
             }
-        } catch (MetadataImportInvalidHeadingException miihe) {
-            throw miihe;
         } catch (Exception e) {
             throw new Exception("Error reading file: " + e.getMessage(), e);
         }
@@ -128,7 +121,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         bulkEditImportService.setUseCollectionTemplate(useTemplate);
 
         // Register the changes - just highlight differences
-        List<BulkEditChange> changes = bulkEditRegisterService.parse(c, csv);
+        List<BulkEditChange> changes = bulkEditRegisterService.parse(c, is);
 
         // Display the changes
         int changeCounter = displayChanges(changes, false);

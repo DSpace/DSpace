@@ -20,7 +20,7 @@ public abstract class BulkEditServiceFactory {
     /**
      * Get the service for parsing a {@link DSpaceCSV} to a list of {@link org.dspace.app.bulkedit.BulkEditChange}
      */
-    public abstract BulkEditParsingService<DSpaceCSV> getCSVBulkEditParsingService();
+    public abstract BulkEditParsingService getCSVBulkEditParsingService();
 
     /**
      * Get the service for applying {@link org.dspace.app.bulkedit.BulkEditChange}s
@@ -32,6 +32,6 @@ public abstract class BulkEditServiceFactory {
      */
     public static BulkEditServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
-            .getServiceByName("bulkEditServiceFactory", BulkEditServiceFactory.class);
+                                    .getServiceByName("bulkEditServiceFactory", BulkEditServiceFactory.class);
     }
 }
