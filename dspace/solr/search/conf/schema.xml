@@ -353,6 +353,9 @@
     <dynamicField name="attr_*" type="textgen" indexed="true" stored="true" multiValued="true"/>
 
     <dynamicField name="random_*" type="random" />
+
+     <field name="customurl" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
+
  </fields>
 
  <uniqueKey>search.uniqueid</uniqueKey>

@@ -371,6 +371,14 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dc", "identifier", "other", identifier);
     }
 
+    public ItemBuilder withCustomUrl(String url) {
+        return setMetadataSingleValue(item, "dspace", "customurl", null, url);
+    }
+
+    public ItemBuilder withOldCustomUrl(String url) {
+        return addMetadataValue(item, "dspace", "customurl", "old", url);
+    }
+
     /**
      * Assign the admin permission to the specified eperson
      *

@@ -139,6 +139,9 @@ updates:
       # TODO: Remove this after this ticket is resolved https://github.com/DSpace/DSpace/issues/11621
       - dependency-name: "com.google.errorprone:*"
         versions: [ ">=2.43.0" ]
+      # Don't automatically update BouncyCastle because maven-gpg-plugin REQUIRES a very specific version or release
+      # errors will occur. See https://github.com/DSpace/DSpace/pull/11696
+      - dependency-name: "org.bouncycastle:*"
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
@@ -277,6 +280,9 @@ updates:
       # Last version of errorprone to support JDK 17 is 2.42.0
       - dependency-name: "com.google.errorprone:*"
         versions: [ ">=2.43.0" ]
+      # Don't automatically update BouncyCastle because maven-gpg-plugin REQUIRES a very specific version or release
+      # errors will occur. See https://github.com/DSpace/DSpace/pull/11696
+      - dependency-name: "org.bouncycastle:*"
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
@@ -415,6 +421,9 @@ updates:
       # Last version of errorprone to support JDK 17 is 2.42.0
       - dependency-name: "com.google.errorprone:*"
         versions: [ ">=2.43.0" ]
+      # Don't automatically update BouncyCastle because maven-gpg-plugin REQUIRES a very specific version or release
+      # errors will occur. See https://github.com/DSpace/DSpace/pull/11696
+      - dependency-name: "org.bouncycastle:*"
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
@@ -565,6 +574,9 @@ updates:
       # Last version of errorprone to support JDK 11 is 2.31.0
       - dependency-name: "com.google.errorprone:*"
         versions: [">=2.32.0"]
+      # Don't automatically update BouncyCastle because maven-gpg-plugin REQUIRES a very specific version or release
+      # errors will occur. See https://github.com/DSpace/DSpace/pull/11696
+      - dependency-name: "org.bouncycastle:*"
       # Spring Security 5.8 changes the behavior of CSRF Tokens in a way which is incompatible with DSpace 7
       # See https://github.com/DSpace/DSpace/pull/9888#issuecomment-2408165545
       - dependency-name: "org.springframework.security:*"
