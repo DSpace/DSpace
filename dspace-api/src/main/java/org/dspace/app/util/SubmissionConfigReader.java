@@ -25,7 +25,9 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.content.edit.EditItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
@@ -830,5 +832,13 @@ public class SubmissionConfigReader {
             }
         }
         return results;
+    }
+
+    public SubmissionConfig getSubmissionConfigByInProgressSubmission(InProgressSubmission<?> object, Context context) {
+        if (object instanceof EditItem) {
+            String submissionDefinition = ((EditItem) object).getMode().getSubmissionDefinition();
+            return getSubmissionConfigByName(submissionDefinition);
+        }
+        return getSubmissionConfigByCollection(object.getCollection());
     }
 }
