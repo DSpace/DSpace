@@ -52,6 +52,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.io.IOUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -101,12 +102,14 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.supervision.SupervisionOrder;
 import org.dspace.validation.CclicenseValidator;
 import org.dspace.validation.LicenseValidator;
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 /**
  * Test suite for the WorkspaceItem endpoint
@@ -2090,6 +2093,38 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         xmlIS.close();
     }
 
+    private static @NonNull ResultMatcher dcContributorAuthor(Matcher<String> matcher) {
+        String contributorMetadata = "dc.contributor.author";
+        return traditionalPageOneMatcher(contributorMetadata, matcher);
+    }
+
+    private static @NonNull ResultMatcher traditionalPageOneMatcher(
+        String metadata, Matcher<String> matcher
+    ) {
+        return jsonPath(
+            "$._embedded.workspaceitems[0].sections.traditionalpageone['" + metadata + "'][0].value",
+            matcher
+        );
+    }
+
+    private static @NonNull ResultMatcher traditionalPageTwoMatcher(
+        String metadata, Matcher<String> matcher
+    ) {
+        return jsonPath(
+            "$._embedded.workspaceitems[0].sections.traditionalpagetwo['" + metadata + "'][0].value",
+            matcher
+        );
+    }
+
+    private static @NonNull ResultMatcher uploadMatcher(
+        String metadata, Matcher<String> matcher
+    ) {
+        return jsonPath(
+            "$._embedded.workspaceitems[0].sections.upload.files[0].metadata['" + metadata + "'][0].value",
+            matcher
+        );
+    }
+
     @Test
     /**
      * Test the creation of a workspaceitem POSTing to the resource collection endpoint a PDF file. As a single item
@@ -2112,37 +2147,38 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
-        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
-        final MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/myfile.pdf", "application/pdf",
-                                                                pdf);
+        try (InputStream pdf = getClass().getResourceAsStream("simple-article.pdf")) {
+            final MockMultipartFile pdfFile =
+                new MockMultipartFile("file", "/local/path/myfile.pdf", "application/pdf", pdf);
 
-        // bulk create a workspaceitem
-        getClient(authToken).perform(multipart("/api/submission/workspaceitems")
-                                         .file(pdfFile))
-                            // bulk create should return 200, 201 (created) is better for single resource
-                            .andExpect(status().isOk())
-                            // testing grobid extraction
-                            .andExpect(jsonPath(
-                                "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
-                                is("This is a simple test file")))
-                            .andExpect(jsonPath(
-                                "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.contributor.author'][0].value",
-                                is("Bollini, Andrea")))
-                            .andExpect(jsonPath(
-                                "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.date.issued'][0].value",
-                                is("2018")))
-                            .andExpect(jsonPath(
-                                "$._embedded.workspaceitems[0].sections.traditionalpagetwo['dc.description.abstract'][0].value",
-                                is("This is the abstract of our PDF file")))
-                            // we can just check that the pdf is stored in the item
-                            .andExpect(
-                                jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0].metadata['dc.title'][0].value",
-                                         is("myfile.pdf")))
-                            .andExpect(jsonPath(
-                                "$._embedded.workspaceitems[0].sections.upload.files[0].metadata['dc.source'][0].value",
-                                is("/local/path/myfile.pdf")));
-
-        pdf.close();
+            // bulk create a workspaceitem
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
+                                             .file(pdfFile))
+                                // bulk create should return 200, 201 (created) is better for single resource
+                                .andExpect(status().isOk())
+                                // testing grobid extraction
+                                .andExpect(jsonPath(
+                                    "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
+                                    is("This is a simple test file")))
+                                .andExpect(traditionalPageOneMatcher("dc.contributor.author", is("Bollini, Andrea")))
+                                .andExpect(traditionalPageOneMatcher("dc.date.issued", is("2018")))
+                                .andExpect(
+                                    traditionalPageTwoMatcher(
+                                        "dc.description.abstract", is("This is the abstract of our PDF file")
+                                    )
+                                )
+                                // we can just check that the pdf is stored in the item
+                                .andExpect(
+                                    uploadMatcher(
+                                        "dc.title", is("myfile.pdf")
+                                    )
+                                )
+                                .andExpect(
+                                    uploadMatcher(
+                                        "dc.source", is("/local/path/myfile.pdf")
+                                    )
+                                );
+        }
     }
 
     @Test
