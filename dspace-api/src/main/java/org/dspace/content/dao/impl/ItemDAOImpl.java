@@ -439,18 +439,12 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     @Override
     public Iterator<Item> findByLastModifiedSince(Context context, Instant since)
         throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery<UUID> criteriaQuery = criteriaBuilder.createQuery(UUID.class);
-        Root<Item> itemRoot = criteriaQuery.from(Item.class);
-        criteriaQuery.select(itemRoot.get(Item_.id));
-        criteriaQuery.where(criteriaBuilder.greaterThan(itemRoot.get(Item_.lastModified), since));
-        criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get((Item_.id))));
-
-        // Transform into a query object to execute
-        Query query = createQuery(context, criteriaQuery);
+        Query query = createQuery(context,
+                "SELECT i.id FROM Item i WHERE lastModified > :last_modified ORDER BY id");
+        query.setParameter("last_modified", since);
         @SuppressWarnings("unchecked")
         List<UUID> uuids = query.getResultList();
-        log.info("Retrieved " + uuids.size() + " items modified since " + since);
+        log.debug("Retrieved " + uuids.size() + " items modified since " + since);
         return new UUIDIterator<Item>(context, uuids, Item.class, this);
     }
 
@@ -471,7 +465,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         Query query = createQuery(context, criteriaQuery);
         @SuppressWarnings("unchecked")
         List<UUID> uuids = query.getResultList();
-        log.info("Retrieved " + uuids.size() + " items from collection " + collection.getID() +
+        log.debug("Retrieved " + uuids.size() + " items from collection " + collection.getID() +
                  " modified since " + last);
         return new UUIDIterator<Item>(context, uuids, Item.class, this);
     }

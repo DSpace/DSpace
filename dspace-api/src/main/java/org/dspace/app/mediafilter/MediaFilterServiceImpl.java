@@ -29,6 +29,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
+import org.dspace.content.Site;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
@@ -124,11 +125,11 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             // dspace.filtermedia.lastdate is saved as datetime. If new items are added while running
             // the script, storing time at the start of script to ensure that these items are processed
             // in the next run.
-            timeToStore = DCDate.getCurrent().toString();
+            timeToStore = Instant.now().toString();
             String lastDate = siteService.getMetadata(siteService.findSite(context), "dspace.filtermedia.lastdate");
             logInfo("Last date retrieved from db for media filter processing: " + lastDate);
-            if ((lastDate != null) && (isForce == false)) {
-                fromDate = new DCDate(lastDate).toDate().toInstant(); //.atZone(ZoneId.systemDefault()).toLocalDate();
+            if ((lastDate != null) && (!isForce)) {
+                fromDate = Instant.parse(lastDate);
             }
         }
         if (skipList != null) {
@@ -157,13 +158,14 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             }
         }
         if (storeLastDate) {
+            Site site = siteService.findSite(context);
             logInfo("Setting new last date to db for media filter processing: " + timeToStore);
-            siteService.clearMetadata(context, siteService.findSite(context),
+            siteService.clearMetadata(context, site,
                 "dspace", "filtermedia", "lastdate", Item.ANY);
-            siteService.addMetadata(context, siteService.findSite(context),
+            siteService.addMetadata(context, site,
                 "dspace", "filtermedia", "lastdate", null,
                 timeToStore);
-            siteService.update(context, siteService.findSite(context));
+            siteService.update(context, site);
         }
     }
 
