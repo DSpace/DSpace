@@ -2127,6 +2127,20 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
 
     @Test
     public void testPatchWithValidationErrors3213() throws Exception {
+
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] {
+                                             "org.dspace.content.authority.ItemAuthority = OrgUnitAuthority"
+                                         });
+        configurationService.setProperty("choices.plugin.oairecerif.funder", "OrgUnitAuthority");
+        configurationService.setProperty("choices.presentation.oairecerif.funder", "suggest");
+        configurationService.setProperty("authority.controlled.oairecerif.funder", "true");
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
+
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)

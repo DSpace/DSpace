@@ -566,6 +566,90 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
    </form>
 
+     <form name="orgunit">
+         <row>
+             <field>
+                 <dc-schema>dc</dc-schema>
+                 <dc-element>title</dc-element>
+                 <label>Organization name</label>
+                 <input-type>onebox</input-type>
+                 <repeatable>false</repeatable>
+                 <required>You must enter the oganization name.</required>
+                 <hint />
+             </field>
+         </row>
+     </form>
+
+     <form name="funding">
+         <row>
+             <field>
+                 <dc-schema>dc</dc-schema>
+                 <dc-element>title</dc-element>
+                 <label>Title</label>
+                 <input-type>onebox</input-type>
+                 <repeatable>false</repeatable>
+                 <required>You must enter the project title</required>
+                 <hint />
+             </field>
+         </row>
+         <row>
+             <field>
+                 <dc-schema>oairecerif</dc-schema>
+                 <dc-element>funder</dc-element>
+                 <label>Financing</label>
+                 <input-type>inline-group</input-type>
+                 <repeatable>true</repeatable>
+                 <required>You must enter financing information</required>
+                 <hint />
+             </field>
+         </row>
+         <row>
+             <field>
+                 <dc-schema>dc</dc-schema>
+                 <dc-element>type</dc-element>
+                 <label>Type</label>
+                 <input-type value-pairs-name="funding_types">dropdown</input-type>
+                 <repeatable>false</repeatable>
+                 <required />
+                 <hint />
+             </field>
+         </row>
+     </form>
+
+     <form name="funding-oairecerif-funder">
+         <row>
+             <field>
+                 <dc-schema>oairecerif</dc-schema>
+                 <dc-element>funder</dc-element>
+                 <label>Funder</label>
+                 <input-type>onebox</input-type>
+                 <repeatable>false</repeatable>
+                 <required>You must enter the funder</required>
+                 <style>col-xs-12 col-md-6 col-lg-3</style>
+                 <hint />
+             </field>
+             <field>
+                 <dc-schema>oairecerif</dc-schema>
+                 <dc-element>amount</dc-element>
+                 <label>Amount</label>
+                 <input-type>onebox</input-type>
+                 <repeatable>false</repeatable>
+                 <required />
+                 <hint />
+             </field>
+             <field>
+                 <dc-schema>oairecerif</dc-schema>
+                 <dc-element>amount</dc-element>
+                 <dc-qualifier>currency</dc-qualifier>
+                 <label>Currency</label>
+                 <input-type value-pairs-name="currency">dropdown</input-type>
+                 <repeatable>false</repeatable>
+                 <required />
+                 <hint />
+             </field>
+         </row>
+     </form>
+
    <form name="personstep">
      <row>
        <field>
@@ -861,6 +945,52 @@ it, please enter the types and the actual numbers or codes.</hint>
        <displayed-value>(Other)</displayed-value>
        <stored-value>other</stored-value>
      </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="funding_types" dc-term="funding_types">
+       <pair>
+           <displayed-value>Unspecified</displayed-value>
+           <stored-value />
+       </pair>
+       <pair>
+           <displayed-value>Gift</displayed-value>
+           <stored-value>Gift</stored-value>
+       </pair>
+       <pair>
+           <displayed-value>Internal Funding</displayed-value>
+           <stored-value>Internal Funding</stored-value>
+       </pair>
+       <pair>
+           <displayed-value>Contract</displayed-value>
+           <stored-value>Contract</stored-value>
+       </pair>
+       <pair>
+           <displayed-value>Award</displayed-value>
+           <stored-value>Award</stored-value>
+       </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="currency" dc-term="currency">
+       <pair>
+           <displayed-value>Swiss franc</displayed-value>
+           <stored-value>Swiss franc</stored-value>
+       </pair>
+       <pair>
+           <displayed-value>Euro</displayed-value>
+           <stored-value>Euro</stored-value>
+       </pair>
+       <pair>
+           <displayed-value>US dollar</displayed-value>
+           <stored-value>US dollar</stored-value>
+       </pair>
+       <pair>
+           <displayed-value>Albanian lek</displayed-value>
+           <stored-value>Albanian lek</stored-value>
+       </pair>
+       <pair>
+           <displayed-value>Armenian dram</displayed-value>
+           <stored-value>Armenian dram</stored-value>
+       </pair>
    </value-pairs>
 
  </form-value-pairs>
