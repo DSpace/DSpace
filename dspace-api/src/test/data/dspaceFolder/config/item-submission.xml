@@ -251,6 +251,18 @@
             <type>custom-url</type>
         </step-definition>
 
+        <step-definition id="funding" mandatory="true">
+            <heading>submit.progressbar.describe.funding</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <step-definition id="orgunit" mandatory="true">
+            <heading>submit.progressbar.describe.orgunit</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -397,6 +409,19 @@
            <step id="collection" />
            <step id="onlyTitle"/>
            <step id="upload" />
+        </submission-process>
+
+        <submission-process name="funding">
+            <step id="collection" />
+            <step id="funding" />
+<!--            <step id="detect-duplicate" />-->
+            <step id="license" />
+        </submission-process>
+
+        <submission-process name="orgunit">
+            <step id="collection" />
+            <step id="orgunit" />
+            <step id="license" />
         </submission-process>
 
     </submission-definitions>
