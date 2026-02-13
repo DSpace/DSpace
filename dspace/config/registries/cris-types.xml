@@ -1,0 +1,33 @@
+<dspace-dc-types>
+
+  <dspace-header>
+    <title>DSpace Cris Types</title>
+  </dspace-header>
+
+  <dc-schema>
+    <name>cris</name>
+    <namespace>https://www.4science.it/dspace-cris/</namespace>
+  </dc-schema>
+
+  <dc-type>
+    <schema>cris</schema>
+    <element>cms</element>
+    <qualifier>home-header</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>cris</schema>
+    <element>cms</element>
+    <qualifier>home-news</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>cris</schema>
+    <element>cms</element>
+    <qualifier>footer</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+</dspace-dc-types>
