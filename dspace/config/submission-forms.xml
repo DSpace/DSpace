@@ -477,8 +477,8 @@
             </row>
             <row>
                 <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>identifier</dc-element>
+                    <dc-schema>oaire</dc-schema>
+                    <dc-element>awardNumber</dc-element>
                     <label>ID</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the id of the project</hint>
