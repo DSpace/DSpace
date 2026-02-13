@@ -473,19 +473,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     @Override
     public void buildSpellCheck()
             throws SearchServiceException, IOException {
-        try {
-            if (solrSearchCore.getSolr() == null) {
-                return;
-            }
-            SolrQuery solrQuery = new SolrQuery();
-            solrQuery.set("spellcheck", true);
-            solrQuery.set(SpellingParams.SPELLCHECK_BUILD, true);
-            solrSearchCore.getSolr().query(solrQuery, solrSearchCore.REQUEST_METHOD);
-        } catch (SolrServerException e) {
-            //Make sure to also log the exception since this command is usually run from a crontab.
-            log.error(e, e);
-            throw new SearchServiceException(e);
-        }
+        // DirectSolrSpellChecker reads directly from the main Solr index at query time,
+        // so no separate build step is needed. This eliminates timeout issues on large
+        // repositories where the previous IndexBasedSpellChecker could take minutes to
+        // rebuild its parallel index.
+        log.info("Spellcheck uses DirectSolrSpellChecker — no build step required.");
     }
 
     @Override
