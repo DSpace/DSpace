@@ -193,15 +193,11 @@
              see the 'submission.autosave' settings in the 'environment.common.ts'.
              See also 'config/spring/api/step-processing-listener.xml' for further server side configuration
              -->
-        <!--Step will be to enrich the current submission querying external providers or processing the uploaded file -->
-        <!-- Uncomment this step to enrich the current submission using information extracted
-            from uploaded files or metadata. Please check also config/spring/api/step-processing-listener.xml
-            for further configuration -->
-        <!--<step-definition id="extractionstep" mandatory="true">
+        <step-definition id="extractionstep">
             <heading>submit.progressbar.ExtractMetadataStep</heading>
             <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
             <type>extract</type>
-        </step-definition>-->
+        </step-definition>
 
         <!-- Openaire submission steps/forms -->
         <step-definition id="openaireProjectForm" mandatory="true">
@@ -287,7 +283,6 @@
             <!--<step id="sample"/> -->
 
             <step id="collection"/>
-            <step id="extractionstep"/>
             <!-- To include the 'Show Identifiers' step, uncomment the line below. Make sure
                  that identifiers.cfg and identifier-service.xml are properly configured. -->
             <!--<step id="identifiers"/>-->
@@ -311,6 +306,8 @@
 
             <!--Step will be to Upload the item -->
             <step id="upload"/>
+
+            <!-- <step id="extractionstep"/> -->
 
             <!-- Uncomment this step to allow the user to select a Creative Commons License -->
             <!-- <step id="cclicense"/> -->

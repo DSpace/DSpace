@@ -117,7 +117,7 @@ public class GrobidMetadataExtractionIT extends AbstractControllerIntegrationTes
                             .withName("Sub Community")
                             .build();
 
-        CollectionBuilder.createCollection(context, child1, "123456789/extraction-test")
+        CollectionBuilder.createCollection(context, child1, "123456789/grobid-extraction")
                          .withName("Collection 1")
                          .withSubmitterGroup(eperson)
                          .build();
