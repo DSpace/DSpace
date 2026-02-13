@@ -173,6 +173,11 @@ public class Email {
      */
     private String charset;
 
+    /**
+     * The MIME type this message will be sent in
+     */
+    private String mimeType;
+
     /** The message being assembled. */
     MimeMessage message;
 
@@ -212,6 +217,7 @@ public class Email {
         template = null;
         replyTo = null;
         charset = null;
+        mimeType = null;
     }
 
     /**
@@ -332,6 +338,15 @@ public class Email {
     }
 
     /**
+     * Set the MIME type of the message.
+     *
+     * @param mt the name of a MIME type, such as "text/plain" (default) or "text/html".
+     */
+    public void setMimeType(String mt) {
+        mimeType = mt;
+    }
+
+    /**
      * "Reset" the message. Clears the arguments, attachments and recipients,
      * but leaves the subject and content intact.
      */
@@ -343,6 +358,7 @@ public class Email {
         moreAttachments.clear();
         replyTo = null;
         charset = null;
+        mimeType = null;
     }
 
     /**
@@ -393,6 +409,10 @@ public class Email {
         // If no character set specified, attempt to retrieve a default
         if (charset == null) {
             charset = config.getProperty("mail.charset");
+        }
+
+        if (mimeType == null) {
+            mimeType = config.getProperty("mail.mimetype");
         }
 
         // Get session
@@ -468,6 +488,8 @@ public class Email {
                 }
             } else if ("charset".equalsIgnoreCase(headerName)) {
                 charset = headerValue;
+            } else if ("mimetype".equalsIgnoreCase(headerName)) {
+                mimeType = headerValue;
             } else {
                 message.setHeader(headerName, headerValue);
             }
@@ -482,10 +504,19 @@ public class Email {
 
         // Attach the body.
         if (attachments.isEmpty() && moreAttachments.isEmpty()) { // Flat body.
-            if (charset != null) {
-                message.setText(body, charset);
+            if (mimeType != null) {
+                // If a character set has been specified, or a default exists
+                if (charset != null) {
+                    message.setContent(body, mimeType + "; charset=" + charset);
+                } else {
+                    message.setContent(body, mimeType + "; charset=utf-8");
+                }
             } else {
-                message.setText(body);
+                if (charset != null) {
+                    message.setText(body, charset);
+                } else {
+                    message.setText(body);
+                }
             }
         } else { // Add attachments.
             Multipart multipart = new MimeMultipart();

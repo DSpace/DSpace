@@ -2,13 +2,46 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
+#set($mimetype = "text/html")
 #set($subject = "Welcome new registered ${config.get('dspace.name')} user!")
-Thank you for registering an account. Your new account can be used immediately
-to subscribe to notices of new content arriving in collections of your choice.
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Registration Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .signature {
+            margin-top: 30px;
+        }
+        .contact {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p>Thank you for registering an account. Your new account can be used immediately to subscribe to notices of new content arriving in collections of your choice.</p>
 
-Your new account can also be granted privileges to submit new content, or to
-edit and/or approve submissions.
+        <p>Your new account can also be granted privileges to submit new content, or to edit and/or approve submissions.</p>
 
-If you need assistance with your account, please email ${config.get("mail.helpdesk")}.
+        <p class="contact">If you need assistance with your account, please email ${config.get("mail.helpdesk")}.</p>
 
-The ${config.get('dspace.name')} Team
+        <p class="signature">The ${config.get('dspace.name')} Team</p>
+    </div>
+</body>
+</html>

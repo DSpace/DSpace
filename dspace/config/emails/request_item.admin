@@ -8,13 +8,65 @@
 ##             {4} the approver's email address
 ## See org.dspace.core.Email for information on the format of this file.
 ##
+#set($mimetype = "text/html")
 #set($subject = "${config.get('dspace.name')}: Request for Open Access")
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request a Copy - Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .request-info {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #4caf50;
+        }
+        .request-details {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .detail-item {
+            margin: 10px 0;
+        }
+        .signature {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Request a Copy</h2>
 
-${params[3]}, with address ${params[4]},
-requested the following document/file to be in Open Access:
+        <div class="request-info">
+            ${params[3]}, with address ${params[4]},<br>
+            requested the following document/file to be in Open Access:
+        </div>
 
-Document Handle: ${params[1]}
-File ID: ${params[0]}
-Token: ${params[2]}
+        <div class="request-details">
+            <div class="detail-item"><strong>Document Handle:</strong> ${params[1]}</div>
+            <div class="detail-item"><strong>File ID:</strong> ${params[0]}</div>
+            <div class="detail-item"><strong>Token:</strong> ${params[2]}</div>
+        </div>
 
-The ${config.get('dspace.name')} Team
+        <p class="signature">The ${config.get('dspace.name')} Team</p>
+    </div>
+</body>
+</html>

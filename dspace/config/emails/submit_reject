@@ -6,17 +6,95 @@
 ## {3}  Reason for the rejection
 ## {4}  Link to 'My DSpace' page
 ##
+#set($mimetype = "text/html")
 #set($subject = "${config.get('dspace.name')}: Submission Rejected")
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Submission Has Been Rejected</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .rejection-notification {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #d32f2f;
+        }
+        .submission-details {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .explanation {
+            background-color: #fce4e4;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #d32f2f;
+        }
+        .access-info {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007cba;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .signature {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Submission Rejected</h2>
 
-You submitted: ${params[0]}
+        <div class="rejection-notification">
+            Your submission has been rejected by ${params[2]}
+        </div>
 
-To collection: ${params[1]}
+        <div class="submission-details">
+            <p><strong>You submitted:</strong> ${params[0]}</p>
+            <p><strong>To collection:</strong> ${params[1]}</p>
+        </div>
 
-Your submission has been rejected by ${params[2]}
-with the following explanation:
+        <p><strong>with the following explanation:</strong></p>
 
-${params[3]}
+        <div class="explanation">
+            ${params[3]}
+        </div>
 
-Your submission has not been deleted. You can access it from your "My${config.get('dspace.shortname')}" page: ${params[4]}
+        <div class="access-info">
+            <p>Your submission has not been deleted. You can access it from your "My${config.get('dspace.shortname')}" page:</p>
+            <p><a href="${params[4]}" class="button">View Submission</a></p>
+            <p>${params[4]}</p>
+        </div>
 
-The ${config.get('dspace.name')} Team
+        <p class="signature">The ${config.get('dspace.name')} Team</p>
+    </div>
+</body>
+</html>

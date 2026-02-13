@@ -10,18 +10,69 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
+#set($mimetype = "text/html")
 #set($subject = "${config.get('dspace.name')}: Feedback Form Information")
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Feedback Received</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .comments {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #007cba;
+        }
+        .details {
+            background-color: #f0f7ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .detail-item {
+            margin: 8px 0;
+        }
+        .signature {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>User Feedback</h2>
 
-Comments:
+        <div class="comments">
+            <strong>Comments:</strong>
+            <p>${params[6]}</p>
+        </div>
 
-${params[6]}
+        <div class="details">
+            <h3>Submission Details</h3>
+            <div class="detail-item"><strong>Date:</strong> ${params[0]}</div>
+            <div class="detail-item"><strong>Email:</strong> ${params[1]}</div>
+            <div class="detail-item"><strong>Logged In As:</strong> ${params[2]}</div>
+            <div class="detail-item"><strong>Referring Page:</strong> ${params[3]}</div>
+            <div class="detail-item"><strong>User Agent:</strong> ${params[4]}</div>
+            <div class="detail-item"><strong>Session:</strong> ${params[5]}</div>
+        </div>
 
-
-Date: ${params[0]}
-Email: ${params[1]}
-Logged In As: ${params[2]}
-Referring Page: ${params[3]}
-User Agent: ${params[4]}
-Session: ${params[5]}
-
-The ${config.get('dspace.name')} Team
+        <p class="signature">The ${config.get('dspace.name')} Team</p>
+    </div>
+</body>
+</html>
