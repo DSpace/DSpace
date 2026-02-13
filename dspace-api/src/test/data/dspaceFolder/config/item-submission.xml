@@ -33,6 +33,7 @@
         <name-map collection-handle="123456789/test-duplicate-detection" submission-name="test-duplicate-detection"/>
         <name-map collection-handle="123456789/collection-test-patch" submission-name="publicationTestPatch"/>
         <name-map collection-handle="123456789/enforced-relation" submission-name="enforcedRelation"/>
+        <name-map collection-handle="123456789/person" submission-name="person-submission"/>
     </submission-map>
 
 
@@ -113,6 +114,12 @@
             <heading>submit.progressbar.accessCondition</heading>
             <processing-class>org.dspace.app.rest.submit.step.AccessConditionStep</processing-class>
             <type>accessCondition</type>
+        </step-definition>
+
+        <step-definition id="personstep">
+            <heading>Submit Person Details</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
         </step-definition>
 
         <!-- Step Upload Item with Embargo Features to enable this step, please
@@ -345,6 +352,12 @@
             <step id="upload-no-required-metadata" />
             <step id="license" />
         </submission-process>
+
+        <submission-process name="person-submission">
+            <step id="collection"/>
+            <step id="personstep"/>
+        </submission-process>
+
     </submission-definitions>
 
 </item-submission>

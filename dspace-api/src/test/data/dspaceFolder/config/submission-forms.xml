@@ -483,6 +483,52 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
    </form>
 
+   <form name="personstep">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <label>Preferred Name</label>
+         <input-type>name</input-type>
+         <repeatable>false</repeatable>
+         <required>You must enter least at the Surname.</required>
+         <hint />
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>person</dc-schema>
+         <dc-element>givenName</dc-element>
+         <label>First name</label>
+         <input-type>onebox</input-type>
+         <repeatable>false</repeatable>
+         <required />
+         <hint />
+       </field>
+       <field>
+         <dc-schema>person</dc-schema>
+         <dc-element>familyName</dc-element>
+         <label>Family name</label>
+         <input-type>onebox</input-type>
+         <repeatable>false</repeatable>
+         <required />
+         <hint />
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>oairecerif</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>url</dc-qualifier>
+         <label>Personal Site(s)</label>
+         <input-type>link</input-type>
+         <repeatable>true</repeatable>
+         <required />
+         <hint />
+       </field>
+     </row>
+   </form>
+
  </form-definitions>
 
 
