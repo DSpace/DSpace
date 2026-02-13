@@ -154,17 +154,17 @@
             <type>submission-form</type>
         </step-definition>
 
-		<step-definition id="upload">
-			<heading>submit.progressbar.upload</heading>
-			<processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
-			<type>upload</type>
-		</step-definition>
-		<step-definition id="license">
-			<heading>submit.progressbar.license</heading>
-			<processing-class>org.dspace.app.rest.submit.step.LicenseStep</processing-class>
-			<type>license</type>
-			<scope visibilityOutside="read-only">submission</scope>
-		</step-definition>
+        <step-definition id="upload">
+            <heading>submit.progressbar.upload</heading>
+            <processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
+            <type>upload</type>
+        </step-definition>
+        <step-definition id="license">
+            <heading>submit.progressbar.license</heading>
+            <processing-class>org.dspace.app.rest.submit.step.LicenseStep</processing-class>
+            <type>license</type>
+            <scope visibilityOutside="read-only">submission</scope>
+        </step-definition>
 
         <!-- This optional step may allow the user to select a Creative Commons license -->
         <step-definition id="cclicense" mandatory="false">

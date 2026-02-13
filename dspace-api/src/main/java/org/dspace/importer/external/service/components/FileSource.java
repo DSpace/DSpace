@@ -11,8 +11,6 @@ package org.dspace.importer.external.service.components;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.exception.FileMultipleOccurencesException;
 import org.dspace.importer.external.exception.FileSourceException;
@@ -58,11 +56,13 @@ public interface FileSource extends MetadataSource {
      */
     public default boolean isValidSourceForFile(String originalName) {
         List<String> extensions = getSupportedExtensions();
-        if (CollectionUtils.isEmpty(extensions)) {
+        if (extensions == null || extensions.isEmpty()) {
             return false;
         }
         if (originalName != null && originalName.contains(".")) {
-            return getSupportedExtensions().contains(FilenameUtils.getExtension(originalName));
+            String extension = originalName.substring(originalName.lastIndexOf('.') + 1,
+                originalName.length());
+            return getSupportedExtensions().contains(extension);
         }
         return false;
     }
