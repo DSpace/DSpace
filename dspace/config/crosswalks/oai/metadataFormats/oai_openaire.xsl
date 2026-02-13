@@ -796,7 +796,7 @@
 
     <!-- oaire:resourceType -->
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationtype.html -->
-    <xsl:template match="doc:element[@name='dc']/doc:element[@name='type']/doc:element" mode="oaire">
+    <xsl:template match="doc:element[@name='dc']/doc:element[@name='type']/doc:element[doc:field[@name='value']]" mode="oaire">
         <xsl:variable name="resourceTypeGeneral">
             <xsl:call-template name="resolveResourceTypeGeneral">
                 <xsl:with-param name="field" select="./doc:field[@name='value']/text()"/>
