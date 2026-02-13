@@ -70,6 +70,9 @@ public abstract class AbstractPackageIngester
      * Key = DSpace Object just ingested, Value = List of all packages relating to a DSpaceObject
      **/
     private Map<DSpaceObject, List<String>> packageReferences = new HashMap<DSpaceObject, List<String>>();
+    private Map<DSpaceObject, Map<String, List<String>>> relPackageReferences = new HashMap<>();
+
+    private Map<String, String> pathToNewUUID = new HashMap<>();
 
     /**
      * Map of all successfully ingested/replaced DSpace objects for current
@@ -195,6 +198,9 @@ public abstract class AbstractPackageIngester
                             String childHandle = getIngestedMap().get(childPkg);
                             if (childHandle != null) {
                                 Item childItem = (Item) handleService.resolveToObject(context, childHandle);
+                                if (childItem != null && !pathToNewUUID.containsKey(childPkg.getAbsolutePath())) {
+                                    pathToNewUUID.put(childPkg.getAbsolutePath(), childItem.getID().toString());
+                                }
                                 // Ensure Item is mapped to Collection that referenced it
                                 Collection collection = (Collection) dso;
                                 if (childItem != null && !itemService.isIn(childItem, collection)) {
@@ -359,6 +365,31 @@ public abstract class AbstractPackageIngester
         packageReferences.put(dso, packageRefValues);
     }
 
+    public void addRelPackageReference(DSpaceObject dso, String relType, String packageRef) {
+        Map<String, List<String>> packageTypeMap = null;
+
+        // Check if we already have an entry for packages reference by this object
+        if (relPackageReferences.containsKey(dso)) {
+            packageTypeMap = relPackageReferences.get(dso);
+        } else {
+            //Create a new empty list of references
+            packageTypeMap = new HashMap<>();
+        }
+
+        List<String> packageRefValues = null;
+        if (packageTypeMap.containsKey(relType)) {
+            packageRefValues = packageTypeMap.get(relType);
+        } else {
+            packageRefValues = new ArrayList<>();
+        }
+
+        //add this package reference to existing list and save
+        packageRefValues.add(packageRef);
+        packageTypeMap.put(relType, packageRefValues);
+        relPackageReferences.put(dso, packageTypeMap);
+    }
+
+
     /**
      * Return a list of known SIP references from a newly created DSpaceObject.
      * <P>
@@ -424,5 +455,9 @@ public abstract class AbstractPackageIngester
         } else {
             return new ArrayList(coll);
         }
+    }
+
+    public Map<String, String> getPathToNewUUID() {
+        return pathToNewUUID;
     }
 }

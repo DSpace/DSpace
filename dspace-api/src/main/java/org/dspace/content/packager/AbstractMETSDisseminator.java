@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -63,6 +64,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
 import org.dspace.content.crosswalk.AbstractPackagerWrappingCrosswalk;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
@@ -70,6 +73,7 @@ import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -1081,6 +1085,9 @@ public abstract class AbstractMETSDisseminator
 
         // Does subclass have something to add to structMap?
         addStructMap(context, dso, params, mets);
+        if (dso.getType() == 2 ) {
+            addStructMapItem(context, dso, params, mets);
+        }
 
         return mets;
     }
@@ -1567,6 +1574,106 @@ public abstract class AbstractMETSDisseminator
     public abstract void addStructMap(Context context, DSpaceObject dso,
                                       PackageParameters params, Mets mets)
         throws SQLException, IOException, AuthorizeException, MetsException;
+
+    public void addStructMapItem(Context context, DSpaceObject dso,
+                                 PackageParameters params, Mets mets)
+            throws SQLException {
+        Item item = (Item) dso;
+        RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+
+        List<MetadataValue> mdvs = item.getMetadata();
+        List<Relationship> relList = relationshipService.findByItem(context, item);
+        Map<String, List<Relationship>> relsMap = sortRelListByPlace(item, relList);
+        String extension = getMIMEType(params).split("/")[1];
+        if (relList.size() > 0) {
+            StructMap structMap = new StructMap();
+            structMap.setID("rels");
+            for (String key : relsMap.keySet()) {
+                Div divParent = new Div();
+                divParent.setID("rels_" + key);
+                for (Relationship relationship : relsMap.get(key)) {
+                    int place = 0;
+                    String value = "";
+                    Item otherItem;
+                    if (relationship.getRightItem() == item) {
+                        place = relationship.getRightPlace();
+                        value = relationship.getRightwardValue();
+                        otherItem = relationship.getLeftItem();
+                    } else {
+                        place = relationship.getLeftPlace();
+                        value = relationship.getLeftwardValue();
+                        otherItem = relationship.getRightItem();
+                    }
+                    if (otherItem.isArchived()) {
+                        Div divChild = new Div();
+                        divChild.setORDER(place);
+                        if (value == null || !value.equalsIgnoreCase("")) {
+                            divChild.setLABEL(value);
+                        }
+                        String dsoType = Constants.typeText[otherItem.getType()];
+                        String childFile = "";
+                        if (configurationService.getBooleanProperty("replicate.packer.typeprefix", true)) {
+                            childFile = dsoType + "@";
+                        }
+                        childFile += otherItem.getHandle().replace('/', '-') + "." + extension;
+                        Mptr mptrHandle = new Mptr();
+                        mptrHandle.setXlinkHref(otherItem.getHandle());
+                        mptrHandle.setLOCTYPE(Loctype.HANDLE);
+                        Mptr mptrURL = new Mptr();
+                        mptrURL.setXlinkHref(otherItem.getHandle());
+                        mptrURL.setLOCTYPE(Loctype.URL);
+                        mptrURL.setXlinkHref(childFile);
+                        Mptr mptrUrn = new Mptr();
+                        mptrUrn.setXlinkHref("urn:uuid:" + otherItem.getID().toString());
+                        mptrUrn.setLOCTYPE(Loctype.URN);
+                        divChild.getContent().add(mptrHandle);
+                        divChild.getContent().add(mptrURL);
+                        divChild.getContent().add(mptrUrn);
+                        divParent.getContent().add(divChild);
+                    }
+                }
+                structMap.getContent().add(divParent);
+            }
+            mets.getContent().add(structMap);
+        }
+    }
+
+    private Map<String, List<Relationship>> sortRelListByPlace(Item item, List<Relationship> relList) {
+        Map<String, List<Relationship>> relsMap = new HashMap<>();
+        boolean isRight = false;
+
+        for (Relationship relationship : relList) {
+            String typeLabel = "";
+            if (relationship.getRightItem() == item) {
+                typeLabel = relationship.getRelationshipType().getRightwardType();
+                isRight = true;
+            } else {
+                typeLabel = relationship.getRelationshipType().getLeftwardType();
+            }
+            if (!relsMap.containsKey(typeLabel)) {
+                List<Relationship> newRelList = new ArrayList<>();
+                newRelList.add(relationship);
+                relsMap.put(typeLabel, newRelList);
+            } else {
+                List<Relationship> currList = relsMap.get(typeLabel);
+                currList.add(relationship);
+                currList = leftOrRightSort(isRight, currList);
+                relsMap.put(typeLabel, currList);
+            }
+        }
+
+        return relsMap;
+    }
+
+    private List<Relationship> leftOrRightSort(boolean isRight, List<Relationship> rels) {
+        if (isRight) {
+            rels.sort((Relationship o1, Relationship o2) -> o1.getRightPlace() - o2.getRightPlace());
+        } else {
+            rels.sort((Relationship o1, Relationship o2) -> o1.getLeftPlace() - o2.getLeftPlace());
+        }
+
+        return rels;
+    }
 
     /**
      * @param bundle bundle
