@@ -407,7 +407,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getServiceByName(String name, Class<T> type) {
+    public <T> T getServiceByName(String name, Class<? super T> type) {
         checkRunning();
         if (type == null) {
             throw new IllegalArgumentException("Type cannot be null");
@@ -447,7 +447,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             if (name == null
                 && service == null) {
                 try {
-                    Map<String, T> map = applicationContext.getBeansOfType(type);
+                    Map<String, ?> map = applicationContext.getBeansOfType(type);
                     if (map.size() == 1) {
                         // only return the bean if there is exactly one
                         service = (T) map.values().iterator().next();
@@ -466,17 +466,17 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> List<T> getServicesByType(Class<T> type) {
+    public <T> List<T> getServicesByType(Class<? super T> type) {
         checkRunning();
         if (type == null) {
             throw new IllegalArgumentException("type cannot be null");
         }
 
-        List<T> services = new ArrayList<>();
-        Map<String, T> beans;
+        List<T> services;
+        Map<String, ?> beans;
         try {
             beans = applicationContext.getBeansOfType(type, true, true);
-            services.addAll((Collection<? extends T>) beans.values());
+            services = new ArrayList<>((Collection<T>) beans.values());
         } catch (BeansException e) {
             throw new RuntimeException("Failed to get beans of type (" + type + "): " + e.getMessage(), e);
         }

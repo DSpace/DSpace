@@ -12,12 +12,23 @@ import java.sql.SQLException;
 import org.apache.commons.cli.ParseException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * This is the CLI version of the {@link Curation} script.
  * This will only be called when the curate script is called from a commandline instance.
  */
-public class CurationCli extends Curation {
+public class CurationCli<T extends ScriptConfiguration<?>> extends Curation<T> {
+
+    /**
+     * Constructor for CurationCli.
+     * Command-line interface wrapper for Curation script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
+     */
+    public CurationCli(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     /**
      * This is the overridden instance of the {@link Curation#assignCurrentUserInContext()} method in the parent class

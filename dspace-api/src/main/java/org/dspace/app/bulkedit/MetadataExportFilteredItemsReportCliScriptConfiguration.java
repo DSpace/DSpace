@@ -18,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Jean-François Morin (Université Laval)
  */
-public class MetadataExportFilteredItemsReportCliScriptConfiguration
-    extends MetadataExportFilteredItemsReportScriptConfiguration<MetadataExportFilteredItemsReportCli> {
+public class MetadataExportFilteredItemsReportCliScriptConfiguration<T extends MetadataExportFilteredItemsReport<?>>
+    extends MetadataExportFilteredItemsReportScriptConfiguration<T> {
 
     @Autowired
     private ConfigurationService configurationService;

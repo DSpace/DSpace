@@ -18,7 +18,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  * Implementation of {@link DSpaceRunnable} to find subscribed objects and send notification mails about them
  */
 public class SubscriptionEmailNotificationConfiguration<T
-        extends SubscriptionEmailNotification> extends ScriptConfiguration<T> {
+        extends SubscriptionEmailNotification<?>> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 

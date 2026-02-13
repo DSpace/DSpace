@@ -10,7 +10,6 @@ package org.dspace.app.suggestion.runnable;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
 import org.dspace.scripts.configuration.ScriptConfiguration;
-import org.dspace.utils.DSpace;
 
 /**
  * CLI implementation of the {@link PublicationLoaderRunnable} script.
@@ -19,21 +18,17 @@ import org.dspace.utils.DSpace;
  *
  * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  */
-public class PublicationLoaderRunnableCli extends PublicationLoaderRunnable {
+public class PublicationLoaderRunnableCli<T extends ScriptConfiguration<?>> extends PublicationLoaderRunnable<T> {
 
     /**
-     * Retrieves the script configuration associated with this CLI script.
-     * This method fetches the configuration from the DSpace service manager.
-     *
-     * @return The {@link ScriptConfiguration} instance for the import-loader-suggestions script.
+     * Constructor for PublicationLoaderRunnableCli.
+     * Command-line interface wrapper for PublicationLoaderRunnable script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
      */
-    @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public ScriptConfiguration<?> getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-                           .getServiceByName("import-loader-suggestions", ScriptConfiguration.class);
+    public PublicationLoaderRunnableCli(T scriptConfiguration) {
+        super(scriptConfiguration);
     }
-
 
     /**
      * Sets up the script execution environment.

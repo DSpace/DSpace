@@ -82,7 +82,7 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCli"/>
     </bean>
 
-    <bean id="import" class="org.dspace.app.itemimport.ItemImportCLIScriptConfiguration" primary="true">
+    <bean id="import-cli" class="org.dspace.app.itemimport.ItemImportCLIScriptConfiguration" primary="true">
         <property name="description" value="Batch Import from Simple Archive Format (SAF)" />
         <property name="dspaceRunnableClass" value="org.dspace.app.itemimport.ItemImportCLI"/>
     </bean>

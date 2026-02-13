@@ -13,7 +13,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 /**
  * The {@link ScriptConfiguration} for the {@link IndexClient} script
  */
-public class IndexDiscoveryScriptConfiguration<T extends IndexClient> extends ScriptConfiguration<T> {
+public class IndexDiscoveryScriptConfiguration<T extends IndexClient<?>> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 

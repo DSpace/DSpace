@@ -16,7 +16,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  *
  * @author Jean-François Morin (Université Laval)
  */
-public class MetadataExportFilteredItemsReportScriptConfiguration<T extends MetadataExportFilteredItemsReport>
+public class MetadataExportFilteredItemsReportScriptConfiguration<T extends MetadataExportFilteredItemsReport<?>>
         extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableclass;

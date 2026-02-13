@@ -24,6 +24,7 @@ import org.dspace.app.rest.utils.ApplicationConfig;
 import org.dspace.app.rest.utils.DSpaceAPIRequestLoggingFilter;
 import org.dspace.app.sitemap.GenerateSitemaps;
 import org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCli;
+import org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCliScriptConfiguration;
 import org.dspace.app.util.DSpaceContextListener;
 import org.dspace.google.GoogleAsyncEventListener;
 import org.dspace.utils.servlet.DSpaceWebappServletFilter;
@@ -62,13 +63,16 @@ public class WebApplication {
     @Autowired
     private GoogleAsyncEventListener googleAsyncEventListener;
 
+    @Autowired
+    private SolrDatabaseResyncCliScriptConfiguration<?> solrDatabaseResyncCliScriptConfiguration;
+
     @Scheduled(cron = "${sitemap.cron:-}")
     public void generateSitemap() throws IOException, SQLException {
         GenerateSitemaps.generateSitemapsScheduled();
     }
 
     @Scheduled(cron = "${ldn.queue.extractor.cron:-}")
-    public void ldnExtractFromQueue() throws IOException, SQLException {
+    public void ldnExtractFromQueue() throws SQLException {
         if (!configuration.getLdnEnabled()) {
             return;
         }
@@ -76,7 +80,7 @@ public class WebApplication {
     }
 
     @Scheduled(cron = "${ldn.queue.timeout.checker.cron:-}")
-    public void ldnQueueTimeoutCheck() throws IOException, SQLException {
+    public void ldnQueueTimeoutCheck() throws SQLException {
         if (!configuration.getLdnEnabled()) {
             return;
         }
@@ -85,7 +89,7 @@ public class WebApplication {
 
     @Scheduled(cron = "${solr-database-resync.cron:-}")
     public void solrDatabaseResync() throws Exception {
-        SolrDatabaseResyncCli.runScheduled();
+        SolrDatabaseResyncCli.runScheduled(this.solrDatabaseResyncCliScriptConfiguration);
     }
 
     @Scheduled(cron = "${google.analytics.cron:-}")

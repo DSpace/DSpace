@@ -12,8 +12,19 @@ import java.sql.SQLException;
 import org.apache.commons.cli.ParseException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
-public class HarvestCli extends Harvest {
+public class HarvestCli<T extends ScriptConfiguration<?>> extends Harvest<T> {
+
+    /**
+     * Constructor for HarvestCli.
+     * Command-line interface wrapper for Harvest script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
+     */
+    public HarvestCli(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     /**
      * This is the overridden instance of the {@link Harvest#assignCurrentUserInContext()} method in the parent class

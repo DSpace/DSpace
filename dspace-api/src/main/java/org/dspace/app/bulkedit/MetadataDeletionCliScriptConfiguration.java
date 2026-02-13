@@ -13,6 +13,7 @@ package org.dspace.app.bulkedit;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class MetadataDeletionCliScriptConfiguration extends MetadataDeletionScriptConfiguration<MetadataDeletionCli> {
+public class MetadataDeletionCliScriptConfiguration<T extends MetadataDeletion<?>>
+    extends MetadataDeletionScriptConfiguration<T> {
 
 }

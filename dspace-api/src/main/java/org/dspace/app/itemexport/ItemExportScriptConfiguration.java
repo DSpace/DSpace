@@ -16,7 +16,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  * 
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
-public class ItemExportScriptConfiguration<T extends ItemExport> extends ScriptConfiguration<T> {
+public class ItemExportScriptConfiguration<T extends ItemExport<?>> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 

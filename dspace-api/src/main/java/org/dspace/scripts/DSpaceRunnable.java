@@ -30,7 +30,7 @@ import org.dspace.scripts.handler.DSpaceRunnableHandler;
  * script
  * @param <T>
  */
-public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements Runnable {
+public abstract class DSpaceRunnable<T extends ScriptConfiguration<?>> implements Runnable {
 
     /**
      * The CommandLine object for the script that'll hold the information
@@ -54,11 +54,32 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     protected DSpaceRunnableHandler handler;
 
     /**
+     * Tells if the current context user that is running the script is an admin
+     */
+    private Boolean isAdmin = null;
+
+    /**
+     * The ScriptConfiguration that this DSpaceRunnable uses to retrieve information about the script
+     */
+    private T scriptConfiguration;
+
+    /**
      * This method will return the Configuration that the implementing DSpaceRunnable uses
      * @return  The {@link ScriptConfiguration} that this implementing DspaceRunnable uses
      */
-    public abstract T getScriptConfiguration();
+    public T getScriptConfiguration() {
+        return this.scriptConfiguration;
+    }
 
+    public DSpaceRunnable() { }
+
+    /**
+     * Constructor for the DSpaceRunnable that takes in the ScriptConfiguration that this DSpaceRunnable will use
+     * @param scriptConfiguration   The ScriptConfiguration that this DSpaceRunnable will use
+     */
+    public DSpaceRunnable(T scriptConfiguration) {
+        this.scriptConfiguration = scriptConfiguration;
+    }
 
     private void setHandler(DSpaceRunnableHandler dSpaceRunnableHandler) {
         this.handler = dSpaceRunnableHandler;

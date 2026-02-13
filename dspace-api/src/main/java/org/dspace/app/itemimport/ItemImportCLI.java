@@ -23,6 +23,7 @@ import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * CLI variant for the {@link ItemImport} class.
@@ -30,7 +31,17 @@ import org.dspace.eperson.EPerson;
  *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
-public class ItemImportCLI extends ItemImport {
+public class ItemImportCLI<T extends ScriptConfiguration<?>> extends ItemImport<T> {
+
+    /**
+     * Constructor for ItemImportCLI.
+     * Command-line interface wrapper for ItemImport script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
+     */
+    public ItemImportCLI(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     @Override
     protected void validate(Context context) {
