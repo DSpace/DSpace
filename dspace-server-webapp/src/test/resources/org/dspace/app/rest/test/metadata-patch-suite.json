@@ -139,6 +139,44 @@
       }
     },
     {
+      "name": "replace titles by adding two with one list",
+      "patch": [
+        {
+          "op": "add",
+          "path": "/metadata/dc.title",
+          "value": [
+            { "value": "title 1 (from list)" },
+            { "value": "title 2 (from list)" }
+          ]
+        }
+      ],
+      "expect": {
+        "dc.title": [
+          { "value": "title 1 (from list)", "language": null, "authority": null, "confidence": -1, "place": 0},
+          { "value": "title 2 (from list)", "language": null, "authority": null, "confidence": -1, "place": 1}
+        ]
+      }
+    },
+    {
+      "name": "insert title in between existing ones",
+      "patch": [
+        {
+          "op": "add",
+          "path": "/metadata/dc.title/1",
+          "value": [
+            { "value": "appended title" }
+          ]
+        }
+      ],
+      "expect": {
+        "dc.title": [
+          { "value": "title 1 (from list)", "language": null, "authority": null, "confidence": -1, "place": 0},
+          { "value": "appended title", "language": null, "authority": null, "confidence": -1, "place": 1},
+          { "value": "title 2 (from list)", "language": null, "authority": null, "confidence": -1, "place": 2}
+        ]
+      }
+    },
+    {
       "name": "remove all titles",
       "patch": [
         {
