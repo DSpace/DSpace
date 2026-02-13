@@ -1039,7 +1039,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community,
-        int offset, int limit) throws SQLException, SearchServiceException {
+        int offset, int limit) throws SearchServiceException {
 
         List<Collection> collections = new ArrayList<>();
         DiscoverQuery discoverQuery = new DiscoverQuery();
@@ -1056,8 +1056,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public int countCollectionsWithSubmit(String q, Context context, Community community)
-        throws SQLException, SearchServiceException {
+    public int countCollectionsWithSubmit(Context context, String q, Community community)
+        throws SearchServiceException {
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setMaxResults(0);
@@ -1079,29 +1079,12 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
      *                                   terms. The terms are used to make also a prefix query on SOLR
      *                                   so it can be used to implement an autosuggest feature over the collection name
      * @return                           discovery search result objects
-     * @throws SQLException              if something goes wrong
      * @throws SearchServiceException    if search error
      */
     private DiscoverResult retrieveCollectionsWithSubmit(Context context, DiscoverQuery discoverQuery,
         String entityType, Community community, String q)
-        throws SQLException, SearchServiceException {
+        throws SearchServiceException {
 
-        StringBuilder query = new StringBuilder();
-        EPerson currentUser = context.getCurrentUser();
-        if (!authorizeService.isAdmin(context)) {
-            String userId = "";
-            if (currentUser != null) {
-                userId = currentUser.getID().toString();
-            }
-            query.append("submit:(e").append(userId);
-
-            Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
-            for (Group group : groups) {
-                query.append(" OR g").append(group.getID());
-            }
-            query.append(")");
-            discoverQuery.addFilterQueries(query.toString());
-        }
         if (Objects.nonNull(community)) {
             discoverQuery.addFilterQueries("location.comm:" + community.getID().toString());
         }
@@ -1115,6 +1098,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 .append(escapedQuery).append("*").append(")");
             discoverQuery.setQuery(buildQuery.toString());
         }
+        discoverQuery.addRequiredAuthorization(Constants.ADD);
         DiscoverResult resp = searchService.search(context, discoverQuery);
         return resp;
     }
@@ -1154,8 +1138,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         context.turnOffAuthorisationSystem();
         List<Collection> collections;
         try {
-            collections = findCollectionsWithSubmit(null, context, community, entityType, 0, 1);
-        } catch (SQLException | SearchServiceException e) {
+            collections = findCollectionsWithSubmit(context, null, community, entityType, 0, 1);
+        } catch (SearchServiceException e) {
             throw new RuntimeException(e);
         }
         context.restoreAuthSystemState();
@@ -1175,8 +1159,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community, String entityType,
-            int offset, int limit) throws SQLException, SearchServiceException {
+    public List<Collection> findCollectionsWithSubmit(Context context, String q, Community community, String entityType,
+            int offset, int limit) throws SearchServiceException {
         List<Collection> collections = new ArrayList<>();
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
@@ -1193,8 +1177,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public int countCollectionsWithSubmit(String q, Context context, Community community, String entityType)
-            throws SQLException, SearchServiceException {
+    public int countCollectionsWithSubmit(Context context, String q, Community community, String entityType)
+            throws SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setMaxResults(0);
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
