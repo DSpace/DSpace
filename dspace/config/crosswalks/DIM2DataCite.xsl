@@ -362,6 +362,9 @@
         <xsl:variable name="authority" select="@authority"/>
         <creator>
             <creatorName>
+                <xsl:call-template name="nameType">
+                    <xsl:with-param name="authority_value" select="$authority"/>
+                </xsl:call-template>
                 <xsl:value-of select="." />
             </creatorName>
             <xsl:call-template name="personOrcid">
@@ -418,11 +421,15 @@
         Adds contributor and contributorType information
     -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='contributor'][not(@qualifier='author')]">
+        <xsl:variable name="authority" select="@authority"/>
         <xsl:choose>
             <xsl:when test="@qualifier='editor'"> 
                 <xsl:element name="contributor">
                     <xsl:attribute name="contributorType">Editor</xsl:attribute>
                     <contributorName>
+                        <xsl:call-template name="nameType">
+                            <xsl:with-param name="authority_value" select="$authority"/>
+                        </xsl:call-template>
                         <xsl:value-of select="." />
                     </contributorName>
                 </xsl:element>
@@ -431,6 +438,9 @@
                 <xsl:element name="contributor">
                     <xsl:attribute name="contributorType">RelatedPerson</xsl:attribute>
                     <contributorName>
+                        <xsl:call-template name="nameType">
+                            <xsl:with-param name="authority_value" select="$authority"/>
+                        </xsl:call-template>
                         <xsl:value-of select="." />
                     </contributorName>
                 </xsl:element>
@@ -439,6 +449,9 @@
                 <xsl:element name="contributor">
                     <xsl:attribute name="contributorType">Other</xsl:attribute>
                     <contributorName>
+                        <xsl:call-template name="nameType">
+                            <xsl:with-param name="authority_value" select="$authority"/>
+                        </xsl:call-template>
                         <xsl:value-of select="." />
                     </contributorName>
                 </xsl:element>
@@ -447,6 +460,9 @@
                 <xsl:element name="contributor">
                     <xsl:attribute name="contributorType">Other</xsl:attribute>
                     <contributorName>
+                        <xsl:call-template name="nameType">
+                            <xsl:with-param name="authority_value" select="$authority"/>
+                        </xsl:call-template>
                         <xsl:value-of select="." />
                     </contributorName>
                 </xsl:element>
@@ -455,6 +471,9 @@
                 <xsl:element name="contributor">
                     <xsl:attribute name="contributorType">Other</xsl:attribute>
                     <contributorName>
+                        <xsl:call-template name="nameType">
+                            <xsl:with-param name="authority_value" select="$authority"/>
+                        </xsl:call-template>
                         <xsl:value-of select="." />
                     </contributorName>
                 </xsl:element>
@@ -664,4 +683,25 @@
         </xsl:if>
     </xsl:template>
 
+    <!--
+        This template is used to add a nameType attribute to a
+        contributorName element when a dspace.entity.type virtual
+        metadata is available to be able to tell whether the
+        contributor is a Person or an OrgUnit, or when it comes in
+        through the isOrgUnitOfPublication relationship.
+    -->
+    <xsl:template name="nameType">
+      <xsl:param name="authority_value"/>
+      <xsl:variable name="entity_type" select= "//dspace:field[@mdschema='dspace' and @element='relatedentity' and @qualifier='type' and @authority=$authority_value]" />
+      <xsl:if test="starts-with($authority_value, 'virtual::')">
+        <xsl:choose>
+          <xsl:when test="$entity_type = 'OrgUnit' or //dspace:field[@mdschema='relation' and @element='isOrgUnitOfPublication' and @authority=$authority_value]">
+            <xsl:attribute name="nameType">Organizational</xsl:attribute>
+          </xsl:when>
+          <xsl:when test="$entity_type = 'Person'">
+            <xsl:attribute name="nameType">Personal</xsl:attribute>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:if>
+    </xsl:template>
 </xsl:stylesheet>
