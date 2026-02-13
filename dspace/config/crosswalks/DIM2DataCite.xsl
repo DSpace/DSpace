@@ -51,6 +51,13 @@
     <xsl:template match="@* | text()" />
 
     <xsl:template match="/dspace:dim[@dspaceType='ITEM']">
+        <xsl:call-template name="datacite-root">
+            <xsl:with-param name="dim-root" select="." />
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template name="datacite-root">
+        <xsl:param name="dim-root" />
         <!--
             org.dspace.identifier.doi.DataCiteConnector uses this XSLT to
             transform metadata for the DataCite metadata store. This crosswalk
@@ -77,7 +84,7 @@
                 company as well. We have to ensure to use URIs of our prefix
                 as primary identifiers only.
             -->
-            <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and (contains(., $prefix))]" />
+            <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and (contains(., $prefix))]" />
 
             <!--
                 DataCite (2)
@@ -86,8 +93,8 @@
             -->
             <creators>
                 <xsl:choose>
-                    <xsl:when test="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']">
-                        <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']" />
+                    <xsl:when test="$dim-root//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']">
+                        <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']" />
                     </xsl:when>
                     <xsl:otherwise>
                         <creator>
@@ -104,8 +111,8 @@
             -->
             <titles>
                 <xsl:choose>
-                    <xsl:when test="//dspace:field[@mdschema='dc' and @element='title']">
-                        <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='title']" />
+                    <xsl:when test="$dim-root//dspace:field[@mdschema='dc' and @element='title']">
+                        <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='title']" />
                     </xsl:when>
                     <xsl:otherwise>
                         <title>(:unas) unassigned</title>
@@ -121,8 +128,8 @@
             -->
             <xsl:element name="publisher">
                 <xsl:choose>
-                    <xsl:when test="//dspace:field[@mdschema='dc' and @element='publisher']">
-                        <xsl:value-of select="//dspace:field[@mdschema='dc' and @element='publisher'][1]" />
+                    <xsl:when test="$dim-root//dspace:field[@mdschema='dc' and @element='publisher']">
+                        <xsl:value-of select="$dim-root//dspace:field[@mdschema='dc' and @element='publisher'][1]" />
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:value-of select="$publisher" />
@@ -138,14 +145,14 @@
             -->
             <publicationYear>
                 <xsl:choose>
-                    <xsl:when test="//dspace:field[@mdschema='dc' and @element='date' and @qualifier='issued']">
-                        <xsl:value-of select="substring(//dspace:field[@mdschema='dc' and @element='date' and @qualifier='issued'], 1, 4)" />
+                    <xsl:when test="$dim-root//dspace:field[@mdschema='dc' and @element='date' and @qualifier='issued']">
+                        <xsl:value-of select="substring($dim-root//dspace:field[@mdschema='dc' and @element='date' and @qualifier='issued'], 1, 4)" />
                     </xsl:when>
-                    <xsl:when test="//dspace:field[@mdschema='dc' and @element='date' and @qualifier='available']">
-                        <xsl:value-of select="substring(//dspace:field[@mdschema='dc' and @element='date' and @qualifier='available'], 1, 4)" />
+                    <xsl:when test="$dim-root//dspace:field[@mdschema='dc' and @element='date' and @qualifier='available']">
+                        <xsl:value-of select="substring($dim-root//dspace:field[@mdschema='dc' and @element='date' and @qualifier='available'], 1, 4)" />
                     </xsl:when>
-                    <xsl:when test="//dspace:field[@mdschema='dc' and @element='date']">
-                        <xsl:value-of select="substring(//dspace:field[@mdschema='dc' and @element='date'], 1, 4)" />
+                    <xsl:when test="$dim-root//dspace:field[@mdschema='dc' and @element='date']">
+                        <xsl:value-of select="substring($dim-root//dspace:field[@mdschema='dc' and @element='date'], 1, 4)" />
                     </xsl:when>
                     <xsl:otherwise>0000</xsl:otherwise>
                 </xsl:choose>
@@ -162,9 +169,9 @@
                 Format: open
                 Attribute: subjectSchema (optional), schemeURI (optional)
             -->  
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='subject']">
+            <xsl:if test="$dim-root//dspace:field[@mdschema='dc' and @element='subject']">
                 <subjects>
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='subject']" />
+                    <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='subject']" />
                 </subjects>
             </xsl:if>
 
@@ -189,7 +196,7 @@
                         <xsl:value-of select="$hostinginstitution" />
                     </contributorName>
                 </xsl:element>
-                <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='contributor'][not(@qualifier='author')]" />
+                <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='contributor'][not(@qualifier='author')]" />
             </contributors>
 
             <!--
@@ -198,7 +205,7 @@
                 Occ: 0-n
                 Required Attribute: dataType - controlled list
             --> 
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='date' and 
+            <xsl:if test="$dim-root//dspace:field[@mdschema='dc' and @element='date' and 
                         (@qualifier='accessioned' 
                          or @qualifier='available' 
                          or @qualifier='copyright' 
@@ -207,7 +214,7 @@
                          or @qualifier='submitted'
                          or @qualifier='updated')]" >
                 <xsl:element name="dates">
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='date' and 
+                    <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='date' and 
                         (@qualifier='accessioned' 
                          or @qualifier='available' 
                          or @qualifier='copyright' 
@@ -224,7 +231,7 @@
                 Occ: 0-1
                 Format: IETF BCP 47 or ISO 639-1
             -->
-            <xsl:apply-templates select="(//dspace:field[@mdschema='dc' and @element='language' and (@qualifier='iso' or @qualifier='rfc3066')])[1]" />
+            <xsl:apply-templates select="($dim-root//dspace:field[@mdschema='dc' and @element='language' and (@qualifier='iso' or @qualifier='rfc3066')])[1]" />
 
             <!--
                 DataCite (10)
@@ -233,7 +240,7 @@
             -->
             <!--<xsl:apply-templates select="(//dspace:field[@mdschema='dc' and @element='type'])[1]" />-->
             <xsl:choose>
-                <xsl:when test="(//dspace:field[@mdschema='dc' and @element='type'])[1]">
+                <xsl:when test="($dim-root//dspace:field[@mdschema='dc' and @element='type'])[1]">
                     <xsl:apply-templates select="(//dspace:field[@mdschema='dc' and @element='type'])[1]" />
                 </xsl:when>
                 <xsl:otherwise>
@@ -253,9 +260,9 @@
                 Occ: 0-n
                 Required Attribute: alternateIdentifierType (free format)
             -->
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and not(contains(., $prefix))]">
+            <xsl:if test="$dim-root//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and not(contains(., $prefix))]">
                 <xsl:element name="alternateIdentifiers">
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and not(contains(., $prefix))]" />
+                    <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and not(contains(., $prefix))]" />
                 </xsl:element>
             </xsl:if>
 
@@ -271,18 +278,18 @@
                 DataCite (13)
                 Add sizes.
             -->
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']">             
+            <xsl:if test="$dim-root//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']">             
                 <xsl:element name="sizes">
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']" />      
+                    <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']" />      
                 </xsl:element>
             </xsl:if>
 
             <!-- DataCite (14)
                  Add formats.
             -->
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='format'][not(@qualifier='extent')]">
+            <xsl:if test="$dim-root//dspace:field[@mdschema='dc' and @element='format'][not(@qualifier='extent')]">
                 <xsl:element name="formats">
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='format'][not(@qualifier='extent')]" />       
+                    <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='format'][not(@qualifier='extent')]" />       
                 </xsl:element>
             </xsl:if>
 
@@ -298,9 +305,9 @@
                 Rights.
                 Occ: 0-1
             -->
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='rights']">
+            <xsl:if test="$dim-root//dspace:field[@mdschema='dc' and @element='rights']">
                 <xsl:element name="rightsList">
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='rights']" />
+                    <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='rights']" />
                 </xsl:element>
             </xsl:if>
 
@@ -310,9 +317,9 @@
                 Occ: 0-n
                 Required Attribute: descriptionType - controlled list
             -->
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='description' and (@qualifier='abstract' or @qualifier='tableofcontents' or not(@qualifier))]">
+            <xsl:if test="$dim-root//dspace:field[@mdschema='dc' and @element='description' and (@qualifier='abstract' or @qualifier='tableofcontents' or not(@qualifier))]">
                 <xsl:element name="descriptions">
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='description' and (@qualifier='abstract' or @qualifier='tableofcontents' or not(@qualifier))]" />
+                    <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='description' and (@qualifier='abstract' or @qualifier='tableofcontents' or not(@qualifier))]" />
                 </xsl:element>
             </xsl:if>
             
