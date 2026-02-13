@@ -11,6 +11,8 @@ import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static java.util.Arrays.asList;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Enumeration;
@@ -18,6 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import com.lyncode.xoai.dataprovider.OAIDataProvider;
 import com.lyncode.xoai.dataprovider.OAIRequestParameters;
@@ -25,6 +34,7 @@ import com.lyncode.xoai.dataprovider.core.XOAIManager;
 import com.lyncode.xoai.dataprovider.exceptions.InvalidContextException;
 import com.lyncode.xoai.dataprovider.exceptions.OAIException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,6 +51,10 @@ import org.dspace.xoai.services.api.xoai.SetRepositoryResolver;
 import org.dspace.xoai.services.impl.xoai.DSpaceResumptionTokenFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,6 +71,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class DSpaceOAIDataProvider {
     private static final Logger log = getLogger(DSpaceOAIDataProvider.class);
 
+    private Transformer htmlTransformer = null;
+
     @Autowired
     XOAICacheService cacheService;
     @Autowired
@@ -71,6 +87,25 @@ public class DSpaceOAIDataProvider {
     SetRepositoryResolver setRepositoryResolver;
 
     private DSpaceResumptionTokenFormatter resumptionTokenFormat = new DSpaceResumptionTokenFormatter();
+
+    @PostConstruct
+    public void setUpHTMLTransformer() {
+        try {
+            XOAIManager manager = xoaiManagerResolver.getManager();
+            if (manager.hasStyleSheet()) {
+                ResourceLoader resourceLoader = new DefaultResourceLoader();
+                String styleSheetPath = manager.getStyleSheet();
+                Resource styleSheetResource = resourceLoader.getResource("classpath:" + styleSheetPath);
+                Source htmlTransformSource
+                    = new StreamSource(new ByteArrayInputStream(styleSheetResource.getContentAsByteArray()));
+                TransformerFactory transformerFactory
+                    = TransformerFactory.newInstance();
+                htmlTransformer = transformerFactory.newTransformer(htmlTransformSource);
+            }
+        } catch (Exception e) {
+            log.warn("Could not set up HTML transformer for OAI-PMH app: " + e.toString());
+        }
+    }
 
     @RequestMapping("")
     public void index(HttpServletResponse response, HttpServletRequest request) throws IOException {
@@ -92,7 +127,8 @@ public class DSpaceOAIDataProvider {
 
     @RequestMapping("/{context}")
     public String contextAction(Model model, HttpServletRequest request, HttpServletResponse response,
-                                @PathVariable("context") String xoaiContext) throws IOException, ServletException {
+            @PathVariable("context") String xoaiContext)
+            throws IOException, ServletException, TransformerException {
         Context context = null;
         try {
             request.setCharacterEncoding("UTF-8");
@@ -109,7 +145,26 @@ public class DSpaceOAIDataProvider {
             OutputStream out = response.getOutputStream();
             OAIRequestParameters parameters = new OAIRequestParameters(buildParametersMap(request));
 
-            response.setContentType("text/xml");
+            boolean shouldServeAsHTML = false;
+            List<MediaType> acceptMediaTypes = MediaType.parseMediaTypes(request.getHeader("Accept"));
+            if (htmlTransformer != null) {
+                response.addHeader("Vary", "Accept");
+                for (MediaType acceptMediaType : acceptMediaTypes) {
+                    if (acceptMediaType.includes(MediaType.TEXT_XML) ||
+                            acceptMediaType.includes(MediaType.APPLICATION_XML)) {
+                        break;
+                    } else if (acceptMediaType.includes(MediaType.TEXT_HTML)) {
+                        shouldServeAsHTML = true;
+                    }
+                }
+            }
+
+            if (shouldServeAsHTML) {
+                response.setContentType("text/html");
+                out = new ByteArrayOutputStream();
+            } else {
+                response.setContentType("text/xml");
+            }
             response.setCharacterEncoding("UTF-8");
 
             String identification = xoaiContext + parameters.requestID();
@@ -124,6 +179,13 @@ public class DSpaceOAIDataProvider {
                 dataProvider.handle(parameters, out);
             }
 
+            if (shouldServeAsHTML) {
+                OutputStream responseOut = response.getOutputStream();
+                Source source = new StreamSource(new ByteArrayInputStream(((ByteArrayOutputStream) out).toByteArray()));
+                Result result = new StreamResult(responseOut);
+                htmlTransformer.transform(source, result);
+                out = responseOut;
+            }
 
             out.flush();
             out.close();
