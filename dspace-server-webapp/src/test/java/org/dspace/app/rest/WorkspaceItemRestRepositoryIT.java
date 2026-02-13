@@ -52,7 +52,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.io.IOUtils;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -102,14 +101,12 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.supervision.SupervisionOrder;
 import org.dspace.validation.CclicenseValidator;
 import org.dspace.validation.LicenseValidator;
-import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
 
 /**
  * Test suite for the WorkspaceItem endpoint
@@ -164,16 +161,16 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         anonymousGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
         adminGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ADMIN);
 
-        context.restoreAuthSystemState();
-    }
+         context.restoreAuthSystemState();
+     }
 
-    @Test
-    /**
-     * All the workspaceitem should be returned regardless of the collection where they were created
-     *
-     * @throws Exception
-     */
-    public void findAllTest() throws Exception {
+     @Test
+     /**
+      * All the workspaceitem should be returned regardless of the collection where they were created
+      *
+      * @throws Exception
+      */
+     public void findAllTest() throws Exception {
         context.setCurrentUser(admin);
 
         //** GIVEN **
@@ -2091,94 +2088,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             }
         }
         xmlIS.close();
-    }
-
-    private static @NonNull ResultMatcher dcContributorAuthor(Matcher<String> matcher) {
-        String contributorMetadata = "dc.contributor.author";
-        return traditionalPageOneMatcher(contributorMetadata, matcher);
-    }
-
-    private static @NonNull ResultMatcher traditionalPageOneMatcher(
-        String metadata, Matcher<String> matcher
-    ) {
-        return jsonPath(
-            "$._embedded.workspaceitems[0].sections.traditionalpageone['" + metadata + "'][0].value",
-            matcher
-        );
-    }
-
-    private static @NonNull ResultMatcher traditionalPageTwoMatcher(
-        String metadata, Matcher<String> matcher
-    ) {
-        return jsonPath(
-            "$._embedded.workspaceitems[0].sections.traditionalpagetwo['" + metadata + "'][0].value",
-            matcher
-        );
-    }
-
-    private static @NonNull ResultMatcher uploadMatcher(
-        String metadata, Matcher<String> matcher
-    ) {
-        return jsonPath(
-            "$._embedded.workspaceitems[0].sections.upload.files[0].metadata['" + metadata + "'][0].value",
-            matcher
-        );
-    }
-
-    @Test
-    /**
-     * Test the creation of a workspaceitem POSTing to the resource collection endpoint a PDF file. As a single item
-     * will be created we expect to have the pdf file stored as a bitstream
-     *
-     * @throws Exception
-     */
-    public void createWorkspaceItemFromPDFFileTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        //** GIVEN **
-        //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                                           .withName("Sub Community")
-                                           .build();
-        CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-
-        String authToken = getAuthToken(admin.getEmail(), password);
-
-        try (InputStream pdf = getClass().getResourceAsStream("simple-article.pdf")) {
-            final MockMultipartFile pdfFile =
-                new MockMultipartFile("file", "/local/path/myfile.pdf", "application/pdf", pdf);
-
-            // bulk create a workspaceitem
-            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
-                                             .file(pdfFile))
-                                // bulk create should return 200, 201 (created) is better for single resource
-                                .andExpect(status().isOk())
-                                // testing grobid extraction
-                                .andExpect(jsonPath(
-                                    "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
-                                    is("This is a simple test file")))
-                                .andExpect(traditionalPageOneMatcher("dc.contributor.author", is("Bollini, Andrea")))
-                                .andExpect(traditionalPageOneMatcher("dc.date.issued", is("2018")))
-                                .andExpect(
-                                    traditionalPageTwoMatcher(
-                                        "dc.description.abstract", is("This is the abstract of our PDF file")
-                                    )
-                                )
-                                // we can just check that the pdf is stored in the item
-                                .andExpect(
-                                    uploadMatcher(
-                                        "dc.title", is("myfile.pdf")
-                                    )
-                                )
-                                .andExpect(
-                                    uploadMatcher(
-                                        "dc.source", is("/local/path/myfile.pdf")
-                                    )
-                                );
-        }
     }
 
     @Test

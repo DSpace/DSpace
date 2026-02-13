@@ -58,6 +58,14 @@ public class GrobidImportMetadataSourceServiceImpl extends AbstractPlainMetadata
         this.grobidClient = grobidClient;
     }
 
+    public GrobidClient getGrobidClient() {
+        return grobidClient;
+    }
+
+    public void setGrobidClient(GrobidClient grobidClient) {
+        this.grobidClient = grobidClient;
+    }
+
     @Override
     public String getImportSource() {
         return "GrobidMetadataSource";
@@ -88,8 +96,7 @@ public class GrobidImportMetadataSourceServiceImpl extends AbstractPlainMetadata
         for (SourceDesc sourceDesc : sourceDescs) {
             List<Object> biblsAndBiblStructsAndListBibls = sourceDesc.getBiblsAndBiblStructsAndListBibls();
             for (Object bibl : biblsAndBiblStructsAndListBibls) {
-                if (bibl instanceof BiblStruct) {
-                    BiblStruct struct = (BiblStruct) bibl;
+                if (bibl instanceof BiblStruct struct) {
                     List<Analytic> analytics = struct.getAnalytics();
                     for (Analytic analytic : analytics) {
                         // Analytic
@@ -98,9 +105,8 @@ public class GrobidImportMetadataSourceServiceImpl extends AbstractPlainMetadata
                     }
                     List<Object> monogrsAndSeries = struct.getMonogrsAndSeries();
                     for (Object monogrsAndSerie : monogrsAndSeries) {
-                        if (monogrsAndSerie instanceof Monogr) {
+                        if (monogrsAndSerie instanceof Monogr monogr) {
                             // Monogr
-                            Monogr monogr = (Monogr) monogrsAndSerie;
                             List<Object> imprintsAndAuthorsAndEditors = monogr.getImprintsAndAuthorsAndEditors();
                             extractInfo(metadata, imprintsAndAuthorsAndEditors, "monogr");
                         } else {
@@ -125,31 +131,29 @@ public class GrobidImportMetadataSourceServiceImpl extends AbstractPlainMetadata
 
     private void extractInfo(PlainMetadataSourceDto meatadata, List<Object> objects, String prefix) {
         for (Object object : objects) {
-            if (object instanceof Author) {
-                extractAuthors(meatadata, object, prefix);
-            } else if (object instanceof Title) {
-                extractTitle(meatadata, object, prefix);
-            } else if (object instanceof Idno) {
-                extractIdno(meatadata, (Idno) object, prefix);
-            } else if (object instanceof ProfileDesc) {
-                ProfileDesc profileDesc = (ProfileDesc) object;
-                extractInfo(meatadata, profileDesc.getAbstractsAndTextClassesAndCorrespDescs(), prefix);
-            } else if (object instanceof Abstract) {
-                extractInfo(meatadata, ((Abstract) object).getContent(), prefix + "abstract");
-            } else if (object instanceof TextClass) {
-                extractInfo(meatadata, ((TextClass) object).getClassCodesAndKeywords(), prefix);
-            } else if (object instanceof P) {
-                extractInfo(meatadata, ((P) object).getContent(), prefix + "paragraph");
-            } else if (object instanceof Keywords) {
-                extractInfo(meatadata, ((Keywords) object).getContent(), prefix + "keywords");
-            } else if (object instanceof Term) {
-                extractInfo(meatadata, ((Term) object).getContent(), prefix + "term");
-            } else if (object instanceof Date) {
-                extractDate(meatadata, ((Date) object), prefix + "date");
-            } else if (object instanceof Imprint) {
-                extractInfo(meatadata, ((Imprint) object).getBiblScopesAndDatesAndPubPlaces(), prefix + "imprint");
-            } else if (object instanceof String) {
-                String str = (String) object;
+            if (object instanceof Author author) {
+                extractAuthors(meatadata, author, prefix);
+            } else if (object instanceof Title title) {
+                extractTitle(meatadata, title, prefix);
+            } else if (object instanceof Idno idno) {
+                extractIdno(meatadata, idno, prefix);
+            } else if (object instanceof ProfileDesc profile) {
+                extractInfo(meatadata, profile.getAbstractsAndTextClassesAndCorrespDescs(), prefix);
+            } else if (object instanceof Abstract abs) {
+                extractInfo(meatadata, abs.getContent(), prefix + "abstract");
+            } else if (object instanceof TextClass text) {
+                extractInfo(meatadata, text.getClassCodesAndKeywords(), prefix);
+            } else if (object instanceof P p) {
+                extractInfo(meatadata, p.getContent(), prefix + "paragraph");
+            } else if (object instanceof Keywords keywords) {
+                extractInfo(meatadata, keywords.getContent(), prefix + "keywords");
+            } else if (object instanceof Term term) {
+                extractInfo(meatadata, term.getContent(), prefix + "term");
+            } else if (object instanceof Date date) {
+                extractDate(meatadata, date, prefix + "date");
+            } else if (object instanceof Imprint imprint) {
+                extractInfo(meatadata, imprint.getBiblScopesAndDatesAndPubPlaces(), prefix + "imprint");
+            } else if (object instanceof String str) {
                 if (StringUtils.isNotBlank(str)) {
                     meatadata.addMetadata(prefix.toLowerCase(), str);
                 }
@@ -164,54 +168,52 @@ public class GrobidImportMetadataSourceServiceImpl extends AbstractPlainMetadata
     }
 
     private void extractIdno(PlainMetadataSourceDto meatadataSource, Idno object, String prefix) {
-        extractInfo(meatadataSource, object.getContent(), object.getType());
+        extractInfo(meatadataSource, object.getContent(), object.getType().toLowerCase());
     }
 
     private void extractTitle(PlainMetadataSourceDto meatadataSource, Object authorsAndEditorsAndTitle, String prefix) {
         Title title = (Title) authorsAndEditorsAndTitle;
         if ("main".equals(title.getType())) {
-            String outputtitle = "";
+            StringBuilder outputtitle = new StringBuilder();
             for (Object string : title.getContent()) {
                 if (string instanceof String) {
-                    outputtitle += (String) string;
+                    outputtitle.append((String) string);
                 }
             }
-            meatadataSource.addMetadata((prefix + "title").toLowerCase(), outputtitle);
+            meatadataSource.addMetadata((prefix + "title").toLowerCase(), outputtitle.toString());
         }
     }
 
-    private void extractAuthors(PlainMetadataSourceDto meatadataSource, Object authorsAndEditorsAndTitle,
-        String prefix) {
+    private void extractAuthors(
+        PlainMetadataSourceDto meatadataSource, Object authorsAndEditorsAndTitle, String prefix
+    ) {
         Author author = (Author) authorsAndEditorsAndTitle;
         List<Object> contents = author.getContent();
         for (Object content : contents) {
-            if (content instanceof PersName) {
-                PersName persName = (PersName) content;
+            if (content instanceof PersName persName) {
                 List<Object> names = persName.getContent();
-                String firstName = "";
-                String lastName = "";
+                StringBuilder firstName = new StringBuilder();
+                StringBuilder lastName = new StringBuilder();
                 for (Object name : names) {
-                    if (name instanceof Surname) {
-                        Surname surname = (Surname) name;
+                    if (name instanceof Surname surname) {
                         for (Object string : surname.getContent()) {
                             if (string instanceof String) {
-                                lastName += (String) string;
+                                lastName.append((String) string);
                             }
                         }
                     }
-                    if (name instanceof Forename) {
-                        Forename forename = (Forename) name;
+                    if (name instanceof Forename forename) {
                         if ("first".equals(forename.getType())) {
                             for (Object string : forename.getContent()) {
                                 if (string instanceof String) {
-                                    firstName += (String) string;
+                                    firstName.append((String) string);
                                 }
                             }
                         }
                     }
                 }
-                String outputname = lastName;
-                if (StringUtils.isNotBlank(firstName)) {
+                String outputname = lastName.toString();
+                if (StringUtils.isNotBlank(firstName.toString())) {
                     outputname += ", " + firstName;
                 }
                 meatadataSource.addMetadata((prefix + "name").toLowerCase(), outputname);

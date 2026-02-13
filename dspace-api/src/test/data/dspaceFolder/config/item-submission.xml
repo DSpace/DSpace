@@ -133,6 +133,12 @@
             <type>extract</type>
         </step-definition>
 
+        <step-definition id="grobidmetadata" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
         <!-- Fake Steps to test parsing of all options -->
         <!-- <step-definition mandatory="false"> <heading>fake.submission.readonly</heading>
             <processing-class>org.dspace.submit.step.SampleStep</processing-class> <type>sample</type>
@@ -285,8 +291,7 @@
 
         <submission-process name="extractiontestprocess">
             <step id="collection"/>
-            <step id="traditionalpageone"/>
-            <step id="traditionalpagetwo"/>
+            <step id="grobidmetadata"/>
             <step id="upload"/>
             <step id="extractionstep"/>
             <step id="license"/>

@@ -329,7 +329,7 @@
                 <value>pdf</value>
             </list>
         </property>
-        <property name="metadataFieldMap" ref="grobidMetadataFieldMap"></property>
+        <property name="metadataFieldMap" ref="grobidMetadataFieldMap"/>
     </bean>
 
 </beans>
