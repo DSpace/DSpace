@@ -1,0 +1,75 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:annotation-config/>
+    <!-- allows us to use spring annotations in beans -->
+
+    <bean id="grobidClient" class="org.dspace.submit.extraction.grobid.client.GrobidClientImpl">
+        <constructor-arg name="baseUrl" value="${metadata.extraction.grobid.url}" />
+    </bean>
+    
+    <util:map id="grobidMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <entry key-ref="dcTitle" value-ref="grobidTitleContributor" />
+        <entry key-ref="dcAuthors" value-ref="grobidAuthorsContributor" />
+        <entry key-ref="dcJournal" value-ref="grobidJournalContributor" />
+		<entry key-ref="dcIssued" value-ref="grobidIssuedContributor" />
+		<entry key-ref="dcJissn" value-ref="grobidJissnContributor" />
+        <entry key-ref="dcPisbn" value-ref="grobidPisbnContributor" />
+		<entry key-ref="dcDoi" value-ref="grobidDoiContributor" />
+		<entry key-ref="dcAbstract" value-ref="grobidAbstractContributor" />
+		<entry key-ref="dcAllKeyword" value-ref="grobidKeywordsContributor" />  
+    </util:map>
+
+    <bean id="grobidTitleContributor" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcTitle"/>
+        <property name="key" value="analytictitle" />
+    </bean>
+    
+    <bean id="grobidAuthorsContributor" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcAuthors"/>
+        <property name="key" value="analyticname" />
+    </bean>
+
+    <bean id="grobidJournalContributor" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcJournal"/>
+        <property name="key" value="monogrtitle" />
+    </bean>
+
+    <bean id="grobidIssuedContributor" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcIssued"/>
+        <property name="key" value="publicationstmtdatepublished" />
+    </bean>
+    
+    <bean id="grobidJissnContributor" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcJissn"/>
+        <property name="key" value="issn" />
+    </bean>
+    
+    <bean id="grobidPisbnContributor" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcPisbn"/>
+        <property name="key" value="isbn" />
+    </bean>
+    
+    <bean id="grobidDoiContributor" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcDoi"/>
+        <property name="key" value="doi" />
+    </bean>
+    
+    <bean id="grobidAbstractContributor" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcAbstract"/>
+        <property name="key" value="profiledescabstractparagraph" />
+    </bean>
+    
+    <bean id="grobidKeywordsContributor" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcAllKeyword"/>
+        <property name="key" value="profiledesckeywordsterm" />
+    </bean>
+    
+</beans>
