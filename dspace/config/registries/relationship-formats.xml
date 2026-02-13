@@ -35,6 +35,30 @@
 
     <dc-type>
         <schema>relation</schema>
+        <element>isEditorOfPublication</element>
+        <scope_note>Contains all uuids of the "latest" EDITORS that the current PUBLICATION links to via a relationship. In other words, this stores all relationships pointing from the current PUBLICATION to any EDITOR where the AUTHOR is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isEditorOfPublication</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of EDITORS which link to the current PUBLICATION via a "latest" relationship. In other words, this stores all relationships pointing to the current PUBLICATION from an EDITOR, implying that the PUBLICATION is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfEditor</element>
+        <scope_note>Contains all uuids of the "latest" PUBLICATIONS that the current EDITOR links to via a relationship. In other words, this stores all relationships pointing from the current EDITOR to any PUBLICATION where the PUBLICATION is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfEditor</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of PUBLICATIONS which link to the current EDITOR via a "latest" relationship. In other words, this stores all relationships pointing to the current EDITOR from any PUBLICATION, implying that the EDITOR is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
         <element>isProjectOfPublication</element>
         <scope_note>Contains all uuids of the "latest" PROJECTS that the current PUBLICATION links to via a relationship. In other words, this stores all relationships pointing from the current PUBLICATION to any PROJECT where the PROJECT is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
