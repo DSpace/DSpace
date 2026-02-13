@@ -26,12 +26,14 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 
@@ -60,6 +62,12 @@ public class RequestItemEmailNotifier {
 
     @Inject
     protected RequestItemService requestItemService;
+
+    @Inject
+    protected ItemService itemService;
+
+    @Inject
+    protected EPersonService epersonService;
 
     protected final RequestItemAuthorExtractor requestItemAuthorExtractor;
 
@@ -95,12 +103,14 @@ public class RequestItemEmailNotifier {
 
         email.addArgument(ri.getReqEmail()); // {1} Requester's address
 
+        Bitstream bitstream1 = ri.getBitstream();
         email.addArgument(ri.isAllfiles() // {2} All bitstreams or just one?
-            ? I18nUtil.getMessage("itemRequest.all") : ri.getBitstream().getName());
+            ? I18nUtil.getMessage("itemRequest.all") : bitstreamService.getName(bitstream1));
 
         email.addArgument(handleService.getCanonicalForm(ri.getItem().getHandle())); // {3}
 
-        email.addArgument(ri.getItem().getName()); // {4} requested item's title
+        Item item = ri.getItem();
+        email.addArgument(itemService.getName(item)); // {4} requested item's title
 
         email.addArgument(ri.getReqMessage()); // {5} message from requester
 
@@ -196,7 +206,8 @@ public class RequestItemEmailNotifier {
         // Build an email back to the requester.
         email.addArgument(ri.getReqName()); // {0} requestor's name
         email.addArgument(handleService.getCanonicalForm(ri.getItem().getHandle())); // {1} URL of the requested Item
-        email.addArgument(ri.getItem().getName()); // {2} title of the requested Item
+        Item item1 = ri.getItem();
+        email.addArgument(itemService.getName(item1)); // {2} title of the requested Item
         email.addArgument(grantorName);     // {3} name of the grantor
         email.addArgument(grantorAddress);  // {4} email of the grantor
         email.addArgument(message); //         {5} grantor's optional message
@@ -219,20 +230,20 @@ public class RequestItemEmailNotifier {
                 } else {
                     if (ri.isAllfiles()) {
                         Item item = ri.getItem();
-                        List<Bundle> bundles = item.getBundles("ORIGINAL");
+                        List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
                         for (Bundle bundle : bundles) {
                             List<Bitstream> bitstreams = bundle.getBitstreams();
                             for (Bitstream bitstream : bitstreams) {
-                                if (!bitstream.getFormat(context).isInternal() &&
-                                        requestItemService.isRestricted(context,
-                                                bitstream)) {
+                                if (!bitstreamService.getFormat(context, bitstream).isInternal()
+                                    && requestItemService.isRestricted(context, bitstream)
+                                ) {
                                     // #8636 Anyone receiving the email can respond to the
                                     // request without authenticating into DSpace
                                     context.turnOffAuthorisationSystem();
                                     email.addAttachment(
                                             bitstreamService.retrieve(context, bitstream),
-                                            bitstream.getName(),
-                                            bitstream.getFormat(context).getMIMEType());
+                                        bitstreamService.getName(bitstream),
+                                        bitstreamService.getFormat(context, bitstream).getMIMEType());
                                     context.restoreAuthSystemState();
                                 }
                             }
@@ -242,8 +253,8 @@ public class RequestItemEmailNotifier {
                         //#8636 Anyone receiving the email can respond to the request without authenticating into DSpace
                         context.turnOffAuthorisationSystem();
                         email.addAttachment(bitstreamService.retrieve(context, bitstream),
-                                bitstream.getName(),
-                                bitstream.getFormat(context).getMIMEType());
+                                        bitstreamService.getName(bitstream),
+                            bitstreamService.getFormat(context, bitstream).getMIMEType());
                         context.restoreAuthSystemState();
                     }
                 }
@@ -284,7 +295,7 @@ public class RequestItemEmailNotifier {
         Bitstream bitstream = ri.getBitstream();
         String bitstreamName;
         if (bitstream != null) {
-            bitstreamName = bitstream.getName();
+            bitstreamName = bitstreamService.getName(bitstream);
         } else {
             bitstreamName = "all"; // TODO localize
         }
@@ -298,8 +309,8 @@ public class RequestItemEmailNotifier {
         message.addArgument(item.getHandle());       // {1} Item handle
         message.addArgument(ri.getToken());          // {2} Request token
         if (approver != null) {
-            message.addArgument(approver.getFullName()); // {3} Approver's name
-            message.addArgument(approver.getEmail());    // {4} Approver's address
+            message.addArgument(epersonService.getFullName(approver));           // {3} Approver's name
+            message.addArgument(approver.getEmail());                            // {4} Approver's address
         } else {
             message.addArgument("anonymous approver");                           // [3] Approver's name
             message.addArgument(configurationService.getProperty("mail.admin")); // [4] Approver's address

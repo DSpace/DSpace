@@ -139,9 +139,7 @@ public class SiteTest extends AbstractUnitTest {
      */
     @Test
     public void testGetName() {
-        assertThat("testGetName 0", s.getName(),
-                equalTo(configurationService.getProperty("dspace.name")));
-        assertThat("testGetName 1", siteService.getName(s),
+        assertThat("testGetName", siteService.getName(s),
                 equalTo(configurationService.getProperty("dspace.name")));
     }
 
@@ -150,7 +148,7 @@ public class SiteTest extends AbstractUnitTest {
      */
     @Test
     public void testGetURL() {
-        assertThat("testGetURL 0", s.getURL(),
+        assertThat("testGetURL 0", siteService.getURL(s),
                 equalTo(configurationService.getProperty("dspace.ui.url")));
     }
 

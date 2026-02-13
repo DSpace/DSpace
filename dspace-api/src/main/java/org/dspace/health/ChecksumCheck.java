@@ -17,12 +17,16 @@ import org.dspace.checker.ChecksumResultCode;
 import org.dspace.checker.ChecksumResultsCollector;
 import org.dspace.checker.MostRecentChecksum;
 import org.dspace.checker.SimpleDispatcher;
+import org.dspace.content.Bitstream;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 
 /**
  * @author LINDAT/CLARIN dev team
  */
 public class ChecksumCheck extends Check {
+    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     @Override
     public String run(ReportInfo ri) {
@@ -56,9 +60,10 @@ public class ChecksumCheck extends Check {
             for (MostRecentChecksum bi : collector.arr) {
                 if (!ChecksumResultCode.CHECKSUM_MATCH.equals(bi
                                                                   .getChecksumResult().getResultCode())) {
+                    Bitstream bitstream = bi.getBitstream();
                     ret += String
                         .format("md5 checksum FAILED (%s): %s id: %s bitstream-id: %s\n was: %s\n  is: %s\n",
-                                bi.getChecksumResult(), bi.getBitstream().getName(),
+                                bi.getChecksumResult(), bitstreamService.getName(bitstream),
                                 bi.getBitstream().getInternalId(), bi.getBitstream().getID(),
                                 bi.getExpectedChecksum(),
                                 bi.getCurrentChecksum());

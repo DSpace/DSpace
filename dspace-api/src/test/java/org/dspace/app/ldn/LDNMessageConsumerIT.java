@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
@@ -135,9 +136,9 @@ public class LDNMessageConsumerIT extends AbstractIntegrationTestWithDatabase {
             configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle());
         assertEquals(notification.getObject().getIetfCiteAs(),
             itemService.getMetadataByMetadataString(item, "dc.identifier.uri").get(0).getValue());
+        UUID bid = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME).get(0).getBitstreams().get(0).getID();
         assertEquals(notification.getObject().getUrl().getId(),
-            configurationService.getProperty("dspace.ui.url") + "/bitstreams/" +
-                item.getBundles(Constants.CONTENT_BUNDLE_NAME).get(0).getBitstreams().get(0).getID() + "/download");
+            configurationService.getProperty("dspace.ui.url") + "/bitstreams/" + bid + "/download");
 
         // check target
         assertEquals(notification.getTarget().getId(), notifyService.getUrl());
@@ -211,9 +212,9 @@ public class LDNMessageConsumerIT extends AbstractIntegrationTestWithDatabase {
             configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle());
         assertEquals(notification.getObject().getIetfCiteAs(),
             itemService.getMetadataByMetadataString(item, "dc.identifier.uri").get(0).getValue());
+        UUID bid = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME).get(0).getBitstreams().get(0).getID();
         assertEquals(notification.getObject().getUrl().getId(),
-            configurationService.getProperty("dspace.ui.url") + "/bitstreams/" +
-                item.getBundles(Constants.CONTENT_BUNDLE_NAME).get(0).getBitstreams().get(0).getID() + "/download");
+            configurationService.getProperty("dspace.ui.url") + "/bitstreams/" + bid + "/download");
 
         // check target
         assertEquals(notification.getTarget().getId(), notifyService.getUrl());
@@ -282,9 +283,9 @@ public class LDNMessageConsumerIT extends AbstractIntegrationTestWithDatabase {
             configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle());
         assertEquals(notification.getObject().getIetfCiteAs(),
             itemService.getMetadataByMetadataString(item, "dc.identifier.uri").get(0).getValue());
+        UUID bid = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME).get(0).getBitstreams().get(0).getID();
         assertEquals(notification.getObject().getUrl().getId(),
-            configurationService.getProperty("dspace.ui.url") + "/bitstreams/" +
-                item.getBundles(Constants.CONTENT_BUNDLE_NAME).get(0).getBitstreams().get(0).getID() + "/download");
+            configurationService.getProperty("dspace.ui.url") + "/bitstreams/" + bid + "/download");
 
         // check target
         assertEquals(notification.getTarget().getId(), notifyService.getUrl());
@@ -353,9 +354,9 @@ public class LDNMessageConsumerIT extends AbstractIntegrationTestWithDatabase {
             configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle());
         assertEquals(notification.getObject().getIetfCiteAs(),
             itemService.getMetadataByMetadataString(item, "dc.identifier.uri").get(0).getValue());
+        UUID bid = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME).get(0).getBitstreams().get(0).getID();
         assertEquals(notification.getObject().getUrl().getId(),
-            configurationService.getProperty("dspace.ui.url") + "/bitstreams/" +
-                item.getBundles(Constants.CONTENT_BUNDLE_NAME).get(0).getBitstreams().get(0).getID() + "/download");
+            configurationService.getProperty("dspace.ui.url") + "/bitstreams/" + bid + "/download");
 
         // check target
         assertEquals(notification.getTarget().getId(), notifyService.getUrl());

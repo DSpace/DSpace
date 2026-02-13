@@ -19,6 +19,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
@@ -36,6 +37,9 @@ public class SolrServiceIndexItemEditorsPlugin implements SolrServiceIndexPlugin
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
+
+    @Autowired
+    protected ItemService itemService;
 
     @Override
     public void additionalIndex(Context context, IndexableObject idxObj, SolrInputDocument document) {
@@ -63,7 +67,7 @@ public class SolrServiceIndexItemEditorsPlugin implements SolrServiceIndexPlugin
                     }
                 } catch (SQLException e) {
                     log.error(LogHelper.getHeader(context, "Error while indexing resource policies",
-                        "Item: (id " + item.getID() + " name " + item.getName() + ")" ));
+                        "Item: (id " + item.getID() + " name " + itemService.getName(item) + ")" ));
                 }
             }
         }

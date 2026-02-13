@@ -20,10 +20,12 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -37,6 +39,8 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public class ItemFilterUtil {
 
     protected static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected static BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected static BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     private static final Logger log = LogManager.getLogger(ItemFilterUtil.class);
     public static final String[] MIMES_PDF = {"application/pdf"};
     public static final String[] MIMES_JPG = {"image/jpeg"};
@@ -87,7 +91,7 @@ public class ItemFilterUtil {
      */
     static int countBitstream(BundleName bundleName, Item item) {
         return item.getBundles().stream()
-                .filter(bundle -> bundle.getName().equals(bundleName.name()))
+                .filter(bundle -> bundleService.getName(bundle).equals(bundleName.name()))
                 .mapToInt(bundle -> bundle.getBitstreams().size())
                 .sum();
     }
@@ -100,10 +104,10 @@ public class ItemFilterUtil {
      */
     static List<String> getBitstreamNames(BundleName bundleName, Item item) {
         return item.getBundles().stream()
-                .filter(bundle -> bundle.getName().equals(bundleName.name()))
+                .filter(bundle -> bundleService.getName(bundle).equals(bundleName.name()))
                 .map(Bundle::getBitstreams)
                 .flatMap(List::stream)
-                .map(Bitstream::getName)
+                .map(bitstream -> bitstreamService.getName(bitstream))
                 .collect(Collectors.toList());
     }
 
@@ -128,18 +132,21 @@ public class ItemFilterUtil {
      */
     static int countBitstreamMime(Context context, BundleName bundleName, Item item, String[] mimeList) {
         return item.getBundles().stream()
-                .filter(bundle -> bundle.getName().equals(bundleName.name()))
+                .filter(bundle -> {
+                    return bundleService.getName(bundle).equals(bundleName.name());
+                })
                 .map(Bundle::getBitstreams)
                 .flatMap(List::stream)
                 .mapToInt(bit -> {
                     int count = 0;
                     for (String mime : mimeList) {
                         try {
-                            if (bit.getFormat(context).getMIMEType().equals(mime.trim())) {
+                            BitstreamFormat format = bitstreamService.getFormat(context, bit);
+                            if (format.getMIMEType().equals(mime.trim())) {
                                 count++;
                             }
                         } catch (SQLException e) {
-                            log.error("Get format error for bitstream " + bit.getName());
+                            log.error("Get format error for bitstream " + bitstreamService.getName(bit));
                         }
                     }
                     return count;
@@ -156,14 +163,16 @@ public class ItemFilterUtil {
      */
     static int countBitstreamByDesc(BundleName bundleName, Item item, String[] descList) {
         return item.getBundles().stream()
-                .filter(bundle -> bundle.getName().equals(bundleName.name()))
+                .filter(bundle -> {
+                    return bundleService.getName(bundle).equals(bundleName.name());
+                })
                 .map(Bundle::getBitstreams)
                 .flatMap(List::stream)
-                .filter(bit -> bit.getDescription() != null)
+                .filter(bit -> bitstreamService.getDescription(bit) != null)
                 .mapToInt(bit -> {
                     int count = 0;
                     for (String desc : descList) {
-                        String bitDesc = bit.getDescription();
+                        String bitDesc = bitstreamService.getDescription(bit);
                         if (bitDesc.equals(desc.trim())) {
                             count++;
                         }
@@ -187,14 +196,17 @@ public class ItemFilterUtil {
             Context context, BundleName bundleName, Item item, String[] mimeList, String prop) {
         long size = DSpaceServicesFactory.getInstance().getConfigurationService().getLongProperty(prop);
         return item.getBundles().stream()
-                .filter(bundle -> bundle.getName().equals(bundleName.name()))
+                .filter(bundle -> {
+                    return bundleService.getName(bundle).equals(bundleName.name());
+                })
                 .map(Bundle::getBitstreams)
                 .flatMap(List::stream)
                 .mapToInt(bit -> {
                     int count = 0;
                     for (String mime : mimeList) {
                         try {
-                            if (bit.getFormat(context).getMIMEType().equals(mime.trim())) {
+                            BitstreamFormat format = bitstreamService.getFormat(context, bit);
+                            if (format.getMIMEType().equals(mime.trim())) {
                                 if (bit.getSizeBytes() < size) {
                                     count++;
                                 }
@@ -222,14 +234,17 @@ public class ItemFilterUtil {
             Context context, BundleName bundleName, Item item, String[] mimeList, String prop) {
         long size = DSpaceServicesFactory.getInstance().getConfigurationService().getLongProperty(prop);
         return item.getBundles().stream()
-                .filter(bundle -> bundle.getName().equals(bundleName.name()))
+                .filter(bundle -> {
+                    return bundleService.getName(bundle).equals(bundleName.name());
+                })
                 .map(Bundle::getBitstreams)
                 .flatMap(List::stream)
                 .mapToInt(bit -> {
                     int count = 0;
                     for (String mime : mimeList) {
                         try {
-                            if (bit.getFormat(context).getMIMEType().equals(mime.trim())) {
+                            BitstreamFormat format = bitstreamService.getFormat(context, bit);
+                            if (format.getMIMEType().equals(mime.trim())) {
                                 if (bit.getSizeBytes() > size) {
                                     count++;
                                 }
@@ -264,13 +279,16 @@ public class ItemFilterUtil {
      */
     static int countBitstreamMimeStartsWith(Context context, BundleName bundleName, Item item, String prefix) {
         return item.getBundles().stream()
-                .filter(bundle -> bundle.getName().equals(bundleName.name()))
+                .filter(bundle -> {
+                    return bundleService.getName(bundle).equals(bundleName.name());
+                })
                 .map(Bundle::getBitstreams)
                 .flatMap(List::stream)
                 .mapToInt(bit -> {
                     int count = 0;
                     try {
-                        if (bit.getFormat(context).getMIMEType().startsWith(prefix)) {
+                        BitstreamFormat format = bitstreamService.getFormat(context, bit);
+                        if (format.getMIMEType().startsWith(prefix)) {
                             count++;
                         }
                     } catch (SQLException e) {
@@ -294,7 +312,9 @@ public class ItemFilterUtil {
         Set<String> bundles = Arrays.stream(bundleList)
                 .collect(Collectors.toSet());
         return item.getBundles().stream()
-                .anyMatch(bundle -> !bundles.contains(bundle.getName()));
+                .anyMatch(bundle -> {
+                    return !bundles.contains(bundleService.getName(bundle));
+                });
     }
 
     static boolean hasOriginalBitstreamMime(Context context, Item item, String[] mimeList) {

@@ -164,7 +164,7 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
         IOException {
 
         boolean processed = false;
-        boolean isImage = bitstream.getFormat(context).getMIMEType().contains("image/");
+        boolean isImage = bitstreamService.getFormat(context, bitstream).getMIMEType().contains("image/");
         if (isImage) {
             Optional<MetadataValue> op = bitstream.getMetadata().stream()
                                                   .filter(m -> m.getMetadataField().toString('.')

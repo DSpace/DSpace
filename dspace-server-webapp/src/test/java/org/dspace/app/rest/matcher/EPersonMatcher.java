@@ -20,10 +20,13 @@ import java.lang.reflect.Array;
 import java.util.UUID;
 
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
 public class EPersonMatcher {
+    public static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     private EPersonMatcher() { }
 
@@ -83,12 +86,12 @@ public class EPersonMatcher {
     public static Matcher<? super Object> matchProperties(EPerson ePerson) {
         return allOf(
                 hasJsonPath("$.uuid", is(ePerson.getID().toString())),
-                hasJsonPath("$.name", is(ePerson.getName())),
+                hasJsonPath("$.name", is(epersonService.getName(ePerson))),
                 hasJsonPath("$.type", is("eperson")),
                 hasJsonPath("$.canLogIn", not(empty())),
                 hasJsonPath("$.metadata", Matchers.allOf(
-                        MetadataMatcher.matchMetadata("eperson.firstname", ePerson.getFirstName()),
-                        MetadataMatcher.matchMetadata("eperson.lastname", ePerson.getLastName())
+                        MetadataMatcher.matchMetadata("eperson.firstname", epersonService.getFirstName(ePerson)),
+                        MetadataMatcher.matchMetadata("eperson.lastname", epersonService.getLastName(ePerson))
                 ))
         );
     }

@@ -22,6 +22,7 @@ import org.dspace.discovery.indexobject.factory.CollectionIndexFactory;
 import org.dspace.discovery.indexobject.factory.InprogressSubmissionIndexFactory;
 import org.dspace.discovery.indexobject.factory.ItemIndexFactory;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.supervision.SupervisionOrder;
 import org.dspace.supervision.service.SupervisionOrderService;
 import org.dspace.util.SolrUtils;
@@ -44,6 +45,9 @@ public abstract class InprogressSubmissionIndexFactoryImpl
     @Autowired
     protected SupervisionOrderService supervisionOrderService;
 
+    @Autowired
+    protected EPersonService epersonService;
+
 
     @Override
     public SolrInputDocument buildDocument(Context context, T indexableObject) throws SQLException, IOException {
@@ -62,7 +66,7 @@ public abstract class InprogressSubmissionIndexFactoryImpl
         EPerson submitter = inProgressSubmission.getSubmitter();
         if (submitter != null) {
             addFacetIndex(doc, "submitter", submitter.getID().toString(),
-                    submitter.getFullName());
+                epersonService.getFullName(submitter));
         }
 
         addSupervisedByFacetIndex(context, item, doc);

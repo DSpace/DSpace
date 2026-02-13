@@ -16,6 +16,9 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 
@@ -35,6 +38,9 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
     // The log4j logger for this class
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamsIntoMetadata.class);
 
+    private final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    private final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+
 
     /**
      * Perform the bitstream metadata creation.
@@ -50,23 +56,27 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
         // Unless this is an item, we'll skip this item
         status = Curator.CURATE_SKIP;
         boolean changed = false;
-        logDebugMessage("The target dso is " + dso.getName());
+        logDebugMessage(
+            "The target dso is " + ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getName(dso)
+        );
         if (dso instanceof Item) {
             try {
                 Item item = (Item) dso;
                 itemService.clearMetadata(Curator.curationContext(), item, "dc", "format", Item.ANY, Item.ANY);
                 for (Bundle bundle : item.getBundles()) {
-                    if ("ORIGINAL".equals(bundle.getName())) {
+                    if ("ORIGINAL".equals(bundleService.getName(bundle))) {
                         for (Bitstream bitstream : bundle.getBitstreams()) {
                             // Add the metadata and update the item
                             addMetadata(item, bitstream, "original");
                             changed = true;
                         }
-                    } else if ("THUMBNAIL".equals(bundle.getName())) {
-                        for (Bitstream bitstream : bundle.getBitstreams()) {
-                            // Add the metadata and update the item
-                            addMetadata(item, bitstream, "thumbnail");
-                            changed = true;
+                    } else {
+                        if ("THUMBNAIL".equals(bundleService.getName(bundle))) {
+                            for (Bitstream bitstream : bundle.getBitstreams()) {
+                                // Add the metadata and update the item
+                                addMetadata(item, bitstream, "thumbnail");
+                                changed = true;
+                            }
                         }
                     }
 
@@ -114,14 +124,14 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     protected void addMetadata(Item item, Bitstream bitstream, String type) throws SQLException {
-        String value = bitstream.getFormat(Curator.curationContext()).getMIMEType() + "##";
-        value += bitstream.getName() + "##";
+        String value = bitstreamService.getFormat(Curator.curationContext(), bitstream).getMIMEType() + "##";
+        value += bitstreamService.getName(bitstream) + "##";
         value += bitstream.getSizeBytes() + "##";
         value += item.getHandle() + "##";
         value += bitstream.getSequenceID() + "##";
         value += bitstream.getChecksum() + "##";
-        if (bitstream.getDescription() != null) {
-            value += bitstream.getDescription();
+        if (bitstreamService.getDescription(bitstream) != null) {
+            value += bitstreamService.getDescription(bitstream);
         }
         itemService.addMetadata(Curator.curationContext(), item, "dc", "format", type, "en", value);
     }

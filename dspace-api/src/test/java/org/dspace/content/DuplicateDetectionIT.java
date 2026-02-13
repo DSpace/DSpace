@@ -23,6 +23,7 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.DuplicateDetectionService;
 import org.dspace.content.virtual.PotentialDuplicate;
 import org.dspace.discovery.SearchServiceException;
@@ -41,6 +42,8 @@ public class DuplicateDetectionIT extends AbstractIntegrationTestWithDatabase {
     private DuplicateDetectionService duplicateDetectionService = ContentServiceFactory.getInstance()
             .getDuplicateDetectionService();
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private CollectionService collectionService
+        = ContentServiceFactory.getInstance().getCollectionService();
     private Collection col;
     private Collection workflowCol;
     private Item item1;
@@ -122,8 +125,9 @@ public class DuplicateDetectionIT extends AbstractIntegrationTestWithDatabase {
         // We should have title, uuid, owning collection name set and metadata value list instantiated to empty
         assertEquals("UUID should match item1 uuid", item1.getID(), potentialDuplicate.getUuid());
         assertEquals("Title should match item1 title", item1Title, potentialDuplicate.getTitle());
+        Collection collection = item1.getOwningCollection();
         assertEquals("Owning collection should match item1 owning collection",
-                item1.getOwningCollection().getName(), potentialDuplicate.getOwningCollectionName());
+                     collectionService.getName(collection), potentialDuplicate.getOwningCollectionName());
         assertEquals("Metadata value list size should be 0",
                 0, potentialDuplicate.getMetadataValueList().size());
     }
@@ -363,6 +367,7 @@ public class DuplicateDetectionIT extends AbstractIntegrationTestWithDatabase {
         //indexingService.commit();
         context.restoreAuthSystemState();
         context.setCurrentUser(admin);
+
         List<PotentialDuplicate> potentialDuplicates =
                 duplicateDetectionService.getPotentialDuplicates(context, workflowItem1.getItem());
 

@@ -24,6 +24,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,6 +43,9 @@ public class FullTextContentStreamsTest {
 
     @Mock
     private BitstreamService bitstreamService;
+
+    @Mock
+    private BundleService bundleService;
 
     @Mock
     private Item item;
@@ -65,12 +69,12 @@ public class FullTextContentStreamsTest {
     @Before
     public void setUp() throws Exception {
         when(item.getHandle()).thenReturn(HANDLE);
-        when(originalBundle.getName()).thenReturn("ORIGINAL");
-        when(textBundle.getName()).thenReturn("TEXT");
+        when(bundleService.getName(originalBundle)).thenReturn("ORIGINAL");
+        when(bundleService.getName(textBundle)).thenReturn("TEXT");
 
-        when(textBitstream1.getName()).thenReturn("Full Text 1");
-        when(textBitstream2.getName()).thenReturn("Full Text 2");
-        when(textBitstream3.getName()).thenReturn("Full Text 3");
+        when(bitstreamService.getName(textBitstream1)).thenReturn("Full Text 1");
+        when(bitstreamService.getName(textBitstream2)).thenReturn("Full Text 2");
+        when(bitstreamService.getName(textBitstream3)).thenReturn("Full Text 3");
 
         when(textBitstream1.getSizeBytes()).thenReturn(1L);
         when(textBitstream2.getSizeBytes()).thenReturn(2L);
@@ -84,6 +88,7 @@ public class FullTextContentStreamsTest {
             .thenReturn(new ByteArrayInputStream("This is text 3".getBytes(StandardCharsets.UTF_8)));
 
         streams.bitstreamService = bitstreamService;
+        streams.bundleService = bundleService;
     }
 
     @Test

@@ -12,7 +12,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dspace.content.Bitstream;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,11 +25,13 @@ import org.springframework.stereotype.Component;
  */
 @Component(BitstreamIIIFVirtualMetadata.IIIF_BITSTREAM_VIRTUAL_METADATA_BEAN_PREFIX + "mimetype")
 public class BitstreamMimetypeIIIFVirtualMetadata implements BitstreamIIIFVirtualMetadata {
+    @Autowired
+    BitstreamService bitstreamService;
 
     @Override
     public List<String> getValues(Context context, Bitstream bitstream) {
         try {
-            return Collections.singletonList(bitstream.getFormat(context).getMIMEType());
+            return Collections.singletonList(bitstreamService.getFormat(context, bitstream).getMIMEType());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

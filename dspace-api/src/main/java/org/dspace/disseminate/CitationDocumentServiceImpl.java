@@ -32,6 +32,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -88,6 +89,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
     protected CommunityService communityService;
+    @Autowired(required = true)
+    protected CollectionService collectionService;
     @Autowired(required = true)
     protected ItemService itemService;
     @Autowired(required = true)
@@ -243,7 +246,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     @Override
     public boolean canGenerateCitationVersion(Context context, Bitstream bitstream) throws SQLException {
-        return VALID_TYPES.contains(bitstream.getFormat(context).getMIMEType());
+        return VALID_TYPES.contains(bitstreamService.getFormat(context, bitstream).getMIMEType());
     }
 
     @Override

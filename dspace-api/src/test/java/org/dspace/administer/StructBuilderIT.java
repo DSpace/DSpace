@@ -338,7 +338,8 @@ public class StructBuilderIT
         assertFalse("Output does not match input.", isDifferent(myDiff));
 
         // Does the "top" community sit beneath the new parent?
-        assertEquals("Top Community 0", parent.getSubcommunities().get(0).getName());
+        Community community = parent.getSubcommunities().get(0);
+        assertEquals("Top Community 0", communityService.getName(community));
     }
 
     /**

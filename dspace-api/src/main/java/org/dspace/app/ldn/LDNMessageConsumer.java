@@ -42,6 +42,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LDN;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
@@ -66,6 +68,7 @@ public class LDNMessageConsumer implements Consumer {
     private ConfigurationService configurationService;
     private ItemService itemService;
     private BitstreamService bitstreamService;
+    private EPersonService epersonService;
     private final String RESUBMISSION_SUFFIX = "-resubmission";
     private final String ENDORSEMENT_PATTERN = "request-endorsement";
     private final String REVIEW_PATTERN = "request-review";
@@ -78,6 +81,7 @@ public class LDNMessageConsumer implements Consumer {
         itemService = ContentServiceFactory.getInstance().getItemService();
         bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
         inboundPatternService = NotifyServiceFactory.getInstance().getNotifyServiceInboundPatternService();
+        epersonService = EPersonServiceFactory.getInstance().getEPersonService();
     }
 
     @Override
@@ -190,7 +194,9 @@ public class LDNMessageConsumer implements Consumer {
         appendGeneratedMessage(ldn,
                 ldnMessage,
                 actorID,
-                (actorID != null && item.getSubmitter() != null) ? item.getSubmitter().getFullName() : null,
+                (actorID != null && item.getSubmitter() != null) ?
+                                   epersonService.getFullName(item.getSubmitter())
+                                   : null,
                 resubmissionID);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -282,7 +288,8 @@ public class LDNMessageConsumer implements Consumer {
     }
 
     private Optional<Bitstream> findPrimaryBitstream(Item item) {
-        List<Bundle> bundles = item.getBundles(Constants.CONTENT_BUNDLE_NAME);
+        List<Bundle> bundles = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
+
         return bundles.stream()
                       .findFirst()
                       .map(Bundle::getPrimaryBitstream)
@@ -297,7 +304,7 @@ public class LDNMessageConsumer implements Consumer {
         return bitstream.map(bs -> {
             try {
                 Context context = ContextUtil.obtainCurrentRequestContext();
-                BitstreamFormat bitstreamFormat = bs.getFormat(context);
+                BitstreamFormat bitstreamFormat = bitstreamService.getFormat(context, bs);
                 if (bitstreamFormat.getShortDescription().equals("Unknown")) {
                     return getUserFormatMimeType(bs);
                 }

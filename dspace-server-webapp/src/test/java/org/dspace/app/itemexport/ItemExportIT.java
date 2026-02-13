@@ -43,6 +43,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.ProcessStatus;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
@@ -68,6 +69,8 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private BitstreamService bitstreamService;
     @Autowired
     private CollectionService collectionService;
     @Autowired
@@ -350,11 +353,11 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
         assertEquals(2, process.getBitstreams().size());
         assertEquals(1,
                 process.getBitstreams().stream()
-                .filter(b -> Strings.CS.contains(b.getName(), ".log"))
+                .filter(b -> Strings.CS.contains(bitstreamService.getName(b), ".log"))
                 .count());
         assertEquals(1,
                 process.getBitstreams().stream()
-                .filter(b -> Strings.CS.contains(b.getName(), ".zip"))
+                .filter(b -> Strings.CS.contains(bitstreamService.getName(b), ".zip"))
                 .count());
     }
 }
