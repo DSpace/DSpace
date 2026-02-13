@@ -1207,16 +1207,31 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                                 } catch (NumberFormatException e) {
                                     // ignore - iAssetstore remains -1
                                 }
-                            } else if ("-f".equals(sToken) && tokenizer.hasMoreTokens()) {
-                                sFilePath = tokenizer.nextToken();
                             } else if (sToken.startsWith("bundle:")) {
                                 sBundle = sToken.substring(7);
                             } else {
                                 // unrecognized token - should be no problem
                             }
                         } // while
-                        if (iAssetstore == -1 || sFilePath == null) {
-                            logError("\tERROR: invalid contents file line");
+                        if (iAssetstore == -1) {
+                            logError("\tERROR: invalid store number in contents file line");
+                            logInfo("\t\tSkipping line: "
+                                + sRegistrationLine);
+                            continue;
+                        }
+
+                        // look for the file path
+                        // handle special cases (like whitespaces in the file path)
+                        if (line.indexOf("-f") > 0) {
+                            String sLineFromFilePath = StringUtils.substring(line, line.indexOf("-f") + 2).trim();
+                            if (sLineFromFilePath.indexOf("\tbundle") > 0) {
+                                sFilePath = StringUtils.substringBefore(sLineFromFilePath, "\tbundle");
+                            } else {
+                                sFilePath = sLineFromFilePath;
+                            }
+                        }
+                        if (sFilePath == null) {
+                            logError("\tERROR: invalid file path in contents file line");
                             logInfo("\t\tSkipping line: "
                                 + sRegistrationLine);
                             continue;
