@@ -16,9 +16,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.factory.UtilServiceFactory;
+import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -91,6 +94,7 @@ public class Curator {
     protected TaskResolver resolver = new TaskResolver();
     protected TxScope txScope = TxScope.OPEN;
     protected CommunityService communityService;
+    protected DSpaceObjectUtils dspaceObjectUtils;
     protected ItemService itemService;
     protected HandleService handleService;
     protected DSpaceRunnableHandler handler;
@@ -110,6 +114,7 @@ public class Curator {
      */
     public Curator() {
         communityService = ContentServiceFactory.getInstance().getCommunityService();
+        dspaceObjectUtils = UtilServiceFactory.getInstance().getDSpaceObjectUtils();
         itemService = ContentServiceFactory.getInstance().getItemService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
         resolver = new TaskResolver();
@@ -250,6 +255,19 @@ public class Curator {
             curationCtx.set(c);
 
             DSpaceObject dso = handleService.resolveToObject(c, id);
+            // check if the DSpace Object does not have a handle and must be resolved by its uuid
+            if (dso == null) {
+                UUID uuid = null;
+                try {
+                    uuid = UUID.fromString(id);
+                } catch (IllegalArgumentException iae) {
+                    // no uuid, nothing to do here.
+                    log.debug("ID {} is not a valid UUID", id);
+                }
+                if (uuid != null) {
+                    dso = dspaceObjectUtils.findDSpaceObject(c, uuid);
+                }
+            }
             if (dso != null) {
                 curate(dso);
             } else {
