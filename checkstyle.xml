@@ -76,6 +76,12 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
             <property name="separateLineBetweenGroups" value="true"/>
             <property name="customImportOrderRules" value="STATIC###STANDARD_JAVA_PACKAGE###THIRD_PARTY_PACKAGE"/>
         </module>
+        <!-- Forbid obsolete Apache Commons Lang 2 imports -->
+        <module name="IllegalImport">
+            <property name="illegalPkgs" value="org.apache.commons.lang"/> <!-- use org.apache.commons.lang3 instead -->
+            <message key="import.illegal"
+                     value="Do not use obsolete Apache Commons Lang 2; use Lang 3 or (preferably) JDK alternatives"/>
+        </module>
 
         <!-- ##### Javadocs requirements ##### -->
         <!-- Requirements for Javadocs for classes/interfaces -->
