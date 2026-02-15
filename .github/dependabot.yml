@@ -135,10 +135,6 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
-      # Last version of errorprone to support JDK 17 is 2.42.0
-      # TODO: Remove this after this ticket is resolved https://github.com/DSpace/DSpace/issues/11621
-      - dependency-name: "com.google.errorprone:*"
-        versions: [ ">=2.43.0" ]
       # Don't automatically update BouncyCastle because maven-gpg-plugin REQUIRES a very specific version or release
       # errors will occur. See https://github.com/DSpace/DSpace/pull/11696
       - dependency-name: "org.bouncycastle:*"
@@ -277,9 +273,6 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
-      # Last version of errorprone to support JDK 17 is 2.42.0
-      - dependency-name: "com.google.errorprone:*"
-        versions: [ ">=2.43.0" ]
       # Don't automatically update BouncyCastle because maven-gpg-plugin REQUIRES a very specific version or release
       # errors will occur. See https://github.com/DSpace/DSpace/pull/11696
       - dependency-name: "org.bouncycastle:*"
@@ -418,9 +411,6 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
-      # Last version of errorprone to support JDK 17 is 2.42.0
-      - dependency-name: "com.google.errorprone:*"
-        versions: [ ">=2.43.0" ]
       # Don't automatically update BouncyCastle because maven-gpg-plugin REQUIRES a very specific version or release
       # errors will occur. See https://github.com/DSpace/DSpace/pull/11696
       - dependency-name: "org.bouncycastle:*"
