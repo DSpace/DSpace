@@ -169,7 +169,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
     /**
      * Determine if this bitstream is registered (available elsewhere on
      * filesystem than in assetstore). More about registered items:
-     * https://wiki.duraspace.org/display/DSDOC3x/Registering+(not+Importing)+Bitstreams+via+Simple+Archive+Format
+     * https://wiki.lyrasis.org/display/DSDOC3x/Registering+(not+Importing)+Bitstreams+via+Simple+Archive+Format
      *
      * @param bitstream DSpace bitstream
      * @return true if the bitstream is registered, false otherwise

@@ -9,7 +9,7 @@ package org.dspace.app.rest.security;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.MockObjectRest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ public class MockObjectRestPermissionEvaluatorPlugin extends RestObjectPermissio
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
                                        DSpaceRestPermission restPermission) {
-        if (!StringUtils.equalsIgnoreCase(MockObjectRest.NAME, targetType)) {
+        if (!Strings.CI.equals(MockObjectRest.NAME, targetType)) {
             return false;
         }
         return true;

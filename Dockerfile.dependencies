@@ -2,9 +2,9 @@
 # The purpose of this image is to make the build for dspace/dspace run faster
 #
 
-# This Dockerfile uses JDK17 by default.
+# This Dockerfile uses JDK21 by default.
 # To build with other versions, use "--build-arg JDK_VERSION=[value]"
-ARG JDK_VERSION=17
+ARG JDK_VERSION=21
 
 # Step 1 - Download all Dependencies
 FROM docker.io/maven:3-eclipse-temurin-${JDK_VERSION} AS build
@@ -24,51 +24,51 @@ USER dspace
 # performing any code compilation steps.
 
 # Parent POM
-ADD --chown=dspace pom.xml /app/
+COPY --chown=dspace pom.xml /app/
 RUN mkdir -p /app/dspace
 
 # 'dspace' module POM. Includes 'additions' ONLY, as it's the only submodule that is required to exist.
-ADD --chown=dspace dspace/pom.xml /app/dspace/
+COPY --chown=dspace dspace/pom.xml /app/dspace/
 RUN mkdir -p /app/dspace/modules/
-ADD --chown=dspace dspace/modules/pom.xml /app/dspace/modules/
+COPY --chown=dspace dspace/modules/pom.xml /app/dspace/modules/
 RUN mkdir -p /app/dspace/modules/additions
-ADD --chown=dspace dspace/modules/additions/pom.xml /app/dspace/modules/additions/
+COPY --chown=dspace dspace/modules/additions/pom.xml /app/dspace/modules/additions/
 
 # 'dspace-api' module POM
 RUN mkdir -p /app/dspace-api
-ADD --chown=dspace dspace-api/pom.xml /app/dspace-api/
+COPY --chown=dspace dspace-api/pom.xml /app/dspace-api/
 
 # 'dspace-iiif' module POM
 RUN mkdir -p /app/dspace-iiif
-ADD --chown=dspace dspace-iiif/pom.xml /app/dspace-iiif/
+COPY --chown=dspace dspace-iiif/pom.xml /app/dspace-iiif/
 
 # 'dspace-oai' module POM
 RUN mkdir -p /app/dspace-oai
-ADD --chown=dspace dspace-oai/pom.xml /app/dspace-oai/
+COPY --chown=dspace dspace-oai/pom.xml /app/dspace-oai/
 
 # 'dspace-rdf' module POM
 RUN mkdir -p /app/dspace-rdf
-ADD --chown=dspace dspace-rdf/pom.xml /app/dspace-rdf/
+COPY --chown=dspace dspace-rdf/pom.xml /app/dspace-rdf/
 
 # 'dspace-saml2' module POM
 RUN mkdir -p /app/dspace-saml2
-ADD --chown=dspace dspace-saml2/pom.xml /app/dspace-saml2/
+COPY --chown=dspace dspace-saml2/pom.xml /app/dspace-saml2/
 
 # 'dspace-server-webapp' module POM
 RUN mkdir -p /app/dspace-server-webapp
-ADD --chown=dspace dspace-server-webapp/pom.xml /app/dspace-server-webapp/
+COPY --chown=dspace dspace-server-webapp/pom.xml /app/dspace-server-webapp/
 
 # 'dspace-services' module POM
 RUN mkdir -p /app/dspace-services
-ADD --chown=dspace dspace-services/pom.xml /app/dspace-services/
+COPY --chown=dspace dspace-services/pom.xml /app/dspace-services/
 
 # 'dspace-sword' module POM
 RUN mkdir -p /app/dspace-sword
-ADD --chown=dspace dspace-sword/pom.xml /app/dspace-sword/
+COPY --chown=dspace dspace-sword/pom.xml /app/dspace-sword/
 
 # 'dspace-swordv2' module POM
 RUN mkdir -p /app/dspace-swordv2
-ADD --chown=dspace dspace-swordv2/pom.xml /app/dspace-swordv2/
+COPY --chown=dspace dspace-swordv2/pom.xml /app/dspace-swordv2/
 
 # Trigger the installation of all maven dependencies (hide download progress messages)
 # Maven flags here ensure that we skip final assembly, skip building test environment and skip all code verification checks.
@@ -80,3 +80,6 @@ RUN mvn --no-transfer-progress verify ${MAVEN_FLAGS}
 # This ensures when dspace:dspace is built, it will use the Maven local cache (~/.m2) for dependencies
 USER root
 RUN rm -rf /app/*
+
+# Switch to initial user to drop root privileges (DL3002)
+USER dspace

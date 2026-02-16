@@ -45,7 +45,7 @@ public class BasicDispatcher extends Dispatcher {
         if (log.isDebugEnabled()) {
             int n = 0;
             for (Iterator i = cp.getFilters().iterator(); i.hasNext(); ++n) {
-                int f[] = (int[]) i.next();
+                int[] f = (int[]) i.next();
                 log.debug("Adding Consumer=\"" + cp.getName() + "\", instance="
                               + cp.getConsumer().toString() + ", filter["
                               + String.valueOf(n) + "]=(ObjMask="

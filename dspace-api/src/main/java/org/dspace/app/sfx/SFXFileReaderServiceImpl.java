@@ -18,6 +18,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.sfx.service.SFXFileReaderService;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.content.DCPersonName;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -79,9 +80,9 @@ public class SFXFileReaderServiceImpl implements SFXFileReaderService {
         log.info("Parsing XML file... " + fileName);
         DocumentBuilder docBuilder;
         Document doc = null;
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setIgnoringElementContentWhitespace(true);
         try {
+            DocumentBuilderFactory docBuilderFactory = XMLUtils.getDocumentBuilderFactory();
+            docBuilderFactory.setIgnoringElementContentWhitespace(true);
             docBuilder = docBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             log.error("Wrong parser configuration: " + e.getMessage());

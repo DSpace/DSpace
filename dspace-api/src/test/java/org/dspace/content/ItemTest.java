@@ -19,11 +19,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -56,6 +58,7 @@ import org.dspace.eperson.Group;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.AopTestUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -114,7 +117,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
-            authorizeServiceSpy = spy(authorizeService);
+            // Use mock with spiedInstance for Mockito 5.x compatibility with Spring proxies
+            // (Mockito 5.x doesn't allow spy() directly on Spring proxies as it detects them as mocks)
+            // Note: spiedInstance requires the mocked type to match the actual instance type
+            Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
+            authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
+                withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
             // "Wire" our spy to be used by the current loaded object services
             // (To ensure these services use the spy instead of the real service)
             ReflectionTestUtils.setField(collectionService, "authorizeService", authorizeServiceSpy);
@@ -1095,7 +1103,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testRemoveDSpaceLicenseAuth() throws Exception {
         // First create a bundle for test
         context.turnOffAuthorisationSystem();
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
         context.restoreAuthSystemState();
@@ -1117,7 +1125,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testRemoveDSpaceLicenseNoAuth() throws Exception {
         // First create a bundle for test
         context.turnOffAuthorisationSystem();
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
         context.restoreAuthSystemState();
@@ -1133,7 +1141,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testRemoveLicensesAuth() throws Exception {
         // First create test content
         context.turnOffAuthorisationSystem();
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
 
@@ -1167,7 +1175,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testRemoveLicensesNoAuth() throws Exception {
         // First create test content
         context.turnOffAuthorisationSystem();
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
 
@@ -1376,7 +1384,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testReplaceAllBitstreamPolicies() throws Exception {
         context.turnOffAuthorisationSystem();
         //we add some bundles for the test
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
 
@@ -1451,7 +1459,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         }
 
         //we add some bundles for the test
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
 
@@ -1597,9 +1605,46 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         Collection collection = it.getCollections().get(0);
         it.setOwningCollection(collection);
-        ItemService itemServiceSpy = spy(itemService);
+        // Use mock with custom default answer for Mockito 5.x compatibility with Spring proxies
+        final ItemService realItemService = itemService;
+        ItemService itemServiceSpy = mock(ItemService.class, withSettings().defaultAnswer(invocation -> {
+            try {
+                return invocation.getMethod().invoke(realItemService, invocation.getArguments());
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause();
+            }
+        }));
 
         itemService.move(context, it, collection, collection);
+        context.restoreAuthSystemState();
+        assertThat("testMoveSameCollection 0", it.getOwningCollection(), notNullValue());
+        assertThat("testMoveSameCollection 1", it.getOwningCollection(), equalTo(collection));
+        verify(itemServiceSpy, times(0)).delete(context, it);
+    }
+
+    /**
+     * Test of move with inherit default policies method, of class Item, where both Collections are the same.
+     */
+    @Test
+    public void testMoveSameCollectionWithInheritDefaultPolicies() throws Exception {
+        context.turnOffAuthorisationSystem();
+        while (it.getCollections().size() > 1) {
+            it.removeCollection(it.getCollections().get(0));
+        }
+
+        Collection collection = it.getCollections().get(0);
+        it.setOwningCollection(collection);
+        // Use mock with custom default answer for Mockito 5.x compatibility with Spring proxies
+        final ItemService realItemService = itemService;
+        ItemService itemServiceSpy = mock(ItemService.class, withSettings().defaultAnswer(invocation -> {
+            try {
+                return invocation.getMethod().invoke(realItemService, invocation.getArguments());
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause();
+            }
+        }));
+
+        itemService.move(context, it, collection, collection, true);
         context.restoreAuthSystemState();
         assertThat("testMoveSameCollection 0", it.getOwningCollection(), notNullValue());
         assertThat("testMoveSameCollection 1", it.getOwningCollection(), equalTo(collection));

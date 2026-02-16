@@ -126,14 +126,39 @@ public class Packager {
     protected boolean submit = true;
     protected boolean userInteractionEnabled = true;
 
-    // die from illegal command line
+    /**
+     * Signal a usage error and exit.
+     * Throws PackagerExitException instead of calling System.exit() directly
+     * to allow for proper testing when called via reflection.
+     *
+     * @param msg the error message to display
+     */
     protected static void usageError(String msg) {
         System.out.println(msg);
         System.out.println(" (run with -h flag for details)");
-        System.exit(1);
+        throw new PackagerExitException(1, msg);
     }
 
+    /**
+     * Main entry point. When called via ScriptLauncher, exceptions will be
+     * caught and handled by the launcher. For success, the method returns normally.
+     * For errors, PackagerExitException is thrown and propagates up.
+     *
+     * @param argv command line arguments
+     * @throws Exception if an error occurs
+     */
     public static void main(String[] argv) throws Exception {
+        runPackager(argv);
+    }
+
+    /**
+     * Main packager logic, separated from main() to allow testing.
+     * Throws PackagerExitException instead of calling System.exit() directly.
+     *
+     * @param argv command line arguments
+     * @throws Exception if an error occurs
+     */
+    protected static void runPackager(String[] argv) throws Exception {
         Options options = new Options();
         options.addOption("p", "parent", true,
                           "Handle(s) of parent Community or Collection into which to ingest object (repeatable)");
@@ -224,7 +249,7 @@ public class Packager {
             } else {
                 //otherwise, display list of valid packager types
                 System.out.println("\nAvailable Submission Package (SIP) types:");
-                String pn[] = pluginService
+                String[] pn = pluginService
                     .getAllPluginNames(PackageIngester.class);
                 for (int i = 0; i < pn.length; ++i) {
                     System.out.println("  " + pn[i]);
@@ -236,7 +261,7 @@ public class Packager {
                     System.out.println("  " + pn[i]);
                 }
             }
-            System.exit(0);
+            return;
         }
 
         //look for flag to disable all user interaction
@@ -274,7 +299,7 @@ public class Packager {
             // process
             pkgParams.setRecursiveModeEnabled(true);
         }
-        String files[] = line.getArgs();
+        String[] files = line.getArgs();
         if (files.length > 0) {
             sourceFile = files[0];
         }
@@ -282,9 +307,9 @@ public class Packager {
             myPackager.submit = false;
         }
         if (line.hasOption('o')) {
-            String popt[] = line.getOptionValues('o');
+            String[] popt = line.getOptionValues('o');
             for (int i = 0; i < popt.length; ++i) {
-                String pair[] = popt[i].split("\\=", 2);
+                String[] pair = popt[i].split("\\=", 2);
                 if (pair.length == 2) {
                     pkgParams.addProperty(pair[0].trim(), pair[1].trim());
                 } else if (pair.length == 1) {
@@ -303,7 +328,7 @@ public class Packager {
             System.err.println("Error - missing a REQUIRED argument or option.\n");
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("PackageManager  [options]  package-file|-\n", options);
-            System.exit(0);
+            return;
         }
 
         // find the EPerson, assign to context
@@ -362,13 +387,16 @@ public class Packager {
 
                     //commit all changes & exit successfully
                     context.complete();
-                    System.exit(0);
+                    return;
+                } catch (PackagerExitException e) {
+                    // Re-throw PackagerExitException as-is
+                    throw e;
                 } catch (Exception e) {
                     // abort all operations
                     e.printStackTrace();
                     context.abort();
                     System.out.println(e);
-                    System.exit(1);
+                    throw new PackagerExitException(1);
                 }
             }
 
@@ -383,7 +411,7 @@ public class Packager {
             }
 
             // validate each parent arg (if any)
-            DSpaceObject parentObjs[] = null;
+            DSpaceObject[] parentObjs = null;
             if (parents != null) {
                 System.out.println("Destination parents:");
 
@@ -409,13 +437,16 @@ public class Packager {
 
                 //commit all changes & exit successfully
                 context.complete();
-                System.exit(0);
+                return;
+            } catch (PackagerExitException e) {
+                // Re-throw PackagerExitException as-is
+                throw e;
             } catch (Exception e) {
                 // abort all operations
                 e.printStackTrace();
                 context.abort();
                 System.out.println(e);
-                System.exit(1);
+                throw new PackagerExitException(1);
             }
         } else {
             // else, if DISSEMINATE mode
@@ -438,7 +469,7 @@ public class Packager {
             //disseminate the requested object
             myPackager.disseminate(context, dip, dso, pkgParams, sourceFile);
         }
-        System.exit(0);
+        return;
     }
 
     /**
@@ -461,7 +492,7 @@ public class Packager {
      * @throws PackageException      if packaging error
      */
     protected void ingest(Context context, PackageIngester sip, PackageParameters pkgParams, String sourceFile,
-                          DSpaceObject parentObjs[])
+                          DSpaceObject[] parentObjs)
         throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException,
         PackageException {
         // make sure we have an input file
@@ -469,7 +500,7 @@ public class Packager {
 
         if (!pkgFile.exists()) {
             System.out.println("\nERROR: Package located at " + sourceFile + " does not exist!");
-            System.exit(1);
+            throw new PackagerExitException(1, "Package file does not exist: " + sourceFile);
         }
 
         System.out.println("\nIngesting package located at " + sourceFile);
@@ -665,7 +696,7 @@ public class Packager {
 
         if (!pkgFile.exists()) {
             System.out.println("\nPackage located at " + sourceFile + " does not exist!");
-            System.exit(1);
+            throw new PackagerExitException(1, "Package file does not exist: " + sourceFile);
         }
 
         System.out.println("\nReplacing DSpace object(s) with package located at " + sourceFile);

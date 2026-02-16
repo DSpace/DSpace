@@ -138,7 +138,7 @@ public class DSpaceMETSDisseminator
 
         // XXX FIXME maybe let dmd choices be configured in DSpace config?
 
-        String result[] = null;
+        String[] result = null;
         if (params != null) {
             result = params.getProperties("dmd");
         }
@@ -163,7 +163,7 @@ public class DSpaceMETSDisseminator
     public String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException {
         if (dso.getType() == Constants.BITSTREAM) {
-            String result[] = new String[1];
+            String[] result = new String[1];
             result[0] = "PREMIS";
             return result;
         } else {

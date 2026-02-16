@@ -41,13 +41,13 @@ jobs:
       - name: Install JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 17
+          java-version: 21
           distribution: 'temurin'
 
       # Initializes the CodeQL tools for scanning.
       # https://github.com/github/codeql-action
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           # Codescan Javascript as well since a few JS files exist in REST API's interface
           languages: java, javascript
@@ -56,8 +56,8 @@ jobs:
       # NOTE: Based on testing, this autobuild process works well for DSpace. A custom
       # DSpace build w/caching (like in build.yml) was about the same speed as autobuild.
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
+        uses: github/codeql-action/autobuild@v3
 
       # Perform GitHub Code Scanning.
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3

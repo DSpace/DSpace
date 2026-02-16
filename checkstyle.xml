@@ -106,6 +106,9 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
         <!-- Right braces should be on start of a new line (default value) -->
         <module name="RightCurly"/>
 
+        <!-- Enforce Java-style array declaration instead of C-style -->
+        <module name="ArrayTypeStyle"/>
+
         <!-- ##### Indentation / Whitespace requirements ##### -->
         <!-- Require 4-space indentation (default value) -->
         <module name="Indentation"/>

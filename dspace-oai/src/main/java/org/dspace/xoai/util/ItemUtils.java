@@ -18,6 +18,7 @@ import java.util.List;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import com.lyncode.xoai.util.Base64Utils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.factory.UtilServiceFactory;
@@ -143,7 +144,7 @@ public class ItemUtils {
                     bitstream.getField().add(createValue("name", name));
                 }
                 if (oname != null) {
-                    bitstream.getField().add(createValue("originalName", name));
+                    bitstream.getField().add(createValue("originalName", oname));
                 }
                 if (description != null) {
                     bitstream.getField().add(createValue("description", description));
@@ -163,6 +164,19 @@ public class ItemUtils {
         }
 
         return bundles;
+    }
+
+    /**
+     * Sanitizes a string to remove characters that are invalid
+     * in XML 1.0 using the Apache Commons Text library.
+     * @param value The string to sanitize.
+     * @return A sanitized string, or null if the input was null.
+     */
+    private static String sanitize(String value) {
+        if (value == null) {
+            return null;
+        }
+        return StringEscapeUtils.escapeXml10(value);
     }
 
     /**
@@ -281,7 +295,7 @@ public class ItemUtils {
             valueElem = language;
         }
 
-        valueElem.getField().add(createValue("value", val.getValue()));
+        valueElem.getField().add(createValue("value", sanitize(val.getValue())));
         if (val.getAuthority() != null) {
             valueElem.getField().add(createValue("authority", val.getAuthority()));
             if (val.getConfidence() != Choices.CF_NOVALUE) {

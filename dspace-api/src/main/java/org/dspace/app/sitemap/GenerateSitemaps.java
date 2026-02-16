@@ -7,6 +7,8 @@
  */
 package org.dspace.app.sitemap;
 
+import static org.dspace.discovery.SearchUtils.RESOURCE_TYPE_FIELD;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -64,6 +66,19 @@ public class GenerateSitemaps {
     private GenerateSitemaps() { }
 
     public static void main(String[] args) throws Exception {
+        runGenerateSitemaps(args);
+        // Note: Do NOT call System.exit() on success - let the JVM exit naturally.
+        // This allows launcher.xml scripts to be called via reflection in tests.
+    }
+
+    /**
+     * Run the generate-sitemaps logic.
+     * This method is called by main() for CLI usage and directly by tests.
+     *
+     * @param args the command line arguments
+     * @throws Exception if an error occurs during sitemap generation
+     */
+    public static void runGenerateSitemaps(String[] args) throws Exception {
         final String usage = GenerateSitemaps.class.getCanonicalName();
 
         CommandLineParser parser = new DefaultParser();
@@ -86,17 +101,17 @@ public class GenerateSitemaps {
             line = parser.parse(options, args);
         } catch (ParseException pe) {
             hf.printHelp(usage, options);
-            System.exit(1);
+            return;
         }
 
         if (line.hasOption('h')) {
             hf.printHelp(usage, options);
-            System.exit(0);
+            return;
         }
 
         if (line.getArgs().length != 0) {
             hf.printHelp(usage, options);
-            System.exit(1);
+            return;
         }
 
         /*
@@ -108,7 +123,7 @@ public class GenerateSitemaps {
             System.err
                 .println("Nothing to do (no sitemap to generate)");
             hf.printHelp(usage, options);
-            System.exit(1);
+            return;
         }
 
         // Note the negation (CLI options indicate NOT to generate a sitemap)
@@ -119,8 +134,6 @@ public class GenerateSitemaps {
         if (line.hasOption('d')) {
             deleteSitemaps();
         }
-
-        System.exit(0);
     }
 
     /**
@@ -188,7 +201,8 @@ public class GenerateSitemaps {
         try {
             DiscoverQuery discoveryQuery = new DiscoverQuery();
             discoveryQuery.setMaxResults(PAGE_SIZE);
-            discoveryQuery.setQuery("search.resourcetype:Community");
+            discoveryQuery.setQuery("*:*");
+            discoveryQuery.addFilterQueries(RESOURCE_TYPE_FIELD + ":Community");
             do {
                 discoveryQuery.setStart(offset);
                 DiscoverResult discoverResult = searchService.search(c, discoveryQuery);
@@ -212,7 +226,8 @@ public class GenerateSitemaps {
             offset = 0;
             discoveryQuery = new DiscoverQuery();
             discoveryQuery.setMaxResults(PAGE_SIZE);
-            discoveryQuery.setQuery("search.resourcetype:Collection");
+            discoveryQuery.setQuery("*:*");
+            discoveryQuery.addFilterQueries(RESOURCE_TYPE_FIELD + ":Collection");
             do {
                 discoveryQuery.setStart(offset);
                 DiscoverResult discoverResult = searchService.search(c, discoveryQuery);
@@ -236,7 +251,8 @@ public class GenerateSitemaps {
             offset = 0;
             discoveryQuery = new DiscoverQuery();
             discoveryQuery.setMaxResults(PAGE_SIZE);
-            discoveryQuery.setQuery("search.resourcetype:Item");
+            discoveryQuery.setQuery("*:*");
+            discoveryQuery.addFilterQueries(RESOURCE_TYPE_FIELD + ":Item");
             discoveryQuery.addSearchField("search.entitytype");
             do {
 

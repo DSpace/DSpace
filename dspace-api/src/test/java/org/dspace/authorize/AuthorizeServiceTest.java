@@ -9,14 +9,24 @@
 package org.dspace.authorize;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -38,6 +48,10 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
                                                                                    .getResourcePolicyService();
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
 
     public AuthorizeServiceTest() {
     }
@@ -127,6 +141,89 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
             throw new AssertionError(ex);
         }
     }
+
+    /**
+     * When a bundle is created it should inherit custom policies (deduped)
+     * from the item, as otherwise bitstream bundles created via filter-media etc.
+     * will be created without READ policies
+     */
+    @Test
+    public void testInheritanceOfCustomPolicies() {
+        try {
+            context.turnOffAuthorisationSystem();
+            Community community = communityService.create(null, context);
+            Collection collection = collectionService.create(context, community);
+            WorkspaceItem wsItem = workspaceItemService.create(context, collection, false);
+            Item item = installItemService.installItem(context, wsItem);
+            // Simulate access conditions adding READ policy to the item
+            ResourcePolicy itemCustomRead = resourcePolicyService.create(context, eperson, null);
+            itemCustomRead.setAction(Constants.READ);
+            itemCustomRead.setRpType(ResourcePolicy.TYPE_CUSTOM);
+            // Simulate a random ADMIN action policy that might have been added manually
+            ResourcePolicy itemCustomAdmin = resourcePolicyService.create(context, eperson, null);
+            itemCustomAdmin.setAction(Constants.ADMIN);
+            itemCustomAdmin.setRpType(ResourcePolicy.TYPE_CUSTOM);
+            List<ResourcePolicy> customPolicies = new ArrayList<>();
+            customPolicies.add(itemCustomRead);
+            customPolicies.add(itemCustomAdmin);
+            authorizeService.addPolicies(context, customPolicies, item);
+            // Create a bundle, this should call inheritPolicies via itemService.addBundle
+            Bundle bundle = bundleService.create(context, item, "THUMBNAIL");
+            List<ResourcePolicy> newPolicies = authorizeService
+                .findPoliciesByDSOAndType(context, bundle, ResourcePolicy.TYPE_CUSTOM);
+            Assert.assertEquals("Bundle should inherit custom policy from item", 1, newPolicies.size());
+            Assert.assertNotEquals("Bundle should ONLY inherit non-admin custom policy from item",
+                    Constants.ADMIN, newPolicies.get(0).getAction());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            context.restoreAuthSystemState();
+        }
+    }
+
+    /**
+     * For other DSOs (which pass false) and for a bundle explicitly calling
+     * inheritPolicies(..., false), the TYPE_CUSTOM policies should not be inherited
+     * but other non-admin policies should be inherited as usual
+     */
+    @Test
+    public void testNonInheritanceOfCustomPolicies() {
+        try {
+            context.turnOffAuthorisationSystem();
+            Community community = communityService.create(null, context);
+            Collection collection = collectionService.create(context, community);
+            WorkspaceItem wsItem = workspaceItemService.create(context, collection, false);
+            Item item = installItemService.installItem(context, wsItem);
+            Bundle bundle = bundleService.create(context, item, "THUMBNAIL");
+            // Simulate a custom READ policy added by access conditions step
+            ResourcePolicy itemCustomRead = resourcePolicyService.create(context, eperson, null);
+            itemCustomRead.setAction(Constants.READ);
+            itemCustomRead.setRpType(ResourcePolicy.TYPE_CUSTOM);
+            // Simulate an ordinary default read item policy inherited from collection
+            ResourcePolicy itemDefaultRead = resourcePolicyService.create(context, eperson, null);
+            itemDefaultRead.setAction(Constants.READ);
+            itemDefaultRead.setRpType(ResourcePolicy.TYPE_INHERITED);
+            List<ResourcePolicy> customPolicies = new ArrayList<>();
+            customPolicies.add(itemCustomRead);
+            customPolicies.add(itemDefaultRead);
+            authorizeService.addPolicies(context, customPolicies, item);
+            // Now, inherit policies for bundle with includeCustom=false (which is how other DSOs behave)
+            authorizeService.inheritPolicies(context, item, bundle, false);
+            List<ResourcePolicy> newCustomPolicies = authorizeService
+                .findPoliciesByDSOAndType(context, bundle, ResourcePolicy.TYPE_CUSTOM);
+            List<ResourcePolicy> newInheritedPolicies = authorizeService
+                .findPoliciesByDSOAndType(context, bundle, ResourcePolicy.TYPE_INHERITED);
+            Assert.assertEquals("Bundle should not inherit custom policy from item, if false passed",
+                    0, newCustomPolicies.size());
+            Assert.assertEquals("Bundle should inherit non-custom, non-admin policies as usual",
+                    ResourcePolicy.TYPE_INHERITED, newInheritedPolicies.get(0).getRpType());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            context.restoreAuthSystemState();
+        }
+    }
+
 //
 //    @Test
 //    public void testIsCollectionAdmin() throws SQLException, AuthorizeException, IOException {
