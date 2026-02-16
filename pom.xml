@@ -1238,7 +1238,7 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-observation</artifactId>
-                <version>1.14.14</version>
+                <version>1.16.3</version>
             </dependency>
 
             <dependency>
