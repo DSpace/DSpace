@@ -8,7 +8,10 @@
 package org.dspace.subscriptions.service;
 
 import java.util.List;
+import java.util.Map;
 
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -20,6 +23,7 @@ import org.dspace.eperson.EPerson;
  */
 public interface SubscriptionGenerator<T> {
 
-    public void notifyForSubscriptions(Context c, EPerson ePerson, List<T> comm, List<T> coll);
+    void notifyForSubscriptions(Context c, EPerson ePerson, Map<Community, List<T>> comm,
+                                Map<Collection, List<T>> coll);
 
 }
