@@ -61,4 +61,16 @@
         <description>Connection to an embedded Solr instance.</description>
     </bean>
 
+    <bean id='HttpSolrClientFactory'
+          class='org.dspace.statistics.HttpSolrClientFactory'>
+        <description>HTTP connection to a Solr instance.</description>
+    </bean>
+
+    <!-- audit -->
+    <bean id="org.dspace.app.audit.AuditSolrServiceImpl" class="org.dspace.app.audit.MockAuditSolrService" autowire-candidate="true">
+        <property name="solrDocumentFactory" ref="defaultSolrDocumentFactory"/>
+        <property name="httpSolrClientFactory" ref="HttpSolrClientFactory"/>
+    </bean>
+
+
 </beans>

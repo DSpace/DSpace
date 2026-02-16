@@ -18,13 +18,17 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
+import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -67,9 +71,14 @@ public class DSpaceConfigurationServiceTest {
         l.put("current.user", "${aaronz}");
         l.put("test.key1", "This is a value");
         l.put("test.key2", "This is key1=${test.key1}");
+        // Hierarchical properties
+        l.put("hier.key1.foo", "key1_foo");
+        l.put("hier.key1.bar", "key1_bar");
+        l.put("hier.key2.foo", "key2_foo");
+        l.put("hier.key2.bar", "key2_bar");
 
         // Record how many properties we initialized with (for below unit tests)
-        numPropsLoaded = 9;
+        numPropsLoaded = 13;
 
         configurationService.loadConfiguration(l);
         l = null;
@@ -437,6 +446,67 @@ public class DSpaceConfigurationServiceTest {
     public void testGetConfiguration() {
         assertNotNull(configurationService.getConfiguration());
         assertEquals(numPropsLoaded, configurationService.getProperties().size());
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getHierarchicalConfiguration()}.
+     */
+    @Test
+    public void testGetHierarchicalConfiguration() {
+        HierarchicalConfiguration<ImmutableNode> config = configurationService.getHierarchicalConfiguration();
+
+        assertNotNull(config);
+        assertEquals(2, config.childConfigurationsAt("hier").size());
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getChildren()}.
+     */
+    @Test
+    public void testGetChildren() {
+        List<HierarchicalConfiguration<ImmutableNode>> children = configurationService.getChildren("hier");
+
+        assertNotNull(children);
+        assertEquals(2, children.size());
+
+        List<String> childPropertyNames = children.stream()
+            .map(node -> node.getRootElementName())
+            .collect(Collectors.toList());
+
+        assertEquals(2, childPropertyNames.size());
+        assertEquals("key1", childPropertyNames.get(0));
+        assertEquals("key2", childPropertyNames.get(1));
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getChildren()}.
+     */
+    @Test
+    public void testGetChildrenNonExistentKey() {
+        List<HierarchicalConfiguration<ImmutableNode>> children =
+            configurationService.getChildren("thisKeyDoesNotExist");
+
+        assertNotNull(children);
+        assertEquals(0, children.size());
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getChildren()}.
+     */
+    @Test
+    public void testGetChildrenDeepKey() {
+        List<HierarchicalConfiguration<ImmutableNode>> children = configurationService.getChildren("hier.key1");
+
+        assertNotNull(children);
+        assertEquals(2, children.size());
+
+        List<String> childPropertyNames = children.stream()
+            .map(node -> node.getRootElementName())
+            .collect(Collectors.toList());
+
+        assertEquals(2, childPropertyNames.size());
+        assertEquals("foo", childPropertyNames.get(0));
+        assertEquals("bar", childPropertyNames.get(1));
     }
 
     /**

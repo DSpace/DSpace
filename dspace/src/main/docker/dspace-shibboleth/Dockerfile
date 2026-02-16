@@ -9,7 +9,7 @@
 # This will be deployed as dspace/dspace-shibboleth:latest
 # Build from Ubuntu as it has easy Apache tooling (e.g. a2enmod script is debian only).
 # Apache & mod_shib are required for DSpace to act as an SP
-# See also https://wiki.lyrasis.org/display/DSDOC7x/Authentication+Plugins#AuthenticationPlugins-ShibbolethAuthentication
+# See also https://wiki.lyrasis.org/display/DSDOC9x/Authentication+Plugins#AuthenticationPlugins-ShibbolethAuthentication
 FROM docker.io/ubuntu:20.04
 
 # Apache ENVs (default values)
@@ -39,10 +39,10 @@ RUN a2enmod ssl proxy proxy_ajp proxy_http shib && \
     a2ensite dspace-vhost.conf
 
 # Setup Shibboleth configs
-COPY shibboleth2.xml /etc/shibboleth/
-COPY attribute-map.xml /etc/shibboleth/
-RUN cd /etc/shibboleth/ \
-    && shib-keygen
+WORKDIR /etc/shibboleth
+COPY shibboleth2.xml .
+COPY attribute-map.xml .
+RUN shib-keygen
 
 # Copy over our startup script
 COPY httpd-shibd-foreground.sh /usr/local/bin/

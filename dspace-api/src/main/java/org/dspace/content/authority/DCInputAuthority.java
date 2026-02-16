@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
@@ -66,7 +67,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
      * The map of the input form reader associated to use for a specific java locale
      */
     private static Map<Locale, DCInputsReader> dcis = null;
-    private static String pluginNames[] = null;
+    private static String[] pluginNames = null;
 
     public DCInputAuthority() {
         super();
@@ -87,7 +88,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
             initPluginNames();
         }
 
-        return (String[]) ArrayUtils.clone(pluginNames);
+        return ArrayUtils.clone(pluginNames);
     }
 
     private static synchronized void initPluginNames() {
@@ -157,7 +158,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         List<Choice> v = new ArrayList<Choice>();
         for (int i = 0; i < valuesLocale.length; ++i) {
             // In a DCInputAuthority context, a user will want to query the labels, not the values
-            if (query == null || StringUtils.containsIgnoreCase(labelsLocale[i], query)) {
+            if (query == null || Strings.CI.contains(labelsLocale[i], query)) {
                 if (found >= start && v.size() < limit) {
                     v.add(new Choice(null, valuesLocale[i], labelsLocale[i]));
                     if (valuesLocale[i].equalsIgnoreCase(query)) {
@@ -179,7 +180,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         String[] labelsLocale = labels.get(currentLocale.getLanguage());
         for (int i = 0; i < valuesLocale.length; ++i) {
             if (text.equalsIgnoreCase(valuesLocale[i])) {
-                Choice v[] = new Choice[1];
+                Choice[] v = new Choice[1];
                 v[0] = new Choice(String.valueOf(i), valuesLocale[i], labelsLocale[i]);
                 return new Choices(v, 0, v.length, Choices.CF_UNCERTAIN, false, 0);
             }

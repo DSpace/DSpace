@@ -28,6 +28,7 @@ public class NotifyServiceRest extends BaseObjectRest<Integer> {
     private String url;
     private String ldnUrl;
     private boolean enabled;
+    private boolean usesActorEmailId;
     private BigDecimal score;
     private String lowerIp;
     private String upperIp;
@@ -88,6 +89,15 @@ public class NotifyServiceRest extends BaseObjectRest<Integer> {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
+
+    public boolean isUsesActorEmailId() {
+        return usesActorEmailId;
+    }
+
+    public void setUsesActorEmailId(boolean usesActorEmailId) {
+        this.usesActorEmailId = usesActorEmailId;
+    }
+
     public List<NotifyServiceInboundPatternRest> getNotifyServiceInboundPatterns() {
         return notifyServiceInboundPatterns;
     }

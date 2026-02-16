@@ -56,7 +56,7 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository {
         if (identifier == null) {
             throw new IdDoesNotExistException();
         }
-        String parts[] = identifier.split(Pattern.quote(":"));
+        String[] parts = identifier.split(Pattern.quote(":"));
         if (parts.length == 3) {
             try {
                 SolrQuery params = new SolrQuery("item.handle:" + parts[2]);

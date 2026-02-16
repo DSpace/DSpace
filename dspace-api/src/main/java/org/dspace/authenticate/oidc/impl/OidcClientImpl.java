@@ -22,12 +22,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authenticate.oidc.OidcClient;
 import org.dspace.authenticate.oidc.OidcClientException;
 import org.dspace.authenticate.oidc.model.OidcTokenResponseDTO;
@@ -83,21 +84,17 @@ public class OidcClientImpl implements OidcClient {
     }
 
     private <T> T executeAndParseJson(HttpUriRequest httpUriRequest, Class<T> clazz) {
-
-        HttpClient client = HttpClientBuilder.create().build();
-
-        return executeAndReturns(() -> {
-
-            HttpResponse response = client.execute(httpUriRequest);
-
-            if (isNotSuccessfull(response)) {
-                throw new OidcClientException(getStatusCode(response), formatErrorMessage(response));
-            }
-
-            return objectMapper.readValue(getContent(response), clazz);
-
-        });
-
+        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
+            return executeAndReturns(() -> {
+                CloseableHttpResponse response = client.execute(httpUriRequest);
+                if (isNotSuccessfull(response)) {
+                    throw new OidcClientException(getStatusCode(response), formatErrorMessage(response));
+                }
+                return objectMapper.readValue(getContent(response), clazz);
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private <T> T executeAndReturns(ThrowingSupplier<T, Exception> supplier) {

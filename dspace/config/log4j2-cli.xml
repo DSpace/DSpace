@@ -25,6 +25,7 @@
         <Appender name='A1'
                   filePattern="${log.dir}/dspace-cli.log-%d{yyyy-MM-dd}"
                   type='RollingFile'
+                  fileName='${log.dir}/dspace-cli.log'
         >
             <!-- NOTE: The %equals patterns are providing a default value of "unknown" if "correlationID" or
                  "requestID" are not currently set in the ThreadContext. -->

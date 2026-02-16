@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.DefaultParser.Builder;
 import org.apache.commons.cli.ParseException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataDSpaceCsvExportServiceImpl;
@@ -143,7 +145,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
 
         Iterator<Item> itemIterator = searchService.iteratorSearch(context, dso, discoverQuery);
         handler.logDebug("creating dspacecsv");
-        DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService.export(context, itemIterator, true);
+        DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService.export(context, itemIterator, true, handler);
         handler.logDebug("writing to file " + getFileNameOrExportFile());
         handler.writeFilestream(context, getFileNameOrExportFile(), dSpaceCSV.getInputStream(), EXPORT_CSV);
         context.restoreAuthSystemState();
@@ -166,5 +168,15 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
             scopeObj = new IndexableCollection(collectionService.find(context, uuid));
         }
         return scopeObj;
+    }
+
+    @Override
+    protected StepResult parse(String[] args) throws ParseException {
+        commandLine = new DefaultParser().parse(getScriptConfiguration().getOptions(), args);
+        Builder builder = new DefaultParser().builder();
+        builder.setStripLeadingAndTrailingQuotes(false);
+        commandLine = builder.build().parse(getScriptConfiguration().getOptions(), args);
+        setup();
+        return StepResult.Continue;
     }
 }

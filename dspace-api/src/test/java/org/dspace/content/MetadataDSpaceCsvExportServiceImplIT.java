@@ -16,6 +16,7 @@ import java.util.List;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.bulkedit.DSpaceCSVLine;
+import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
@@ -31,6 +32,9 @@ import org.junit.Test;
  */
 public class MetadataDSpaceCsvExportServiceImplIT
         extends AbstractIntegrationTestWithDatabase {
+
+    TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+
     /**
      * Test of handleExport method, of class MetadataDSpaceCsvExportServiceImpl.
      * @throws java.lang.Exception passed through.
@@ -66,7 +70,7 @@ public class MetadataDSpaceCsvExportServiceImplIT
         boolean exportAll = false;
         MetadataDSpaceCsvExportServiceImpl instance = new MetadataDSpaceCsvExportServiceImpl();
         DSpaceCSV expResult = null;
-        DSpaceCSV result = instance.export(context, toExport, exportAll);
+        DSpaceCSV result = instance.export(context, toExport, exportAll, testDSpaceRunnableHandler);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -105,7 +109,7 @@ public class MetadataDSpaceCsvExportServiceImplIT
                 .getServiceManager()
                 .getServiceByName(MetadataDSpaceCsvExportServiceImpl.class.getCanonicalName(),
                         MetadataDSpaceCsvExportService.class);
-        DSpaceCSV result = instance.export(context, parentCommunity, false);
+        DSpaceCSV result = instance.export(context, parentCommunity, false, testDSpaceRunnableHandler);
 
         // Examine the result.
         List<DSpaceCSVLine> csvLines = result.getCSVLines();

@@ -38,6 +38,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Community;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
@@ -81,6 +82,9 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
 
     @Autowired
     AuthorizeService authorizeService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     private CommunityService cs;
 
@@ -127,7 +131,6 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
 
     private Community createCommunity(Context context, Community parent) throws AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         CommunityRest communityRest;
         try {
             ServletInputStream input = req.getInputStream();
@@ -220,12 +223,31 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     @SearchRestMethod(name = "findAdminAuthorized")
     public Page<CommunityRest> findAdminAuthorized (
         Pageable pageable, @Parameter(value = "query") String query) {
+        return findAuthorized(pageable, Constants.ADMIN, query);
+    }
+
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "findEditAuthorized")
+    public Page<CommunityRest> findEditAuthorized (
+        Pageable pageable, @Parameter(value = "query") String query) {
+        return findAuthorized(pageable, Constants.WRITE, query);
+    }
+
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "findAddAuthorized")
+    public Page<CommunityRest> findAddAuthorized (
+        Pageable pageable, @Parameter(value = "query") String query) {
+        return findAuthorized(pageable, Constants.ADD, query);
+    }
+
+    private Page<CommunityRest> findAuthorized(Pageable pageable, int action, String query) {
         try {
             Context context = obtainContext();
-            List<Community> communities = authorizeService.findAdminAuthorizedCommunity(context, query,
+            List<Community> communities = authorizeService.findAuthorizedCommunityByAction(context, query,
+                action,
                 Math.toIntExact(pageable.getOffset()),
                 Math.toIntExact(pageable.getPageSize()));
-            long tot = authorizeService.countAdminAuthorizedCommunity(context, query);
+            long tot = authorizeService.countAuthorizedCommunityByAction(context, query, action);
             return converter.toRestPage(communities, pageable, tot , utils.obtainProjection());
         } catch (SearchServiceException | SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -251,7 +273,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
         CommunityRest communityRest;
         try {
-            communityRest = new ObjectMapper().readValue(jsonNode.toString(), CommunityRest.class);
+            communityRest = mapper.readValue(jsonNode.toString(), CommunityRest.class);
         } catch (IOException e) {
             throw new UnprocessableEntityException("Error parsing community json: " + e.getMessage());
         }
@@ -327,7 +349,6 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         throws SQLException, AuthorizeException {
 
         Group group = cs.createAdministrators(context, community);
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         try {
             ServletInputStream input = request.getInputStream();

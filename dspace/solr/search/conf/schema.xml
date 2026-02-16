@@ -254,6 +254,7 @@
     <field name="discoverable" type="string" indexed="true" stored="true" omitNorms="true" docValues="true" />
 
     <field name="read" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
+    <field name="admin" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
 
     <!-- used to track who submitted an item -->
     <field name="submitter" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
@@ -261,6 +262,8 @@
     <field name="taskfor" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
    
     <field name="has_content_in_original_bundle" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
+
+    <field name="has_geospatial_metadata" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
 
     <!-- used to track which group(s) have submit permissions -->
     <field name="submit" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
@@ -324,7 +327,7 @@
     <dynamicField name="*_mlt" type="text" indexed="true" stored="true" multiValued="true" omitNorms="true" termVectors="true" termPositions="true" termOffsets="true"/>
 
     <!--Date matching-->
-    <dynamicField name="*.year" type="sint" indexed="true" stored="true" multiValued="true" omitNorms="true" />
+    <dynamicField name="*_year" type="sint" indexed="true" stored="true" multiValued="true" omitNorms="true" />
     <dynamicField name="*_dt" type="date" indexed="true" stored="true" multiValued="false" omitNorms="true"  docValues="true"/>
 
     <!--Used for matching on all other fields -->
@@ -350,6 +353,9 @@
     <dynamicField name="attr_*" type="textgen" indexed="true" stored="true" multiValued="true"/>
 
     <dynamicField name="random_*" type="random" />
+
+     <field name="customurl" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
+
  </fields>
 
  <uniqueKey>search.uniqueid</uniqueKey>

@@ -9,7 +9,7 @@ package org.dspace.app.rest.submit.factory.impl;
 
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -51,8 +51,8 @@ public class BitstreamResourcePolicyUtils {
             String name = newAccessCondition.getName();
             String description = newAccessCondition.getDescription();
 
-            Date startDate = newAccessCondition.getStartDate();
-            Date endDate = newAccessCondition.getEndDate();
+            LocalDate startDate = newAccessCondition.getStartDate();
+            LocalDate endDate = newAccessCondition.getEndDate();
 
             findApplyResourcePolicy(context, uploadConfiguration, obj, name, description, startDate, endDate);
         }
@@ -75,8 +75,8 @@ public class BitstreamResourcePolicyUtils {
      * @throws ParseException       If parse error
      */
     public static void findApplyResourcePolicy(Context context, UploadConfiguration uploadConfiguration,
-            DSpaceObject obj, String name, String description,
-                                               Date startDate, Date endDate)
+                                               DSpaceObject obj, String name, String description,
+                                               LocalDate startDate, LocalDate endDate)
             throws SQLException, AuthorizeException, ParseException {
         boolean found = false;
         for (AccessConditionOption aco : uploadConfiguration.getOptions()) {

@@ -8,13 +8,12 @@
 package org.dspace.authority;
 
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.time.DateTimeException;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +55,7 @@ public class AuthorityValue {
     /**
      * When this authority record has been created
      */
-    private Date creationDate;
+    private Instant creationDate;
 
     /**
      * If this authority has been removed
@@ -66,7 +65,7 @@ public class AuthorityValue {
     /**
      * represents the last time that DSpace got updated information from its external source
      */
-    private Date lastModified;
+    private Instant lastModified;
 
     public AuthorityValue() {
     }
@@ -99,11 +98,11 @@ public class AuthorityValue {
         this.value = value;
     }
 
-    public Date getCreationDate() {
+    public Instant getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
     }
 
@@ -111,7 +110,7 @@ public class AuthorityValue {
         this.creationDate = stringToDate(creationDate);
     }
 
-    public Date getLastModified() {
+    public Instant getLastModified() {
         return lastModified;
     }
 
@@ -119,7 +118,7 @@ public class AuthorityValue {
         this.lastModified = stringToDate(lastModified);
     }
 
-    public void setLastModified(Date lastModified) {
+    public void setLastModified(Instant lastModified) {
         this.lastModified = lastModified;
     }
 
@@ -132,7 +131,7 @@ public class AuthorityValue {
     }
 
     protected void updateLastModifiedDate() {
-        this.lastModified = new Date();
+        this.lastModified = Instant.now();
     }
 
     public void update() {
@@ -152,7 +151,7 @@ public class AuthorityValue {
     public SolrInputDocument getSolrInputDocument() {
 
         SolrInputDocument doc = new SolrInputDocument();
-        DateFormat solrDateFormatter = SolrUtils.getDateFormatter();
+        DateTimeFormatter solrDateFormatter = SolrUtils.getDateFormatter();
         doc.addField("id", getId());
         doc.addField("field", getField());
         doc.addField("value", getValue());
@@ -173,8 +172,8 @@ public class AuthorityValue {
         this.field = String.valueOf(document.getFieldValue("field"));
         this.value = String.valueOf(document.getFieldValue("value"));
         this.deleted = (Boolean) document.getFieldValue("deleted");
-        this.creationDate = (Date) document.getFieldValue("creation_date");
-        this.lastModified = (Date) document.getFieldValue("last_modified_date");
+        this.creationDate = ((java.util.Date) document.getFieldValue("creation_date")).toInstant();
+        this.lastModified = ((java.util.Date) document.getFieldValue("last_modified_date")).toInstant();
     }
 
     /**
@@ -206,7 +205,7 @@ public class AuthorityValue {
      * Build a list of ISO date formatters to parse various forms.
      *
      * <p><strong>Note:</strong>  any formatter which does not parse a zone or
-     * offset must have a default zone set.  See {@link stringToDate}.
+     * offset must have a default zone set.  See {@link #stringToDate(String)}.
      *
      * @return the formatters.
      */
@@ -224,13 +223,13 @@ public class AuthorityValue {
      * @param date serialized date to be converted.
      * @return converted date, or null if no parser accepted the input.
      */
-    static public Date stringToDate(String date) {
-        Date result = null;
+    static public Instant stringToDate(String date) {
+        Instant result = null;
         if (StringUtils.isNotBlank(date)) {
             for (DateTimeFormatter formatter : getDateFormatters()) {
                 try {
                     ZonedDateTime dateTime = ZonedDateTime.parse(date, formatter);
-                    result = Date.from(dateTime.toInstant());
+                    result = dateTime.toInstant();
                     break;
                 } catch (DateTimeException e) {
                     log.debug("Input '{}' did not match {}", date, formatter);

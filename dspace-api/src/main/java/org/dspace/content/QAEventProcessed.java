@@ -8,7 +8,7 @@
 package org.dspace.content;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,8 +16,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -35,9 +33,8 @@ public class QAEventProcessed implements Serializable {
     @Column(name = "qaevent_id")
     private String eventId;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "qaevent_timestamp")
-    private Date eventTimestamp;
+    private Instant eventTimestamp;
 
     @JoinColumn(name = "eperson_uuid")
     @ManyToOne
@@ -55,11 +52,11 @@ public class QAEventProcessed implements Serializable {
         this.eventId = eventId;
     }
 
-    public Date getEventTimestamp() {
+    public Instant getEventTimestamp() {
         return eventTimestamp;
     }
 
-    public void setEventTimestamp(Date eventTimestamp) {
+    public void setEventTimestamp(Instant eventTimestamp) {
         this.eventTimestamp = eventTimestamp;
     }
 

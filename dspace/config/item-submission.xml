@@ -172,6 +172,11 @@
             <processing-class>org.dspace.app.rest.submit.step.CCLicenseStep</processing-class>
 	        <type>cclicense</type>
         </step-definition>
+        <step-definition id="custom-url">
+            <heading>submit.progressbar.CustomUrlStep</heading>
+            <processing-class>org.dspace.app.rest.submit.step.CustomUrlStep</processing-class>
+            <type>custom-url</type>
+        </step-definition>
 
 		<!-- This optional step may allow the user to select access conditions on the item -->
         <step-definition id="itemAccessConditions">
@@ -333,6 +338,9 @@
         <submission-process name="Person">
             <step id="collection"/>
             <step id="personStep"/>
+            <!-- The custom-url step can be uncommented to allow the Person's custom URL (when enabled) to be
+                 customized during submission.-->
+            <!-- <step id="custom-url"/> -->
             <step id="upload"/>
             <step id="license"/>
         </submission-process>
@@ -406,6 +414,10 @@
 
             <!--Step will be to Sign off on the License -->
             <step id="license"/>
+
+            <!-- Step allows the user to select a Creative Commons License -->
+            <!-- Required for OpenAIREv4 support -->
+            <step id="cclicense"/>
         </submission-process>
         <submission-process name="openairePersonSubmission">
             <step id="collection"/>

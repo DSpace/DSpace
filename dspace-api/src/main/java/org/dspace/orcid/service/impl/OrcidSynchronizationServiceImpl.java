@@ -13,7 +13,6 @@ import static java.util.List.of;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.dspace.content.Item.ANY;
 import static org.dspace.profile.OrcidEntitySyncPreference.DISABLED;
 
@@ -24,7 +23,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -36,10 +36,12 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.orcid.OrcidQueue;
 import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.client.OrcidClient;
 import org.dspace.orcid.model.OrcidEntityType;
 import org.dspace.orcid.model.OrcidTokenResponseDTO;
+import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.orcid.service.OrcidSynchronizationService;
 import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.profile.OrcidEntitySyncPreference;
@@ -61,8 +63,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationService {
 
     private static final Logger log = LoggerFactory.getLogger(OrcidSynchronizationServiceImpl.class);
+
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private OrcidQueueService orcidQueueService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -101,7 +107,8 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             itemService.addMetadata(context, profile, "dspace", "orcid", "scope", null, scope);
         }
 
-        if (isBlank(itemService.getMetadataFirstValue(profile, "dspace", "orcid", "authenticated", Item.ANY))) {
+        if (StringUtils.isBlank(itemService.getMetadataFirstValue(
+                profile, "dspace", "orcid", "authenticated", Item.ANY))) {
             String currentDate = ISO_DATE_TIME.format(now());
             itemService.setMetadataSingleValue(context, profile, "dspace", "orcid", "authenticated", null, currentDate);
         }
@@ -109,7 +116,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         setAccessToken(context, profile, ePerson, accessToken);
 
         EPerson ePersonByOrcid = ePersonService.findByNetid(context, orcid);
-        if (ePersonByOrcid == null && isBlank(ePerson.getNetid())) {
+        if (ePersonByOrcid == null && StringUtils.isBlank(ePerson.getNetid())) {
             ePerson.setNetid(orcid);
             updateEPerson(context, ePerson);
         }
@@ -120,7 +127,6 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
     @Override
     public void unlinkProfile(Context context, Item profile) throws SQLException {
-
         clearOrcidProfileMetadata(context, profile);
 
         clearSynchronizationSettings(context, profile);
@@ -128,6 +134,11 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         clearOrcidToken(context, profile);
 
         updateItem(context, profile);
+
+        List<OrcidQueue> queueRecords = orcidQueueService.findByProfileItemId(context, profile.getID());
+        for (OrcidQueue queueRecord : queueRecords) {
+            orcidQueueService.delete(context, queueRecord);
+        }
 
     }
 
@@ -180,7 +191,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         String newValue = value.name();
         String oldValue = itemService.getMetadataFirstValue(profile, "dspace", "orcid", "sync-mode", Item.ANY);
 
-        if (StringUtils.equals(oldValue, newValue)) {
+        if (Strings.CS.equals(oldValue, newValue)) {
             return false;
         } else {
             itemService.setMetadataSingleValue(context, profile, "dspace", "orcid", "sync-mode", null, value.name());

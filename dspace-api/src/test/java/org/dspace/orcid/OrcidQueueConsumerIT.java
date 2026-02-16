@@ -27,7 +27,6 @@ import static org.hamcrest.Matchers.is;
 
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -212,7 +211,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withMetadata("person.country::IT")
             .withPutCode("123456")
             .withOperation(OrcidOperation.INSERT)
-            .withTimestamp(Date.from(Instant.ofEpochMilli(100000)))
+            .withTimestamp(Instant.ofEpochMilli(100000))
             .withStatus(201)
             .build();
 
@@ -221,7 +220,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withMetadata("person.country::IT")
             .withPutCode("123456")
             .withOperation(OrcidOperation.DELETE)
-            .withTimestamp(Date.from(Instant.ofEpochMilli(200000)))
+            .withTimestamp(Instant.ofEpochMilli(200000))
             .withStatus(204)
             .build();
 
@@ -256,7 +255,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withMetadata("person.country::IT")
             .withPutCode("123456")
             .withOperation(OrcidOperation.INSERT)
-            .withTimestamp(Date.from(Instant.ofEpochMilli(100000)))
+            .withTimestamp(Instant.ofEpochMilli(100000))
             .withStatus(201)
             .build();
 
@@ -265,7 +264,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withMetadata("person.country::IT")
             .withPutCode("123456")
             .withOperation(OrcidOperation.DELETE)
-            .withTimestamp(Date.from(Instant.ofEpochMilli(200000)))
+            .withTimestamp(Instant.ofEpochMilli(200000))
             .withStatus(204)
             .build();
 
@@ -274,7 +273,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withMetadata("person.country::IT")
             .withPutCode("123456")
             .withOperation(OrcidOperation.INSERT)
-            .withTimestamp(Date.from(Instant.ofEpochMilli(300000)))
+            .withTimestamp(Instant.ofEpochMilli(300000))
             .withStatus(201)
             .build();
 
@@ -308,7 +307,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withMetadata("person.country::IT")
             .withPutCode("123456")
             .withOperation(OrcidOperation.INSERT)
-            .withTimestamp(Date.from(Instant.ofEpochMilli(100000)))
+            .withTimestamp(Instant.ofEpochMilli(100000))
             .withStatus(201)
             .build();
 
@@ -317,7 +316,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withMetadata("person.country::IT")
             .withPutCode("123456")
             .withOperation(OrcidOperation.DELETE)
-            .withTimestamp(Date.from(Instant.ofEpochMilli(200000)))
+            .withTimestamp(Instant.ofEpochMilli(200000))
             .withStatus(400)
             .build();
 
