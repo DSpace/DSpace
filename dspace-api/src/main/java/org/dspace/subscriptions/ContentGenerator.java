@@ -8,7 +8,7 @@
 package org.dspace.subscriptions;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
