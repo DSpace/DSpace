@@ -244,12 +244,9 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
          */
         Item item = workspaceItem.getItem();
-        if (!authorizeService.isAdmin(context)
-            && (item.getSubmitter() == null || (context.getCurrentUser() == null)
-                || (context.getCurrentUser().getID() != item.getSubmitter().getID()))) {
+        if (isNotAuthorizedToDelete(context, item)) {
             // Not an admit, not the submitter
-            throw new AuthorizeException("Must be an administrator or the "
-                                             + "original submitter to delete a workspace item");
+            throw new AuthorizeException("Must be an administrator or the submitter to delete a workspace item");
         }
 
         log.info(LogHelper.getHeader(context, "delete_workspace_item",
@@ -327,4 +324,13 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         }
 
     }
+
+    private boolean isNotAuthorizedToDelete(Context context, Item item) throws SQLException {
+        EPerson submitter = item.getSubmitter();
+        EPerson currentUser = context.getCurrentUser();
+        return !authorizeService.isAdmin(context)
+            && (submitter == null || (currentUser == null) || (!submitter.getID().equals(currentUser.getID())))
+            && !authorizeService.authorizeActionBoolean(context, item, Constants.DELETE);
+    }
+
 }

@@ -40,6 +40,15 @@
     <bean id="solrServiceBestMatchIndexingPlugin" class="org.dspace.discovery.SolrServiceBestMatchIndexingPlugin"/>
     <bean id="solrServiceBestMatchStrictIndexingPlugin"
           class="org.dspace.discovery.SolrServiceStrictBestMatchIndexingPlugin"/>
+    <bean id="sharedWorkspaceSolrIndexPlugin" class="org.dspace.discovery.SharedWorkspaceSolrIndexPlugin">
+        <constructor-arg name="additionalReadMetadata" ref="sharedWorkspaceAuthorMetadataFields"/>
+    </bean>
+
+    <util:list id="sharedWorkspaceAuthorMetadataFields" value-type="java.lang.String">
+        <value>dc.contributor.author</value>
+        <value>dc.contributor.editor</value>
+    </util:list>
+
     <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
     <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">
         <property name="map">
@@ -59,6 +68,7 @@
                 <!-- "workspace" is a special entry to search for your own workspace items -->
                 <entry key="workspace" value-ref="workspaceConfiguration" />
                 <entry key="supervisedWorkspace" value-ref="supervisedWorkspaceConfiguration" />
+                <entry key="otherworkspace" value-ref="otherWorkspaceConfiguration" />
                 <!-- "workflow" is a special entry to search for your own workflow tasks -->
                 <entry key="workflow" value-ref="workflowConfiguration" />
                 <!-- "workflowAdmin" is a special entry to search for all workflow items if you are an administrator -->
