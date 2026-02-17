@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.lowagie.text.DocumentException;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.dspace.app.util.XMLUtils;
@@ -110,7 +109,7 @@ public class PdfGenerator {
             renderer.setDocument(doc, null);
             renderer.layout();
             renderer.createPDF(out);
-        } catch (ParserConfigurationException | SAXException | IOException | DocumentException e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new RuntimeException(e);
         }
     }
