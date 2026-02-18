@@ -73,14 +73,14 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         .andExpect(content().contentType(contentType))
                         //The configuration file for the test env includes 6 forms
                         .andExpect(jsonPath("$.page.size", is(20)))
-                        .andExpect(jsonPath("$.page.totalElements", equalTo(15)))
-                        .andExpect(jsonPath("$.page.totalPages", equalTo(1)))
+                        .andExpect(jsonPath("$.page.totalElements", equalTo(23)))
+                        .andExpect(jsonPath("$.page.totalPages", equalTo(2)))
                         .andExpect(jsonPath("$.page.number", is(0)))
                         .andExpect(
                             jsonPath("$._links.self.href",
                                      Matchers.startsWith(REST_SERVER_URL + "config/submissionforms")))
-                        //The array of submissionforms should have a size of 12
-                        .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(15))))
+                        //The array of submissionforms should have a size of 20
+                        .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(20))))
         ;
     }
 
@@ -91,12 +91,12 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$.page.size", is(20)))
-                        .andExpect(jsonPath("$.page.totalElements", equalTo(15)))
-                        .andExpect(jsonPath("$.page.totalPages", equalTo(1)))
+                        .andExpect(jsonPath("$.page.totalElements", equalTo(23)))
+                        .andExpect(jsonPath("$.page.totalPages", equalTo(2)))
                         .andExpect(jsonPath("$.page.number", is(0)))
                         .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL
                                                                                           + "config/submissionforms")))
-                        .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(15))));
+                        .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(20))));
     }
 
     @Test
@@ -686,25 +686,26 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
     public void findAllPaginationTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         int pageSize = 2;
-        int totalElements = 15;
+        int totalElements = 16;
         int totalPages = 8;
 
         List<String> expectedIds = Arrays.asList(
             "personstep",
             "publicationStepGroup-dc-contributor-author",
             "journalVolumeStep",
+            "funding",
             "publicationStepGroup",
+            "patent",
             "publicationStepGroup-dc-contributor-editor",
+            "patent_indexing",
+            "patent_references",
             "typebindtest",
             "bitstream-metadata",
+            "titleAndIssuedDate",
             "test-outside-workflow-hidden",
             "languagetest",
-            "publicationStep",
-            "test-outside-submission-hidden",
-            "qualdroptest",
-            "traditionalpagetwo",
-            "sampleauthority",
-            "traditionalpageone"
+            "onlyTitle",
+            "publicationStep"
         );
 
         List<String> allIds = new ArrayList<>();
