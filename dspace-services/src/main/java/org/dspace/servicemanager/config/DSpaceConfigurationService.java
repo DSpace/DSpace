@@ -205,6 +205,16 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     }
 
     /**
+     * Returns Properties configurations starting with prefix
+     *
+     */
+    @Override
+    public Properties getPropertiesWithPrefix(String name) {
+        return  ConfigurationConverter.getProperties(getConfiguration().subset(name));
+    }
+
+
+    /**
      * Returns property value as a String.
      * If property is not found, default value is returned.
      *
