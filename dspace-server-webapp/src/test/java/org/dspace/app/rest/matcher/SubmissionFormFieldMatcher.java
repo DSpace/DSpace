@@ -29,7 +29,7 @@ public class SubmissionFormFieldMatcher {
 
     /**
      * Shortcut for the
-     * {@link SubmissionFormFieldMatcher#matchFormFieldDefinition(String, String, String, String, boolean, String, String, String, String)}
+     * {@link SubmissionFormFieldMatcher#matchFormFieldDefinition(String, String, String, String, boolean,String, String, String, String, String)}
      * with a null style and vocabulary name
      *
      * @param type
@@ -57,7 +57,7 @@ public class SubmissionFormFieldMatcher {
 
     /**
      * Shortcut for the
-     * {@link SubmissionFormFieldMatcher#matchFormFieldDefinition(String, String, String, String, boolean, String, String, String, String)}
+     * {@link SubmissionFormFieldMatcher#matchFormFieldDefinition(String, String, String, String, boolean, String, String, String)}
      * with a null controlled vocabulary
      *
      * @param type
@@ -83,7 +83,7 @@ public class SubmissionFormFieldMatcher {
     public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String typeBind,
             String mandatoryMessage, boolean repeatable, String hints, String style, String metadata) {
         return matchFormFieldDefinition(type, label, typeBind, mandatoryMessage, repeatable, hints, style, metadata,
-                null);
+                null, null);
     }
 
     /**
@@ -110,12 +110,15 @@ public class SubmissionFormFieldMatcher {
      * @param controlledVocabulary
      *            the expected controlled vocabulary, can be null. If null the corresponding json path is expected to be
      *            missing
+     * @param vocabularyType
+     *            the expected vocabulary type, can be null. If null the corresopnding json path is expected to be
+     *            missing
      * @return a Matcher for all the condition above
      */
     public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String typeBind,
                                                                    String mandatoryMessage, boolean repeatable,
                                                                    String hints, String style, String metadata,
-                                                                   String controlledVocabulary) {
+                                                                   String controlledVocabulary, String vocabularyType) {
         return allOf(
             // check each field definition
             hasJsonPath("$.input.type", is(type)),
@@ -124,6 +127,8 @@ public class SubmissionFormFieldMatcher {
             hasJsonPath("$.selectableMetadata[0].metadata", is(metadata)),
             controlledVocabulary != null ? hasJsonPath("$.selectableMetadata[0].controlledVocabulary",
                     is(controlledVocabulary)) : hasNoJsonPath("$.selectableMetadata[0].controlledVocabulary"),
+            vocabularyType != null ? hasJsonPath("$.selectableMetadata[0].vocabularyType",
+                    is(vocabularyType)) : hasNoJsonPath("$.selectableMetadata[0].vocabularyType"),
             mandatoryMessage != null ? hasJsonPath("$.mandatoryMessage", containsString(mandatoryMessage)) :
                 hasNoJsonPath("$.mandatoryMessage"),
             hasJsonPath("$.mandatory", is(mandatoryMessage != null)),

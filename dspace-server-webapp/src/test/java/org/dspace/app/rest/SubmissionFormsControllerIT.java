@@ -68,13 +68,13 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(content().contentType(contentType))
                    //The configuration file for the test env includes 6 forms
                    .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", equalTo(11)))
+                   .andExpect(jsonPath("$.page.totalElements", equalTo(12)))
                    .andExpect(jsonPath("$.page.totalPages", equalTo(1)))
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(
                        jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "config/submissionforms")))
                    //The array of submissionforms should have a size of 11
-                   .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(11))))
+                   .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(12))))
         ;
     }
 
@@ -85,12 +85,12 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", equalTo(11)))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(12)))
                 .andExpect(jsonPath("$.page.totalPages", equalTo(1)))
                 .andExpect(jsonPath("$.page.number", is(0)))
                 .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL
                            + "config/submissionforms")))
-                .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(11))));
+                .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(12))));
     }
 
     @Test
@@ -225,20 +225,20 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                                 SubmissionFormFieldMatcher.matchFormFieldDefinition("onebox", "Author", null,
                                         null, true,
                                 "Author field that can be associated with an authority providing suggestion",
-                                null, "dc.contributor.author", "SolrAuthorAuthority")
+                                null, "dc.contributor.author", "SolrAuthorAuthority", null)
                             )))
                         .andExpect(jsonPath("$.rows[1].fields", contains(
                                 SubmissionFormFieldMatcher.matchFormFieldDefinition("lookup-name", "Editor", null,
                                         null, false,
                                 "Editor field that can be associated with an authority "
                                 + "providing the special name lookup",
-                                null, "dc.contributor.editor", "SolrEditorAuthority")
+                                null, "dc.contributor.editor", "SolrEditorAuthority", null)
                             )))
                         .andExpect(jsonPath("$.rows[2].fields", contains(
                                 SubmissionFormFieldMatcher.matchFormFieldDefinition("lookup", "Subject", null,
                                         null, true,
                                 "Subject field that can be associated with an authority providing lookup",
-                                null, "dc.subject", "SolrSubjectAuthority")
+                                null, "dc.subject", "SolrSubjectAuthority", null)
                             )))
                         ;
         // we need to force a reload of the config now to be able to reload also the cache of the other
@@ -272,7 +272,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                                         null, true,
                                 "Select the type(s) of content of the item. To select more than one value in the " +
                                 "list, you may have to hold down the \"CTRL\" or \"Shift\" key.",
-                                null, "dc.type", "common_types")
+                                null, "dc.type", "common_types", null)
                             )))
         ;
     }
@@ -396,7 +396,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                           + " Se la lingua non compare nell'elenco, selezionare (Altro)."
                           + " Se il contenuto non ha davvero una lingua"
                           + " (ad esempio, se è un set di dati o un'immagine) selezionare (N/A)",
-                          null, "dc.language.iso", "common_iso_languages"))));
+                          null, "dc.language.iso", "common_iso_languages", null))));
 
         // user select ukrainian language
         getClient(tokenEperson).perform(get("/api/config/submissionforms/languagetest").locale(uk))
@@ -418,7 +418,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                            .matchFormFieldDefinition("dropdown", "Мова", null, null, false,
                            "Виберiть мову головного змiсту файлу, як що мови немає у списку, вибрати (Iнша)."
                          + " Як що вмiст вайлу не є текстовим, наприклад є фотографiєю, тодi вибрати (N/A)",
-                         null, "dc.language.iso", "common_iso_languages"))));
+                         null, "dc.language.iso", "common_iso_languages", null))));
          resetLocalesConfiguration();
     }
 
@@ -476,7 +476,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                           + " Se la lingua non compare nell'elenco, selezionare (Altro)."
                           + " Se il contenuto non ha davvero una lingua"
                           + " (ad esempio, se è un set di dati o un'immagine) selezionare (N/A)",
-                          null, "dc.language.iso", "common_iso_languages"))));
+                          null, "dc.language.iso", "common_iso_languages", null))));
 
         // user with ukrainian prefer language
         getClient(tokenEpersonUK).perform(get("/api/config/submissionforms/languagetest"))
@@ -498,7 +498,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                            .matchFormFieldDefinition("dropdown", "Мова", null, null, false,
                            "Виберiть мову головного змiсту файлу, як що мови немає у списку, вибрати (Iнша)."
                          + " Як що вмiст вайлу не є текстовим, наприклад є фотографiєю, тодi вибрати (N/A)",
-                         null, "dc.language.iso", "common_iso_languages"))));
+                         null, "dc.language.iso", "common_iso_languages", null))));
          resetLocalesConfiguration();
     }
 
@@ -551,7 +551,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                          + " Se la lingua non compare nell'elenco, selezionare (Altro)."
                          + " Se il contenuto non ha davvero una lingua"
                          + " (ad esempio, se è un set di dati o un'immagine) selezionare (N/A)",
-                         null, "dc.language.iso", "common_iso_languages"))));
+                         null, "dc.language.iso", "common_iso_languages", null))));
          resetLocalesConfiguration();
     }
 
@@ -699,7 +699,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                          Matchers.containsString("/api/config/submissionforms?"),
                          Matchers.containsString("page=5"), Matchers.containsString("size=2"))))
                  .andExpect(jsonPath("$.page.size", is(2)))
-                 .andExpect(jsonPath("$.page.totalElements", equalTo(11)))
+                 .andExpect(jsonPath("$.page.totalElements", equalTo(12)))
                  .andExpect(jsonPath("$.page.totalPages", equalTo(6)))
                  .andExpect(jsonPath("$.page.number", is(0)));
 
@@ -709,7 +709,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.submissionforms[0].id", is("test-outside-workflow-hidden")))
-                 .andExpect(jsonPath("$._embedded.submissionforms[1].id", is("languagetest")))
+                 .andExpect(jsonPath("$._embedded.submissionforms[1].id", is("vocabulary-suggest-test")))
                  .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                          Matchers.containsString("/api/config/submissionforms?"),
                          Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
@@ -726,7 +726,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                          Matchers.containsString("/api/config/submissionforms?"),
                          Matchers.containsString("page=5"), Matchers.containsString("size=2"))))
                  .andExpect(jsonPath("$.page.size", is(2)))
-                 .andExpect(jsonPath("$.page.totalElements", equalTo(11)))
+                 .andExpect(jsonPath("$.page.totalElements", equalTo(12)))
                  .andExpect(jsonPath("$.page.totalPages", equalTo(6)))
                  .andExpect(jsonPath("$.page.number", is(1)));
 
@@ -735,8 +735,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                 .param("page", "2"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.submissionforms[0].id", is("publicationStep")))
-                .andExpect(jsonPath("$._embedded.submissionforms[1].id", is("test-outside-submission-hidden")))
+                .andExpect(jsonPath("$._embedded.submissionforms[0].id", is("languagetest")))
+                .andExpect(jsonPath("$._embedded.submissionforms[1].id", is("publicationStep")))
                 .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                         Matchers.containsString("/api/config/submissionforms?"),
                         Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
@@ -750,7 +750,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         Matchers.containsString("/api/config/submissionforms?"),
                         Matchers.containsString("page=5"), Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$.page.size", is(2)))
-                .andExpect(jsonPath("$.page.totalElements", equalTo(11)))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(12)))
                 .andExpect(jsonPath("$.page.totalPages", equalTo(6)))
                 .andExpect(jsonPath("$.page.number", is(2)));
 
@@ -759,8 +759,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
             .param("page", "3"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$._embedded.submissionforms[0].id", is("qualdroptest")))
-            .andExpect(jsonPath("$._embedded.submissionforms[1].id", is("traditionalpagetwo")))
+            .andExpect(jsonPath("$._embedded.submissionforms[0].id", is("test-outside-submission-hidden")))
+            .andExpect(jsonPath("$._embedded.submissionforms[1].id", is("qualdroptest")))
             .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                 Matchers.containsString("/api/config/submissionforms?"),
                 Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
@@ -774,7 +774,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                 Matchers.containsString("/api/config/submissionforms?"),
                 Matchers.containsString("page=5"), Matchers.containsString("size=2"))))
             .andExpect(jsonPath("$.page.size", is(2)))
-            .andExpect(jsonPath("$.page.totalElements", equalTo(11)))
+            .andExpect(jsonPath("$.page.totalElements", equalTo(12)))
             .andExpect(jsonPath("$.page.totalPages", equalTo(6)))
             .andExpect(jsonPath("$.page.number", is(3)));
 
@@ -783,8 +783,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                                  .param("page", "4"))
                              .andExpect(status().isOk())
                              .andExpect(content().contentType(contentType))
-                             .andExpect(jsonPath("$._embedded.submissionforms[0].id", is("sampleauthority")))
-                             .andExpect(jsonPath("$._embedded.submissionforms[1].id", is("traditionalpageone")))
+                             .andExpect(jsonPath("$._embedded.submissionforms[0].id", is("traditionalpagetwo")))
+                             .andExpect(jsonPath("$._embedded.submissionforms[1].id", is("sampleauthority")))
                              .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                                  Matchers.containsString("/api/config/submissionforms?"),
                                  Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
@@ -798,7 +798,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                                  Matchers.containsString("/api/config/submissionforms?"),
                                  Matchers.containsString("page=5"), Matchers.containsString("size=2"))))
                              .andExpect(jsonPath("$.page.size", is(2)))
-                             .andExpect(jsonPath("$.page.totalElements", equalTo(11)))
+                             .andExpect(jsonPath("$.page.totalElements", equalTo(12)))
                              .andExpect(jsonPath("$.page.totalPages", equalTo(6)))
                              .andExpect(jsonPath("$.page.number", is(4)));
 
@@ -807,7 +807,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                 .param("page", "5"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$._embedded.submissionforms[0].id", is("typebindtest")))
+            .andExpect(jsonPath("$._embedded.submissionforms[0].id", is("traditionalpageone")))
+            .andExpect(jsonPath("$._embedded.submissionforms[1].id", is("typebindtest")))
             .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                 Matchers.containsString("/api/config/submissionforms?"),
                 Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
@@ -821,7 +822,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                 Matchers.containsString("/api/config/submissionforms?"),
                 Matchers.containsString("page=5"), Matchers.containsString("size=2"))))
             .andExpect(jsonPath("$.page.size", is(2)))
-            .andExpect(jsonPath("$.page.totalElements", equalTo(11)))
+            .andExpect(jsonPath("$.page.totalElements", equalTo(12)))
             .andExpect(jsonPath("$.page.totalPages", equalTo(6)))
             .andExpect(jsonPath("$.page.number", is(5)));
     }
