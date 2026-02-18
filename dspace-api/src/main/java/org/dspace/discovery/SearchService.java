@@ -90,6 +90,8 @@ public interface SearchService {
     List<Item> getRelatedItems(Context context, Item item,
                                DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration);
 
+    String createLocationQueryForAdministrableDSOs(String epersonAndGroupClause);
+
     /**
      * Method to create a  Query that includes all
      * communities and collections a user may administrate.
