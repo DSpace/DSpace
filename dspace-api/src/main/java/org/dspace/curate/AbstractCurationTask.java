@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -161,41 +160,13 @@ public abstract class AbstractCurationTask implements CurationTask {
 
     @Override
     public int perform(Context ctx, String id) throws IOException {
-        DSpaceObject dso = dereference(ctx, id);
-        return (dso != null) ? perform(dso) : Curator.CURATE_FAIL;
-    }
-
-    /**
-     * Returns a DSpaceObject for passed identifier, if it exists
-     *
-     * @param ctx DSpace context
-     * @param id  canonical id of object
-     * @return dso
-     * DSpace object, or null if no object with id exists
-     * @throws IOException if IO error
-     */
-    protected DSpaceObject dereference(Context ctx, String id) throws IOException {
-        // the identifier can be a handle or uuid. Try handle first
+        DSpaceObject dso = null;
         try {
-            DSpaceObject dso = handleService.resolveToObject(ctx, id);
-            // if the id did not resolve to a handle, check if it is a uuid
-            if (dso == null) {
-                UUID uuid = null;
-                try {
-                    uuid = UUID.fromString(id);
-                } catch (IllegalArgumentException iae) {
-                    // no uuid, nothing to do here.
-                    log.debug("ID {} is not a valid UUID", id);
-                }
-                if (uuid != null) {
-                    dso = dspaceObjectUtils.findDSpaceObject(ctx, uuid);
-                }
-            }
-            // dso is either null or a DSpaceObject
-            return dso;
+            dso = dspaceObjectUtils.findDSpaceObject(ctx, id);
         } catch (SQLException sqlE) {
             throw new IOException(sqlE.getMessage(), sqlE);
         }
+        return (dso != null) ? perform(dso) : Curator.CURATE_FAIL;
     }
 
     /**

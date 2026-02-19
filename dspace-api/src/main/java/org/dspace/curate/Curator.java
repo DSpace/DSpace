@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -254,20 +253,7 @@ public class Curator {
             //Save the context on current execution thread
             curationCtx.set(c);
 
-            DSpaceObject dso = handleService.resolveToObject(c, id);
-            // check if the DSpace Object does not have a handle and must be resolved by its uuid
-            if (dso == null) {
-                UUID uuid = null;
-                try {
-                    uuid = UUID.fromString(id);
-                } catch (IllegalArgumentException iae) {
-                    // no uuid, nothing to do here.
-                    log.debug("ID {} is not a valid UUID", id);
-                }
-                if (uuid != null) {
-                    dso = dspaceObjectUtils.findDSpaceObject(c, uuid);
-                }
-            }
+            DSpaceObject dso = dspaceObjectUtils.findDSpaceObject(c,id);
             if (dso != null) {
                 curate(dso);
             } else {
