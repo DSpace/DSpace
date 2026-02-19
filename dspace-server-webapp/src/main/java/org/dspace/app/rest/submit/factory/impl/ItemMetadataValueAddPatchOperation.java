@@ -180,9 +180,17 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
                 this.updateRelationshipPlace(context, source, idx, rel);
 
             } else {
-                getDSpaceObjectService()
-                        .addMetadata(context, source, metadata[0], metadata[1], metadata[2],
-                                ll.getLanguage(), ll.getValue(), ll.getAuthority(), ll.getConfidence(), idx);
+                if (ll.getSecurityLevel() != null) {
+                    getDSpaceObjectService()
+                            .addMetadataInPlaceSecured(context, source, metadata[0], metadata[1], metadata[2],
+                                    ll.getLanguage(), ll.getValue(), ll.getAuthority(), ll.getConfidence(),
+                                    idx, ll.getSecurityLevel());
+                } else {
+                    getDSpaceObjectService()
+                            .addMetadata(context, source, metadata[0], metadata[1], metadata[2],
+                                    ll.getLanguage(), ll.getValue(), ll.getAuthority(), ll.getConfidence(), idx);
+                }
+
             }
             idx++;
         }
@@ -214,7 +222,7 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
     private void updateRelationshipPlace(Context context, Item dso, int place, Relationship rs) {
 
         try {
-            if (rs.getLeftItem().equals(dso)) {
+            if (rs.getLeftItem().getID().equals(dso.getID())) {
                 rs.setLeftPlace(place);
             } else {
                 rs.setRightPlace(place);

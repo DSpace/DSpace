@@ -12,27 +12,9 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
            http://www.springframework.org/schema/util
            http://www.springframework.org/schema/util/spring-util.xsd">
-
-    <bean id="org.dspace.services.ConfigurationService"
-          class="org.dspace.servicemanager.config.DSpaceConfigurationService" scope="singleton"/>
-
-    <!-- provider for exposing default Handle services implementaion. -->
-    <!--bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.HandleIdentifierProvider"
-          scope="singleton">
-        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
-    </bean-->
-
-    <bean name="org.dspace.core.DBConnection" class="org.dspace.core.HibernateDBConnection" lazy-init="true" scope="prototype"/>
-
-    <!-- Register all our Flyway callback classes (which run before/after database migrations) -->
-    <bean class="org.dspace.storage.rdbms.RegistryUpdater"/>
-    <bean class="org.dspace.storage.rdbms.GroupServiceInitializer"/>
-    <bean class="org.dspace.storage.rdbms.SiteServiceInitializer"/>
-    <bean class="org.dspace.storage.rdbms.EntityTypeServiceInitializer"/>
-
     <util:map id="securityLevelsMap">
         <entry key="0" value-ref="level0Security"/>
         <entry key="1" value-ref="level1Security"/>
