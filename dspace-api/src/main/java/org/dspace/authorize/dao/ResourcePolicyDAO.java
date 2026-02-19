@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.ResourcePolicyOwnerVO;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
@@ -40,6 +41,9 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
     public List<ResourcePolicy> findByDSoAndAction(Context context, DSpaceObject dso, int actionId) throws SQLException;
 
     public void deleteByDsoAndTypeAndAction(Context context, DSpaceObject dSpaceObject, String type, int action)
+        throws SQLException;
+
+    public List<ResourcePolicy> findByDSoAndActionAndType(Context c, DSpaceObject o, int actionId, String type)
         throws SQLException;
 
     public List<ResourcePolicy> findByTypeGroupAction(Context context, DSpaceObject dso, Group group, int action)
@@ -242,5 +246,16 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
 
     public ResourcePolicy findOneById(Context context, Integer id) throws SQLException;
 
+    /**
+     * Return a list of date valid policy owners for a list of object that match the
+     * action.
+     *
+     * @param  c            context
+     * @param  dsoIds       DSpaceObject ids policies relate to
+     * @param  actionID     action (defined in class Constants)
+     * @return              list of resource policies
+     * @throws SQLException if there's a database problem
+     */
+    List<ResourcePolicyOwnerVO> findValidPolicyOwners(Context c, List<UUID> dsoIds, int actionID) throws SQLException;
 
 }

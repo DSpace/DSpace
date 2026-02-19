@@ -27,6 +27,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.edit.EditItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -281,13 +282,10 @@ public class SubmissionConfigReader {
 
         CollectionService collService = ContentServiceFactory.getInstance().getCollectionService();
 
-        // FIXME: This metadata lookup for cris.submission.definition was ported from DSpace-CRIS (CST-3062)
-        // to fix the test patchRemoveMandatoryMetadataTest. It allows binding a submission definition
-        // to a collection via the cris.submission.definition metadata field.
-        // It is unclear if this feature should be kept in the DSpace core alignment or if the tests
-        // should be refactored to use handle-based or entity-type mappings instead.
-        // See: https://4science.atlassian.net/browse/CST-3062
-        String submitName = collService.getMetadataFirstValue(collection, "cris", "submission", "definition", null);
+        String submitName = collService.getMetadataFirstValue(collection,
+                                                              MetadataSchemaEnum.DSPACE.getName(),
+                                                              "submission",
+                                                              "definition", null);
         if (submitName != null) {
             try {
                 SubmissionConfig subConfig = getSubmissionConfigByName(submitName);

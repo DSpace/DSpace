@@ -8,8 +8,8 @@
 package org.dspace.builder;
 
 import static org.dspace.content.LicenseUtils.getLicenseText;
-import static org.dspace.content.MetadataSchemaEnum.CRIS;
 import static org.dspace.content.MetadataSchemaEnum.DC;
+import static org.dspace.content.MetadataSchemaEnum.DSPACE;
 import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 
 import java.io.IOException;
@@ -210,11 +210,11 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     public ItemBuilder withCrisPolicyEPerson(String value, String authority) {
-        return addMetadataValue(item, CRIS.getName(), "policy", "eperson", null, value, authority, CF_ACCEPTED);
+        return addMetadataValue(item, DSPACE.getName(), "policy", "eperson", null, value, authority, CF_ACCEPTED);
     }
 
     public ItemBuilder withCrisPolicyGroup(String value, String authority) {
-        return addMetadataValue(item, CRIS.getName(), "policy", "group", null, value, authority, CF_ACCEPTED);
+        return addMetadataValue(item, DSPACE.getName(), "policy", "group", null, value, authority, CF_ACCEPTED);
     }
 
     public ItemBuilder withDoiIdentifier(String doi) {
