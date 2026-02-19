@@ -14,7 +14,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Optional;
 
+import eu.openaire.jaxb.model.Response;
 import org.dspace.AbstractDSpaceTest;
+import org.dspace.external.OpenAIRERestConnector;
 import org.dspace.external.factory.ExternalServiceFactory;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
@@ -101,5 +103,22 @@ public class OpenaireFundingDataProviderTest extends AbstractDSpaceTest {
         Optional<ExternalDataObject> result = openaireFundingDataProvider.getExternalDataObject(id);
 
         assertTrue("openaireFunding.getExternalDataObject.notExists:WRONGID", result.isEmpty());
+    }
+
+    @Test
+    public void testGetNumberOfResultsWhenResponseIsNull() {
+        // Create a mock connector that returns null
+        OpenAIREFundingDataProvider provider = new OpenAIREFundingDataProvider();
+        provider.setSourceIdentifier("test");
+        provider.setConnector(new OpenAIRERestConnector("test") {
+            @Override
+            public Response searchProjectByKeywords(int page, int size, String... keywords) {
+                return null;
+            }
+        });
+
+        // Should return 0 when response is null, not throw NullPointerException
+        int result = provider.getNumberOfResults("test");
+        assertEquals("Should return 0 when response is null", 0, result);
     }
 }
