@@ -96,6 +96,7 @@ public class CreateMissingIdentifiersIT
         // Must remove any cached named plugins before creating a new one
         CoreServiceFactory.getInstance().getPluginService().clearNamedPluginClasses();
         // Define a new task dynamically
+        String[] prevTaskDef = configurationService.getArrayProperty(P_TASK_DEF);
         configurationService.setProperty(P_TASK_DEF,
                 CreateMissingIdentifiers.class.getCanonicalName() + " = " + TASK_NAME);
 
@@ -143,6 +144,8 @@ public class CreateMissingIdentifiersIT
             for (Class identifierProviderClass : identifierProviderClasses) {
                 registerProvider(identifierProviderClass);
             }
+            // restore curation task configuration
+            configurationService.setProperty(P_TASK_DEF, prevTaskDef);
         }
     }
 }
