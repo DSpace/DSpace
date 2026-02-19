@@ -11,6 +11,9 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
+import java.util.List;
+
+import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.hamcrest.Matcher;
 
 public class SortOptionMatcher {
@@ -53,5 +56,15 @@ public class SortOptionMatcher {
             hasJsonPath("$.name", is(name)),
             hasJsonPath("$.sortOrder", is(sortDirection))
         );
+    }
+
+    public static Matcher<? super Object> sortOptionMatcher(DiscoverySortFieldConfiguration option) {
+        return sortOptionMatcher(option.getMetadataField(), option.getDefaultSortOrder().name());
+    }
+
+    public static Matcher<? super Object>[] createSortOptionMatchers(List<DiscoverySortFieldConfiguration> options) {
+        return options.stream()
+                      .map(SortOptionMatcher::sortOptionMatcher)
+                      .toArray(Matcher[]::new);
     }
 }

@@ -12,6 +12,7 @@ import static java.util.Collections.singletonList;
 import static org.dspace.discovery.configuration.DiscoveryConfigurationParameters.SORT.VALUE;
 import static org.dspace.discovery.configuration.DiscoveryConfigurationParameters.TYPE_HIERARCHICAL;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -148,7 +149,7 @@ public class RestDiscoverQueryBuilderTest {
         verify(discoverQueryBuilder, times(1)).buildQuery(context, scope, discoveryConfiguration, query,
                                                           Arrays.asList(tranformedFilter), singletonList("item"),
                                                           page.getPageSize(), page.getOffset(), "dc.title",
-                                                          "ASC");
+                                                          "ASC", true);
     }
 
     @Test
@@ -156,7 +157,7 @@ public class RestDiscoverQueryBuilderTest {
         restQueryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, emptyList(), null);
 
         verify(discoverQueryBuilder, times(1)).buildQuery(context, null, discoveryConfiguration, null,
-                                                          emptyList(), emptyList(), null, null, null, null);
+                                                          emptyList(), emptyList(), null, null, null, null, true);
     }
 
     @Test
@@ -166,7 +167,7 @@ public class RestDiscoverQueryBuilderTest {
 
         verify(discoverQueryBuilder, times(1)).buildQuery(context, null, discoveryConfiguration, null,
                                                           emptyList(), emptyList(), page.getPageSize(),
-                                                          page.getOffset(), "SCORE", "ASC");
+                                                          page.getOffset(), "SCORE", "ASC", true);
     }
 
     @Test
@@ -176,13 +177,13 @@ public class RestDiscoverQueryBuilderTest {
 
         verify(discoverQueryBuilder, times(1))
                 .buildQuery(context, null, discoveryConfiguration, null, emptyList(), emptyList(),
-                        page.getPageSize(), page.getOffset(), null, null);
+                        page.getPageSize(), page.getOffset(), null, null, true);
     }
 
     @Test(expected = DSpaceBadRequestException.class)
     public void testCatchIllegalArgumentException() throws Exception {
         when(discoverQueryBuilder.buildQuery(any(), any(), any(), any(), any(), anyList(), any(), any(), any(),
-                                             any())).thenThrow(IllegalArgumentException.class);
+                                             any(), anyBoolean())).thenThrow(IllegalArgumentException.class);
         restQueryBuilder
                 .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "TEST", page);
     }
@@ -190,7 +191,7 @@ public class RestDiscoverQueryBuilderTest {
     @Test(expected = InvalidSearchRequestException.class)
     public void testCatchSearchServiceException() throws Exception {
         when(discoverQueryBuilder.buildQuery(any(), any(), any(), any(), any(), anyList(), any(), any(), any(),
-                                             any())).thenThrow(SearchServiceException.class);
+                                             any(), anyBoolean())).thenThrow(SearchServiceException.class);
         restQueryBuilder
                 .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "ITEM", page);
     }
