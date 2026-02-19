@@ -35,7 +35,7 @@
         <jackson.version>2.21.0</jackson.version>
         <jackson-annotations.version>2.21</jackson-annotations.version>
         <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
-        <jaxb-api.version>4.0.4</jaxb-api.version>
+        <jaxb-api.version>4.0.5</jaxb-api.version>
         <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
         <jcache-version>1.1.1</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
