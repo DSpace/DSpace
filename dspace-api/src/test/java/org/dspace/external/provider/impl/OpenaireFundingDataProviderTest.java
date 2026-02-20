@@ -16,7 +16,7 @@ import java.util.Optional;
 
 import eu.openaire.jaxb.model.Response;
 import org.dspace.AbstractDSpaceTest;
-import org.dspace.external.OpenAIRERestConnector;
+import org.dspace.external.OpenaireRestConnector;
 import org.dspace.external.factory.ExternalServiceFactory;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
@@ -108,9 +108,9 @@ public class OpenaireFundingDataProviderTest extends AbstractDSpaceTest {
     @Test
     public void testGetNumberOfResultsWhenResponseIsNull() {
         // Create a mock connector that returns null
-        OpenAIREFundingDataProvider provider = new OpenAIREFundingDataProvider();
+        OpenaireFundingDataProvider provider = new OpenaireFundingDataProvider();
         provider.setSourceIdentifier("test");
-        provider.setConnector(new OpenAIRERestConnector("test") {
+        provider.setConnector(new OpenaireRestConnector("test") {
             @Override
             public Response searchProjectByKeywords(int page, int size, String... keywords) {
                 return null;

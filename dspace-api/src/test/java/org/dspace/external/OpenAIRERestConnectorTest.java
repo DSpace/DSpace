@@ -50,7 +50,7 @@ public class OpenAIRERestConnectorTest {
             try (MockedStatic<DSpaceHttpClientFactory> mockedFactory =
                          Mockito.mockStatic(DSpaceHttpClientFactory.class)) {
                 mockedFactory.when(DSpaceHttpClientFactory::getInstance).thenReturn(mock);
-                OpenAIRERestConnector connector = new OpenAIRERestConnector(mockServer.url("").toString());
+                OpenaireRestConnector connector = new OpenaireRestConnector(mockServer.url("").toString());
                 Response response = connector.searchProjectByKeywords(0, 10, "keyword");
                 // Basically check it doesn't throw UnmarshallerException and that we are getting our mocked response
                 assertTrue("Expected the query to contain the replaced keyword",
