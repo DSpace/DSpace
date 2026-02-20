@@ -141,6 +141,9 @@ updates:
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # Ignore updates for jboss-logging because it is a "convergence only" dependency
+      # that we do not use directly (see comments in pom.xml).
+      - dependency-name: "org.jboss.logging:*"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -279,6 +282,9 @@ updates:
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # Ignore updates for jboss-logging because it is a "convergence only" dependency
+      # that we do not use directly (see comments in pom.xml).
+      - dependency-name: "org.jboss.logging:*"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
@@ -417,6 +423,9 @@ updates:
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # Ignore updates for jboss-logging because it is a "convergence only" dependency
+      # that we do not use directly (see comments in pom.xml).
+      - dependency-name: "org.jboss.logging:*"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
@@ -574,6 +583,9 @@ updates:
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # Ignore updates for jboss-logging because it is a "convergence only" dependency
+      # that we do not use directly (see comments in pom.xml).
+      - dependency-name: "org.jboss.logging:*"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
