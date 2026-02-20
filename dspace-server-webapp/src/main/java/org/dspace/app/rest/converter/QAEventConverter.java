@@ -7,10 +7,6 @@
  */
 package org.dspace.app.rest.converter;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -70,8 +66,7 @@ public class QAEventConverter implements DSpaceConverter<QAEvent, QAEventRest> {
         rest.setTitle(modelObject.getTitle());
         rest.setTopic(modelObject.getTopic());
         rest.setEventDate(modelObject.getLastUpdate());
-        DecimalFormat decimalFormat = new DecimalFormat("0.000", new DecimalFormatSymbols(Locale.ENGLISH));
-        rest.setTrust(decimalFormat.format(modelObject.getTrust()));
+        rest.setTrust(QAEventRest.TRUST_FMT.format(modelObject.getTrust()));
         // right now only the pending status can be found in persisted qa events
         rest.setStatus(modelObject.getStatus());
         return rest;

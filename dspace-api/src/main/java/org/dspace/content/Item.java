@@ -27,8 +27,6 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import org.dspace.content.comparator.NameAscendingComparator;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
@@ -99,9 +97,6 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "items")
     private final List<Bundle> bundles = new ArrayList<>();
-
-    @Transient
-    private transient ItemService itemService;
 
     /**
      * True if anything else was changed since last metadata retrieval()
@@ -289,26 +284,6 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     }
 
     /**
-     * Get the bundles matching a bundle name (name corresponds roughly to type)
-     *
-     * @param name
-     *            name of bundle (ORIGINAL/TEXT/THUMBNAIL)
-     *
-     * @return the bundles in an unordered array
-     */
-    public List<Bundle> getBundles(String name) {
-        List<Bundle> matchingBundles = new ArrayList<>();
-         // now only keep bundles with matching names
-        List<Bundle> bunds = getBundles();
-        for (Bundle bundle : bunds) {
-            if (name.equals(bundle.getName())) {
-                matchingBundles.add(bundle);
-            }
-        }
-        return matchingBundles;
-    }
-
-    /**
      * Add a bundle to the item, should not be made public since we don't want to skip business logic
      *
      * @param bundle the bundle to be added
@@ -366,20 +341,8 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     }
 
     @Override
-    public String getName() {
-        return getItemService().getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
-    }
-
-    @Override
     public Integer getLegacyId() {
         return legacyId;
-    }
-
-    public ItemService getItemService() {
-        if (itemService == null) {
-            itemService = ContentServiceFactory.getInstance().getItemService();
-        }
-        return itemService;
     }
 
     @Override

@@ -17,6 +17,8 @@ import java.util.UUID;
 
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.util.service.DSpaceObjectUtils;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataDSpaceCsvExportService;
 import org.dspace.core.Constants;
@@ -30,6 +32,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Implementation of {@link MetadataDSpaceCsvExportService}
  */
 public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExportService {
+
+    @Autowired
+    private CommunityService communityService;
+
+    @Autowired
+    private CollectionService collectionService;
 
     @Autowired
     private ItemService itemService;
@@ -62,16 +70,20 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
             }
 
             if (dso.getType() == Constants.ITEM) {
-                handler.logInfo("Exporting item '" + dso.getName() + "' (" + identifier + ")");
+                handler.logInfo("Exporting item '" + itemService.getName((Item) dso) + "' (" + identifier + ")");
                 List<Item> item = new ArrayList<>();
                 item.add((Item) dso);
                 toExport = item.iterator();
             } else if (dso.getType() == Constants.COLLECTION) {
-                handler.logInfo("Exporting collection '" + dso.getName() + "' (" + identifier + ")");
+                handler.logInfo(
+                    "Exporting collection '" + collectionService.getName((Collection) dso) + "' (" + identifier + ")"
+                );
                 Collection collection = (Collection) dso;
                 toExport = itemService.findByCollection(context, collection, getCsvExportLimit(), 0);
             } else if (dso.getType() == Constants.COMMUNITY) {
-                handler.logInfo("Exporting community '" + dso.getName() + "' (" + identifier + ")");
+                handler.logInfo(
+                    "Exporting community '" + communityService.getName((Community) dso) + "' (" + identifier + ")"
+                );
                 toExport = buildFromCommunity(context, (Community) dso);
             } else {
                 throw new IllegalArgumentException(

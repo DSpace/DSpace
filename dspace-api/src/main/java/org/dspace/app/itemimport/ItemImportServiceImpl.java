@@ -1490,7 +1490,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             // now add the bitstream
             bs = bitstreamService.create(c, targetBundle, bis);
 
-            bs.setName(c, fileName);
+            bitstreamService.setName(c, bs, fileName);
 
             // Identify the format
             // FIXME - guessing format guesses license.txt incorrectly as a text
@@ -1560,13 +1560,13 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             // set the name to just the filename
             int iLastSlash = bitstreamPath.lastIndexOf('/');
-            bs.setName(c, bitstreamPath.substring(iLastSlash + 1));
+            bitstreamService.setName(c, bs, bitstreamPath.substring(iLastSlash + 1));
 
             // Identify the format
             // FIXME - guessing format guesses license.txt incorrectly as a text file format!
             BitstreamFormat bf = bitstreamFormatService.guessFormat(c, bs);
             bitstreamService.setFormat(c, bs, bf);
-            bs.setDescription(c, description);
+            bitstreamService.setDescription(c, bs, description);
 
             bitstreamService.update(c, bs);
         }
@@ -1765,7 +1765,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             // find bitstream
             List<Bitstream> bitstreams = itemService.getNonInternalBitstreams(c, myItem);
             for (Bitstream bitstream : bitstreams) {
-                if (bitstream.getName().equals(bitstreamName)) {
+                if (bitstreamService.getName(bitstream).equals(bitstreamName)) {
                     bs = bitstream;
                     break;
                 }
@@ -1792,7 +1792,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 if (descriptionExists) {
                     logInfo("\tSetting description for "
                         + bitstreamName);
-                    bs.setDescription(c, thisDescription);
+                    bitstreamService.setDescription(c, bs, thisDescription);
                     updateRequired = true;
                 }
 

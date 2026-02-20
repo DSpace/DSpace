@@ -113,11 +113,12 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                                BundleMatcher.matchBundle(bundle1.getName(),
-                                                          bundle1.getID(),
-                                                          bundle1.getHandle(),
-                                                          bundle1.getType(),
-                                                          bundle1.getBitstreams())
+                                BundleMatcher.matchBundle(
+                                    bundleService.getName(bundle1),
+                                    bundle1.getID(),
+                                    bundle1.getHandle(),
+                                    bundle1.getType(),
+                                    bundle1.getBitstreams())
 
                         )));
 
@@ -180,16 +181,18 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(admin.getEmail(), password);
 
         // Expect only the first Bundle to be returned
+        Bundle bundle = bundles.get(0);
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
                    .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                           BundleMatcher.matchBundle(bundles.get(0).getName(),
-                                                     bundles.get(0).getID(),
-                                                     bundles.get(0).getHandle(),
-                                                     bundles.get(0).getType(),
-                                                     bundles.get(0).getBitstreams())
+                           BundleMatcher.matchBundle(
+                               bundleService.getName(bundle),
+                               bundles.get(0).getID(),
+                               bundles.get(0).getHandle(),
+                               bundles.get(0).getType(),
+                               bundles.get(0).getBitstreams())
         )));
 
 
@@ -338,7 +341,7 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
         ;
 
         targetBundle = bundleService.find(context, targetBundle.getID());
-        String name = targetBundle.getName();
+        String name = bundleService.getName(targetBundle);
         String handle = targetBundle.getHandle();
         List<Bitstream> bitstreams = targetBundle.getBitstreams();
         getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
@@ -513,7 +516,7 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
         ;
 
         targetBundle = bundleService.find(context, targetBundle.getID());
-        String name = targetBundle.getName();
+        String name = bundleService.getName(targetBundle);
         String handle = targetBundle.getHandle();
         List<Bitstream> bitstreams = targetBundle.getBitstreams();
 
@@ -633,7 +636,7 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
         assertFalse(context.reloadEntity(bitstream).isDeleted());
 
         targetBundle = bundleService.find(context, targetBundle.getID());
-        String name = targetBundle.getName();
+        String name = bundleService.getName(targetBundle);
         String handle = targetBundle.getHandle();
         List<Bitstream> bitstreams = targetBundle.getBitstreams();
 
@@ -744,11 +747,12 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                                BundleMatcher.matchBundle(bundle1.getName(),
-                                                          bundle1.getID(),
-                                                          bundle1.getHandle(),
-                                                          bundle1.getType(),
-                                                          bundle1.getBitstreams())
+                                BundleMatcher.matchBundle(
+                                    bundleService.getName(bundle1),
+                                    bundle1.getID(),
+                                    bundle1.getHandle(),
+                                    bundle1.getType(),
+                                    bundle1.getBitstreams())
 
                         )));
 
@@ -847,11 +851,12 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                                BundleMatcher.matchBundle(bundle1.getName(),
-                                                          bundle1.getID(),
-                                                          bundle1.getHandle(),
-                                                          bundle1.getType(),
-                                                          bundle1.getBitstreams())
+                                BundleMatcher.matchBundle(
+                                    bundleService.getName(bundle1),
+                                    bundle1.getID(),
+                                    bundle1.getHandle(),
+                                    bundle1.getType(),
+                                    bundle1.getBitstreams())
 
                         )));
 
@@ -949,11 +954,12 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                                BundleMatcher.matchBundle(bundle1.getName(),
-                                                          bundle1.getID(),
-                                                          bundle1.getHandle(),
-                                                          bundle1.getType(),
-                                                          bundle1.getBitstreams())
+                                BundleMatcher.matchBundle(
+                                    bundleService.getName(bundle1),
+                                    bundle1.getID(),
+                                    bundle1.getHandle(),
+                                    bundle1.getType(),
+                                    bundle1.getBitstreams())
 
                         )));
 
@@ -1051,11 +1057,12 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                                BundleMatcher.matchBundle(bundle1.getName(),
-                                                          bundle1.getID(),
-                                                          bundle1.getHandle(),
-                                                          bundle1.getType(),
-                                                          bundle1.getBitstreams())
+                                BundleMatcher.matchBundle(
+                                    bundleService.getName(bundle1),
+                                    bundle1.getID(),
+                                    bundle1.getHandle(),
+                                    bundle1.getType(),
+                                    bundle1.getBitstreams())
 
                         )));
 
@@ -1154,11 +1161,12 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                                BundleMatcher.matchBundle(bundle1.getName(),
-                                                          bundle1.getID(),
-                                                          bundle1.getHandle(),
-                                                          bundle1.getType(),
-                                                          bundle1.getBitstreams())
+                                BundleMatcher.matchBundle(
+                                    bundleService.getName(bundle1),
+                                    bundle1.getID(),
+                                    bundle1.getHandle(),
+                                    bundle1.getType(),
+                                    bundle1.getBitstreams())
 
                         )));
 
@@ -1256,11 +1264,12 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                                BundleMatcher.matchBundle(bundle1.getName(),
-                                                          bundle1.getID(),
-                                                          bundle1.getHandle(),
-                                                          bundle1.getType(),
-                                                          bundle1.getBitstreams())
+                                BundleMatcher.matchBundle(
+                                    bundleService.getName(bundle1),
+                                    bundle1.getID(),
+                                    bundle1.getHandle(),
+                                    bundle1.getType(),
+                                    bundle1.getBitstreams())
 
                         )));
 
@@ -1358,11 +1367,12 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                                BundleMatcher.matchBundle(bundle1.getName(),
-                                                          bundle1.getID(),
-                                                          bundle1.getHandle(),
-                                                          bundle1.getType(),
-                                                          bundle1.getBitstreams())
+                                BundleMatcher.matchBundle(
+                                    bundleService.getName(bundle1),
+                                    bundle1.getID(),
+                                    bundle1.getHandle(),
+                                    bundle1.getType(),
+                                    bundle1.getBitstreams())
 
                         )));
 

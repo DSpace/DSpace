@@ -225,7 +225,7 @@ public class DSpaceMETSIngester
                 if (newName != null) {
                     //String mfileId = mfile.getAttributeValue("ID");
                     //Bitstream bs = (Bitstream)fileIdToBitstream.get(mfileId);
-                    bs.setName(context, newName);
+                    bitstreamService.setName(context, bs, newName);
                     bitstreamService.update(context, bs);
                 }
             }

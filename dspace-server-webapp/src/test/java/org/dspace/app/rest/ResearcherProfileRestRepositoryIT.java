@@ -78,6 +78,7 @@ import org.dspace.content.RelationshipType;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.orcid.OrcidQueue;
 import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.client.OrcidClient;
@@ -123,6 +124,9 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     @Mock
     private OrcidClient orcidClientMock;
+
+    @Autowired
+    private EPersonService epersonService;
 
     @Autowired
     private OrcidSynchronizationService orcidSynchronizationService;
@@ -209,14 +213,14 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     public void testFindById() throws Exception {
 
         UUID id = user.getID();
-        String name = user.getFullName();
+        String name = epersonService.getFullName(user);
 
         String authToken = getAuthToken(user.getEmail(), password);
 
         context.turnOffAuthorisationSystem();
 
         ItemBuilder.createItem(context, personCollection)
-            .withDspaceObjectOwner(name, id.toString())
+            .withDSpaceObjectOwner(name, id.toString())
             .build();
 
         context.restoreAuthSystemState();
@@ -251,14 +255,14 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     public void testFindByIdWithAdmin() throws Exception {
 
         UUID id = user.getID();
-        String name = user.getFullName();
+        String name = epersonService.getFullName(user);
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
         context.turnOffAuthorisationSystem();
 
         ItemBuilder.createItem(context, personCollection)
-            .withDspaceObjectOwner(name, id.toString())
+            .withDSpaceObjectOwner(name, id.toString())
             .build();
 
         context.restoreAuthSystemState();
@@ -292,14 +296,14 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     public void testFindByIdWithoutOwnerUser() throws Exception {
 
         UUID id = user.getID();
-        String name = user.getFullName();
+        String name = epersonService.getFullName(user);
 
         String authToken = getAuthToken(anotherUser.getEmail(), password);
 
         context.turnOffAuthorisationSystem();
 
         ItemBuilder.createItem(context, personCollection)
-            .withDspaceObjectOwner(name, id.toString())
+            .withDSpaceObjectOwner(name, id.toString())
             .build();
 
         context.restoreAuthSystemState();
@@ -324,7 +328,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     public void testCreateAndReturn() throws Exception {
 
         String id = user.getID().toString();
-        String name = user.getFullName();
+        String name = epersonService.getName(user);
 
         String authToken = getAuthToken(user.getEmail(), password);
 
@@ -343,8 +347,8 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("item")))
             .andExpect(jsonPath("$.metadata", matchMetadata("dspace.object.owner", name, id, 0)))
-            .andExpect(jsonPath("$.metadata", matchMetadata("person.givenName", user.getFirstName(), 0)))
-            .andExpect(jsonPath("$.metadata", matchMetadata("person.familyName", user.getLastName(), 0)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("person.givenName", epersonService.getFirstName(user), 0)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("person.familyName", epersonService.getLastName(user), 0)))
             .andExpect(jsonPath("$.metadata", matchMetadata("dspace.entity.type", "Person", 0)));
 
         getClient(authToken).perform(get("/api/eperson/profiles/{id}/eperson", id))
@@ -394,7 +398,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     public void testCreateAndReturnWithAdmin() throws Exception {
 
         String id = user.getID().toString();
-        String name = user.getFullName();
+        String name = epersonService.getName(user);
 
         configurationService.setProperty("researcher-profile.collection.uuid", null);
 
@@ -415,8 +419,8 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         getClient(authToken).perform(get("/api/eperson/profiles/{id}/item", id))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("item")))
-            .andExpect(jsonPath("$.metadata", matchMetadata("person.givenName", user.getFirstName(), 0)))
-            .andExpect(jsonPath("$.metadata", matchMetadata("person.familyName", user.getLastName(), 0)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("person.givenName", epersonService.getFirstName(user), 0)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("person.familyName", epersonService.getLastName(user), 0)))
             .andExpect(jsonPath("$.metadata", matchMetadata("dspace.object.owner", name, id, 0)))
             .andExpect(jsonPath("$.metadata", matchMetadata("dspace.entity.type", "Person", 0)));
 
@@ -638,7 +642,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         context.turnOffAuthorisationSystem();
 
         Item profileItem = ItemBuilder.createItem(context, personCollection)
-            .withDspaceObjectOwner(user.getEmail(), user.getID().toString())
+            .withDSpaceObjectOwner(user)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("access-token", eperson)
             .withOrcidAuthenticated("authenticated")
@@ -1144,7 +1148,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         ItemBuilder.createItem(context, personCollection)
             .withTitle("Admin User")
             .withPersonEmail("test@email.it")
-            .withDspaceObjectOwner("Admin User", admin.getID().toString())
+            .withDSpaceObjectOwner("Admin User", admin.getID().toString())
             .build();
 
         context.restoreAuthSystemState();
@@ -1161,7 +1165,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     @Test
     public void researcherProfileClaim() throws Exception {
         String id = user.getID().toString();
-        String name = user.getName();
+        String name = epersonService.getName(user);
 
         context.turnOffAuthorisationSystem();
 
@@ -2928,7 +2932,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         Item publication = ItemBuilder.createItem(context, collection)
             .withTitle(title)
-            .withAuthor(author.getName())
+            .withAuthor(itemService.getName(author))
             .build();
 
         RelationshipBuilder.createRelationshipBuilder(context, author, publication, isAuthorOfPublication).build();

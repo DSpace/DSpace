@@ -123,16 +123,17 @@ public class MatomoRequestDetailsEnricherFactory {
         if (ue == null || ue.getObject() == null) {
             return null;
         }
+        DSpaceObject dso = ue.getObject();
         try {
-            if (ue.getObject().getType() == Constants.BITSTREAM) {
+            if (dso.getType() == Constants.BITSTREAM) {
                 // For a bitstream download we really want to know the title of the owning item
                 // rather than the bitstream name.
-                return ContentServiceFactory.getInstance()
-                                            .getDSpaceObjectService(ue.getObject())
-                                            .getParentObject(ue.getContext(), ue.getObject())
-                                            .getName();
+                DSpaceObject parent = ContentServiceFactory.getInstance()
+                                            .getDSpaceObjectService(dso)
+                                            .getParentObject(ue.getContext(), dso);
+                return ContentServiceFactory.getInstance().getDSpaceObjectService(parent).getName(parent);
             } else {
-                return ue.getObject().getName();
+                return ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getName(dso);
             }
         } catch (SQLException e) {
             // This shouldn't merit interrupting the user's transaction so log the error and continue.

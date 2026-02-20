@@ -385,8 +385,8 @@ public class SamlAuthentication implements AuthenticationMethod {
             }
 
             ePerson.setEmail(email.toLowerCase());
-            ePerson.setFirstName(context, firstName);
-            ePerson.setLastName(context, lastName);
+            ePersonService.setFirstName(context, ePerson, firstName);
+            ePersonService.setLastName(context, ePerson, firstName);
             ePerson.setCanLogIn(true);
             ePerson.setSelfRegistered(true);
 
@@ -402,8 +402,8 @@ public class SamlAuthentication implements AuthenticationMethod {
 
                 message += "  netid: " + ePerson.getNetid() + "\n";
                 message += "  email: " + ePerson.getEmail() + "\n";
-                message += "  firstName: " + ePerson.getFirstName() + "\n";
-                message += "  lastName: " + ePerson.getLastName();
+                message += "  firstName: " + ePersonService.getFirstName(ePerson) + "\n";
+                message += "  lastName: " + ePersonService.getLastName(ePerson);
 
                 log.info(message);
             }
@@ -466,11 +466,11 @@ public class SamlAuthentication implements AuthenticationMethod {
             }
 
             if (firstName != null) {
-                eperson.setFirstName(context, firstName);
+                ePersonService.setFirstName(context,eperson, firstName);
             }
 
             if (lastName != null) {
-                eperson.setLastName(context, lastName);
+                ePersonService.setLastName(context, eperson, lastName);
             }
 
             if (log.isDebugEnabled()) {

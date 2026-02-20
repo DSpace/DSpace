@@ -24,6 +24,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
@@ -36,6 +37,9 @@ import org.swordapp.server.UriRegistry;
 public class SimpleZipContentDisseminator implements SwordContentDisseminator {
     protected BitstreamService bitstreamService = ContentServiceFactory
         .getInstance().getBitstreamService();
+
+    protected BundleService bundleService = ContentServiceFactory
+        .getInstance().getBundleService();
 
     protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -55,10 +59,10 @@ public class SimpleZipContentDisseminator implements SwordContentDisseminator {
 
             List<Bundle> bundles = item.getBundles();
             for (Bundle bundle : bundles) {
-                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+                if (Constants.CONTENT_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                     List<Bitstream> bss = bundle.getBitstreams();
                     for (Bitstream bitstream : bss) {
-                        ZipEntry ze = new ZipEntry(bitstream.getName());
+                        ZipEntry ze = new ZipEntry(bitstreamService.getName(bitstream));
                         zip.putNextEntry(ze);
                         InputStream is = bitstreamService
                             .retrieve(context, bitstream);

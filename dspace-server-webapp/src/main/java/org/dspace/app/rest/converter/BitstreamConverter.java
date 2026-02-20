@@ -15,6 +15,9 @@ import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
@@ -25,6 +28,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BitstreamConverter extends DSpaceObjectConverter<Bitstream, BitstreamRest> {
+    @Autowired
+    BundleService bundleService;
+
+    @Autowired
+    BitstreamService bitstreamService;
 
     @Override
     public BitstreamRest convert(org.dspace.content.Bitstream obj, Projection projection) {
@@ -38,7 +46,8 @@ public class BitstreamConverter extends DSpaceObjectConverter<Bitstream, Bitstre
             e1.printStackTrace();
         }
         if (bundles != null && bundles.size() > 0) {
-            b.setBundleName(bundles.get(0).getName());
+            Bundle bundle = bundles.get(0);
+            b.setBundleName(bundleService.getName(bundle));
         }
         CheckSumRest checksum = new CheckSumRest();
         checksum.setCheckSumAlgorithm(obj.getChecksumAlgorithm());
@@ -56,5 +65,10 @@ public class BitstreamConverter extends DSpaceObjectConverter<Bitstream, Bitstre
     @Override
     public Class<Bitstream> getModelClass() {
         return Bitstream.class;
+    }
+
+    @Override
+    protected BitstreamService getDSOService() {
+        return bitstreamService;
     }
 }

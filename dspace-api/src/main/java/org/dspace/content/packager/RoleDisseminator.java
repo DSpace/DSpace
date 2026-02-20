@@ -27,6 +27,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -88,6 +90,7 @@ public class RoleDisseminator implements PackageDisseminator {
 
     protected final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected final GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    protected final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     /*
      * (non-Javadoc)
@@ -310,8 +313,10 @@ public class RoleDisseminator implements PackageDisseminator {
             for (EPerson member : group.getMembers()) {
                 writer.writeEmptyElement(MEMBER);
                 writer.writeAttribute(ID, String.valueOf(member.getID()));
-                if (null != member.getName()) {
-                    writer.writeAttribute(NAME, member.getName());
+
+                String name = ePersonService.getName(member);
+                if (null != name) {
+                    writer.writeAttribute(NAME, name);
                 }
             }
             writer.writeEndElement();
@@ -370,13 +375,13 @@ public class RoleDisseminator implements PackageDisseminator {
             } else if (group.equals(collection.getSubmitters())) {
                 //Check if Submitters group
                 return GROUP_TYPE_SUBMIT;
-            } else if (group.equals(collection.getWorkflowStep1(context))) {
+            } else if (group.equals(collectionService.getWorkflowGroup(context, collection, 1))) {
                 //Check if workflow step 1 group
                 return GROUP_TYPE_WORKFLOW_STEP_1;
-            } else if (group.equals(collection.getWorkflowStep2(context))) {
+            } else if (group.equals(collectionService.getWorkflowGroup(context, collection, 2))) {
                 //check if workflow step 2 group
                 return GROUP_TYPE_WORKFLOW_STEP_2;
-            } else if (group.equals(collection.getWorkflowStep3(context))) {
+            } else if (group.equals(collectionService.getWorkflowGroup(context, collection, 3))) {
                 //check if workflow step 3 group
                 return GROUP_TYPE_WORKFLOW_STEP_3;
             }
@@ -411,21 +416,24 @@ public class RoleDisseminator implements PackageDisseminator {
             writer.writeEndElement();
         }
 
-        if (eperson.getFirstName() != null) {
+        String firstName = ePersonService.getFirstName(eperson);
+        String lastName = ePersonService.getLastName(eperson);
+        if (firstName != null) {
             writer.writeStartElement(FIRST_NAME);
-            writer.writeCharacters(eperson.getFirstName());
+            writer.writeCharacters(firstName);
             writer.writeEndElement();
         }
 
-        if (eperson.getLastName() != null) {
+        if (lastName != null) {
             writer.writeStartElement(LAST_NAME);
-            writer.writeCharacters(eperson.getLastName());
+            writer.writeCharacters(lastName);
             writer.writeEndElement();
         }
 
-        if (eperson.getLanguage() != null) {
+        String language = ePersonService.getLanguage(eperson);
+        if (language != null) {
             writer.writeStartElement(LANGUAGE);
-            writer.writeCharacters(eperson.getLanguage());
+            writer.writeCharacters(language);
             writer.writeEndElement();
         }
 
@@ -521,16 +529,16 @@ public class RoleDisseminator implements PackageDisseminator {
                 list.add(collection.getSubmitters());
             }
             //check for workflow step 1 group
-            if (collection.getWorkflowStep1(context) != null) {
-                list.add(collection.getWorkflowStep1(context));
+            if (collectionService.getWorkflowGroup(context, collection, 1) != null) {
+                list.add(collectionService.getWorkflowGroup(context, collection, 1));
             }
             //check for workflow step 2 group
-            if (collection.getWorkflowStep2(context) != null) {
-                list.add(collection.getWorkflowStep2(context));
+            if (collectionService.getWorkflowGroup(context, collection, 2) != null) {
+                list.add(collectionService.getWorkflowGroup(context, collection, 2));
             }
             //check for workflow step 3 group
-            if (collection.getWorkflowStep3(context) != null) {
-                list.add(collection.getWorkflowStep3(context));
+            if (collectionService.getWorkflowGroup(context, collection, 3) != null) {
+                list.add(collectionService.getWorkflowGroup(context, collection, 3));
             }
 
             // FINAL CATCH-ALL -> Find any other groups where name begins with "COLLECTION_<ID>_"

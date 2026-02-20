@@ -36,6 +36,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
@@ -67,6 +68,7 @@ public class RequestItemEmailNotifierTest
     private static BitstreamService bitstreamService;
     private static HandleService handleService;
     private static RequestItemService requestItemService;
+    private static ItemService itemService;
     private static RequestItemEmailNotifier requestItemEmailNotifier;
 
     public RequestItemEmailNotifierTest() {
@@ -85,7 +87,8 @@ public class RequestItemEmailNotifierTest
                 = HandleServiceFactory.getInstance().getHandleService();
         requestItemService
                 = RequestItemServiceFactory.getInstance().getRequestItemService();
-
+        itemService
+                = ContentServiceFactory.getInstance().getItemService();
         // Instantiate and initialize the unit, using the "help desk" strategy.
         requestItemEmailNotifier
                 = new RequestItemEmailNotifier(
@@ -97,6 +100,7 @@ public class RequestItemEmailNotifierTest
         requestItemEmailNotifier.configurationService = configurationService;
         requestItemEmailNotifier.handleService = handleService;
         requestItemEmailNotifier.requestItemService = requestItemService;
+        requestItemEmailNotifier.itemService = itemService;
     }
 
     @AfterClass

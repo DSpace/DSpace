@@ -55,6 +55,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.CollectionService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -79,6 +80,9 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Autowired
     private XmlWorkflowFactory xmlWorkflowFactory;
+
+    @Autowired
+    private CollectionService collectionService;
 
     @Before
     @Override
@@ -473,8 +477,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID() + "/collection"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", Matchers
-                        .is(CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()))));
+                .andExpect(jsonPath("$", Matchers.is(CollectionMatcher.matchCollectionEntry(
+                    collectionService.getName(col1), col1.getID(), col1.getHandle()))));
 
         getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID() + "/item"))
                 .andExpect(status().isOk())

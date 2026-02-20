@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 
 /**
@@ -28,7 +29,9 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream> {
 
     HashMap<String, Integer> priorityMap = new HashMap<>();
 
-    private Context context;
+    private final Context context;
+
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     public GoogleBitstreamComparator(Context context, Map<String, String> googleScholarSettings) {
         this.context = context;
@@ -100,12 +103,8 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream> {
 
     private int getPriorityFromBitstream(Bitstream bitstream) {
         try {
-            String check = bitstream.getFormat(context).getMIMEType();
-            if (priorityMap.containsKey(bitstream.getFormat(context).getMIMEType())) {
-                return priorityMap.get(bitstream.getFormat(context).getMIMEType());
-            } else {
-                return Integer.MAX_VALUE;
-            }
+            BitstreamFormat format = bitstreamService.getFormat(context, bitstream);
+            return priorityMap.getOrDefault(format.getMIMEType(), Integer.MAX_VALUE);
         } catch (SQLException e) {
             log.error(e.getMessage());
             return Integer.MAX_VALUE;

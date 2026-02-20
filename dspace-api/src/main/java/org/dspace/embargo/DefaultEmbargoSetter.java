@@ -24,12 +24,16 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.embargo.factory.EmbargoServiceFactory;
 import org.dspace.embargo.service.EmbargoService;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.license.CreativeCommonsServiceImpl;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -46,6 +50,9 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public class DefaultEmbargoSetter implements EmbargoSetter {
     protected AuthorizeService authorizeService;
     protected ResourcePolicyService resourcePolicyService;
+    protected EPersonService epersonService;
+    protected BundleService bundleService;
+    protected BitstreamService bitstreamService;
 
     public DefaultEmbargoSetter() {
         super();
@@ -90,7 +97,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
         DCDate liftDate = EmbargoServiceFactory.getInstance().getEmbargoService().getEmbargoTermsAsDate(context, item);
         for (Bundle bn : item.getBundles()) {
             // Skip the LICENSE and METADATA bundles, they stay world-readable
-            String bnn = bn.getName();
+            String bnn = getBundleService().getName(bn);
             if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn
                 .equals(CreativeCommonsServiceImpl.CC_BUNDLE_NAME))) {
                 //AuthorizeManager.removePoliciesActionFilter(context, bn, Constants.READ);
@@ -158,7 +165,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
         throws SQLException, AuthorizeException, IOException {
         for (Bundle bn : item.getBundles()) {
             // Skip the LICENSE and METADATA bundles, they stay world-readable
-            String bnn = bn.getName();
+            String bnn = getBundleService().getName(bn);
             if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn
                 .equals(CreativeCommonsServiceImpl.CC_BUNDLE_NAME))) {
                 // don't report on "TEXT" or "THUMBNAIL" bundles; those
@@ -168,10 +175,12 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
                     for (ResourcePolicy rp : getAuthorizeService()
                         .getPoliciesActionFilter(context, bn, Constants.READ)) {
                         if (rp.getStartDate() == null) {
-                            System.out.println("CHECK WARNING: Item " + item.getHandle() + ", Bundle " + bn
-                                    .getName() + " allows READ by " +
-                                    ((rp.getEPerson() != null) ? "Group " + rp.getGroup().getName() :
-                                            "EPerson " + rp.getEPerson().getFullName()));
+                            System.out.println(
+                                "CHECK WARNING: Item " + item.getHandle() +
+                                    ", Bundle " + getBundleService().getName(bn)
+                                    + " allows READ by " + ((rp.getEPerson() != null)
+                                    ? "Group " + rp.getGroup().getName()
+                                    : "EPerson " + getEPersonService().getFullName(rp.getEPerson())));
                         }
                     }
                 }
@@ -180,10 +189,13 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
                     for (ResourcePolicy rp : getAuthorizeService()
                         .getPoliciesActionFilter(context, bs, Constants.READ)) {
                         if (rp.getStartDate() == null) {
-                            System.out.println("CHECK WARNING: Item " + item.getHandle() + ", Bitstream " + bs
-                                    .getName() + " (in Bundle " + bn.getName() + ") allows READ by " +
-                                    ((rp.getEPerson() != null) ? "Group " + rp.getGroup().getName() :
-                                            "EPerson " + rp.getEPerson().getFullName()));
+                            System.out.println(
+                                "CHECK WARNING: Item " + item.getHandle() +
+                                    ", Bitstream " + getBitstreamService().getName(bs)
+                                    + " (in Bundle " + getBundleService().getName(bn)
+                                    + ") allows READ by " + ((rp.getEPerson() != null)
+                                    ? "Group " + rp.getGroup().getName()
+                                    : "EPerson " + getEPersonService().getFullName(rp.getEPerson())));
                         }
                     }
                 }
@@ -203,5 +215,26 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
             resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
         }
         return resourcePolicyService;
+    }
+
+    private EPersonService getEPersonService() {
+        if (epersonService == null) {
+            epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+        }
+        return epersonService;
+    }
+
+    private BundleService getBundleService() {
+        if (bundleService == null) {
+            bundleService = ContentServiceFactory.getInstance().getBundleService();
+        }
+        return bundleService;
+    }
+
+    private BitstreamService getBitstreamService() {
+        if (bitstreamService == null) {
+            bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+        }
+        return bitstreamService;
     }
 }

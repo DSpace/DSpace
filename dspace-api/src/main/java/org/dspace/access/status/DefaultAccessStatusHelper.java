@@ -35,7 +35,7 @@ import org.dspace.eperson.service.GroupService;
 
 /**
  * Default plugin implementation of the access status helper.
- * 
+ *
  * The methods provides a simple logic to calculate the access status
  * of an item based on the policies of the primary or the first bitstream
  * in the original bundle. Users can override those methods for
@@ -138,21 +138,21 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      */
     private Bitstream getPrimaryOrFirstBitstreamInOriginalBundle(Item item) {
         // Consider only the original bundles.
-        List<Bundle> bundles = item.getBundles(Constants.DEFAULT_BUNDLE_NAME);
+        List<Bundle> bundles = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
         // Check for primary bitstreams first.
         Bitstream bitstream = bundles.stream()
-            .map(bundle -> bundle.getPrimaryBitstream())
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElse(null);
+                                     .map(Bundle::getPrimaryBitstream)
+                                     .filter(Objects::nonNull)
+                                     .findFirst()
+                                     .orElse(null);
         if (bitstream == null) {
             // If there is no primary bitstream,
             // take the first bitstream in the bundles.
             bitstream = bundles.stream()
-                .map(bundle -> bundle.getBitstreams())
-                .flatMap(List::stream)
-                .findFirst()
-                .orElse(null);
+                               .map(Bundle::getBitstreams)
+                               .flatMap(List::stream)
+                               .findFirst()
+                               .orElse(null);
         }
         return bitstream;
     }
@@ -213,7 +213,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
 
     /**
      * Retrieves the read policies for a DSpace object based on the type
-     * 
+     *
      * If the type is current, consider the current logged in user
      * If the type is anonymous, only consider the anonymous group
      *

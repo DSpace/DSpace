@@ -204,9 +204,9 @@ public class PackageUtils {
         if (bf == null) {
             bf = bitstreamFormatService.guessFormat(context, lbs);
         }
-        lbs.setFormat(context, bf);
-        lbs.setName(context, Constants.LICENSE_BITSTREAM_NAME);
-        lbs.setSource(context, Constants.LICENSE_BITSTREAM_NAME);
+        bitstreamService.setFormat(context, lbs, bf);
+        bitstreamService.setName(context, lbs, Constants.LICENSE_BITSTREAM_NAME);
+        bitstreamService.setSource(context, lbs, Constants.LICENSE_BITSTREAM_NAME);
         bitstreamService.update(context, lbs);
     }
 
@@ -244,7 +244,7 @@ public class PackageUtils {
             List<Bitstream> bitstreams = bundle.getBitstreams();
 
             for (Bitstream bitstream : bitstreams) {
-                if (bsName.equals(bitstream.getName())) {
+                if (bsName.equals(bitstreamService.getName(bitstream))) {
                     return bitstream;
                 }
             }
@@ -277,7 +277,7 @@ public class PackageUtils {
             List<Bitstream> bitstreams = bundle.getBitstreams();
 
             for (Bitstream bitstream : bitstreams) {
-                if (bitstream.getFormat(context).getID() == fid) {
+                if (bitstreamService.getFormat(context, bitstream).getID() == fid) {
                     return bitstream;
                 }
             }
@@ -295,9 +295,11 @@ public class PackageUtils {
      * @return true if this bundle name indicates it is a meta-info bundle.
      */
     public static boolean isMetaInfoBundle(Bundle bn) {
-        return (bn.getName().equals(Constants.LICENSE_BUNDLE_NAME) ||
-            bn.getName().equals(CreativeCommonsService.CC_BUNDLE_NAME) ||
-            bn.getName().equals(Constants.METADATA_BUNDLE_NAME));
+        if (bundleService.getName(bn).equals(Constants.LICENSE_BUNDLE_NAME) ||
+            bundleService.getName(bn).equals(CreativeCommonsService.CC_BUNDLE_NAME)) {
+            return true;
+        }
+        return (bundleService.getName(bn).equals(Constants.METADATA_BUNDLE_NAME));
     }
 
     /**
@@ -378,10 +380,10 @@ public class PackageUtils {
         // not found, try to create one
         if (bsf == null) {
             bsf = bitstreamFormatService.create(context);
-            bsf.setShortDescription(context, shortDesc);
+            bitstreamFormatService.setShortDescription(context, bsf, shortDesc);
             bsf.setMIMEType(MIMEType);
             bsf.setDescription(desc);
-            bsf.setSupportLevel(supportLevel);
+            bitstreamFormatService.setSupportLevel(bsf, supportLevel);
             bsf.setInternal(internal);
             bitstreamFormatService.update(context, bsf);
         }
@@ -415,7 +417,7 @@ public class PackageUtils {
 
             for (Bitstream bitstream : bitstreams) {
                 // The License should have a file format of "License"
-                if (bitstream.getFormat(context).getID() == licenseFormatId) {
+                if (bitstreamService.getFormat(context, bitstream).getID() == licenseFormatId) {
                     //found a bitstream with format "License" -- return it
                     return bitstream;
                 }

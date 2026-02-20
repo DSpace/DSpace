@@ -12,6 +12,8 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.contentreport.FilteredCollection;
 import org.hamcrest.Matcher;
 
@@ -20,6 +22,7 @@ import org.hamcrest.Matcher;
  * @author Jean-François Morin (Université Laval)
  */
 public class ContentReportMatcher {
+    public static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     private ContentReportMatcher() { }
 
@@ -41,7 +44,7 @@ public class ContentReportMatcher {
 
     public static Matcher<? super Object> matchFilteredItemProperties(Item item) {
         return allOf(
-                hasJsonPath("$.name", is(item.getName())),
+                hasJsonPath("$.name", is(itemService.getName(item))),
                 hasJsonPath("$.inArchive", is(item.isArchived())),
                 hasJsonPath("$.discoverable", is(item.isDiscoverable())),
                 hasJsonPath("$.withdrawn", is(item.isWithdrawn())),

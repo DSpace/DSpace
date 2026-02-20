@@ -17,6 +17,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.BitstreamFormatDAO;
 import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
+
+    @Autowired
+    protected BitstreamService bitstreamService;
 
     protected BitstreamFormatServiceImpl() {
 
@@ -236,7 +240,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
 
     @Override
     public BitstreamFormat guessFormat(Context context, Bitstream bitstream) throws SQLException {
-        String filename = bitstream.getName();
+        String filename = bitstreamService.getName(bitstream);
         // FIXME: Just setting format to first guess
         // For now just get the file name
 

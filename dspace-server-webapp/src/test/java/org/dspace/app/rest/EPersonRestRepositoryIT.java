@@ -75,6 +75,7 @@ import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.MetadataField;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
@@ -104,6 +105,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    private CollectionService collectionService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -261,7 +265,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                       EPersonMatcher.matchEPersonEntry(newUser),
+                       EPersonMatcher.matchProperties(newUser),
                        EPersonMatcher.matchEPersonOnEmail(admin.getEmail()),
                        EPersonMatcher.matchEPersonOnEmail(eperson.getEmail())
                    )))
@@ -315,7 +319,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                           EPersonMatcher.matchEPersonEntry(testEPerson),
+                           EPersonMatcher.matchProperties(testEPerson),
                            EPersonMatcher.matchEPersonOnEmail(admin.getEmail())
                    )))
                    .andExpect(jsonPath("$._embedded.epersons", Matchers.not(
@@ -370,11 +374,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$", EPersonMatcher.matchFullEmbeds()))
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
-                       EPersonMatcher.matchEPersonEntry(ePerson2)
+                       EPersonMatcher.matchProperties(ePerson2)
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        is(
-                           EPersonMatcher.matchEPersonEntry(ePerson)
+                           EPersonMatcher.matchProperties(ePerson)
                        )
                    )))
         ;
@@ -431,11 +435,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
-                       EPersonMatcher.matchEPersonEntry(ePerson2)
+                       EPersonMatcher.matchProperties(ePerson2)
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        is(
-                           EPersonMatcher.matchEPersonEntry(ePerson1)
+                           EPersonMatcher.matchProperties(ePerson1)
                        )
                    )))
                    .andExpect(jsonPath("$._links.self.href",
@@ -518,7 +522,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(contentType))
                             .andExpect(jsonPath("$", is(
-                                    EPersonMatcher.matchEPersonEntry(ePerson)
+                                    EPersonMatcher.matchProperties(ePerson)
                             )));
 
         // it must be case-insensitive
@@ -527,7 +531,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(contentType))
                             .andExpect(jsonPath("$", is(
-                                    EPersonMatcher.matchEPersonEntry(ePerson)
+                                    EPersonMatcher.matchProperties(ePerson)
                             )));
     }
 
@@ -578,27 +582,27 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                    .param("query", ePerson.getLastName()))
+                    .param("query", ePersonService.getLastName(ePerson)))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
                     .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                            EPersonMatcher.matchEPersonEntry(ePerson),
-                            EPersonMatcher.matchEPersonEntry(ePerson3),
-                            EPersonMatcher.matchEPersonEntry(ePerson4),
-                            EPersonMatcher.matchEPersonEntry(ePerson5)
+                            EPersonMatcher.matchProperties(ePerson),
+                            EPersonMatcher.matchProperties(ePerson3),
+                            EPersonMatcher.matchProperties(ePerson4),
+                            EPersonMatcher.matchProperties(ePerson5)
                     )))
                     .andExpect(jsonPath("$.page.totalElements", is(4)));
 
         // it must be case insensitive
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                .param("query", ePerson.getLastName().toLowerCase()))
+                .param("query", ePersonService.getLastName(ePerson).toLowerCase()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                        EPersonMatcher.matchEPersonEntry(ePerson),
-                        EPersonMatcher.matchEPersonEntry(ePerson3),
-                        EPersonMatcher.matchEPersonEntry(ePerson4),
-                        EPersonMatcher.matchEPersonEntry(ePerson5)
+                        EPersonMatcher.matchProperties(ePerson),
+                        EPersonMatcher.matchProperties(ePerson3),
+                        EPersonMatcher.matchProperties(ePerson4),
+                        EPersonMatcher.matchProperties(ePerson5)
                 )))
                 .andExpect(jsonPath("$.page.totalElements", is(4)));
     }
@@ -635,27 +639,27 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                    .param("query", ePerson.getFirstName()))
+                    .param("query", ePersonService.getFirstName(ePerson)))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
                     .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                            EPersonMatcher.matchEPersonEntry(ePerson),
-                            EPersonMatcher.matchEPersonEntry(ePerson3),
-                            EPersonMatcher.matchEPersonEntry(ePerson4),
-                            EPersonMatcher.matchEPersonEntry(ePerson5)
+                            EPersonMatcher.matchProperties(ePerson),
+                            EPersonMatcher.matchProperties(ePerson3),
+                            EPersonMatcher.matchProperties(ePerson4),
+                            EPersonMatcher.matchProperties(ePerson5)
                     )))
                     .andExpect(jsonPath("$.page.totalElements", is(4)));
 
         // it must be case insensitive
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                .param("query", ePerson.getFirstName().toLowerCase()))
+                .param("query", ePersonService.getFirstName(ePerson).toLowerCase()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                        EPersonMatcher.matchEPersonEntry(ePerson),
-                        EPersonMatcher.matchEPersonEntry(ePerson3),
-                        EPersonMatcher.matchEPersonEntry(ePerson4),
-                        EPersonMatcher.matchEPersonEntry(ePerson5)
+                        EPersonMatcher.matchProperties(ePerson),
+                        EPersonMatcher.matchProperties(ePerson3),
+                        EPersonMatcher.matchProperties(ePerson4),
+                        EPersonMatcher.matchProperties(ePerson5)
                 )))
                 .andExpect(jsonPath("$.page.totalElements", is(4)));
     }
@@ -696,7 +700,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(contentType))
                             .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
-                                    EPersonMatcher.matchEPersonEntry(ePerson)
+                                    EPersonMatcher.matchProperties(ePerson)
                             )))
                             .andExpect(jsonPath("$.page.totalElements", is(1)));
 
@@ -706,7 +710,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(contentType))
                             .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
-                                    EPersonMatcher.matchEPersonEntry(ePerson)
+                                    EPersonMatcher.matchProperties(ePerson)
                             )))
                             .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
@@ -747,7 +751,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(contentType))
                             .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
-                                    EPersonMatcher.matchEPersonEntry(ePerson)
+                                    EPersonMatcher.matchProperties(ePerson)
                             )))
                             .andExpect(jsonPath("$.page.totalElements", is(1)));
 
@@ -757,7 +761,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(contentType))
                             .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
-                                    EPersonMatcher.matchEPersonEntry(ePerson)
+                                    EPersonMatcher.matchProperties(ePerson)
                             )))
                             .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
@@ -935,7 +939,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(contentType))
                             .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
-                                EPersonMatcher.matchEPersonEntry(ePerson)
+                                EPersonMatcher.matchProperties(ePerson)
                             )))
                             .andExpect(jsonPath("$.page.totalElements", is(1)));
 
@@ -946,10 +950,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(contentType))
                             .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                                EPersonMatcher.matchEPersonEntry(ePerson),
-                                EPersonMatcher.matchEPersonEntry(ePerson2),
-                                EPersonMatcher.matchEPersonEntry(ePerson3),
-                                EPersonMatcher.matchEPersonEntry(ePerson4)
+                                EPersonMatcher.matchProperties(ePerson),
+                                EPersonMatcher.matchProperties(ePerson2),
+                                EPersonMatcher.matchProperties(ePerson3),
+                                EPersonMatcher.matchProperties(ePerson4)
                             )));
     }
 
@@ -985,7 +989,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(contentType))
                             .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
-                                EPersonMatcher.matchEPersonEntry(ePerson)
+                                EPersonMatcher.matchProperties(ePerson)
                             )))
                             .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
@@ -1155,7 +1159,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             .createCollection(context, community)
             .withWorkflowGroup(1, ePerson)
             .build();
-        Group workflowGroup = collection.getWorkflowStep1(context);
+        Group workflowGroup = collectionService.getWorkflowGroup(context, collection, 1);
         context.restoreAuthSystemState();
 
         // enable Polish locale
@@ -3363,9 +3367,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                            EPersonMatcher.matchEPersonEntry(adminChild1),
-                            EPersonMatcher.matchEPersonEntry(adminCol1),
-                            EPersonMatcher.matchEPersonEntry(colSubmitter)
+                            EPersonMatcher.matchProperties(adminChild1),
+                            EPersonMatcher.matchProperties(adminCol1),
+                            EPersonMatcher.matchProperties(colSubmitter)
                             )))
                  .andExpect(jsonPath("$.page.totalElements", is(3)));
 
@@ -3374,9 +3378,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                            EPersonMatcher.matchEPersonEntry(adminChild1),
-                            EPersonMatcher.matchEPersonEntry(adminCol1),
-                            EPersonMatcher.matchEPersonEntry(colSubmitter)
+                            EPersonMatcher.matchProperties(adminChild1),
+                            EPersonMatcher.matchProperties(adminCol1),
+                            EPersonMatcher.matchProperties(colSubmitter)
                             )))
                  .andExpect(jsonPath("$.page.totalElements", is(3)));
 
@@ -3445,9 +3449,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
                     .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                               EPersonMatcher.matchEPersonEntry(adminChild1),
-                               EPersonMatcher.matchEPersonEntry(adminCol),
-                               EPersonMatcher.matchEPersonEntry(col1Submitter)
+                               EPersonMatcher.matchProperties(adminChild1),
+                               EPersonMatcher.matchProperties(adminCol),
+                               EPersonMatcher.matchProperties(col1Submitter)
                                )))
                     .andExpect(jsonPath("$.page.totalElements", is(3)));
 
@@ -3464,9 +3468,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
                     .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                               EPersonMatcher.matchEPersonEntry(adminChild1),
-                               EPersonMatcher.matchEPersonEntry(adminCol),
-                               EPersonMatcher.matchEPersonEntry(col1Submitter)
+                               EPersonMatcher.matchProperties(adminChild1),
+                               EPersonMatcher.matchProperties(adminCol),
+                               EPersonMatcher.matchProperties(col1Submitter)
                                )))
                     .andExpect(jsonPath("$.page.totalElements", is(3)));
 
@@ -3526,7 +3530,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                 .param("query", ePerson.getFirstName())
+                 .param("query", ePersonService.getFirstName(ePerson))
                  .param("page", "0")
                  .param("size", "2"))
                  .andExpect(status().isOk())
@@ -3541,7 +3545,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                  .andExpect(jsonPath("$.page.totalElements", is(5)));
 
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                .param("query", ePerson.getFirstName())
+                .param("query", ePersonService.getFirstName(ePerson))
                 .param("page", "1")
                 .param("size", "2"))
                 .andExpect(status().isOk())
@@ -3556,7 +3560,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.page.totalElements", is(5)));
 
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                .param("query", ePerson.getFirstName())
+                .param("query", ePersonService.getFirstName(ePerson))
                 .param("page", "2")
                 .param("size", "2"))
                 .andExpect(status().isOk())
@@ -3571,7 +3575,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.page.totalElements", is(5)));
 
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                .param("query", ePerson.getFirstName())
+                .param("query", ePersonService.getFirstName(ePerson))
                 .param("page", "3")
                 .param("size", "2"))
                 .andExpect(status().isOk())

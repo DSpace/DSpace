@@ -63,6 +63,7 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.service.VersioningService;
@@ -106,6 +107,9 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private EPersonService epersonService;
 
     @Before
     public void setup() throws SQLException, AuthorizeException {
@@ -159,7 +163,8 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(adminToken).perform(get("/api/versioning/versions/" + version.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(version))))
-                             .andExpect(jsonPath("$.submitterName", Matchers.is(version.getEPerson().getFullName())));
+                             .andExpect(jsonPath("$.submitterName",
+                                                 Matchers.is(epersonService.getFullName(version.getEPerson()))));
     }
 
     @Test
@@ -172,7 +177,8 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(adminToken).perform(get("/api/versioning/versions/" + version.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(version))))
-                             .andExpect(jsonPath("$.submitterName", Matchers.is(version.getEPerson().getFullName())));
+                             .andExpect(jsonPath("$.submitterName",
+                                                 Matchers.is(epersonService.getFullName(version.getEPerson()))));
 
         configurationService.setProperty("versioning.item.history.include.submitter", true);
 
@@ -186,7 +192,8 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(adminToken).perform(get("/api/versioning/versions/" + version.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(version))))
-                             .andExpect(jsonPath("$.submitterName", Matchers.is(version.getEPerson().getFullName())));
+                             .andExpect(jsonPath("$.submitterName",
+                                                 Matchers.is(epersonService.getFullName(version.getEPerson()))));
 
     }
 
@@ -198,7 +205,8 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(adminToken).perform(get("/api/versioning/versions/" + version.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(version))))
-                             .andExpect(jsonPath("$.submitterName", Matchers.is(version.getEPerson().getFullName())));
+                             .andExpect(jsonPath("$.submitterName",
+                                                 Matchers.is(epersonService.getFullName(version.getEPerson()))));
 
     }
 

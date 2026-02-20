@@ -85,11 +85,11 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         if (collectionAdmin == null) {
             // This EPerson creation should only happen once (i.e. for first test run)
             collectionAdmin = ePersonService.create(context);
-            collectionAdmin.setFirstName(context, "first");
-            collectionAdmin.setLastName(context, "last");
+            ePersonService.setFirstName(context, collectionAdmin, "first");
+            ePersonService.setLastName(context, collectionAdmin, "last");
             collectionAdmin.setEmail("collectionAdminTest@email.com");
             collectionAdmin.setCanLogIn(true);
-            collectionAdmin.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+            ePersonService.setLanguage(context, collectionAdmin, I18nUtil.getDefaultLocale().getLanguage());
             ePersonService.setPassword(collectionAdmin, password);
             // actually save the eperson to unit testing DB
             ePersonService.update(context, collectionAdmin);

@@ -137,7 +137,7 @@ public class BitstreamRestController {
 
         // Get bitstream metadata
         Long lastModified = bitstreamService.getLastModified(bit);
-        BitstreamFormat format = bit.getFormat(context);
+        BitstreamFormat format = bitstreamService.getFormat(context, bit);
         String mimetype = format.getMIMEType();
         String name = getBitstreamName(bit, format);
 
@@ -253,7 +253,7 @@ public class BitstreamRestController {
      * @return name
      */
     private String getBitstreamName(Bitstream bit, BitstreamFormat format) {
-        String name = bit.getName();
+        String name = bitstreamService.getName(bit);
         if (name == null) {
             // give a default name to the file based on the UUID and the primary extension of the format
             name = bit.getID().toString();
@@ -363,7 +363,7 @@ public class BitstreamRestController {
             throw new ResourceNotFoundException("Bitstream with id: " + uuid + " not found");
         }
 
-        bitstream.setFormat(context, bitstreamFormat);
+        bitstreamService.setFormat(context, bitstream, bitstreamFormat);
 
         context.commit();
 

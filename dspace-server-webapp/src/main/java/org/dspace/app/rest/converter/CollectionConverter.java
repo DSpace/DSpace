@@ -51,4 +51,9 @@ public class CollectionConverter extends DSpaceObjectConverter<Collection, Colle
     public boolean supportsModel(IndexableObject idxo) {
         return idxo.getIndexedObject() instanceof Collection;
     }
+
+    @Override
+    protected CollectionService getDSOService() {
+        return collectionService;
+    }
 }

@@ -132,8 +132,12 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
         Bitstream found = bitstreamService.find(context, id);
         assertThat("testBSFind 0", found, notNullValue());
         //the item created by default has no name nor type set
-        assertThat("testBSFind 1", found.getFormat(context).getMIMEType(), equalTo("application/octet-stream"));
-        assertThat("testBSFind 2", found.getName(), nullValue());
+        assertThat(
+            "testBSFind 1",
+            bitstreamService.getFormat(context, found).getMIMEType(),
+            equalTo("application/octet-stream")
+        );
+        assertThat("testBSFind 2", bitstreamService.getName(found), nullValue());
         assertThat("testBSFind 3", found.getID(), equalTo(id));
     }
 
@@ -204,8 +208,12 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
         Bitstream created = bitstreamService.create(context, new FileInputStream(f));
 
         //the item created by default has no name nor type set
-        assertThat("testCreate 0", created.getFormat(context).getMIMEType(), equalTo("application/octet-stream"));
-        assertThat("testCreate 1", created.getName(), nullValue());
+        assertThat(
+            "testCreate 0",
+            bitstreamService.getFormat(context, created).getMIMEType(),
+            equalTo("application/octet-stream")
+        );
+        assertThat("testCreate 1", bitstreamService.getName(created), nullValue());
     }
 
     /**
@@ -221,8 +229,12 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream registered = bitstreamService.register(context, assetstore, f.getName());
         //the item created by default has no name nor type set
-        assertThat("testRegister 0", registered.getFormat(context).getMIMEType(), equalTo("application/octet-stream"));
-        assertThat("testRegister 1", registered.getName(), nullValue());
+        assertThat(
+            "testRegister 0",
+            bitstreamService.getFormat(context, registered).getMIMEType(),
+            equalTo("application/octet-stream")
+        );
+        assertThat("testRegister 1", bitstreamService.getName(registered), nullValue());
     }
 
     /**
@@ -269,25 +281,15 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     }
 
     /**
-     * Test of getName method, of class Bitstream.
-     */
-    @Override
-    @Test
-    public void testGetName() {
-        //name is null when not set
-        assertThat("testGetName 0", bs.getName(), nullValue());
-    }
-
-    /**
      * Test of setName method, of class Bitstream.
      */
     @Test
     public void testSetName() throws SQLException {
         String name = "new name";
-        bs.setName(context, name);
-        assertThat("testGetName 0", bs.getName(), notNullValue());
-        assertThat("testGetName 1", bs.getName(), not(equalTo("")));
-        assertThat("testGetName 2", bs.getName(), equalTo(name));
+        bitstreamService.setName(context, bs, name);
+        assertThat("testGetName 0", bitstreamService.getName(bs), notNullValue());
+        assertThat("testGetName 1", bitstreamService.getName(bs), not(equalTo("")));
+        assertThat("testGetName 2", bitstreamService.getName(bs), equalTo(name));
     }
 
     /**
@@ -296,7 +298,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test
     public void testGetSource() {
         //source is null if not set
-        assertThat("testGetSource 0", bs.getSource(), nullValue());
+        assertThat("testGetSource 0", bitstreamService.getSource(bs), nullValue());
     }
 
     /**
@@ -305,10 +307,10 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test
     public void testSetSource() throws SQLException {
         String source = "new source";
-        bs.setSource(context, source);
-        assertThat("testSetSource 0", bs.getSource(), notNullValue());
-        assertThat("testSetSource 1", bs.getSource(), not(equalTo("")));
-        assertThat("testSetSource 2", bs.getSource(), equalTo(source));
+        bitstreamService.setSource(context, bs, source);
+        assertThat("testSetSource 0", bitstreamService.getSource(bs), notNullValue());
+        assertThat("testSetSource 1", bitstreamService.getSource(bs), not(equalTo("")));
+        assertThat("testSetSource 2", bitstreamService.getSource(bs), equalTo(source));
     }
 
     /**
@@ -317,7 +319,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test
     public void testGetDescription() {
         //default description is null if not set
-        assertThat("testGetDescription 0", bs.getDescription(), nullValue());
+        assertThat("testGetDescription 0", bitstreamService.getDescription(bs), nullValue());
     }
 
     /**
@@ -326,10 +328,10 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test
     public void testSetDescription() throws SQLException {
         String description = "new description";
-        bs.setDescription(context, description);
-        assertThat("testSetDescription 0", bs.getDescription(), notNullValue());
-        assertThat("testSetDescription 1", bs.getDescription(), not(equalTo("")));
-        assertThat("testSetDescription 2", bs.getDescription(), equalTo(description));
+        bitstreamService.setDescription(context, bs, description);
+        assertThat("testSetDescription 0", bitstreamService.getDescription(bs), notNullValue());
+        assertThat("testSetDescription 1", bitstreamService.getDescription(bs), not(equalTo("")));
+        assertThat("testSetDescription 2", bitstreamService.getDescription(bs), equalTo(description));
     }
 
     /**
@@ -372,12 +374,12 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test
     public void testSetUserFormatDescription() throws SQLException {
         String userdescription = "user format description";
-        bs.setUserFormatDescription(context, userdescription);
-        assertThat("testSetUserFormatDescription 0", bs.getUserFormatDescription()
+        bitstreamService.setUserFormatDescription(context, bs, userdescription);
+        assertThat("testSetUserFormatDescription 0", bitstreamService.getUserFormatDescription(bs)
             , notNullValue());
-        assertThat("testSetUserFormatDescription 1", bs.getUserFormatDescription()
+        assertThat("testSetUserFormatDescription 1", bitstreamService.getUserFormatDescription(bs)
             , not(equalTo("")));
-        assertThat("testSetUserFormatDescription 2", bs.getUserFormatDescription()
+        assertThat("testSetUserFormatDescription 2", bitstreamService.getUserFormatDescription(bs)
             , equalTo(userdescription));
     }
 
@@ -387,7 +389,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test
     public void testGetUserFormatDescription() {
         //null by default if not set
-        assertThat("testGetUserFormatDescription 0", bs.getUserFormatDescription()
+        assertThat("testGetUserFormatDescription 0", bitstreamService.getUserFormatDescription(bs)
             , nullValue());
     }
 
@@ -398,12 +400,9 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     public void testGetFormatDescription() throws SQLException {
         //format is unknown by default
         String format = "Unknown";
-        assertThat("testGetFormatDescription 0", bs.getFormatDescription(context),
-                   notNullValue());
-        assertThat("testGetFormatDescription 1", bs.getFormatDescription(context),
-                   not(equalTo("")));
-        assertThat("testGetFormatDescription 2", bs.getFormatDescription(context),
-                   equalTo(format));
+        assertThat("testGetFormatDescription 0", bitstreamService.getFormatDescription(context, bs), notNullValue());
+        assertThat("testGetFormatDescription 1", bitstreamService.getFormatDescription(context, bs), not(equalTo("")));
+        assertThat("testGetFormatDescription 2", bitstreamService.getFormatDescription(context, bs), equalTo(format));
     }
 
     /**
@@ -411,8 +410,12 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetFormat() throws SQLException {
-        assertThat("testGetFormat 0", bs.getFormat(context), notNullValue());
-        assertThat("testGetFormat 1", bs.getFormat(context), equalTo(bitstreamFormatService.findUnknown(context)));
+        assertThat("testGetFormat 0", bitstreamService.getFormat(context, bs), notNullValue());
+        assertThat(
+            "testGetFormat 1",
+            bitstreamService.getFormat(context, bs),
+            equalTo(bitstreamFormatService.findUnknown(context))
+        );
     }
 
     /**
@@ -423,8 +426,12 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
         int id = 3;
         BitstreamFormat format = bitstreamFormatService.find(context, id);
         bs.setFormat(format);
-        assertThat("testSetFormat 0", bs.getFormat(context), notNullValue());
-        assertThat("testSetFormat 1", bs.getFormat(context), equalTo(bitstreamFormatService.find(context, id)));
+        assertThat("testSetFormat 0", bitstreamService.getFormat(context, bs), notNullValue());
+        assertThat(
+            "testSetFormat 1",
+            bitstreamService.getFormat(context, bs),
+            equalTo(bitstreamFormatService.find(context, id))
+        );
     }
 
     /**

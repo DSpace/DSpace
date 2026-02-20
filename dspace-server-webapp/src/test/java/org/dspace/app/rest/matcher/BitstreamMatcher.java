@@ -21,9 +21,15 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.hamcrest.Matcher;
 
 public class BitstreamMatcher {
+    private static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    private static final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
 
     private BitstreamMatcher() { }
 
@@ -123,15 +129,18 @@ public class BitstreamMatcher {
 
     public static Matcher<? super Object> matchProperties(Bitstream bitstream) {
         try {
+            String description = bitstreamService.getDescription(bitstream);
+
+            Bundle bundle = bitstream.getBundles().get(0);
             return allOf(
                     hasJsonPath("$.uuid", is(bitstream.getID().toString())),
-                    hasJsonPath("$.name", is(bitstream.getName())),
-                    hasJsonPath("$.bundleName", is(bitstream.getBundles().get(0).getName())),
+                    hasJsonPath("$.name", is(bitstreamService.getName(bitstream))),
+                    hasJsonPath("$.bundleName", is(bundleService.getName(bundle))),
                     hasJsonPath("$.metadata", allOf(
-                            matchMetadata("dc.title", bitstream.getName())
+                            matchMetadata("dc.title", bitstreamService.getName(bitstream))
                     )),
-                    bitstream.getDescription() != null ?
-                            hasJsonPath("$.metadata", matchMetadata("dc.description", bitstream.getDescription())) :
+                    description != null ?
+                            hasJsonPath("$.metadata", matchMetadata("dc.description", description)) :
                             hasJsonPath("$.metadata", matchMetadataDoesNotExist("dc.description")),
                     hasJsonPath("$.sizeBytes", is((int) bitstream.getSizeBytes())),
                     hasJsonPath("$.checkSum", matchChecksum())

@@ -60,6 +60,8 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
+    protected BundleService bundleService;
+    @Autowired(required = true)
     protected ItemService itemService;
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -101,7 +103,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
         // Create a table row
         Bundle bundle = bundleDAO.create(context, new Bundle());
-        bundle.setName(context, name);
+        setName(context, bundle, name);
         itemService.addBundle(context, item, bundle);
         if (!bundle.getItems().contains(item)) {
             bundle.addItem(item);
@@ -127,7 +129,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         Bitstream target = null;
 
         for (Bitstream bitstream : bundle.getBitstreams()) {
-            if (name.equals(bitstream.getName())) {
+            if (name.equals(bitstreamService.getName(bitstream))) {
                 target = bitstream;
                 break;
             }
@@ -552,7 +554,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         authorizeService.authorizeAction(context, bundle, Constants.DELETE);
 
         context.addEvent(new Event(Event.DELETE, Constants.BUNDLE, bundle.getID(),
-                bundle.getName(), DetailType.DSO_NAME, getIdentifiers(context, bundle)));
+                bundleService.getName(bundle), DetailType.DSO_NAME, getIdentifiers(context, bundle)));
 
         // Remove bitstreams
         List<Bitstream> bitstreams = bundle.getBitstreams();

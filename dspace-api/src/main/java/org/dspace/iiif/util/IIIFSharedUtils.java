@@ -15,6 +15,8 @@ import org.apache.commons.lang3.Strings;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.license.CreativeCommonsServiceImpl;
 import org.dspace.services.ConfigurationService;
@@ -44,6 +46,8 @@ public class IIIFSharedUtils {
 
     protected static final ConfigurationService configurationService
         = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    public static final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
 
 
     private IIIFSharedUtils() {}
@@ -96,12 +100,19 @@ public class IIIFSharedUtils {
      * @return true if the bundle can contain bitstreams to use as IIIF resources
      */
     public static boolean isIIIFBundle(Bundle b) {
-        return !Strings.CI.equalsAny(b.getName(), Constants.LICENSE_BUNDLE_NAME,
-            Constants.METADATA_BUNDLE_NAME, CreativeCommonsServiceImpl.CC_BUNDLE_NAME, "THUMBNAIL",
-            "BRANDED_PREVIEW", "TEXT", OTHER_CONTENT_BUNDLE)
-            && b.getMetadata().stream()
-                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
-                .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
+        return !Strings.CI.equalsAny(
+            bundleService.getName(b),
+            Constants.LICENSE_BUNDLE_NAME,
+            Constants.METADATA_BUNDLE_NAME,
+            CreativeCommonsServiceImpl.CC_BUNDLE_NAME,
+            "THUMBNAIL",
+            "BRANDED_PREVIEW",
+            "TEXT",
+            OTHER_CONTENT_BUNDLE
+        ) && b.getMetadata()
+              .stream()
+              .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
+              .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
     }
 
     /**

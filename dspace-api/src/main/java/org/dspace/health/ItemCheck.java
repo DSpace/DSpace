@@ -193,7 +193,7 @@ public class ItemCheck extends Check {
         List<Community> top_communities = communityService.findAllTop(context);
         for (Community c : top_communities) {
             cl.add(
-                new java.util.AbstractMap.SimpleEntry<>(c.getName(), itemService.countItems(context, c))
+                new java.util.AbstractMap.SimpleEntry<>(communityService.getName(c), itemService.countItems(context, c))
             );
         }
         return cl;

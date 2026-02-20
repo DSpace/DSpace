@@ -53,4 +53,9 @@ public class CommunityConverter
     public boolean supportsModel(IndexableObject idxo) {
         return idxo.getIndexedObject() instanceof Community;
     }
+
+    @Override
+    protected CommunityService getDSOService() {
+        return communityService;
+    }
 }

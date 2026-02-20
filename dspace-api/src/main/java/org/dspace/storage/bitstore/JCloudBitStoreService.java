@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
@@ -39,6 +40,7 @@ import org.jclouds.blobstore.options.ListContainerOptions;
 import org.jclouds.blobstore.options.PutOptions.Builder;
 import org.jclouds.io.ContentMetadata;
 import org.jclouds.javax.annotation.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * JCloudBitstream asset store service
@@ -57,6 +59,9 @@ public class JCloudBitStoreService extends BaseBitStoreService {
 
     /** Logger for this class */
     private static final Logger log = LogManager.getLogger(JCloudBitStoreService.class);
+
+    @Autowired
+    BitstreamService bitstreamService;
 
     /** Properties for configuring the cloud storage provider */
     private Properties properties;
@@ -506,9 +511,9 @@ public class JCloudBitStoreService extends BaseBitStoreService {
      * @param bitstream the bitstream to get the MIME type for
      * @return the MIME type of the bitstream
      */
-    public static String getMIMEType(final Bitstream bitstream) {
+    public String getMIMEType(final Bitstream bitstream) {
         try {
-            BitstreamFormat format = bitstream.getFormat(new Context());
+            BitstreamFormat format = bitstreamService.getFormat(new Context(), bitstream);
             return format == null ? null : format.getMIMEType();
         } catch (SQLException ignored) {
             throw new RuntimeException(ignored);

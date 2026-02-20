@@ -27,6 +27,7 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.audit.MetadataEvent;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.ReloadableEntity;
@@ -186,8 +187,6 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
         return id;
     }
 
-    public abstract String getName();
-
     /**
      * Get the Handle of the object. This may return <code>null</code>
      *
@@ -263,4 +262,18 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
         this.modified = true;
     }
 
+    /**
+     * @deprecated  This method is required to keep some legacy methods working, but should never be used in new code.
+     */
+    protected String getMetadataFirstValue(String schema, String element, String qualifier) {
+        return getMetadata()
+            .stream()
+            .filter(mdv ->
+                        StringUtils.equals(schema, mdv.getMetadataField().getMetadataSchema().getName())
+                            && StringUtils.equals(element, mdv.getMetadataField().getElement())
+                            && StringUtils.equals(qualifier, mdv.getMetadataField().getQualifier()))
+            .map(MetadataValue::getValue)
+            .findFirst()
+            .orElse(null);
+    }
 }

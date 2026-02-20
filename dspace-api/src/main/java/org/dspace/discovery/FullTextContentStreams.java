@@ -36,6 +36,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
 
 /**
@@ -48,6 +49,7 @@ public class FullTextContentStreams extends ContentStreamBase {
 
     protected final Context context;
     protected List<FullTextBitstream> fullTextStreams;
+    protected BundleService bundleService;
     protected BitstreamService bitstreamService;
 
     public FullTextContentStreams(Context context, Item parentItem) throws SQLException {
@@ -74,7 +76,7 @@ public class FullTextContentStreams extends ContentStreamBase {
         List<Bundle> myBundles = parentItem.getBundles();
 
         for (Bundle myBundle : emptyIfNull(myBundles)) {
-            if (Strings.CS.equals(FULLTEXT_BUNDLE, myBundle.getName())) {
+            if (Strings.CS.equals(FULLTEXT_BUNDLE, getBundleService().getName(myBundle))) {
                 // a-ha! grab the text out of the bitstreams
                 List<Bitstream> bitstreams = myBundle.getBitstreams();
                 log.debug("Processing full-text bitstreams. Item handle: " + sourceInfo);
@@ -86,7 +88,7 @@ public class FullTextContentStreams extends ContentStreamBase {
                         log.debug("Added BitStream: "
                                 + fulltextBitstream.getStoreNumber() + " "
                                 + fulltextBitstream.getSequenceID() + " "
-                                + fulltextBitstream.getName());
+                                + getBitstreamService().getName(fulltextBitstream));
                     } else {
                         log.error("Found a NULL bitstream when processing full-text files: item handle:" + sourceInfo);
                     }
@@ -147,6 +149,12 @@ public class FullTextContentStreams extends ContentStreamBase {
         return CollectionUtils.isEmpty(fullTextStreams);
     }
 
+    private BundleService getBundleService() {
+        if (bundleService == null) {
+            bundleService = ContentServiceFactory.getInstance().getBundleService();
+        }
+        return bundleService;
+    }
     private BitstreamService getBitstreamService() {
         if (bitstreamService == null) {
             bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
@@ -164,12 +172,12 @@ public class FullTextContentStreams extends ContentStreamBase {
         }
 
         public String getContentType(final Context context) throws SQLException {
-            BitstreamFormat format = bitstream != null ? bitstream.getFormat(context) : null;
+            BitstreamFormat format = bitstream != null ? getBitstreamService().getFormat(context, bitstream) : null;
             return format == null ? null : StringUtils.trimToEmpty(format.getMIMEType());
         }
 
         public String getFileName() {
-            return bitstream != null ? StringUtils.trimToEmpty(bitstream.getName()) : null;
+            return bitstream != null ? StringUtils.trimToEmpty(getBitstreamService().getName(bitstream)) : null;
         }
 
         public long getSize() {

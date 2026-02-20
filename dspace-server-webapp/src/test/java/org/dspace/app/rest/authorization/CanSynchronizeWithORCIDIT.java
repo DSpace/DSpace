@@ -75,7 +75,7 @@ public class CanSynchronizeWithORCIDIT extends AbstractControllerIntegrationTest
 
         itemA = ItemBuilder.createItem(context, collectionA)
                            .withTitle("itemA")
-                           .withDspaceObjectOwner("user" , context.getCurrentUser().getID().toString())
+                           .withDSpaceObjectOwner("user" , context.getCurrentUser().getID().toString())
                            .build();
 
         context.restoreAuthSystemState();

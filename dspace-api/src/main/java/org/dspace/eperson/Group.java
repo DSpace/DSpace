@@ -190,7 +190,6 @@ public class Group extends CacheableDSpaceObject implements DSpaceObjectLegacySu
         return Constants.GROUP;
     }
 
-    @Override
     public String getName() {
         return name;
     }

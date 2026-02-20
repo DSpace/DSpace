@@ -63,11 +63,13 @@ public class EntityServiceImplTest  {
 
         // Mock the state of objects utilized in findByItemId() to meet the success criteria of an invocation
         when(itemService.find(any(), any())).thenReturn(item);
-        when(item.getName()).thenReturn("ItemName");
+        when(itemService.getName(item)).thenReturn("ItemName");
 
         // The returned Entity's item should match the mocked item's name
+        Item item1 = entityService.findByItemId(context, item.getID()).getItem();
         assertEquals("TestFindByItem 0", "ItemName",
-                entityService.findByItemId(context, item.getID()).getItem().getName());
+                     itemService.getName(item1)
+        );
     }
 
     @Test

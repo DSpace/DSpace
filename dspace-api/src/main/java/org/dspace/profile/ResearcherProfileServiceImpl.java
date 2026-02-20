@@ -49,6 +49,7 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.orcid.service.OrcidSynchronizationService;
 import org.dspace.profile.service.AfterResearcherProfileCreationAction;
@@ -97,6 +98,9 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
     @Autowired(required = false)
     private List<AfterResearcherProfileCreationAction> afterCreationActions;
+
+    @Autowired
+    EPersonService epersonService;
 
     @PostConstruct
     public void postConstruct() {
@@ -215,7 +219,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
         context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, item, "dspace", "object", "owner", null,
-                                ePerson.getName(), ePerson.getID().toString(), CF_ACCEPTED);
+                                epersonService.getName(ePerson), ePerson.getID().toString(), CF_ACCEPTED);
         context.restoreAuthSystemState();
 
         return new ResearcherProfile(item);
@@ -276,15 +280,15 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
             throws AuthorizeException, SQLException {
 
         String id = ePerson.getID().toString();
-        String fullName = ePerson.getFullName();
+        String fullName = epersonService.getFullName(ePerson);
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
         Item item = workspaceItem.getItem();
         itemService.addMetadata(context, item, "dc", "title", null, null, fullName);
         itemService.addMetadata(context, item, "person", "email", null, null, ePerson.getEmail());
         itemService.addMetadata(context, item, "dspace", "object", "owner", null, fullName, id, CF_ACCEPTED);
-        itemService.addMetadata(context, item, "person", "familyName", null, null, ePerson.getLastName());
-        itemService.addMetadata(context, item, "person", "givenName", null, null, ePerson.getFirstName());
+        itemService.addMetadata(context, item, "person", "familyName", null, null, epersonService.getLastName(ePerson));
+        itemService.addMetadata(context, item, "person", "givenName", null, null, epersonService.getFirstName(ePerson));
 
         item = installItemService.installItem(context, workspaceItem);
 

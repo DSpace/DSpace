@@ -38,6 +38,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -49,6 +50,7 @@ import org.dspace.core.LogHelper;
 import org.dspace.curate.service.XmlWorkflowCuratorService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.handle.service.HandleService;
@@ -128,6 +130,10 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     protected ConfigurationService configurationService;
     @Autowired(required = true)
     protected XmlWorkflowCuratorService xmlWorkflowCuratorService;
+    @Autowired
+    protected EPersonService epersonService;
+    @Autowired
+    protected CollectionService collectionService;
 
     protected XmlWorkflowServiceImpl() {
 
@@ -676,7 +682,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
                 email.addRecipient(ep.getEmail());
                 email.addArgument(title);
-                email.addArgument(coll.getName());
+                email.addArgument(collectionService.getName(coll));
                 email.addArgument(handleService.getCanonicalForm(handle));
 
                 email.send();
@@ -706,7 +712,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 Locale supportedLocale = I18nUtil.getEPersonLocale(epa);
                 Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "flowtask_notify"));
                 email.addArgument(title);
-                email.addArgument(coll.getName());
+                email.addArgument(collectionService.getName(coll));
                 email.addArgument(submitter);
                 email.addArgument(taskName);
                 email.addArgument(message);
@@ -723,7 +729,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     protected String getItemTitle(XmlWorkflowItem wi) throws SQLException {
         Item myitem = wi.getItem();
-        String title = myitem.getName();
+        String title = itemService.getName(myitem);
 
         // only return the first element, or "Untitled"
         if (StringUtils.isNotBlank(title)) {
@@ -1175,7 +1181,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     @Override
     public String getEPersonName(EPerson ePerson) {
-        String submitter = ePerson.getFullName();
+        String submitter = epersonService.getFullName(ePerson);
 
         submitter = submitter + " (" + ePerson.getEmail() + ")";
 
@@ -1198,7 +1204,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         boolean isProvenancePrivacyActive = Boolean.parseBoolean(isProvenancePrivacyActiveProperty);
 
         if (myitem.getSubmitter() != null && !isProvenancePrivacyActive) {
-            provmessage.append("Submitted by ").append(myitem.getSubmitter().getFullName())
+            provmessage.append("Submitted by ").append(epersonService.getFullName(myitem.getSubmitter()))
                     .append(" (").append(myitem.getSubmitter().getEmail()).append(") on ")
                     .append(now.toString());
         } else {
@@ -1230,7 +1236,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             EPerson eperson = wi.getSubmitter();
             if (eperson != null) {
                 // Get the item title
-                String title = wi.getItem().getName();
+                Item item = wi.getItem();
+                String title = itemService.getName(item);
 
                 // Get the collection
                 Collection coll = wi.getCollection();
@@ -1242,7 +1249,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
                 email.addRecipient(eperson.getEmail());
                 email.addArgument(title);
-                email.addArgument(coll.getName());
+                email.addArgument(collectionService.getName(coll));
                 email.addArgument(rejector);
                 email.addArgument(reason);
                 email.addArgument(configurationService.getProperty("dspace.ui.url") + "/mydspace");

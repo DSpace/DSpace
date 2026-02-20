@@ -134,11 +134,12 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", BundleMatcher.matchFullEmbeds()))
-                .andExpect(jsonPath("$", BundleMatcher.matchBundle(bundle1.getName(),
-                        bundle1.getID(),
-                        bundle1.getHandle(),
-                        bundle1.getType(),
-                        bundle1.getBitstreams())
+                .andExpect(jsonPath("$", BundleMatcher.matchBundle(
+                    bundleService.getName(bundle1),
+                    bundle1.getID(),
+                    bundle1.getHandle(),
+                    bundle1.getType(),
+                    bundle1.getBitstreams())
                 ))
         ;
 
@@ -148,10 +149,11 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                 .andExpect(jsonPath("$", BundleMatcher.matchLinks(bundle1.getID())))
-                .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle1.getName(),
-                        bundle1.getID(),
-                        bundle1.getHandle(),
-                        bundle1.getType())
+                .andExpect(jsonPath("$", BundleMatcher.matchProperties(
+                    bundleService.getName(bundle1),
+                    bundle1.getID(),
+                    bundle1.getHandle(),
+                    bundle1.getType())
                 ))
         ;
     }
@@ -207,17 +209,19 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.bundles", Matchers.hasItems(
-                           BundleMatcher.matchBundle(bundle1.getName(),
-                                                     bundle1.getID(),
-                                                     bundle1.getHandle(),
-                                                     bundle1.getType(),
-                                                     bundle1.getBitstreams())
+                           BundleMatcher.matchBundle(
+                               bundleService.getName(bundle1),
+                               bundle1.getID(),
+                               bundle1.getHandle(),
+                               bundle1.getType(),
+                               bundle1.getBitstreams())
                            ,
-                           BundleMatcher.matchBundle(bundle2.getName(),
-                                                     bundle2.getID(),
-                                                     bundle2.getHandle(),
-                                                     bundle2.getType(),
-                                                     bundle2.getBitstreams())
+                           BundleMatcher.matchBundle(
+                               bundleService.getName(bundle2),
+                               bundle2.getID(),
+                               bundle2.getHandle(),
+                               bundle2.getType(),
+                               bundle2.getBitstreams())
 
                    )))
                    .andExpect(jsonPath("$._links.self.href",
@@ -402,12 +406,12 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String bitstreamContent = "Dummy content";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream1 = BitstreamBuilder.createBitstream(context, item, is, bundle1.getName())
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is, bundleService.getName(bundle1))
                                          .withName("Bitstream")
                                          .withDescription("Description")
                                          .withMimeType("text/plain")
                                          .build();
-            bitstream2 = BitstreamBuilder.createBitstream(context, item, is, bundle1.getName())
+            bitstream2 = BitstreamBuilder.createBitstream(context, item, is, bundleService.getName(bundle1))
                                          .withName("Bitstream2")
                                          .withDescription("Description2")
                                          .withMimeType("text/plain")
@@ -468,12 +472,12 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String bitstreamContent = "Dummy content";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream1 = BitstreamBuilder.createBitstream(context, item, is, bundle1.getName())
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is, bundleService.getName(bundle1))
                     .withName("Bitstream")
                     .withDescription("Description")
                     .withMimeType("text/plain")
                     .build();
-            bitstream2 = BitstreamBuilder.createBitstream(context, item, is, bundle1.getName())
+            bitstream2 = BitstreamBuilder.createBitstream(context, item, is, bundleService.getName(bundle1))
                     .withName("Bitstream2")
                     .withDescription("Description2")
                     .withMimeType("text/plain")
@@ -603,7 +607,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                     .build();
         }
 
-        bundle1 = item.getBundles("ORIGINAL").get(0);
+        bundle1 = itemService.getBundles(item, "ORIGINAL").get(0);
 
         context.restoreAuthSystemState();
 

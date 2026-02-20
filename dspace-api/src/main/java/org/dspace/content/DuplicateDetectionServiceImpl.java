@@ -23,6 +23,7 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.dspace.app.itemupdate.MetadataUtilities;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.DuplicateDetectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
@@ -40,6 +41,7 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.IndexableWorkflowItem;
 import org.dspace.discovery.indexobject.IndexableWorkspaceItem;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.VersionHistory;
@@ -74,6 +76,8 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
     WorkspaceItemService workspaceItemService;
     @Autowired
     ItemService itemService;
+    @Autowired
+    CollectionService collectionService;
 
     /**
      * Get a list of PotentialDuplicate objects (wrappers with some metadata included for previewing) that
@@ -202,7 +206,8 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
                 configurationService.getArrayProperty("duplicate.preview.metadata.field", new String[]{})));
 
         // Get item metadata and if it's configured for mapping, copy it across to the potential duplicate object
-        List<MetadataValue> metadata = resultItem.getCachedMetadata();
+        List<MetadataValue> metadata
+            = itemService.getMetadata(resultItem, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
 
         // Prepare a map of metadata to set on the potential duplicate object
         for (MetadataValue metadatum : metadata) {
@@ -222,9 +227,16 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
         // More authorisation checks
         if (workflowItem != null) {
             Collection c = workflowItem.getCollection();
-            if (groupService.isMember(context, context.getCurrentUser(), c.getWorkflowStep1(context)) ||
-                    groupService.isMember(context, context.getCurrentUser(), c.getWorkflowStep2(context)) ||
-                    groupService.isMember(context, context.getCurrentUser(), c.getWorkflowStep3(context))) {
+
+            Group step1 = collectionService.getWorkflowGroup(context, c, 1);
+            Group step2 = collectionService.getWorkflowGroup(context, c, 2);
+            Group step3 = collectionService.getWorkflowGroup(context, c, 3);
+
+            if (
+                groupService.isMember(context, context.getCurrentUser(), step1)
+                    || groupService.isMember(context, context.getCurrentUser(), step2)
+                    || groupService.isMember(context, context.getCurrentUser(), step3)
+            ) {
                 // Current user is a member of one of the workflow role groups
                 potentialDuplicate.setWorkflowItemId(workflowItem.getID());
                 return Optional.of(potentialDuplicate);

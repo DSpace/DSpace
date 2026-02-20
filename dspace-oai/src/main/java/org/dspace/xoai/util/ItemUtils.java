@@ -35,11 +35,15 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xoai.data.DSpaceItem;
@@ -56,6 +60,12 @@ public class ItemUtils {
 
     private static final ItemService itemService
             = ContentServiceFactory.getInstance().getItemService();
+
+    public static final BundleService bundleService
+            = ContentServiceFactory.getInstance().getBundleService();
+
+    public static final EPersonService epersonService
+            = EPersonServiceFactory.getInstance().getEPersonService();
 
     private static final RelationshipService relationshipService
             = ContentServiceFactory.getInstance().getRelationshipService();
@@ -107,7 +117,7 @@ public class ItemUtils {
         for (Bundle b : bs) {
             Element bundle = create("bundle");
             bundles.getElement().add(bundle);
-            bundle.getField().add(createValue("name", b.getName()));
+            bundle.getField().add(createValue("name", bundleService.getName(b)));
 
             Element bitstreams = create("bitstreams");
             bundle.getElement().add(bitstreams);
@@ -122,10 +132,12 @@ public class ItemUtils {
                 // Check if current bitstream is in original bundle + 1 of the 2 following
                 // Bitstream = primary bitstream in bundle -> true
                 // No primary bitstream found in bundle-> only the first one gets flagged as "primary"
-                if (b.getName() != null && b.getName().equals("ORIGINAL") && (b.getPrimaryBitstream() != null
+                if (bundleService.getName(b) != null) {
+                    if (bundleService.getName(b).equals("ORIGINAL") && (b.getPrimaryBitstream() != null
                         && b.getPrimaryBitstream().getID() == bit.getID()
                         || b.getPrimaryBitstream() == null && bit.getID() == bits.get(0).getID())) {
-                    primary = true;
+                        primary = true;
+                    }
                 }
 
                 Element bitstream = create("bitstream");
@@ -136,9 +148,9 @@ public class ItemUtils {
 
                 String cks = bit.getChecksum();
                 String cka = bit.getChecksumAlgorithm();
-                String oname = bit.getSource();
-                String name = bit.getName();
-                String description = bit.getDescription();
+                String oname = bitstreamService.getSource(bit);
+                String name = bitstreamService.getName(bit);
+                String description = bitstreamService.getDescription(bit);
 
                 if (name != null) {
                     bitstream.getField().add(createValue("name", name));
@@ -152,7 +164,7 @@ public class ItemUtils {
                 // Add bitstream embargo information (READ policy present, for Anonymous group with a start date)
                 addResourcePolicyInformation(context, bit, bitstream);
 
-                bitstream.getField().add(createValue("format", bit.getFormat(context).getMIMEType()));
+                bitstream.getField().add(createValue("format", bitstreamService.getFormat(context, bit).getMIMEType()));
                 bitstream.getField().add(createValue("size", "" + bit.getSizeBytes()));
                 bitstream.getField().add(createValue("url", url));
                 bitstream.getField().add(createValue("checksum", cks));
@@ -197,7 +209,13 @@ public class ItemUtils {
 
         for (ResourcePolicy policy : policies) {
             String groupName = policy.getGroup() != null ? policy.getGroup().getName() : null;
-            String user = policy.getEPerson() != null ? policy.getEPerson().getName() : null;
+            String user;
+            if (policy.getEPerson() != null) {
+                EPerson ePerson = policy.getEPerson();
+                user = epersonService.getName(ePerson);
+            } else {
+                user = null;
+            }
             String action = Constants.actionText[policy.getAction()];
             LocalDate startDate = policy.getStartDate();
             LocalDate endDate = policy.getEndDate();

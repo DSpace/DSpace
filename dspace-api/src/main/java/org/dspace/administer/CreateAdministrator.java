@@ -284,9 +284,9 @@ public final class CreateAdministrator {
             eperson.setSelfRegistered(false);
         }
 
-        eperson.setLastName(context, last);
-        eperson.setFirstName(context, first);
-        eperson.setLanguage(context, language);
+        ePersonService.setLastName(context, eperson, last);
+        ePersonService.setFirstName(context, eperson, first);
+        ePersonService.setLanguage(context, eperson, language);
         ePersonService.setPassword(eperson, pw);
         ePersonService.update(context, eperson);
 

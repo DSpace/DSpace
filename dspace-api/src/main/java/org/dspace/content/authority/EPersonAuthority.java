@@ -61,7 +61,11 @@ public class EPersonAuthority implements ChoiceAuthority {
 
         List<Choice> choiceList = new ArrayList<Choice>();
         for (EPerson eperson : ePersons) {
-            choiceList.add(new Choice(eperson.getID().toString(), eperson.getFullName(), eperson.getFullName()));
+            choiceList.add(new Choice(
+                eperson.getID().toString(),
+                ePersonService.getFullName(eperson),
+                ePersonService.getFullName(eperson))
+            );
         }
         Choice[] results = new Choice[choiceList.size()];
         results = choiceList.toArray(results);
@@ -79,7 +83,7 @@ public class EPersonAuthority implements ChoiceAuthority {
         Context context = getContext();
         try {
             EPerson ePerson = ePersonService.find(context, uuid);
-            return ePerson != null ? ePerson.getFullName() : null;
+            return ePerson != null ? ePersonService.getFullName(ePerson) : null;
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);

@@ -93,10 +93,13 @@ import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.orcid.OrcidHistory;
 import org.dspace.orcid.OrcidQueue;
 import org.dspace.orcid.service.OrcidHistoryService;
@@ -127,6 +130,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private EPersonService epersonService;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private BundleService bundleService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -2892,9 +2904,10 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(publicItem1)))
                    .andExpect(jsonPath("$._embedded.owningCollection",
-                                       CollectionMatcher.matchCollectionEntry(col1.getName(),
-                                                                              col1.getID(),
-                                                                              col1.getHandle())))
+                                       CollectionMatcher.matchCollectionEntry(
+                                           collectionService.getName(col1),
+                                           col1.getID(),
+                                           col1.getHandle())))
                    // .doesNotExist() makes sure that this section is not embedded, it's not there at all
                    .andExpect(jsonPath("$._embedded.bundles").doesNotExist())
                    // .doesNotExist() makes sure that this section is not embedded, it's not there at all
@@ -2981,8 +2994,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(publicItem1)))
                    .andExpect(jsonPath("$._embedded.owningCollection",
-                                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(),
-                                                                              col1.getHandle())))
+                                       CollectionMatcher.matchCollectionEntry(
+                                           collectionService.getName(col1), col1.getID(), col1.getHandle())))
                    // .doesNotExist() makes sure that this section is not embedded, it's not there at all
                    .andExpect(jsonPath("$._embedded.bundles").doesNotExist())
                    .andExpect(jsonPath("$._embedded.relationships").doesNotExist())
@@ -3302,16 +3315,26 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
         .andExpect(jsonPath("$._embedded.bundles._embedded.bundles",Matchers.containsInAnyOrder(
-            BundleMatcher.matchProperties(bundle0.getName(), bundle0.getID(), bundle0.getHandle(), bundle0.getType()),
-            BundleMatcher.matchProperties(bundle1.getName(), bundle1.getID(), bundle1.getHandle(), bundle1.getType()),
-            BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(), bundle2.getHandle(), bundle2.getType()),
-            BundleMatcher.matchProperties(bundle3.getName(), bundle3.getID(), bundle3.getHandle(), bundle3.getType()),
-            BundleMatcher.matchProperties(bundle4.getName(), bundle4.getID(), bundle4.getHandle(), bundle4.getType()),
-            BundleMatcher.matchProperties(bundle5.getName(), bundle5.getID(), bundle5.getHandle(), bundle5.getType()),
-            BundleMatcher.matchProperties(bundle6.getName(), bundle6.getID(), bundle6.getHandle(), bundle6.getType()),
-            BundleMatcher.matchProperties(bundle7.getName(), bundle7.getID(), bundle7.getHandle(), bundle7.getType()),
-            BundleMatcher.matchProperties(bundle8.getName(), bundle8.getID(), bundle8.getHandle(), bundle8.getType()),
-            BundleMatcher.matchProperties(bundle9.getName(), bundle9.getID(), bundle9.getHandle(), bundle9.getType())
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle0), bundle0.getID(), bundle0.getHandle(), bundle0.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle1), bundle1.getID(), bundle1.getHandle(), bundle1.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle2), bundle2.getID(), bundle2.getHandle(), bundle2.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle3), bundle3.getID(), bundle3.getHandle(), bundle3.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle4), bundle4.getID(), bundle4.getHandle(), bundle4.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle5), bundle5.getID(), bundle5.getHandle(), bundle5.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle6), bundle6.getID(), bundle6.getHandle(), bundle6.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle7), bundle7.getID(), bundle7.getHandle(), bundle7.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle8), bundle8.getID(), bundle8.getHandle(), bundle8.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle9), bundle9.getID(), bundle9.getHandle(), bundle9.getType())
         )))
         .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items/" + item.getID())))
         .andExpect(jsonPath("$._embedded.bundles.page.size", is(20)))
@@ -3352,22 +3375,32 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
+        Bundle bundle = bundles.get(4);
+        Bundle bundle1 = bundles.get(3);
+        Bundle bundle2 = bundles.get(2);
+        Bundle bundle3 = bundles.get(1);
+        Bundle bundle4 = bundles.get(0);
         getClient().perform(get("/api/core/items/" + item.getID())
                                     .param("embed", "bundles")
                            .param("embed.size", "bundles=5"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
         .andExpect(jsonPath("$._embedded.bundles._embedded.bundles",Matchers.containsInAnyOrder(
-            BundleMatcher.matchProperties(bundles.get(0).getName(), bundles.get(0).getID(), bundles.get(0).getHandle(),
-                                          bundles.get(0).getType()),
-            BundleMatcher.matchProperties(bundles.get(1).getName(), bundles.get(1).getID(), bundles.get(1).getHandle(),
-                                          bundles.get(1).getType()),
-            BundleMatcher.matchProperties(bundles.get(2).getName(), bundles.get(2).getID(), bundles.get(2).getHandle(),
-                                          bundles.get(2).getType()),
-            BundleMatcher.matchProperties(bundles.get(3).getName(), bundles.get(3).getID(), bundles.get(3).getHandle(),
-                                          bundles.get(3).getType()),
-            BundleMatcher.matchProperties(bundles.get(4).getName(), bundles.get(4).getID(), bundles.get(4).getHandle(),
-                                          bundles.get(4).getType())
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle4), bundles.get(0).getID(), bundles.get(0).getHandle(),
+                bundles.get(0).getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle3), bundles.get(1).getID(), bundles.get(1).getHandle(),
+                bundles.get(1).getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle2), bundles.get(2).getID(), bundles.get(2).getHandle(),
+                bundles.get(2).getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle1), bundles.get(3).getID(), bundles.get(3).getHandle(),
+                bundles.get(3).getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle), bundles.get(4).getID(), bundles.get(4).getHandle(),
+                bundles.get(4).getType())
         )))
         .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items/" + item.getID())))
         .andExpect(jsonPath("$._embedded.bundles.page.size", is(5)))
@@ -3408,16 +3441,26 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
         .andExpect(jsonPath("$._embedded.bundles._embedded.bundles",Matchers.containsInAnyOrder(
-            BundleMatcher.matchProperties(bundle0.getName(), bundle0.getID(), bundle0.getHandle(), bundle0.getType()),
-            BundleMatcher.matchProperties(bundle1.getName(), bundle1.getID(), bundle1.getHandle(), bundle1.getType()),
-            BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(), bundle2.getHandle(), bundle2.getType()),
-            BundleMatcher.matchProperties(bundle3.getName(), bundle3.getID(), bundle3.getHandle(), bundle3.getType()),
-            BundleMatcher.matchProperties(bundle4.getName(), bundle4.getID(), bundle4.getHandle(), bundle4.getType()),
-            BundleMatcher.matchProperties(bundle5.getName(), bundle5.getID(), bundle5.getHandle(), bundle5.getType()),
-            BundleMatcher.matchProperties(bundle6.getName(), bundle6.getID(), bundle6.getHandle(), bundle6.getType()),
-            BundleMatcher.matchProperties(bundle7.getName(), bundle7.getID(), bundle7.getHandle(), bundle7.getType()),
-            BundleMatcher.matchProperties(bundle8.getName(), bundle8.getID(), bundle8.getHandle(), bundle8.getType()),
-            BundleMatcher.matchProperties(bundle9.getName(), bundle9.getID(), bundle9.getHandle(), bundle9.getType())
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle0), bundle0.getID(), bundle0.getHandle(), bundle0.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle1), bundle1.getID(), bundle1.getHandle(), bundle1.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle2), bundle2.getID(), bundle2.getHandle(), bundle2.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle3), bundle3.getID(), bundle3.getHandle(), bundle3.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle4), bundle4.getID(), bundle4.getHandle(), bundle4.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle5), bundle5.getID(), bundle5.getHandle(), bundle5.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle6), bundle6.getID(), bundle6.getHandle(), bundle6.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle7), bundle7.getID(), bundle7.getHandle(), bundle7.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle8), bundle8.getID(), bundle8.getHandle(), bundle8.getType()),
+            BundleMatcher.matchProperties(
+                bundleService.getName(bundle9), bundle9.getID(), bundle9.getHandle(), bundle9.getType())
         )))
         .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items/" + item.getID())))
         .andExpect(jsonPath("$._embedded.bundles.page.size", is(20)))
@@ -3519,8 +3562,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
                    .andExpect(jsonPath("$._embedded.bundles._embedded.bundles", Matchers.containsInAnyOrder(
-                           BundleMatcher.matchProperties(bundle0.getName(), bundle0.getID(), bundle0.getHandle(),
-                                                         bundle0.getType())
+                           BundleMatcher.matchProperties(
+                               bundleService.getName(bundle0), bundle0.getID(), bundle0.getHandle(), bundle0.getType())
                    )))
                    .andExpect(jsonPath("$._embedded.bundles._embedded.bundles[0]._embedded.bitstreams" +
                                                "._embedded.bitstreams",
@@ -3641,8 +3684,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
                    .andExpect(jsonPath("$._embedded.bundles._embedded.bundles", Matchers.containsInAnyOrder(
-                           BundleMatcher.matchProperties(bundle0.getName(), bundle0.getID(), bundle0.getHandle(),
-                                                         bundle0.getType())
+                           BundleMatcher.matchProperties(
+                               bundleService.getName(bundle0), bundle0.getID(), bundle0.getHandle(), bundle0.getType())
                    )))
                    .andExpect(jsonPath("$._embedded.bundles._embedded.bundles[0]._embedded.bitstreams" +
                                                "._embedded.bitstreams",
@@ -3896,7 +3939,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withDspaceObjectOwner(eperson.getFullName(), eperson.getID().toString())
+            .withDSpaceObjectOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
             .build();
@@ -3960,7 +4003,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Item firstProfile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withDspaceObjectOwner(firstOwner.getFullName(), firstOwner.getID().toString())
+            .withDSpaceObjectOwner(firstOwner)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", firstOwner)
             .withOrcidSynchronizationPublicationsPreference(ALL)
@@ -3968,14 +4011,14 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Item secondProfile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withDspaceObjectOwner(secondOwner.getFullName(), secondOwner.getID().toString())
+            .withDSpaceObjectOwner(secondOwner)
             .withOrcidIdentifier("4444-1111-2222-3333")
             .withOrcidAccessToken("bb4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
             .build();
 
         Item thirdProfile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withDspaceObjectOwner(thirdOwner.getFullName(), thirdOwner.getID().toString())
+            .withDSpaceObjectOwner(thirdOwner)
             .withOrcidIdentifier("5555-1111-2222-3333")
             .withOrcidAccessToken("cb4d18a0-8d9a-40f1-b601-a417255c8d20", thirdOwner)
             .withOrcidSynchronizationPublicationsPreference(ALL)
@@ -4047,7 +4090,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Item firstProfile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withDspaceObjectOwner(firstOwner.getFullName(), firstOwner.getID().toString())
+            .withDSpaceObjectOwner(firstOwner)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", firstOwner)
             .withOrcidSynchronizationFundingsPreference(ALL)
@@ -4055,14 +4098,14 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Item secondProfile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withDspaceObjectOwner(secondOwner.getFullName(), secondOwner.getID().toString())
+            .withDSpaceObjectOwner(secondOwner)
             .withOrcidIdentifier("4444-1111-2222-3333")
             .withOrcidAccessToken("bb4d18a0-8d9a-40f1-b601-a417255c8d20", secondOwner)
             .build();
 
         Item thirdProfile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withDspaceObjectOwner(thirdOwner.getFullName(), thirdOwner.getID().toString())
+            .withDSpaceObjectOwner(thirdOwner)
             .withOrcidIdentifier("5555-1111-2222-3333")
             .withOrcidAccessToken("cb4d18a0-8d9a-40f1-b601-a417255c8d20", thirdOwner)
             .withOrcidSynchronizationFundingsPreference(ALL)
@@ -4224,7 +4267,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .param("projection", "full"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntryFullProjection(
-                                        col1.getName(), col1.getID(), col1.getHandle())));
+                                 collectionService.getName(col1), col1.getID(), col1.getHandle())));
 
         // try to spoof information as a logged in eperson using embedding, verify that no embeds are included
         getClient(tokenEperson).perform(get("/api/core/items/" + item.getID())
@@ -4232,7 +4275,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                  .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
-                 .andExpect(jsonPath("$.name", Matchers.is(item.getName())))
+                 .andExpect(jsonPath("$.name", Matchers.is(itemService.getName(item))))
                  .andExpect(jsonPath("$.handle", Matchers.is(item.getHandle())))
                  .andExpect(jsonPath("$.metadata").isEmpty())
                  .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
@@ -4265,7 +4308,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                    .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
-                   .andExpect(jsonPath("$.name", Matchers.is(item.getName())))
+                   .andExpect(jsonPath("$.name", Matchers.is(itemService.getName(item))))
                    .andExpect(jsonPath("$.handle", Matchers.is(item.getHandle())))
                    .andExpect(jsonPath("$.metadata").isEmpty())
                    .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))

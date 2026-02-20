@@ -242,7 +242,7 @@ public class RegistryLoader {
             format.setMIMEType(mimeType);
             bitstreamFormatService.setShortDescription(context, format, shortDesc);
             format.setDescription(desc);
-            format.setSupportLevel(supportLevel);
+            bitstreamFormatService.setSupportLevel(format, supportLevel);
             format.setInternal(internal);
             ArrayList<String> extensionList = new ArrayList<>();
             extensionList.addAll(Arrays.asList(extensions));

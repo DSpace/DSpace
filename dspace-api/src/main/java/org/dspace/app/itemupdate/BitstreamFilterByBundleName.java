@@ -12,11 +12,14 @@ import java.util.List;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BundleService;
 
 /**
  * BitstreamFilter implementation to filter by bundle name
  */
 public class BitstreamFilterByBundleName extends BitstreamFilter {
+    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
 
     protected String bundleName;
 
@@ -44,7 +47,7 @@ public class BitstreamFilterByBundleName extends BitstreamFilter {
         try {
             List<Bundle> bundles = bitstream.getBundles();
             for (Bundle b : bundles) {
-                if (b.getName().equals(bundleName)) {
+                if (bundleService.getName(b).equals(bundleName)) {
                     return true;
                 }
             }

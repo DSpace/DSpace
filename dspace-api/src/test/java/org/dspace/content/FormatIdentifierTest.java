@@ -73,19 +73,19 @@ public class FormatIdentifierTest extends AbstractUnitTest {
         //TODO: the check if filename is null is wrong, as it checks after using a toLowerCase
         //which can trigger the NPE
         bs = bitstreamService.create(context, new FileInputStream(f));
-        bs.setName(context, null);
+        bitstreamService.setName(context, bs, null);
         result = bitstreamFormatService.guessFormat(context, bs);
         assertThat("testGuessFormat 0", result, nullValue());
 
         //test unknown format
         bs = bitstreamService.create(context, new FileInputStream(f));
-        bs.setName(context, "file_without_extension.");
+        bitstreamService.setName(context, bs, "file_without_extension.");
         result = bitstreamFormatService.guessFormat(context, bs);
         assertThat("testGuessFormat 1", result, nullValue());
 
         //test known format
         bs = bitstreamService.create(context, new FileInputStream(f));
-        bs.setName(context, testProps.get("test.bitstream").toString());
+        bitstreamService.setName(context, bs, testProps.get("test.bitstream").toString());
         result = bitstreamFormatService.guessFormat(context, bs);
         assertThat("testGuessFormat 2", result.getID(), equalTo(pdf.getID()));
         assertThat("testGuessFormat 3", result.getMIMEType(), equalTo(pdf.getMIMEType()));

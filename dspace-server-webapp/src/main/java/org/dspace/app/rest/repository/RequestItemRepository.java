@@ -46,6 +46,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.InvalidReCaptchaException;
 import org.dspace.eperson.factory.CaptchaServiceFactory;
 import org.dspace.eperson.service.CaptchaService;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -94,6 +95,9 @@ public class RequestItemRepository
 
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired(required = true)
+    protected EPersonService epersonService;
 
     /*
      * DSpaceRestRepository
@@ -205,7 +209,7 @@ public class RequestItemRepository
         // Requester's human-readable name.
         String username;
         if (null != user) { // Prefer authenticated user's name.
-            username = user.getFullName();
+            username = epersonService.getFullName(user);
         } else { // An anonymous session may provide a name.
             // Escape username to evade nasty XSS attempts
             username = HtmlUtils.htmlEscape(rir.getRequestName(),"UTF-8");

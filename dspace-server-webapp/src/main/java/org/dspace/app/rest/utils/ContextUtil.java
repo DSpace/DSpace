@@ -18,6 +18,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.utils.DSpace;
@@ -39,6 +41,8 @@ public class ContextUtil {
      * Where the context is stored on an HTTP Request object
      */
     public static final String DSPACE_CONTEXT = "dspace.context";
+
+    public static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     /**
      * Default constructor
@@ -91,7 +95,7 @@ public class ContextUtil {
     }
 
     /**
-     * Shortcut for {@link #obtainContext(Request)} using the {@link RequestService}
+     * Shortcut for {@link #obtainContext(HttpServletRequest)} using the {@link RequestService}
      * to retrieve the current thread request
      * 
      * @return the DSpace Context associated with the current thread-bound request
@@ -125,7 +129,7 @@ public class ContextUtil {
             }
         }
         if (userLocale == null && context.getCurrentUser() != null) {
-            String userLanguage = context.getCurrentUser().getLanguage();
+            String userLanguage = epersonService.getLanguage(context.getCurrentUser());
             if (userLanguage != null) {
                 userLocale = new Locale(userLanguage);
             }

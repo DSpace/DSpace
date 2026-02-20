@@ -36,7 +36,7 @@ public class OriginalBitstreamFilter extends BitstreamFilterByBundleName {
         try {
             List<Bundle> bundles = bitstream.getBundles();
             for (Bundle bundle : bundles) {
-                if (bundle.getName().equals("ORIGINAL")) {
+                if (bundleService.getName(bundle).equals("ORIGINAL")) {
                     return true;
                 }
             }

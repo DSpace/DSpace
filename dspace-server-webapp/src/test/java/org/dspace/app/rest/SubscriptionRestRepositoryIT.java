@@ -40,9 +40,11 @@ import org.dspace.builder.SubscribeBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.service.CollectionService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
+import org.dspace.eperson.service.EPersonService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,13 +54,19 @@ import org.springframework.http.MediaType;
 /**
  * Integration test to test the /api/config/subscriptions endpoint
  * (Class has to start or end with IT to be picked up by the failsafe plugin)
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ResourcePolicyService resourcePolicyService;
+
+    @Autowired
+    private EPersonService epersonService;
+
+    @Autowired
+    CollectionService collectionService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -1064,7 +1072,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/eperson"))
                              .andExpect(status().isOk())
-                             .andExpect(jsonPath("$", is(EPersonMatcher.matchEPersonEntry(eperson))));
+                             .andExpect(jsonPath("$", is(EPersonMatcher.matchProperties(eperson))));
     }
 
     @Test
@@ -1082,7 +1090,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/eperson"))
                                .andExpect(status().isOk())
-                               .andExpect(jsonPath("$", is(EPersonMatcher.matchEPersonEntry(eperson))));
+                               .andExpect(jsonPath("$", is(EPersonMatcher.matchProperties(eperson))));
     }
 
     @Test
@@ -1141,7 +1149,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/resource"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.uuid", Matchers.is(collection.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(collection.getName())))
+                             .andExpect(jsonPath("$.name", Matchers.is(collectionService.getName(collection))))
                              .andExpect(jsonPath("$.type", Matchers.is("collection")));
     }
 
@@ -1161,7 +1169,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/resource"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.uuid", Matchers.is(collection.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(collection.getName())))
+                             .andExpect(jsonPath("$.name", Matchers.is(collectionService.getName(collection))))
                              .andExpect(jsonPath("$.type", Matchers.is("collection")));
     }
 
@@ -1220,7 +1228,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/resource"))
                                .andExpect(status().isOk())
                                .andExpect(jsonPath("$.uuid", Matchers.is(col1.getID().toString())))
-                               .andExpect(jsonPath("$.name", Matchers.is(col1.getName())))
+                               .andExpect(jsonPath("$.name", Matchers.is(collectionService.getName(col1))))
                                .andExpect(jsonPath("$.type", Matchers.is("collection")));
 
         context.turnOffAuthorisationSystem();

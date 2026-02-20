@@ -78,6 +78,9 @@ public class AccountServiceImpl implements AccountService {
     private GroupService groupService;
 
     @Autowired
+    private EPersonService epersonService;
+
+    @Autowired
     private AuthenticationService authenticationService;
 
     @Autowired
@@ -270,7 +273,7 @@ public class AccountServiceImpl implements AccountService {
                     "eperson.firstname"
                 );
             if (firstName != null) {
-                eperson.setFirstName(context, firstName.getValue());
+                epersonService.setFirstName(context, eperson, firstName.getValue());
             }
 
             RegistrationDataMetadata lastName =
@@ -279,7 +282,7 @@ public class AccountServiceImpl implements AccountService {
                     "eperson.lastname"
                 );
             if (lastName != null) {
-                eperson.setLastName(context, lastName.getValue());
+                epersonService.setLastName(context, eperson, lastName.getValue());
             }
             eperson.setCanLogIn(true);
             eperson.setSelfRegistered(true);

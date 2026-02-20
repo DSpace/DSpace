@@ -300,7 +300,7 @@ public interface ItemService
      * @return the bundles in an unordered array
      * @throws SQLException if database error
      */
-    List<Bundle> getBundles(Item item, String name) throws SQLException;
+    List<Bundle> getBundles(Item item, String name);
 
     /**
      * Add an existing bundle to this item. This has immediate effect.

@@ -27,6 +27,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.orcid.OrcidQueue;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -41,6 +42,9 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private EPersonService epersonService;
 
     @Test
     public void findAllTest() throws Exception {
@@ -82,13 +86,13 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         Item itemPerson = ItemBuilder.createItem(context, col1)
                                      .withPersonIdentifierFirstName("Josiah")
                                      .withPersonIdentifierLastName("Carberry")
-                                     .withDspaceObjectOwner(researcher.getFullName(), researcher.getID().toString())
+                                     .withDSpaceObjectOwner(researcher)
                                      .build();
 
         Item itemPerson2 = ItemBuilder.createItem(context, col1)
                                       .withPersonIdentifierFirstName("Laura")
                                       .withPersonIdentifierLastName("Shulz")
-                                      .withDspaceObjectOwner(researcher2.getFullName(), researcher2.getID().toString())
+                                      .withDSpaceObjectOwner(researcher2)
                                       .build();
 
         itemService.addMetadata(context, itemPerson, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
@@ -180,13 +184,13 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         Item itemPerson = ItemBuilder.createItem(context, col1)
                                      .withPersonIdentifierFirstName("Josiah")
                                      .withPersonIdentifierLastName("Carberry")
-                                     .withDspaceObjectOwner(researcher.getFullName(), researcher.getID().toString())
+                                     .withDSpaceObjectOwner(researcher)
                                      .build();
 
         Item itemPerson2 = ItemBuilder.createItem(context, col1)
                                       .withPersonIdentifierFirstName("Laura")
                                       .withPersonIdentifierLastName("Shulz")
-                                      .withDspaceObjectOwner(researcher2.getFullName(), researcher2.getID().toString())
+                                      .withDSpaceObjectOwner(researcher2)
                                       .build();
 
         itemService.addMetadata(context, itemPerson, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
@@ -242,7 +246,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         Item itemPerson = ItemBuilder.createItem(context, col1)
                                      .withPersonIdentifierFirstName("Josiah")
                                      .withPersonIdentifierLastName("Carberry")
-                                     .withDspaceObjectOwner(researcher.getFullName(), researcher.getID().toString())
+                                     .withDSpaceObjectOwner(researcher)
                                      .build();
 
         itemService.addMetadata(context, itemPerson, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
@@ -293,13 +297,13 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         Item itemPerson1 = ItemBuilder.createItem(context, col1)
                                       .withPersonIdentifierFirstName("Josiah")
                                       .withPersonIdentifierLastName("Carberry")
-                                      .withDspaceObjectOwner(researcher.getFullName(), researcher.getID().toString())
+                                      .withDSpaceObjectOwner(researcher)
                                       .build();
 
         Item itemPerson2 = ItemBuilder.createItem(context, col1)
                                       .withPersonIdentifierFirstName("Laura")
                                       .withPersonIdentifierLastName("Shulz")
-                                      .withDspaceObjectOwner(researcher2.getFullName(), researcher2.getID().toString())
+                                      .withDSpaceObjectOwner(researcher2)
                                       .build();
 
         itemService.addMetadata(context, itemPerson1, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
@@ -365,7 +369,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
             .withPersonIdentifierFirstName("Josiah")
             .withPersonIdentifierLastName("Carberry")
             .withOrcidIdentifier("0000-0002-1825-0097")
-            .withDspaceObjectOwner(researcher.getFullName(), researcher.getID().toString())
+            .withDSpaceObjectOwner(researcher)
             .build();
 
         OrcidQueue orcidQueue = createOrcidQueue(context, itemPerson, "Description", "Publication", "12345").build();
@@ -404,7 +408,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         Item itemPerson1 = ItemBuilder.createItem(context, col1)
                                       .withPersonIdentifierFirstName("Josiah")
                                       .withPersonIdentifierLastName("Carberry")
-                                      .withDspaceObjectOwner(researcher.getFullName(), researcher.getID().toString())
+                                      .withDSpaceObjectOwner(researcher)
                                       .build();
 
         itemService.addMetadata(context, itemPerson1, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
@@ -447,7 +451,8 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         Item itemPerson1 = ItemBuilder.createItem(context, col1)
                                       .withPersonIdentifierFirstName("Josiah")
                                       .withPersonIdentifierLastName("Carberry")
-                                      .withDspaceObjectOwner(researcher.getFullName(), researcher.getID().toString())
+                                      .withDSpaceObjectOwner(
+                                          epersonService.getFullName(researcher), researcher.getID().toString())
                                       .build();
 
         itemService.addMetadata(context, itemPerson1, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
@@ -496,7 +501,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         Item itemPerson1 = ItemBuilder.createItem(context, col1)
                                       .withPersonIdentifierFirstName("Josiah")
                                       .withPersonIdentifierLastName("Carberry")
-                                      .withDspaceObjectOwner(researcher.getFullName(), researcher.getID().toString())
+                                      .withDSpaceObjectOwner(researcher)
                                       .build();
 
         itemService.addMetadata(context, itemPerson1, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
@@ -542,7 +547,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         Item itemPerson1 = ItemBuilder.createItem(context, col1)
                                       .withPersonIdentifierFirstName("Josiah")
                                       .withPersonIdentifierLastName("Carberry")
-                                      .withDspaceObjectOwner(researcher.getFullName(), researcher.getID().toString())
+                                      .withDSpaceObjectOwner(researcher)
                                       .build();
 
         itemService.addMetadata(context, itemPerson1, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
@@ -591,7 +596,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         Item itemPerson1 = ItemBuilder.createItem(context, col1)
                                       .withPersonIdentifierFirstName("Josiah")
                                       .withPersonIdentifierLastName("Carberry")
-            .withDspaceObjectOwner(researcher.getFullName(), researcher.getID().toString())
+                                      .withDSpaceObjectOwner(researcher)
                                       .build();
 
         itemService.addMetadata(context, itemPerson1, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
