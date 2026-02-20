@@ -381,8 +381,8 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
                     // Sort metadata values by text value, so their 'position' in db doesn't matter for dedupe purposes
                     List<String> values = metadataValues.stream().map(metadataValue -> {
                         // Apply value modification in case it's configured for the current metadata field
-                        if (duplicateComparisonValueTransformers.containsKey(field)) {
-                            return duplicateComparisonValueTransformers.get(field).transform(metadataValue.getValue());
+                        if (duplicateComparisonValueTransformers.containsKey(fieldName)) {
+                            return duplicateComparisonValueTransformers.get(fieldName).transform(metadataValue.getValue());
                         }
                         return metadataValue.getValue();
                     }).sorted().toList();
