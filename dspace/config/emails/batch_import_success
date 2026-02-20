@@ -6,11 +6,64 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
+#set($mimetype = "text/html")
 #set($subject = 'DSpace - Batch import successfully completed')
-The batch item import you initiated from the DSpace UI has completed successfully.
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Import Completed Successfully</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success {
+            color: #2e7d32;
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #4caf50;
+        }
+        .file-path {
+            background-color: #f1f8e9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .signature {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Batch Import Completed Successfully</h2>
 
-You may find the mapfile for the import in the following path: ${params[0]}
+        <div class="success">
+            <p>The batch item import you initiated from the DSpace UI has completed successfully.</p>
+        </div>
 
+        <p>You may find the mapfile for the import in the following path:</p>
 
-The DSpace Team
+        <div class="file-path">
+            ${params[0]}
+        </div>
 
+        <p class="signature">The DSpace Team</p>
+    </div>
+</body>
+</html>

@@ -10,11 +10,71 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
+#set($mimetype = "text/html")
 #set($subject = "${config.get('dspace.name')}: Error ${params[0]} DOI ${params[3]}")
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOI Operation Failed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .error-header {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #d32f2f;
+        }
+        .error-details {
+            background-color: #fff3f3;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .error-message {
+            background-color: #fce4e4;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #d32f2f;
+        }
+        .signature {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>DOI Operation Failed</h2>
 
-Date:    ${params[1]}
+        <div class="error-details">
+            <p><strong>Date:</strong> ${params[1]}</p>
+        </div>
 
-${params[0]} DOI ${params[4]} for ${params[2]} with ID ${params[3]} failed:
-${params[5]}
+        <div class="error-header">
+            ${params[0]} DOI ${params[4]} for ${params[2]} with ID ${params[3]} failed
+        </div>
 
-The ${config.get('dspace.name')} Team
+        <div class="error-message">
+            ${params[5]}
+        </div>
+
+        <p class="signature">The ${config.get('dspace.name')} Team</p>
+    </div>
+</body>
+</html>

@@ -10,15 +10,86 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
+#set($mimetype = "text/html")
 #set($subject = "${config.get('dspace.name')}: Internal Server Error")
-An internal server error occurred on ${params[0]}:
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Server Error Occurred</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #F5F5F5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .error-header {
+            color: #D32F2F;
+            background-color: #FFEBEE;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #D32F2F;
+        }
+        .error-details {
+            background-color: #FFF3F3;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .detail-item {
+            margin: 8px 0;
+        }
+        .error-message {
+            background-color: #FCE4E4;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #D32F2F;
+        }
+        .exception {
+            background-color: #FFDADA;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #D32F2F;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Internal Server Error Occurred</h2>
 
-Date:       ${params[1]}
-Session ID: ${params[2]}
-User:       ${params[5]}
-IP address: ${params[6]}
+        <div class="error-header">
+            An internal server error occurred on ${params[0]}
+        </div>
 
-${params[3]}
+        <div class="error-details">
+            <div class="detail-item"><strong>Date:</strong> ${params[1]}</div>
+            <div class="detail-item"><strong>Session ID:</strong> ${params[2]}</div>
+            <div class="detail-item"><strong>User:</strong> ${params[5]}</div>
+            <div class="detail-item"><strong>IP address:</strong> ${params[6]}</div>
+        </div>
 
-Exception:
-${params[4]}
+        <div class="error-message">
+            ${params[3]}
+        </div>
+
+        <p><strong>Exception:</strong></p>
+        <div class="exception">
+          ${params[4]}
+        </div>
+    </div>
+</body>
+</html>

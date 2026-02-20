@@ -4,18 +4,89 @@
 ## {1}  Name of collection
 ## {2}  handle
 ##
+#set($mimetype = "text/html")
 #set($subject = "${config.get('dspace.name')}: Submission Approved and Archived")
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Submission Has Been Accepted</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success-notification {
+            color: #2e7d32;
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #4caf50;
+        }
+        .submission-details {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .identifier {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            border: 2px dashed #2196f3;
+        }
+        .citation-note {
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #ff9800;
+        }
+        .signature {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Submission Accepted</h2>
 
-You submitted: ${params[0]}
+        <div class="success-notification">
+            Your submission has been accepted and archived in ${config.get('dspace.name')}!
+        </div>
 
-To collection: ${params[1]}
+        <div class="submission-details">
+            <p><strong>You submitted:</strong> ${params[0]}</p>
+            <p><strong>To collection:</strong> ${params[1]}</p>
+        </div>
 
-Your submission has been accepted and archived in ${config.get('dspace.name')},
-and it has been assigned the following identifier:
-${params[2]}
+        <p>Your submission has been assigned the following identifier:</p>
 
-Please use this identifier when citing your submission.
+        <div class="identifier">
+            ${params[2]}
+        </div>
 
-Many thanks!
+        <div class="citation-note">
+            <p><strong>Please use this identifier when citing your submission.</strong></p>
+        </div>
 
-The ${config.get('dspace.name')} Team
+        <p class="signature">Many thanks!<br><br>
+        The ${config.get('dspace.name')} Team</p>
+    </div>
+</body>
+</html>

@@ -6,14 +6,57 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
+#set($mimetype = "text/html")
 #set($subject = 'DSpace - The batch import was not completed.')
-The batch import you initiated from the DSpace UI was not completed, due to the following reason:
- ${params[0]}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Import Failed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .error {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #d32f2f;
+        }
+        .signature {
+            margin-top: 30px;
+        }
+        .contact {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p>The batch import you initiated from the DSpace UI was not completed, due to the following reason:</p>
 
-For more information you may contact your system administrator:
- ${params[1]}
+        <div class="error">
+            ${params[0]}
+        </div>
 
+        <p class="contact">For more information you may contact your system administrator:<br>
+        ${params[1]}</p>
 
-
-The DSpace Team
-
+        <p class="signature">The DSpace Team</p>
+    </div>
+</body>
+</html>
