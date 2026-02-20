@@ -18,6 +18,8 @@ import org.springframework.data.domain.Sort;
  * This class' purpose is to create a container for the information used in the SearchResultsResource
  */
 public class SearchResultsRest extends DiscoveryResultsRest {
+    public static final String NAME = "searchresult";
+    public static final String PLURAL_NAME = "searchresults";
 
     @JsonIgnore
     private long totalNumberOfResults;
@@ -26,7 +28,7 @@ public class SearchResultsRest extends DiscoveryResultsRest {
     List<SearchResultEntryRest> searchResults;
 
     @JsonIgnore
-    List<SearchFacetEntryRest> facets;
+    Pageable page;
 
     public List<SearchResultEntryRest> getSearchResults() {
         return searchResults;
@@ -53,16 +55,22 @@ public class SearchResultsRest extends DiscoveryResultsRest {
         this.totalNumberOfResults = totalNumberOfResults;
     }
 
-    public void addFacetEntry(final SearchFacetEntryRest facetEntry) {
-        if (facets == null) {
-            facets = new LinkedList<>();
-        }
-
-        facets.add(facetEntry);
+    public Pageable getPage() {
+        return page;
     }
 
-    public List<SearchFacetEntryRest> getFacets() {
-        return facets;
+    public void setPage(Pageable page) {
+        this.page = page;
+    }
+
+    @Override
+    public String getType() {
+        return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public static class AppliedFilter {

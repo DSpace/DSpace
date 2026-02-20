@@ -173,14 +173,14 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         FailableFunction<MockHttpServletRequestBuilder, MockHttpServletRequestBuilder, Exception> modifyRequest,
         List<Matcher<? super Object>> searchResultMatchers
     ) throws Exception {
-        MockHttpServletRequestBuilder minRequest = get("/api/discover/search/objects")
+        MockHttpServletRequestBuilder minRequest = get("/api/discover/searchresults/search/objects")
             .param("configuration", configuration);
 
         MockHttpServletRequestBuilder modifiedRequest = modifyRequest.apply(minRequest);
 
         getClient(authToken).perform(modifiedRequest)
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.type", is("discover")))
+            .andExpect(jsonPath("$.type", is("searchresult")))
             .andExpect(jsonPath("$._embedded.searchResult.page", is(
                 // assume everything fits on one page
                 PageMatcher.pageEntryWithTotalPagesAndElements(
@@ -306,7 +306,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(community),
             matchSearchResult(collection),
@@ -320,7 +320,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify only item 1.2 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(community),
             matchSearchResult(collection),
@@ -344,7 +344,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(community),
             matchSearchResult(collection),
@@ -358,7 +358,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify both items appear in /api/discover/search/objects
+        // verify both items appear in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(community),
             matchSearchResult(collection),
@@ -383,7 +383,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(community),
             matchSearchResult(collection),
@@ -397,7 +397,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify only item 1.2 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(community),
             matchSearchResult(collection),
@@ -425,7 +425,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(getAuthToken(admin.getEmail(), password), configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -437,7 +437,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify only item 1.2 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(getAuthToken(admin.getEmail(), password), configuration, List.of(
             matchSearchResult(i1_2, "item 1.2")
         ));
@@ -469,7 +469,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(getAuthToken(admin.getEmail(), password), configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -482,7 +482,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify only item 1.2 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(getAuthToken(admin.getEmail(), password), configuration, List.of(
             matchSearchResult(i1_2, "item 1.2")
         ));
@@ -504,7 +504,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -516,7 +516,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify only item 1.2 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_2, "item 1.2")
         ));
@@ -539,7 +539,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -551,7 +551,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify only item 1.2 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_2, "item 1.2")
         ));
@@ -574,7 +574,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -586,7 +586,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify both items appear in /api/discover/search/objects
+        // verify both items appear in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
@@ -610,7 +610,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -622,7 +622,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify only item 1.2 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_2, "item 1.2")
         ));
@@ -645,7 +645,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -657,7 +657,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify both items appear in /api/discover/search/objects
+        // verify both items appear in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
@@ -681,7 +681,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -693,7 +693,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify only item 1.2 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_2, "item 1.2")
         ));
@@ -716,7 +716,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -728,7 +728,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify both items appear in /api/discover/search/objects
+        // verify both items appear in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
@@ -752,7 +752,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -764,7 +764,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify only item 1.2 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_2, "item 1.2")
         ));
@@ -787,7 +787,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -799,7 +799,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify both items appear in /api/discover/search/objects
+        // verify both items appear in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
@@ -823,7 +823,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -835,7 +835,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify only item 1.2 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_2, "item 1.2")
         ));
@@ -859,7 +859,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -871,7 +871,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify both items appear in /api/discover/search/objects
+        // verify both items appear in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
@@ -896,7 +896,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -908,7 +908,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify only item 1.2 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_2, "item 1.2")
         ));
@@ -931,7 +931,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -943,7 +943,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify both items appear in /api/discover/search/objects
+        // verify both items appear in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
@@ -967,7 +967,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -979,7 +979,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify only item 1.2 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_2, "item 1.2")
         ));
@@ -1002,7 +1002,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -1014,7 +1014,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify both items appear in /api/discover/search/objects
+        // verify both items appear in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
@@ -1038,7 +1038,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -1050,7 +1050,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify only item 1.2 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_2, "item 1.2")
         ));
@@ -1076,7 +1076,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects
+        // verify item 1.1 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
@@ -1088,7 +1088,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify only item 1.2 appears in /api/discover/searchresults/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_2, "item 1.2")
         ));

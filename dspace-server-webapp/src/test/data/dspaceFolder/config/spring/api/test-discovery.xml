@@ -107,6 +107,7 @@
                 <entry key="123456789/discovery-sub-community-2-1" value-ref="discovery-sub-community-2-1"/>
                 <entry key="123456789/discovery-collection-2-1-1" value-ref="discovery-collection-2-1-1"/>
                 <entry key="123456789/discovery-collection-2-2-1" value-ref="discovery-collection-2-2-1"/>
+                <entry key="123456789/discovery-configuration-tests" value-ref="discovery-parent-community-1" />
 
                 <!-- Configuration for the minAndMax of sidebar facets test (DiscoveryRestControllerIT) -->
                 <!-- Since these tests can not be made dynamic as the rest of the tests -->

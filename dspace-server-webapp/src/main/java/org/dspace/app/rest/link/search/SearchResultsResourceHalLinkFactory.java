@@ -9,6 +9,8 @@ package org.dspace.app.rest.link.search;
 
 import java.util.LinkedList;
 
+import org.dspace.app.rest.RestResourceController;
+import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.model.hateoas.SearchResultsResource;
 import org.springframework.data.domain.Pageable;
@@ -21,13 +23,19 @@ import org.springframework.stereotype.Component;
  * addLinks in the HalLinkService
  */
 @Component
-public class SearchResultsResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<SearchResultsResource> {
+public class SearchResultsResourceHalLinkFactory extends HalLinkFactory<SearchResultsResource, RestResourceController> {
 
     protected void addLinks(SearchResultsResource halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
         SearchResultsRest resultsRest = halResource.getContent();
 
-        list.add(buildLink(IanaLinkRelations.SELF.value(), buildSearchBaseLink(resultsRest).toUriString()));
+        halResource.removeLinks();
+        list.add(Link.of(halResource.constructSelfLink(resultsRest), IanaLinkRelations.SELF));
+    }
+
+    @Override
+    protected Class<RestResourceController> getControllerClass() {
+        return RestResourceController.class;
     }
 
     @Override

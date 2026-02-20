@@ -44,8 +44,6 @@ public class DiscoverResultConverter {
     protected ConverterService converter;
 
     @Autowired
-    private DiscoverFacetsConverter facetConverter;
-    @Autowired
     private SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter;
 
     public SearchResultsRest convert(final Context context, final String query, final List<String> dsoTypes,
@@ -61,16 +59,10 @@ public class DiscoverResultConverter {
 
         addSearchResults(searchResult, resultsRest, projection);
 
-        addFacetValues(context, searchResult, resultsRest, configuration, projection);
-
         resultsRest.setTotalNumberOfResults(searchResult.getTotalSearchResults());
+        resultsRest.setPage(page);
 
         return resultsRest;
-    }
-
-    private void addFacetValues(Context context, final DiscoverResult searchResult, final SearchResultsRest resultsRest,
-            final DiscoveryConfiguration configuration, final Projection projection) {
-        facetConverter.addFacetValues(context, searchResult, resultsRest, configuration, projection);
     }
 
     private void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest,

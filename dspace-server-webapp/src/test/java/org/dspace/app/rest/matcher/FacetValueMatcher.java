@@ -24,7 +24,7 @@ public class FacetValueMatcher {
         return allOf(
             hasJsonPath("$.label", is(label)),
             hasJsonPath("$.type", is("discover")),
-            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("api/discover/searchresults/search/objects")),
             hasJsonPath("$._links.search.href", containsString(
                     "f.author=" + urlPathSegmentEscaper().escape(label) + ",equals"
             ))
@@ -44,7 +44,7 @@ public class FacetValueMatcher {
             hasJsonPath("$.count", is(count)),
             hasJsonPath("$.label", is(label)),
             hasJsonPath("$.type", is("discover")),
-            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("api/discover/searchresults/search/objects")),
             hasJsonPath("$._links.search.href", containsString("f.author=" + authority + ",authority"))
         );
     }
@@ -54,7 +54,7 @@ public class FacetValueMatcher {
             hasJsonPath("$.label", is(label)),
             hasJsonPath("$.type", is("discover")),
             hasJsonPath("$.count", is(count)),
-            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("api/discover/searchresults/search/objects")),
             hasJsonPath("$._links.search.href", containsString(
                 "f.subject=" + urlPathSegmentEscaper().escape(label) + ",equals"))
         );
@@ -65,7 +65,7 @@ public class FacetValueMatcher {
                 hasJsonPath("$.label", is(label)),
                 hasJsonPath("$.type", is("discover")),
                 hasJsonPath("$.count", is(count)),
-                hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+                hasJsonPath("$._links.search.href", containsString("api/discover/searchresults/search/objects")),
                 hasJsonPath("$._links.search.href", containsString("f." + facet + "=" + label + ",equals"))
         );
     }
@@ -77,7 +77,7 @@ public class FacetValueMatcher {
             hasJsonPath("$.count", is(count)),
             hasJsonPath("$.label", is(label)),
             hasJsonPath("$.type", is("discover")),
-            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("api/discover/searchresults/search/objects")),
             hasJsonPath("$._links.search.href", containsString("f.subject=" + authority + ",authority"))
         );
     }
@@ -86,7 +86,7 @@ public class FacetValueMatcher {
         return allOf(
             hasJsonPath("$.label", Matchers.notNullValue()),
             hasJsonPath("$.type", is("discover")),
-            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("api/discover/searchresults/search/objects")),
             hasJsonPath("$._links.search.href", containsString("f.dateIssued=")),
             hasJsonPath("$._links.search.href", containsString(",equals"))
         );
@@ -97,7 +97,7 @@ public class FacetValueMatcher {
             hasJsonPath("$.label", Matchers.notNullValue()),
             hasJsonPath("$.type", is("discover")),
             hasJsonPath("$.count", is(1)),
-            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("api/discover/searchresults/search/objects")),
             hasJsonPath("$._links.search.href", containsString("f.dateIssued=")),
             hasJsonPath("$._links.search.href", containsString(",equals"))
         );
@@ -107,7 +107,7 @@ public class FacetValueMatcher {
         return allOf(
             hasJsonPath("$.label", is(label)),
             hasJsonPath("$.type", is("discover")),
-            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("api/discover/searchresults/search/objects")),
             hasJsonPath("$._links.search.href", containsString("f.dateIssued=")),
             hasJsonPath("$._links.search.href", containsString(",equals"))
         );
@@ -119,7 +119,7 @@ public class FacetValueMatcher {
             hasJsonPath("$.count", is(count)),
             hasJsonPath("$.label", is(label)),
             hasJsonPath("$.type", is("discover")),
-            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("api/discover/searchresults/search/objects")),
             hasJsonPath("$._links.search.href", containsString("f.supervisedBy=" + authority + ",authority"))
         );
     }

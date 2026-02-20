@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter.query;
 
-import static org.dspace.app.rest.model.SearchConfigurationRest.Filter.OPERATOR_QUERY;
+import static org.dspace.app.rest.model.SearchFilterRest.OPERATOR_QUERY;
 
 import java.util.LinkedList;
 import java.util.List;

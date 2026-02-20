@@ -7,23 +7,24 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.app.rest.RestResourceController;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
 /**
  * This class' purpose is to create a container for the information used in the SearchFacetEntryResource
  */
-public class SearchFacetEntryRest extends RestAddressableModel {
+@LinksRest(links = {
+    @LinkRest(name = SearchFacetEntryRest.VALUES, method = "getValues"),
+})
+public class SearchFacetEntryRest extends BaseObjectRest<String> {
 
-    public static final String NAME = "discover";
-    public static final String PLURAL_NAME = NAME;
+    public static final String NAME = "facet";
+    public static final String PLURAL_NAME = "facets";
     public static final String CATEGORY = RestModel.DISCOVER;
+    public static final String VALUES = "values";
 
     private String name;
     private String facetType;
@@ -44,17 +45,17 @@ public class SearchFacetEntryRest extends RestAddressableModel {
     private String maxValue;
 
     @JsonIgnore
-    private List<SearchFacetValueRest> values = new LinkedList<>();
+    private SearchFacetInformation facetInformation;
 
     public SearchFacetEntryRest(final String name) {
         this.name = name;
+        setId(name);
     }
 
     public String getCategory() {
         return CATEGORY;
     }
 
-    @JsonIgnore
     public String getType() {
         return NAME;
     }
@@ -68,7 +69,7 @@ public class SearchFacetEntryRest extends RestAddressableModel {
     }
 
     public Class getController() {
-        return DiscoveryRestController.class;
+        return RestResourceController.class;
     }
 
     public String getName() {
@@ -79,12 +80,12 @@ public class SearchFacetEntryRest extends RestAddressableModel {
         this.name = name;
     }
 
-    public void addValue(final SearchFacetValueRest valueRest) {
-        values.add(valueRest);
+    public SearchFacetInformation getFacetInformation() {
+        return facetInformation;
     }
 
-    public List<SearchFacetValueRest> getValues() {
-        return values;
+    public void setFacetInformation(SearchFacetInformation facetInformation) {
+        this.facetInformation = facetInformation;
     }
 
     public String getFacetType() {

@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.rest.parameter.SearchFilter;
 
 /**
@@ -50,7 +50,7 @@ public abstract class DiscoveryResultsRest extends BaseObjectRest<String> {
     }
 
     public Class getController() {
-        return DiscoveryRestController.class;
+        return RestResourceController.class;
     }
 
     public String getQuery() {
