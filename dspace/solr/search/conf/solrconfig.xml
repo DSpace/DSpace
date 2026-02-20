@@ -166,6 +166,8 @@
         </arr>
     </requestHandler>
 
+    <!-- Suggest dictionaries here should either use a field ending in _suggest
+         as configured in discovery.cfg, or flat files -->
     <searchComponent name="suggest" class="solr.SuggestComponent">
         <lst name="suggester">
             <str name="name">subject</str>
@@ -184,6 +186,16 @@
             <str name="suggestAnalyzerFieldType">textgen</str>
             <str name="buildOnCommit">true</str>
             <str name="buildOnOptimize">true</str>
+        </lst>
+        <lst name="suggester">
+            <str name="name">countries_file</str>
+            <str name="lookupImpl">FuzzyLookupFactory</str>
+            <str name="dictionaryImpl">FileDictionaryFactory</str>
+            <str name="sourceLocation">countries.txt</str>
+            <str name="suggestAnalyzerFieldType">textgen</str>
+            <str name="buildOnCommit">true</str>
+            <str name="buildOnOptimize">true</str>
+            <str name="buildOnStartup">true</str>
         </lst>
     </searchComponent>
 
