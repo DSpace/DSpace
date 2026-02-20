@@ -69,11 +69,11 @@
 
     <bean id="arxivDoiContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="arxiv.arxiv.doi"/>
-        <property name="query" value="arxiv:doi"/>
-        <property name="prefixToNamespaceMapping" ref="arxivArxivPrefixToNamespaceMapping"/>
+        <property name="query" value="ns:link[@title='doi']/@href"/>
+        <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
     </bean>
     <bean id="arxiv.arxiv.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier"/>
+        <constructor-arg value="dc.relation.hasversion"/>
     </bean>
 
     <bean id="arxivJournalContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">

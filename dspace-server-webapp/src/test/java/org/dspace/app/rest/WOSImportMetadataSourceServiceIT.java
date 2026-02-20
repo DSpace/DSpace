@@ -112,7 +112,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
                 "Preservice science teachers coding science simulations:"
                 + " epistemological understanding, coding skills, and lesson design");
         MetadatumDTO issn = createMetadatumDTO("dc", "identifier", "issn", "1042-1629");
-        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", null, "10.1007/s11423-022-10119-7");
+        MetadatumDTO doi = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.1007/s11423-022-10119-7");
         MetadatumDTO description = createMetadatumDTO("dc", "description", "abstract",
                 "National and state science learning standards urge K-12 educators to offer authentic Science,"
                 + " Technology, Engineering, and Mathematics learning experiences.");
@@ -184,7 +184,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         "The latent structure of global scientific development");
 
         MetadatumDTO issn2 = createMetadatumDTO("dc", "identifier", "issn", "2397-3374");
-        MetadatumDTO doi2 = createMetadatumDTO("dc", "identifier", null, "10.1038/s41562-022-01367-x");
+        MetadatumDTO doi2 = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.1038/s41562-022-01367-x");
         MetadatumDTO description2 = createMetadatumDTO("dc", "description", "abstract",
                 "Science is essential to innovation and economic prosperity."
                 + "By examining the scientific output of each country,"
