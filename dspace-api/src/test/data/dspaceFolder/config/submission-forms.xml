@@ -483,6 +483,116 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
    </form>
 
+   <form name="grobidmetadata">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Title</label>
+         <input-type>onebox</input-type>
+         <required>Field required</required>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>author</dc-qualifier>
+         <label>Author</label>
+         <input-type>name</input-type>
+         <repeatable>false</repeatable>
+         <required>You must enter at least the author.</required>
+         <hint>Enter the names of the authors of this item in the form Lastname, Firstname [i.e. Smith, Josh or Smith, J].</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>source</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Journal</label>
+         <input-type>onebox</input-type>
+         <hint>Enter the Journal of the publication</hint>
+         <required></required>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>
+         <dc-qualifier>issued</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Date of Issue</label>
+         <style>col-sm-4</style>
+         <input-type>date</input-type>
+         <hint>Please give the date of previous publication or public distribution.
+           You can leave out the day and/or month if they aren't
+           applicable.</hint>
+         <required>You must enter at least the year.</required>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>issn</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>ISSN</label>
+         <input-type>onebox</input-type>
+         <hint>Enter the ISSN of the book.</hint>
+         <required></required>
+       </field>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>isbn</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>ISBN of Book</label>
+         <input-type>onebox</input-type>
+         <hint>Enter the ISBN of the book in which this chapter appears.</hint>
+         <required></required>
+       </field>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>doi</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>DOI</label>
+         <input-type>onebox</input-type>
+         <hint>Enter the DIO of the publication.</hint>
+         <required></required>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier>abstract</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Abstract</label>
+         <input-type>textarea</input-type>
+         <hint>Enter the abstract of the item. </hint>
+         <required></required>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>subject</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Subject</label>
+         <input-type>onebox</input-type>
+         <hint>Subject field that can be associated with an authority providing lookup</hint>
+         <required></required>
+       </field>
+     </row>
+   </form>
+
+
  </form-definitions>
 
 

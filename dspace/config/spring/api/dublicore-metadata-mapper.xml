@@ -51,7 +51,7 @@
         <constructor-arg value="dc.subject"/>
     </bean>
  	<bean id="dcDoi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier"/>
+        <constructor-arg value="dc.identifier.doi"/>
     </bean>
  	<bean id="dcPublisher" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.publisher"/>

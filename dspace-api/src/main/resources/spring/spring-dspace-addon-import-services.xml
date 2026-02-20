@@ -31,6 +31,7 @@
                 <ref bean="tsvImportService" />
                 <ref bean="endnoteImportService" />
                 <ref bean="DoiImportService" />
+                <ref bean="grobidImportMetadataSourceService" />
             </list>
          </property>
     </bean>
@@ -320,6 +321,15 @@
 
     <bean class="java.lang.Integer" id="maxRetry">
         <constructor-arg value="3"/>
+    </bean>
+
+    <bean id="grobidImportMetadataSourceService" class="org.dspace.submit.extraction.GrobidImportMetadataSourceServiceImpl">
+        <property name="supportedExtensions">
+            <list>
+                <value>pdf</value>
+            </list>
+        </property>
+        <property name="metadataFieldMap" ref="grobidMetadataFieldMap"/>
     </bean>
 
 </beans>
