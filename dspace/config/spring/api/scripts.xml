@@ -92,6 +92,14 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.itemexport.ItemExportCLI"/>
     </bean>
 
+    <bean id="get-github-release"
+          class="org.dspace.app.statistics.GetGithubReleaseScriptConfiguration">
+        <property name="description"
+                  value="Fetch a release from Github"/>
+        <property name="dspaceRunnableClass"
+                  value="org.dspace.app.statistics.GetGithubRelease"/>
+    </bean>
+
     <bean id="subscription-send" class="org.dspace.subscriptions.SubscriptionEmailNotificationCliScriptConfiguration">
         <property name="description" value="Send emails related to Community/Collection/Item subscriptions"/>
         <property name="dspaceRunnableClass" value="org.dspace.subscriptions.SubscriptionEmailNotificationCli"/>

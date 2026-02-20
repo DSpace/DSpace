@@ -97,6 +97,19 @@
         </step>
     </command>
     <command>
+        <name>get-counter-robots</name>
+        <description>Download the latest COUNTER robots pattern list as ./COUNTER_Robots_list.txt</description>
+        <step>
+            <class>org.dspace.app.statistics.GetGithubRelease</class>
+            <argument>--owner</argument>
+            <argument>atmire</argument>
+            <argument>--repository</argument>
+            <argument>COUNTER-Robots</argument>
+            <argument>--file</argument>
+            <argument>generated/COUNTER_Robots_list.txt</argument>
+        </step>
+    </command>
+    <command>
         <name>harvest</name>
         <description>Manage the OAI-PMH harvesting of external collections</description>
         <step>
