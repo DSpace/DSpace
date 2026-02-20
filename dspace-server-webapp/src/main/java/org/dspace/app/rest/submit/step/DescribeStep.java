@@ -9,6 +9,7 @@ package org.dspace.app.rest.submit.step;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.Strings;
@@ -93,6 +94,13 @@ public class DescribeStep extends AbstractProcessingStep {
                     for (Object qualifier : input.getPairs()) {
                         fieldsName.add(input.getFieldName() + "." + (String) qualifier);
                     }
+                } else if (Strings.CI.equals(input.getInputType(), "group") ||
+                    Strings.CI.equals(input.getInputType(), "inline-group")) {
+                    log.debug("Called child form:" + config.getId() + "-" +
+                             Utils.standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
+                    DCInputSet inputConfigChild = inputReader.getInputsByFormName(config.getId() + "-" + Utils
+                        .standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
+                    readField(obj, config, data, inputConfigChild);
                 } else {
                     String fieldName = input.getFieldName();
                     if (fieldName != null) {
@@ -168,7 +176,9 @@ public class DescribeStep extends AbstractProcessingStep {
             PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory()
                         .instanceOf(DESCRIBE_STEP_METADATA_OPERATION_ENTRY, op.getOp());
             String[] split = patchOperation.getAbsolutePath(op.getPath()).split("/");
-            if (inputConfig.isFieldPresent(split[0])) {
+            String fieldName = split[0];
+            Optional<DCInput> field = inputConfig.getField(fieldName);
+            if (field.isPresent()) {
                 patchOperation.perform(context, currentRequest, source, op);
             } else {
                 throw new UnprocessableEntityException("The field " + split[0] + " is not present in section "

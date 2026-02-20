@@ -8,6 +8,7 @@
 package org.dspace.scripts;
 
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -18,7 +19,9 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.cli.DSpaceSkipUnknownArgumentsParser;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
@@ -52,6 +55,11 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
      *  a CommandlineDSpaceRunnableHandler depending from where the script is called
      */
     protected DSpaceRunnableHandler handler;
+
+    /**
+     * Tells if the current context user that is running the script is an admin
+     */
+    private Boolean isAdmin = null;
 
     /**
      * This method will return the Configuration that the implementing DSpaceRunnable uses
@@ -207,5 +215,37 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
 
     public enum StepResult {
         Continue, Exit;
+    }
+
+    protected boolean isAdmin() {
+        return isAdmin;
+    }
+
+    protected void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
+
+    /**
+     * Method that handles the authorization system for the script.
+     * It will disable the authorization system if the script is run as an admin.
+     * It will restore authorization system if is in ignore state and if the script is run as an admin.
+     *
+     * @param context current DSpace Context
+     */
+    protected void handleAuthorizationSystem(Context context) {
+        if (this.isAdmin == null) {
+            try {
+                this.setAdmin(AuthorizeServiceFactory.getInstance().getAuthorizeService().isAdmin(context));
+            } catch (SQLException e) {
+                handler.handleException("Cannot determine if the script is run as an admin", e);
+            }
+        }
+        if (Boolean.TRUE.equals(this.isAdmin)) {
+            if (context.ignoreAuthorization()) {
+                context.restoreAuthSystemState();
+            } else {
+                context.turnOffAuthorisationSystem();
+            }
+        }
     }
 }

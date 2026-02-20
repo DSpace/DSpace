@@ -92,7 +92,7 @@ public interface ItemService
      * @param item    item to populate with template item specified metadata
      * @throws SQLException       if database error
      */
-    public void populateWithTemplateItemMetadata (Context context, Collection collection, boolean template, Item item)
+    void populateWithTemplateItemMetadata(Context context, Collection collection, boolean template, Item item)
         throws SQLException;
 
     /**
@@ -743,6 +743,30 @@ public interface ItemService
             throws SQLException, AuthorizeException;
 
     /**
+     * Find items based on a specific metadata field and value, bypassing standard
+     * status filters. If the value is <code>Item.ANY</code>, it returns all items
+     * containing at least one value for the specified field.
+     * <p>
+     * This method validates the existence of the schema and field before querying
+     * the DAO. It does not filter by archive status, meaning results may include
+     * workspace, workflow, or withdrawn items depending on the DAO implementation.
+     * </p>
+     *
+     * @param context   DSpace context object
+     * @param schema    metadata schema name (e.g., "dc")
+     * @param element   metadata element name (e.g., "identifier")
+     * @param qualifier metadata qualifier name (e.g., "uri"), or null
+     * @param value     the value to search for, or <code>Item.ANY</code> to match any value
+     * @return an iterator over the matching items
+     * @throws SQLException             if a database error occurs
+     * @throws AuthorizeException       if the user lacks sufficient privileges
+     * @throws IllegalArgumentException if the schema or metadata field does not exist
+     */
+    Iterator<Item> findUnfilteredByMetadataField(Context context,
+                                                 String schema, String element, String qualifier, String value)
+        throws SQLException, AuthorizeException;
+
+    /**
      * Returns an iterator of in archive items possessing the passed metadata field, or only
      * those matching the passed value, if value is not Item.ANY. This method excludes items
      * that are not the latest version in their version history (old versions of versioned items).
@@ -822,7 +846,6 @@ public interface ItemService
      * @return an iterator over the items matching that authority value
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
-     * @throws IOException        if IO error
      */
     Iterator<Item> findByAuthorityValue(Context context,
                                                String schema, String element, String qualifier, String value)
@@ -1013,6 +1036,36 @@ public interface ItemService
                                            String lang, boolean enableVirtualMetadata);
 
     /**
+     * Returns the item's entity type, if any.
+     *
+     * @param  item    the item
+     * @return         the entity type as string, if any
+     */
+    String getEntityType(Item item);
+
+    /**
+     * Set the entity type of the given item with the provided value.
+     *
+     * @param item       the item to update
+     * @param entityType the entity type to set
+     */
+    void setEntityType(Context context, Item item, String entityType);
+
+    /**
+     * Find all the items in the archive or not with a given authority key value in LIKE format.
+     *
+     * @param context         DSpace context object
+     * @param likeAuthority   value that will be used with operator LIKE on field
+     *                        authority, it's possible to enter '%' to improve
+     *                        searching
+     * @param inArchive       true for archived items, null for all items (archived and not)
+     * @return
+     * @throws SQLException   if database error
+     */
+    Iterator<Item> findByLikeAuthorityValue(Context context, String likeAuthority,
+                                            Boolean inArchive) throws SQLException;
+
+    /**
      * Retrieve the label of the entity type of the given item.
      * @param item the item.
      * @return the label of the entity type, taken from the item metadata, or null if not found.
@@ -1027,7 +1080,8 @@ public interface ItemService
      */
     EntityType getEntityType(Context context, Item item) throws SQLException;
 
-
+    Iterator<Item> findRelatedItemsByAuthorityControlledFields(Context context,
+                                                               Item item, List<String> authorities);
     /**
      * Check whether the given item is the latest version. If the latest item cannot
      * be determined, because either the version history or the latest version is
@@ -1036,5 +1090,5 @@ public interface ItemService
      * @param  item    the item that should be checked.
      * @return         true if the item is the latest version, false otherwise.
      */
-    public boolean isLatestVersion(Context context, Item item) throws SQLException;
+    boolean isLatestVersion(Context context, Item item) throws SQLException;
 }

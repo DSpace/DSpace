@@ -8,8 +8,10 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -58,6 +60,11 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         int total = submissionConfigService.countSubmissionConfigs();
         List<SubmissionConfig> subConfs = submissionConfigService.getAllSubmissionConfigs(
                 pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
+
+        subConfs = subConfs.stream()
+                           .sorted(Comparator.comparing(SubmissionConfig::getSubmissionName))
+                           .collect(Collectors.toList());
+
         return converter.toRestPage(subConfs, pageable, total, utils.obtainProjection());
     }
 

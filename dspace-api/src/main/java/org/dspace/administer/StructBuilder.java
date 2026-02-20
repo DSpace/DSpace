@@ -56,6 +56,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.CrisConstants;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -347,6 +348,7 @@ public class StructBuilder {
         communityMap.put("sidebar", MD_SIDEBAR_TEXT);
 
         collectionMap.put("name", MD_NAME);
+        collectionMap.put("shared-workspace", CrisConstants.MD_SHARED_WORKSPACE);
         collectionMap.put("description", MD_SHORT_DESCRIPTION);
         collectionMap.put("intro", MD_INTRODUCTORY_TEXT);
         collectionMap.put("copyright", MD_COPYRIGHT_TEXT);

@@ -56,7 +56,7 @@ public class ValidationServiceImpl implements ValidationService {
     public List<ValidationError> validate(Context context, InProgressSubmission<?> obj) {
 
         SubmissionConfig submissionConfig = submissionConfigReader
-            .getSubmissionConfigByCollection(obj.getCollection());
+                .getSubmissionConfigByInProgressSubmission(obj, context);
 
         List<ValidationError> errors = new ArrayList<ValidationError>();
 

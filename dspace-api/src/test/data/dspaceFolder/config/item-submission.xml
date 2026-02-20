@@ -20,6 +20,8 @@
         <name-map collection-handle="default" submission-name="traditional"/>
         <name-map collection-handle="123456789/traditional-with-custom-url"
                   submission-name="traditional-with-custom-url"/>
+        <name-map collection-handle="123456789/nested-metadata-test"
+                  submission-name="nestedMetadataTest"/>
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
         <name-map collection-handle="123456789/extraction-test" submission-name="extractiontestprocess"/>
         <name-map collection-handle="123456789/qualdrop-test" submission-name="qualdroptest"/>
@@ -33,6 +35,10 @@
         <name-map collection-handle="123456789/test-duplicate-detection" submission-name="test-duplicate-detection"/>
         <name-map collection-handle="123456789/collection-test-patch" submission-name="publicationTestPatch"/>
         <name-map collection-handle="123456789/enforced-relation" submission-name="enforcedRelation"/>
+        <name-map collection-handle="123456789/person" submission-name="person-submission"/>
+        <name-map collection-handle="123456789/modeA" submission-name="modeA"/>
+        <name-map collection-handle="123456789/mode2" submission-name="modeB"/>
+        <name-map collection-handle="123456789/patent-test" submission-name="patent"/>
     </submission-map>
 
 
@@ -115,6 +121,12 @@
             <type>accessCondition</type>
         </step-definition>
 
+        <step-definition id="personstep">
+            <heading>Submit Person Details</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
         <!-- Step Upload Item with Embargo Features to enable this step, please
             make sure to comment-out the previous step "UploadStep" <step-definition id="upload-with-embargo">
             <heading>submit.progressbar.upload</heading> <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
@@ -139,6 +151,24 @@
             <scope visibility="read-only">submission</scope> </step-definition> <step-definition mandatory="false">
             <heading>fake.workflow.readonly</heading> <processing-class>org.dspace.submit.step.SampleStep</processing-class>
             <type>sample</type> <scope visibility="read-only">workflow</scope> </step-definition> -->
+
+        <!-- patent steps [START] -->
+        <step-definition id="patent" mandatory="true">
+            <heading>submit.progressbar.describe.patent</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="patent_indexing" mandatory="true">
+            <heading>submit.progressbar.describe.patent_indexing</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="patent_references" mandatory="true">
+            <heading>submit.progressbar.describe.patent_references</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <!-- publication steps [END]   -->
 
         <!-- This is the Sample Step which utilizes the JSPSampleStep class -->
         <step-definition id="sample">
@@ -216,10 +246,40 @@
             <type>submission-form</type>
         </step-definition>
 
+        <step-definition id="publicationStepGroup" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <step-definition id="titleAndIssuedDate" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        
+        <step-definition id="onlyTitle" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
         <step-definition id="custom-url">
             <heading>submit.progressbar.CustomUrlStep</heading>
             <processing-class>org.dspace.app.rest.submit.step.CustomUrlStep</processing-class>
             <type>custom-url</type>
+        </step-definition>
+
+        <step-definition id="funding" mandatory="true">
+            <heading>submit.progressbar.describe.funding</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <step-definition id="orgunit" mandatory="true">
+            <heading>submit.progressbar.describe.orgunit</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
         </step-definition>
 
     </step-definitions>
@@ -275,6 +335,16 @@
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
             <step id="custom-url"/>
+        </submission-process>
+
+        <!-- patent, used by some collection like 123456789/1001 -->
+        <submission-process name="patent">
+            <step id="collection" />
+            <step id="patent" />
+            <step id="patent_indexing" />
+            <step id="patent_references" />
+            <step id="upload" />
+            <step id="license" />
         </submission-process>
 
         <submission-process name="languagetestprocess">
@@ -345,6 +415,44 @@
             <step id="upload-no-required-metadata" />
             <step id="license" />
         </submission-process>
+
+        <submission-process name="nestedMetadataTest">
+            <step id="collection" />
+            <step id="publicationStepGroup" />
+        </submission-process>
+
+        <submission-process name="person-submission">
+            <step id="collection"/>
+            <step id="personstep"/>
+        </submission-process>
+
+        <submission-process name="modeA">
+           <step id="titleAndIssuedDate"/>
+        </submission-process>
+
+        <submission-process name="modeB">
+           <step id="onlyTitle"/>
+        </submission-process>
+
+        <submission-process name="modeC">
+           <step id="collection" />
+           <step id="onlyTitle"/>
+           <step id="upload" />
+        </submission-process>
+
+        <submission-process name="funding">
+            <step id="collection" />
+            <step id="funding" />
+<!--            <step id="detect-duplicate" />-->
+            <step id="license" />
+        </submission-process>
+
+        <submission-process name="orgunit">
+            <step id="collection" />
+            <step id="orgunit" />
+            <step id="license" />
+        </submission-process>
+
     </submission-definitions>
 
 </item-submission>
