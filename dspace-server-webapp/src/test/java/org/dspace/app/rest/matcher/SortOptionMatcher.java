@@ -59,7 +59,7 @@ public class SortOptionMatcher {
     }
 
     public static Matcher<? super Object> sortOptionMatcher(DiscoverySortFieldConfiguration option) {
-        return sortOptionMatcher(option.getMetadataField(), option.getDefaultSortOrder().name());
+        return sortOptionMatcher(option.getSortField(), option.getDefaultSortOrder().name());
     }
 
     public static Matcher<? super Object>[] createSortOptionMatchers(List<DiscoverySortFieldConfiguration> options) {

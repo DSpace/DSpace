@@ -86,7 +86,7 @@ public class SearchResultsRestRepository extends DSpaceRestRepository<SearchResu
         try {
             discoverQuery = queryBuilder
                 .buildQuery(context, scopeObject, discoveryConfiguration, query, searchFilters, dsoTypes, page,
-                    hitHighlighting == null || hitHighlighting);
+                    hitHighlighting == null || hitHighlighting, false);
             searchResult = searchService.search(context, scopeObject, discoverQuery);
 
         } catch (SearchServiceException e) {

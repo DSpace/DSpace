@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class DiscoverySortFieldConfiguration {
 
+    private String name;
     private String metadataField;
     private String type = DiscoveryConfigurationParameters.TYPE_TEXT;
 
@@ -26,12 +27,28 @@ public class DiscoverySortFieldConfiguration {
 
     private SORT_ORDER defaultSortOrder;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getMetadataField() {
         return metadataField;
     }
 
     public void setMetadataField(String metadataField) {
         this.metadataField = metadataField;
+    }
+
+    /**
+     * Get the field this sort configuration is targeting
+     * Metadata field takes priority over name
+     */
+    public String getSortField() {
+        return metadataField != null ? metadataField : name;
     }
 
     public String getType() {
@@ -55,7 +72,7 @@ public class DiscoverySortFieldConfiguration {
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof DiscoverySortFieldConfiguration) {
             DiscoverySortFieldConfiguration compareConfig = (DiscoverySortFieldConfiguration) obj;
-            if (compareConfig.getMetadataField().equals(getMetadataField()) && compareConfig.getType()
+            if (compareConfig.getSortField().equals(getSortField()) && compareConfig.getType()
                                                                                             .equals(getType())) {
                 return true;
             }
@@ -66,7 +83,7 @@ public class DiscoverySortFieldConfiguration {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(3, 19)
-            .append(this.getMetadataField())
+            .append(this.getSortField())
             .append(this.getType())
             .toHashCode();
     }
