@@ -123,4 +123,9 @@
     <bean id="communityDeletionStrategy" class="org.dspace.deletion.process.strategies.CommunityDeletionStrategy" />
     <bean id="collectionDeletionStrategy" class="org.dspace.deletion.process.strategies.CollectionDeletionStrategy" />
 
+    <bean id="item-enhancer" class="org.dspace.content.enhancer.script.ItemEnhancerScriptConfiguration">
+        <property name="description" value="Script that allows to enhance all items"/>
+        <property name="dspaceRunnableClass" value="org.dspace.content.enhancer.script.ItemEnhancerScript"/>
+    </bean>
+
 </beans>
