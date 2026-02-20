@@ -1168,13 +1168,6 @@
                 <version>3.5.0.Final</version>
             </dependency>
 
-            <!-- Hibernate & Solr disagree on the version of antlr. So, specify the latest version -->
-            <dependency>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-runtime</artifactId>
-                <version>4.13.2</version>
-            </dependency>
-
             <!-- Rome is used for RSS / ATOM syndication feeds -->
             <dependency>
                 <groupId>com.rometools</groupId>
