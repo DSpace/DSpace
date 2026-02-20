@@ -287,4 +287,101 @@
         <scope_note>Contains all uuids of PROJECTS which link to the current FUNDING AGENCY via a "latest" relationship. In other words, this stores all relationships pointing to the current FUNDING AGENCY from any PROJECT, implying that the FUNDING AGENCY is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>relation</schema>
+        <element>isAuthorOfDataset</element>
+        <scope_note>Contains all uuids of the "latest" AUTHORS that the current DATASET links to via a relationship. In other words, this stores all relationships pointing from the current DATASET to any AUTHOR where the AUTHOR is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isAuthorOfDataset</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of AUTHORS which link to the current DATASET via a "latest" relationship. In other words, this stores all relationships pointing to the current DATASET from an AUTHOR, implying that the DATASET is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isDatasetOfAuthor</element>
+        <scope_note>Contains all uuids of the "latest" DATASETS that the current AUTHOR links to via a relationship. In other words, this stores all relationships pointing from the current AUTHOR to any DATASET where the DATASET is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isDatasetOfAuthor</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of DATASETS which link to the current AUTHOR via a "latest" relationship. In other words, this stores all relationships pointing to the current AUTHOR from any DATASET, implying that the AUTHOR is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProjectOfDataset</element>
+        <scope_note>Contains all uuids of the "latest" PROJECTS that the current DATASET links to via a relationship. In other words, this stores all relationships pointing from the current DATASET to any PROJECT where the PROJECT is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProjectOfDataset</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of PROJECTS which link to the current DATASET via a "latest" relationship. In other words, this stores all relationships pointing to the current DATASET from any PROJECT, implying that the DATASET is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isDatasetOfProject</element>
+        <scope_note>Contains all uuids of the "latest" DATASETS that the current PROJECT links to via a relationship. In other words, this stores all relationships pointing from the current PROJECT to any DATASET where the DATASET is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isDatasetOfProject</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of DATASETS which link to the current PROJECT via a "latest" relationship. In other words, this stores all relationships pointing to the current PROJECT from any DATASET, implying that the PROJECT is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isOrgUnitOfDataset</element>
+        <scope_note>Contains all uuids of the "latest" ORGANISATIONAL UNITS that the current DATASET links to via a relationship. In other words, this stores all relationships pointing from the current DATASET to any ORGANISATIONAL UNIT where the ORGANISATIONAL UNIT is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isOrgUnitOfDataset</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of ORGANISATIONAL UNITS which link to the current DATASET via a "latest" relationship. In other words, this stores all relationships pointing to the current DATASET from any ORGANISATIONAL UNIT, implying that the DATASET is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isDatasetOfOrgUnit</element>
+        <scope_note>Contains all uuids of the "latest" DATASETS that the current ORGANISATIONAL UNIT links to via a relationship. In other words, this stores all relationships pointing from the current ORGANISATIONAL UNIT to any DATASET where the DATASET is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isDatasetOfOrgUnit</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of DATASETS which link to the current ORGANISATIONAL UNIT via a "latest" relationship. In other words, this stores all relationships pointing to the current ORGANISATIONAL UNIT from any DATASET, implying that the ORGANISATIONAL UNIT is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfDataset</element>
+        <scope_note>Contains all uuids of the "latest" PUBLICATIONS that the current DATASET links to via a relationship. In other words, this stores all relationships pointing from the current DATASET to any PUBLICATION where the PUBLICATION is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfDataset</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of PUBLICATIONS which link to the current DATASET via a "latest" relationship. In other words, this stores all relationships pointing to the current DATASET from any PUBLICATION, implying that the DATASET is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isDatasetOfPublication</element>
+        <scope_note>Contains all uuids of the "latest" DATASETS that the current PUBLICATION links to via a relationship. In other words, this stores all relationships pointing from the current PUBLICATION to any DATASET where the DATASET is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isDatasetOfPublication</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of DATASETS which link to the current PUBLICATION via a "latest" relationship. In other words, this stores all relationships pointing to the current PUBLICATION from any DATASET, implying that the PUBLICATION is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+
 </dspace-dc-types>

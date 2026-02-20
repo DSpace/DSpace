@@ -21,6 +21,10 @@
                 <entry key="isVolumeOfJournal" value-ref="isVolumeOfJournalMap"/>
                 <entry key="isIssueOfJournalVolume" value-ref="isIssueOfJournalVolumeMap"/>
                 <entry key="isJournalIssueOfPublication" value-ref="isJournalIssueOfPublicationMap"/>
+                <entry key="isAuthorOfDataset" value-ref="isAuthorOfPublicationMap"/>
+                <entry key="isOrgUnitOfDataset" value-ref="isOrgUnitOfPublicationMap"/>
+                <entry key="isDatasetOfPublication" value-ref="isDatasetOfPublicationMap"/>
+                <entry key="isPublicationOfDataset" value-ref="isPublicationOfDatasetMap"/>
             </map>
         </property>
     </bean>
@@ -31,6 +35,7 @@
                 <entry key="Publication" value="f.entityType=Publication,equals"/>
                 <entry key="Person" value="f.entityType=Person,equals"/>
                 <entry key="Journal" value="f.entityType=Journal,equals"/>
+                <entry key="Dataset" value="f.entityType=Dataset,equals"/>
             </map>
         </property>
     </bean>
@@ -223,6 +228,27 @@
         </property>
         <property name="separator">
             <value>, </value>
+        </property>
+    </bean>
+
+    <util:map id="isDatasetOfPublicationMap">
+        <entry key="dc.relation.isbasedon" value-ref="relatedEntityIdentifier_uri"/>
+    </util:map>
+    <util:map id="isPublicationOfDatasetMap">
+        <entry key="dc.relation.isreferencedby" value-ref="relatedEntityIdentifier_uri"/>
+    </util:map>
+    <!-- This Collected bean will create a list of dc.identifier.uri virtual metadata fields that hold the value of
+    Create new scratch file from selection, each of them in a separate metadata value.
+    If the related item has:
+        dc.relation.isbasedon/isreferencedby = https://demo.dspace.org/handle/123456789/123
+    Then the original item will have, in this case:
+        dc.identifier.uri = https://demo.dspace.org/handle/123456789/123
+    -->
+    <bean class="org.dspace.content.virtual.Collected" id="relatedEntityIdentifier_uri">
+        <property name="fields">
+            <util:list>
+                <value>dc.identifier.uri</value>
+            </util:list>
         </property>
     </bean>
 
