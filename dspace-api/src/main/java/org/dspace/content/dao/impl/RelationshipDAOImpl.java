@@ -57,7 +57,7 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
             )
         );
 
-        return list(context, criteriaQuery, false, Relationship.class, limit, offset);
+        return list(context, criteriaQuery, true, Relationship.class, limit, offset);
     }
 
     /**
