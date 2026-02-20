@@ -175,7 +175,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      */
     public void setLeftPlace(int leftPlace) {
         this.leftPlace = leftPlace;
-        leftItem.setMetadataModified();
+        leftItem.setRelationshipMetadataModified();
     }
 
     /**
@@ -192,7 +192,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      */
     public void setRightPlace(int rightPlace) {
         this.rightPlace = rightPlace;
-        rightItem.setMetadataModified();
+        rightItem.setRelationshipMetadataModified();
     }
 
     /**
@@ -248,8 +248,8 @@ public class Relationship implements ReloadableEntity<Integer> {
 
         // on one item, relation.* fields will change
         // on the other item, relation.*.latestForDiscovery will change
-        leftItem.setMetadataModified();
-        rightItem.setMetadataModified();
+        leftItem.setRelationshipMetadataModified();
+        rightItem.setRelationshipMetadataModified();
     }
 
     public enum LatestVersionStatus {
