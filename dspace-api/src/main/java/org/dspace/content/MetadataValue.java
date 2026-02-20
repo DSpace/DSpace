@@ -271,5 +271,16 @@ public class MetadataValue implements ReloadableEntity<Integer> {
         return hash;
     }
 
+    public String getSchema() {
+        return getMetadataField().getMetadataSchema().getName();
+    }
+
+    public String getElement() {
+        return getMetadataField().getElement();
+    }
+
+    public String getQualifier() {
+        return getMetadataField().getQualifier();
+    }
 
 }
