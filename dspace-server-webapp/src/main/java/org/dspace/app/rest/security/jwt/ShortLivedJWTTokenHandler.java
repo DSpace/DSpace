@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.security.jwt;
 
+import java.sql.SQLException;
 import java.time.Instant;
 
 import com.nimbusds.jose.JOSEException;
@@ -17,8 +18,13 @@ import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.util.DateUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,6 +33,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ShortLivedJWTTokenHandler extends JWTTokenHandler {
+
+    @Autowired
+    private EPersonService ePersonService;
+
+    private static final Logger log = LogManager.getLogger(ShortLivedJWTTokenHandler.class);
 
     /**
      * Determine if current JWT is valid for the given EPerson object.
@@ -58,13 +69,25 @@ public class ShortLivedJWTTokenHandler extends JWTTokenHandler {
 
     /**
      * The session salt doesn't need to be updated for short lived tokens.
+     * Unless no session salt is set, in which case it will be generated.
+     * As the salt is used to sign the JWT, it is important that it is set
+     *
      * @param context current DSpace Context
      * @param previousLoginDate date of last login (prior to this one)
      * @return EPerson object of current user, with an updated session salt
      */
     @Override
     protected EPerson updateSessionSalt(final Context context, final Instant previousLoginDate) {
-        return context.getCurrentUser();
+        EPerson ePerson = context.getCurrentUser();
+        if (ePerson != null && StringUtils.isBlank(ePerson.getSessionSalt())) {
+            try {
+                ePerson.setSessionSalt(generateRandomKey());
+                ePersonService.update(context, ePerson);
+            } catch (SQLException | AuthorizeException e) {
+                log.warn("Failed to update session salt for EPerson: {}", ePerson.getID(), e);
+            }
+        }
+        return ePerson;
     }
 
     @Override
