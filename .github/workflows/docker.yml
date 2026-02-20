@@ -176,6 +176,7 @@ jobs:
       # This ensures we are using the images just built & not any prior versions on DockerHub
       - name: Load all downloaded Docker images
         run: |
+          mkdir -p /tmp/docker
           find /tmp/docker -type f -name "*.tar" -exec docker image load --input "{}" \;
           docker image ls -a
       # Start backend using our compose script in the codebase.
