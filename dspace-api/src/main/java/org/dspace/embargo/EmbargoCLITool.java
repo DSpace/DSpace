@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -25,6 +27,8 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.embargo.factory.EmbargoServiceFactory;
@@ -44,11 +48,13 @@ public class EmbargoCLITool {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(EmbargoServiceImpl.class);
 
     private static final EmbargoService embargoService = EmbargoServiceFactory.getInstance().getEmbargoService();
+    private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     /**
      * Default constructor
      */
-    private EmbargoCLITool() { }
+    private EmbargoCLITool() {
+    }
 
     /**
      * Command-line service to scan for every Item with an expired embargo,
@@ -96,8 +102,7 @@ public class EmbargoCLITool {
         options.addOption("l", "lift", false,
                           "Function: ONLY lift embargoes, do NOT check the state of any embargoed Items.");
 
-        options.addOption("a", "adjust", false,
-                          "Function: Adjust bitstreams policies");
+        options.addOption("a", "adjust", false, "Function: Adjust bitstreams policies");
 
         options.addOption("h", "help", false, "help");
         CommandLine line = null;
@@ -145,13 +150,20 @@ public class EmbargoCLITool {
                 }
             } else {
                 Iterator<Item> ii = embargoService.findItemsByLiftMetadata(context);
+                List<UUID> uuidsToProcess = new ArrayList<UUID>();
                 while (ii.hasNext()) {
                     Item item = ii.next();
+                    uuidsToProcess.add(item.getID());
+                    context.uncacheEntity(item);
+                }
+                for (UUID uuid : uuidsToProcess) {
+                    Item item = itemService.find(context, uuid);
                     if (processOneItem(context, item, line, now)) {
                         status = 1;
                     }
-                    context.uncacheEntity(item);
+                    context.commit();
                 }
+
             }
             context.complete();
             context = null;
@@ -175,7 +187,7 @@ public class EmbargoCLITool {
     // lift or check embargo on one Item, handle exceptions
     // return false on success, true if there was fatal exception.
     protected static boolean processOneItem(Context context, Item item, CommandLine line, ZonedDateTime now)
-        throws Exception {
+            throws Exception {
         boolean status = false;
         List<MetadataValue> lift = embargoService.getLiftMetadata(context, item);
 
@@ -190,13 +202,15 @@ public class EmbargoCLITool {
                     if (liftDate.toDate().isBefore(now)) {
                         if (line.hasOption('v')) {
                             System.err.println(
-                                "Lifting embargo from Item handle=" + item.getHandle() + ", lift date=" +
-                                    lift.get(0).getValue());
+                                    "Lifting embargo from Item handle=" + item.getHandle() + ", lift date=" + lift.get(
+                                            0).getValue());
                         }
                         if (line.hasOption('n')) {
                             if (!line.hasOption('q')) {
-                                System.err.println("DRY RUN: would have lifted embargo from Item handle=" + item
-                                    .getHandle() + ", lift date=" + lift.get(0).getValue());
+                                System.err.println(
+                                        "DRY RUN: would have lifted embargo from Item handle=" + item.getHandle() +
+                                                ", lift date=" + lift.get(
+                                                0).getValue());
                             }
                         } else if (!line.hasOption('c')) {
                             embargoService.liftEmbargo(context, item);
