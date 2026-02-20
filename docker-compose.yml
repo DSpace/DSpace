@@ -34,6 +34,12 @@ services:
       # from the host machine. This IP range MUST correspond to the 'dspacenet' subnet defined above.
       proxies__P__trusted__P__ipranges: '172.23.0'
       LOGGING_CONFIG: /dspace/config/log4j2-container.xml
+      # [DEV ONLY] Initial DSpace Admin Configuration.
+      # If these are set, the entrypoint will attempt to create this user on startup.
+      # SECURITY WARNING: Storing cleartext passwords in docker-compose.yml is insecure.
+      # For production, either move these values to a non-commited .env file or remove them entirely.
+      INIT_ADMIN_EMAIL: dspace@dspace.org
+      INIT_ADMIN_PASSWORD: dspace
     image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-latest-test}"
     build:
       context: .
@@ -63,6 +69,15 @@ services:
     - |
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
+      if [ -n "$$INIT_ADMIN_EMAIL" ] && [ -n "$$INIT_ADMIN_PASSWORD" ]; then
+        /dspace/bin/dspace create-administrator \
+          -e "$$INIT_ADMIN_EMAIL" \
+          -f "$${INIT_ADMIN_FIRSTNAME:-DSpace}" \
+          -l "$${INIT_ADMIN_LASTNAME:-Admin}" \
+          -p "$$INIT_ADMIN_PASSWORD"
+      else
+        echo "Skipped initializing admin account: INIT_ADMIN_EMAIL and/or INIT_ADMIN_PASSWORD missing."
+      fi
       java -jar /dspace/webapps/server-boot.jar
   # DSpace PostgreSQL database container
   dspacedb:

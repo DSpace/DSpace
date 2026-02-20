@@ -50,3 +50,8 @@ rebel.xml
 
 ## Ignore jenv configuration
 .java-version
+
+## Ignore local environment configuration (dotenv)
+## TODO: Use '!' or comment out if .env files should be commited.
+.env
+.env*.local
