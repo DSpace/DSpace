@@ -382,7 +382,8 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
                     List<String> values = metadataValues.stream().map(metadataValue -> {
                         // Apply value modification in case it's configured for the current metadata field
                         if (duplicateComparisonValueTransformers.containsKey(fieldName)) {
-                            return duplicateComparisonValueTransformers.get(fieldName).transform(metadataValue.getValue());
+                            return duplicateComparisonValueTransformers.get(fieldName)
+                                .transform(metadataValue.getValue());
                         }
                         return metadataValue.getValue();
                     }).sorted().toList();
