@@ -407,6 +407,8 @@ public class DCInputsReader {
                 } else if (tagName.equals("vocabulary")) {
                     String closedVocabularyString = getAttribute(nd, "closed");
                     field.put("closedVocabulary", closedVocabularyString);
+                    String vocabularyTypeString = getAttribute(nd, "type");
+                    field.put("vocabularyType", vocabularyTypeString);
                 } else if (tagName.equals("language")) {
                     if (Boolean.valueOf(value)) {
                         String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);

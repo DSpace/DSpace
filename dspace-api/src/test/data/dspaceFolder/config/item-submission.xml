@@ -33,6 +33,7 @@
         <name-map collection-handle="123456789/test-duplicate-detection" submission-name="test-duplicate-detection"/>
         <name-map collection-handle="123456789/collection-test-patch" submission-name="publicationTestPatch"/>
         <name-map collection-handle="123456789/enforced-relation" submission-name="enforcedRelation"/>
+        <name-map collection-handle="123456789/test-suggestion-vocabulary" submission-name="testSuggestionVocabulary"/>
     </submission-map>
 
 
@@ -222,6 +223,12 @@
             <type>custom-url</type>
         </step-definition>
 
+        <step-definition id="vocabulary-suggest-test" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -345,6 +352,11 @@
             <step id="upload-no-required-metadata" />
             <step id="license" />
         </submission-process>
+
+        <submission-process name="testSuggestionVocabulary">
+            <step id="vocabulary-suggest-test"></step>
+        </submission-process>
+
     </submission-definitions>
 
 </item-submission>
