@@ -10,7 +10,6 @@ package org.dspace.app.util.factory;
 import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.app.util.service.OpenSearchService;
-import org.dspace.app.util.service.WebAppService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -26,14 +25,7 @@ public class UtilServiceFactoryImpl extends UtilServiceFactory {
     @Autowired(required = true)
     private OpenSearchService openSearchService;
     @Autowired(required = true)
-    private WebAppService webAppService;
-    @Autowired(required = true)
     private DSpaceObjectUtils dSpaceObjectUtils;
-
-    @Override
-    public WebAppService getWebAppService() {
-        return webAppService;
-    }
 
     @Override
     public OpenSearchService getOpenSearchService() {

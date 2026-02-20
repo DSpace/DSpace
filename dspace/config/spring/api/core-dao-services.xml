@@ -8,7 +8,6 @@
     <!-- DAO declarations -->
     <!-- **************** -->
     <bean class="org.dspace.app.requestitem.dao.impl.RequestItemDAOImpl"/>
-    <bean class="org.dspace.app.util.dao.impl.WebAppDAOImpl"/>
 
     <bean class="org.dspace.authorize.dao.impl.ResourcePolicyDAOImpl"/>
 
