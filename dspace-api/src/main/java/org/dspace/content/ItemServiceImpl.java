@@ -1267,6 +1267,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     private DiscoverResult retrieveItemsWithEdit(Context context, DiscoverQuery discoverQuery, String q)
         throws SearchServiceException {
         if (StringUtils.isNotBlank(q)) {
+            // Although not all items will have a metadata dc.title, we use it for autocomplete because it is the
+            // most common. Ideally, we should use a field that all indexed items have
+            q = searchService.formatAutoCompleteQuery(q, "dc.title_sort");
             discoverQuery.setQuery(q);
         }
         discoverQuery.addRequiredAuthorization(Constants.WRITE);
