@@ -11,21 +11,32 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactory;
 import org.dspace.statistics.export.service.OpenUrlService;
-import org.dspace.utils.DSpace;
 
 /**
  * Script to retry the failed url transmissions to IRUS
  * This script also has an option to add new failed urls for testing purposes
  */
-public class RetryFailedOpenUrlTracker extends DSpaceRunnable<RetryFailedOpenUrlTrackerScriptConfiguration> {
+public class RetryFailedOpenUrlTracker<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     private String lineToAdd = null;
     private boolean help = false;
     private boolean retryFailed = false;
 
     private OpenUrlService openUrlService;
+
+    /**
+     * Constructor for RetryFailedOpenUrlTracker script.
+     * Retries failed OpenURL tracker commits to IRUS analytics system
+     * and manages the queue of failed usage statistics transmissions.
+     * 
+     * @param scriptConfiguration The script configuration defining retry parameters and queue management options
+     */
+    public RetryFailedOpenUrlTracker(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     /**
      * Run the script
@@ -51,11 +62,6 @@ public class RetryFailedOpenUrlTracker extends DSpaceRunnable<RetryFailedOpenUrl
         }
         context.restoreAuthSystemState();
         context.complete();
-    }
-
-    public RetryFailedOpenUrlTrackerScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager().getServiceByName("retry-tracker",
-                                                                 RetryFailedOpenUrlTrackerScriptConfiguration.class);
     }
 
     /**

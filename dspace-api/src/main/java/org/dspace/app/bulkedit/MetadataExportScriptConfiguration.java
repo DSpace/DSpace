@@ -13,7 +13,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 /**
  * The {@link ScriptConfiguration} for the {@link MetadataExport} script
  */
-public class MetadataExportScriptConfiguration<T extends MetadataExport> extends ScriptConfiguration<T> {
+public class MetadataExportScriptConfiguration<T extends MetadataExport<?>> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 

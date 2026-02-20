@@ -17,9 +17,9 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
 
 /**
  * {@link DSpaceRunnable} implementation to delete all the values of the given
@@ -28,7 +28,7 @@ import org.dspace.utils.DSpace;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class MetadataDeletion extends DSpaceRunnable<MetadataDeletionScriptConfiguration<MetadataDeletion>> {
+public class MetadataDeletion<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     private MetadataValueService metadataValueService;
 
@@ -39,6 +39,17 @@ public class MetadataDeletion extends DSpaceRunnable<MetadataDeletionScriptConfi
     private String metadataField;
 
     private boolean list;
+
+    /**
+     * Constructor for MetadataDeletion script.
+     * Deletes all values of specified metadata fields from items across the repository,
+     * with safety controls to prevent accidental data loss.
+     * 
+     * @param scriptConfiguration The script configuration defining metadata field deletion parameters
+     */
+    public MetadataDeletion(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     @Override
     public void internalRun() throws Exception {
@@ -87,13 +98,6 @@ public class MetadataDeletion extends DSpaceRunnable<MetadataDeletionScriptConfi
 
     private String[] getErasableMetadata() {
         return configurationService.getArrayProperty("bulkedit.allow-bulk-deletion");
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public MetadataDeletionScriptConfiguration<MetadataDeletion> getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-            .getServiceByName("metadata-deletion", MetadataDeletionScriptConfiguration.class);
     }
 
     @Override

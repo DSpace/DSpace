@@ -7,12 +7,23 @@
  */
 package org.dspace.app.bulkedit;
 
+import org.dspace.scripts.configuration.ScriptConfiguration;
+
 /**
  * The {@link MetadataDeletion} for CLI.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class MetadataDeletionCli extends MetadataDeletion {
+public class MetadataDeletionCli<T extends ScriptConfiguration<?>> extends MetadataDeletion<T> {
 
+    /**
+     * Constructor for MetadataDeletionCli.
+     * Command-line interface wrapper for MetadataDeletion script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
+     */
+    public MetadataDeletionCli(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 }

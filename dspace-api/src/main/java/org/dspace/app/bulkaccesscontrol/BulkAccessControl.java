@@ -65,6 +65,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.model.AccessConditionOption;
@@ -76,7 +77,7 @@ import org.dspace.utils.DSpace;
  * @author Mohamed Eskander (mohamed.eskander at 4science.it)
  *
  */
-public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptConfiguration<BulkAccessControl>> {
+public class BulkAccessControl<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     private DSpaceObjectUtils dSpaceObjectUtils;
 
@@ -111,6 +112,16 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
     private boolean help = false;
 
     protected String eperson = null;
+
+    /**
+     * Constructor for BulkAccessControl script.
+     * 
+     * @param scriptConfiguration The script configuration that defines the parameters
+     *                           and settings for this bulk access control operation
+     */
+    public BulkAccessControl(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -678,13 +689,6 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
 
     protected boolean isAuthorized(Context context) {
         return true;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public BulkAccessControlScriptConfiguration<BulkAccessControl> getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-                           .getServiceByName("bulk-access-control", BulkAccessControlScriptConfiguration.class);
     }
 
 }

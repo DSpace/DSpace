@@ -34,14 +34,14 @@ import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.utils.DSpace;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * Test class for harvested collections.
  *
  * @author Alexey Maslov
  */
-public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
+public class Harvest<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     private HarvestedCollectionService harvestedCollectionService;
     protected EPersonService ePersonService;
@@ -57,11 +57,17 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
 
     protected Context context;
 
-
-    public HarvestScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-                           .getServiceByName("harvest", HarvestScriptConfiguration.class);
+    /**
+     * Constructor for Harvest script.
+     * This script manages OAI-PMH harvesting operations for external collections.
+     * 
+     * @param scriptConfiguration The script configuration defining harvest parameters,
+     *                           collection settings, and OAI-PMH endpoint details
+     */
+    public Harvest(T scriptConfiguration) {
+        super(scriptConfiguration);
     }
+
 
     public void setup() throws ParseException {
         harvestedCollectionService =

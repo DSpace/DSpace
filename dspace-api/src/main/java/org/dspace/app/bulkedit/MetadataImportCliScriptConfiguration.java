@@ -13,7 +13,8 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 /**
  * The {@link ScriptConfiguration} for the {@link org.dspace.app.bulkedit.MetadataImportCLI} CLI script
  */
-public class MetadataImportCliScriptConfiguration extends MetadataImportScriptConfiguration<MetadataImportCLI> {
+public class MetadataImportCliScriptConfiguration<T extends MetadataImport<?>>
+    extends MetadataImportScriptConfiguration<T> {
 
     @Override
     public Options getOptions() {

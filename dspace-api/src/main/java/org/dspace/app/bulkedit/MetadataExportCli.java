@@ -8,8 +8,19 @@
 package org.dspace.app.bulkedit;
 
 import org.apache.commons.cli.ParseException;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
-public class MetadataExportCli extends MetadataExport {
+public class MetadataExportCli<T extends ScriptConfiguration<?>> extends MetadataExport<T> {
+
+    /**
+     * Constructor for MetadataExportCli.
+     * Command-line interface wrapper for MetadataExport script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
+     */
+    public MetadataExportCli(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     @Override
     protected String getFileNameForExportFile() {

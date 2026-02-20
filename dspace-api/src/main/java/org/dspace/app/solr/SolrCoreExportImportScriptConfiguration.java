@@ -16,7 +16,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  *
  * @author Stefano Maffei (stefano.maffei at 4science.com)
  */
-public class SolrCoreExportImportScriptConfiguration<T extends SolrCoreExportImport> extends ScriptConfiguration<T> {
+public class SolrCoreExportImportScriptConfiguration<T extends SolrCoreExportImport<?>> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 

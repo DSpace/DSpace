@@ -9,18 +9,20 @@ package org.dspace.scripts.impl;
 
 import org.apache.commons.cli.ParseException;
 import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.scripts.MockDSpaceRunnableScriptConfiguration;
-import org.dspace.utils.DSpace;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
-public class MockDSpaceRunnableScript extends DSpaceRunnable<MockDSpaceRunnableScriptConfiguration> {
-    @Override
-    public void internalRun() throws Exception {
+public class MockDSpaceRunnableScript<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
+
+    /**
+     * Constructor for the MockDSpaceRunnableScript
+     * @param scriptConfiguration
+     */
+    public MockDSpaceRunnableScript(T scriptConfiguration) {
+        super(scriptConfiguration);
     }
 
     @Override
-    public MockDSpaceRunnableScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-                           .getServiceByName("mock-script", MockDSpaceRunnableScriptConfiguration.class);
+    public void internalRun() {
     }
 
     @Override

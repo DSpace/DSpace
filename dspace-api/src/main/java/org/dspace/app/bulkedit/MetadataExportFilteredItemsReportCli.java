@@ -11,13 +11,26 @@ package org.dspace.app.bulkedit;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * The CLI version of the {@link MetadataExportFilteredItemsReport} script
  *
  * @author Jean-François Morin (Université Laval)
  */
-public class MetadataExportFilteredItemsReportCli extends MetadataExportFilteredItemsReport {
+public class MetadataExportFilteredItemsReportCli<T extends ScriptConfiguration<?>>
+    extends MetadataExportFilteredItemsReport<T> {
+
+
+    /**
+     * Constructor for MetadataExportFilteredItemsReportCli.
+     * Command-line interface wrapper for MetadataExportFilteredItemsReport script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
+     */
+    public MetadataExportFilteredItemsReportCli(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     @Override
     protected String getFileNameOrExportFile() {
