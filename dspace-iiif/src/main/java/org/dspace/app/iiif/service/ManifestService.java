@@ -158,6 +158,7 @@ public class ManifestService extends AbstractResourceService {
         if (guessCanvasDimension) {
             canvasService.guessCanvasDimensions(context, bundles);
         }
+        int index = 1;
         for (Bundle bnd : bundles) {
             String bundleToCPrefix = null;
             if (bundles.size() > 1) {
@@ -166,9 +167,10 @@ public class ManifestService extends AbstractResourceService {
             }
             for (Bitstream bitstream : utils.getIIIFBitstreams(context, bnd)) {
                 // Add the Canvas to the Sequence.
-                CanvasGenerator canvas = sequenceService.addCanvas(context, item, bnd, bitstream);
+                CanvasGenerator canvas = sequenceService.addCanvas(context, item, bnd, bitstream, index);
                 // Update the Ranges.
                 rangeService.updateRanges(bitstream, bundleToCPrefix, canvas);
+                index++;
             }
         }
         // If Ranges were created, add them to manifest.
