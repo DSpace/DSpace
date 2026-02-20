@@ -331,6 +331,14 @@
             <step id="license"/>
         </submission-process>
 
+        <submission-process name="publication-edit">
+            <step id="collection"/>
+            <!-- Publications use a custom first step, but share page 2 with "traditional" Item form -->
+            <step id="publicationStep"/>
+            <step id="traditionalpagetwo"/>
+            <step id="upload"/>
+        </submission-process>
+
         <!--
         Submission Process for 'Person' Entities
         To enable: create a collection for Persons and add it to the <submission-map> tag linking to this process
