@@ -34,6 +34,8 @@
     <xsl:param name="prefix">10.5072/dspace-</xsl:param>
     <!-- The content of the following parameter will be used as element publisher. -->
     <xsl:param name="publisher">My University</xsl:param>
+    <!-- The content of the following variable will be used as the ROR of the publisher. If there is no ROR, leave this blank -->
+    <xsl:param name="publisherRor"></xsl:param>
     <!-- The content of the following variable will be used as element contributor with contributorType datamanager. -->
     <xsl:param name="datamanager"><xsl:value-of select="$publisher" /></xsl:param>
     <!-- The content of the following variable will be used as element contributor with contributorType hostingInstitution. -->
@@ -125,6 +127,11 @@
                         <xsl:value-of select="//dspace:field[@mdschema='dc' and @element='publisher'][1]" />
                     </xsl:when>
                     <xsl:otherwise>
+                        <xsl:if test="$publisherRor">
+                            <xsl:attribute name="publisherIdentifier" select="$publisherRor" />
+                            <xsl:attribute name="publisherIdentifierScheme">ROR</xsl:attribute>
+                            <xsl:attribute name="schemeURI">https://ror.org</xsl:attribute>
+                        </xsl:if>
                         <xsl:value-of select="$publisher" />
                     </xsl:otherwise>
                 </xsl:choose>
