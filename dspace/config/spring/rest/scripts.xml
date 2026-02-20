@@ -49,6 +49,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleaner"/>
     </bean>
 
+    <bean id="bulk-import" class="org.dspace.app.bulkedit.BulkImportScriptConfiguration" primary="true">
+        <property name="description" value="Perform the bulk import of an excel file with a list of item to add, update or remove"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.BulkImport"/>
+    </bean>
+
     <bean id="orcid-bulk-push" class="org.dspace.orcid.script.OrcidBulkPushScriptConfiguration" primary="true">
         <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
         <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
