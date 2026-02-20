@@ -6,6 +6,7 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.matcher;
+
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.hamcrest.Matchers.allOf;
@@ -17,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.util.DateMathParser;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;

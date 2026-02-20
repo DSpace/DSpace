@@ -22,7 +22,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -1149,11 +1148,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public void move(Context context, Item item, Collection from, Collection to)
         throws SQLException, AuthorizeException, IOException {
 
-        // If the two collections are the same, do nothing.
-        if (from.equals(to)) {
-            return;
-        }
-
         // Use the normal move method, and default to not inherit permissions
         this.move(context, item, from, to, false);
     }
@@ -1166,6 +1160,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // only do write authorization if user is not an editor
         if (!canEdit(context, item)) {
             authorizeService.authorizeAction(context, item, Constants.WRITE);
+        }
+
+        // If the two collections are the same, do nothing.
+        if (from.equals(to)) {
+            return;
         }
 
         // Move the Item from one Collection to the other
@@ -1268,43 +1267,38 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
      *
      * @param context                    DSpace context
      * @param discoverQuery
+     * @param q                          query string
      * @return                           discovery search result objects
-     * @throws SQLException              if something goes wrong
      * @throws SearchServiceException    if search error
      */
-    private DiscoverResult retrieveItemsWithEdit(Context context, DiscoverQuery discoverQuery)
-        throws SQLException, SearchServiceException {
-        EPerson currentUser = context.getCurrentUser();
-        if (!authorizeService.isAdmin(context)) {
-            String userId = currentUser != null ? "e" + currentUser.getID().toString() : "e";
-            Stream<String> groupIds = groupService.allMemberGroupsSet(context, currentUser).stream()
-                .map(group -> "g" + group.getID());
-            String query = Stream.concat(Stream.of(userId), groupIds)
-                .collect(Collectors.joining(" OR ", "edit:(", ")"));
-            discoverQuery.addFilterQueries(query);
+    private DiscoverResult retrieveItemsWithEdit(Context context, DiscoverQuery discoverQuery, String q)
+        throws SearchServiceException {
+        if (StringUtils.isNotBlank(q)) {
+            discoverQuery.setQuery(q);
         }
+        discoverQuery.addRequiredAuthorization(Constants.WRITE);
         return searchService.search(context, discoverQuery);
     }
 
     @Override
-    public List<Item> findItemsWithEdit(Context context, int offset, int limit)
-        throws SQLException, SearchServiceException {
+    public List<Item> findItemsWithEdit(Context context, String q, int offset, int limit)
+        throws SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
         discoverQuery.setStart(offset);
         discoverQuery.setMaxResults(limit);
-        DiscoverResult resp = retrieveItemsWithEdit(context, discoverQuery);
+        DiscoverResult resp = retrieveItemsWithEdit(context, discoverQuery, q);
         return resp.getIndexableObjects().stream()
             .map(solrItems -> ((IndexableItem) solrItems).getIndexedObject())
             .collect(Collectors.toList());
     }
 
     @Override
-    public int countItemsWithEdit(Context context) throws SQLException, SearchServiceException {
+    public int countItemsWithEdit(Context context, String q) throws SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setMaxResults(0);
         discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
-        DiscoverResult resp = retrieveItemsWithEdit(context, discoverQuery);
+        DiscoverResult resp = retrieveItemsWithEdit(context, discoverQuery, q);
         return (int) resp.getTotalSearchResults();
     }
 
@@ -1372,6 +1366,27 @@ prevent the generation of resource policy entry values with null dspace_object a
             throws SQLException, AuthorizeException {
         String[] mdValueByField = getMDValueByField(metadataField);
         return findArchivedByMetadataField(context, mdValueByField[0], mdValueByField[1], mdValueByField[2], value);
+    }
+
+    @Override
+    public Iterator<Item> findArchivedByMetadataFieldExcludingOldVersions(Context context, String schema,
+                                                                          String element, String qualifier,
+                                                                          String value)
+            throws SQLException, AuthorizeException {
+        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        if (mds == null) {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
+        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        if (mdf == null) {
+            throw new IllegalArgumentException(
+                    "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
+
+        if (Item.ANY.equals(value)) {
+            return itemDAO.findByMetadataFieldExcludingOldVersions(context, mdf, null, true);
+        }
+        return itemDAO.findByMetadataFieldExcludingOldVersions(context, mdf, value, true);
     }
 
     /**

@@ -803,7 +803,7 @@
 
     <!-- oaire:resourceType -->
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_publicationtype.html -->
-    <xsl:template match="doc:element[@name='dc']/doc:element[@name='type']/doc:element" mode="oaire">
+    <xsl:template match="doc:element[@name='dc']/doc:element[@name='type']/doc:element[doc:field[@name='value']]" mode="oaire">
         <xsl:variable name="resourceTypeGeneral">
             <xsl:call-template name="resolveResourceTypeGeneral">
                 <xsl:with-param name="field" select="./doc:field[@name='value']/text()"/>
@@ -1490,7 +1490,7 @@
             </xsl:when>
             <xsl:when test="$lc_dc_type = 'thesis'">
                 <xsl:text>literature</xsl:text>
-            </xsl:when>		
+            </xsl:when>
             <xsl:when test="$lc_dc_type = 'dataset'">
                 <xsl:text>dataset</xsl:text>
             </xsl:when>

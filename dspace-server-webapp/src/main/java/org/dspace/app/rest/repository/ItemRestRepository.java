@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,6 +22,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.Strings;
+import org.dspace.app.customurl.CustomUrlService;
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -42,6 +46,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -82,6 +88,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     @Autowired
     private UriListHandlerService uriListHandlerService;
+
+    @Autowired
+    private CustomUrlService customUrlService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -180,7 +189,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
-        if (itemRest.getInArchive() == false) {
+        if (!itemRest.getInArchive()) {
             throw new DSpaceBadRequestException("InArchive attribute should not be set to false for the create");
         }
         UUID owningCollectionUuid = UUIDUtils.fromString(owningCollectionUuidString);
@@ -254,6 +263,27 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         return bundle;
     }
 
+    /**
+     * Method to find the items for which the current user has editing rights.
+     *
+     * @param query    Query string
+     * @param pageable Pagination information
+     * @return Page of Items (REST representation) for which the current user has editing rights
+     * @throws SearchServiceException
+     */
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "findEditAuthorized")
+    public Page<ItemRest> findEditAuthorized(@Parameter(value = "query") String query,
+                                             Pageable pageable)
+        throws SearchServiceException {
+        Context context = obtainContext();
+        List<Item> items = itemService.findItemsWithEdit(context, query,
+            Math.toIntExact(pageable.getOffset()),
+            Math.toIntExact(pageable.getPageSize()));
+        int tot = itemService.countItemsWithEdit(context, query);
+        return converter.toRestPage(items, pageable, tot, utils.obtainProjection());
+    }
+
     @Override
     protected ItemRest createAndReturn(Context context, List<String> stringList)
         throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
@@ -261,6 +291,31 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         Item item = uriListHandlerService.handle(context, req, stringList, Item.class);
         return converter.toRest(item, utils.obtainProjection());
+    }
+
+
+    @SearchRestMethod(name = "findByCustomURL")
+    public ItemRest findByCustomUrl(@Parameter(value = "q", required = true) String customUrl) {
+        Item item = findItemByUuidOrCustomUrl(obtainContext(), customUrl)
+            .orElseThrow(() -> new ResourceNotFoundException("Item with custom URL '" + customUrl + "' not found"));
+        return converter.toRest(item, utils.obtainProjection());
+    }
+
+    private Optional<Item> findItemByUuidOrCustomUrl(Context context, String customUrl) {
+
+        UUID uuid = UUIDUtils.fromString(customUrl);
+        if (uuid != null) {
+
+            try {
+                return Optional.ofNullable(itemService.find(context, uuid));
+            } catch (SQLException e) {
+                throw new SQLRuntimeException(e);
+            }
+
+        }
+
+        return customUrlService.findItemByCustomUrl(context, customUrl);
+
     }
 
 }

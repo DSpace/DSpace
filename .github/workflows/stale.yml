@@ -1,0 +1,71 @@
+# DSpace rules for flagging untouched issues and PRs as stale using 'stale':
+# https://github.com/actions/stale
+name: 'Mark issues and PRs as stale'
+on:
+  # Schedule to run weekly on Sunday at 2:03am UTC
+  schedule:
+    - cron: '3 2 * * 0'
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/stale@v10
+        with:
+          # Number of GitHub API calls to allow in a single run (to avoid hitting GitHub's rate limit)
+          # Default is 30. But, we've found that only results in processing ~7 issues or PRs. So, we've increased it.
+          operations-per-run: 60
+          # Issues will be marked stale after 3 years of no activity
+          days-before-issue-stale: 1095
+          # Issues marked stale will be closed after one additional week of no activity
+          days-before-issue-close: 7
+          # High priority issues are never marked stale
+          exempt-issue-labels: 'high priority'
+          # When an issue is marked stale, this label and comment will be added to the issue.
+          stale-issue-label: stale
+          stale-issue-message: |
+            This issue has been automatically marked as stale because it has not had
+            activity in 3 years. It will be closed in 7 days if no further activity occurs.
+
+            Allowing issues to close as stale helps us filter out issues which can wait
+            for future development time. All issues closed by this bot will continue to act 
+            like normal issues; they can be searched for, commented on or reopened at any point.
+
+            To extend the lifetime of an issue please comment below. This will help us to see
+            that this issue is still affecting you with current versions of DSpace, and encourage
+            us to re-prioritize this issue.
+          # When an issue is closed, this comment will be added to the issue.
+          close-issue-message: |
+            This issue has been closed automatically as "stale". If this still affects you please 
+            request to re-open this issue via a comment, providing us with details on how this still
+            impacts your usage of DSpace.
+          # PRs will be marked stale after 1 year of no activity
+          days-before-pr-stale: 365
+          # PRs marked stale will be closed after two additional weeks of no activity
+          days-before-pr-close: 14
+          # High priority PRs are never marked stale
+          exempt-pr-labels: 'high priority'
+          # When a PR is marked stale, this label and comment will be added to the issue.
+          stale-pr-label: stale
+          stale-pr-message: |
+            This pull request has been automatically marked as stale because it has not had
+            activity in one year. It will be closed in 14 days if no further activity occurs.
+
+            Allowing pull requests to close as stale helps us filter out old work that is no longer
+            relevant and helps developers focus on reviewing current work.
+
+            All pull requests closed by this bot act like normal pull requests;
+            they can be searched for, commented on or reopened at any point.
+
+            If these changes are still relevant then please comment and/or rebase your PR based on the
+            latest DSpace code. This will remove the stale status and notify us to assign a reviewer
+            for your PR.
+          close-pr-message: |
+            This pull request has been closed automatically. If these changes are still relevant
+            then please re-open this pull request with a comment and rebase your PR based on the latest
+            DSpace code. This will notify us to assign a reviewer to your PR.
+
