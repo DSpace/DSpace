@@ -8,19 +8,15 @@
 package org.dspace.shell;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import org.dspace.servicemanager.DSpaceKernelImpl;
-import org.dspace.shell.commands.DatabaseCommands;
-import org.dspace.shell.commands.DiscoveryCommands;
-import org.dspace.shell.commands.EmbargoCommands;
 import org.dspace.shell.config.TestShellConfiguration;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
-import org.springframework.shell.command.CommandCatalog;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -38,9 +34,6 @@ class DSpaceShellApplicationTests {
 
     @Autowired
     private ApplicationContext applicationContext;
-
-    @Autowired(required = false)
-    private CommandCatalog commandCatalog;
 
     @MockBean
     private DSpaceKernelImpl dspaceKernel;

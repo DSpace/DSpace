@@ -7,17 +7,7 @@
  */
 package org.dspace.shell.commands;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
-
-import java.util.concurrent.TimeUnit;
-
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.shell.test.ShellAssertions;
-import org.springframework.shell.test.ShellTestClient;
 import org.springframework.shell.test.autoconfigure.ShellTest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -36,8 +26,5 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 @DisplayName("DatabaseCommands - Integration Tests")
 class DatabaseCommandsIT {
-
-    @Autowired
-    private ShellTestClient client;
 
 }

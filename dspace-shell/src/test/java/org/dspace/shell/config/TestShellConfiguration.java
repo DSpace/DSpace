@@ -11,8 +11,6 @@ import javax.sql.DataSource;
 
 import org.dspace.core.Context;
 import org.dspace.kernel.ServiceManager;
-//import org.dspace.servicemanager.DSpaceKernelImpl;
-//import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.ConfigurationService;
 import org.flywaydb.core.Flyway;
 import org.mockito.Mockito;
@@ -42,16 +40,11 @@ public class TestShellConfiguration {
     @Bean
     @Primary
     public DataSource testDataSource() {
-        // Opção 1: Mock simples
-        //return Mockito.mock(DataSource.class);
-
-        // Opção 2: H2 embedded (descomentado se necessário)
 
         return new EmbeddedDatabaseBuilder()
             .setType(EmbeddedDatabaseType.H2)
             .setName("testdb;MODE=PostgreSQL")
             .build();
-        
     }
 
     /**
@@ -90,7 +83,7 @@ public class TestShellConfiguration {
     }
 
     /**
-     * Mock do ServiceManager do DSpace.
+     * ServiceManager Mock for DSpace.
      */
     @Bean
     @Primary
