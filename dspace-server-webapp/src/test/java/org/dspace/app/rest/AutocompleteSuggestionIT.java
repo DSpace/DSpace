@@ -110,4 +110,49 @@ public class AutocompleteSuggestionIT extends AbstractControllerIntegrationTest 
                 .andExpect(jsonPath("$.suggest.subject.test.numFound", is(0)));
     }
 
+    /**
+     * Test that an unauthenticated request returns HTTP 401 Unauthorized.
+     */
+    @Test
+    public void unauthenticatedRequestShouldReturn401() throws Exception {
+        getClient().perform(
+                get("/api/discover/suggest")
+                        .param("dict", "subject")
+                        .param("q", "test"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    /**
+     * Test that a non-allowed dictionary request returns HTTP 403 Forbidden.
+     */
+    @Test
+    public void nonAllowedDictionaryShouldReturn403() throws Exception {
+        String userToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(userToken).perform(
+                get("/api/discover/suggest")
+                        .param("dict", "not_in_allowlist")
+                        .param("q", "test"))
+                .andExpect(status().isForbidden());
+    }
+
+    /**
+     * Test that missing required parameters return HTTP 400 Bad Request.
+     */
+    @Test
+    public void missingParametersShouldReturn400() throws Exception {
+        String userToken = getAuthToken(eperson.getEmail(), password);
+
+        // Missing 'q' parameter
+        getClient(userToken).perform(
+                get("/api/discover/suggest")
+                        .param("dict", "subject"))
+                .andExpect(status().isBadRequest());
+
+        // Missing 'dict' parameter
+        getClient(userToken).perform(
+                get("/api/discover/suggest")
+                        .param("q", "test"))
+                .andExpect(status().isBadRequest());
+    }
 }

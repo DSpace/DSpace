@@ -8,6 +8,7 @@
 package org.dspace.discovery;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -43,6 +44,22 @@ public class SolrSuggestService {
     }
 
     /**
+     * Check whether the given dictionary name is in the configured allowlist.
+     * If no allowlist is configured, all dictionaries are allowed.
+     *
+     * @param dictionary the dictionary name to check
+     * @return true if allowed, false otherwise
+     */
+    public boolean isAllowedDictionary(String dictionary) {
+        String[] allowed = configurationService.getArrayProperty(
+                "discovery.suggest.allowed-dictionaries");
+        if (allowed == null || allowed.length == 0) {
+            return true;
+        }
+        return Arrays.asList(allowed).contains(dictionary);
+    }
+
+    /**
      * Get a list of suggested terms from the Solr suggest request handler
      *
      * @param query      the current text input
@@ -69,8 +86,5 @@ public class SolrSuggestService {
             throw new RuntimeException("Unable to retrieve suggest response.", e);
         }
     }
-
-
-
 
 }

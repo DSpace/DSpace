@@ -35,12 +35,14 @@ import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.repository.DiscoveryRestRepository;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.discovery.SolrSuggestService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -72,6 +74,9 @@ public class DiscoveryRestController implements InitializingBean {
 
     @Autowired
     private ConverterService converter;
+
+    @Autowired
+    private SolrSuggestService solrSuggestService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -237,18 +242,36 @@ public class DiscoveryRestController implements InitializingBean {
     }
 
     /**
-     * Return serialized map of Solr search suggest handler results
-     * for use in autocomplete and term suggestion lookups
-     * @param dictionary dictionary as configured in search/solrconfig.xml
-     * @param query term query
-     * @return Map (to be serialized to JSON)
+     * Endpoint for autocomplete suggestions. Queries the Solr suggest handler.
+     * Protected by a configurable dictionary allowlist and authentication.
+     *
+     * @param dictionary the name of the suggest dictionary to query
+     * @param query      the current text input for autocomplete
+     * @return ResponseEntity with suggestion results in Solr suggest response format
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/suggest", produces = "application/json")
-    public Map<String, Object> suggest(
-        @RequestParam(name = "dict") String dictionary,
-        @RequestParam(name = "q") String query) {
-        SolrSuggestService solrSuggestService = DSpaceServicesFactory.getInstance().getServiceManager()
-            .getServicesByType(SolrSuggestService.class).get(0);
-        return solrSuggestService.getSuggestions(query, dictionary);
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @RequestMapping(method = RequestMethod.GET, value = "/suggest",
+            produces = "application/json")
+    public ResponseEntity<Map<String, Object>> suggest(
+            @RequestParam(name = "dict") String dictionary,
+            @RequestParam(name = "q") String query) {
+
+        if (StringUtils.isBlank(dictionary) || StringUtils.isBlank(query)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (!solrSuggestService.isAllowedDictionary(dictionary)) {
+            log.warn("Suggest request for non-allowed dictionary: {}", dictionary);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> suggestions = solrSuggestService.getSuggestions(query, dictionary);
+            return ResponseEntity.ok(suggestions);
+        } catch (RuntimeException e) {
+            log.error("Error retrieving suggestions for dictionary={}, query={}", dictionary, query, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
