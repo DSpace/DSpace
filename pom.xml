@@ -1151,11 +1151,21 @@
                 <version>${hibernate-validator.version}</version>
             </dependency>
 
-            <!-- Hibernate introduces multiple versions of jboss-logging. So, specify version we want -->
+            <!-- Different Hibernate components introduce different (conflicting)
+                 versions of jboss-logging. We specify it here to avoid dependency
+                 convergence issues, and the version here is pinned to the version
+                 used by the hibernate-orm parent.
+
+                 See: https://github.com/hibernate/hibernate-orm/blob/6.4/settings.gradle#L74
+
+                 Dependabot is configured to ignore updates for jboss-logging.
+
+                 See: .github/dependabot.yml
+            -->
             <dependency>
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
-                <version>3.6.1.Final</version>
+                <version>3.5.0.Final</version>
             </dependency>
 
             <!-- Hibernate & Solr disagree on the version of antlr. So, specify the latest version -->
