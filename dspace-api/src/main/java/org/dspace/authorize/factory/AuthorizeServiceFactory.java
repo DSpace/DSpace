@@ -10,6 +10,7 @@ package org.dspace.authorize.factory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.submit.model.UploadConfigurationService;
 
 /**
  * Abstract factory to get services for the authorize package, use AuthorizeServiceFactory.getInstance() to retrieve
@@ -22,6 +23,8 @@ public abstract class AuthorizeServiceFactory {
     public abstract AuthorizeService getAuthorizeService();
 
     public abstract ResourcePolicyService getResourcePolicyService();
+
+    public abstract UploadConfigurationService getUploadConfigurationService();
 
     public static AuthorizeServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()

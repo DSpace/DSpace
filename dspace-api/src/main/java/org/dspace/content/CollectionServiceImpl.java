@@ -68,6 +68,7 @@ import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -128,6 +129,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
+
+    @Autowired(required = true)
+    protected WorkflowItemService<?> workflowItemService;
 
     @Autowired
     protected ItemCounter itemCounter;
@@ -1247,6 +1251,19 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             }
         }
         return null;
+    }
+    @Override
+    public Collection findByItem(Context context, Item item) throws SQLException {
+        if (item.getOwningCollection() != null) {
+            return item.getOwningCollection();
+        }
+
+        InProgressSubmission<Integer> inProgressSubmission = findInProgressSubmission(context, item);
+        return inProgressSubmission != null ? inProgressSubmission.getCollection() : null;
+    }
+    private InProgressSubmission<Integer> findInProgressSubmission(Context context, Item item) throws SQLException {
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, item);
+        return workspaceItem != null ? workspaceItem : workflowItemService.findByItem(context, item);
     }
 
     @Override

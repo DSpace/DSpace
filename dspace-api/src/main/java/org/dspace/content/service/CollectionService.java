@@ -500,6 +500,17 @@ public interface CollectionService
     public Collection retrieveCollectionByEntityType(Context context, Item item, String entityType)
         throws SQLException;
 
+    /**
+     * Returns the collection related to the given item. If the item is archived,
+     * this method returns the own collection of that item, otherwise returns the
+     * collection related to the current InProgressSubmission related to that item.
+     *
+     * @param  context      the DSpace context
+     * @param  item         the item from where the search start
+     * @return              the collection related to the given item
+     * @throws SQLException if an SQL error occurs
+     */
+    public Collection findByItem(Context context, Item item) throws SQLException;
 
     /**
      * Counts the number of Collection for which the current user has 'submit' privileges.

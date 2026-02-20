@@ -209,6 +209,11 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, schema, element, qualifier, language, value, authority, confidence);
     }
 
+    public ItemBuilder withSecuredMetadata(String schema, String element, String qualifier,
+        String value, Integer securityLevel) {
+        return addSecuredMetadataValue(item, schema, element, qualifier, value, securityLevel);
+    }
+
     public ItemBuilder withCrisPolicyEPerson(String value, String authority) {
         return addMetadataValue(item, CRIS.getName(), "policy", "eperson", null, value, authority, CF_ACCEPTED);
     }
@@ -227,6 +232,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withIsniIdentifier(String isni) {
         return addMetadataValue(item, "person", "identifier", "isni", isni);
+    }
+
+    public ItemBuilder withPatentNo(String patentNo) {
+        return addMetadataValue(item, "dc", "identifier", "patentno", patentNo);
     }
 
     public ItemBuilder withFullName(String fullname) {
