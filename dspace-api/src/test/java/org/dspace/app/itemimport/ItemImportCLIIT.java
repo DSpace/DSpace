@@ -17,8 +17,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.file.PathUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.app.itemexport.factory.ItemExportServiceFactory;
+import org.dspace.app.itemexport.service.ItemExportService;
+import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
+import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EntityTypeBuilder;
@@ -55,6 +60,9 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private ItemImportService itemImportService = ItemImportServiceFactory.getInstance().getItemImportService();
+    private ItemExportService itemExportService = ItemExportServiceFactory.getInstance().getItemExportService();
+
     private Collection collection;
     private Path tempDir;
     private Path workDir;
@@ -544,6 +552,80 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
         checkItemDeletion();
     }
 
+    @Test
+    public void importItemByZipSafWithRegisteredBitstreams() throws Exception {
+        try {
+            // use simple SAF in zip format
+            String updatedZipName = ZIP_NAME + "-updated.zip";
+
+            // unzip and zip again to add the link to the registered bitstream
+            Files.copy(getClass().getResourceAsStream("saf-registered-bitstreams.zip"),
+                Path.of(tempDir + File.separator + ZIP_NAME));
+            String unzippedDir = itemImportService.unzip(new File(tempDir + File.separator + ZIP_NAME),
+                tempDir + File.separator + "extracted");
+            String contentsData = "-r -s 0 -f " + "file1.txt";
+            String contentsPath = unzippedDir + File.separator + "item_000" + File.separator + "contents";
+            FileUtils.writeStringToFile(new File(contentsPath), contentsData);
+            itemExportService.zip(tempDir + File.separator + "extracted" + File.separator + ZIP_NAME,
+                tempDir + File.separator + updatedZipName);
+
+            Files.copy(getClass().getResourceAsStream("file1.txt"), Path.of(
+                configurationService.getProperty("assetstore.dir") + File.separator + "file1.txt"));
+
+            String[] args = new String[] {"import", "-a", "-e", admin.getEmail(), "-c", collection.getID().toString(),
+                "-s", tempDir.toString(), "-z", updatedZipName, "-m", tempDir + File.separator + "mapfile.out"};
+            perfomImportScript(args);
+
+            checkMetadata();
+            checkMetadataWithAnotherSchema();
+            checkBitstream();
+
+            // confirm that TEMP_DIR still exists
+            File workTempDir = new File(workDir + File.separator + TEMP_DIR);
+            assertTrue(workTempDir.exists());
+        } finally {
+            Files.deleteIfExists(Path.of(
+                configurationService.getProperty("assetstore.dir") + File.separator + "file1.txt"));
+        }
+    }
+
+    @Test
+    public void importItemByZipSafWithRegisteredBitstreamsWithSpacesInName() throws Exception {
+        try {
+            // use simple SAF in zip format
+            String updatedZipName = ZIP_NAME + "-updated.zip";
+
+            // unzip and zip again to add the link to the registered bitstream
+            Files.copy(getClass().getResourceAsStream("saf-registered-bitstreams.zip"),
+                Path.of(tempDir + File.separator + ZIP_NAME));
+            String unzippedDir = itemImportService.unzip(new File(tempDir + File.separator + ZIP_NAME),
+                tempDir + File.separator + "extracted");
+            String contentsData = "-r -s 0 -f " + "file with spaces.txt";
+            String contentsPath = unzippedDir + File.separator + "item_000" + File.separator + "contents";
+            FileUtils.writeStringToFile(new File(contentsPath), contentsData);
+            itemExportService.zip(tempDir + File.separator + "extracted" + File.separator + ZIP_NAME,
+                tempDir + File.separator + updatedZipName);
+
+            Files.copy(getClass().getResourceAsStream("file with spaces.txt"), Path.of(
+                configurationService.getProperty("assetstore.dir") + File.separator + "file with spaces.txt"));
+
+            String[] args = new String[] {"import", "-a", "-e", admin.getEmail(), "-c", collection.getID().toString(),
+                "-s", tempDir.toString(), "-z", updatedZipName, "-m", tempDir + File.separator + "mapfile.out"};
+            perfomImportScript(args);
+
+            checkMetadata();
+            checkMetadataWithAnotherSchema();
+            checkBitstreamWithSpacesInFileName();
+
+            // confirm that TEMP_DIR still exists
+            File workTempDir = new File(workDir + File.separator + TEMP_DIR);
+            assertTrue(workTempDir.exists());
+        } finally {
+            Files.deleteIfExists(Path.of(
+                configurationService.getProperty("assetstore.dir") + File.separator + "file with spaces.txt"));
+        }
+    }
+
     /**
      * Check metadata on imported item
      * @throws Exception
@@ -573,6 +655,17 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
         Bitstream bitstream = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next()
                 .getBundles("ORIGINAL").get(0).getBitstreams().get(0);
         assertEquals(bitstream.getName(), "file1.txt");
+    }
+
+    /**
+     * Check bitstreams on imported item
+     * @throws Exception
+     */
+    private void checkBitstreamWithSpacesInFileName() throws Exception {
+        Bitstream bitstream = itemService.findArchivedByMetadataField(
+                context, "dc", "title", null, publicationTitle).next()
+            .getBundles("ORIGINAL").get(0).getBitstreams().get(0);
+        assertEquals(bitstream.getName(), "file with spaces.txt");
     }
 
     /**
