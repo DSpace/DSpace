@@ -487,6 +487,29 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setParameter("last_modified", since);
         @SuppressWarnings("unchecked")
         List<UUID> uuids = query.getResultList();
+        log.debug("Retrieved " + uuids.size() + " items modified since " + since);
+        return new UUIDIterator<Item>(context, uuids, Item.class, this);
+    }
+
+    @Override
+    public Iterator<Item> findAllByCollectionLastModifiedSince(Context context, Collection collection,
+                                                               Instant last) throws SQLException {
+        // Select UUID of all items which have this "collection" in their list of collections
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<UUID> criteriaQuery = criteriaBuilder.createQuery(UUID.class);
+        Root<Item> itemRoot = criteriaQuery.from(Item.class);
+        criteriaQuery.select(itemRoot.get(Item_.id));
+        criteriaQuery.where(criteriaBuilder.and(
+            criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)),
+            criteriaBuilder.greaterThan(itemRoot.get(Item_.lastModified), last)));
+        criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get((Item_.id))));
+
+        // Transform into a query object to execute
+        Query query = createQuery(context, criteriaQuery);
+        @SuppressWarnings("unchecked")
+        List<UUID> uuids = query.getResultList();
+        log.debug("Retrieved " + uuids.size() + " items from collection " + collection.getID() +
+                 " modified since " + last);
         return new UUIDIterator<Item>(context, uuids, Item.class, this);
     }
 

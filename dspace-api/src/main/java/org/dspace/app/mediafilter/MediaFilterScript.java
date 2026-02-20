@@ -7,7 +7,10 @@
  */
 package org.dspace.app.mediafilter;
 
+import java.sql.SQLException;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,6 +26,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
@@ -39,7 +45,7 @@ import org.dspace.utils.DSpace;
  * bitstreams to be processed, even if they have been before; -n noindex does not
  * recreate index after processing bitstreams; -i [identifier] limits processing
  * scope to a community, collection or item; -m [max] limits processing to a
- * maximum number of items; -fd [fromdate] takes only items starting from this date,
+ * maximum number of items; -d [fromdate] takes only items starting from this date,
  * filtering by last_modified in the item table.
  */
 public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfiguration> {
@@ -62,7 +68,9 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
     private String[] filterNames;
     private String[] skipIds = null;
     private Map<String, List<String>> filterFormats = new HashMap<>();
-    private LocalDate fromDate = null;
+    private Instant fromDate = null;
+
+    private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
 
     public MediaFilterScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager()
@@ -115,8 +123,10 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
             skipIds = commandLine.getOptionValues('s');
         }
 
-        if (commandLine.hasOption('d')) {
-            fromDate = LocalDate.parse(commandLine.getOptionValue('d'));
+        // isForce overrides fromDate
+        if (!isForce && commandLine.hasOption('d')) {
+            fromDate = LocalDate.parse(commandLine.getOptionValue('d')).atStartOfDay(ZoneId.systemDefault())
+                                                                           .toInstant();
         }
 
 
@@ -230,6 +240,14 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
 
         try {
             c = new Context();
+
+            MetadataField field = metadataFieldService.findByElement(c, "dspace", "filtermedia", "lastdate");
+            if (field == null) {
+                throw new SQLException("Cannot find field dspace.filtermedia.lastdate from the Metadata "
+                                          + "Registry. Please update the registry by running\n"
+                                          + "./dspace registry-loader -metadata ../config/registries/dspace-types.xml\n"
+                                          + "in the [dspace]/bin/ directory.");
+            }
 
             // have to be super-user to do the filtering
             c.turnOffAuthorisationSystem();
