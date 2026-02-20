@@ -140,6 +140,17 @@
                                 </rules>
                             </configuration>
                         </execution>
+                        <execution>
+                            <id>enforce-plugin-versions</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requirePluginVersions />
+                                </rules>
+                            </configuration>
+                        </execution>
                     </executions>
                 </plugin>
                 <!-- Used to compile all Java classes -->
@@ -414,6 +425,22 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>0.8.14</version>
+                </plugin>
+                <!-- Freeze versions of the remaining compiler plugins for reproducible builds -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>3.1.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.12.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>3.1.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>
