@@ -8,12 +8,16 @@
 package org.dspace.app.rest.repository.patch.operation;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
@@ -40,7 +44,8 @@ public class DSpaceObjectMetadataAddOperation<R extends DSpaceObject> extends Pa
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
         DSpaceObjectService dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(resource);
-        MetadataValueRest metadataValueToAdd = metadataPatchUtils.extractMetadataValueFromOperation(operation);
+        List<MetadataValueRest> metadataValueToAdd = metadataPatchUtils
+            .extractMetadataValueListFromOperation(operation);
         MetadataField metadataField = metadataPatchUtils.getMetadataField(context, operation);
         String indexInPath = metadataPatchUtils.getIndexFromPath(operation.getPath());
 
@@ -60,15 +65,58 @@ public class DSpaceObjectMetadataAddOperation<R extends DSpaceObject> extends Pa
      */
     private void add(Context context, DSpaceObject dso, DSpaceObjectService dsoService, MetadataField metadataField,
                      MetadataValueRest metadataValue, String index) {
+        add(context, dso, dsoService, metadataField, List.of(metadataValue), index);
+    }
+
+    /**
+     * Adds metadata to the dso (appending if index is 0 or left out, prepending if -)
+     *
+     * @param context           context patch is being performed in
+     * @param dso               dso being patched
+     * @param dsoService        service doing the patch in db
+     * @param metadataField     md field being patched
+     * @param metadataValueList list of md element values
+     * @param index             determines whether we're prepending (-) or appending (0) md value (if one value in list)
+     */
+    private void add(Context context, DSpaceObject dso, DSpaceObjectService dsoService, MetadataField metadataField,
+                     List<MetadataValueRest> metadataValueList, String index) {
         metadataPatchUtils.checkMetadataFieldNotNull(metadataField);
         int indexInt = 0;
+        if (index != null && metadataValueList.size() > 1) {
+            throw new DSpaceBadRequestException("Cannot add multiple metadata values with an index in the path.");
+        }
         if (index != null && index.equals("-")) {
             indexInt = -1;
+        } else if (index != null) {
+            try {
+                indexInt = Integer.parseInt(index);
+            } catch (NumberFormatException e) {
+                throw new DSpaceBadRequestException("Invalid index to add metadata value");
+            }
+            // Check that index is within bounds of existing metadata values
+            List<MetadataValue> metadataValues = dsoService.getMetadata(dso,
+                    metadataField.getMetadataSchema().getName(), metadataField.getElement(),
+                    metadataField.getQualifier(), Item.ANY);
+            if (indexInt > metadataValues.size()) {
+                throw new UnprocessableEntityException("There is no metadata of this type at that index");
+            }
         }
         try {
-            dsoService.addAndShiftRightMetadata(context, dso, metadataField.getMetadataSchema().getName(),
-                    metadataField.getElement(), metadataField.getQualifier(), metadataValue.getLanguage(),
-                    metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence(), indexInt);
+            if (index == null) {
+                // no index => adding/replacing values from the list
+                dsoService.clearMetadata(context, dso, metadataField.getMetadataSchema().getName(),
+                        metadataField.getElement(), metadataField.getQualifier(), Item.ANY);
+                for (MetadataValueRest metadataValue : metadataValueList) {
+                    dsoService.addAndShiftRightMetadata(context, dso, metadataField.getMetadataSchema().getName(),
+                        metadataField.getElement(), metadataField.getQualifier(), metadataValue.getLanguage(),
+                        metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence(), -1);
+                }
+            } else {
+                dsoService.addAndShiftRightMetadata(context, dso, metadataField.getMetadataSchema().getName(),
+                    metadataField.getElement(), metadataField.getQualifier(), metadataValueList.get(0).getLanguage(),
+                    metadataValueList.get(0).getValue(), metadataValueList.get(0).getAuthority(),
+                    metadataValueList.get(0).getConfidence(), indexInt);
+            }
         } catch (SQLException e) {
             throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataAddOperation.add trying to add " +
                     "metadata to dso.", e);
