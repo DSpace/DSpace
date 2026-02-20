@@ -16,6 +16,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.cli.ParseException;
@@ -25,6 +26,7 @@ import org.apache.commons.lang3.Strings;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EntityTypeBuilder;
@@ -38,6 +40,7 @@ import org.dspace.content.Relationship;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
@@ -46,6 +49,7 @@ import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -77,6 +81,16 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         this.personCollection = CollectionBuilder.createCollection(context, community)
                                                  .withEntityType("Person")
                                                  .build();
+        context.restoreAuthSystemState();
+    }
+
+    @After
+    public void after() throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+        List<Relationship> relationships = relationshipService.findAll(context);
+        for (Relationship relationship : relationships) {
+            relationshipService.delete(context, relationship);
+        }
         context.restoreAuthSystemState();
     }
 
@@ -115,7 +129,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             Strings.CS.equals(
                 itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY).get(0).getValue(),
                 "Donald, SmithImported"));
-        eperson = ePersonService.findByEmail(context, eperson.getEmail());
+        eperson = ePersonService.findByEmail(context, admin.getEmail());
         assertEquals(importedItem.getSubmitter(), eperson);
 
         context.turnOffAuthorisationSystem();
@@ -133,7 +147,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
                               .get(0).getValue(), "Donald, SmithImported"));
         assertTrue(Strings.CS.equals(itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
                               .get(0).getValue(), "Publication"));
-        eperson = ePersonService.findByEmail(context, eperson.getEmail());
+        EPerson eperson = ePersonService.findByEmail(context, admin.getEmail());
         assertEquals(importedItem.getSubmitter(), eperson);
 
         context.turnOffAuthorisationSystem();
@@ -151,7 +165,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             .get(0).getValue(), "Donald, SmithImported"));
         assertEquals(1, itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
             .size());
-        eperson = ePersonService.findByEmail(context, eperson.getEmail());
+        EPerson eperson = ePersonService.findByEmail(context, admin.getEmail());
         assertEquals(importedItem.getSubmitter(), eperson);
 
         context.turnOffAuthorisationSystem();
@@ -299,7 +313,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         out.close();
         String fileLocation = csvFile.getAbsolutePath();
         try {
-            String[] args = new String[] {"metadata-import", "-f", fileLocation, "-e", eperson.getEmail(), "-s"};
+            String[] args = new String[] {"metadata-import", "-f", fileLocation, "-e", admin.getEmail(), "-s"};
             if (useTemplate) {
                 args = ArrayUtils.add(args, "-t");
             }
