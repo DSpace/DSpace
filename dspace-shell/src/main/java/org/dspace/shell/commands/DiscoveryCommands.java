@@ -57,7 +57,7 @@ public class DiscoveryCommands extends AbstractShellComponent {
      * @param rebuild
      * @param clean
      * @param force
-     * @param item
+     * @param id
      * @param itemToRemove
      * @param spellchecker
      */
@@ -92,7 +92,7 @@ public class DiscoveryCommands extends AbstractShellComponent {
             )
             boolean force,
             @Option(
-                longNames = "item",
+                longNames = "identifier",
                 shortNames = 'i',
                 description =
                     "Reindex an individual object (and any child objects).  When run on an Item,"
@@ -102,7 +102,7 @@ public class DiscoveryCommands extends AbstractShellComponent {
                      + " and contained Items.",
                 required = false
             )
-            String item,
+            String id,
             @Option(
                 longNames = "remove",
                 shortNames = 'r',
@@ -122,15 +122,15 @@ public class DiscoveryCommands extends AbstractShellComponent {
     ) {
         Optional<IndexableObject> indexableObject = Optional.empty();
         try {
-            if (item != null && !item.isEmpty()) {
+            if (id != null && !id.isEmpty()) {
                 Context ctx = getContext();
                 IndexingService indexingService = getIndexingService();
                 System.out.println(
-                    "Indexing " + item + " force " + force
+                    "Indexing " + id + " force " + force
                 );
-                indexableObject = resolveIndexableObject(ctx, item);
+                indexableObject = resolveIndexableObject(ctx, id);
                 if (!indexableObject.isPresent()) {
-                    throw new IllegalArgumentException("Cannot resolve " + item + " to a DSpace object");
+                    throw new IllegalArgumentException("Cannot resolve " + id + " to a DSpace object");
                 }
 
                 final long startTimeMillis = Instant.now().toEpochMilli();

@@ -11,6 +11,7 @@ import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /**
  * Starts the DSpace kernel to load all configurations and services
@@ -25,6 +26,7 @@ public class DSpaceConfigLoader {
     protected static transient DSpaceKernelImpl kernelImpl;
 
     @Bean
+    @Profile("!test")
     public DSpaceKernelImpl dspaceKernel() throws IllegalStateException {
 
         // Initialize the service manager kernel

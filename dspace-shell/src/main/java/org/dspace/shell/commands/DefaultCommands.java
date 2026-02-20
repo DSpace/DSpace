@@ -9,6 +9,7 @@ package org.dspace.shell.commands;
 
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.shell.command.CommandAlias;
 import org.springframework.shell.command.CommandCatalog;
@@ -43,48 +44,46 @@ public class DefaultCommands {
     )
     public void listCommands() {
         CommandCatalog commandCatalog = catalogProvider.getObject(); // lazy resolve
-        System.out.println("# DSpace Shell - command list");
-        System.out.println("");
-        for (Map.Entry<String, CommandRegistration> entry : commandCatalog.getRegistrations().entrySet()) {
-            String keyName = entry.getKey();
-            CommandRegistration registration = entry.getValue();
-            String commandName = registration.getCommand();
+        String newLine = System.getProperty("line.separator");
+        System.out.println("# DSpace Shell - command list" + newLine);
 
-            // If the iterator is the alias, skip it
-            if (!keyName.equals(commandName)) {
-                continue;
-            }
-            String aliases = registration.getAliases().stream()
-                    .map(CommandAlias::getCommand)
-                    .collect(Collectors.joining(", "));
+        commandCatalog.getRegistrations().entrySet().stream()
+            .sorted(Map.Entry.comparingByKey()) // sort alphabetically
+            .forEach(entry -> {
+                String keyName = entry.getKey();
+                CommandRegistration registration = entry.getValue();
+                String commandName = registration.getCommand();
 
-            System.out.println("## " + commandName );
-            System.out.println("");
+                // If the iterator is the alias, skip it
+                if (keyName.equals(commandName)) {
 
-            System.out.println("**Group:** `" + registration.getGroup() + "`" );
-            System.out.println("");
+                    String aliases = registration.getAliases().stream()
+                        .map(CommandAlias::getCommand)
+                        .collect(Collectors.joining(", "));
 
-            if (aliases.isEmpty()) {
-                System.out.println("Alias: `" + aliases + "`" );
-                System.out.println("");
-            }
+                    System.out.println("## " + commandName + newLine );
 
-            System.out.println(registration.getDescription());
-            System.out.println("");
-            System.out.println("usage: `"+ commandName + " [OPTIONS]`");
-            System.out.println("");
-            System.out.println("| Option | Description | Type | Required |");
-            System.out.println("| ------ | ------ | ------ | ------ |");
+                    System.out.println("**Group:** " + registration.getGroup() + newLine);
 
-            registration.getOptions().forEach(option -> {
-                System.out.print("| --" + String.join(", --", option.getLongNames()));
-                System.out.print(" | " + option.getDescription());
-                System.out.print(" | " + option.getType().getType().getTypeName());
-                System.out.print(" | " + option.isRequired());
-                System.out.println(" |");
+                    if (aliases.isEmpty()) {
+                        System.out.println("**Alias:** `" + aliases + "`" + newLine );
+                    }
+
+                    System.out.println(registration.getDescription() + newLine);
+                    System.out.println("**usage:** `" + commandName + " [OPTIONS]`" + newLine);
+
+                    System.out.println("| Option | Description | Type | Required |");
+                    System.out.println("| ------ | ------ | ------ | ------ |");
+
+                    registration.getOptions().forEach(option -> {
+                        System.out.print("| --" + String.join(", --", option.getLongNames()));
+                        System.out.print(" | " + option.getDescription());
+                        System.out.print(" | " + option.getType().getType().getTypeName());
+                        System.out.print(" | " + option.isRequired());
+                        System.out.println(" |" + newLine);
+                    });
+
+                }
             });
-
-            System.out.println("");
-        }
     }
 }
