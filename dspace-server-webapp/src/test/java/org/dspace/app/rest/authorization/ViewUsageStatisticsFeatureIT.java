@@ -378,4 +378,36 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
                                .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
                                .andExpect(jsonPath("$._embedded").exists());
     }
+
+    @Test
+    public void adminSiteWhenStatsDisabled() throws Exception {
+    configurationService.setProperty("usage-statistics.enabled", false);
+    configurationService.setProperty("usage-statistics.authorization.admin.usage", true);
+
+    String adminToken = getAuthToken(admin.getEmail(), password);
+    getClient(adminToken).perform(
+        get("/api/authz/authorizations/search/object")
+            .param("embed", "feature")
+            .param("feature", feature)
+            .param("uri", utils.linkToSingleResource(siteRest, "self").getHref()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.page.totalElements", is(0)))
+        .andExpect(jsonPath("$._embedded").doesNotExist());
+    }
+
+    @Test
+    public void adminSiteWhenStatsEnabled() throws Exception {
+    configurationService.setProperty("usage-statistics.enabled", true);
+    configurationService.setProperty("usage-statistics.authorization.admin.usage", true);
+
+    String adminToken = getAuthToken(admin.getEmail(), password);
+    getClient(adminToken).perform(
+        get("/api/authz/authorizations/search/object")
+            .param("embed", "feature")
+            .param("feature", feature)
+            .param("uri", utils.linkToSingleResource(siteRest, "self").getHref()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
+        .andExpect(jsonPath("$._embedded").exists());
+    }
 }
