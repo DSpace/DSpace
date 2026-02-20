@@ -27,6 +27,25 @@ public class SubmissionFormFieldMatcher {
     private SubmissionFormFieldMatcher() {
     }
 
+    public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String mandatoryMessage,
+        boolean repeatable, String hints, String metadata) {
+        return matchFormFieldDefinition(type, label, null, mandatoryMessage, repeatable, hints, null, metadata,
+            null);
+    }
+
+    public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String mandatoryMessage,
+                                                                   boolean repeatable, String hints, String style,
+                                                                   String metadata) {
+        return matchFormFieldDefinition(type, label, null, mandatoryMessage, repeatable, hints, style, metadata);
+    }
+
+    public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String mandatoryMessage,
+                                                                   boolean repeatable, String hints, String style,
+                                                                   String metadata, String controlledVocabulary) {
+        return matchFormFieldDefinition(type, label, null, mandatoryMessage, repeatable, hints, style, metadata,
+            controlledVocabulary);
+    }
+
     /**
      * Shortcut for the
      * {@link SubmissionFormFieldMatcher#matchFormFieldDefinition(String, String, String, String, boolean, String, String, String, String)}

@@ -22,6 +22,7 @@
                    <set>
                        <value>dc.date.accessioned</value>
                        <value>dc.description.provenance</value>
+                       <value>dspace.entity.type</value>
                    </set>
                </property>
                
