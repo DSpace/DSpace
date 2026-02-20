@@ -147,7 +147,7 @@ public class AIPDIMCrosswalk
     public Element disseminateElement(Context context, DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException,
         AuthorizeException {
-        return XSLTDisseminationCrosswalk.createDIM(dso);
+        return XSLTDisseminationCrosswalk.createDIM(context, dso);
     }
 
     /**

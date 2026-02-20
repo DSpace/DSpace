@@ -289,9 +289,12 @@
             <!--
                  DataCite (15)
                  Add version.
-                 As we currently do not link versions as related identifier, we skip
-                the version information too.
             -->
+            <xsl:if test="@itemVersion">
+                <xsl:element name="version">
+                    <xsl:value-of select="@itemVersion" />
+                </xsl:element>
+            </xsl:if>
 
             <!--
                 DataCite (16)
