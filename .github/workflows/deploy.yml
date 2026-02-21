@@ -153,8 +153,3 @@ jobs:
             "$DSPACE_INSTALL_DIR/bin/dspace" database migrate
 
           ENDSSH
-
-      - name: SSH — limpar arquivos temporários
-        if: always()
-        run: |
-          ssh $REMOTE_USER@$REMOTE_HOST "rm -rf /tmp/dspace-build"
