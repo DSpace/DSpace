@@ -58,7 +58,7 @@ jobs:
           db.driver = org.postgresql.Driver
           db.dialect = org.dspace.util.DSpacePostgreSQLDialect
           db.username = dspace
-          db.password = ${{ secrets.DB_PASSWORD }}
+          db.password = ${{ secrets.DB_PASSWORD_DEV }}
           db.schema = public
           db.maxconnections = 30
           db.maxwait = 10000
