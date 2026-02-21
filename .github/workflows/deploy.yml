@@ -3,14 +3,14 @@ name: DSpace Build & Deploy
 on:
   push:
     branches:
-      - main
+      - develop
   workflow_dispatch:
 
 env:
   REMOTE_USER: ${{ secrets.VPS_USER }}
   REMOTE_HOST: ${{ secrets.VPS_HOST_DEV }}
   REMOTE_DIR: "/tmp/dspace-build"
-  DSPACE_INSTALL_DIR: "/volumes/dspaceinstall"
+  DSPACE_INSTALL_DIR: "/dspaceinstall"
 
 jobs:
   # ─────────────────────────────────────────────
