@@ -1,130 +1,81 @@
+# DSpace 9 – Docker Deploy
 
-# DSpace
+## Pré-requisitos
+- Docker 24+
+- Docker Compose v2+
+- Código-fonte do DSpace na mesma pasta dos arquivos Docker
 
-[![Build Status](https://github.com/DSpace/DSpace/workflows/Build/badge.svg)](https://github.com/DSpace/DSpace/actions?query=workflow%3ABuild)
+## Estrutura esperada
+```
+.
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example
+└── <código-fonte DSpace>/   ← conteúdo do repositório
+```
 
-[DSpace Documentation](https://wiki.lyrasis.org/display/DSDOC/) |
-[DSpace Releases](https://github.com/DSpace/DSpace/releases) |
-[DSpace Wiki](https://wiki.lyrasis.org/display/DSPACE/Home) |
-[Support](https://wiki.lyrasis.org/display/DSPACE/Support)
+## 1. Configure as variáveis de ambiente
+```bash
+cp .env.example .env
+# Edite .env e troque POSTGRES_PASSWORD por uma senha segura
+```
 
-## Overview
+## 2. Build e inicialização
+```bash
+# Build da imagem e sobe todos os serviços
+docker compose up -d --build
+```
 
-DSpace open source software is a turnkey repository application used by more than
-2,000 organizations and institutions worldwide to provide durable access to digital resources.
-For more information, visit http://www.dspace.org/
+O processo de build inclui:
+1. Compilação Maven do DSpace (pode levar 10–20 min na primeira vez)
+2. Deploy via Ant no diretório `/dspace`
+3. Cópia dos cores Solr (serviço `solr-init`)
+4. Inicialização do backend Spring Boot
 
-DSpace consists of both a Java-based backend and an Angular-based frontend.
+## 3. Acompanhe os logs
+```bash
+docker compose logs -f dspace-backend
+```
 
-* Backend (this codebase) provides a REST API, along with other machine-based interfaces (e.g. OAI-PMH, SWORD, etc)
-    * The REST Contract is at https://github.com/DSpace/RestContract
-* Frontend (https://github.com/DSpace/dspace-angular/) is the User Interface built on the REST API
+Aguarde a mensagem indicando que o servidor está pronto (porta 8080 disponível).
 
-Prior versions of DSpace (v6.x and below) used two different UIs (XMLUI and JSPUI). Those UIs are no longer supported in v7 and above.
-* A maintenance branch for older versions is still available, see `dspace-6_x` for 6.x maintenance.
+## 4. Crie o administrador
+```bash
+docker compose exec dspace-backend /dspace/bin/dspace create-administrator
+```
 
-## Downloads
+## 5. Acesse
+- **Backend REST API:** http://localhost:8080/server
+- **Solr Admin UI:** http://localhost:8983/solr
 
-* Backend (REST API): https://github.com/DSpace/DSpace/releases
-* Frontend (User Interface): https://github.com/DSpace/dspace-angular/releases
+## Comandos úteis
 
-## Documentation / Installation
+| Ação | Comando |
+|---|---|
+| Parar tudo | `docker compose down` |
+| Parar e remover volumes | `docker compose down -v` |
+| Rebuild só do backend | `docker compose up -d --build dspace-backend` |
+| Ver logs de um serviço | `docker compose logs -f <serviço>` |
+| Executar comando DSpace | `docker compose exec dspace-backend /dspace/bin/dspace <cmd>` |
 
-Documentation for each release may be viewed online or downloaded via our [Documentation Wiki](https://wiki.lyrasis.org/display/DSDOC/).
+## Variáveis de ambiente disponíveis
 
-The latest DSpace Installation instructions are available at:
-https://wiki.lyrasis.org/display/DSDOC8x/Installing+DSpace
+Qualquer propriedade do `dspace.cfg` ou `local.cfg` pode ser sobrescrita via `JAVA_OPTS` no `docker-compose.yml`, usando o padrão:
 
-Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL)
-and a servlet container (usually Tomcat) in order to function.
-More information about these and all other prerequisites can be found in the Installation instructions above.
+```
+-D<nome.da.propriedade>=<valor>
+```
 
-## Running DSpace 8 in Docker
+Exemplo para trocar a URL pública:
+```yaml
+JAVA_OPTS: >-
+  -Ddspace.server.url=https://meu-dominio.com/server
+  -Ddspace.ui.url=https://meu-dominio.com
+```
 
-NOTE: At this time, we do not have production-ready Docker images for DSpace.
-That said, we do have quick-start Docker Compose scripts for development or testing purposes.
+## Notas de produção
 
-See [Running DSpace 8 with Docker Compose](dspace/src/main/docker-compose/README.md)
-
-## Contributing
-
-See [Contributing documentation](CONTRIBUTING.md)
-
-## Getting Help
-
-DSpace provides public mailing lists where you can post questions or raise topics for discussion.
-We welcome everyone to participate in these lists:
-
-* [dspace-community@googlegroups.com](https://groups.google.com/d/forum/dspace-community) : General discussion about DSpace platform, announcements, sharing of best practices
-* [dspace-tech@googlegroups.com](https://groups.google.com/d/forum/dspace-tech) : Technical support mailing list. See also our guide for [How to troubleshoot an error](https://wiki.lyrasis.org/display/DSPACE/Troubleshoot+an+error).
-* [dspace-devel@googlegroups.com](https://groups.google.com/d/forum/dspace-devel) : Developers / Development mailing list
-
-Great Q&A is also available under the [DSpace tag on Stackoverflow](http://stackoverflow.com/questions/tagged/dspace)
-
-Additional support options are at https://wiki.lyrasis.org/display/DSPACE/Support
-
-DSpace also has an active service provider network. If you'd rather hire a service provider to
-install, upgrade, customize, or host DSpace, then we recommend getting in touch with one of our
-[Registered Service Providers](http://www.dspace.org/service-providers).
-
-## Issue Tracker
-
-DSpace uses GitHub to track issues:
-* Backend (REST API) issues: https://github.com/DSpace/DSpace/issues
-* Frontend (User Interface) issues: https://github.com/DSpace/dspace-angular/issues
-
-## Testing
-
-### Running Tests
-
-By default, in DSpace, Unit Tests and Integration Tests are disabled. However, they are
-run automatically by [GitHub Actions](https://github.com/DSpace/DSpace/actions?query=workflow%3ABuild) for all Pull Requests and code commits.
-
-* How to run both Unit Tests (via `maven-surefire-plugin`) and Integration Tests (via `maven-failsafe-plugin`):
-  ```
-  mvn install -DskipUnitTests=false -DskipIntegrationTests=false
-  ```
-* How to run _only_ Unit Tests:
-  ```
-  mvn test -DskipUnitTests=false
-  ```
-* How to run a *single* Unit Test
-  ```
-  # Run all tests in a specific test class
-  # NOTE: failIfNoTests=false is required to skip tests in other modules
-  mvn test -DskipUnitTests=false -Dtest=[full.package.testClassName] -DfailIfNoTests=false
-
-  # Run one test method in a specific test class
-  mvn test -DskipUnitTests=false -Dtest=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
-  ```
-* How to run _only_ Integration Tests
-  ```
-  mvn install -DskipIntegrationTests=false
-  ```
-* How to run a *single* Integration Test
-  ```
-  # Run all integration tests in a specific test class
-  # NOTE: failIfNoTests=false is required to skip tests in other modules
-  mvn install -DskipIntegrationTests=false -Dit.test=[full.package.testClassName] -DfailIfNoTests=false
-
-  # Run one test method in a specific test class
-  mvn install -DskipIntegrationTests=false -Dit.test=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
-  ```
-* How to run only tests of a specific DSpace module
-  ```
-  # Before you can run only one module's tests, other modules may need to be installed into your ~/.m2
-  cd [dspace-src]
-  mvn clean install
-
-  # Then, move into a module subdirectory, and run the test command
-  cd [dspace-src]/dspace-server-webapp
-  # Choose your test command from the lists above
-  ```
-
-## License
-
-DSpace source code is freely available under a standard [BSD 3-Clause license](https://opensource.org/licenses/BSD-3-Clause).
-The full license is available in the [LICENSE](LICENSE) file or online at http://www.dspace.org/license/
-
-DSpace uses third-party libraries which may be distributed under different licenses. Those licenses are listed
-in the [LICENSES_THIRD_PARTY](LICENSES_THIRD_PARTY) file.
+- **Segurança:** Remova a exposição da porta `8983` do Solr ou restrinja via firewall. O Solr **não deve** ser acessível publicamente.
+- **HTTPS:** Coloque um reverse proxy (Nginx/Traefik) na frente do backend na porta 8080.
+- **Memória:** Ajuste `-Xmx` em `JAVA_OPTS` conforme a RAM disponível (recomendado: mínimo 2 GB para produção).
+- **Backups:** O volume `postgres_data` contém o banco de dados. Faça backup regular com `pg_dump`.
