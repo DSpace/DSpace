@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/dspace-backend
+  IMAGE_NAME: ${{ github.repository }}
   DSPACE_INSTALL_DIR: /dspaceinstall
 
 jobs:
@@ -143,11 +143,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Definir nome da imagem em lowercase
+        id: image_name
+        run: echo "value=$(echo '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
       - name: Extrair metadata da imagem (tags e labels)
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ steps.image_name.outputs.value }}
           tags: |
             type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
@@ -179,12 +183,12 @@ jobs:
 
       - name: Gerar script de deploy
         env:
-          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GHCR_ACTOR: ${{ github.actor }}
-          # GHCR_TOKEN e GHCR_ACTOR precisam de env: pois são expandidos
-          # dentro do heredoc local (cat > /tmp/deploy.sh << EOF)
+          IMAGE_RAW: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
+          GHCR_ACTOR: cjuniorgomes
         run: |
+          # Forçar lowercase (exigência do GHCR)
+          IMAGE=$(echo "${IMAGE_RAW}:latest" | tr '[:upper:]' '[:lower:]')
           cat > /tmp/deploy.sh << EOF
           #!/bin/bash
           set -e
