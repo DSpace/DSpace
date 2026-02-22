@@ -8,6 +8,7 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
@@ -25,6 +26,31 @@ public class ExternalSourceEntryMatcher {
             hasJsonPath("$.value", is(value)),
             hasJsonPath("$.externalSource", is(source))
         );
+    }
+
+    /**
+     * Check if the external source has a given metadata
+     *
+     * @param metadata the metadata name
+     * @param value    the metadata value
+     * @param place    the metadata place
+     * @return
+     */
+    public static Matcher<? super Object> matchItemWithGivenMetadata(String metadata, String value,
+                                                                     String place) {
+        return allOf(
+            // Check metadata appear metadata section
+            hasJsonPath("$.metadata.['" + metadata + "'][" + place + "].value", is(value)));
+    }
+
+    /**
+     * Gets a matcher to ensure a given key is not present.
+     *
+     * @param metadata the metadata name.
+     * @return the matcher.
+     */
+    public static Matcher<? super Object> matchMetadataDoesNotExist(String metadata) {
+        return hasNoJsonPath("$.metadata.['" + metadata + "']");
     }
 
 }

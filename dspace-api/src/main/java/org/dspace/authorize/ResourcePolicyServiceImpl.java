@@ -41,7 +41,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ResourcePolicyServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ResourcePolicyServiceImpl.class);
 
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
@@ -113,6 +113,11 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     @Override
     public List<ResourcePolicy> find(Context c, DSpaceObject o, int actionId) throws SQLException {
         return resourcePolicyDAO.findByDSoAndAction(c, o, actionId);
+    }
+
+    @Override
+    public List<ResourcePolicy> find(Context c, DSpaceObject o, int actionId, String type) throws SQLException {
+        return resourcePolicyDAO.findByDSoAndActionAndType(c, o, actionId, type);
     }
 
     @Override
@@ -205,13 +210,11 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
         }
 
         // now expiration date
-        if (ed != null && now.isAfter(ed)) {
-            // end date is set, return false if we're after it
-            return false;
-        }
+        // end date is set, return false if we're after it
+        return ed == null || !now.isAfter(ed);
 
         // if we made it this far, start < now < end
-        return true; // date must be okay
+// date must be okay
     }
 
     @Override
@@ -361,7 +364,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
 
     @Override
     public List<ResourcePolicy> findByEPersonAndResourceUuid(Context context, EPerson eperson, UUID resourceUuid,
-        int offset, int limit) throws SQLException {
+                                                             int offset, int limit) throws SQLException {
         return resourcePolicyDAO.findByEPersonAndResourceUuid(context, eperson, resourceUuid, offset, limit);
     }
 
@@ -373,7 +376,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
 
     @Override
     public List<ResourcePolicy> findByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId,
-        int offset, int limit) throws SQLException {
+                                                             int offset, int limit) throws SQLException {
         return resourcePolicyDAO.findByResouceUuidAndActionId(context, resourceUuid, actionId, offset, limit);
     }
 
@@ -405,7 +408,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
 
     @Override
     public List<ResourcePolicy> findByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid,
-        int offset, int limit) throws SQLException {
+                                                           int offset, int limit) throws SQLException {
         return resourcePolicyDAO.findByGroupAndResourceUuid(context, group, resourceUuid, offset, limit);
     }
 
@@ -427,5 +430,11 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
             isMy = true;
         }
         return isMy || authorizeService.isAdmin(context, eperson, resourcePolicy.getdSpaceObject());
+    }
+
+    @Override
+    public List<ResourcePolicyOwnerVO> findValidPolicyOwners(Context c, List<UUID> dsoIds, int actionID)
+        throws SQLException {
+        return resourcePolicyDAO.findValidPolicyOwners(c, dsoIds, actionID);
     }
 }

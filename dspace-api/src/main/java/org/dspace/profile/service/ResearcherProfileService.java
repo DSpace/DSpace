@@ -109,4 +109,15 @@ public interface ResearcherProfileService {
      * @return the profile type
      */
     String getProfileType();
+
+    /**
+     * Check if the given ePerson is an author of the given item by checking if any of the
+     * configured shared workspace author metadata fields contain the profile's item ID as authority.
+     *
+     * @param  context the relevant DSpace Context.
+     * @param  ePerson the ePerson to check
+     * @param  item    the item to check
+     * @return         true if the ePerson is an author of the item
+     */
+    boolean isAuthorOf(Context context, EPerson ePerson, Item item);
 }

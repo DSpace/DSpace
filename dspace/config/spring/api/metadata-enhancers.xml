@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+>
+
+    <context:annotation-config />
+    
+    <bean id="org.dspace.content.enhancer.service.ItemEnhancerService" 
+        class="org.dspace.content.enhancer.service.impl.ItemEnhancerServiceImpl" />
+
+    <bean class="org.dspace.content.enhancer.impl.RelatedEntityItemEnhancerUtils" />
+
+    <util:list id="researchOutputsEntityTypes">
+        <value>Publication</value>
+        <value>Product</value>
+        <value>Patent</value>
+    </util:list>
+
+    <bean class="org.dspace.content.enhancer.impl.RelatedEntityItemEnhancer" >
+        <property name="sourceEntityTypes" ref="researchOutputsEntityTypes" />
+        <property name="sourceItemMetadataFields">
+            <list>
+                <value>dc.contributor.author</value>
+                <value>dc.contributor.editor</value>
+            </list>
+        </property>
+        <property name="relatedItemMetadataFields">
+            <list>
+                <value>person.affiliation.name</value>
+            </list>
+        </property>
+        <property name="virtualQualifier" value="department" />
+    </bean>
+
+    <bean class="org.dspace.content.enhancer.impl.RelatedEntityItemEnhancer" >
+        <property name="sourceEntityTypes" ref="researchOutputsEntityTypes" />
+        <property name="sourceItemMetadataFields">
+            <list>
+                <value>dc.contributor.author</value>
+                <value>dc.contributor.editor</value>
+            </list>
+        </property>
+        <property name="relatedItemMetadataFields">
+            <list>
+                <value>person.identifier.orcid</value>
+            </list>
+        </property>
+        <property name="virtualQualifier" value="orcid" />
+    </bean>
+
+    <bean class="org.dspace.content.enhancer.impl.RelatedEntityItemEnhancer" >
+        <property name="sourceEntityTypes">
+            <list>
+                <value>Publication</value>
+            </list>
+        </property>
+        <property name="sourceItemMetadataFields">
+            <list>
+                <value>dc.relation.journal</value>
+                <value>dc.relation.ispartof</value>
+            </list>
+        </property>
+        <property name="relatedItemMetadataFields">
+            <list>
+                <value>miur.journal.ance</value>
+                <value>miur.identifier.ance</value>
+            </list>
+        </property>
+        <property name="virtualQualifier" value="journalance" />
+    </bean>
+
+</beans>

@@ -177,6 +177,26 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         );
     }
 
+    @ExceptionHandler(UnprocessableEditException.class)
+    protected ResponseEntity<Object> handleCustomUnprocessableEditException(HttpServletRequest request,
+                                                                            HttpServletResponse response,
+                                                                            UnprocessableEditException ex)
+                                                                     throws IOException {
+        String location;
+        String exceptionMessage;
+        if (null == ex) {
+            exceptionMessage = "none";
+            location = "unknown";
+        } else {
+            exceptionMessage = ex.getMessage();
+            StackTraceElement[] trace = ex.getStackTrace();
+            location = trace.length <= 0 ? "unknown" : trace[0].toString();
+        }
+        log.warn("{} (status:{} exception: {} at: {})", "unprocessable edit item", HttpStatus.UNPROCESSABLE_ENTITY,
+                exceptionMessage, location);
+        return new ResponseEntity<>(ex.getErrors(), null, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
     @ExceptionHandler(QueryMethodParameterConversionException.class)
     protected void ParameterConversionException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {

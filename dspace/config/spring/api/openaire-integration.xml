@@ -110,8 +110,8 @@
         <entry key="http://namespace.openaire.eu/oaf" value="oaf" />
         <entry key="http://www.w3.org/2001/XMLSchema-instance" value="xsi" />
     </util:map>
-    
-    <!--
+
+
     <util:map id="openaireProjectsMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
         <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
@@ -137,6 +137,7 @@
     <bean id="openaireFunding.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.title"/>
     </bean>
+
     <bean id="openaireFundingAcronym" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="openaireFunding.acronym"/>
         <property name="query" value=".//acronym"/>
@@ -172,7 +173,6 @@
     <bean id="openaireFunding.endDate" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="oairecerif.funding.endDate"/>
     </bean>
-    -->
 
     <!-- <bean id="openaireFundingKeywords" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="openaireFunding.keywords"/>
@@ -182,7 +182,7 @@
     <bean id="openaireFunding.keywords" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.subject"/>
     </bean> -->
-<!--
+
     <bean id="openaireFundingFunder" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="openaireFunding.funder"/>
         <property name="query" value=".//fundingtree/funder/name"/>
@@ -218,6 +218,9 @@
     <bean id="openaireFunding.summary" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.description"/>
     </bean>
--->
+
+    <bean class="java.lang.Integer" id="maxRetry">
+        <constructor-arg value="3"/>
+    </bean>
 
 </beans>
