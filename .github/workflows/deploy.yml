@@ -170,45 +170,48 @@ jobs:
     needs: build-and-publish
 
     steps:
-      - name: Configurar chave SSH e fazer deploy
+      - name: Configurar chave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY_DEV }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${{ secrets.VPS_HOST_DEV }}" >> ~/.ssh/known_hosts
+
+      - name: Gerar script de deploy
         env:
-          SSH_KEY: ${{ secrets.VPS_SSH_KEY_DEV }}
-          SSH_HOST: ${{ secrets.VPS_HOST_DEV }}
-          SSH_USER: ${{ secrets.VPS_USER }}
+          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GHCR_ACTOR: ${{ github.actor }}
-          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          # GHCR_TOKEN e GHCR_ACTOR precisam de env: pois são expandidos
+          # dentro do heredoc local (cat > /tmp/deploy.sh << EOF)
         run: |
-          # Configurar chave SSH
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts
+          cat > /tmp/deploy.sh << EOF
+          #!/bin/bash
+          set -e
 
-          # Executar deploy no servidor via SSH
-          ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" \
-            IMAGE="$IMAGE" GHCR_TOKEN="$GHCR_TOKEN" GHCR_ACTOR="$GHCR_ACTOR" \
-            bash << 'REMOTE'
-              set -e
+          echo "==> Login no GHCR..."
+          echo "${GHCR_TOKEN}" | docker login ghcr.io -u "${GHCR_ACTOR}" --password-stdin
 
-              echo "==> Login no GHCR..."
-              echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
+          echo "==> Pull da nova imagem..."
+          docker pull "${IMAGE}"
 
-              echo "==> Pull da nova imagem..."
-              docker pull "$IMAGE"
+          echo "==> Parando container anterior (se existir)..."
+          docker stop dspace-backend || true
+          docker rm   dspace-backend || true
 
-              echo "==> Parando container anterior (se existir)..."
-              docker stop dspace-backend || true
-              docker rm   dspace-backend || true
+          echo "==> Subindo novo container..."
+          docker run -d \
+            --name dspace-backend \
+            --restart unless-stopped \
+            -p 8080:8080 \
+            -v /dspaceinstall/assetstore:/dspaceinstall/assetstore \
+            "${IMAGE}"
 
-              echo "==> Subindo novo container..."
-              docker run -d \
-                --name dspace-backend \
-                --restart unless-stopped \
-                -p 8080:8080 \
-                -v /volumes/solr:/opt/solr \
-                -v /volumes/assetstore:/volumes/dspaceinstall/assetstore \
-                "$IMAGE"
+          echo "==> Deploy concluído!"
+          EOF
+          chmod +x /tmp/deploy.sh
 
-              echo "==> Deploy concluído!"
-          REMOTE
+      - name: Enviar e executar script de deploy no servidor
+        run: |
+          scp -o StrictHostKeyChecking=no /tmp/deploy.sh "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST_DEV }}:/tmp/deploy.sh"
+          ssh -o StrictHostKeyChecking=no "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST_DEV }}" "bash /tmp/deploy.sh; rm /tmp/deploy.sh"
