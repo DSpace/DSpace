@@ -12,10 +12,14 @@ env:
   DSPACE_INSTALL_DIR: /dspaceinstall
 
 jobs:
+  # ──────────────────────────────────────────────────────────────────────
+  # JOB 1: Build Maven + ant fresh_install + gera imagem Docker + push
+  # ──────────────────────────────────────────────────────────────────────
   build-and-publish:
     name: Build, Install & Publish Image
     runs-on: ubuntu-latest
 
+    # PostgreSQL local para o ant fresh_install poder conectar
     services:
       postgres:
         image: postgres:15
@@ -33,7 +37,7 @@ jobs:
 
     permissions:
       contents: read
-      packages: write
+      packages: write   # necessário para push no GHCR
 
     steps:
       - name: Checkout do repositório
@@ -127,6 +131,11 @@ jobs:
         run: |
           $DSPACE_INSTALL_DIR/bin/dspace database migrate
 
+      # Copia o resultado do ant fresh_install para dentro do contexto
+      # de build do Docker (COPY só enxerga paths relativos ao contexto)
+      - name: Copiar instalação para contexto do Docker
+        run: cp -R $DSPACE_INSTALL_DIR ./dspace-installed
+
       - name: Login no GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -151,8 +160,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            DSPACE_INSTALL_DIR=${{ env.DSPACE_INSTALL_DIR }}
 
   # ──────────────────────────────────────────────────────────────────────
   # JOB 2: Deploy no servidor remoto

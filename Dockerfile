@@ -1,12 +1,17 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Dockerfile — DSpace Backend (Runnable JAR / Spring Boot)
+#
+# O CI copia o resultado do ant fresh_install para ./dspace-installed/
+# antes de rodar o docker build, tornando o path relativo ao contexto.
+# ─────────────────────────────────────────────────────────────────────────────
+
 FROM eclipse-temurin:17-jre
 
-ARG DSPACE_INSTALL_DIR=/dspaceinstall
-ENV DSPACE_INSTALL_DIR=${DSPACE_INSTALL_DIR}
+ENV DSPACE_INSTALL_DIR=/volumes/dspaceinstall
 
-# Copia o DSpace já instalado pelo ant fresh_install no runner
-COPY ${DSPACE_INSTALL_DIR} ${DSPACE_INSTALL_DIR}
+# Copia o conteúdo instalado (path relativo ao contexto do build)
+COPY dspace-installed/ ${DSPACE_INSTALL_DIR}/
 
 EXPOSE 8080
 
-CMD java -jar ${DSPACE_INSTALL_DIR}/webapps/server-boot.jar \
-         --dspace.dir=${DSPACE_INSTALL_DIR}
+CMD ["java", "-jar", "/volumes/dspaceinstall/webapps/server-boot.jar", "--dspace.dir=/volumes/dspaceinstall"]
