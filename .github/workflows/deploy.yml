@@ -7,18 +7,33 @@ on:
   workflow_dispatch:
 
 env:
-  REMOTE_USER: ${{ secrets.VPS_USER }}
-  REMOTE_HOST: ${{ secrets.VPS_HOST_DEV }}
-  REMOTE_DIR: "/tmp/dspace-build"
-  DSPACE_INSTALL_DIR: "/dspaceinstall"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/dspace-backend
+  DSPACE_INSTALL_DIR: /dspaceinstall
 
 jobs:
-  # ─────────────────────────────────────────────
-  # JOB 1: Build no runner do GitHub (hosted)
-  # ─────────────────────────────────────────────
-  build:
-    name: Maven Build
+  build-and-publish:
+    name: Build, Install & Publish Image
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: dspace
+          POSTGRES_USER: dspace
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD_DEV }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dspace"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout do repositório
@@ -38,15 +53,25 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      # Cria o local.cfg ANTES do mvn package, para que o build
-      # já o inclua no pacote de instalação gerado
+      - name: Instalar Ant
+        run: sudo apt-get install -y ant
+
+      - name: Criar diretório de instalação
+        run: sudo mkdir -p $DSPACE_INSTALL_DIR && sudo chown $USER $DSPACE_INSTALL_DIR
+
+      - name: Habilitar pgcrypto no PostgreSQL
+        run: |
+          PGPASSWORD=${{ secrets.DB_PASSWORD_DEV }} psql \
+            -h localhost -U dspace -d dspace \
+            -c "CREATE EXTENSION IF NOT EXISTS pgcrypto;"
+
       - name: Criar arquivo local.cfg
         run: |
           cat > dspace/config/local.cfg << EOF
-          dspace.dir = /dspaceinstall
-          dspace.server.url = https://dev.interacoes.ltap.ifce.edu.br/server
-          dspace.server.ssr.url = https://dev.interacoes.ltap.ifce.edu.br/server
-          dspace.ui.url = https://dev.interacoes.ltap.ifce.edu.br
+          dspace.dir = $DSPACE_INSTALL_DIR
+          dspace.server.url = https://dspace.dev.interacoes.ltap.ifce.edu.br/server
+          dspace.server.ssr.url = https://dspace.dev.interacoes.ltap.ifce.edu.br/server
+          dspace.ui.url = https://dspace.dev.interacoes.ltap.ifce.edu.br
           dspace.name = InterAções - SASE/MEC
           dspace.shortname = InterAções
           default.language = pt_BR
@@ -93,33 +118,51 @@ jobs:
               package \
               -DskipTests
 
-      - name: Compactar artefato de instalação
+      - name: ant fresh_install
         run: |
-          tar -czf dspace-installer.tar.gz \
-            -C dspace/target \
-            dspace-installer
+          cd dspace/target/dspace-installer
+          ant fresh_install
 
-      - name: Upload do artefato
-        uses: actions/upload-artifact@v4
+      - name: dspace database migrate
+        run: |
+          $DSPACE_INSTALL_DIR/bin/dspace database migrate
+
+      - name: Login no GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          name: dspace-installer
-          path: dspace-installer.tar.gz
-          retention-days: 1
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-  # ─────────────────────────────────────────────
-  # JOB 2: Transferência e instalação no servidor
-  # ─────────────────────────────────────────────
+      - name: Extrair metadata da imagem (tags e labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build e push da imagem Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            DSPACE_INSTALL_DIR=${{ env.DSPACE_INSTALL_DIR }}
+
+  # ──────────────────────────────────────────────────────────────────────
+  # JOB 2: Deploy no servidor remoto
+  # ──────────────────────────────────────────────────────────────────────
   deploy:
-    name: Deploy via SSH
+    name: Deploy no servidor
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-and-publish
 
     steps:
-      - name: Download do artefato gerado no build
-        uses: actions/download-artifact@v4
-        with:
-          name: dspace-installer
-
       - name: Configurar chave SSH
         run: |
           mkdir -p ~/.ssh
@@ -127,29 +170,32 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "${{ secrets.VPS_HOST_DEV }}" >> ~/.ssh/known_hosts
 
-      - name: SCP — enviar artefato ao servidor
+      - name: SSH — pull e restart do container
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
         run: |
-          ssh $REMOTE_USER@$REMOTE_HOST "mkdir -p $REMOTE_DIR"
-          scp dspace-installer.tar.gz \
-              $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/dspace-installer.tar.gz
-
-      - name: SSH — instalar DSpace no servidor
-        run: |
-          ssh $REMOTE_USER@$REMOTE_HOST << 'ENDSSH'
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST_DEV }} << ENDSSH
             set -e
 
-            REMOTE_DIR="/tmp/dspace-build"
-            DSPACE_INSTALL_DIR="/dspaceinstall"
+            echo "==> Login no GHCR..."
+            echo "${{ secrets.GITHUB_TOKEN }}" | \
+              docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            echo "==> Descompactando artefato..."
-            cd "$REMOTE_DIR"
-            tar -xzf dspace-installer.tar.gz
+            echo "==> Pull da nova imagem..."
+            docker pull $IMAGE
 
-            echo "==> Rodando ant fresh_install..."
-            cd "$REMOTE_DIR/dspace-installer"
-            ant fresh_install
+            echo "==> Parando container anterior (se existir)..."
+            docker stop dspace-backend || true
+            docker rm   dspace-backend || true
 
-            echo "==> Migrando banco de dados..."
-            "$DSPACE_INSTALL_DIR/bin/dspace" database migrate
+            echo "==> Subindo novo container..."
+            docker run -d \
+              --name dspace-backend \
+              --restart unless-stopped \
+              -p 8080:8080 \
+              -v /volumes/solr:/opt/solr \
+              -v /volumes/assetstore:/volumes/dspaceinstall/assetstore \
+              $IMAGE
 
+            echo "==> Deploy concluído!"
           ENDSSH
