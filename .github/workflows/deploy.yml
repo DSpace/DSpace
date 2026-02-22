@@ -170,39 +170,45 @@ jobs:
     needs: build-and-publish
 
     steps:
-      - name: Configurar chave SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_SSH_KEY_DEV }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "${{ secrets.VPS_HOST_DEV }}" >> ~/.ssh/known_hosts
-
-      - name: SSH — pull e restart do container
+      - name: Configurar chave SSH e fazer deploy
         env:
+          SSH_KEY: ${{ secrets.VPS_SSH_KEY_DEV }}
+          SSH_HOST: ${{ secrets.VPS_HOST_DEV }}
+          SSH_USER: ${{ secrets.VPS_USER }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_ACTOR: ${{ github.actor }}
           IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
         run: |
-          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST_DEV }} << ENDSSH
-            set -e
+          # Configurar chave SSH
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts
 
-            echo "==> Login no GHCR..."
-            echo "${{ secrets.GITHUB_TOKEN }}" | \
-              docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          # Executar deploy no servidor via SSH
+          ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" \
+            IMAGE="$IMAGE" GHCR_TOKEN="$GHCR_TOKEN" GHCR_ACTOR="$GHCR_ACTOR" \
+            bash << 'REMOTE'
+              set -e
 
-            echo "==> Pull da nova imagem..."
-            docker pull $IMAGE
+              echo "==> Login no GHCR..."
+              echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
 
-            echo "==> Parando container anterior (se existir)..."
-            docker stop dspace-backend || true
-            docker rm   dspace-backend || true
+              echo "==> Pull da nova imagem..."
+              docker pull "$IMAGE"
 
-            echo "==> Subindo novo container..."
-            docker run -d \
-              --name dspace-backend \
-              --restart unless-stopped \
-              -p 8080:8080 \
-              -v /volumes/solr:/opt/solr \
-              -v /volumes/assetstore:/volumes/dspaceinstall/assetstore \
-              $IMAGE
+              echo "==> Parando container anterior (se existir)..."
+              docker stop dspace-backend || true
+              docker rm   dspace-backend || true
 
-            echo "==> Deploy concluído!"
-          ENDSSH
+              echo "==> Subindo novo container..."
+              docker run -d \
+                --name dspace-backend \
+                --restart unless-stopped \
+                -p 8080:8080 \
+                -v /volumes/solr:/opt/solr \
+                -v /volumes/assetstore:/volumes/dspaceinstall/assetstore \
+                "$IMAGE"
+
+              echo "==> Deploy concluído!"
+          REMOTE
