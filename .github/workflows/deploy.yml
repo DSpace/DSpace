@@ -133,8 +133,66 @@ jobs:
 
       # Copia o resultado do ant fresh_install para dentro do contexto
       # de build do Docker (COPY só enxerga paths relativos ao contexto)
+      # Sobrescreve local.cfg com configurações de produção APÓS o ant
+      # O ant usou localhost, a imagem Docker usará os containers da rede
+      - name: Gerar local.cfg de produção
+        run: |
+          cat > $DSPACE_INSTALL_DIR/config/local.cfg << EOF
+          dspace.dir = /dspaceinstall
+          dspace.server.url = https://dspace.dev.interacoes.ltap.ifce.edu.br/server
+          dspace.server.ssr.url = https://dspace.dev.interacoes.ltap.ifce.edu.br/server
+          dspace.ui.url = https://dspace.dev.interacoes.ltap.ifce.edu.br
+          dspace.name = InterAções - SASE/MEC
+          dspace.shortname = InterAções
+          default.language = pt_BR
+
+          solr.server = http://dspace-solr:8983/solr
+          solr.multicorePrefix =
+
+          db.url = jdbc:postgresql://dspace-db:5432/dspace
+          db.driver = org.postgresql.Driver
+          db.dialect = org.dspace.util.DSpacePostgreSQLDialect
+          db.username = dspace
+          db.password = ${{ secrets.DB_PASSWORD_DEV }}
+          db.schema = public
+          db.maxconnections = 30
+          db.maxwait = 10000
+          db.minidle = 0
+          db.maxidle = 10
+          db.initialsize = 0
+          db.maxconnlifetime = -1
+          db.removeabandoned = false
+          db.removeabandonedtimeout = 300
+
+          logging.server.include-after-request = false
+          logging.server.include-client-info = false
+          logging.server.include-headers = false
+          logging.server.include-payload = false
+          logging.server.include-query-string = false
+          logging.server.include-stacktrace-for-httpcode = 422
+          logging.server.max-payload-length = 10000
+
+          mail.server = smtp.sendgrid.net
+          mail.server.port = 587
+          mail.server.use.tls = true
+          mail.server.use.ssl = false
+          mail.server.username = apikey
+          mail.server.password = ${{ secrets.SMTP_PASSWD }}
+          mail.from.address = no-reply@ltap.ifce.edu.br
+          EOF
+
       - name: Copiar instalação para contexto do Docker
-        run: cp -R $DSPACE_INSTALL_DIR ./dspace-installed
+        run: |
+          # Copia o CONTEÚDO de /dspaceinstall (não a pasta em si)
+          # usando /. no final garante que copia apenas o conteúdo interno
+          mkdir -p ./dspace-installed
+          cp -R $DSPACE_INSTALL_DIR/. ./dspace-installed/
+          echo "==> Verificando estrutura copiada..."
+          ls -la ./dspace-installed/
+          echo "==> Verificando config..."
+          ls -la ./dspace-installed/config/ | head -20
+          echo "==> Verificando webapps..."
+          ls -la ./dspace-installed/webapps/
 
       - name: Login no GitHub Container Registry
         uses: docker/login-action@v3
@@ -206,6 +264,13 @@ jobs:
             echo "==> Parando container anterior (se existir)..."
             docker stop dspace-backend || true
             docker rm   dspace-backend || true
+
+            echo "==> Criando rede se não existir..."
+            docker network create dspace-net-develop || true
+
+            echo "==> Conectando containers de banco e solr na rede..."
+            docker network connect dspace-net-develop dspace-db || true
+            docker network connect dspace-net-develop dspace-solr || true
 
             echo "==> Subindo novo container..."
             docker run -d \
