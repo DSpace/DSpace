@@ -1654,6 +1654,12 @@
             <pair><displayed-value>Programa Saúde na Escola</displayed-value><stored-value>Programa Saúde na Escola</stored-value></pair>
             <pair><displayed-value>Recomposição de Aprendizagem</displayed-value><stored-value>Recomposição de Aprendizagem</stored-value></pair>
             <pair><displayed-value>Segurança e Proteção no Ambiente Escolar</displayed-value><stored-value>Segurança e Proteção no Ambiente Escolar</stored-value></pair>
+            <pair><displayed-value>Educação de Jovens e Adultos (EJA)</displayed-value><stored-value>Educação de Jovens e Adultos (EJA)</stored-value></pair>
+            <pair><displayed-value>Desenvolvimento Agrário</displayed-value><stored-value>Desenvolvimento Agrário</stored-value></pair>
+            <pair><displayed-value>Popularização da Ciência</displayed-value><stored-value>Popularização da Ciência</stored-value></pair>
+            <pair><displayed-value>Saúde Coletiva</displayed-value><stored-value>Saúde Coletiva</stored-value></pair>
+            <pair><displayed-value>Valorização do Patrimônio Cultural, Histórico e Natural</displayed-value><stored-value>Valorização do Patrimônio Cultural, Histórico e Natural</stored-value></pair>
+            <pair><displayed-value>Educação para a Emancipação</displayed-value><stored-value>Educação para a Emancipação</stored-value></pair>
         </value-pairs>
 
         <value-pairs value-pairs-name="esferas" dc-term="type">
