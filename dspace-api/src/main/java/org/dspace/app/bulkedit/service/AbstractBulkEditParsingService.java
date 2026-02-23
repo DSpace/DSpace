@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.bulkedit.BulkEditChange;
 import org.dspace.app.bulkedit.BulkEditMetadataValue;
 import org.dspace.app.bulkedit.MetadataImportException;
@@ -224,8 +225,8 @@ public abstract class AbstractBulkEditParsingService<T, R> implements BulkEditPa
      * already known to be equal.
      */
     protected boolean isValueChanged(BulkEditMetadataValue original, BulkEditMetadataValue imported) {
-        return StringUtils.equals(original.getValue(), imported.getValue())
-            && StringUtils.equals(original.getAuthority(), imported.getAuthority())
+        return Strings.CI.equals(original.getValue(), imported.getValue())
+            && Strings.CI.equals(original.getAuthority(), imported.getAuthority())
             && original.getConfidence() == imported.getConfidence();
     }
 
