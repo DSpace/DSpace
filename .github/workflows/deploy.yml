@@ -181,41 +181,55 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "${{ secrets.VPS_HOST_DEV }}" >> ~/.ssh/known_hosts
 
-      - name: Gerar script de deploy
+      # ── DEBUG: remover após confirmar que as variáveis chegam corretamente ──
+      - name: Debug — verificar variáveis no runner
         env:
-          IMAGE_RAW: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
-          GHCR_ACTOR: cjuniorgomes
+          IMAGE_RAW: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         run: |
-          # Forçar lowercase (exigência do GHCR)
           IMAGE=$(echo "${IMAGE_RAW}:latest" | tr '[:upper:]' '[:lower:]')
-          cat > /tmp/deploy.sh << EOF
-          #!/bin/bash
-          set -e
+          echo "IMAGE_RAW=${IMAGE_RAW}"
+          echo "IMAGE=${IMAGE}"
+          echo "GHCR_ACTOR=cjuniorgomes"
+          # Mostra só os primeiros caracteres do token para confirmar que não está vazio
+          echo "GHCR_TOKEN (primeiros 6 chars)=${GHCR_TOKEN:0:6}"
 
-          echo "==> Login no GHCR..."
-          docker login ghcr.io -u "${GHCR_ACTOR}" --password "${GHCR_TOKEN}"
-
-          echo "==> Pull da nova imagem..."
-          docker pull "${IMAGE}"
-
-          echo "==> Parando container anterior (se existir)..."
-          docker stop dspace-backend || true
-          docker rm   dspace-backend || true
-
-          echo "==> Subindo novo container..."
-          docker run -d \
-            --name dspace-backend \
-            --restart unless-stopped \
-            -p 8080:8080 \
-            -v /dspaceinstall/assetstore:/dspaceinstall/assetstore \
-            "${IMAGE}"
-
-          echo "==> Deploy concluído!"
-          EOF
-          chmod +x /tmp/deploy.sh
-
-      - name: Enviar e executar script de deploy no servidor
+      - name: Deploy no servidor
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
+          IMAGE_RAW: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         run: |
-          scp -o StrictHostKeyChecking=no /tmp/deploy.sh "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST_DEV }}:/tmp/deploy.sh"
-          ssh -o StrictHostKeyChecking=no "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST_DEV }}" "bash /tmp/deploy.sh; rm /tmp/deploy.sh"
+          IMAGE=$(echo "${IMAGE_RAW}:latest" | tr '[:upper:]' '[:lower:]')
+
+          ssh -o StrictHostKeyChecking=no "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST_DEV }}" \
+            GHCR_TOKEN="${GHCR_TOKEN}" \
+            GHCR_ACTOR="cjuniorgomes" \
+            IMAGE="${IMAGE}" \
+            bash -s << 'REMOTE'
+              set -e
+
+              echo "==> Verificando variáveis no servidor..."
+              echo "IMAGE=${IMAGE}"
+              echo "GHCR_ACTOR=${GHCR_ACTOR}"
+              echo "GHCR_TOKEN (primeiros 6 chars)=${GHCR_TOKEN:0:6}"
+
+              echo "==> Login no GHCR..."
+              docker login ghcr.io -u "$GHCR_ACTOR" --password "$GHCR_TOKEN"
+
+              echo "==> Pull da nova imagem..."
+              docker pull "$IMAGE"
+
+              echo "==> Parando container anterior (se existir)..."
+              docker stop dspace-backend || true
+              docker rm   dspace-backend || true
+
+              echo "==> Subindo novo container..."
+              docker run -d \
+                --name dspace-backend \
+                --restart unless-stopped \
+                -p 8080:8080 \
+                -v /dspaceinstall/assetstore:/dspaceinstall/assetstore \
+                "$IMAGE"
+
+              echo "==> Deploy concluído!"
+          REMOTE
