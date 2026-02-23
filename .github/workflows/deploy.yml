@@ -211,6 +211,7 @@ jobs:
             docker run -d \
               --name dspace-backend \
               --restart unless-stopped \
+              --network dspace-net \
               -p 8080:8080 \
               -v /dspaceinstall/assetstore:/dspaceinstall/assetstore \
               "$IMAGE"
