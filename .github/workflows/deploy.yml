@@ -278,7 +278,7 @@ jobs:
               --restart unless-stopped \
               --network dspace-net-develop \
               -p 8080:8080 \
-              -v /dspaceinstall/assetstore:/dspaceinstall/assetstore \
+              -v /home/interacoes/dspace-solr-postgres/assetstore:/dspaceinstall/assetstore \
               "$IMAGE"
 
             echo "==> Deploy concluído!"
