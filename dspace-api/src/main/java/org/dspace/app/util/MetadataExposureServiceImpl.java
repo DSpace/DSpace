@@ -14,10 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -71,6 +74,9 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
     @Autowired(required = true)
     protected ConfigurationService configurationService;
 
+    @Autowired(required = true)
+    protected GroupService groupService;
+
     protected MetadataExposureServiceImpl() {
 
     }
@@ -98,8 +104,23 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
         }
 
         if (hidden && context != null) {
-            // the administrator's override
+            // administrator's override: admins can always see hidden fields
             hidden = !authorizeService.isAdmin(context);
+        }
+
+        if (hidden && context != null) {
+            // group-based override: members of any group listed in metadata.hide.groups
+            // are also allowed to see hidden metadata fields
+            String groupsConfig = configurationService.getProperty("metadata.hide.groups");
+            if (StringUtils.isNotBlank(groupsConfig)) {
+                for (String groupName : groupsConfig.split(",")) {
+                    String trimmedGroupName = groupName.trim();
+                    if (StringUtils.isNotBlank(trimmedGroupName) && groupService.isMember(context, trimmedGroupName)) {
+                        hidden = false;
+                        break;
+                    }
+                }
+            }
         }
 
         return hidden;
@@ -130,6 +151,10 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
             List<String> propertyKeys = configurationService.getPropertyKeys();
             for (String key : propertyKeys) {
                 if (key.startsWith(CONFIG_PREFIX)) {
+                    // Skip control keys that share the prefix but are not field-hiding directives
+                    if (key.equals("metadata.hide.groups")) {
+                        continue;
+                    }
                     if (configurationService.getBooleanProperty(key, true)) {
                         String mdField = key.substring(CONFIG_PREFIX.length());
                         String segment[] = mdField.split("\\.", 3);
