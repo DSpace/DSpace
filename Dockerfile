@@ -14,4 +14,4 @@ COPY dspace-installed/ ${DSPACE_INSTALL_DIR}/
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "/volumes/dspaceinstall/webapps/server-boot.jar", "--dspace.dir=/volumes/dspaceinstall"]
+CMD ["java", "-jar", "/dspaceinstall/webapps/server-boot.jar", "--dspace.dir=/dspaceinstall"]
