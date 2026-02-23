@@ -181,34 +181,15 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "${{ secrets.VPS_HOST_DEV }}" >> ~/.ssh/known_hosts
 
-      # ── DEBUG: remover após confirmar que as variáveis chegam corretamente ──
-      - name: Debug — verificar variáveis no runner
-        env:
-          GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
-          IMAGE_RAW: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-        run: |
-          IMAGE=$(echo "${IMAGE_RAW}:latest" | tr '[:upper:]' '[:lower:]')
-          echo "IMAGE_RAW=${IMAGE_RAW}"
-          echo "IMAGE=${IMAGE}"
-          echo "GHCR_ACTOR=cjuniorgomes"
-          # Mostra só os primeiros caracteres do token para confirmar que não está vazio
-          echo "GHCR_TOKEN (primeiros 6 chars)=${GHCR_TOKEN:0:6}"
-
       - name: Deploy no servidor
-        env:
-          GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
-          IMAGE_RAW: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         run: |
-          IMAGE=$(echo "${IMAGE_RAW}:latest" | tr '[:upper:]' '[:lower:]')
-
-          # Gera o script com os valores já interpolados pelo runner
-          # Os valores são escapados com printf %q para evitar problemas
-          # com caracteres especiais no token
-          SCRIPT=$(printf '
+          ssh -o StrictHostKeyChecking=no "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST_DEV }}" bash << 'REMOTE'
             set -e
-            GHCR_TOKEN=%q
-            GHCR_ACTOR=%q
-            IMAGE=%q
+
+            # Carrega variáveis do .env no servidor
+            set -a
+            source /home/interacoes/dspace-solr-postgres/.env
+            set +a
 
             echo "==> Login no GHCR..."
             docker login ghcr.io -u "$GHCR_ACTOR" --password "$GHCR_TOKEN"
@@ -229,6 +210,4 @@ jobs:
               "$IMAGE"
 
             echo "==> Deploy concluído!"
-          ' "${GHCR_TOKEN}" "cjuniorgomes" "${IMAGE}")
-
-          ssh -o StrictHostKeyChecking=no "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST_DEV }}" "$SCRIPT"
+          REMOTE
