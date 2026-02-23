@@ -154,7 +154,7 @@ jobs:
           images: ${{ steps.image_name.outputs.value }}
           tags: |
             type=sha,prefix=sha-
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest
 
       - name: Build e push da imagem Docker
         uses: docker/build-push-action@v5
@@ -193,6 +193,12 @@ jobs:
 
             echo "==> Login no GHCR..."
             docker login ghcr.io -u "$GHCR_ACTOR" --password "$GHCR_TOKEN"
+
+            echo "==> Tags disponíveis no GHCR..."
+            curl -s -u "$GHCR_ACTOR:$GHCR_TOKEN" \
+              "https://ghcr.io/v2/interacoes/dspace-backend/tags/list" || true
+
+            echo "==> IMAGE que será usada: $IMAGE"
 
             echo "==> Pull da nova imagem..."
             docker pull "$IMAGE"
