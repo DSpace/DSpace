@@ -73,9 +73,9 @@ jobs:
         run: |
           cat > dspace/config/local.cfg << EOF
           dspace.dir = $DSPACE_INSTALL_DIR
-          dspace.server.url = https://dspace.dev.interacoes.ltap.ifce.edu.br/server
-          dspace.server.ssr.url = https://dspace.dev.interacoes.ltap.ifce.edu.br/server
-          dspace.ui.url = https://dspace.dev.interacoes.ltap.ifce.edu.br
+          dspace.server.url = https://dev.interacoes.ltap.ifce.edu.br/server
+          dspace.server.ssr.url = https://dev.interacoes.ltap.ifce.edu.br/server
+          dspace.ui.url = https://dev.interacoes.ltap.ifce.edu.br
           dspace.name = InterAções - SASE/MEC
           dspace.shortname = InterAções
           default.language = pt_BR
@@ -139,9 +139,9 @@ jobs:
         run: |
           cat > $DSPACE_INSTALL_DIR/config/local.cfg << EOF
           dspace.dir = /dspaceinstall
-          dspace.server.url = https://dspace.dev.interacoes.ltap.ifce.edu.br/server
-          dspace.server.ssr.url = https://dspace.dev.interacoes.ltap.ifce.edu.br/server
-          dspace.ui.url = https://dspace.dev.interacoes.ltap.ifce.edu.br
+          dspace.server.url = https://dev.interacoes.ltap.ifce.edu.br/server
+          dspace.server.ssr.url = https://dev.interacoes.ltap.ifce.edu.br/server
+          dspace.ui.url = https://dev.interacoes.ltap.ifce.edu.br
           dspace.name = InterAções - SASE/MEC
           dspace.shortname = InterAções
           default.language = pt_BR
