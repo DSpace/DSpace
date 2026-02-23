@@ -11,10 +11,12 @@ package org.dspace.content.authority;
 import org.dspace.content.authority.service.ItemAuthorityService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+
 /**
+ * Implementation of {@link ItemAuthorityService} that delegates query
+ * generation and confidence calculation to a {@link CustomAuthoritySolrFilter}.
  *
- * @author Stefano Maffei 4Science.com
- *
+ * * @author Stefano Maffei 4Science.com
  */
 public class ItemAuthorityServiceImpl implements ItemAuthorityService {
 
@@ -24,17 +26,20 @@ public class ItemAuthorityServiceImpl implements ItemAuthorityService {
     protected ConfigurationService configurationService;
 
     /**
-     * Get the solr query to be executed Priority is given to the
-     * itemauthoritylookup field which contains exact names The best match term is
-     * lower priority since it generates permutations of the names
-     * @param  searchTerm the term to be searched
-     * @return            solr query to be executed
+     * {@inheritDoc}
+     * Returns the standard query, which is optimized for matching
+     * against the 'itemauthoritylookup' field.
      */
     @Override
     public String getSolrQueryExactMatch(String searchTerm) {
         return getSolrQuery(searchTerm);
     }
 
+    /**
+     * {@inheritDoc}
+     * Delegates to the filter to apply parsing (e.g., Lastname/Firstname)
+     * and Solr boosting weights.
+     */
     @Override
     public String getSolrQuery(String searchTerm) {
         return customAuthorityFilter.getSolrQuery(searchTerm);

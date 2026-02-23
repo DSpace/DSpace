@@ -733,6 +733,13 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         return StringUtils.countMatches(field, "_") == 3;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * If enabled, this also overwrites the metadata text value with the Item's
+     * 'dc.title' to ensure label consistency.
+     *
+     */
     @Override
     public void setReferenceWithAuthority(MetadataValue metadataValue, Item item) {
 

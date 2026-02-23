@@ -19,34 +19,41 @@ import org.dspace.core.Context;
 public interface ItemSearchService {
 
     /**
-     * Search an item with the given searchParam.
+     * Performs a global search for an item using a unique identifier.
+     * This is a convenience method for {@link #search(Context, String, Item)} with no source context.
      *
      * @param context     the DSpace context
-     * @param searchParam the searchParam
-     * @return the found item
+     * @param searchParam the identifier (UUID, CRIS sourceId, or prefixed metadata value)
+     * @return the found item, or null if no match is found
      */
     default Item search(Context context, String searchParam) {
         return search(context, searchParam, null);
     }
 
     /**
-     * Search an item with the given searchParam.
+     * Performs a contextual search for an item. The search attempts to resolve the
+     * identifier through multiple strategies (UUID, local CRIS ID, or external
+     * authority mappers).
      *
      * @param context     the DSpace context
-     * @param searchParam the searchParam
-     * @param source      the source item
-     * @return the found item
+     * @param searchParam the identifier to search for
+     * @param source      the item that triggered the search, used for tracking
+     * resolution attempts or providing context to specialized searchers
+     * @return the found item, or null if no match is found
      */
     Item search(Context context, String searchParam, Item source);
 
     /**
-     * Search an item with the given searchParam and relationship type.
+     * Performs a type-strict search for an item. Matches are only returned if the
+     * resulting item has a {@code dspace.entity.type} that matches the provided
+     * entityType.
      *
      * @param context     the DSpace context
-     * @param searchParam the searchParam
-     * @param entityType  the item entityType
-     * @param source      the source item
-     * @return the found item
+     * @param searchParam the identifier to search for
+     * @param entityType  the required dspace.entity.type (e.g., "Person", "OrgUnit")
+     * @param source      the item that triggered the search
+     * @return the found item that matches both the identifier and the entity type,
+     * or null if no match is found or if the type does not align
      */
     Item search(Context context, String searchParam, String entityType, Item source);
 

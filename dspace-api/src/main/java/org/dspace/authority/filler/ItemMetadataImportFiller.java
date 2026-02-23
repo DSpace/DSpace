@@ -28,13 +28,28 @@ import org.dspace.core.Context;
 import org.dspace.core.CrisConstants;
 
 /**
- * Implementation of {@link AuthorityImportFiller} that fill the given item
- * starting from the info present in the given metadata, using an inner set of
- * configurations.
+ * Implementation of {@link AuthorityImportFiller} that enriches a target item
+ * with metadata extracted from a related Authority item.
+ *
+ * <p><b>Core Logic:</b></p>
+ * <ul>
+ * <li><b>Trigger-Based:</b> Managed by a map of {@link MetadataConfiguration}, keyed by
+ * the metadata field on the target item (e.g., {@code dc.contributor.author}).</li>
+ * <li><b>Positional Mapping:</b> By default, it extracts metadata from the source
+ * item at the same index ({@code place}) as the trigger field.</li>
+ * <li><b>Mass Import:</b> If {@code useAll} is enabled in {@link MappingDetails},
+ * all values for a source field are imported regardless of position.</li>
+ * <li><b>Placeholder Safety:</b> Automatically filters out placeholder
+ * values to prevent "empty" data from being imported.</li>
+ * </ul>
+ *
+ * <p><b>Configuration Example (cris-plugin.xml):</b></p>
+ * A mapping for {@code dc.contributor.author} might define that
+ * {@code oairecerif.author.affiliation} from the Person item should be copied
+ * to {@code person.affiliation.name} on the Publication item.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  * @author Giuseppe Digilio (giuseppe.digilio at 4science.it)
- *
  */
 public class ItemMetadataImportFiller implements AuthorityImportFiller {
 
@@ -84,6 +99,14 @@ public class ItemMetadataImportFiller implements AuthorityImportFiller {
 
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This implementation merges the value of the {@code metadata} parameter
+     * (as a {@code dc.title}) with additional fields extracted from the
+     * {@code relatedItem} based on the current {@link MetadataConfiguration}.
+     * </p>
+     */
     @Override
     public List<MetadataValueDTO> getMetadataListByRelatedItemAndMetadata(Context context, Item relatedItem,
                                                                           MetadataValue metadata) {

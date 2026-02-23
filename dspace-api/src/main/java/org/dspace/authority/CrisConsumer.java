@@ -54,11 +54,35 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
- * Consumer to store item related entities when an item submission/modification
- * occurs.
+ * Consumer responsible for the automated creation and linking of entities
+ * during item submission or modification.
+ * * <p>
+ * When an Item (the "subject") is processed, this consumer scans its metadata
+ * fields. If a field is configured to have a "linked entity type" (e.g.,
+ * {@code dc.contributor.author} linked to the {@code Person} entity), the
+ * consumer performs the following:
+ * </p>
+ * * <ul>
+ * <li><b>Identification:</b> It generates a unique {@code cris.sourceId} for
+ * the metadata value (usually an MD5 hash of the text or an ID from an
+ * external authority like ORCID).</li>
+ * <li><b>Lookup:</b> It searches for an existing Item that matches the
+ * {@code entityType} and {@code cris.sourceId}.</li>
+ * <li><b>Creation:</b> If no match is found, it automatically creates a new
+ * Item of the required type in the appropriate Collection.</li>
+ * <li><b>Enrichment:</b> It populates the related item with data using
+ * {@link AuthorityImportFiller} (e.g., pulling affiliation or email).</li>
+ * <li><b>Linking:</b> It updates the original Item's metadata to include
+ * the UUID of the related entity as its authority value, setting the
+ * confidence to {@code CF_ACCEPTED}.</li>
+ * </ul>
+ * * <p>
+ * <b>Example:</b> Submitting an article with {@code dc.contributor.author = "Mario Rossi"}
+ * will trigger the creation of a new {@code Person} item for Mario Rossi if one
+ * does not exist, and link the article to that person via a CRIS authority key.
+ * </p>
  *
- * @author Luca Giamminonni (luca.giamminonni at 4science.it)
- *
+ * * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
 public class CrisConsumer implements Consumer {
 

@@ -263,9 +263,10 @@ public interface ChoiceAuthorityService {
     public void clearCache() throws SubmissionConfigReaderException;
 
     /**
-     * Get the entity type starting from the metadata field.
-     *
-     * @return       the entity type as a String
+     * Retrieves the entity type for a metadata field if its ChoiceAuthority
+     * supports entity linking.
+     * @param fieldKey The metadata field (e.g., "dc_contributor_author").
+     * @return The entity type (e.g., "Person"), or null if not linkable.
      */
     String getLinkedEntityType(String fieldKey);
 
@@ -312,11 +313,10 @@ public interface ChoiceAuthorityService {
     public ChoiceAuthority getAuthorityByFieldKeyCollection(String fieldKey, int dsoType, Collection collection);
 
     /**
-     * Set the reference between the given metadata value and the item using the
-     * authority.
-     *
-     * @param metadataValue the metadata value to update
-     * @param item          the item to be linked to the metadata value
+     * Links metadata to an Item by setting the authority key to the Item's UUID
+     * and the confidence to CF_ACCEPTED.
+     * @param metadataValue The metadata to link.
+     * @param item The target authority Item.
      */
     void setReferenceWithAuthority(MetadataValue metadataValue, Item item);
 

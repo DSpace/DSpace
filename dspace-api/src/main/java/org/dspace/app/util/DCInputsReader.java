@@ -711,11 +711,22 @@ public class DCInputsReader {
 
 
     /**
-     * Returns a list of set of DC inputs belonging to group field used for a particular input form
+     * Resolves and retrieves {@link DCInputSet} definitions for nested metadata groups.
+     * <p>
+     * Scans the parent {@code formName} for fields with {@code input-type} 'group' or 'inline-group'.
+     * For each match, it resolves a sub-form using the naming convention:
+     * {@code [parentFormName]-[schema]-[element]-[qualifier]}
+     * </p>
+     * <ul>
+     * <li><b>group:</b> Standard nested container.</li>
+     * <li><b>inline-group:</b> UI hint for compact/horizontal layout.</li>
+     * </ul>
+     * <b>Example:</b> {@code publicationStepGroup} + {@code dc.contributor.author}
+     * &rarr; {@code publicationStepGroup-dc-contributor-author}
      *
-     * @param formName input form unique name
-     * @return List of DC input set
-     * @throws DCInputsReaderException if not found
+     * @param formName The parent form identifier.
+     * @return List of resolved input sets for nested groups.
+     * @throws DCInputsReaderException if sub-form retrieval fails.
      */
     public List<DCInputSet> getInputsByGroup(String formName)
         throws DCInputsReaderException {

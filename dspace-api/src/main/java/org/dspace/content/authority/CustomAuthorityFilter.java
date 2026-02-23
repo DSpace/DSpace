@@ -22,8 +22,12 @@ public abstract class CustomAuthorityFilter {
     protected List<String> customQueries;
 
     /**
+     * Evaluates the authority context and returns the list of custom Solr filter
+     * queries if this filter is applicable.
      *
-     * @return a list of custom solr filter queries
+     * @param linkableEntityAuthority the authority instance being queried
+     * @return a list of custom solr filter queries, or an empty list if
+     * {@link #appliesTo(LinkableEntityAuthority)} returns false.
      */
     public List<String> getFilterQueries(LinkableEntityAuthority linkableEntityAuthority) {
         if (appliesTo(linkableEntityAuthority)) {
@@ -33,11 +37,19 @@ public abstract class CustomAuthorityFilter {
     }
 
     /**
-     * Defines if instance can provide additional filter queries for given
-     * relationship type
+     * Determines if this filter instance should provide additional queries for the
+     * specific authority configuration or relationship type.
+     *
+     * @param linkableEntityAuthority the authority instance being queried
+     * @return true if the filter should be applied, false otherwise
      */
     public abstract boolean appliesTo(LinkableEntityAuthority linkableEntityAuthority);
 
+    /**
+     * Safely retrieves the internal list of configured custom Solr queries.
+     *
+     * @return the list of filter queries, or an empty list if none are configured.
+     */
     protected final List<String> createFilterQueries() {
         return Optional.ofNullable(customQueries).orElseGet(Collections::emptyList);
     }

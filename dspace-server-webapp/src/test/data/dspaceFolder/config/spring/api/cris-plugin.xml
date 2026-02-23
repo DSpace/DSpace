@@ -31,13 +31,11 @@
                             <map>
                                 <entry key="oairecerif.author.affiliation">
                                     <bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
-                                        <property name="visibility" value="1" />
                                         <property name="targetMetadata" value="person.affiliation.name" />
                                     </bean>
                                 </entry>
                                 <entry key="constant.person.jobTitle">
                                     <bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
-                                        <property name="visibility" value="1" />
                                         <property name="targetMetadata" value="person.jobTitle" />
                                         <property name="constantValue" value="Worker" />
                                     </bean>
@@ -53,7 +51,6 @@
                             <map>
                                 <entry key="oairecerif.editor.affiliation">
                                     <bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
-                                        <property name="visibility" value="1" />
                                         <property name="targetMetadata" value="person.affiliation.name" />
                                     </bean>
                                 </entry>
@@ -68,7 +65,6 @@
                             <map>
                                 <entry key="dc.relation.issn">
                                     <bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
-                                        <property name="visibility" value="1" />
                                     </bean>
                                 </entry>
                             </map>
@@ -82,7 +78,6 @@
                             <map>
                                 <entry key="oaire.awardNumber">
                                     <bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
-                                        <property name="visibility" value="1" />
                                     </bean>
                                 </entry>
                             </map>
@@ -96,7 +91,6 @@
                             <map>
                                 <entry key="dc.relation.grantno">
                                     <bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
-                                        <property name="visibility" value="1" />
                                         <property name="targetMetadata" value="oairecerif.funding.identifier" />
                                     </bean>
                                 </entry>

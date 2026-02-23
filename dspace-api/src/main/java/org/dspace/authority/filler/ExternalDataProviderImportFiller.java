@@ -31,7 +31,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link AuthorityImportFiller} which enriches the item with
- * the data retrieved with the configured
+ * data retrieved from an external data provider (e.g., ORCID, VIVO, etc.).
+ * When a metadata value contains an authority reference with the "will be generated"
+ * prefix, this filler retrieves the corresponding external data object and uses
+ * it to enrich the item with additional metadata (such as author affiliations,
+ * publication history, etc.).
  *
  * @author Luca Giamminonni (luca.giamminonni at 4Science)
  *
@@ -63,6 +67,18 @@ public class ExternalDataProviderImportFiller implements AuthorityImportFiller {
         return List.of();
     }
 
+    /**
+     * Fills the given item with data retrieved from the external data provider.
+     * This method extracts the external identifier (e.g., ORCID) from the source metadata's
+     * authority field, retrieves the corresponding ExternalDataObject from the provider,
+     * and enriches the item with the external data's metadata.
+     * Additionally, if no title is set on the item, it sets the title from the metadata value.
+     *
+     * @param context        the context
+     * @param sourceMetadata the metadata containing the authority reference
+     * @param item           the item to fill with external data
+     * @throws SQLException  if an error occurs during metadata addition
+     */
     @Override
     public void fillItem(Context context, MetadataValue sourceMetadata, Item item) throws SQLException {
 

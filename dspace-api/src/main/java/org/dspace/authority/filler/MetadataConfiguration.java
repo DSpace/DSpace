@@ -41,12 +41,23 @@ public class MetadataConfiguration {
         this.updateEnabled = updateEnabled;
     }
 
+    /**
+     * Configuration details for mapping metadata from a source item to a target item.
+     * Each MappingDetails defines how a particular metadata field should be handled
+     * during the import process.
+     */
     public static class MappingDetails {
 
+        /**
+         * If true, all matching metadata values will be copied. If false, only
+         * the value at the position matching the source metadata will be copied.
+         */
         private boolean useAll;
 
-        private Integer visibility;
-
+        /**
+         * If true, new metadata values are appended to existing ones instead of
+         * replacing them. Default is false (replace mode).
+         */
         private boolean appendMode = false;
 
         private String targetMetadata;
@@ -70,14 +81,6 @@ public class MetadataConfiguration {
 
         public void setUseAll(boolean useAll) {
             this.useAll = useAll;
-        }
-
-        public Integer getVisibility() {
-            return visibility;
-        }
-
-        public void setVisibility(Integer visibility) {
-            this.visibility = visibility;
         }
 
         public String getTargetMetadata() {

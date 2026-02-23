@@ -46,12 +46,20 @@ public interface AuthorityImportFiller {
     void fillItem(Context context, MetadataValue sourceMetadata, Item itemToFill) throws SQLException;
 
     /**
-     * Return a list of metadata using the given metadata of a source item.
+     * Retrieves a list of metadata values derived from a related item and its
+     * corresponding reference metadata.
+     * <p>
+     * This method is used to "flatten" or "extract" information from a relationship.
+     * It uses the {@code metadata} parameter to identify the specific link and the
+     * {@code relatedItem} as the source of the data to be returned.
+     * </p>
      *
-     * @param context        the context
-     * @param relatedItem    the source metadata
-     * @param metadata       the source metadata related to the list to return
-     * @throws SQLException if an error occurs during the metadata addition
+     * @param context     The DSpace context.
+     * @param relatedItem The item that acts as the source of the information.
+     * @param metadata    The metadata value that represents the relationship or
+     * the pointer to the related item.
+     * @return A list of {@link MetadataValueDTO} objects representing the extracted
+     * data. May return an empty list if no metadata should be extracted.
      */
     List<MetadataValueDTO> getMetadataListByRelatedItemAndMetadata(Context context, Item relatedItem,
                                                                    MetadataValue metadata);

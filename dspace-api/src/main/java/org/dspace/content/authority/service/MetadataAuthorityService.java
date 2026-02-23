@@ -57,7 +57,7 @@ public interface MetadataAuthorityService {
     /**
      * Predicate - is field allowing authority?
      *
-     * @param fieldKey field key
+     * @param fieldKey      field key in the format [schema]_[element]_[qualifier] (e.g., "dc_contributor_author")
      * @param dsoType       the type of dspace object to consider (Item, Bitstream,
      *                      etc?.) as defined in the {@link Constants}
      * @param collection    the DSpace collection that own or will own the DSpace

@@ -46,8 +46,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
- * Implementation of {@link ItemSearcher} and {@link ItemReferenceResolver} to
- * search the item by the configured metadata.
+ * Implementation of {@link ItemSearcher} and {@link ItemReferenceResolver}.
+ * <p>
+ * This class handles the lifecycle of references:
+ * 1. <b>Search:</b> Finds an item by an external identifier (e.g., finding a Person by ORCID).
+ * 2. <b>Resolution:</b> After an item is found or created, it scans the repository for
+ * any other items (like Publications) that were waiting for this item to exist
+ * (marked with the "will be referenced" prefix) and updates their authority keys
+ * to the permanent item UUID.
+ * </p>
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *

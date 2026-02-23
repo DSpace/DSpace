@@ -34,9 +34,21 @@ import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 
 /**
+ * Event consumer that synchronizes and validates metadata fields of type "link".
+ * <p>
+ * For metadata fields configured as {@code <input-type>link</input-type>} in the
+ * submission forms, this consumer ensures that both the 'value' (label) and
+ * 'authority' are populated:
+ * </p>
+ * <ul>
+ * <li>If the authority is present but the value is blank, the authority is copied to the value.</li>
+ * <li>If the value is present but the authority is blank, the value is copied to the authority.</li>
+ * <li>Sets the confidence level to {@link Choices#CF_ACCEPTED} for these synchronized values.</li>
+ * </ul>
+ * <p>
+ * </p>
  *
- * @author Stefano Maffei(stefano.maffei at 4science.com)
- *
+ * @author Stefano Maffei (stefano.maffei at 4science.com)
  */
 public class AuthorityLinkConsumer implements Consumer {
 
@@ -85,6 +97,11 @@ public class AuthorityLinkConsumer implements Consumer {
 
     }
 
+    /**
+     * Processes the item by identifying all "link" type input fields defined in
+     * the collection's submission form. It then iterates through the item's
+     * metadata for those specific fields to perform value-authority synchronization.
+     */
     private void consumeItem(Context context, Item item) throws Exception {
         List<String> linkMetadata = getLinkMetadata(context, item);
         List<MetadataValue> metadataValues = linkMetadata.stream()

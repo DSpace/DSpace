@@ -29,13 +29,16 @@ public final class AuthorityServiceUtils {
     protected UploadConfigurationService uploadConfigurationService;
 
     /**
+     * Resolves the configuration name (Submission Name or Form Name) used as a key
+     * for authority lookups, based on the DSpace Object type and Collection context.
      *
-     * @param configReader the Submission Config Reader
-     * @param dsoType      the type of dspace object (ITEM or BITSTREAM) for all the
-     *                     other object <code>null</code> is returned
-     * @param collection   the collection where the object stays
-     * @return the name of the submission form (if ITEM) or the name of the metadata
-     *         form (BITSTREAM)
+     * @param configReader the Submission Config Reader to query for configurations
+     * @param dsoType      the type of DSpace Object (ITEM or BITSTREAM). Other types
+     * return null.
+     * @param collection   the collection context used to determine the assigned
+     * submission process
+     * @return the name of the submission process or metadata form, or null if no
+     * mapping is found or the type is unsupported
      */
     public String getSubmissionOrFormName(SubmissionConfigReader configReader, int dsoType,
             Collection collection) {
@@ -57,13 +60,21 @@ public final class AuthorityServiceUtils {
     }
 
     /**
+     * Resolves the configuration name used as a key for authority lookups using
+     * the SubmissionConfigService.
+     * <p>
+     * This method performs the same logic as
+     * {@link #getSubmissionOrFormName(SubmissionConfigReader, int, Collection)}
+     * but utilizes the service layer instead of the reader. It identifies the
+     * context required to find field-specific authority settings in
+     * {@code ChoiceAuthorityServiceImpl}.
+     * </p>
      *
-     * @param submissionConfigService the Submission Config service
-     * @param dsoType      the type of dspace object (ITEM or BITSTREAM) for all the
-     *                     other object <code>null</code> is returned
-     * @param collection   the collection where the object stays
-     * @return the name of the submission form (if ITEM) or the name of the metadata
-     *         form (BITSTREAM)
+     * @param submissionConfigService the service used to access submission configurations
+     * @param dsoType                 the type of DSpace Object (ITEM or BITSTREAM)
+     * @param collection              the collection context
+     * @return the name of the submission process or metadata form, or null if no
+     * mapping is found
      */
     public String getSubmissionOrFormName(SubmissionConfigService submissionConfigService, int dsoType,
                                           Collection collection) {
