@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: interacoes/dspace-backend
   DSPACE_INSTALL_DIR: /dspaceinstall
 
 jobs:
@@ -201,35 +201,34 @@ jobs:
         run: |
           IMAGE=$(echo "${IMAGE_RAW}:latest" | tr '[:upper:]' '[:lower:]')
 
-          ssh -o StrictHostKeyChecking=no "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST_DEV }}" \
-            GHCR_TOKEN="${GHCR_TOKEN}" \
-            GHCR_ACTOR="cjuniorgomes" \
-            IMAGE="${IMAGE}" \
-            bash -s << 'REMOTE'
-              set -e
+          # Gera o script com os valores já interpolados pelo runner
+          # Os valores são escapados com printf %q para evitar problemas
+          # com caracteres especiais no token
+          SCRIPT=$(printf '
+            set -e
+            GHCR_TOKEN=%q
+            GHCR_ACTOR=%q
+            IMAGE=%q
 
-              echo "==> Verificando variáveis no servidor..."
-              echo "IMAGE=${IMAGE}"
-              echo "GHCR_ACTOR=${GHCR_ACTOR}"
-              echo "GHCR_TOKEN (primeiros 6 chars)=${GHCR_TOKEN:0:6}"
+            echo "==> Login no GHCR..."
+            docker login ghcr.io -u "$GHCR_ACTOR" --password "$GHCR_TOKEN"
 
-              echo "==> Login no GHCR..."
-              docker login ghcr.io -u "$GHCR_ACTOR" --password "$GHCR_TOKEN"
+            echo "==> Pull da nova imagem..."
+            docker pull "$IMAGE"
 
-              echo "==> Pull da nova imagem..."
-              docker pull "$IMAGE"
+            echo "==> Parando container anterior (se existir)..."
+            docker stop dspace-backend || true
+            docker rm   dspace-backend || true
 
-              echo "==> Parando container anterior (se existir)..."
-              docker stop dspace-backend || true
-              docker rm   dspace-backend || true
+            echo "==> Subindo novo container..."
+            docker run -d \
+              --name dspace-backend \
+              --restart unless-stopped \
+              -p 8080:8080 \
+              -v /dspaceinstall/assetstore:/dspaceinstall/assetstore \
+              "$IMAGE"
 
-              echo "==> Subindo novo container..."
-              docker run -d \
-                --name dspace-backend \
-                --restart unless-stopped \
-                -p 8080:8080 \
-                -v /dspaceinstall/assetstore:/dspaceinstall/assetstore \
-                "$IMAGE"
+            echo "==> Deploy concluído!"
+          ' "${GHCR_TOKEN}" "cjuniorgomes" "${IMAGE}")
 
-              echo "==> Deploy concluído!"
-          REMOTE
+          ssh -o StrictHostKeyChecking=no "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST_DEV }}" "$SCRIPT"
