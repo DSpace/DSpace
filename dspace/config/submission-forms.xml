@@ -1640,6 +1640,7 @@
     <form-value-pairs>
 
         <value-pairs value-pairs-name="nucleoTematico" dc-term="type">
+            <pair><displayed-value>Não se aplica</displayed-value><stored-value>Não se aplica</stored-value></pair>
             <pair><displayed-value>Busca ativa escolar</displayed-value><stored-value>Busca ativa escolar</stored-value></pair>
             <pair><displayed-value>Busca ativa</displayed-value><stored-value>Busca ativa</stored-value></pair>
             <pair><displayed-value>Educação ambiental e emergência climática</displayed-value><stored-value>Educação ambiental e emergência climática</stored-value></pair>
