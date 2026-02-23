@@ -11,7 +11,6 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -155,8 +154,8 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
 
         getClient().perform(get("/api/discover/discoveryconfigurations/workspace/defaultsortoption"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", SortOptionMatcher.sortOptionMatcher(workspaceConfig.getSearchSortConfiguration()
-                                                                                      .getDefaultSortField())
+                   .andExpect(jsonPath("$", SortOptionMatcher
+                       .sortOptionMatcher(workspaceConfig.getSearchSortConfiguration().getDefaultSortField())
                    ));
 
         getClient().perform(get("/api/discover/discoveryconfigurations/workspace")
@@ -173,8 +172,8 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
 
         getClient().perform(get("/api/discover/discoveryconfigurations/default/defaultsortoption"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$", SortOptionMatcher.sortOptionMatcher(defaultConfig.getSearchSortConfiguration()
-                        .getDefaultSortField())
+                    .andExpect(jsonPath("$", SortOptionMatcher
+                        .sortOptionMatcher(defaultConfig.getSearchSortConfiguration().getDefaultSortField())
                     ));
     }
 
