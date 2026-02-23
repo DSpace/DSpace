@@ -185,7 +185,7 @@ jobs:
         env:
           IMAGE_RAW: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
-          GHCR_ACTOR: cjuniorgomes
+          GHCR_ACTOR: interacoes
         run: |
           # Forçar lowercase (exigência do GHCR)
           IMAGE=$(echo "${IMAGE_RAW}:latest" | tr '[:upper:]' '[:lower:]')
