@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.dspace.content.Collection;
 import org.dspace.core.Context;
 
 /**
@@ -86,4 +87,22 @@ public interface IndexingService {
      */
     void atomicUpdate(Context context, String uniqueIndexId, String field, Map<String,Object> fieldModifier)
             throws SolrServerException, IOException;
+
+    /**
+     * Index all items in the given collection.
+     * When {@code numThreads} is greater than 1, items are indexed in parallel using a fixed
+     * thread pool. The caller's {@code context} is used only to pre-collect item IDs; each
+     * worker thread opens its own read-only {@link Context}.
+     *
+     * @param context    calling context
+     * @param collection collection whose items should be indexed
+     * @param force      when {@code true} every item is re-indexed regardless of modification date
+     * @param numThreads number of parallel worker threads; 1 means sequential
+     * @return number of items indexed
+     * @throws SQLException           on database error
+     * @throws IOException            on I/O error
+     * @throws SearchServiceException on Solr error
+     */
+    long indexItems(Context context, Collection collection, boolean force, int numThreads)
+        throws SQLException, IOException, SearchServiceException;
 }

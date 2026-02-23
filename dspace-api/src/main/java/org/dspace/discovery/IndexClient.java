@@ -9,7 +9,6 @@ package org.dspace.discovery;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,7 +19,6 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableCommunity;
@@ -29,6 +27,7 @@ import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
@@ -41,6 +40,9 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
     private IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager()
                                                .getServiceByName(IndexingService.class.getName(),
                                                                  IndexingService.class);
+    private final ConfigurationService configurationService =
+            DSpaceServicesFactory.getInstance().getConfigurationService();
+    private int numThreads;
 
     private IndexClientOptions indexClientOptions;
 
@@ -126,8 +128,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         } else if (indexClientOptions == IndexClientOptions.INDEX) {
             handler.logInfo("Indexing " + commandLine.getOptionValue('i') + " force " + commandLine.hasOption("f"));
             final long startTimeMillis = System.currentTimeMillis();
-            final long count = indexAll(indexer, ContentServiceFactory.getInstance().
-                    getItemService(), context, indexableObject.get());
+            final long count = indexAll(indexer, context, indexableObject.get(), numThreads);
             final long seconds = (System.currentTimeMillis() - startTimeMillis) / 1000;
             handler.logInfo("Indexed " + count + " object" + (count > 1 ? "s" : "") + " in " + seconds + " seconds");
         } else if (indexClientOptions == IndexClientOptions.UPDATE ||
@@ -163,22 +164,24 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             throw new ParseException("Unable to create a new DSpace Context: " + e.getMessage());
         }
         indexClientOptions = IndexClientOptions.getIndexClientOption(commandLine);
+        numThreads = configurationService.getIntProperty("discovery.index.threads", 1);
     }
+
     /**
      * Indexes the given object and all children, if applicable.
      *
      * @param indexingService
-     * @param itemService
      * @param context         The relevant DSpace Context.
      * @param dso             DSpace object to index recursively
+     * @param numThreads      number of parallel indexing threads; 1 means sequential
      * @throws IOException            A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SearchServiceException in case of a solr exception
      * @throws SQLException           An exception that provides information on a database access error or other errors.
      */
     private static long indexAll(final IndexingService indexingService,
-                                 final ItemService itemService,
                                  final Context context,
-                                 final IndexableObject dso)
+                                 final IndexableObject dso,
+                                 final int numThreads)
         throws IOException, SearchServiceException, SQLException {
         long count = 0;
 
@@ -188,7 +191,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             final Community community = (Community) dso.getIndexedObject();
             final String communityHandle = community.getHandle();
             for (final Community subcommunity : community.getSubcommunities()) {
-                count += indexAll(indexingService, itemService, context, new IndexableCommunity(subcommunity));
+                count += indexAll(indexingService, context, new IndexableCommunity(subcommunity), numThreads);
                 //To prevent memory issues, discard an object from the cache after processing
                 context.uncacheEntity(subcommunity);
             }
@@ -198,44 +201,13 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             for (final Collection collection : reloadedCommunity.getCollections()) {
                 count++;
                 indexingService.indexContent(context, new IndexableCollection(collection), true, true);
-                count += indexItems(indexingService, itemService, context, collection);
+                count += indexingService.indexItems(context, collection, true, numThreads);
                 //To prevent memory issues, discard an object from the cache after processing
                 context.uncacheEntity(collection);
             }
         } else if (dso instanceof IndexableCollection) {
-            count += indexItems(indexingService, itemService, context, (Collection) dso.getIndexedObject());
+            count += indexingService.indexItems(context, (Collection) dso.getIndexedObject(), true, numThreads);
         }
-
-        return count;
-    }
-
-    /**
-     * Indexes all items in the given collection.
-     *
-     * @param indexingService
-     * @param itemService
-     * @param context         The relevant DSpace Context.
-     * @param collection      collection to index
-     * @throws IOException            A general class of exceptions produced by failed or interrupted I/O operations.
-     * @throws SearchServiceException in case of a solr exception
-     * @throws SQLException           An exception that provides information on a database access error or other errors.
-     */
-    private static long indexItems(final IndexingService indexingService,
-                                   final ItemService itemService,
-                                   final Context context,
-                                   final Collection collection)
-        throws IOException, SearchServiceException, SQLException {
-        long count = 0;
-
-        final Iterator<Item> itemIterator = itemService.findByCollection(context, collection);
-        while (itemIterator.hasNext()) {
-            Item item = itemIterator.next();
-            indexingService.indexContent(context, new IndexableItem(item), true, false);
-            count++;
-            //To prevent memory issues, discard an object from the cache after processing
-            context.uncacheEntity(item);
-        }
-        indexingService.commit();
 
         return count;
     }
