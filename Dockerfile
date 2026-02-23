@@ -7,7 +7,7 @@
 
 FROM eclipse-temurin:17-jre
 
-ENV DSPACE_INSTALL_DIR=/volumes/dspaceinstall
+ENV DSPACE_INSTALL_DIR=/dspaceinstall
 
 # Copia o conteúdo instalado (path relativo ao contexto do build)
 COPY dspace-installed/ ${DSPACE_INSTALL_DIR}/
