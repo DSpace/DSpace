@@ -185,7 +185,7 @@ jobs:
         env:
           IMAGE_RAW: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
-          GHCR_ACTOR: interacoes
+          GHCR_ACTOR: cjuniorgomes
         run: |
           # Forçar lowercase (exigência do GHCR)
           IMAGE=$(echo "${IMAGE_RAW}:latest" | tr '[:upper:]' '[:lower:]')
@@ -194,7 +194,7 @@ jobs:
           set -e
 
           echo "==> Login no GHCR..."
-          echo "${GHCR_TOKEN}" | docker login ghcr.io -u "${GHCR_ACTOR}" --password-stdin
+          docker login ghcr.io -u "${GHCR_ACTOR}" --password "${GHCR_TOKEN}"
 
           echo "==> Pull da nova imagem..."
           docker pull "${IMAGE}"
