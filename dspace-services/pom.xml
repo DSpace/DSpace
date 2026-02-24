@@ -90,13 +90,6 @@
             <artifactId>spring-context-support</artifactId>
             <version>${spring.version}</version>
             <scope>compile</scope>
-            <exclusions>
-                <!-- Spring JCL is unnecessary and conflicts with commons-logging when both are on classpath -->
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-jcl</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

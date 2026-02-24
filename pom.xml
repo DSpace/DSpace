@@ -1194,13 +1194,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-orm</artifactId>
                 <version>${spring.version}</version>
-                <exclusions>
-                    <!-- Spring JCL is unnecessary and conflicts with commons-logging when both are on classpath -->
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-jcl</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!-- Explicitly Specify Latest Version of Spring -->
@@ -1208,6 +1201,14 @@
                 <artifactId>spring-core</artifactId>
                 <groupId>org.springframework</groupId>
                 <version>${spring.version}</version>
+                <exclusions>
+                    <!-- Spring JCL is unnecessary and conflicts with commons-logging when both are on classpath.
+                         NOTE: When Spring JCL is on the classpath, this results in Handle Server issues. -->
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-jcl</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>

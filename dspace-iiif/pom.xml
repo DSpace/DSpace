@@ -44,11 +44,6 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
-                <!-- Spring JCL is unnecessary and conflicts with commons-logging when both are on classpath -->
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-jcl</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
 
