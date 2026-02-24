@@ -146,4 +146,12 @@ public interface BundleService extends DSpaceObjectService<Bundle>, DSpaceObject
     public void setOrder(Context context, Bundle bundle, UUID bitstreamIds[]) throws AuthorizeException, SQLException;
 
     int countTotal(Context context) throws SQLException;
+
+    /**
+     * Returns the count of bitstreams for the given bundle, performance optimized.
+     *
+     * @param context      DSpace Context
+     * @param bundle       the bitstream bundle
+     */
+    int countBitstreams(Context context, Bundle bundle) throws SQLException;
 }
