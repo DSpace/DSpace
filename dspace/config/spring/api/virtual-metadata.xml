@@ -12,6 +12,7 @@
                  are to be added to the item that has a relationship with this relationship type-->
             <map>
                 <entry key="isAuthorOfPublication" value-ref="isAuthorOfPublicationMap"/>
+                <entry key="isAdvisorOfPublication" value-ref="isAdvisorOfPublicationMap"/>
                 <entry key="isOrgUnitOfPublication" value-ref="isOrgUnitOfPublicationMap"/>
                 <entry key="isPersonOfProject" value-ref="isPersonOfProjectMap"/>
                 <entry key="isOrgUnitOfProject" value-ref="isOrgUnitOfProjectMap"/>
@@ -68,6 +69,29 @@
                 <value>person.identifier.orcid</value>
             </util:list>
         </property>
+    </bean>
+
+    <util:map id="isAdvisorOfPublicationMap">
+        <entry key="dc.contributor.advisor" value-ref="publicationAdvisor_advisor"/>
+    </util:map>
+    <!--
+         If the related item has:
+            person.familyName = Smith
+            person.givenName = John
+         Then the original item will have, in this case:
+            dc.contributor.advisor = Smith, John -->
+    <bean class="org.dspace.content.virtual.Concatenate" id="publicationAdvisor_advisor">
+        <property name="fields">
+            <util:list>
+                <value>person.familyName</value>
+                <value>person.givenName</value>
+            </util:list>
+        </property>
+        <property name="separator">
+            <value>, </value>
+        </property>
+        <property name="useForPlace" value="true"/>
+        <property name="populateWithNameVariant" value="true"/>
     </bean>
 
     <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
