@@ -50,3 +50,6 @@ rebel.xml
 
 ## Ignore jenv configuration
 .java-version
+
+## Ignore mise configuration
+mise.toml
