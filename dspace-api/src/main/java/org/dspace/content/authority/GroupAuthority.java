@@ -15,12 +15,20 @@ import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
+import org.dspace.core.NameAwarePlugin;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.util.UUIDUtils;
 
 /**
+ * Implementation of {@link ChoiceAuthority} that provides choices based on DSpace Groups.
+ * <p>
+ * This class allows metadata fields to be constrained to a list of existing user
+ * groups within the system. It performs searches against the {@link GroupService}
+ * and stores the Group's {@link UUID} as the authority key, while the Group's
+ * name is used as the label.
+ * </p>
  *
  * @author Mykhaylo Boychuk (4science.it)
  */

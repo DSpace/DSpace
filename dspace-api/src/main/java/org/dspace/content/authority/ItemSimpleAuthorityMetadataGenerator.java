@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
@@ -29,11 +30,35 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- *
- * Generic generator to work on nested/simple metadata
+ * Implementation of {@link ItemAuthorityExtraMetadataGenerator} that extracts
+ * metadata from DSpace items and adds them as extra information to authority choices.
+ * <p>
+ * This generator reads metadata values from Solr documents and populates the
+ * Choice's extras map. It supports both simple and nested metadata fields.
+ * </p>
+ * <p>
+ * Key features:
+ * <ul>
+ *   <li><strong>Data- prefixing:</strong> When {@code useAsData} is true, keys are prefixed
+ *       with "data-" which are then passed to the frontend to automatically fill other submission
+ *       fields.</li>
+ *   <li><strong>Authority linking:</strong> Extracts authority references (e.g., affiliation UUIDs)
+ *       and includes them in the format {@code value::authority}</li>
+ *   <li><strong>Aggregate mode:</strong> When {@code singleResultOnAggregate} is false, a single
+ *       item can produce multiple choices (one per metadata value)</li>
+ * </ul>
+ * </p>
+ * <p>
+ * Example: For a Person with two affiliations, this generator can create:
+ * <ul>
+ *   <li>display: "Author 1(University of Rome)",
+ *   extras: {data-oairecerif_author_affiliation: "University of Rome::uuid1"}</li>
+ *   <li>display: "Author 1(University of Milan)",
+ *   extras: {data-oairecerif_author_affiliation: "University of Milan::uuid2"}</li>
+ * </ul>
+ * </p>
  *
  * @author Mykhaylo Boychuk (4Science.it)
- *
  */
 public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraMetadataGenerator {
 
@@ -55,20 +80,36 @@ public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraM
     private boolean useForDisplay = true;
     private boolean useAsData = true;
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * If the {@code authorityName} matches the configuration, it populates the
+     * {@code keyId} with values found in the Solr document's stored projection fields.
+     * </p>
+     */
     @Override
     public Map<String, String> build(String checkAuthorityName, SolrDocument document) {
         Map<String, String> extras = new HashMap<String, String>();
-        if (StringUtils.isBlank(authorityName) || StringUtils.equals(authorityName, checkAuthorityName)) {
+        if (StringUtils.isBlank(authorityName) || Strings.CS.equals(authorityName, checkAuthorityName)) {
             buildSingleExtraByRP(document, extras);
         }
         return extras;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * When {@code singleResultOnAggregate} is set to {@code false}, this method
+     * "explodes" a single Solr document into multiple {@link Choice} objects—one for
+     * each value found in the configured metadata field (e.g., creating one choice
+     * per affiliation for a single person).
+     * </p>
+     */
     @Override
     public List<Choice> buildAggregate(String checkAuthorityName, SolrDocument document) {
         List<Choice> choiceList = new LinkedList<Choice>();
         String title = ((ArrayList<String>) document.getFieldValue("dc.title")).get(0);
-        if (StringUtils.isNotBlank(authorityName) && !StringUtils.equals(authorityName, checkAuthorityName)) {
+        if (StringUtils.isNotBlank(authorityName) && !Strings.CS.equals(authorityName, checkAuthorityName)) {
             choiceList.add(
                 new Choice((String) document.getFieldValue("search.resourceid"),
                            title, title, new HashMap<String, String>()));
@@ -192,7 +233,7 @@ public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraM
     }
 
     private String nullOrValue(String string) {
-        if (StringUtils.equals(string, "null")) {
+        if (Strings.CS.equals(string, "null")) {
             return null;
         } else {
             return string;

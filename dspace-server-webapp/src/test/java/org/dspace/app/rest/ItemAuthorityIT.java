@@ -271,10 +271,13 @@ public class ItemAuthorityIT extends AbstractControllerIntegrationTest {
        configurationService.setProperty("choices.presentation.person.affiliation.name", "authorLookup");
        configurationService.setProperty("authority.controlled.person.affiliation.name", "true");
 
-       // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
-       // the properties that we're altering above and this is only used within the tests
-       pluginService.clearNamedPluginClasses();
-       choiceAuthorityService.clearCache();
+       configurationService.setProperty("choices.plugin.oairecerif.person.affiliation", "OrgUnitAuthority");
+       configurationService.setProperty("choices.presentation.oairecerif.person.affiliation", "suggest");
+       configurationService.setProperty("authority.controlled.oairecerif.person.affiliation", "true");
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
 
        parentCommunity = CommunityBuilder.createCommunity(context).build();
        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).build();
@@ -571,7 +574,7 @@ public class ItemAuthorityIT extends AbstractControllerIntegrationTest {
                                             new String[] {
                                              "org.dspace.content.authority.ItemAuthority = AuthorAuthority"
                                             });
-       configurationService.setProperty("choises.externalsource.dc.contributor.author", "authorAuthority");
+       configurationService.setProperty("choices.externalsource.dc.contributor.author", "authorAuthority");
         configurationService.setProperty("cris.ItemAuthority.AuthorAuthority.entityType", "Person");
        // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
        // the properties that we're altering above and this is only used within the tests

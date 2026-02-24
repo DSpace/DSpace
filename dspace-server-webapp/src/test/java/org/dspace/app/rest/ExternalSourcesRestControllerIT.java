@@ -178,7 +178,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void testAuthorityImportDataProviderExternalSource() throws Exception {
         context.turnOffAuthorisationSystem();
-        configurationService.setProperty("choises.externalsource.dc.contributor.author", "authorAuthority");
+        configurationService.setProperty("choices.externalsource.dc.contributor.author", "authorAuthority");
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
@@ -230,7 +230,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void testAuthorityImportDataProviderExternalSourceWithPlaceholder() throws Exception {
         context.turnOffAuthorisationSystem();
-        configurationService.setProperty("choises.externalsource.dc.contributor.author", "authorAuthority");
+        configurationService.setProperty("choices.externalsource.dc.contributor.author", "authorAuthority");
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
@@ -281,7 +281,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void testAuthorityImportDataProviderExternalSourceWithEmptyValue() throws Exception {
         context.turnOffAuthorisationSystem();
-        configurationService.setProperty("choises.externalsource.dc.contributor.author", "authorAuthority");
+        configurationService.setProperty("choices.externalsource.dc.contributor.author", "authorAuthority");
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
