@@ -63,25 +63,4 @@
         <property name="virtualQualifier" value="orcid" />
     </bean>
 
-    <bean class="org.dspace.content.enhancer.impl.RelatedEntityItemEnhancer" >
-        <property name="sourceEntityTypes">
-            <list>
-                <value>Publication</value>
-            </list>
-        </property>
-        <property name="sourceItemMetadataFields">
-            <list>
-                <value>dc.relation.journal</value>
-                <value>dc.relation.ispartof</value>
-            </list>
-        </property>
-        <property name="relatedItemMetadataFields">
-            <list>
-                <value>miur.journal.ance</value>
-                <value>miur.identifier.ance</value>
-            </list>
-        </property>
-        <property name="virtualQualifier" value="journalance" />
-    </bean>
-
 </beans>
