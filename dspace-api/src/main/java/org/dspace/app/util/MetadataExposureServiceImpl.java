@@ -109,13 +109,21 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
         }
 
         if (hidden && context != null) {
-            // group-based override: members of any group listed in metadata.hide.groups
-            // are also allowed to see hidden metadata fields
-            String groupsConfig = configurationService.getProperty("metadata.hide.groups");
+            // Group-based override: resolve which groups list to use.
+            // Per-field key (metadata.hide.schema.element[.qualifier].groups) takes
+            // precedence over the global key (metadata.hide.groups).
+            // If neither is set the field remains hidden for non-admins.
+            String perFieldKey = CONFIG_PREFIX + schema + "." + element
+                    + (qualifier != null ? "." + qualifier : "") + ".groups";
+            String groupsConfig = configurationService.getProperty(perFieldKey);
+            if (StringUtils.isBlank(groupsConfig)) {
+                groupsConfig = configurationService.getProperty("metadata.hide.groups");
+            }
             if (StringUtils.isNotBlank(groupsConfig)) {
                 for (String groupName : groupsConfig.split(",")) {
                     String trimmedGroupName = groupName.trim();
-                    if (StringUtils.isNotBlank(trimmedGroupName) && groupService.isMember(context, trimmedGroupName)) {
+                    if (StringUtils.isNotBlank(trimmedGroupName)
+                            && groupService.isMember(context, trimmedGroupName)) {
                         hidden = false;
                         break;
                     }
@@ -151,8 +159,10 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
             List<String> propertyKeys = configurationService.getPropertyKeys();
             for (String key : propertyKeys) {
                 if (key.startsWith(CONFIG_PREFIX)) {
-                    // Skip control keys that share the prefix but are not field-hiding directives
-                    if (key.equals("metadata.hide.groups")) {
+                    // Skip group-access control keys (global and per-field) that share
+                    // the prefix but are not field-hiding directives.
+                    // e.g. metadata.hide.groups  or  metadata.hide.dc.title.groups
+                    if (key.endsWith(".groups")) {
                         continue;
                     }
                     if (configurationService.getBooleanProperty(key, true)) {
