@@ -22,7 +22,8 @@ public class SortOptionConverter implements DSpaceConverter<DiscoverySortFieldCo
     public SortOptionRest convert(DiscoverySortFieldConfiguration sortOption, Projection projection) {
         SortOptionRest sortOptionRest = new SortOptionRest();
 
-        sortOptionRest.setName(sortOption.getMetadataField());
+        sortOptionRest.setName(sortOption.getMetadataField() != null ?
+            sortOption.getMetadataField() : sortOption.getName());
         sortOptionRest.setSortOrder(sortOption.getDefaultSortOrder().name());
         sortOptionRest.setProjection(projection);
 

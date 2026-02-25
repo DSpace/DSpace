@@ -228,6 +228,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -348,6 +349,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortDateAccessioned"/>
@@ -366,6 +368,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortDateAccessioned"/>
@@ -413,6 +416,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -552,6 +556,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -701,6 +706,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -980,6 +986,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortLastModified" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortLastModified" />
@@ -1056,6 +1063,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -1131,6 +1139,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -1215,6 +1224,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -1285,6 +1295,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -1347,6 +1358,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -1409,6 +1421,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -1467,6 +1480,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -1521,6 +1535,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -1581,6 +1596,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -1645,6 +1661,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -1707,6 +1724,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -1767,6 +1785,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -1827,6 +1846,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -1886,6 +1906,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -1943,6 +1964,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -2000,6 +2022,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -2059,6 +2082,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -2129,6 +2153,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortDateAccessioned" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortEntityType"/>
@@ -2188,6 +2213,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortScore" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
@@ -2229,6 +2255,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortTitle" />
                 <property name="sortFields">
                     <list>
                         <ref bean="sortTitle"/>
@@ -2284,6 +2311,7 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSortField" ref="sortLastModified" />
                 <property name="sortFields">
                     <list>
                     	<ref bean="sortLastModified"/>
@@ -3388,6 +3416,7 @@
 
     <!--Sort properties-->
     <bean id="sortScore" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
+        <property name="name" value="score"/>
         <property name="defaultSortOrder" value="desc"/>
     </bean>
 

@@ -11,7 +11,6 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -145,7 +144,8 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
 
     @Test
     public void testLinkDefaultSortOption() throws Exception {
-        DiscoveryConfiguration config = SearchUtils.getDiscoveryConfiguration(context, "workspace", null);
+        DiscoveryConfiguration workspaceConfig = SearchUtils.getDiscoveryConfiguration(context, "workspace", null);
+        DiscoveryConfiguration defaultConfig = SearchUtils.getDiscoveryConfiguration(context, "default", null);
 
         getClient().perform(get("/api/discover/discoveryconfigurations/workspace"))
                    .andExpect(status().isOk())
@@ -154,15 +154,15 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
 
         getClient().perform(get("/api/discover/discoveryconfigurations/workspace/defaultsortoption"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", SortOptionMatcher.sortOptionMatcher(config.getSearchSortConfiguration()
-                                                                                      .getDefaultSortField())
+                   .andExpect(jsonPath("$", SortOptionMatcher
+                       .sortOptionMatcher(workspaceConfig.getSearchSortConfiguration().getDefaultSortField())
                    ));
 
         getClient().perform(get("/api/discover/discoveryconfigurations/workspace")
                                     .param("embed", "defaultsortoption"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.defaultsortoption",
-                                       SortOptionMatcher.sortOptionMatcher(config.getSearchSortConfiguration()
+                                       SortOptionMatcher.sortOptionMatcher(workspaceConfig.getSearchSortConfiguration()
                                                                                  .getDefaultSortField())));
 
         getClient().perform(get("/api/discover/discoveryconfigurations/default"))
@@ -171,7 +171,10 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
                    .andExpect(jsonPath("$._links.defaultsortoption", not(empty())));
 
         getClient().perform(get("/api/discover/discoveryconfigurations/default/defaultsortoption"))
-                   .andExpect(status().isNoContent());
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", SortOptionMatcher
+                        .sortOptionMatcher(defaultConfig.getSearchSortConfiguration().getDefaultSortField())
+                    ));
     }
 
     @Test
@@ -188,6 +191,8 @@ public class DiscoveryConfigurationRestRepositoryIT extends AbstractControllerIn
                    .andExpect(jsonPath("$._embedded.sortoptions._embedded.sortoptions", containsInAnyOrder(
                            SortOptionMatcher.createSortOptionMatchers(config.getSearchSortConfiguration()
                                                                             .getSortFields()))))
-                   .andExpect(jsonPath("$._embedded.defaultsortoption", nullValue()));
+                   .andExpect(jsonPath("$._embedded.defaultsortoption",
+                           SortOptionMatcher.sortOptionMatcher(config.getSearchSortConfiguration()
+                                                                     .getDefaultSortField())));
     }
 }
