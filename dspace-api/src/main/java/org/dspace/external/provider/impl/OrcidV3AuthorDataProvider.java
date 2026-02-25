@@ -18,9 +18,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.dto.MetadataValueDTO;
+import org.dspace.external.OrcidConnectionException;
 import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.AbstractExternalDataProvider;
@@ -89,6 +91,9 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
     public void initializeAccessToken() {
         // If we have reaches max retries or the access token is already set, return immediately
         if (maxClientRetries <= 0 || StringUtils.isNotBlank(accessToken)) {
+            if (maxClientRetries <= 0) {
+                log.warn("Maximum retry attempts reached for ORCID token retrieval");
+            }
             return;
         }
         try {
@@ -168,8 +173,14 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
             return null;
         }
         initializeAccessToken();
-        InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"), accessToken);
-        return converter.convertSinglePerson(bioDocument);
+        try {
+            InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"),
+                                                             accessToken);
+            return converter.convertSinglePerson(bioDocument);
+        } catch (OrcidConnectionException e) {
+            log.error("Error retrieving ORCID bio for ID=" + id, e);
+            return null;
+        }
     }
 
     /**
@@ -200,26 +211,31 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
                 + "&start=" + start
                 + "&rows=" + limit;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
-        InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
-        List<Result> results = converter.convert(bioDocument);
-        List<Person> bios = new LinkedList<>();
-        for (Result result : results) {
-            OrcidIdentifier orcidIdentifier = result.getOrcidIdentifier();
-            if (orcidIdentifier != null) {
-                log.debug("Found OrcidId=" + orcidIdentifier.getPath());
-                String orcid = orcidIdentifier.getPath();
-                Person bio = getBio(orcid);
-                if (bio != null) {
-                    bios.add(bio);
+        try {
+            InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
+            List<Result> results = converter.convert(bioDocument);
+            List<Person> bios = new LinkedList<>();
+            for (Result result : results) {
+                OrcidIdentifier orcidIdentifier = result.getOrcidIdentifier();
+                if (orcidIdentifier != null) {
+                    log.debug("Found OrcidId=" + orcidIdentifier.getPath());
+                    String orcid = orcidIdentifier.getPath();
+                    Person bio = getBio(orcid);
+                    if (bio != null) {
+                        bios.add(bio);
+                    }
                 }
             }
+            return bios.stream().map(bio -> convertToExternalDataObject(bio)).collect(Collectors.toList());
+        } catch (OrcidConnectionException e) {
+            log.error("Error searching ORCID for query=" + query, e);
+            return Collections.emptyList();
         }
-        return bios.stream().map(bio -> convertToExternalDataObject(bio)).collect(Collectors.toList());
     }
 
     @Override
     public boolean supports(String source) {
-        return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
+        return Strings.CI.equals(sourceIdentifier, source);
     }
 
     @Override
@@ -233,8 +249,13 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
                 + "&start=" + 0
                 + "&rows=" + 0;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
-        InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
-        return Math.min(converter.getNumberOfResultsFromXml(bioDocument), MAX_INDEX);
+        try {
+            InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
+            return Math.min(converter.getNumberOfResultsFromXml(bioDocument), MAX_INDEX);
+        } catch (OrcidConnectionException e) {
+            log.error("Error getting number of results from ORCID for query=" + query, e);
+            return 0;
+        }
     }
 
 

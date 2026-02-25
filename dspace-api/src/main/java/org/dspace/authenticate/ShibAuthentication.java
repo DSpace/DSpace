@@ -160,7 +160,7 @@ public class ShibAuthentication implements AuthenticationMethod {
      * SUCCESS - authenticated OK. <br>
      * BAD_CREDENTIALS - user exists, but credentials (e.g. passwd)
      * don't match <br>
-     * CERT_REQUIRED - not allowed to login this way without X.509 cert.
+     * CERT_REQUIRED - not allowed to login this way without a cert.
      * <br>
      * NO_SUCH_USER - user not found using this method. <br>
      * BAD_ARGS - user/pw not appropriate for this method
@@ -417,8 +417,7 @@ public class ShibAuthentication implements AuthenticationMethod {
      * Predicate, is this an implicit authentication method. An implicit method
      * gets credentials from the environment (such as an HTTP request or even
      * Java system properties) rather than the explicit username and password.
-     * For example, a method that reads the X.509 certificates in an HTTPS
-     * request is implicit.
+     * For example, a method that provides IP-based authentication is implicit.
      *
      * @return true if this method uses implicit authentication.
      */
@@ -871,7 +870,7 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             String[] nameParts = MetadataFieldName.parse(field);
             ePersonService.setMetadataSingleValue(context, eperson,
-                    nameParts[0], nameParts[1], nameParts[2], value, null);
+                    nameParts[0], nameParts[1], nameParts[2], null, value);
             log.debug("Updated the eperson's '{}' metadata using header: '{}' = '{}'.",
                     field, header, value);
         }
@@ -917,7 +916,7 @@ public class ShibAuthentication implements AuthenticationMethod {
                     " is not allowed to login.");
             return BAD_ARGS;
         } else if (eperson.getRequireCertificate()) {
-            // this user can only login with x.509 certificate
+            // this user can only login with a certificate
             log.error(
                 "Shibboleth-based password authentication failed for user " + username + " because the eperson object" +
                     " requires a certificate to authenticate..");

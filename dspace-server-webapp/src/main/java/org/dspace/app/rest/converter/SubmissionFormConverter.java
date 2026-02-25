@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.ScopeEnum;
 import org.dspace.app.rest.model.SubmissionFormFieldRest;
 import org.dspace.app.rest.model.SubmissionFormInputTypeRest;
@@ -110,7 +111,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
 
         if (dcinput.isMetadataField()) {
             // only try to process the metadata input type if there's a metadata field
-            if (!StringUtils.equalsIgnoreCase(dcinput.getInputType(), "qualdrop_value")) {
+            if (!Strings.CI.equals(dcinput.getInputType(), "qualdrop_value")) {
 
                 // value-pair and vocabulary are a special kind of authorities
                 String inputType = dcinput.getInputType();

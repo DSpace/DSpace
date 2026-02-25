@@ -8,7 +8,7 @@ on:
 permissions: {}
 jobs:
   automation:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
     # Add the new issue to a project board, if it needs triage
     # See https://github.com/actions/add-to-project

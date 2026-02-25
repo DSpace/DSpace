@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.annotation.Resource;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
@@ -88,7 +88,7 @@ public class WosAttribute2ValueContributor implements MetadataContributor<Elemen
 
     private void setField(String attributeValue, Element el, List<MetadatumDTO> values) {
         for (String id : attributeValue2metadata.keySet()) {
-            if (StringUtils.equals(id, attributeValue)) {
+            if (Strings.CS.equals(id, attributeValue)) {
                 if (this.firstChild) {
                     String value = el.getChild(this.childName).getValue();
                     values.add(metadataFieldMapping.toDCValue(attributeValue2metadata.get(id), value));

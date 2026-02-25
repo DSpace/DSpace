@@ -1881,8 +1881,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         // ---- BROWSES BY ITEM ----
         //** WHEN **
         //An anonymous user browses the items in the Browse by date issued endpoint
-        //with startsWith set to 199
-        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=199")
+        //with startsWith set to 1990
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
                                 .param("size", "2"))
 
                    //** THEN **
@@ -1891,8 +1891,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //We expect the totalElements to be the 2 items present in the repository
-                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   //We expect the totalElements to be the 5 items from 1990 til now
+                   .andExpect(jsonPath("$.page.totalElements", is(5)))
                    //We expect to jump to page 1 of the index
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(jsonPath("$.page.size", is(2)))
@@ -2053,8 +2053,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** WHEN **
         //An anonymous user browses the items in the Browse by date issued endpoint
-        //with startsWith set to 199 and Page to 1
-        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=199")
+        //with startsWith set to 1990 and Page to 1
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
                                 .param("size", "1").param("page", "1"))
 
                    //** THEN **
@@ -2063,17 +2063,76 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //We expect the totalElements to be the 2 items present in the repository
-                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   //We expect the totalElements to be the 5 items present in the repository from 1990 until now
+                   .andExpect(jsonPath("$.page.totalElements", is(5)))
                    //We expect to jump to page 1 of the index
                    .andExpect(jsonPath("$.page.number", is(1)))
                    .andExpect(jsonPath("$.page.size", is(1)))
-                   .andExpect(jsonPath("$._links.self.href", containsString("startsWith=199")))
+                   .andExpect(jsonPath("$._links.self.href", containsString("startsWith=1990")))
 
-                   //Verify that the index jumps to the "Java" item.
-                   .andExpect(jsonPath("$._embedded.items",
-                        contains(
-                            ItemMatcher.matchItemWithTitleAndDateIssued(item3, "Java", "1995-05-23")
+                //Verify that the returned item is 2nd (page 0 first item, page 1 second item) item from 1990
+                // Items: Alan Turing - 1912; Blade Runner - 1982-06-25 || Python - 1990;
+                // Java - 1995-05-23; Zeta Reticuli - 2018-01-01; Moon - 2018-01-02; T-800 - 2029
+                // 2nd since 1990: Java
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item3,
+                                        "Java", "1995-05-23")
+                        )));
+
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
+                .param("size", "2").param("page", "1"))
+                //Verify that the returned item is 3rd&4th item from 1990
+                // Items: Alan Turing - 1912; Blade Runner - 1982-06-25 || Python - 1990;
+                // Java - 1995-05-23; Zeta Reticuli - 2018-01-01; Moon - 2018-01-02; T-800 - 2029
+                // => Zeta Reticuli & Moon
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item7,
+                                        "Zeta Reticuli", "2018-01-01"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item4,
+                                        "Moon", "2018-01-02")
+                        )));
+
+        // Sort descending
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990&sort=default,DESC")
+                        .param("size", "2").param("page", "0"))
+                //Verify that the returned items are from 1990 and below dates
+                // Items: Alan Turing - 1912; Blade Runner - 1982-06-25 || Python - 1990;
+                // Java - 1995-05-23; Zeta Reticuli - 2018-01-01; Moon - 2018-01-02; T-800 - 2029
+                // => Python & Blade Runner
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item5,
+                                        "Python", "1990"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                                        "Blade Runner", "1982-06-25")
+                        )));
+
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990&sort=default,DESC")
+                        .param("size", "1").param("page", "0"))
+                //Verify that the returned item is the one closest to 1990 but below its upperBound (1990-12-31)
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item5,
+                                        "Python", "1990")
+                        )));
+
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990&sort=default,DESC")
+                        .param("size", "3").param("page", "0"))
+                //Verify that the 3 returned items are from 1990 and below dates,
+                // with closest to upperBound 1990-12-31 as first
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item5,
+                                        "Python", "1990"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                                        "Blade Runner", "1982-06-25"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item1,
+                                        "Alan Turing", "1912-06-23")
+                        )));
+
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1982-06&sort=default,DESC")
+                        .param("size", "1").param("page", "0"))
+                //Verify that the returned item is the one closest to 1982-06 but below its upperBound (1982-06-30)
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                                        "Blade Runner", "1982-06-25")
                         )));
     }
 

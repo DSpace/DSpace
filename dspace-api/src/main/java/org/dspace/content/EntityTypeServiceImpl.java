@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
@@ -28,6 +29,7 @@ import org.dspace.content.dao.EntityTypeDAO;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SolrSearchCore;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.eperson.EPerson;
@@ -48,6 +50,9 @@ public class EntityTypeServiceImpl implements EntityTypeService {
 
     @Autowired
     protected SolrSearchCore solrSearchCore;
+
+    @Autowired
+    protected SearchService searchService;
 
     @Override
     public EntityType findByEntityType(Context context, String entityType) throws SQLException {
@@ -127,25 +132,31 @@ public class EntityTypeServiceImpl implements EntityTypeService {
         StringBuilder query = null;
         if (!authorizeService.isAdmin(context)) {
             EPerson currentUser = context.getCurrentUser();
+            StringBuilder epersonAndGroupClause = new StringBuilder();
             if (currentUser != null) {
-                String userId = currentUser.getID().toString();
-                query = new StringBuilder();
-                query.append("submit:(e").append(userId);
+                epersonAndGroupClause.append("e").append(currentUser.getID());
             }
-
+            //Retrieve all the groups the current user is a member of
             Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
             for (Group group : groups) {
-                if (query == null) {
-                    query = new StringBuilder();
-                    query.append("submit:(g");
+                if (!epersonAndGroupClause.isEmpty()) {
+                    epersonAndGroupClause.append(" OR g").append(group.getID());
                 } else {
-                    query.append(" OR g");
+                    epersonAndGroupClause.append("g").append(group.getID());
                 }
-                query.append(group.getID());
             }
 
-            if (query != null) {
-                query.append(")");
+            if (epersonAndGroupClause.isEmpty()) {
+                // No user or groups, no authorized types
+                return new ArrayList<>();
+            }
+            query = new StringBuilder();
+            query.append("submit:(").append(epersonAndGroupClause).append(")");
+            query.append(" OR ").append("admin:(").append(epersonAndGroupClause).append(")");
+            String locations = searchService.createLocationQueryForAdministrableDSOs(epersonAndGroupClause.toString());
+            if (StringUtils.isNotBlank(locations)) {
+                query.append(" OR ");
+                query.append(locations);
             }
         }
 
