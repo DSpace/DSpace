@@ -34,7 +34,7 @@ public class SubmissionDefinitionsMatcher {
      */
     public static Matcher<? super Object> matchFullEmbeds() {
         return matchEmbeds(
-                "collections[]",
+                "collections",
                 "sections"
         );
     }
