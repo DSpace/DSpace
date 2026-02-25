@@ -49,12 +49,6 @@
                 <value>crisrp.name</value>
                 <value>person.name.variant</value>
                 <value>person.name.translated</value>
-                <value>crisrp.fullName</value>
-                <value>crisproject.title</value>
-                <value>crisou.name</value>
-                <value>unibe.document.title</value>
-                <value>crisdo.name</value>
-                <value>crisfunding.fundingname</value>
             </list>
         </property>
     </bean>
