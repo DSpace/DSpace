@@ -22,7 +22,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -1139,8 +1138,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         orcidV3AuthorDataProvider.setOrcidRestConnector(mockOrcidConnector);
 
         String orcid = "0000-0002-9029-1854";
-
-        when(mockOrcidConnector.get(matches("^\\d{4}-\\d{4}-\\d{4}-\\d{4}/person$"), any()))
+        when(mockOrcidConnector.get(eq(orcid), any()))
             .thenAnswer(i -> orcidPersonRecord.getInputStream());
 
         try {
@@ -1158,7 +1156,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
             context.restoreAuthSystemState();
 
-            verify(mockOrcidConnector).get(eq(orcid + "/person"), any());
+            verify(mockOrcidConnector).get(eq(orcid), any());
             verifyNoMoreInteractions(mockOrcidConnector);
 
             String authToken = getAuthToken(submitter.getEmail(), password);
@@ -1172,12 +1170,21 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
             Item author = itemService.find(context, authorId);
             assertThat(author, notNullValue());
             assertThat(author.getOwningCollection(), is(persons));
+
+            // Verify metadata fields populated from ORCID import
             assertThat(author.getMetadata(), hasItems(
                 with("dc.title", "Bollini, Andrea"),
                 with("person.familyName", "Bollini"),
                 with("person.givenName", "Andrea"),
+                with("person.email", "andrea.bollini@4science.it"),
                 with("person.identifier.orcid", orcid),
+                with("person.affiliation.name", "4Science"),
                 with("cris.sourceId", "ORCID::" + orcid)));
+
+            // Verify researcher URLs were imported from ORCID
+            List<MetadataValue> researcherUrls = itemService.getMetadataByMetadataString(author,
+                "oairecerif.identifier.url");
+            assertThat("Should have 4 researcher URLs from ORCID", researcherUrls, hasSize(4));
 
             context.turnOffAuthorisationSystem();
 
