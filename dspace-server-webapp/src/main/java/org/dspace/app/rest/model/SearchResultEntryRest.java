@@ -22,6 +22,7 @@ public class SearchResultEntryRest extends RestAddressableModel {
     public static final String NAME = "discover";
     public static final String PLURAL_NAME = NAME;
     public static final String CATEGORY = RestModel.DISCOVER;
+    public static final String OBJECT = "object";
 
     private Map<String, List<String>> hitHighlights;
 
