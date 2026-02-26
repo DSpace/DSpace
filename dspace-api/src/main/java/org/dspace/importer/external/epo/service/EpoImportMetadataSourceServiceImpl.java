@@ -14,6 +14,7 @@ import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -31,7 +32,6 @@ import org.apache.http.HttpException;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.xerces.impl.dv.util.Base64;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
@@ -136,12 +136,10 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     /***
      * Log to EPO, bearer is valid for 20 minutes
-     * 
-     * @param consumerKey       The consumer Key
-     * @param consumerSecretKey The consumer secret key
+     *
      * @return
-     * @throws IOException
-     * @throws HttpException
+     * @throws IOException passed through.
+     * @throws HttpException passed through.
      */
     protected String login() throws IOException, HttpException {
         Map<String, Map<String, String>> params = getLoginParams();
@@ -154,16 +152,16 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     }
 
     private Map<String, Map<String, String>> getLoginParams() {
-        Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+        Map<String, Map<String, String>> params = new HashMap<>();
         Map<String, String> headerParams = getLoginHeaderParams();
         params.put(HEADER_PARAMETERS, headerParams);
         return params;
     }
 
     private Map<String, String> getLoginHeaderParams() {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         String authString = consumerKey + ":" + consumerSecret;
-        params.put("Authorization", "Basic " + Base64.encode(authString.getBytes()));
+        params.put("Authorization", "Basic " + Base64.getEncoder().encodeToString(authString.getBytes()));
         params.put("Content-type", "application/x-www-form-urlencoded");
         return params;
     }
@@ -208,7 +206,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-        return new ArrayList<ImportRecord>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -223,7 +221,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-        return new ArrayList<ImportRecord>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -281,6 +279,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             this.bearer = bearer;
         }
 
+        @Override
         public Integer call() throws Exception {
             return countDocument(bearer, query);
         }
@@ -302,6 +301,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             this.bearer = bearer;
         }
 
+        @Override
         public List<ImportRecord> call() throws Exception {
             int positionToSplit = id.indexOf(":");
             String docType = EpoDocumentId.EPODOC;
@@ -341,10 +341,10 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
      */
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
 
-        private Query query;
+        private final Query query;
+        private final String bearer;
         private Integer start;
         private Integer count;
-        private String bearer;
 
         private SearchByQueryCallable(Query query, String bearer) {
             this.query = query;
@@ -363,7 +363,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
         @Override
         public List<ImportRecord> call() throws Exception {
-            List<ImportRecord> records = new ArrayList<ImportRecord>();
+            List<ImportRecord> records = new ArrayList<>();
             String queryString = query.getParameterAsClass("query", String.class);
             if (StringUtils.isNotBlank(consumerKey) && StringUtils.isNotBlank(consumerSecret)) {
                 if (StringUtils.isNotBlank(queryString) && StringUtils.isNotBlank(bearer)) {
@@ -387,8 +387,8 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             return null;
         }
         try {
-            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
-            Map<String, String> headerParameters = new HashMap<String, String>();
+            Map<String, Map<String, String>> params = new HashMap<>();
+            Map<String, String> headerParameters = new HashMap<>();
             headerParameters.put("Authorization", "Bearer " + bearer);
             headerParameters.put("X-OPS-Range", "1-1");
             params.put(HEADER_PARAMETERS, headerParameters);
@@ -412,7 +412,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                  Namespace.getNamespace("ns", "http://www.epo.org/exchange"));
 
             String totalRes = getElement(root, namespaces, "//ops:biblio-search/@total-result-count");
-            return Integer.parseInt(totalRes);
+            return Integer.valueOf(totalRes);
         } catch (JDOMException | IOException | URISyntaxException | JaxenException e) {
             log.error(e.getMessage(), e);
             return null;
@@ -420,14 +420,14 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     }
 
     private List<EpoDocumentId> searchDocumentIds(String bearer, String query, int start, int count) {
-        List<EpoDocumentId> results = new ArrayList<EpoDocumentId>();
+        List<EpoDocumentId> results = new ArrayList<>();
         int end = start + count;
         if (StringUtils.isBlank(bearer)) {
             return results;
         }
         try {
-            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
-            Map<String, String> headerParameters = new HashMap<String, String>();
+            Map<String, Map<String, String>> params = new HashMap<>();
+            Map<String, String> headerParameters = new HashMap<>();
             headerParameters.put("Authorization", "Bearer " + bearer);
             if (start >= 1 && end > start) {
                 headerParameters.put("X-OPS-Range", start + "-" + end);
@@ -465,13 +465,13 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     }
 
     private List<ImportRecord> searchDocument(String bearer, String id, String docType) {
-        List<ImportRecord> results = new ArrayList<ImportRecord>();
+        List<ImportRecord> results = new ArrayList<>();
         if (StringUtils.isBlank(bearer)) {
             return results;
         }
         try {
-            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
-            Map<String, String> headerParameters = new HashMap<String, String>();
+            Map<String, Map<String, String>> params = new HashMap<>();
+            Map<String, String> headerParameters = new HashMap<>();
             headerParameters.put("Authorization", "Bearer " + bearer);
             params.put(HEADER_PARAMETERS, headerParameters);
 
@@ -501,7 +501,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             return recordsList;
         } catch (JDOMException | IOException e) {
             log.error(e.getMessage(), e);
-            return new LinkedList<Element>();
+            return new LinkedList<>();
         }
     }
 

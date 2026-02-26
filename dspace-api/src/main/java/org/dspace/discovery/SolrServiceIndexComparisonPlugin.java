@@ -7,13 +7,11 @@
  */
 package org.dspace.discovery;
 
-import org.apache.logging.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.tika.utils.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.DuplicateDetectionService;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.IndexableWorkflowItem;
@@ -32,12 +30,7 @@ public class SolrServiceIndexComparisonPlugin implements SolrServiceIndexPlugin 
     @Autowired
     ConfigurationService configurationService;
     @Autowired
-    ItemService itemService;
-    @Autowired
     DuplicateDetectionService duplicateDetectionService;
-
-    private static final Logger log = org.apache.logging.log4j.LogManager
-        .getLogger(SolrServiceIndexComparisonPlugin.class);
 
     /**
      * Index the normalised name of the item to a solr field
@@ -75,7 +68,7 @@ public class SolrServiceIndexComparisonPlugin implements SolrServiceIndexPlugin 
     }
 
     /**
-     * Add the actual comparison value field to the given solr doc
+     * Add the actual comparison value field to the given Solr doc.
      *
      * @param context DSpace context
      * @param item DSpace item

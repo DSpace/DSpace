@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -24,9 +25,9 @@ import java.util.UUID;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tika.Tika;
 import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
 import org.dspace.app.itemimport.service.ItemImportService;
+import org.dspace.app.util.TikaServerAdapter;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -364,22 +365,26 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     }
 
     /**
-     * Confirm that the zip file has the correct MIME type
+     * Confirm that the Zip file has the correct MIME type.
      * @param inputStream
      */
     protected void validateZip(InputStream inputStream) {
-        Tika tika = new Tika();
+        String mimeType;
         try {
-            String mimeType = tika.detect(inputStream);
-            if (mimeType.equals("application/zip")) {
-                zipvalid = true;
-            } else {
-                handler.logError("A valid zip file must be supplied. The provided file has mimetype: " + mimeType);
-                throw new UnsupportedOperationException("A valid zip file must be supplied");
-            }
+            byte[] typeBytes = TikaServerAdapter.postStream("/detect", inputStream,
+                    Integer.MAX_VALUE)
+                    .readAllBytes();
+            mimeType = new String(typeBytes, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new IllegalArgumentException(
                 "There was an error while reading the zip file: " + zipfilename);
+        }
+
+        if ("application/zip".equals(mimeType)) {
+            zipvalid = true;
+        } else {
+            handler.logError("A valid Zip file must be supplied. The provided file has mimetype: " + mimeType);
+            throw new UnsupportedOperationException("A valid Zip file must be supplied");
         }
     }
 

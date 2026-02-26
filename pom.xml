@@ -44,8 +44,6 @@
         <rome.version>1.19.0</rome.version>
         <!-- SLF4J is not used, but specified for dependency convergence issues between many dependencies -->
         <slf4j.version>2.0.17</slf4j.version>
-        <tika.version>2.9.4</tika.version>
-        <!-- Sync BouncyCastle & ASM with whatever version Tika uses -->
         <bouncycastle.version>1.81</bouncycastle.version>
         <asm.version>9.8</asm.version>
         <!-- Jersey is used to integrate with external sources/services -->
@@ -1308,54 +1306,31 @@
                 <version>${solr.client.version}</version>
             </dependency>
 
-            <!-- Tika is used to extract full text from documents in order to index in Solr -->
-            <dependency>
-                <groupId>org.apache.tika</groupId>
-                <artifactId>tika-core</artifactId>
-                <version>${tika.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.tika</groupId>
-                <artifactId>tika-parsers-standard-package</artifactId>
-                <version>${tika.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
-            <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
-            <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcutil-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
-            <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
             <dependency>
                 <groupId>com.healthmarketscience.jackcess</groupId>
                 <artifactId>jackcess</artifactId>
                 <version>4.0.8</version>
             </dependency>
-            <!-- Tika and axiom-api (in dspace-swordv2) disagree on versions -->
             <dependency>
                 <groupId>org.apache.james</groupId>
                 <artifactId>apache-mime4j-core</artifactId>
                 <version>0.8.12</version>
             </dependency>
-            <!-- Tika and solr-core disagree on versions of ASM -->
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
@@ -1644,7 +1619,6 @@
                 <artifactId>fontbox</artifactId>
                 <version>${pdfbox-version}</version>
             </dependency>
-            <!-- Tika and Jena disagree on version of Xerces to use. Select latest -->
             <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>

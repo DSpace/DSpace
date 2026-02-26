@@ -60,6 +60,18 @@ public interface FormatFilter {
         throws Exception;
 
     /**
+     * Filter the source stream and feed the filtrate to a handler.
+     *
+     * @param item Item associated with the stream.
+     * @param stream content of a source Bitstream.
+     * @param handler callback class to absorb the filtered data.
+     * @param verbose true if we should show more detail.
+     * @throws Exception passed through.
+     */
+//    public void filter(Item item, InputStream stream, ExtractedTextHandler handler, boolean verbose)
+//            throws Exception;
+
+    /**
      * Perform any pre-processing of the source bitstream *before* the actual
      * filtering takes place in MediaFilterManager.processBitstream().
      * <p>

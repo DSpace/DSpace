@@ -380,6 +380,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 return false;
             }
 
+// Instead of this vvv
             Bundle targetBundle; // bundle we're modifying
             if (bundles.isEmpty()) {
                 // create new bundle if needed
@@ -391,6 +392,13 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
 
             // create bitstream to store the filter result
             Bitstream b = bitstreamService.create(context, targetBundle, destStream);
+// Instead of this ^^^
+// This vvv
+//            BitstreamTextHandler textHandler
+//                    = new BitstreamTextHandler(context, item, bundles, formatFilter);
+//            formatFilter.filter(item, srcStream, textHandler, isVerbose);
+//            b = textHandler.getBitstream();
+// This ^^^
             // set the name, source and description of the bitstream
             b.setName(context, newName);
             b.setSource(context, "Written by FormatFilter " + formatFilter.getClass().getName() +
@@ -425,6 +433,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
 
         return true;
     }
+
 
     @Override
     public void updatePoliciesOfDerivativeBitstreams(Context context, Item item, Bitstream source)

@@ -9,6 +9,7 @@ package org.dspace.discovery.indexobject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
@@ -19,11 +20,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.csv.TextAndCSVParser;
-import org.apache.tika.sax.BodyContentHandler;
 import org.dspace.core.Context;
 import org.dspace.discovery.FullTextContentStreams;
 import org.dspace.discovery.IndexableObject;
@@ -34,11 +30,12 @@ import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.SolrUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.xml.sax.SAXException;
 
 /**
  * Basis factory interface implementation for indexing/retrieving any IndexableObject in the search core
  * @author Kevin Van de Velde (kevin at atmire dot com)
+ * @param <T> type of IndexableObject.
+ * @param <S> TBD
  */
 public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements IndexFactory<T, S> {
 
@@ -96,9 +93,11 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
     /**
      * Write the document to the index under the appropriate unique identifier.
      *
-     * @param doc     the solr document to be written to the server
-     * @param streams list of bitstream content streams
-     * @throws IOException A general class of exceptions produced by failed or interrupted I/O operations.
+     * @param doc     the Solr document to be written to the server.
+     * @param streams list of bitstream content streams.  Only the first is
+     *                added to the document.
+     * @throws IOException passed through.
+     * @throws SolrServerException passed through.
      */
     protected void writeDocument(SolrInputDocument doc, FullTextContentStreams streams)
             throws IOException, SolrServerException {
@@ -111,54 +110,20 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
                         .getIntProperty("discovery.solr.fulltext.charLimit",
                                 100000);
 
-                // Use Tika's Text parser as the streams are always from the TEXT bundle (i.e. already extracted text)
-                TextAndCSVParser tikaParser = new TextAndCSVParser();
-                BodyContentHandler tikaHandler = new BodyContentHandler(charLimit);
-                Metadata tikaMetadata = new Metadata();
-                ParseContext tikaContext = new ParseContext();
-
-                // Use Apache Tika to parse the full text stream(s)
-                boolean extractionSucceeded = false;
-                try (InputStream fullTextStreams = streams.getStream()) {
-                    tikaParser.parse(fullTextStreams, tikaHandler, tikaMetadata, tikaContext);
-                    extractionSucceeded = true;
-                } catch (SAXException saxe) {
-                    // Check if this SAXException is just a notice that this file was longer than the character limit.
-                    // Unfortunately there is not a unique, public exception type to catch here. This error is thrown
-                    // by Tika's WriteOutContentHandler when it encounters a document longer than the char limit
-                    // https://github.com/apache/tika/blob/main/tika-core/src/main/java/org/apache/tika/sax/WriteOutContentHandler.java
-                    if (saxe.getMessage().contains("limit has been reached")) {
-                        // log that we only indexed up to that configured limit
-                        log.info("Full text is larger than the configured limit (discovery.solr.fulltext.charLimit)."
-                                + " Only the first {} characters were indexed.", charLimit);
-                        extractionSucceeded = true;
-                    } else {
-                        log.error("Tika parsing error. Could not index full text.", saxe);
-                        throw new IOException("Tika parsing error. Could not index full text.", saxe);
-                    }
-                } catch (TikaException | IOException ex) {
-                    log.error("Tika parsing error. Could not index full text.", ex);
-                    throw new IOException("Tika parsing error. Could not index full text.", ex);
+                byte[] bupher;
+                try (InputStream fullTextStream = streams.getStream()) {
+                    bupher = fullTextStream.readNBytes(charLimit * 2);
                 }
-                if (extractionSucceeded) {
-                    // Write Tika metadata to "tika_meta_*" fields.
-                    // This metadata is not very useful right now,
-                    // but we'll keep it just in case it becomes more useful.
-                    for (String name : tikaMetadata.names()) {
-                        for (String value : tikaMetadata.getValues(name)) {
-                            doc.addField("tika_meta_" + name, value);
-                        }
-                    }
-                    // Save (parsed) full text to "fulltext" field
-                    doc.addField("fulltext", tikaHandler.toString());
+                if (bupher.length >= charLimit) {
+                    log.info("Full text is larger than the configured limit (discovery.solr.fulltext.charLimit)."
+                            + " Only the first {} characters were indexed.", charLimit);
                 }
+                doc.addField("fulltext", new String(bupher, StandardCharsets.UTF_8));
             }
             // Add document to index
             solr.add(doc);
-
         }
     }
-
 
     /**
      * Index the provided value as use for a sidebar facet
@@ -209,8 +174,9 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
      * Add the necessary fields to the SOLR document to support a Discover Facet on resourcetypename (archived item,
      * workspace item, workflow item, etc)
      *
-     * @param document    the solr document
-     * @param filterValue the filter value (i.e. <sort_value>\n|||\n<display_value>###<authority_value>
+     * @param document    the Solr document.
+     * @param filterValue the filter value (i.e.
+     *          {@code <sort_value>\n|||\n<display_value>###<authority_value>}).
      */
     protected void addNamedResourceTypeIndex(SolrInputDocument document, String filterValue) {
 
