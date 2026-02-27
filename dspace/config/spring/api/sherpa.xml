@@ -10,6 +10,7 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
+    <!-- Jisc Open Policy Finder API service (formerly SHERPA/RoMEO) -->
 	<bean class="org.dspace.app.sherpa.submit.SHERPASubmitConfigurationService"
 		id="org.dspace.app.sherpa.submit.SHERPASubmitConfigurationService">
 		<property name="issnItemExtractors">
