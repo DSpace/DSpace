@@ -27,7 +27,8 @@ import org.dspace.external.provider.AbstractExternalDataProvider;
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with SHERPAPublisher External
  * data lookups.
- * This provider is a refactored version of SherpaPublisherDataPublisher, rewritten to work with SHERPA v2 API
+ * This provider is a refactored version of SherpaPublisherDataPublisher, rewritten to work with
+ * the Jisc Open Policy Finder API (formerly SHERPA v2 API)
  *
  * It uses a more simple response object than the normal publication / policy search
  *

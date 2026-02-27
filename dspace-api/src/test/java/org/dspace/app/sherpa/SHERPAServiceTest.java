@@ -17,7 +17,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.app.sherpa.v2.SHERPAPublisherResponse;
@@ -88,15 +87,15 @@ public class SHERPAServiceTest extends AbstractDSpaceTest {
 
     /**
      * Test that the URIBuilder and sanitation procedures are producing expected URLs, comparing the results
-     * to manually compiled strings
+     * to manually compiled strings. Note: the API key is now sent as an HTTP header, not as a query parameter.
      * @throws URISyntaxException
      */
     @Test
     public void testUriConstruction() throws URISyntaxException, UnsupportedEncodingException {
-        // Get values for base URL and api key parameter
-        String endpoint = configurationService.getProperty("sherpa.romeo.url",
-            "https://v2.sherpa.ac.uk/cgi/retrieve");
-        String apiKey = configurationService.getProperty("sherpa.romeo.apikey", null);
+        // Get values for base URL (API key is now a header, not in the URL)
+        String endpoint = configurationService.getProperty("openpolicyfinder.url",
+            configurationService.getProperty("sherpa.romeo.url",
+                "https://api.openpolicyfinder.jisc.ac.uk/retrieve"));
 
         // Compare expected outputs
         // Valid ISSN (The Lancet)
@@ -109,27 +108,27 @@ public class SHERPAServiceTest extends AbstractDSpaceTest {
             "TEST", SHERPAUtils.sanitiseQuery(invalidISSN));
 
         // The valid string should look like this (assuming default configuration)
-        // https://v2.sherpa.ac.uk/cgi/retrieve?item-type=publication&filter=[["issn","equals","0140-6736"]]&format=Json
-        String validUrl = new URIBuilder(buildUrlString(validISSN, endpoint, apiKey)).toString();
+        // https://api.openpolicyfinder.jisc.ac.uk/retrieve?item-type=publication&...&format=Json
+        String validUrl = new URIBuilder(buildUrlString(validISSN, endpoint)).toString();
         assertEquals("Built and expected valid URLs differ", validUrl,
             sherpaService.constructHttpGet("publication", "issn", "equals", validISSN)
                 .getURI().toASCIIString());
 
         // The invalid string should look like this (assuming default configuration)
-        // https://v2.sherpa.ac.uk/cgi/retrieve?item-type=publication&filter=[["issn","equals","TEST"]]&format=Json
+        // https://api.openpolicyfinder.jisc.ac.uk/retrieve?item-type=publication&...&format=Json
         // Note - it should return 0 results from the API, but these services are not intended to validate the ISSN
         // query, though they do sanitise it for the JSON input type, hence expecting the braces to be stripped
-        String invalidUrl = new URIBuilder(buildUrlString(invalidISSN, endpoint, apiKey)).toString();
+        String invalidUrl = new URIBuilder(buildUrlString(invalidISSN, endpoint)).toString();
         assertEquals("Built and expected invalid URLs differ", invalidUrl,
             sherpaService.constructHttpGet("publication", "issn", "equals", invalidISSN)
                 .getURI().toASCIIString());
 
 
         // The null query string should look like this (assuming default configuration)
-        // https://v2.sherpa.ac.uk/cgi/retrieve?item-type=publication&filter=[["issn","equals",""]]&format=Json
+        // https://api.openpolicyfinder.jisc.ac.uk/retrieve?item-type=publication&...&format=Json
         // Note - it should return 0 results from the API, but all we do is log a warning, this is not considered
         // a fatal URI syntax exception (the remote call does work, and returns 0 items as valid JSON)
-        String nullUrl = new URIBuilder(buildUrlString(null, endpoint, apiKey)).toString();
+        String nullUrl = new URIBuilder(buildUrlString(null, endpoint)).toString();
         assertEquals("Built and expected invalid URLs differ", nullUrl,
             sherpaService.constructHttpGet("publication", "issn", "equals", null)
                 .getURI().toASCIIString());
@@ -159,7 +158,7 @@ public class SHERPAServiceTest extends AbstractDSpaceTest {
                 && expectedTitle.equals(response.getJournals().get(0).getTitles().get(0)));
 
         // Assert response has expected publication (metadata) URI
-        String expectedSystemMetadataUri = "http://v2.sherpa.ac.uk/id/publication/23803";
+        String expectedSystemMetadataUri = "https://openpolicyfinder.jisc.ac.uk/id/publication/23803";
         assertTrue("Response metadata URI did not match expected '" + expectedSystemMetadataUri
             + "' value", expectedSystemMetadataUri.equals(response.getMetadata().getUri()));
 
@@ -215,22 +214,19 @@ public class SHERPAServiceTest extends AbstractDSpaceTest {
     }
 
     /**
-     * Build URL manually with string builder to compare to URIBuilder usage in actual service
+     * Build URL manually with string builder to compare to URIBuilder usage in actual service.
+     * Note: the API key is now sent as an HTTP header, not as a query parameter.
      * @param query
      * @param endpoint
-     * @param apiKey
      * @return
      */
-    public static String buildUrlString(String query, String endpoint, String apiKey) {
+    public static String buildUrlString(String query, String endpoint) {
         query = SHERPAUtils.sanitiseQuery(query);
         StringBuilder expected = new StringBuilder();
         String filter = "[[\"issn\",\"equals\",\"" + query + "\"]]";
         expected.append(endpoint).append("?")
             .append("item-type=publication&filter=").append(URLEncoder.encode(filter, StandardCharsets.UTF_8))
             .append("&format=Json&offset=0&limit=1");
-        if (StringUtils.isNotBlank(apiKey)) {
-            expected.append("&api-key=").append(apiKey);
-        }
         return expected.toString();
     }
 
