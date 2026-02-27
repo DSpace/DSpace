@@ -183,7 +183,7 @@ jobs:
     steps:
       # Checkout our codebase (to get access to Docker Compose scripts)
       - name: Checkout codebase
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       # Download Docker image artifacts (which were just built by reusable-docker-build.yml)
       - name: Download Docker image artifacts
         uses: actions/download-artifact@v4
