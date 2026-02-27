@@ -34,8 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 
 /**
- * SHERPAService is responsible for making the HTTP call to the SHERPA v2 API
- * for SHERPASubmitService.
+ * SHERPAService is responsible for making the HTTP call to the Jisc Open Policy Finder API
+ * (formerly SHERPA/RoMEO v2) for SHERPASubmitService.
  * Note, this service is ported from DSpace 6 for the ability to search policies by ISSN
  * There are also new DataProvider implementations provided for use as 'external sources'
  * of journal and publisher data
@@ -63,14 +63,32 @@ public class SHERPAService {
     @SuppressWarnings("unused")
     @PostConstruct
     private void init() {
-        // Get endoint and API key from configuration
-        endpoint = configurationService.getProperty("sherpa.romeo.url",
-            "https://v2.sherpa.ac.uk/cgi/retrieve");
-        apiKey = configurationService.getProperty("sherpa.romeo.apikey");
+        // Get endpoint and API key from configuration, with fallback to legacy property names
+        String newUrl = configurationService.getProperty("openpolicyfinder.url");
+        String legacyUrl = configurationService.getProperty("sherpa.romeo.url");
+        if (newUrl != null) {
+            endpoint = newUrl;
+        } else if (legacyUrl != null) {
+            endpoint = legacyUrl;
+            log.warn("Configuration property 'sherpa.romeo.url' is deprecated. "
+                + "Please use 'openpolicyfinder.url' instead.");
+        } else {
+            endpoint = "https://api.openpolicyfinder.jisc.ac.uk/retrieve";
+        }
+
+        String newApiKey = configurationService.getProperty("openpolicyfinder.apikey");
+        String legacyApiKey = configurationService.getProperty("sherpa.romeo.apikey");
+        if (newApiKey != null) {
+            apiKey = newApiKey;
+        } else if (legacyApiKey != null) {
+            apiKey = legacyApiKey;
+            log.warn("Configuration property 'sherpa.romeo.apikey' is deprecated. "
+                + "Please use 'openpolicyfinder.apikey' instead.");
+        }
     }
 
     /**
-     * Search the SHERPA v2 API for a journal policy data using the supplied ISSN.
+     * Search the Open Policy Finder API for journal policy data using the supplied ISSN.
      * If the API key is missing, or the HTTP response is non-OK or does not complete
      * successfully, a simple error response will be returned.
      * Otherwise, the response body will be passed to SHERPAResponse for parsing as JSON
@@ -84,9 +102,9 @@ public class SHERPAService {
     }
 
     /**
-     * Perform an API request to the SHERPA v2 API - this could be a search or a get for any entity type
+     * Perform an API request to the Open Policy Finder API - this could be a search or a get for any entity type
      * but the return object here must be a SHERPAPublisherResponse not the journal-centric SHERPAResponse
-     * For more information about the type, field and predicate arguments, see the SHERPA v2 API documentation
+     * For more information about the type, field and predicate arguments, see the API documentation
      * @param type          entity type eg "publisher"
      * @param field         field eg "issn" or "title"
      * @param predicate     predicate eg "equals" or "contains-word"
@@ -97,10 +115,11 @@ public class SHERPAService {
      */
     public SHERPAPublisherResponse performPublisherRequest(String type, String field, String predicate, String value,
                                                            int start, int limit) {
-        // API Key is *required* for v2 API calls
+        // API Key is *required* for API calls
         if (null == apiKey) {
-            log.error("SHERPA ROMeO API Key missing: please register for an API key and set sherpa.romeo.apikey");
-            return new SHERPAPublisherResponse("SHERPA/RoMEO configuration invalid or missing");
+            log.error("Open Policy Finder API Key missing: "
+                + "please register for an API key and set openpolicyfinder.apikey");
+            return new SHERPAPublisherResponse("Open Policy Finder configuration invalid or missing");
         }
 
         HttpGet method = null;
@@ -111,7 +130,8 @@ public class SHERPAService {
             numberOfTries++;
 
             log.debug(String.format(
-                "Trying to contact SHERPA/RoMEO - attempt %d of %d; timeout is %d; sleep between timeouts is %d",
+                "Trying to contact Open Policy Finder - attempt %d of %d; timeout is %d; "
+                    + "sleep between timeouts is %d",
                 numberOfTries,
                 maxNumberOfTries,
                 timeout,
@@ -131,40 +151,41 @@ public class SHERPAService {
                             + response.getStatusLine().getReasonPhrase());
 
                     if (statusCode != HttpStatus.SC_OK) {
-                        sherpaResponse = new SHERPAPublisherResponse("SHERPA/RoMEO return not OK status: "
-                                + statusCode);
+                        sherpaResponse = new SHERPAPublisherResponse(
+                            "Open Policy Finder return not OK status: " + statusCode);
                         String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-                        log.error("Error from SHERPA HTTP request: " + errorBody);
+                        log.error("Error from Open Policy Finder HTTP request: " + errorBody);
                     }
 
                     HttpEntity responseBody = response.getEntity();
 
                     // If the response body is valid, pass to SHERPAResponse for parsing as JSON
                     if (null != responseBody) {
-                        log.debug("Non-null SHERPA response received for query of " + value);
+                        log.debug("Non-null response received for query of " + value);
                         InputStream content = null;
                         try {
                             content = responseBody.getContent();
                             sherpaResponse =
                                     new SHERPAPublisherResponse(content, SHERPAPublisherResponse.SHERPAFormat.JSON);
                         } catch (IOException e) {
-                            log.error("Encountered exception while contacting SHERPA/RoMEO: " + e.getMessage(), e);
+                            log.error("Encountered exception while contacting Open Policy Finder: "
+                                + e.getMessage(), e);
                         } finally {
                             if (content != null) {
                                 content.close();
                             }
                         }
                     } else {
-                        log.debug("Empty SHERPA response body for query on " + value);
-                        sherpaResponse = new SHERPAPublisherResponse("SHERPA/RoMEO returned no response");
+                        log.debug("Empty response body for query on " + value);
+                        sherpaResponse = new SHERPAPublisherResponse("Open Policy Finder returned no response");
                     }
                 }
             } catch (URISyntaxException e) {
-                String errorMessage = "Error building SHERPA v2 API URI: " + e.getMessage();
+                String errorMessage = "Error building Open Policy Finder API URI: " + e.getMessage();
                 log.error(errorMessage, e);
                 sherpaResponse = new SHERPAPublisherResponse(errorMessage);
             } catch (IOException e) {
-                String errorMessage = "Encountered exception while contacting SHERPA/RoMEO: " + e.getMessage();
+                String errorMessage = "Encountered exception while contacting Open Policy Finder: " + e.getMessage();
                 log.error(errorMessage, e);
                 sherpaResponse = new SHERPAPublisherResponse(errorMessage);
             }  catch (InterruptedException e) {
@@ -179,9 +200,9 @@ public class SHERPAService {
         }
 
         if (sherpaResponse == null) {
-            log.debug("SHERPA response is still null");
+            log.debug("Response is still null");
             sherpaResponse = new SHERPAPublisherResponse(
-                "Error processing the SHERPA/RoMEO answer");
+                "Error processing the Open Policy Finder answer");
         }
 
         // Return the final response
@@ -189,8 +210,8 @@ public class SHERPAService {
     }
 
     /**
-     * Perform an API request to the SHERPA v2 API - this could be a search or a get for any entity type
-     * For more information about the type, field and predicate arguments, see the SHERPA v2 API documentation
+     * Perform an API request to the Open Policy Finder API - this could be a search or a get for any entity type
+     * For more information about the type, field and predicate arguments, see the API documentation
      * @param type          entity type eg "publication" or "publisher"
      * @param field         field eg "issn" or "title"
      * @param predicate     predicate eg "equals" or "contains-word"
@@ -201,10 +222,11 @@ public class SHERPAService {
      */
     public SHERPAResponse performRequest(String type, String field, String predicate, String value,
                                          int start, int limit) {
-        // API Key is *required* for v2 API calls
+        // API Key is *required* for API calls
         if (null == apiKey) {
-            log.error("SHERPA ROMeO API Key missing: please register for an API key and set sherpa.romeo.apikey");
-            return new SHERPAResponse("SHERPA/RoMEO configuration invalid or missing");
+            log.error("Open Policy Finder API Key missing: "
+                + "please register for an API key and set openpolicyfinder.apikey");
+            return new SHERPAResponse("Open Policy Finder configuration invalid or missing");
         }
 
         HttpGet method = null;
@@ -215,7 +237,8 @@ public class SHERPAService {
             numberOfTries++;
 
             log.debug(String.format(
-                "Trying to contact SHERPA/RoMEO - attempt %d of %d; timeout is %d; sleep between timeouts is %d",
+                "Trying to contact Open Policy Finder - attempt %d of %d; timeout is %d; "
+                    + "sleep between timeouts is %d",
                 numberOfTries,
                 maxNumberOfTries,
                 timeout,
@@ -235,39 +258,40 @@ public class SHERPAService {
                             + response.getStatusLine().getReasonPhrase());
 
                     if (statusCode != HttpStatus.SC_OK) {
-                        sherpaResponse = new SHERPAResponse("SHERPA/RoMEO return not OK status: "
-                                + statusCode);
+                        sherpaResponse = new SHERPAResponse(
+                            "Open Policy Finder return not OK status: " + statusCode);
                         String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-                        log.error("Error from SHERPA HTTP request: " + errorBody);
+                        log.error("Error from Open Policy Finder HTTP request: " + errorBody);
                     }
 
                     HttpEntity responseBody = response.getEntity();
 
                     // If the response body is valid, pass to SHERPAResponse for parsing as JSON
                     if (null != responseBody) {
-                        log.debug("Non-null SHERPA response received for query of " + value);
+                        log.debug("Non-null response received for query of " + value);
                         InputStream content = null;
                         try {
                             content = responseBody.getContent();
                             sherpaResponse = new SHERPAResponse(content, SHERPAResponse.SHERPAFormat.JSON);
                         } catch (IOException e) {
-                            log.error("Encountered exception while contacting SHERPA/RoMEO: " + e.getMessage(), e);
+                            log.error("Encountered exception while contacting Open Policy Finder: "
+                                + e.getMessage(), e);
                         } finally {
                             if (content != null) {
                                 content.close();
                             }
                         }
                     } else {
-                        log.debug("Empty SHERPA response body for query on " + value);
-                        sherpaResponse = new SHERPAResponse("SHERPA/RoMEO returned no response");
+                        log.debug("Empty response body for query on " + value);
+                        sherpaResponse = new SHERPAResponse("Open Policy Finder returned no response");
                     }
                 }
             } catch (URISyntaxException e) {
-                String errorMessage = "Error building SHERPA v2 API URI: " + e.getMessage();
+                String errorMessage = "Error building Open Policy Finder API URI: " + e.getMessage();
                 log.error(errorMessage, e);
                 sherpaResponse = new SHERPAResponse(errorMessage);
             } catch (IOException e) {
-                String errorMessage = "Encountered exception while contacting SHERPA/RoMEO: " + e.getMessage();
+                String errorMessage = "Encountered exception while contacting Open Policy Finder: " + e.getMessage();
                 log.error(errorMessage, e);
                 sherpaResponse = new SHERPAResponse(errorMessage);
             } catch (InterruptedException e) {
@@ -282,9 +306,9 @@ public class SHERPAService {
         }
 
         if (sherpaResponse == null) {
-            log.debug("SHERPA response is still null");
+            log.debug("Response is still null");
             sherpaResponse = new SHERPAResponse(
-                "Error processing the SHERPA/RoMEO answer");
+                "Error processing the Open Policy Finder answer");
         }
 
         // Return the final response
@@ -339,14 +363,16 @@ public class SHERPAService {
         if (limit > 0) {
             uriBuilder.addParameter("limit", String.valueOf(limit));
         }
-        if (StringUtils.isNotBlank(apiKey)) {
-            uriBuilder.addParameter("api-key", apiKey);
-        }
 
-        log.debug("SHERPA API URL: " + uriBuilder.toString());
+        log.debug("Open Policy Finder API URL: " + uriBuilder.toString());
 
         // Create HTTP GET object
         HttpGet method = new HttpGet(uriBuilder.build());
+
+        // Set API key as HTTP header (required by Jisc Open Policy Finder API)
+        if (StringUtils.isNotBlank(apiKey)) {
+            method.addHeader("x-api-key", apiKey);
+        }
 
         // Set connection parameters
         int timeout = 5000;
@@ -360,10 +386,11 @@ public class SHERPAService {
     }
 
     /**
-     * Prepare the API query for execution by the HTTP client
+     * Prepare the API query URI for validation purposes.
+     * Note: the API key is sent as an HTTP header, not as a query parameter.
      * @param query     ISSN query string
      * @param endpoint  API endpoint (base URL)
-     * @param apiKey    API key parameter
+     * @param apiKey    API key (unused in URI construction, kept for signature compatibility)
      * @return          URI object
      * @throws URISyntaxException
      */
@@ -379,14 +406,11 @@ public class SHERPAService {
 
         // Log warning if no query is supplied
         if (null == query) {
-            log.warn("No ISSN supplied as query string for SHERPA service search");
+            log.warn("No ISSN supplied as query string for Open Policy Finder service search");
         }
         uriBuilder.addParameter("filter", "[[\"issn\",\"equals\",\"" + query + "\"]]");
         uriBuilder.addParameter("format", "Json");
-        if (StringUtils.isNotBlank(apiKey)) {
-            uriBuilder.addParameter("api-key", apiKey);
-        }
-        log.debug("Would search SHERPA endpoint with " + uriBuilder.toString());
+        log.debug("Would search Open Policy Finder endpoint with " + uriBuilder.toString());
 
         // Return final built URI
         return uriBuilder.build();

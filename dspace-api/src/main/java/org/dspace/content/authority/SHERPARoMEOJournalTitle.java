@@ -16,7 +16,7 @@ import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.utils.DSpace;
 
 /**
- * Journal-name authority based on SHERPA/RoMEO v2
+ * Journal-name authority based on the Jisc Open Policy Finder API (formerly SHERPA/RoMEO v2)
  *
  * @author Larry Stone
  * @author Andrea Bollini (andrea.bollini at 4science.it)
