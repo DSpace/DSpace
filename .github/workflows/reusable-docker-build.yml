@@ -110,7 +110,7 @@ jobs:
 
       # https://github.com/actions/checkout
       - name: Checkout codebase
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # https://github.com/docker/login-action
       # NOTE: This login occurs for BOTH non-PRs or PRs. PRs *must* also login to access private images from GHCR
