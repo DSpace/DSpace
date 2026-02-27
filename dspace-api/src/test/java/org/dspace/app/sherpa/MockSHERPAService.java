@@ -39,9 +39,11 @@ public class MockSHERPAService extends SHERPAService {
     public SHERPAResponse performRequest(String type, String field, String predicate, String value,
                                          int start, int limit) {
         try {
-            String endpoint = configurationService.getProperty("sherpa.romeo.url",
-                "https://v2.sherpa.ac.uk/cgi/retrieve");
-            String apiKey = configurationService.getProperty("sherpa.romeo.apikey");
+            String endpoint = configurationService.getProperty("openpolicyfinder.url",
+                configurationService.getProperty("sherpa.romeo.url",
+                    "https://api.openpolicyfinder.jisc.ac.uk/retrieve"));
+            String apiKey = configurationService.getProperty("openpolicyfinder.apikey",
+                configurationService.getProperty("sherpa.romeo.apikey"));
 
             // Rather than search, we will simply attempt to build the URI using the real prepare method
             // so that any errors there are caught, and will return a valid response for The Lancet
@@ -96,9 +98,11 @@ public class MockSHERPAService extends SHERPAService {
     public SHERPAPublisherResponse performPublisherRequest(String type, String field, String predicate, String value,
                                                            int start, int limit) {
         try {
-            String endpoint = configurationService.getProperty("sherpa.romeo.url",
-                "https://v2.sherpa.ac.uk/cgi/retrieve");
-            String apiKey = configurationService.getProperty("sherpa.romeo.apikey");
+            String endpoint = configurationService.getProperty("openpolicyfinder.url",
+                configurationService.getProperty("sherpa.romeo.url",
+                    "https://api.openpolicyfinder.jisc.ac.uk/retrieve"));
+            String apiKey = configurationService.getProperty("openpolicyfinder.apikey",
+                configurationService.getProperty("sherpa.romeo.apikey"));
 
             // Rather than search, we will simply attempt to build the URI using the real prepare method
             // so that any errors there are caught, and will return a valid response for The Lancet

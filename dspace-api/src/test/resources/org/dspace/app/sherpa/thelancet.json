@@ -59,7 +59,7 @@
                 "language" : "en"
               }
             ],
-            "uri" : "http://v2.sherpa.ac.uk/id/publisher/30",
+            "uri" : "https://openpolicyfinder.jisc.ac.uk/id/publisher/30",
             "id" : 30,
             "name" : [
               {
@@ -99,7 +99,7 @@
             "value" : "yes"
           }
         ],
-        "uri" : "http://v2.sherpa.ac.uk/id/publication/23803",
+        "uri" : "https://openpolicyfinder.jisc.ac.uk/id/publication/23803",
         "date_modified" : "2020-03-06 11:25:54",
         "date_created" : "2012-11-20 14:51:52",
         "publicly_visible" : "yes"
@@ -356,7 +356,7 @@
                     },
                     "system_metadata" : {
                       "id" : 9,
-                      "uri" : "http://v2.sherpa.ac.uk/id/funder/9"
+                      "uri" : "https://openpolicyfinder.jisc.ac.uk/id/funder/9"
                     }
                   }
                 ]
@@ -400,7 +400,7 @@
               ]
             }
           ],
-          "uri" : "http://v2.sherpa.ac.uk/id/publisher_policy/1274",
+          "uri" : "https://openpolicyfinder.jisc.ac.uk/id/publisher_policy/1274",
           "urls" : [
             {
               "description" : "Guidelines for Authors",
@@ -594,7 +594,7 @@
               "url" : "https://www.elsevier.com/about/policies/open-access-licenses"
             }
           ],
-          "uri" : "http://v2.sherpa.ac.uk/id/publisher_policy/3323",
+          "uri" : "https://openpolicyfinder.jisc.ac.uk/id/publisher_policy/3323",
           "id" : 3323,
           "publication_count" : 2102
         }
