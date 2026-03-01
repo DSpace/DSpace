@@ -108,6 +108,9 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Last version of errorprone to support JDK 17 is 2.42.x
+      - dependency-name: "com.google.errorprone:*"
+        versions: [">=2.43.0"]
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -213,6 +216,9 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Last version of errorprone to support JDK 17 is 2.42.x
+      - dependency-name: "com.google.errorprone:*"
+        versions: [">=2.43.0"]
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
