@@ -23,7 +23,7 @@ jobs:
     if: github.event.pull_request.merged
     steps:
       # Checkout code
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       # Port PR to other branch (ONLY if labeled with "port to")
       # See https://github.com/korthout/backport-action
       - name: Create backport pull requests
