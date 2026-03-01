@@ -34,7 +34,7 @@
         <ehcache.version>3.11.1</ehcache.version>
         <errorprone.version>2.47.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-annotations.version below -->
-        <jackson.version>2.21.0</jackson.version>
+        <jackson.version>2.21.1</jackson.version>
         <jackson-annotations.version>2.21</jackson-annotations.version>
         <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
         <jaxb-api.version>4.0.5</jaxb-api.version>
