@@ -13,19 +13,42 @@ import java.io.IOException;
 
 import com.maxmind.geoip2.DatabaseReader;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Service that handle the GeoIP database file.
  *
+ * <p>By default, this bean validates the GeoLite2-City database at startup
+ * and prevents DSpace from starting if it is missing or unreadable.
+ * Set {@code usage-statistics.geo.enabled = false} to skip this check.</p>
+ *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class GeoIpService {
+public class GeoIpService implements InitializingBean {
+
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        boolean geoEnabled = configurationService.getBooleanProperty("usage-statistics.geo.enabled", true);
+        if (!geoEnabled) {
+            log.warn("GeoIP location data is disabled (usage-statistics.geo.enabled = false). "
+                + "Statistics will be recorded without location data.");
+            return;
+        }
+
+        // Validate the GeoLite DB file at startup — if this throws, DSpace will not start.
+        getDatabaseReader().close();
+        log.info("GeoIP database loaded successfully.");
+    }
 
     /**
      * Returns an instance of {@link DatabaseReader} based on the configured db

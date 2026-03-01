@@ -178,6 +178,11 @@ jobs:
         run: |
           find /tmp/docker -type f -name "*.tar" -exec docker image load --input "{}" \;
           docker image ls -a
+      # Disable GeoIP requirement as the GeoLite database is not available in CI.
+      # This is written to local.cfg which is mounted into all containers via ./dspace/config.
+      - name: Disable GeoIP for CI
+        run: |
+          echo "usage-statistics.geo.enabled = false" >> dspace/config/local.cfg
       # Start backend using our compose script in the codebase.
       - name: Start backend in Docker
         run: |
