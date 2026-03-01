@@ -113,6 +113,9 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Last version of errorprone to support JDK 11 is 2.31.0
+      - dependency-name: "com.google.errorprone:*"
+        versions: [">=2.32.0"]
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
