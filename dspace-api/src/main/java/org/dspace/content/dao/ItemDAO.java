@@ -96,6 +96,20 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
     Iterator<Item> findByMetadataFieldExcludingOldVersions(Context context, MetadataField metadataField, String value,
                                                            boolean inArchive) throws SQLException;
 
+    /**
+     * Find all items that have a specific metadata field with an optional value match.
+     * If value is null, returns all items with the field regardless of value.
+     * If value is provided, returns only items where the field value exactly matches (case-sensitive).
+     * <p>
+     * To filter by archive status, use {@link #findByMetadataField(Context, MetadataField, String, boolean)}.
+     * </p>
+     *
+     * @param context       DSpace context object
+     * @param metadataField metadata field to search
+     * @param value         field value to match (if null, matches any value)
+     * @return              iterator over all items matching the criteria
+     * @throws SQLException if database error
+     */
     Iterator<Item> findByMetadataField(Context context, MetadataField metadataField, String value)
         throws SQLException;
 

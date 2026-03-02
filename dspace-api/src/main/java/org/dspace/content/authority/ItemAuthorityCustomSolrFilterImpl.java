@@ -83,6 +83,45 @@ public class ItemAuthorityCustomSolrFilterImpl implements CustomAuthoritySolrFil
         return SolrServiceBestMatchIndexingPlugin.BEST_MATCH_INDEX + ":" + escapeQueryChars(searchTerm);
     }
 
+    /**
+     * Determines the confidence level for authority choices based on result count.
+     * <p>
+     * This implementation provides conservative confidence scores for general item authority lookups.
+     * Even when a single result is returned, it returns {@link Choices#CF_UNCERTAIN} rather than
+     * {@link Choices#CF_ACCEPTED}, reflecting that the coarse matching strategy may produce
+     * false positives.
+     * </p>
+     *
+     * <h3>Confidence Mapping</h3>
+     * <ul>
+     * <li><strong>No results</strong> (length = 0): {@link Choices#CF_UNSET} - No authority data available</li>
+     * <li><strong>Single result</strong> (length = 1): {@link Choices#CF_UNCERTAIN} - Conservative;
+     *     user should verify the match</li>
+     * <li><strong>Multiple results</strong> (length > 1): {@link Choices#CF_AMBIGUOUS} - User must choose
+     *     from multiple options</li>
+     * </ul>
+     *
+     * <h3>Rationale for Conservative Scoring</h3>
+     * <p>
+     * The coarse matching approach (prefix + exact + best-match) can match items that are similar
+     * but not identical. Returning {@code CF_UNCERTAIN} for single results ensures that users
+     * verify the match rather than auto-accepting potentially incorrect authorities.
+     * </p>
+     *
+     * <h3>Comparison with Stricter Implementations</h3>
+     * <p>
+     * Subclasses may override this method to provide higher confidence. For example,
+     * {@link PersonStrictCustomSolrFilterImpl} returns {@code CF_ACCEPTED} for single results
+     * because strict normalization provides higher precision.
+     * </p>
+     *
+     * @param choices variable number of Choice objects returned by the authority lookup
+     * @return a confidence value from {@link Choices} indicating the reliability of the results
+     * @see Choices#CF_UNSET
+     * @see Choices#CF_UNCERTAIN
+     * @see Choices#CF_AMBIGUOUS
+     * @see PersonStrictCustomSolrFilterImpl#getConfidenceForChoices(Choice...)
+     */
     @Override
     public int getConfidenceForChoices(Choice... choices) {
         if (choices.length == 0) {
