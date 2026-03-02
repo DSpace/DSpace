@@ -10,6 +10,8 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class EPersonConverter extends DSpaceObjectConverter<EPerson, org.dspace.app.rest.model.EPersonRest> {
+    @Autowired
+    EPersonService epersonService;
 
     @Override
     public EPersonRest convert(EPerson obj, Projection projection) {
@@ -44,4 +48,8 @@ public class EPersonConverter extends DSpaceObjectConverter<EPerson, org.dspace.
         return EPerson.class;
     }
 
+    @Override
+    protected EPersonService getDSOService() {
+        return epersonService;
+    }
 }

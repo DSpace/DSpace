@@ -21,6 +21,8 @@ import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -34,6 +36,11 @@ public abstract class GenericStatementDisseminator
 
     protected ItemService itemService = ContentServiceFactory.getInstance()
                                                              .getItemService();
+
+    protected BundleService bundleService = ContentServiceFactory.getInstance()
+                                                                 .getBundleService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance()
+                                                                       .getBitstreamService();
 
     protected void populateStatement(Context context, Item item,
                                      Statement statement)
@@ -75,7 +82,7 @@ public abstract class GenericStatementDisseminator
             // an original deposit is everything in the SWORD bundle
             List<Bundle> bundles = item.getBundles();
             for (Bundle bundle : bundles) {
-                if (swordBundle.equals(bundle.getName())) {
+                if (swordBundle.equals(bundleService.getName(bundle))) {
                     List<Bitstream> bitstreams = bundle
                         .getBitstreams();
                     for (Bitstream bitstream : bitstreams) {
@@ -83,8 +90,7 @@ public abstract class GenericStatementDisseminator
                         OriginalDeposit deposit = new OriginalDeposit(
                             this.urlManager.getBitstreamUrl(
                                 bitstream));
-                        deposit.setMediaType(bitstream
-                                                 .getFormat(context).getMIMEType());
+                        deposit.setMediaType(bitstreamService.getFormat(context, bitstream).getMIMEType());
                         deposit.setDepositedOn(java.util.Date.from(this.getDateOfDeposit(item)));
                         originalDeposits.add(deposit);
                     }
@@ -131,7 +137,7 @@ public abstract class GenericStatementDisseminator
             for (String bundleName : includeBundles) {
                 List<Bundle> bundles = item.getBundles();
                 for (Bundle bundle : bundles) {
-                    if (bundleName.equals(bundle.getName())) {
+                    if (bundleName.equals(bundleService.getName(bundle))) {
                         List<Bitstream> bitstreams = bundle
                             .getBitstreams();
                         for (Bitstream bitstream : bitstreams) {
@@ -139,8 +145,7 @@ public abstract class GenericStatementDisseminator
                             ResourcePart part = new ResourcePart(this.urlManager
                                                                      .getActionableBitstreamUrl(
                                                                          bitstream));
-                            part.setMediaType(bitstream
-                                                  .getFormat(context).getMIMEType());
+                            part.setMediaType(bitstreamService.getFormat(context, bitstream).getMIMEType());
                             resources.add(part);
                         }
                     }

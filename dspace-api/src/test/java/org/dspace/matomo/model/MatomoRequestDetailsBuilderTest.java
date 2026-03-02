@@ -30,6 +30,7 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.matomo.factory.MatomoRequestCookieIdentifierEnricher;
@@ -96,28 +97,30 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
         enrichers.add(MatomoRequestDetailsEnricherFactory.actionNameEnricher());
 
         Item item = Mockito.mock(Item.class);
-        Mockito.when(item.getName()).thenReturn("item-name");
-        Mockito.when(item.getType()).thenReturn(Constants.ITEM);
-        Mockito.when(this.usageEvent.getObject()).thenReturn(item);
-        Mockito.when(this.usageEvent.getContext()).thenReturn(context);
-
-        MatomoRequestDetails requestDetails = builder.build(usageEvent);
-        assertThat(
-            requestDetails.parameters,
-            Matchers.hasEntry(
-                Matchers.is("action_name"),
-                Matchers.is("item-name")
-            )
-        );
-
-
-        Bitstream bitstream = Mockito.mock(Bitstream.class);
-        Mockito.when(bitstream.getType()).thenReturn(Constants.BITSTREAM);
-        Mockito.when(this.usageEvent.getObject()).thenReturn(bitstream);
-
         try (MockedStatic<ContentServiceFactory> mock = Mockito.mockStatic(ContentServiceFactory.class)) {
             ContentServiceFactory serviceFactory = Mockito.mock(ContentServiceFactory.class);
             Mockito.when(ContentServiceFactory.getInstance()).thenReturn(serviceFactory);
+            DSpaceObjectService<Item> itemService = Mockito.mock(ItemService.class);
+            Mockito.when(serviceFactory.getDSpaceObjectService(item)).thenReturn(itemService);
+            Mockito.when(itemService.getName(item)).thenReturn("item-name");
+            Mockito.when(item.getType()).thenReturn(Constants.ITEM);
+            Mockito.when(this.usageEvent.getObject()).thenReturn(item);
+            Mockito.when(this.usageEvent.getContext()).thenReturn(context);
+
+            MatomoRequestDetails requestDetails = builder.build(usageEvent);
+            assertThat(
+                requestDetails.parameters,
+                Matchers.hasEntry(
+                    Matchers.is("action_name"),
+                    Matchers.is("item-name")
+                )
+            );
+
+
+            Bitstream bitstream = Mockito.mock(Bitstream.class);
+            Mockito.when(bitstream.getType()).thenReturn(Constants.BITSTREAM);
+            Mockito.when(this.usageEvent.getObject()).thenReturn(bitstream);
+
             DSpaceObjectService<Bitstream> bitstreamService = Mockito.mock(BitstreamService.class);
             Mockito.when(serviceFactory.getDSpaceObjectService(bitstream))
                    .thenReturn(bitstreamService);

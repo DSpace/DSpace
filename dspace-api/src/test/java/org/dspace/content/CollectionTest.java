@@ -158,7 +158,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         assertThat("testCollectionFind 0", found, notNullValue());
         assertThat("testCollectionFind 1", found.getID(), equalTo(id));
         //the community created by default has no name
-        assertThat("testCollectionFind 2", found.getName(), equalTo(""));
+        assertThat("testCollectionFind 2", collectionService.getName(found), equalTo(""));
     }
 
     /**
@@ -172,7 +172,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
 
         Collection created = collectionService.create(context, owningCommunity);
         assertThat("testCreate 0", created, notNullValue());
-        assertThat("testCreate 1", created.getName(), equalTo(""));
+        assertThat("testCreate 1", collectionService.getName(created), equalTo(""));
     }
 
     /**
@@ -340,16 +340,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     }
 
     /**
-     * Test of getName method, of class Collection.
-     */
-    @Test
-    @Override
-    public void testGetName() {
-        //by default is empty
-        assertThat("testGetName 0", collection.getName(), equalTo(""));
-    }
-
-    /**
      * Test of getLogo method, of class Collection.
      */
     @Test
@@ -432,7 +422,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         int step = 1;
         Group g = groupService.create(context);
         context.restoreAuthSystemState();
-        collection.setWorkflowGroup(context, step, g);
+       collectionService.setWorkflowGroup(context, collection, step, g);
         assertThat("testSetWorkflowGroup 0", collectionService.getWorkflowGroup(context, collection, step),
                 notNullValue());
         assertThat("testSetWorkflowGroup 1", collectionService.getWorkflowGroup(context, collection, step), equalTo(g));
@@ -451,8 +441,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         Group g1 = groupService.create(context);
         Group g2 = groupService.create(context);
         context.restoreAuthSystemState();
-        collection.setWorkflowGroup(context, step, g1);
-        collection.setWorkflowGroup(context, step, g2);
+       collectionService.setWorkflowGroup(context, collection, step, g1);
+       collectionService.setWorkflowGroup(context, collection, step, g2);
         assertThat("testSetWorkflowGroup 0", collectionService.getWorkflowGroup(context, collection, step),
                 notNullValue());
         assertThat("testSetWorkflowGroup 1", collectionService.getWorkflowGroup(context, collection, step),
@@ -595,33 +585,16 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     }
 
     /**
-     * Test of getLicenseCollection method, of class Collection.
-     */
-    @Test
-    public void testGetLicenseCollection() {
-        assertThat("testGetLicenseCollection 0", collection.getLicenseCollection(), notNullValue());
-        assertThat("testGetLicenseCollection 1", collection.getLicenseCollection(), equalTo(""));
-    }
-
-    /**
-     * Test of hasCustomLicense method, of class Collection.
-     */
-    @Test
-    public void testHasCustomLicense() {
-        assertFalse("testHasCustomLicense 0", collectionService.hasCustomLicense(collection));
-    }
-
-    /**
      * Test of setLicense method, of class Collection.
      */
     @Test
     public void testSetLicense() throws SQLException {
         String license = "license for test";
-        collection.setLicense(context, license);
+        collectionService.setLicense(context, collection, license);
         assertThat("testSetLicense 0", collectionService.getLicense(collection), notNullValue());
         assertThat("testSetLicense 1", collectionService.getLicense(collection), equalTo(license));
-        assertThat("testSetLicense 2", collection.getLicenseCollection(), notNullValue());
-        assertThat("testSetLicense 3", collection.getLicenseCollection(), equalTo(license));
+        assertThat("testSetLicense 2", collectionService.getLicense(collection), notNullValue());
+        assertThat("testSetLicense 3", collectionService.getLicense(collection), equalTo(license));
     }
 
     /**
@@ -1035,9 +1008,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         context.restoreAuthSystemState();
         assertTrue("testGetCommunities 0", collection.getCommunities().size() == 4);
         //Communities should be sorted by name
-        assertTrue("testGetCommunities 1", collection.getCommunities().get(1).getName().equals("community 1"));
-        assertTrue("testGetCommunities 1", collection.getCommunities().get(2).getName().equals("community 2"));
-        assertTrue("testGetCommunities 1", collection.getCommunities().get(3).getName().equals("community 3"));
+        Community community3 = collection.getCommunities().get(1);
+        assertTrue("testGetCommunities 1", communityService.getName(community3).equals("community 1"));
+        Community community2 = collection.getCommunities().get(2);
+        assertTrue("testGetCommunities 1", communityService.getName(community2).equals("community 2"));
+        Community community1 = collection.getCommunities().get(3);
+        assertTrue("testGetCommunities 1", communityService.getName(community1).equals("community 3"));
     }
 
     /**

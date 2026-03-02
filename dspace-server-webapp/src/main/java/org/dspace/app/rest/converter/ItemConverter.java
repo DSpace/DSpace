@@ -114,4 +114,9 @@ public class ItemConverter
     public boolean supportsModel(IndexableObject idxo) {
         return idxo.getIndexedObject() instanceof Item;
     }
+
+    @Override
+    protected ItemService getDSOService() {
+        return itemService;
+    }
 }

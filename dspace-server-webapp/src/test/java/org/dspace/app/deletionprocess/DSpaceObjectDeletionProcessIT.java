@@ -41,6 +41,9 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.RelationshipType;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.deletion.process.DSpaceObjectDeletionProcess;
 import org.hamcrest.Matchers;
@@ -66,7 +69,16 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     private Collection collection;
 
     @Autowired
+    private CommunityService communityService;
+
+    @Autowired
+    private CollectionService collectionService;
+
+    @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private BitstreamService bitstreamService;
 
     @Override
     public void setUp() throws Exception {
@@ -145,27 +157,27 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(item1.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(item1.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(itemService.getName(item1))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream1.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream1.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream1))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream2.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream2.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream2))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream3.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream3.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream3.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream3))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream4.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream4.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream4.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream4))));
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", item1.getID().toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
@@ -193,17 +205,17 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         getClient(tokenAdmin).perform(get("/api/core/items/" + item2.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(item2.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(item2.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(itemService.getName(item2))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream5.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream5.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream5.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream5))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream6.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream6.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream6.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream6))));
     }
 
     @Test
@@ -214,54 +226,54 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         getClient(tokenAdmin).perform(get("/api/core/collections/" + collection.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(collection.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(collection.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(collectionService.getName(collection))));
 
         // check item1
         getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(item1.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(item1.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(itemService.getName(item1))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream1.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream1.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream1))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream2.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream2.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream2))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream3.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream3.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream3.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream3))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream4.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream4.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream4.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream4))));
 
         getClient(tokenAdmin).perform(get("/api/core/collections/" + collection.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(collection.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(collection.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(collectionService.getName(collection))));
 
         // check item2
         getClient(tokenAdmin).perform(get("/api/core/items/" + item2.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(item2.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(item2.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(itemService.getName(item2))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream5.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream5.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream5.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream5))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream6.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream6.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream6.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream6))));
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", collection.getID().toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
@@ -306,59 +318,59 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         getClient(tokenAdmin).perform(get("/api/core/communities/" + community.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(community.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(community.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(communityService.getName(community))));
 
         getClient(tokenAdmin).perform(get("/api/core/collections/" + collection.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(collection.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(collection.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(collectionService.getName(collection))));
 
         // check item1
         getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(item1.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(item1.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(itemService.getName(item1))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream1.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream1.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream1))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream2.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream2.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream2))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream3.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream3.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream3.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream3))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream4.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream4.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream4.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream4))));
 
         getClient(tokenAdmin).perform(get("/api/core/collections/" + collection.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(collection.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(collection.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(collectionService.getName(collection))));
 
         // check item2
         getClient(tokenAdmin).perform(get("/api/core/items/" + item2.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(item2.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(item2.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(itemService.getName(item2))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream5.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream5.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream5.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream5))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream6.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream6.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream6.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream6))));
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", community.getID().toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
@@ -405,7 +417,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream1.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream1.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream1))));
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", bitstream1.getID().toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
@@ -419,7 +431,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream1.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream1.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream1))));
     }
 
     @Test
@@ -431,29 +443,29 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(item1.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(item1.getName())))
+                             .andExpect(jsonPath("$.name", Matchers.is(itemService.getName(item1))))
                              .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
                             "$.handle")));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream1.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream1.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream1))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream2.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream2.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream2))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream3.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream3.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream3.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream3))));
 
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream4.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", Matchers.is(bitstream4.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(bitstream4.getName())));
+                             .andExpect(jsonPath("$.name", Matchers.is(bitstreamService.getName(bitstream4))));
 
         String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", idRef.get() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();

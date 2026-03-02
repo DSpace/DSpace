@@ -34,6 +34,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
@@ -67,6 +68,9 @@ public class RequestItemServiceImpl implements RequestItemService {
 
     @Autowired
     protected ConfigurationService configurationService;
+
+    @Autowired
+    protected ItemService itemService;
 
     /**
      * Always set UTC for dateMathParser for consistent database date handling
@@ -130,7 +134,7 @@ public class RequestItemServiceImpl implements RequestItemService {
                         new String[]{"ORIGINAL"});
                 for (String bundleName : bundleNames) {
                     if (!minimumSizeThresholdReached) {
-                        for (Bundle bundle : item.getBundles(bundleName)) {
+                        for (Bundle bundle : itemService.getBundles(item, bundleName)) {
                             if (null != bundle && !minimumSizeThresholdReached) {
                                 for (Bitstream bitstreamToCheck : bundle.getBitstreams()) {
                                     if (bitstreamToCheck.getSizeBytes() >= minimumSize) {

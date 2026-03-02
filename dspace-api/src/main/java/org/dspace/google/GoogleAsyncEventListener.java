@@ -25,8 +25,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.google.client.GoogleAnalyticsClient;
@@ -63,7 +65,13 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
     private BitstreamService bitstreamService;
 
     @Autowired
+    private ContentServiceFactory contentServiceFactory;
+
+    @Autowired
     private List<GoogleAnalyticsClient> googleAnalyticsClients;
+
+    @Autowired
+    private BundleService bundleService;
 
     private Buffer eventsBuffer;
 
@@ -246,12 +254,13 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
     private String getObjectName(UsageEvent ue) {
         try {
             if (ue.getObject().getType() == Constants.BITSTREAM) {
-                // For a bitstream download we really want to know the title of the owning item
-                // rather than the bitstream name.
-                return ContentServiceFactory.getInstance().getDSpaceObjectService(ue.getObject())
-                        .getParentObject(ue.getContext(), ue.getObject()).getName();
+                // For a bitstream download we really want to know the title of the owning item rather than the
+                // bitstream name.
+                DSpaceObject parent = contentServiceFactory.getDSpaceObjectService(ue.getObject())
+                                                           .getParentObject(ue.getContext(), ue.getObject());
+                return contentServiceFactory.getDSpaceObjectService(parent).getName(parent);
             } else {
-                return ue.getObject().getName();
+                return contentServiceFactory.getDSpaceObjectService(ue.getObject()).getName(ue.getObject());
             }
         } catch (SQLException e) {
             // This shouldn't merit interrupting the user's transaction so log the error and continue.

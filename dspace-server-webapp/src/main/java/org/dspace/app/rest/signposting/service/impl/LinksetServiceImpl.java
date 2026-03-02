@@ -162,24 +162,16 @@ public class LinksetServiceImpl implements LinksetService {
     }
 
     private Iterator<Bitstream> getItemBitstreams(Context context, Item item) {
-        try {
-            List<Bundle> bundles = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
-            return bundles.stream().flatMap(bundle -> bundle.getBitstreams().stream()).iterator();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        List<Bundle> bundles = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
+        return bundles.stream().flatMap(bundle -> bundle.getBitstreams().stream()).iterator();
     }
 
     private int countItemBitstreams(Item item) {
-        try {
-            int countBitstreams = 0;
-            List<Bundle> bundles = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
-            for (Bundle bundle: bundles) {
-                countBitstreams += bundle.getBitstreams().size();
-            }
-            return countBitstreams;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        int countBitstreams = 0;
+        List<Bundle> bundles = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
+        for (Bundle bundle: bundles) {
+            countBitstreams += bundle.getBitstreams().size();
         }
+        return countBitstreams;
     }
 }

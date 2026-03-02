@@ -188,8 +188,8 @@ public class SamlAuthenticationRestControllerIT extends AbstractControllerIntegr
         assertNotNull(testUser);
         assertEquals("001", testUser.getNetid());
         assertEquals("ben@dspace.org", testUser.getEmail());
-        assertEquals("Ben", testUser.getFirstName());
-        assertEquals("Bitdiddle", testUser.getLastName());
+        assertEquals("Ben", ePersonService.getFirstName(testUser));
+        assertEquals("Bitdiddle", ePersonService.getLastName(testUser));
     }
 
     @Test

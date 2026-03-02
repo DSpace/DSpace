@@ -46,6 +46,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.ProcessStatus;
 import org.dspace.content.Relationship;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
@@ -73,6 +74,8 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
 
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private BitstreamService bitstreamService;
     @Autowired
     private RelationshipService relationshipService;
     @Autowired
@@ -195,8 +198,8 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
      * @throws Exception
      */
     private void checkBitstream() throws Exception {
-        Bitstream bitstream = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next()
-                .getBundles("ORIGINAL").get(0).getBitstreams().get(0);
+        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
+        Bitstream bitstream = itemService.getBundles(item, "ORIGINAL").get(0).getBitstreams().get(0);
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.metadata", allOf(
@@ -255,15 +258,15 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
         assertNotNull(process.getBitstreams());
         assertEquals(3, process.getBitstreams().size());
         assertEquals(1, process.getBitstreams().stream()
-                .filter(b -> Strings.CS.equals(b.getName(), ItemImport.MAPFILE_FILENAME))
+                .filter(b -> Strings.CS.equals(bitstreamService.getName(b), ItemImport.MAPFILE_FILENAME))
                 .count());
         assertEquals(1,
                 process.getBitstreams().stream()
-                .filter(b -> Strings.CS.contains(b.getName(), ".log"))
+                .filter(b -> Strings.CS.contains(bitstreamService.getName(b), ".log"))
                 .count());
         assertEquals(1,
                 process.getBitstreams().stream()
-                .filter(b -> Strings.CS.contains(b.getName(), ".zip"))
+                .filter(b -> Strings.CS.contains(bitstreamService.getName(b), ".zip"))
                 .count());
     }
 }

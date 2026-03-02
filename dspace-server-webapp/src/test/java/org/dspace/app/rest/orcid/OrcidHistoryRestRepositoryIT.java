@@ -49,6 +49,7 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.RelationshipType;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.orcid.OrcidHistory;
 import org.dspace.orcid.OrcidOperation;
 import org.dspace.orcid.OrcidQueue;
@@ -94,6 +95,9 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
     @Autowired
     private OrcidHistoryServiceImpl orcidHistoryService;
 
+    @Autowired
+    private EPersonService epersonService;
+
     private OrcidClient orcidClient;
 
     private OrcidClient orcidClientMock;
@@ -126,7 +130,10 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withPersonIdentifierFirstName("Josiah")
             .withPersonIdentifierLastName("Carberry")
             .withPersonCountry("IT")
-            .withDspaceObjectOwner(researcher.getFullName(), researcher.getID().toString())
+            .withDSpaceObjectOwner(
+                epersonService.getFullName(eperson),
+                researcher.getID().toString()
+            )
             .withOrcidIdentifier(ORCID)
             .build();
 

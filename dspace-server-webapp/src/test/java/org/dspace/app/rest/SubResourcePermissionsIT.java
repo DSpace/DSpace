@@ -29,6 +29,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.service.BundleService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
 
     @Autowired
     private AuthorizeService authorizeService;
+
+    @Autowired
+    private BundleService bundleService;
 
     @Test
     public void itemBundlePrivateItemPermissionTest() throws Exception {
@@ -86,12 +90,12 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
         // should succeed
         getClient(token).perform(get("/api/core/items/" + privateItem1.getID() + "/bundles"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.bundles", Matchers.hasItem(BundleMatcher
-                                                                                        .matchProperties(
-                                                                                            bundle.getName(),
-                                                                                            bundle.getID(),
-                                                                                            bundle.getHandle(),
-                                                                                            bundle.getType()))));
+                        .andExpect(jsonPath("$._embedded.bundles", Matchers.hasItem(
+                            BundleMatcher.matchProperties(
+                                bundleService.getName(bundle),
+                                bundle.getID(),
+                                bundle.getHandle(),
+                                bundle.getType()))));
 
         token = getAuthToken(eperson.getEmail(), password);
 
@@ -113,8 +117,8 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
                                      .param("projection", "full"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.bundles._embedded.bundles", Matchers.hasItem(BundleMatcher
-                                                  .matchProperties(bundle.getName(), bundle.getID(),
-                                                      bundle.getHandle(), bundle.getType()))));
+                                                  .matchProperties(bundleService.getName(bundle), bundle.getID(),
+                                                                   bundle.getHandle(), bundle.getType()))));
 
         token = getAuthToken(eperson.getEmail(), password);
 
@@ -135,16 +139,16 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
         // Should succeed
         getClient(token).perform(get("/api/core/bundles/" + bundle.getID()))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", BundleMatcher
-                            .matchProperties(bundle.getName(), bundle.getID(), bundle.getHandle(), bundle.getType())));
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(
+                            bundleService.getName(bundle), bundle.getID(), bundle.getHandle(), bundle.getType())));
 
 
         // Test item retrieval for anon on public bundle
         // Should succeed
         getClient().perform(get("/api/core/bundles/" + bundle.getID()))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", BundleMatcher
-                       .matchProperties(bundle.getName(), bundle.getID(), bundle.getHandle(), bundle.getType())));
+                   .andExpect(jsonPath("$", BundleMatcher.matchProperties(
+                           bundleService.getName(bundle), bundle.getID(), bundle.getHandle(), bundle.getType())));
 
     }
 
@@ -195,12 +199,12 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
         // Should succeed
         getClient(token).perform(get("/api/core/items/" + publicItem1.getID() + "/bundles"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.bundles", Matchers.hasItem(BundleMatcher
-                                                                                        .matchProperties(
-                                                                                            bundle.getName(),
-                                                                                            bundle.getID(),
-                                                                                            bundle.getHandle(),
-                                                                                            bundle.getType()))));
+                        .andExpect(jsonPath("$._embedded.bundles", Matchers.hasItem(
+                            BundleMatcher.matchProperties(
+                                bundleService.getName(bundle),
+                                bundle.getID(),
+                                bundle.getHandle(),
+                                bundle.getType()))));
 
         token = getAuthToken(eperson.getEmail(), password);
 
@@ -209,16 +213,17 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
         getClient(token).perform(get("/api/core/items/" + publicItem1.getID() + "/bundles"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.bundles", Matchers.not(Matchers.hasItem(
-                            BundleMatcher.matchProperties(bundle.getName(), bundle.getID(), bundle.getHandle(),
-                                                          bundle.getType())))));
+                            BundleMatcher.matchProperties(
+                                bundleService.getName(bundle), bundle.getID(), bundle.getHandle(),
+                                bundle.getType())))));
 
         // Bundle retrieval for public item, checking private bundle as anon
         // Shouldn't contain the private bundle
         getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/bundles"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.bundles", Matchers.not(Matchers.hasItem(
-                       BundleMatcher.matchProperties(bundle.getName(), bundle.getID(), bundle.getHandle(),
-                                                     bundle.getType())))));
+                       BundleMatcher.matchProperties(
+                           bundleService.getName(bundle), bundle.getID(), bundle.getHandle(), bundle.getType())))));
 
         token = getAuthToken(admin.getEmail(), password);
 
@@ -247,7 +252,7 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
                                      .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.bundles._embedded.bundles", Matchers.hasItem(
-                            BundleMatcher.matchProperties(bundle.getName(), bundle.getID(),
+                            BundleMatcher.matchProperties(bundleService.getName(bundle), bundle.getID(),
                                                           bundle.getHandle(), bundle.getType()))));
 
         token = getAuthToken(eperson.getEmail(), password);
@@ -258,7 +263,7 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
                                      .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.bundles._embedded.bundles", Matchers.not(Matchers.hasItem(
-                            BundleMatcher.matchProperties(bundle.getName(), bundle.getID(),
+                            BundleMatcher.matchProperties(bundleService.getName(bundle), bundle.getID(),
                                                           bundle.getHandle(), bundle.getType())))));
 
 
@@ -268,7 +273,7 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
                                 .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.bundles._embedded.bundles", Matchers.not(Matchers.hasItem(
-                       BundleMatcher.matchProperties(bundle.getName(), bundle.getID(),
+                       BundleMatcher.matchProperties(bundleService.getName(bundle), bundle.getID(),
                                                      bundle.getHandle(), bundle.getType())))));
 
 
@@ -278,8 +283,8 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
         // Should succeed
         getClient(token).perform(get("/api/core/bundles/" + bundle.getID()))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", BundleMatcher
-                            .matchProperties(bundle.getName(), bundle.getID(), bundle.getHandle(), bundle.getType())));
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(
+                            bundleService.getName(bundle), bundle.getID(), bundle.getHandle(), bundle.getType())));
 
         token = getAuthToken(eperson.getEmail(), password);
 

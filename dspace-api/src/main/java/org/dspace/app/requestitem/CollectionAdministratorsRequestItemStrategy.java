@@ -25,8 +25,7 @@ import org.springframework.lang.NonNull;
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
-public class CollectionAdministratorsRequestItemStrategy
-        extends RequestItemHelpdeskStrategy {
+public class CollectionAdministratorsRequestItemStrategy extends RequestItemHelpdeskStrategy {
     @Override
     @NonNull
     public List<RequestItemAuthor> getRequestItemAuthor(Context context,
@@ -35,7 +34,10 @@ public class CollectionAdministratorsRequestItemStrategy
         List<RequestItemAuthor> recipients = new ArrayList<>();
         Collection collection = item.getOwningCollection();
         for (EPerson admin : collection.getAdministrators().getMembers()) {
-            recipients.add(new RequestItemAuthor(admin));
+            recipients.add(new RequestItemAuthor(
+                epersonService.getFullName(admin),
+                admin.getEmail()
+            ));
         }
         if (recipients.isEmpty()) {
             return super.getRequestItemAuthor(context, item);

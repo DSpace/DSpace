@@ -25,6 +25,9 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.swordapp.server.SwordError;
@@ -32,6 +35,12 @@ import org.swordapp.server.SwordServerException;
 
 public class FeedContentDisseminator extends AbstractSimpleDC
     implements SwordContentDisseminator {
+
+    protected BundleService bundleService = ContentServiceFactory.getInstance()
+                                                                 .getBundleService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance()
+                                                                       .getBitstreamService();
+
     @Override
     public InputStream disseminate(Context context, Item item)
         throws DSpaceSwordException, SwordError, SwordServerException {
@@ -43,7 +52,7 @@ public class FeedContentDisseminator extends AbstractSimpleDC
 
             List<Bundle> bundles = item.getBundles();
             for (Bundle bundle : bundles) {
-                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+                if (Constants.CONTENT_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                     List<Bitstream> bitstreams = bundle
                         .getBitstreams();
                     for (Bitstream bitstream : bitstreams) {
@@ -92,7 +101,7 @@ public class FeedContentDisseminator extends AbstractSimpleDC
         throws DSpaceSwordException {
         BitstreamFormat format = null;
         try {
-            format = bitstream.getFormat(context);
+            format = bitstreamService.getFormat(context, bitstream);
         } catch (SQLException e) {
             throw new DSpaceSwordException(e);
         }
@@ -106,10 +115,10 @@ public class FeedContentDisseminator extends AbstractSimpleDC
         String bsUrl = urlManager.getBitstreamUrl(bitstream);
 
         entry.setId(bsUrl);
-        entry.setTitle(bitstream.getName());
-        String desc = bitstream.getDescription();
+        entry.setTitle(bitstreamService.getName(bitstream));
+        String desc = bitstreamService.getDescription(bitstream);
         if ("".equals(desc) || desc == null) {
-            desc = bitstream.getName();
+            desc = bitstreamService.getName(bitstream);
         }
         entry.setSummary(desc);
         entry.setUpdated(java.util.Date.from(Instant.now())); // required, though content is spurious

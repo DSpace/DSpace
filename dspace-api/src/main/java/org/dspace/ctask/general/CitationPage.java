@@ -22,6 +22,7 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -115,7 +116,7 @@ public class CitationPage extends AbstractCurationTask {
                 resourcePolicyService.removeAllPolicies(Curator.curationContext(), dBundle);
             } catch (AuthorizeException e) {
                 log.error("User not authorized to create bundle on item \"{}\": {}",
-                        item::getName, e::getMessage);
+                          () -> itemService.getName(item), e::getMessage);
                 return;
             }
         } else {
@@ -125,7 +126,7 @@ public class CitationPage extends AbstractCurationTask {
         //Create a map of the bitstreams in the displayBundle. This is used to
         //check if the bundle being cited is already in the display bundle.
         for (Bitstream bs : dBundle.getBitstreams()) {
-            displayMap.put(bs.getName(), bs);
+            displayMap.put(bitstreamService.getName(bs), bs);
         }
 
         //Determine if the preservation bundle exists and add it if we need to.
@@ -145,7 +146,7 @@ public class CitationPage extends AbstractCurationTask {
                 resourcePolicyService.removeAllPolicies(Curator.curationContext(), pBundle);
             } catch (AuthorizeException e) {
                 log.error("User not authorized to create bundle on item \""
-                              + item.getName() + "\": " + e.getMessage());
+                              + itemService.getName(item) + "\": " + e.getMessage());
             }
             bundles = itemService.getBundles(item, "ORIGINAL");
         }
@@ -166,7 +167,7 @@ public class CitationPage extends AbstractCurationTask {
                 if (citationDocument.canGenerateCitationVersion(Curator.curationContext(), bitstream)) {
                     this.resBuilder.append(item.getHandle())
                             .append(" - ")
-                            .append(bitstream.getName())
+                            .append(bitstreamService.getName(bitstream))
                             .append(" is citable.");
                     try {
                         //Create the cited document
@@ -204,7 +205,7 @@ public class CitationPage extends AbstractCurationTask {
                     //bitstream is not a document
                     this.resBuilder.append(item.getHandle())
                             .append(" - ")
-                            .append(bitstream.getName())
+                            .append(bitstreamService.getName(bitstream))
                             .append(" is not citable.\n");
                     this.status = Curator.CURATE_SUCCESS;
                 }
@@ -245,21 +246,24 @@ public class CitationPage extends AbstractCurationTask {
         //Create an input stream form the temporary file
         //that is the cited document and create a
         //bitstream from it.
-        if (displayMap.containsKey(bitstream.getName())) {
-            bundleService.removeBitstream(context, dBundle, displayMap.get(bitstream.getName()));
+        if (displayMap.containsKey(bitstreamService.getName(bitstream))) {
+            bundleService.removeBitstream(context, dBundle, displayMap.get(bitstreamService.getName(bitstream)));
         }
         Bitstream citedBitstream = bitstreamService.create(context, dBundle, citedDoc);
         citedDoc.close(); //Close up the temporary InputStream
 
         //Setup a good name for our bitstream and make
         //it the same format as the source document.
-        citedBitstream.setName(context, bitstream.getName());
-        bitstreamService.setFormat(context, citedBitstream, bitstream.getFormat(Curator.curationContext()));
-        citedBitstream.setDescription(context, bitstream.getDescription());
-        displayMap.put(bitstream.getName(), citedBitstream);
+        BitstreamFormat format = bitstreamService.getFormat(Curator.curationContext(), bitstream);
+        String description = bitstreamService.getDescription(bitstream);
+
+        bitstreamService.setName(context, citedBitstream, bitstreamService.getName(bitstream));
+        bitstreamService.setFormat(context, citedBitstream, format);
+        bitstreamService.setDescription(context, citedBitstream, description);
+        displayMap.put(bitstreamService.getName(bitstream), citedBitstream);
         clonePolicies(context, bitstream, citedBitstream);
         this.resBuilder.append(" Added ")
-                .append(citedBitstream.getName())
+                .append(bitstreamService.getName(bitstream))
                 .append(" to the ")
                 .append(CitationPage.DISPLAY_BUNDLE_NAME)
                 .append(" bundle.\n");

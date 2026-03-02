@@ -61,6 +61,7 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.DetailType;
@@ -182,6 +183,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     private QAEventsDAO qaEventsDao;
 
     @Autowired
+    private EPersonService epersonService;
+
+    @Autowired
     private VersionHistoryService versionHistoryService;
 
     protected ItemServiceImpl() {
@@ -196,12 +200,12 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             primaryBitstream = originalBundles.get(0).getPrimaryBitstream();
         }
         if (primaryBitstream != null) {
-            if (primaryBitstream.getFormat(context).getMIMEType().equals("text/html")) {
+            if (bitstreamService.getFormat(context, primaryBitstream).getMIMEType().equals("text/html")) {
                 return null;
             }
 
             thumbBitstream = bitstreamService
-                .getBitstreamByName(item, "THUMBNAIL", primaryBitstream.getName() + ".jpg");
+                .getBitstreamByName(item, "THUMBNAIL", bitstreamService.getName(primaryBitstream) + ".jpg");
 
         } else {
             if (requireOriginal) {
@@ -453,12 +457,12 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public List<Bundle> getBundles(Item item, String name) throws SQLException {
+    public List<Bundle> getBundles(Item item, String name) {
         List<Bundle> matchingBundles = new ArrayList<>();
         // now only keep bundles with matching names
         List<Bundle> bunds = item.getBundles();
         for (Bundle bund : bunds) {
-            if (name.equals(bund.getName())) {
+            if (name.equals(bundleService.getName(bund))) {
                 matchingBundles.add(bund);
             }
         }
@@ -489,7 +493,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         context.addEvent(new Event(Event.ADD, Constants.ITEM, item.getID(),
             Constants.BUNDLE, bundle.getID(),
-            bundle.getName(), DetailType.DSO_NAME,
+            bundleService.getName(bundle), DetailType.DSO_NAME,
             getIdentifiers(context, item)));
     }
 
@@ -503,7 +507,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             + item.getID() + ",bundle_id=" + bundle.getID()));
 
         context.addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(),
-            Constants.BUNDLE, bundle.getID(), bundle.getName(), DetailType.DSO_NAME,
+            Constants.BUNDLE, bundle.getID(), bundleService.getName(bundle), DetailType.DSO_NAME,
             getIdentifiers(context, item)));
 
         bundleService.delete(context, bundle);
@@ -540,7 +544,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             List<Bitstream> bitstreams = bund.getBitstreams();
 
             for (Bitstream bitstream : bitstreams) {
-                if (!bitstream.getFormat(context).isInternal()) {
+                if (!bitstreamService.getFormat(context, bitstream).isInternal()) {
                     // Bitstream is not of an internal format
                     bitstreamList.add(bitstream);
                 }
@@ -622,7 +626,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             List<Bitstream> bits = bund.getBitstreams();
 
             for (Bitstream bit : bits) {
-                BitstreamFormat bft = bit.getFormat(context);
+                BitstreamFormat bft = bitstreamService.getFormat(context, bit);
 
                 if (bft.getID() == licensetype) {
                     removethisbundle = true;
@@ -717,14 +721,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // Build some provenance data while we're at it.
         StringBuilder prov = new StringBuilder();
 
-        prov.append("Item withdrawn by ").append(e.getFullName()).append(" (")
+        prov.append("Item withdrawn by ").append(epersonService.getFullName(e)).append(" (")
             .append(e.getEmail()).append(") on ").append(timestamp).append("\n")
             .append("Item was in collections:\n");
 
         List<Collection> colls = item.getCollections();
 
         for (Collection coll : colls) {
-            prov.append(coll.getName()).append(" (ID: ").append(coll.getID()).append(")\n");
+            prov.append(collectionService.getName(coll)).append(" (ID: ").append(coll.getID()).append(")\n");
         }
 
         // Set withdrawn flag. timestamp will be set; last_modified in update()
@@ -772,12 +776,20 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // bitstream checksums
         EPerson e = context.getCurrentUser();
         StringBuilder prov = new StringBuilder();
-        prov.append("Item reinstated by ").append(e.getFullName()).append(" (")
-            .append(e.getEmail()).append(") on ").append(timestamp).append("\n")
+        prov.append("Item reinstated by ")
+            .append(epersonService.getFullName(e))
+            .append(" (")
+            .append(e.getEmail())
+            .append(") on ")
+            .append(timestamp)
+            .append("\n")
             .append("Item was in collections:\n");
 
         for (Collection coll : colls) {
-            prov.append(coll.getName()).append(" (ID: ").append(coll.getID()).append(")\n");
+            prov.append(collectionService.getName(coll))
+                .append(" (ID: ")
+                .append(coll.getID())
+                .append(")\n");
         }
 
         // Clear withdrawn flag
@@ -927,7 +939,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             + item.getID() + ",bundle_id=" + b.getID()));
         context
             .addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(), Constants.BUNDLE, b.getID(),
-                b.getName(), DetailType.DSO_NAME));
+                bundleService.getName(b), DetailType.DSO_NAME));
     }
 
     protected void removeVersion(Context context, Item item) throws AuthorizeException, SQLException {
@@ -1567,7 +1579,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                     return true;
                 }
             }
-            log.debug("item(" + item.getID() + ") " + item.getName() + " is unlisted.");
+            log.debug("item(" + item.getID() + ") " + getName(item) + " is unlisted.");
             return false;
         } catch (SQLException e) {
             log.error(e.getMessage());

@@ -20,6 +20,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.contentreport.service.ContentReportService;
@@ -34,6 +35,8 @@ public class ContentReportServiceImpl implements ContentReportService {
 
     @Autowired
     protected ConfigurationService configurationService;
+    @Autowired
+    private CommunityService communityService;
     @Autowired
     private CollectionService collectionService;
     @Autowired
@@ -64,12 +67,12 @@ public class ContentReportServiceImpl implements ContentReportService {
             for (Collection collection : collections) {
                 FilteredCollection coll = new FilteredCollection();
                 coll.setHandle(collection.getHandle());
-                coll.setLabel(collection.getName());
+                coll.setLabel(collectionService.getName(collection));
                 Community community = collection.getCommunities().stream()
                         .findFirst()
                         .orElse(null);
                 if (community != null) {
-                    coll.setCommunityLabel(community.getName());
+                    coll.setCommunityLabel(communityService.getName(community));
                     coll.setCommunityHandle(community.getHandle());
                 }
                 colls.add(coll);

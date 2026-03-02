@@ -72,7 +72,7 @@ public class SimpleZipContentIngester extends AbstractSwordContentIngester {
             List<Bundle> bundles = item.getBundles();
             Bundle original = null;
             for (Bundle bundle : bundles) {
-                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+                if (Constants.CONTENT_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                     original = bundle;
                     break;
                 }
@@ -148,8 +148,8 @@ public class SimpleZipContentIngester extends AbstractSwordContentIngester {
                 Bitstream bs = bitstreamService.create(context, target, stream);
                 BitstreamFormat format = this
                     .getFormat(context, entryName);
-                bs.setFormat(context, format);
-                bs.setName(context, entryName);
+                bitstreamService.setFormat(context, bs, format);
+                bitstreamService.setName(context, bs, entryName);
                 bitstreamService.update(context, bs);
                 derivedResources.add(bs);
             }
@@ -182,7 +182,7 @@ public class SimpleZipContentIngester extends AbstractSwordContentIngester {
             List<Bundle> bundles = item.getBundles();
             Bundle original = null;
             for (Bundle bundle : bundles) {
-                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+                if (Constants.CONTENT_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                     original = bundle;
                     break;
                 }

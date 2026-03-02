@@ -388,10 +388,11 @@ public class SwordUrlManager {
 
             if (handle != null && !"".equals(handle)) {
                 bsLink = bsLink + "/bitstream/" + handle + "/" +
-                    bitstream.getSequenceID() + "/" + URLEncoder.encode(bitstream.getName(), StandardCharsets.UTF_8);
+                    bitstream.getSequenceID() + "/" +
+                    URLEncoder.encode(bitstreamService.getName(bitstream), StandardCharsets.UTF_8);
             } else {
                 bsLink = bsLink + "/retrieve/" + bitstream.getID() + "/" +
-                    URLEncoder.encode(bitstream.getName(), StandardCharsets.UTF_8);
+                    URLEncoder.encode(bitstreamService.getName(bitstream), StandardCharsets.UTF_8);
             }
 
             return bsLink;
@@ -403,7 +404,7 @@ public class SwordUrlManager {
     public String getActionableBitstreamUrl(Bitstream bitstream)
         throws DSpaceSwordException {
         return this.getSwordBaseUrl() + "/edit-media/bitstream/" +
-            bitstream.getID() + "/" + URLEncoder.encode(bitstream.getName(), StandardCharsets.UTF_8);
+            bitstream.getID() + "/" + URLEncoder.encode(bitstreamService.getName(bitstream), StandardCharsets.UTF_8);
     }
 
     public boolean isActionableBitstreamUrl(Context context, String url) {

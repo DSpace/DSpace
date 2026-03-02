@@ -1325,7 +1325,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", is(idRef.get())))
                              .andExpect(jsonPath("$.source", is(DSPACE_USERS_SOURCE)))
-                             .andExpect(jsonPath("$.title", is(publication.getName())))
+                             .andExpect(jsonPath("$.title", is(itemService.getName(publication))))
                              .andExpect(jsonPath("$.topic", is("REQUEST/WITHDRAWN")))
                              .andExpect(jsonPath("$.trust", is("1.000")))
                              .andExpect(jsonPath("$.status", is("PENDING")));
@@ -1391,7 +1391,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", is(idRef.get())))
                              .andExpect(jsonPath("$.source", is(DSPACE_USERS_SOURCE)))
-                             .andExpect(jsonPath("$.title", is(publication.getName())))
+                             .andExpect(jsonPath("$.title", is(itemService.getName(publication))))
                              .andExpect(jsonPath("$.topic", is("REQUEST/REINSTATE")))
                              .andExpect(jsonPath("$.trust", is("1.000")))
                              .andExpect(jsonPath("$.status", is("PENDING")));
@@ -1473,7 +1473,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", is(idRef.get())))
                              .andExpect(jsonPath("$.source", is(DSPACE_USERS_SOURCE)))
-                             .andExpect(jsonPath("$.title", is(publication.getName())))
+                             .andExpect(jsonPath("$.title", is(itemService.getName(publication))))
                              .andExpect(jsonPath("$.topic", is("REQUEST/WITHDRAWN")))
                              .andExpect(jsonPath("$.trust", is("1.000")))
                              .andExpect(jsonPath("$.status", is("PENDING")));
