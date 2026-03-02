@@ -316,8 +316,8 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                         VocabularyMatcher.matchVocabularyEntry("Американська (USA)", "en_US", "vocabularyEntry")
                         )))
                 .andExpect(jsonPath("$._embedded.entries[*].authority").doesNotExist())
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)))
-                .andExpect(jsonPath("$.page.totalPages", Matchers.is(6)))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(13)))
+                .andExpect(jsonPath("$.page.totalPages", Matchers.is(7)))
                 .andExpect(jsonPath("$.page.size", Matchers.is(2)));
 
         configurationService.setProperty("default.locale","en");
