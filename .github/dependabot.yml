@@ -144,6 +144,10 @@ updates:
       # Ignore updates for jboss-logging because it is a "convergence only" dependency
       # that we do not use directly (see comments in pom.xml).
       - dependency-name: "org.jboss.logging:*"
+      # Don't try to update antlr4-runtime because it is a transitive dependency
+      # used by Hibernate and Solr. The version is pinned in pom.xml and should
+      # only be updated when required. See: https://github.com/DSpace/DSpace/pull/11989
+      - dependency-name: "org.antlr:antlr4-runtime"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -299,6 +303,10 @@ updates:
       # Ignore updates for jboss-logging because it is a "convergence only" dependency
       # that we do not use directly (see comments in pom.xml).
       - dependency-name: "org.jboss.logging:*"
+      # Don't try to update antlr4-runtime because it is a transitive dependency
+      # used by Hibernate and Solr. The version is pinned in pom.xml and should
+      # only be updated when required. See: https://github.com/DSpace/DSpace/pull/11989
+      - dependency-name: "org.antlr:antlr4-runtime"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
@@ -455,6 +463,10 @@ updates:
       # Ignore updates for jboss-logging because it is a "convergence only" dependency
       # that we do not use directly (see comments in pom.xml).
       - dependency-name: "org.jboss.logging:*"
+      # Don't try to update antlr4-runtime because it is a transitive dependency
+      # used by Hibernate and Solr. The version is pinned in pom.xml and should
+      # only be updated when required. See: https://github.com/DSpace/DSpace/pull/11989
+      - dependency-name: "org.antlr:antlr4-runtime"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
