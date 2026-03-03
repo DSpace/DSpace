@@ -1821,13 +1821,77 @@
 
         </value-pairs>
         <value-pairs value-pairs-name="eixoTematico" dc-term="type">
-            <pair><displayed-value>Busca ativa</displayed-value><stored-value>Busca ativa</stored-value></pair>
-            <pair><displayed-value>Educação de Jovens e Adultos (EJA)</displayed-value><stored-value>Educação de Jovens e Adultos (EJA)</stored-value></pair>
-            <pair><displayed-value>Desenvolvimento Agrário</displayed-value><stored-value>Desenvolvimento Agrário</stored-value></pair>
-            <pair><displayed-value>Popularização da Ciência</displayed-value><stored-value>Popularização da Ciência</stored-value></pair>
-            <pair><displayed-value>Saúde Coletiva</displayed-value><stored-value>Saúde Coletiva</stored-value></pair>
-            <pair><displayed-value>Valorização do Patrimônio Cultural, Histórico e Natural</displayed-value><stored-value>Valorização do Patrimônio Cultural, Histórico e Natural</stored-value></pair>
-            <pair><displayed-value>Educação para a Emancipação</displayed-value><stored-value>Educação para a Emancipação</stored-value></pair>
+
+            <pair>
+                <displayed-value>Eixo 1 – Educação para a Emancipação</displayed-value>
+                <stored-value>Eixo 1 – Educação para a Emancipação</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Eixo 2 – Valorização do Patrimônio Cultural, Histórico e Natural</displayed-value>
+                <stored-value>Eixo 2 – Valorização do Patrimônio Cultural, Histórico e Natural</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Eixo 3 – Saúde Coletiva</displayed-value>
+                <stored-value>Eixo 3 – Saúde Coletiva</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Eixo 4 – Popularização da Ciência</displayed-value>
+                <stored-value>Eixo 4 – Popularização da Ciência</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Eixo 5 – Desenvolvimento Agrário</displayed-value>
+                <stored-value>Eixo 5 – Desenvolvimento Agrário</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Eixo 6 – Meio Ambiente e Mudanças Climáticas</displayed-value>
+                <stored-value>Eixo 6 – Meio Ambiente e Mudanças Climáticas</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Eixo 7 – Busca Ativa</displayed-value>
+                <stored-value>Eixo 7 – Busca Ativa</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Eixo 8 – Primeira Infância e Garantia de Direitos</displayed-value>
+                <stored-value>Eixo 8 – Primeira Infância e Garantia de Direitos</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Eixo 9 – Recomposição das Aprendizagens</displayed-value>
+                <stored-value>Eixo 9 – Recomposição das Aprendizagens</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Eixo 10 – Saúde na Escola</displayed-value>
+                <stored-value>Eixo 10 – Saúde na Escola</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Eixo 11 – Equipamentos Intersetoriais</displayed-value>
+                <stored-value>Eixo 11 – Equipamentos Intersetoriais</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Eixo 12 – Segurança no Ambiente Escolar</displayed-value>
+                <stored-value>Eixo 12 – Segurança no Ambiente Escolar</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Eixo 13 – Educação de Jovens e Adultos (EJA)</displayed-value>
+                <stored-value>Eixo 13 – Educação de Jovens e Adultos (EJA)</stored-value>
+            </pair>
+
+            <pair>
+                <displayed-value>Eixo 14 – Políticas de Educação Integral</displayed-value>
+                <stored-value>Eixo 14 – Políticas de Educação Integral</stored-value>
+            </pair>
+
         </value-pairs>
 
         <value-pairs value-pairs-name="esferas" dc-term="type">
