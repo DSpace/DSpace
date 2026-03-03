@@ -22,9 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Service that handle the GeoIP database file.
  *
- * <p>By default, this bean validates the GeoLite2-City database at startup
- * and prevents DSpace from starting if it is missing or unreadable.
- * Set {@code usage-statistics.geo.enabled = false} to skip this check.</p>
+ * <p>By default ({@code usage-statistics.geo.enabled = false}), a warning is
+ * logged at startup when the GeoLite2-City database is missing but DSpace
+ * continues to start normally. Set {@code usage-statistics.geo.enabled = true}
+ * to enable strict mode, which prevents DSpace from starting if the database
+ * is missing or unreadable.</p>
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
@@ -38,7 +40,7 @@ public class GeoIpService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        boolean geoEnabled = configurationService.getBooleanProperty("usage-statistics.geo.enabled", true);
+        boolean geoEnabled = configurationService.getBooleanProperty("usage-statistics.geo.enabled", false);
         if (!geoEnabled) {
             log.warn("GeoIP location data is disabled (usage-statistics.geo.enabled = false). "
                 + "Statistics will be recorded without location data.");
