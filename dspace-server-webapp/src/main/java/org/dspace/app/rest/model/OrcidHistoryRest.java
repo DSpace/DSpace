@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -35,7 +35,7 @@ public class OrcidHistoryRest extends BaseObjectRest<Integer> {
 
     private String putCode;
 
-    private Date timestamp;
+    private Instant timestamp;
 
     private String responseMessage;
 
@@ -94,11 +94,11 @@ public class OrcidHistoryRest extends BaseObjectRest<Integer> {
         this.putCode = putCode;
     }
 
-    public Date getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
 

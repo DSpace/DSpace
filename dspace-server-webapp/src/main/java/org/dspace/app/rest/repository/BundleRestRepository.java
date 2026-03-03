@@ -69,6 +69,9 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     @Autowired
     private BitstreamFormatService bitstreamFormatService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     public BundleRestRepository(BundleService dsoService) {
         super(dsoService);
         this.bundleService = dsoService;
@@ -168,7 +171,6 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
 
         Bitstream bitstream = null;
         if (StringUtils.isNotBlank(properties)) {
-            ObjectMapper mapper = new ObjectMapper();
             BitstreamRest bitstreamRest = null;
             try {
                 bitstreamRest = mapper.readValue(properties, BitstreamRest.class);

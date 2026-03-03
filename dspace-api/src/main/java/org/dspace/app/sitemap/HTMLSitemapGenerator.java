@@ -10,7 +10,7 @@ package org.dspace.app.sitemap;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Class for generating HTML "sitemaps" which contain links to various pages in
@@ -77,7 +77,7 @@ public class HTMLSitemapGenerator extends AbstractGenerator {
     }
 
     @Override
-    public String getURLText(String url, Date lastMod) {
+    public String getURLText(String url, Instant lastMod) {
         StringBuffer urlText = new StringBuffer();
 
         urlText.append("<li><a href=\"").append(url).append("\">").append(url)

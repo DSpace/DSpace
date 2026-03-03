@@ -7,11 +7,11 @@
  */
 package org.dspace.statistics;
 
-import static org.dspace.statistics.SolrLoggerServiceImpl.DATE_FORMAT_8601;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -19,9 +19,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Date;
+import java.time.Instant;
 
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -29,8 +28,14 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -161,25 +166,25 @@ public class SolrLoggerServiceImplIT
         doc.setField(F_IP, NOT_BOT_IP);
         doc.setField(F_DNS, NOT_BOT_DNS);
         doc.setField(F_AGENT, NOT_BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         client.add(doc);
 
         doc.setField(F_IP, BOT_IP);
         doc.setField(F_DNS, BOT_DNS);
         doc.setField(F_AGENT, NOT_BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         client.add(doc);
 
         doc.setField(F_IP, NOT_BOT_IP);
         doc.setField(F_DNS, NOT_BOT_DNS);
         doc.setField(F_AGENT, BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         client.add(doc);
 
         doc.setField(F_IP, BOT_IP);
         doc.setField(F_DNS, BOT_DNS);
         doc.setField(F_AGENT, BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         client.add(doc);
 
         client.commit(true, true);
@@ -259,28 +264,28 @@ public class SolrLoggerServiceImplIT
         doc.setField(F_IP, NOT_BOT_IP);
         doc.setField(F_DNS, NOT_BOT_DNS);
         doc.setField(F_AGENT, NOT_BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         doc.setField(F_IS_BOT, Boolean.FALSE.toString());
         client.add(doc);
 
         doc.setField(F_IP, BOT_IP);
         doc.setField(F_DNS, BOT_DNS);
         doc.setField(F_AGENT, NOT_BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         doc.setField(F_IS_BOT, Boolean.TRUE.toString());
         client.add(doc);
 
         doc.setField(F_IP, NOT_BOT_IP);
         doc.setField(F_DNS, NOT_BOT_DNS);
         doc.setField(F_AGENT, BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         doc.setField(F_IS_BOT, Boolean.TRUE.toString());
         client.add(doc);
 
         doc.setField(F_IP, BOT_IP);
         doc.setField(F_DNS, BOT_DNS);
         doc.setField(F_AGENT, BOT_AGENT);
-        doc.setField(F_TIME, DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc.setField(F_TIME, Instant.now().toString());
         doc.setField(F_IS_BOT, Boolean.TRUE.toString());
         client.add(doc);
 
@@ -304,5 +309,57 @@ public class SolrLoggerServiceImplIT
                     false, isBot);
         }
         assertEquals("Wrong number of documents remaining --", 1, nDocs);
+    }
+
+    @Test
+    public void testPostViewShouldNotLogIgnoredBundles() throws Exception {
+        ContentServiceFactory csf = ContentServiceFactory.getInstance();
+        MockSolrLoggerServiceImpl solrLoggerService = DSpaceServicesFactory.getInstance()
+                .getServiceManager()
+                .getServiceByName("solrLoggerService", MockSolrLoggerServiceImpl.class);
+        solrLoggerService.bitstreamService = csf.getBitstreamService();
+        solrLoggerService.contentServiceFactory = csf;
+        solrLoggerService.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        solrLoggerService.clientInfoService = CoreServiceFactory.getInstance().getClientInfoService();
+        solrLoggerService.afterPropertiesSet();
+        SolrStatisticsCore solrStatisticsCore = DSpaceServicesFactory.getInstance()
+                .getServiceManager()
+                .getServiceByName(SolrStatisticsCore.class.getName(), MockSolrStatisticsCore.class);
+
+        solrStatisticsCore.getSolr().deleteByQuery("*:*");
+        solrStatisticsCore.getSolr().commit();
+
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder
+                .createCommunity(context)
+                .withName("Test Community").build();
+        Collection collection = CollectionBuilder
+                .createCollection(context, community)
+                .withName("Test Collection").build();
+        Item item = ItemBuilder
+                .createItem(context, collection)
+                .withTitle("Test Item for Logging").build();
+        Bitstream originalBitstream = BitstreamBuilder
+                .createBitstream(context, item, new ByteArrayInputStream("original content".getBytes()), "ORIGINAL")
+                .withName("original.txt")
+                .build();
+        Bitstream thumbnailBitstream = BitstreamBuilder
+                .createBitstream(context, item, new ByteArrayInputStream("thumbnail content".getBytes()), "THUMBNAIL")
+                .withName("thumbnail.jpg")
+                .build();
+
+        context.restoreAuthSystemState();
+        solrLoggerService.postView(originalBitstream, null, eperson);
+        solrLoggerService.postView(thumbnailBitstream, null, eperson);
+
+        solrStatisticsCore.getSolr().commit();
+
+        SolrQuery thumbnailQuery = new SolrQuery("id:" + thumbnailBitstream.getID().toString());
+        QueryResponse thumbnailResponse = solrStatisticsCore.getSolr().query(thumbnailQuery);
+        assertEquals("Thumbnail bundle should NOT be logged", 0, thumbnailResponse.getResults().getNumFound());
+
+        SolrQuery originalQuery = new SolrQuery("id:" + originalBitstream.getID().toString());
+        QueryResponse originalResponse = solrStatisticsCore.getSolr().query(originalQuery);
+        assertEquals("ORIGINAL bundle SHOULD be logged", 1, originalResponse.getResults().getNumFound());
     }
 }

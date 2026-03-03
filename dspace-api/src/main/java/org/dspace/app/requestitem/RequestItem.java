@@ -7,7 +7,7 @@
  */
 package org.dspace.app.requestitem;
 
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,8 +19,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -63,19 +61,22 @@ public class RequestItem implements ReloadableEntity<Integer> {
     private boolean allfiles;
 
     @Column(name = "decision_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date decision_date = null;
+    private Instant decision_date = null;
 
     @Column(name = "expires")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date expires = null;
+    private Instant expires = null;
 
     @Column(name = "request_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date request_date = null;
+    private Instant request_date = null;
 
     @Column(name = "accept_request")
     private boolean accept_request;
+
+    @Column(name = "access_token", unique = true, length = 48)
+    private String access_token = null;
+
+    @Column(name = "access_expiry")
+    private Instant access_expiry = null;
 
     /**
      * Protected constructor, create object using:
@@ -90,7 +91,7 @@ public class RequestItem implements ReloadableEntity<Integer> {
         return requestitem_id;
     }
 
-    void setAllfiles(boolean allfiles) {
+    public void setAllfiles(boolean allfiles) {
         this.allfiles = allfiles;
     }
 
@@ -139,7 +140,8 @@ public class RequestItem implements ReloadableEntity<Integer> {
     }
 
     /**
-     * @return a unique request identifier which can be emailed.
+     * @return a unique request identifier which can be emailed to the *approver* of the request.
+     * This is not the same as the access token, which is used by the requester to access the item after approval.
      */
     public String getToken() {
         return token;
@@ -161,11 +163,11 @@ public class RequestItem implements ReloadableEntity<Integer> {
         return bitstream;
     }
 
-    public Date getDecision_date() {
+    public Instant getDecision_date() {
         return decision_date;
     }
 
-    public void setDecision_date(Date decision_date) {
+    public void setDecision_date(Instant decision_date) {
         this.decision_date = decision_date;
     }
 
@@ -177,19 +179,53 @@ public class RequestItem implements ReloadableEntity<Integer> {
         this.accept_request = accept_request;
     }
 
-    public Date getExpires() {
+    public Instant getExpires() {
         return expires;
     }
 
-    void setExpires(Date expires) {
+    void setExpires(Instant expires) {
         this.expires = expires;
     }
 
-    public Date getRequest_date() {
+    public Instant getRequest_date() {
         return request_date;
     }
 
-    void setRequest_date(Date request_date) {
+    void setRequest_date(Instant request_date) {
         this.request_date = request_date;
+    }
+
+    /**
+     * @return A unique token to be used by the requester when granted access to the resource, which
+     * can be emailed upon approval
+     */
+    public String getAccess_token() {
+        return access_token;
+    }
+
+    public void setAccess_token(String access_token) {
+        this.access_token = access_token;
+    }
+
+    /**
+     * @return The date and time when the access token expires.
+     */
+    public Instant getAccess_expiry() {
+        return access_expiry;
+    }
+    public void setAccess_expiry(Instant access_expiry) {
+        this.access_expiry = access_expiry;
+    }
+
+    /**
+     * Sanitize personal information and the approval token, to be used when returning a RequestItem
+     * to Angular, especially for users clicking on the secure link
+     */
+    public void sanitizePersonalData() {
+        setReqEmail("sanitized");
+        setReqName("sanitized");
+        setReqMessage("sanitized");
+        // Even though [approval] token is not a name, it can be used to access the original object
+        setToken("sanitized");
     }
 }

@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
@@ -37,10 +38,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -88,8 +88,10 @@ import org.dspace.content.MetadataFieldName;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -97,6 +99,8 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.supervision.SupervisionOrder;
+import org.dspace.validation.CclicenseValidator;
+import org.dspace.validation.LicenseValidator;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -111,12 +115,19 @@ import org.springframework.test.web.servlet.MvcResult;
  */
 public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    public static final String LICENSE_ERROR_MESSAGE_PATH =
+        "$.errors[?(@.message=='" + LicenseValidator.ERROR_VALIDATION_LICENSEREQUIRED + "')]";
+    public static final String CCLICENSE_ERROR_MESSAGE_PATH =
+        "$.errors[?(@.message=='" + CclicenseValidator.ERROR_VALIDATION_CCLICENSEREQUIRED + "')]";
     @Autowired
     private CollectionService cs;
     @Autowired
     private ItemService itemService;
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     private GroupService groupService;
 
@@ -2618,6 +2629,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                (witem, "Workspace Item 1", "2019-01-01", "ExtraEntry"))));
     }
 
+    @Test
     public void patchReplaceMetadataOnItemStillInSubmissionTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -3794,9 +3806,18 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                                contains( hasJsonPath("$.paths",
-                                    contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(
+                                jsonPath(
+
+                                    LICENSE_ERROR_MESSAGE_PATH,
+                                    contains(
+                                        hasJsonPath(
+                                            "$.paths",
+                                            contains(hasJsonPath("$", is("/sections/license")))
+                                        )
+                                    )
+                                )
+                            )
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3806,9 +3827,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                    contains( hasJsonPath("$.paths",
-                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(hasJsonPath("$.paths", contains(
+                                                    hasJsonPath("$", is("/sections/license")))))))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3824,9 +3845,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                                    contains( hasJsonPath("$.paths",
-                                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(
+                                                    hasJsonPath("$.paths",
+                                                                contains(hasJsonPath("$", is("/sections/license"))))
+                                                )
+                            ))
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3836,9 +3860,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem2.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                    contains( hasJsonPath("$.paths",
-                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(hasJsonPath("$.paths", contains(
+                                                    hasJsonPath("$", is("/sections/license")))))))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3854,9 +3878,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                                contains( hasJsonPath("$.paths",
-                                    contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(
+                                                    hasJsonPath("$.paths",
+                                                                contains(hasJsonPath("$", is("/sections/license")))
+                                                    )
+                                                )
+                            ))
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3866,9 +3894,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem3.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                    contains( hasJsonPath("$.paths",
-                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(
+                                                    hasJsonPath("$.paths",
+                                                                contains(hasJsonPath("$", is("/sections/license")))
+                                                    )
+                                                )
+                            ))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3884,10 +3916,14 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(
-                                jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                                    contains( hasJsonPath("$.paths",
-                                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(
+                                                    hasJsonPath(
+                                                        "$.paths",
+                                                        contains(hasJsonPath("$", is("/sections/license")))
+                                                    )
+                                                )
+                            ))
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3897,9 +3933,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem4.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                contains( hasJsonPath("$.paths",
-                    contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(hasJsonPath("$.paths", contains(
+                                                    hasJsonPath("$", is("/sections/license")))))))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -4061,10 +4097,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = new Date();
-        String startDateStr = dateFmt.format(startDate);
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        String startDateStr = dateFmt.format(LocalDate.now());
 
         // create a list of values to use in add operation
         List<Operation> addAccessCondition = new ArrayList<>();
@@ -4342,8 +4377,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         Integer workspaceItemId = null;
         try {
-
-        ObjectMapper mapper = new ObjectMapper();
         // You have to be an admin to create an Item from an ExternalDataObject
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
@@ -4416,7 +4449,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
                                           + col1.getID().toString())
@@ -4886,7 +4918,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/extraction-test")
                 .withName("Collection 1").build();
-        String authToken = getAuthToken(admin.getEmail(), password);
 
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                 .build();
@@ -4894,6 +4925,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withTitle("This is a test title")
                 .build();
         context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
 
         // try to add the pmid identifier
         List<Operation> addId = new ArrayList<Operation>();
@@ -5675,10 +5708,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date endDate = new Date();
-        String endDateStr = dateFmt.format(endDate);
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        String endDateStr = dateFmt.format(LocalDate.now());
 
         // prepare patch body
         Map<String, String> accessCondition = new HashMap<>();
@@ -5723,12 +5755,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date endDate = DateUtils.addDays(
-            // lease ends 1 day too late
-            DateUtils.addMonths(new Date(), 6), 1
-        );
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        // lease ends 1 day too late
+        LocalDate endDate = LocalDate.now().plusMonths(6).plusDays(1);
         String endDateStr = dateFmt.format(endDate);
 
         // prepare patch body
@@ -5769,10 +5799,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = new Date();
-        String startDateStr = dateFmt.format(startDate);
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        String startDateStr = dateFmt.format(LocalDate.now());
 
         // prepare patch body
         Map<String, String> accessCondition = new HashMap<>();
@@ -5817,12 +5846,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = DateUtils.addDays(
-            // embargo ends 1 day too late
-            DateUtils.addMonths(new Date(), 36), 1
-        );
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        // embargo ends 1 day too late
+        LocalDate startDate = LocalDate.now().plusMonths(36).plusDays(1);
         String startDateStr = dateFmt.format(startDate);
 
         // prepare patch body
@@ -5863,10 +5890,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = new Date();
-        String startDateStr = dateFmt.format(startDate);
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        String startDateStr = dateFmt.format(LocalDate.now());
 
         // prepare patch body
         Map<String, String> accessCondition = new HashMap<>();
@@ -5929,6 +5955,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
     }
 
+    @Test
     public void deleteWorkspaceItemWithMinRelationshipsTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -7151,19 +7178,13 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                      .withName("administrator")
                      .build();
 
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, 2020);
-        calendar.set(Calendar.MONTH, 1);
-        calendar.set(Calendar.DATE, 1);
-
-        Date data = calendar.getTime();
+        LocalDate date = LocalDate.of(2020, 2, 1);
 
         ResourcePolicyBuilder.createResourcePolicy(context, null, embargoedGroup1)
                              .withDspaceObject(witem.getItem())
                              .withPolicyType(TYPE_CUSTOM)
                              .withName("embargoed")
-                             .withStartDate(data)
+                             .withStartDate(date)
                              .build();
 
         context.restoreAuthSystemState();
@@ -7490,19 +7511,13 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                              .withName("openaccess")
                              .build();
 
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, 2020);
-        calendar.set(Calendar.MONTH, 1);
-        calendar.set(Calendar.DATE, 1);
-
-        Date data = calendar.getTime();
+        LocalDate date = LocalDate.of(2020, 2, 1);
 
         ResourcePolicyBuilder.createResourcePolicy(context, null, embargoedGroup1)
                              .withDspaceObject(witem.getItem())
                              .withPolicyType(TYPE_CUSTOM)
                              .withName("embargo")
-                             .withStartDate(data)
+                             .withStartDate(date)
                              .build();
 
         context.restoreAuthSystemState();
@@ -7983,6 +7998,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
             )));
     }
 
+    @Test
     public void verifyBitstreamPolicyNotDuplicatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -8133,8 +8149,6 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
     public void sherpaPolicySectionCacheTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
-
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
@@ -8168,7 +8182,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        Date date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+        Instant date = Instant.parse(retrievalTime.get());
 
         // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -8184,9 +8198,9 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime2.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        Date date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
+        Instant date2 = Instant.parse(retrievalTime2.get());
 
-        assertTrue(date.equals(date2));
+        assertEquals(date, date2);
 
         // create a list of values to use in add operation
         List<Operation> operations = new ArrayList<>();
@@ -8209,9 +8223,9 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+        date = Instant.parse(retrievalTime.get());
 
-        assertTrue(date.after(date2));
+        assertTrue(date.isAfter(date2));
 
         // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -8227,15 +8241,13 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime2.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
-        assertTrue(date.equals(date2));
+        date2 = Instant.parse(retrievalTime2.get());
+        assertEquals(date, date2);
     }
 
     @Test
     public void sherpaPolicySectionWithWrongIssnCacheTest() throws Exception {
         context.turnOffAuthorisationSystem();
-
-        String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
@@ -8268,7 +8280,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        Date date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+        Instant date = Instant.parse(retrievalTime.get());
 
         // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -8282,9 +8294,9 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime2.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        Date date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
+        Instant date2 = Instant.parse(retrievalTime2.get());
 
-        assertTrue(date.equals(date2));
+        assertEquals(date, date2);
 
         // create a list of values to use in add operation
         List<Operation> operations = new ArrayList<>();
@@ -8305,9 +8317,9 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+        date = Instant.parse(retrievalTime.get());
 
-        assertTrue(date.after(date2));
+        assertTrue(date.isAfter(date2));
 
         // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -8321,8 +8333,8 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime2.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
-        assertTrue(date.equals(date2));
+        date2 = Instant.parse(retrievalTime2.get());
+        assertEquals(date, date2);
     }
 
     @Test
@@ -9818,6 +9830,9 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                     .andExpect(status().isCreated())
                     // cclicense is required
+                                .andExpect(jsonPath(CCLICENSE_ERROR_MESSAGE_PATH,
+                                                    contains(hasJsonPath("$.paths", contains(
+                                                        hasJsonPath("$", is("/sections/cclicense")))))))
                     .andExpect(jsonPath("$.errors[?(@.message=='error.validation.cclicense.required')]",
                             contains(
                                     hasJsonPath("$.paths", contains(
@@ -9827,5 +9842,206 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
         } finally {
             WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
         }
+    }
+
+    @Test
+    public void enforceRequiredRelationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+
+        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                "isPublicationOfAuthor", 1, null, 0,
+                null).withCopyToLeft(false).withCopyToRight(true).build();
+
+        isAuthorOfPublication.setTilted(RelationshipType.Tilted.NONE);
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+            .withEntityType("Person").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity, "123456789/enforced-relation")
+            .withName("Collection 2")
+            .withEntityType("Publication").build();
+
+        Item author = ItemBuilder.createItem(context, col1)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withPersonIdentifierLastName("Smith")
+            .withPersonIdentifierFirstName("Donald")
+            .build();
+
+        // two workspace items. Only one of them has the required relationship.
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+
+        RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+
+        Relationship relationship1 = relationshipService.create(
+            context,
+            workspaceItem.getItem(),
+            author,
+            isAuthorOfPublication,
+            0, 0,
+            "isAuthorOfPublication",
+            "isPublicationOfAuthor"
+        );
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        // try to deposit the items. One should fail
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isCreated());
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem2.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void enforceRequiredRelationTiltedRightTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+
+        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                "isPublicationOfAuthor", 1, null, 0,
+                null).withCopyToLeft(false).withCopyToRight(true).build();
+
+        isAuthorOfPublication.setTilted(RelationshipType.Tilted.RIGHT);
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+            .withEntityType("Person").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity, "123456789/enforced-relation")
+            .withName("Collection 2")
+            .withEntityType("Publication").build();
+
+        Item author = ItemBuilder.createItem(context, col1)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withPersonIdentifierLastName("Smith")
+            .withPersonIdentifierFirstName("Donald")
+            .build();
+
+        // two workspace items. Only one of them has the required relationship.
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+
+        RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+
+        Relationship relationship1 = relationshipService.create(
+            context,
+            workspaceItem.getItem(),
+            author,
+            isAuthorOfPublication,
+            0, 0,
+            "isAuthorOfPublication",
+            "isPublicationOfAuthor"
+        );
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        // try to deposit the items. One should fail
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isCreated());
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem2.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void enforceRequiredRelationTiltedLeftTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+
+        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                "isPublicationOfAuthor", 1, null, 0,
+                null).withCopyToLeft(false).withCopyToRight(true).build();
+
+        isAuthorOfPublication.setTilted(RelationshipType.Tilted.LEFT);
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+            .withEntityType("Person").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity, "123456789/enforced-relation")
+            .withName("Collection 2")
+            .withEntityType("Publication").build();
+
+        Item author = ItemBuilder.createItem(context, col1)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withPersonIdentifierLastName("Smith")
+            .withPersonIdentifierFirstName("Donald")
+            .build();
+
+        // two workspace items. Only one of them has the required relationship.
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+
+        RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+
+        Relationship relationship1 = relationshipService.create(
+            context,
+            workspaceItem.getItem(),
+            author,
+            isAuthorOfPublication,
+            0, 0,
+            "isAuthorOfPublication",
+            "isPublicationOfAuthor"
+        );
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        // try to deposit the items. One should fail
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isCreated());
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem2.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isUnprocessableEntity());
     }
 }

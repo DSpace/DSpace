@@ -68,10 +68,10 @@ public class StatisticsBSAdapter {
         switch (visitType) {
             case ITEM_VISITS:
                 return solrLoggerService
-                    .queryTotal("type: " + Constants.ITEM + " AND id: " + item.getID(), resolveFilterQueries(), 0)
+                    .queryTotal("type:" + Constants.ITEM + " AND id:" + item.getID(), resolveFilterQueries(), 0)
                     .getCount();
             case BITSTREAM_VISITS:
-                return solrLoggerService.queryTotal("type: " + Constants.BITSTREAM + " AND owningItem: " + item.getID(),
+                return solrLoggerService.queryTotal("type:" + Constants.BITSTREAM + " AND owningItem:" + item.getID(),
                                                     resolveFilterQueries(), 0).getCount();
             case TOTAL_VISITS:
                 return getNumberOfVisits(ITEM_VISITS, item) + getNumberOfVisits(BITSTREAM_VISITS, item);

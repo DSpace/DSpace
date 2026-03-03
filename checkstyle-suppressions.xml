@@ -7,4 +7,5 @@
     <!-- TODO: We should have these turned on. But, currently there's a known bug with indentation checks
          on JMockIt Expectations blocks and similar. See https://github.com/checkstyle/checkstyle/issues/3739 -->
     <suppress checks="Indentation" files="src[/\\]test[/\\]java"/>
+    <suppress checks="Regexp" files="DSpaceHttpClientFactory\.java"/>
 </suppressions>

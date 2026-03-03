@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
@@ -52,11 +52,11 @@ public class Step implements BeanNameAware {
      */
     public WorkflowActionConfig getActionConfig(String actionID) throws WorkflowConfigurationException {
         // First check the userSelectionMethod as this is not a regular "action"
-        if (userSelectionMethod != null && StringUtils.equals(userSelectionMethod.getId(), actionID)) {
+        if (userSelectionMethod != null && Strings.CS.equals(userSelectionMethod.getId(), actionID)) {
             return userSelectionMethod;
         }
         for (WorkflowActionConfig actionConfig : actions) {
-            if (StringUtils.equals(actionConfig.getId(), actionID)) {
+            if (Strings.CS.equals(actionConfig.getId(), actionID)) {
                 return actionConfig;
             }
         }

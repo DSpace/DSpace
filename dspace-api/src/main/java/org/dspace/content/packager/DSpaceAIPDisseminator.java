@@ -10,9 +10,9 @@ package org.dspace.content.packager;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import edu.harvard.hul.ois.mets.Agent;
@@ -137,7 +137,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
         // (Note: this only works for Items right now, as DSpace doesn't store a
         //  last modified date for Collections or Communities)
         if (disseminateParams.containsKey("updatedAfter") && dso.getType() == Constants.ITEM) {
-            Date afterDate = Utils.parseISO8601Date(disseminateParams.getProperty("updatedAfter"));
+            Instant afterDate = Utils.parseISO8601Date(disseminateParams.getProperty("updatedAfter"));
 
             //if null is returned, we couldn't parse the date!
             if (afterDate == null) {
@@ -148,7 +148,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
 
             //check when this item was last modified.
             Item i = (Item) dso;
-            if (i.getLastModified().after(afterDate)) {
+            if (i.getLastModified().isAfter(afterDate)) {
                 disseminate = true;
             } else {
                 disseminate = false;
@@ -207,7 +207,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
 
         // Add a LASTMODDATE for items
         if (dso.getType() == Constants.ITEM) {
-            metsHdr.setLASTMODDATE(((Item) dso).getLastModified());
+            metsHdr.setLASTMODDATE(java.util.Date.from(((Item) dso).getLastModified()));
         }
 
         // Agent Custodian - name custodian, the DSpace Archive, by handle.

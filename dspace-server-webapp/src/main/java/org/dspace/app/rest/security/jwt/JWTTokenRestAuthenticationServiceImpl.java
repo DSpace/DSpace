@@ -83,6 +83,9 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             String token = loginJWTTokenHandler.createTokenForEPerson(context, request,
                                                                  authentication.getPreviousLoginDate());
             context.commit();
+            // Close the Context, because the DSpaceRequestContextFilter is not called for requests that trigger
+            // the authentication filters (filters that extend AbstractAuthenticationProcessingFilter)
+            context.close();
 
             // Add newly generated auth token to the response
             addTokenToResponse(request, response, token, addCookie);
@@ -245,7 +248,11 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         // which destroys this temporary auth cookie. So, the auth cookie only exists a few seconds.
         if (addCookie) {
             ResponseCookie cookie = ResponseCookie.from(AUTHORIZATION_COOKIE, token)
-                                                  .httpOnly(true).secure(true).sameSite("None").build();
+                                                  .httpOnly(true)
+                                                  .secure(true)
+                                                  .sameSite("None")
+                                                  .path("/server/api/authn")
+                                                  .build();
 
             // Write the cookie to the Set-Cookie header in order to send it
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

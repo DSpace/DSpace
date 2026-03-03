@@ -13,12 +13,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -132,12 +131,12 @@ public class ReportGenerator {
     /**
      * start date of this report
      */
-    private static Date startDate = null;
+    private static LocalDate startDate = null;
 
     /**
      * end date of this report
      */
-    private static Date endDate = null;
+    private static LocalDate endDate = null;
 
     /**
      * the time taken to build the aggregation file from the log
@@ -175,7 +174,7 @@ public class ReportGenerator {
     /**
      * process timing clock
      */
-    private static Calendar startTime = null;
+    private static Instant startTime = null;
 
     /**
      * a map from log file action to human readable action
@@ -326,7 +325,7 @@ public class ReportGenerator {
     public static void processReport(Context context, Report report,
                                      String myInput)
         throws Exception, SQLException {
-        startTime = new GregorianCalendar();
+        startTime = Instant.now();
 
         /** instantiate aggregators */
         actionAggregator = new HashMap<>();
@@ -492,8 +491,7 @@ public class ReportGenerator {
         report.addBlock(levels);
 
         // get the display processing time information
-        Calendar endTime = new GregorianCalendar();
-        long timeInMillis = (endTime.getTimeInMillis() - startTime.getTimeInMillis());
+        long timeInMillis = Instant.now().toEpochMilli() - startTime.toEpochMilli();
         int outputProcessTime = (int) (timeInMillis / 1000);
 
         // prepare the processing information statistics
@@ -666,7 +664,7 @@ public class ReportGenerator {
 
         // first initialise a date format object to do our date processing
         // if necessary
-        SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy");
 
         // FIXME: although this works, it is not very elegant
         // loop through the aggregator file and read in the values
@@ -738,9 +736,9 @@ public class ReportGenerator {
             } else if ("service_name".equals(section)) {
                 name = value;
             } else if ("start_date".equals(section)) {
-                startDate = sdf.parse(value);
+                startDate = LocalDate.parse(value, formatter);
             } else if ("end_date".equals(section)) {
-                endDate = sdf.parse(value);
+                endDate = LocalDate.parse(value, formatter);
             } else if ("analysis_process_time".equals(section)) {
                 processTime = Integer.parseInt(value);
             } else if ("general_summary".equals(section)) {

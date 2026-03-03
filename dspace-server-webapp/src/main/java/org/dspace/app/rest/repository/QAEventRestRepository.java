@@ -16,7 +16,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -67,6 +67,9 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
 
     @Autowired
     private CorrectionTypeService correctionTypeService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Override
     public Page<QAEventRest> findAll(Context context, Pageable pageable) {
@@ -181,7 +184,6 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
             throw new UnprocessableEntityException("This item cannot be processed by this correction type!");
         }
 
-        ObjectMapper mapper = new ObjectMapper();
         CorrectionTypeMessageDTO reason = null;
         try {
             reason = mapper.readValue(request.getInputStream(), CorrectionTypeMessageDTO.class);

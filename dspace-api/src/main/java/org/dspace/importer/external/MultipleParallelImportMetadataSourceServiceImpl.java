@@ -17,7 +17,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import jakarta.el.MethodNotFoundException;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -144,7 +143,7 @@ public class MultipleParallelImportMetadataSourceServiceImpl implements QuerySou
 
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for multiple external data sources");
+        throw new UnsupportedOperationException("This method is not implemented for multiple external data sources");
     }
 
     @Override

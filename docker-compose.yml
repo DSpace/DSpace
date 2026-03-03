@@ -5,6 +5,8 @@ networks:
         # Define a custom subnet for our DSpace network, so that we can easily trust requests from host to container.
         # If you customize this value, be sure to customize the 'proxies.trusted.ipranges' env variable below.
         - subnet: 172.23.0.0/16
+    # Explicitly set external=false because this script creates the network.
+    external: false
 services:
   # DSpace (backend) webapp container
   dspace:
@@ -14,16 +16,20 @@ services:
       # See https://github.com/DSpace/DSpace/blob/main/dspace/config/config-definition.xml
       # __P__ => "." (e.g. dspace__P__dir => dspace.dir)
       # __D__ => "-" (e.g. google__D__metadata => google-metadata)
-      # dspace.dir: Must match with Dockerfile's DSPACE_INSTALL directory.
-      dspace__P__dir: /dspace
-      # Uncomment to set a non-default value for dspace.server.url or dspace.ui.url
+      # Uncomment to set a non-default value for dspace.dir, dspace.server.url or dspace.ui.url
+      # dspace__P__dir: /dspace
       # dspace__P__server__P__url: http://localhost:8080/server
       # dspace__P__ui__P__url: http://localhost:4000
+      # Set SSR URL to the Docker container name so that UI can contact container directly in Production mode.
+      # (This is necessary for docker-compose-angular.yml as it uses production mode by default)
+      dspace__P__server__P__ssr__P__url: http://dspace:8080/server
       dspace__P__name: 'DSpace Started with Docker Compose'
       # db.url: Ensure we are using the 'dspacedb' image for our database
       db__P__url: 'jdbc:postgresql://dspacedb:5432/dspace'
       # solr.server: Ensure we are using the 'dspacesolr' image for Solr
       solr__P__server: http://dspacesolr:8983/solr
+      # matomo.tracker.url: Ensure we are using the 'matomo' image for Matomo
+      matomo__P__tracker__P__url: http://matomo
       # proxies.trusted.ipranges: This setting is required for a REST API running in Docker to trust requests
       # from the host machine. This IP range MUST correspond to the 'dspacenet' subnet defined above.
       proxies__P__trusted__P__ipranges: '172.23.0'
@@ -41,8 +47,6 @@ services:
       target: 8080
     - published: 8000
       target: 8000
-    stdin_open: true
-    tty: true
     volumes:
     # Keep DSpace assetstore directory between reboots
     - assetstore:/dspace/assetstore
@@ -59,25 +63,22 @@ services:
     - |
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
-      java -jar /dspace/webapps/server-boot.jar --dspace.dir=/dspace
+      java -jar /dspace/webapps/server-boot.jar
   # DSpace PostgreSQL database container
   dspacedb:
     container_name: dspacedb
-    # Uses a custom Postgres image with pgcrypto installed
-    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-postgres-pgcrypto:${DSPACE_VER:-latest}"
-    build:
-      # Must build out of subdirectory to have access to install script for pgcrypto
-      context: ./dspace/src/main/docker/dspace-postgres-pgcrypto/
+    # Uses the base PostgreSQL image
+    image: "docker.io/postgres:${POSTGRES_VERSION:-15}"
     environment:
       PGDATA: /pgdata
+      POSTGRES_DB: dspace
+      POSTGRES_USER: dspace
       POSTGRES_PASSWORD: dspace
     networks:
       dspacenet:
     ports:
     - published: 5432
       target: 5432
-    stdin_open: true
-    tty: true
     volumes:
     # Keep Postgres data directory between reboots
     - pgdata:/pgdata
@@ -91,22 +92,25 @@ services:
       additional_contexts:
         solrconfigs: ./dspace/solr/
       args:
-        SOLR_VERSION: "${SOLR_VER:-8.11}"
+        SOLR_VERSION: "${SOLR_VER:-9.8}"
     networks:
       dspacenet:
     ports:
     - published: 8983
       target: 8983
-    stdin_open: true
-    tty: true
     working_dir: /var/solr/data
     volumes:
     # Keep Solr data directory between reboots
     - solr_data:/var/solr/data
+    # NOTE: We are not running Solr as "root", but we need root permissions to copy our cores to the mounted
+    # /var/solr/data directory. Then we start Solr as the "solr" user.
+    user: root
     # Initialize all DSpace Solr cores then start Solr:
     # * First, run precreate-core to create the core (if it doesn't yet exist). If exists already, this is a no-op
     # * Second, copy configsets to this core:
     #   Updates to Solr configs require the container to be rebuilt/restarted: `docker compose -p d7 up -d --build dspacesolr`
+    # * Third, ensure all new folders are owned by "solr" user
+    # * Finally, start Solr as the "solr" user via the provided solr-foreground script
     entrypoint:
     - /bin/bash
     - '-c'
@@ -124,7 +128,10 @@ services:
       cp -r /opt/solr/server/solr/configsets/qaevent/* qaevent
       precreate-core suggestion /opt/solr/server/solr/configsets/suggestion
       cp -r /opt/solr/server/solr/configsets/suggestion/* suggestion
-      exec solr -f
+      precreate-core audit /opt/solr/server/solr/configsets/audit
+      cp -r /opt/solr/server/solr/configsets/audit/* audit
+      chown -R solr:solr /var/solr
+      runuser -u solr -- solr-foreground
 volumes:
   assetstore:
   pgdata:

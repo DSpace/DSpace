@@ -27,6 +27,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportSearchCli" />
     </bean>
 
+    <bean name="metadata-export-filtered-items-report" class="org.dspace.app.bulkedit.MetadataExportFilteredItemsReportCliScriptConfiguration">
+        <property name="description" value="Export metadata from item results in a Metadata Query Report" />
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportFilteredItemsReportCli" />
+    </bean>
+
     <bean id="curate"
           class="org.dspace.curate.CurationCliScriptConfiguration">
         <property name="description"
@@ -95,5 +100,14 @@
         <property name="description" value="Bulk access control"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkaccesscontrol.BulkAccessControlCli"/>
     </bean>
+
+    <bean id="object-deletion" class="org.dspace.deletion.process.DSpaceObjectDeletionProcessScriptConfiguration" primary="true">
+        <property name="description" value="Permanently delete the given object along with all child objects. WARNING: This action cannot be undone." />
+        <property name="dspaceRunnableClass" value="org.dspace.deletion.process.DSpaceObjectDeletionProcess"/>
+    </bean>
+
+    <bean id="itemDeletionStrategy" class="org.dspace.deletion.process.strategies.ItemDeletionStrategy" />
+    <bean id="communityDeletionStrategy" class="org.dspace.deletion.process.strategies.CommunityDeletionStrategy" />
+    <bean id="collectionDeletionStrategy" class="org.dspace.deletion.process.strategies.CollectionDeletionStrategy" />
 
 </beans>

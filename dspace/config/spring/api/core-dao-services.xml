@@ -40,6 +40,7 @@
     <bean class="org.dspace.eperson.dao.impl.Group2GroupCacheDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.GroupDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.RegistrationDataDAOImpl"/>
+    <bean class="org.dspace.eperson.dao.impl.RegistrationDataMetadataDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.SubscriptionDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.SubscriptionParameterDAOImpl"/>
 

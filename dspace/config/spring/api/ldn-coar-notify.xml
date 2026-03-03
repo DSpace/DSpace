@@ -73,7 +73,25 @@
                 <entry>
                     <key>
                         <set>
+                            <value>TentativeAccept</value>
+                            <value>coar-notify:EndorsementAction</value>
+                        </set>
+                    </key>
+                    <ref bean="acceptAckAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
                             <value>TentativeReject</value>
+                            <value>coar-notify:EndorsementAction</value>
+                        </set>
+                    </key>
+                    <ref bean="tentativeRejectAckAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Reject</value>
                             <value>coar-notify:EndorsementAction</value>
                         </set>
                     </key>
@@ -255,6 +273,18 @@
                 <bean class="org.dspace.app.ldn.action.LDNEmailAction">
                     <property name="actionSendFilter" value="${ldn.notification.email}" />
                     <property name="actionSendEmailTextFile" value="coar_notify_rejected" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Support workflows where revisions are needed: this is not a definite reject -->
+    <bean name="tentativeRejectAckAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_rejected_resubmission" />
                 </bean>
             </list>
         </property>

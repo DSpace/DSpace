@@ -19,8 +19,8 @@ import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -241,7 +241,7 @@ public class DOIIdentifierProviderTest
         Random random = new Random();
         if (null == doi) {
             doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR
-                + Long.toHexString(new Date().getTime()) + "-"
+                + Long.toHexString(Instant.now().toEpochMilli()) + "-"
                 + random.nextInt(997);
         }
 
@@ -310,7 +310,7 @@ public class DOIIdentifierProviderTest
         WorkflowException {
         Item item = newItem();
         String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR
-            + Long.toHexString(new Date().getTime());
+            + Long.toHexString(Instant.now().toEpochMilli());
         context.turnOffAuthorisationSystem();
         provider.saveDOIToObject(context, item, doi);
         context.restoreAuthSystemState();
@@ -334,7 +334,7 @@ public class DOIIdentifierProviderTest
         WorkflowException {
         Item item = newItem();
         String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR
-            + Long.toHexString(new Date().getTime());
+            + Long.toHexString(Instant.now().toEpochMilli());
 
         context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, item, DOIIdentifierProvider.MD_SCHEMA,
@@ -355,7 +355,7 @@ public class DOIIdentifierProviderTest
         IllegalAccessException {
         Item item = newItem();
         String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR
-            + Long.toHexString(new Date().getTime());
+            + Long.toHexString(Instant.now().toEpochMilli());
 
         context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, item, DOIIdentifierProvider.MD_SCHEMA,

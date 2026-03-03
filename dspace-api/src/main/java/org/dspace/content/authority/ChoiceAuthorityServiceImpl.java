@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
@@ -337,7 +338,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                             // or an xml vocabulary
                             String authorityName = null;
                             if (StringUtils.isNotBlank(dcinput.getPairsType())
-                                    && !StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
+                                    && !Strings.CS.equals(dcinput.getInputType(), "qualdrop_value")) {
                                 authorityName = dcinput.getPairsType();
                             } else if (StringUtils.isNotBlank(dcinput.getVocabulary())) {
                                 authorityName = dcinput.getVocabulary();
@@ -571,13 +572,17 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
 
                 Set<String> metadataFields = new HashSet<>();
                 Map<String, List<String>> formsToFields = this.authoritiesFormDefinitions.get(nameVocab);
+                // Vocabulary is not associated with any form definition, meaning it won't be a browse index
+                if (formsToFields == null) {
+                    return null;
+                }
                 for (Map.Entry<String, List<String>> formToField : formsToFields.entrySet()) {
                     metadataFields.addAll(formToField.getValue().stream().map(value ->
-                                    StringUtils.replace(value, "_", "."))
+                                    Strings.CS.replace(value, "_", "."))
                             .collect(Collectors.toList()));
                 }
                 DiscoverySearchFilterFacet matchingFacet = null;
-                for (DiscoverySearchFilterFacet facetConfig : searchConfigurationService.getAllFacetsConfig()) {
+                for (DiscoverySearchFilterFacet facetConfig : searchConfigurationService.getAllUniqueFacetsConfig()) {
                     boolean coversAllFieldsFromVocab = true;
                     for (String fieldFromVocab: metadataFields) {
                         boolean coversFieldFromVocab = false;

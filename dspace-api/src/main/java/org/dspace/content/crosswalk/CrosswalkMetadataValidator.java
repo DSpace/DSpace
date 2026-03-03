@@ -8,7 +8,7 @@
 package org.dspace.content.crosswalk;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,7 +82,8 @@ public class CrosswalkMetadataValidator {
                 // add a new schema, giving it a namespace of "unknown". Possibly a very bad idea.
                 if (forceCreate && schemaChoice.equals("add")) {
                     try {
-                        mdSchema = metadataSchemaService.create(context, schema, String.valueOf(new Date().getTime()));
+                        mdSchema = metadataSchemaService.create(context, schema,
+                                                                String.valueOf(Instant.now().toEpochMilli()));
                         mdSchema.setNamespace("unknown" + mdSchema.getID());
                         metadataSchemaService.update(context, mdSchema);
                     } catch (NonUniqueMetadataException e) {

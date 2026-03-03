@@ -16,10 +16,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -348,9 +347,7 @@ public class GoogleMetadataTest extends AbstractUnitTest {
         bundleService.addBitstream(context, bundle, b);
         // Set 3 month embargo on pdf
         Period period = Period.ofMonths(3);
-        Date embargoDate = Date.from(ZonedDateTime.now(ZoneOffset.UTC)
-                .plus(period)
-                .toInstant());
+        LocalDate embargoDate = LocalDate.now(ZoneOffset.UTC).plus(period);
         Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
         authorizeService.removeAllPolicies(context, b);
         resourcePolicyService.removeAllPolicies(context, b);

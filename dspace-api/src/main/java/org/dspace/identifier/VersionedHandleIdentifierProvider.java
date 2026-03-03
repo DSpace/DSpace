@@ -9,7 +9,7 @@ package org.dspace.identifier;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -242,7 +242,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider implem
         Version version = versionHistoryService.getVersion(context, vh, item);
         if (version == null) {
             version = versionService
-                .createNewVersion(context, vh, item, "Restoring from AIP Service", new Date(), versionNumber);
+                .createNewVersion(context, vh, item, "Restoring from AIP Service", Instant.now(), versionNumber);
         }
         versionHistoryService.update(context, vh);
     }

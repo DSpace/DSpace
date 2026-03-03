@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.core.Utils;
 /**
  * Class representing all DC inputs required for a submission, organized into pages
@@ -110,7 +110,7 @@ public class DCInputSet {
             for (int j = 0; j < inputs[i].length; j++) {
                 DCInput field = inputs[i][j];
                 // If this is a "qualdrop_value" field, then the full field name is the field + dropdown qualifier
-                if (StringUtils.equals(field.getInputType(), "qualdrop_value")) {
+                if (Strings.CS.equals(field.getInputType(), "qualdrop_value")) {
                     List<String> pairs = field.getPairs();
                     for (int k = 0; k < pairs.size(); k += 2) {
                         String qualifier = pairs.get(k + 1);

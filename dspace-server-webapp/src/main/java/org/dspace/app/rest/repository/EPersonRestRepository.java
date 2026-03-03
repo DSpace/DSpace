@@ -16,9 +16,11 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.DiscoverableEndpointsService;
+import org.dspace.app.rest.EPersonRegistrationRestController;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -84,6 +86,9 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     @Autowired
     private GroupService groupService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private final EPersonService es;
 
 
@@ -97,7 +102,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             throws AuthorizeException {
         // this need to be revisited we should receive an EPersonRest as input
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         EPersonRest epersonRest = null;
         try {
             epersonRest = mapper.readValue(req.getInputStream(), EPersonRest.class);
@@ -177,7 +181,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         }
         String emailFromJson = epersonRest.getEmail();
         if (StringUtils.isNotBlank(emailFromJson)) {
-            if (!StringUtils.equalsIgnoreCase(registrationData.getEmail(), emailFromJson)) {
+            if (!Strings.CI.equals(registrationData.getEmail(), emailFromJson)) {
                 throw new DSpaceBadRequestException("The email resulting from the token does not match the email given"
                                                         + " in the json body. Email from token: " +
                                                     registrationData.getEmail() + " email from the json body: "
@@ -188,7 +192,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             throw new DSpaceBadRequestException("The self registered property cannot be set to false using this method"
                                                     + " with a token");
         }
-        checkRequiredProperties(epersonRest);
+        checkRequiredProperties(registrationData, epersonRest);
         // We'll turn off authorisation system because this call isn't admin based as it's token based
         context.turnOffAuthorisationSystem();
         EPerson ePerson = createEPersonFromRestObject(context, epersonRest);
@@ -201,8 +205,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         return converter.toRest(ePerson, utils.obtainProjection());
     }
 
-    private void checkRequiredProperties(EPersonRest epersonRest) {
-        MetadataRest metadataRest = epersonRest.getMetadata();
+    private void checkRequiredProperties(RegistrationData registration, EPersonRest epersonRest) {
+        MetadataRest<MetadataValueRest> metadataRest = epersonRest.getMetadata();
         if (metadataRest != null) {
             List<MetadataValueRest> epersonFirstName = metadataRest.getMap().get("eperson.firstname");
             List<MetadataValueRest> epersonLastName = metadataRest.getMap().get("eperson.lastname");
@@ -211,10 +215,25 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
                 throw new EPersonNameNotProvidedException();
             }
         }
+
         String password = epersonRest.getPassword();
-        if (StringUtils.isBlank(password)) {
-            throw new DSpaceBadRequestException("A password is required");
+        String netId = epersonRest.getNetid();
+        if (StringUtils.isBlank(password) && StringUtils.isBlank(netId)) {
+            throw new DSpaceBadRequestException(
+                "You must provide a password or register using an external account"
+            );
         }
+
+        if (StringUtils.isBlank(password) && !canRegisterExternalAccount(registration, epersonRest)) {
+            throw new DSpaceBadRequestException(
+                "Cannot register external account with netId: " + netId
+            );
+        }
+    }
+
+    private boolean canRegisterExternalAccount(RegistrationData registration, EPersonRest epersonRest) {
+        return accountService.isTokenValidForCreation(registration) &&
+            Strings.CS.equals(registration.getNetId(), epersonRest.getNetid());
     }
 
     @Override
@@ -329,7 +348,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
                          Patch patch) throws AuthorizeException, SQLException {
         boolean passwordChangeFound = false;
         for (Operation operation : patch.getOperations()) {
-            if (StringUtils.equalsIgnoreCase(operation.getPath(), "/password")) {
+            if (Strings.CI.equals(operation.getPath(), "/password")) {
                 passwordChangeFound = true;
             }
         }
@@ -339,7 +358,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
                                                     "changing the password");
             }
         } else {
-            if (passwordChangeFound && !StringUtils.equals(context.getAuthenticationMethod(), "password")) {
+            if (passwordChangeFound && !Strings.CS.equals(context.getAuthenticationMethod(), "password")) {
                 throw new AccessDeniedException("Refused to perform the EPerson patch based to change the password " +
                                                         "for non \"password\" authentication");
             }
@@ -365,6 +384,40 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     @Override
     public Class<EPersonRest> getDomainClass() {
         return EPersonRest.class;
+    }
+
+    /**
+     * This method tries to merge the details coming from the {@link EPersonRegistrationRestController} of a given
+     * {@code uuid} eperson. <br/>
+     *
+     * @param context - The Dspace Context
+     * @param uuid - The uuid of the eperson
+     * @param token - A valid registration token
+     * @param override - An optional list of metadata fields that will be overwritten
+     * @return a EPersonRest entity updated with the registration data.
+     * @throws AuthorizeException
+     */
+    public EPersonRest mergeFromRegistrationData(
+        Context context, UUID uuid, String token, List<String> override
+    ) throws AuthorizeException {
+        try {
+
+            if (uuid == null) {
+                throw new DSpaceBadRequestException("The uuid of the person cannot be null");
+            }
+
+            if (token == null) {
+                throw new DSpaceBadRequestException("You must provide a token for the eperson");
+            }
+
+            return converter.toRest(
+                accountService.mergeRegistration(context, uuid, token, override),
+                utils.obtainProjection()
+            );
+        } catch (SQLException e) {
+            log.error(e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

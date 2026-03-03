@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.Date;
+import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
@@ -31,9 +31,9 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
     protected String bitstream_id;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    protected Date decisionDate;
+    protected Instant decisionDate;
 
-    protected Date expires;
+    protected Instant expires;
 
     protected String item_id;
 
@@ -44,7 +44,7 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
     protected String reqName;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    protected Date requestDate;
+    protected Instant requestDate;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     protected String token;
@@ -52,6 +52,14 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
     protected boolean acceptRequest;
 
     protected boolean allfiles;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    protected String accessToken;
+
+    protected Instant accessExpiry;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    protected boolean accessExpired;
 
     /**
      * @return the bitstream requested.
@@ -70,28 +78,28 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
     /**
      * @return the decisionDate
      */
-    public Date getDecisionDate() {
+    public Instant getDecisionDate() {
         return decisionDate;
     }
 
     /**
      * @param decided the decisionDate to set
      */
-    public void setDecisionDate(Date decided) {
+    public void setDecisionDate(Instant decided) {
         this.decisionDate = decided;
     }
 
     /**
      * @return the expires
      */
-    public Date getExpires() {
+    public Instant getExpires() {
         return expires;
     }
 
     /**
      * @param expires the expires to set
      */
-    public void setExpires(Date expires) {
+    public void setExpires(Instant expires) {
         this.expires = expires;
     }
 
@@ -154,14 +162,14 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
     /**
      * @return the requestDate
      */
-    public Date getRequestDate() {
+    public Instant getRequestDate() {
         return requestDate;
     }
 
     /**
      * @param requested the requestDate to set
      */
-    public void setRequestDate(Date requested) {
+    public void setRequestDate(Instant requested) {
         this.requestDate = requested;
     }
 
@@ -207,6 +215,41 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
         this.allfiles = allfiles;
     }
 
+    /**
+     * @return the unique access token to be used by the requester. This is separate to the approval token ('token')
+     */
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    /**
+     * @param accessToken the access token to be used by the requester (not settable through JSON update)
+     */
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    /**
+     * @return the date the access token expires.
+     */
+    public Instant getAccessExpiry() {
+        return this.accessExpiry;
+    }
+
+    /**
+     * @param accessExpiry the date the access token expires.
+     */
+    public void setAccessExpiry(Instant accessExpiry) {
+        this.accessExpiry = accessExpiry;
+    }
+
+    public boolean isAccessExpired() {
+        return accessExpired;
+    }
+
+    public void setAccessExpired(boolean accessExpired) {
+        this.accessExpired = accessExpired;
+    }
     /*
      * Common REST object methods.
      */

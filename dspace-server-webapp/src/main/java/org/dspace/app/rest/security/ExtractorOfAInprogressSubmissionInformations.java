@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.utils.ContextUtil;

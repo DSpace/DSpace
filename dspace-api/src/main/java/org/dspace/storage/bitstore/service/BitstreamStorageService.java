@@ -191,4 +191,11 @@ public interface BitstreamStorageService {
     @Nullable
     Long getLastModified(Bitstream bitstream) throws IOException;
 
+
+    /**
+     * Sets the number for the incoming store
+     * @param incoming
+     */
+    public void setIncomingExternal(int incoming);
+
 }

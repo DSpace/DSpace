@@ -19,7 +19,7 @@ import java.util.Locale;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.hateoas.QAEventResource;
 import org.dspace.content.QAEvent;
 import org.dspace.qaevent.service.dto.NotifyMessageDTO;
@@ -77,10 +77,11 @@ public class QAEventMatcher {
     public static Matcher<? super Object> matchQAEventNotifyEntry(QAEvent event) {
         try {
             ObjectMapper jsonMapper = new JsonMapper();
+            DecimalFormat decimalFormat = new DecimalFormat("0.000", new DecimalFormatSymbols(Locale.ENGLISH));
             return allOf(hasJsonPath("$.id", is(event.getEventId())),
                     hasJsonPath("$.originalId", is(event.getOriginalId())),
                     hasJsonPath("$.title", is(event.getTitle())),
-                    hasJsonPath("$.trust", is(new DecimalFormat("0.000").format(event.getTrust()))),
+                    hasJsonPath("$.trust", is(decimalFormat.format(event.getTrust()))),
                     hasJsonPath("$.status", Matchers.equalToIgnoringCase(event.getStatus())),
                     hasJsonPath("$.message",
                             matchMessage(event.getTopic(), jsonMapper.readValue(event.getMessage(),
@@ -96,14 +97,14 @@ public class QAEventMatcher {
     private static Matcher<? super Object> matchMessage(String topic, QAMessageDTO message) {
         if (message instanceof OpenaireMessageDTO) {
             OpenaireMessageDTO oadto = (OpenaireMessageDTO) message;
-            if (StringUtils.endsWith(topic, "/ABSTRACT")) {
+            if (Strings.CS.endsWith(topic, "/ABSTRACT")) {
                 return allOf(hasJsonPath("$.abstract", is(oadto.getAbstracts())));
-            } else if (StringUtils.endsWith(topic, "/PID")) {
+            } else if (Strings.CS.endsWith(topic, "/PID")) {
                 return allOf(
                         hasJsonPath("$.value", is(oadto.getValue())),
                         hasJsonPath("$.type", is(oadto.getType())),
                         hasJsonPath("$.pidHref", is(calculateOpenairePidHref(oadto.getType(), oadto.getValue()))));
-            } else if (StringUtils.endsWith(topic, "/PROJECT")) {
+            } else if (Strings.CS.endsWith(topic, "/PROJECT")) {
                 return allOf(
                         hasJsonPath("$.openaireId", is(oadto.getOpenaireId())),
                         hasJsonPath("$.acronym", is(oadto.getAcronym())),
@@ -115,14 +116,14 @@ public class QAEventMatcher {
             }
         } else if (message instanceof NotifyMessageDTO) {
             NotifyMessageDTO notifyDTO = (NotifyMessageDTO) message;
-            if (StringUtils.endsWith(topic, "/REVIEW")) {
+            if (Strings.CS.endsWith(topic, "/REVIEW")) {
                 return allOf(
                             hasJsonPath("$.serviceName", is(notifyDTO.getServiceName())),
                             hasJsonPath("$.serviceId", is(notifyDTO.getServiceId())),
                             hasJsonPath("$.href", is(notifyDTO.getHref())),
                             hasJsonPath("$.relationship", is(notifyDTO.getRelationship()))
                 );
-            } else if (StringUtils.endsWith(topic, "/ENDORSEMENT")) {
+            } else if (Strings.CS.endsWith(topic, "/ENDORSEMENT")) {
                 return allOf(
                     hasJsonPath("$.serviceName", is(notifyDTO.getServiceName())),
                     hasJsonPath("$.serviceId", is(notifyDTO.getServiceId())),

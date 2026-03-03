@@ -67,6 +67,9 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
     @Autowired
     private ProcessService processService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private final static String SCRIPTS_ENDPOINT = "/api/" + ScriptRest.CATEGORY + "/" + ScriptRest.PLURAL_NAME;
     private final static String CURATE_SCRIPT_ENDPOINT = SCRIPTS_ENDPOINT + "/bulk-access-control/" +
         ProcessRest.PLURAL_NAME;
@@ -140,7 +143,7 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
                 .perform(
                     multipart(CURATE_SCRIPT_ENDPOINT)
                         .file(bitstreamFile)
-                        .param("properties", new ObjectMapper().writeValueAsString(list)))
+                        .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.processId")));
         } finally {
@@ -194,7 +197,7 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
                 .perform(
                     multipart(CURATE_SCRIPT_ENDPOINT)
                         .file(bitstreamFile)
-                        .param("properties", new ObjectMapper().writeValueAsString(list)))
+                        .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.processId")));
         } finally {
@@ -256,7 +259,7 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
                 .perform(
                     multipart(CURATE_SCRIPT_ENDPOINT)
                         .file(bitstreamFile)
-                        .param("properties", new ObjectMapper().writeValueAsString(list)))
+                        .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.processId")));
         } finally {
@@ -323,7 +326,7 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
                 .perform(
                     multipart(CURATE_SCRIPT_ENDPOINT)
                         .file(bitstreamFile)
-                        .param("properties", new ObjectMapper().writeValueAsString(list)))
+                        .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.processId")));
         } finally {
@@ -398,7 +401,7 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
                 .perform(
                     multipart(CURATE_SCRIPT_ENDPOINT)
                         .file(bitstreamFile)
-                        .param("properties", new ObjectMapper().writeValueAsString(list)))
+                        .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.processId")));
 
@@ -445,7 +448,7 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
         getClient(token)
             .perform(
                 multipart(CURATE_SCRIPT_ENDPOINT)
-                    .param("properties", new ObjectMapper().writeValueAsString(List.of()))
+                    .param("properties", mapper.writeValueAsString(List.of()))
             )
             .andExpect(status().isInternalServerError())
             .andExpect(result -> assertTrue(result.getResolvedException()
@@ -495,7 +498,7 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
             .perform(
                 multipart(CURATE_SCRIPT_ENDPOINT)
                     .file(bitstreamFile)
-                    .param("properties", new ObjectMapper().writeValueAsString(list)))
+                    .param("properties", mapper.writeValueAsString(list)))
             .andExpect(status().isForbidden());
     }
 

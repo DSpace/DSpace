@@ -92,6 +92,9 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Autowired
     private ASimpleMetadataAction AddEndorsedMetadataAction;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Test
     public void findAllNotImplementedTest() throws Exception {
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -1313,7 +1316,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(ePersonToken).perform(post("/api/integration/qualityassuranceevents")
                                .param("correctionType", "request-withdrawn")
                                .param("target", publication.getID().toString())
-                               .content(new ObjectMapper().writeValueAsBytes(message))
+                               .content(mapper.writeValueAsBytes(message))
                                .contentType(contentType))
                                .andExpect(status().isCreated())
                                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
@@ -1374,7 +1377,6 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         AtomicReference<String> idRef = new AtomicReference<String>();
 
-        ObjectMapper mapper = new ObjectMapper();
         CorrectionTypeMessageDTO dto = new CorrectionTypeMessageDTO("provided reason!");
 
         getClient(ePersonToken).perform(post("/api/integration/qualityassuranceevents")
@@ -1453,7 +1455,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(ePersonToken).perform(post("/api/integration/qualityassuranceevents")
                                .param("correctionType", "request-withdrawn")
                                .param("target", publication.getID().toString())
-                               .content(new ObjectMapper().writeValueAsBytes(message))
+                               .content(mapper.writeValueAsBytes(message))
                                .contentType(contentType))
                                .andExpect(status().isUnprocessableEntity());
 
@@ -1462,7 +1464,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(user1Token).perform(post("/api/integration/qualityassuranceevents")
                              .param("correctionType", "request-withdrawn")
                              .param("target", publication.getID().toString())
-                             .content(new ObjectMapper().writeValueAsBytes(message))
+                             .content(mapper.writeValueAsBytes(message))
                              .contentType(contentType))
                              .andExpect(status().isCreated())
                              .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));

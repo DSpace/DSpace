@@ -19,10 +19,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 /**
  * Rest representation of a map of metadata keys to ordered lists of values.
  */
-public class MetadataRest {
+public class MetadataRest<T extends MetadataValueRest> {
 
     @JsonAnySetter
-    private SortedMap<String, List<MetadataValueRest>> map = new TreeMap();
+    private SortedMap<String, List<T>> map = new TreeMap();
 
     /**
      * Gets the map.
@@ -30,7 +30,7 @@ public class MetadataRest {
      * @return the map of keys to ordered values.
      */
     @JsonAnyGetter
-    public SortedMap<String, List<MetadataValueRest>> getMap() {
+    public SortedMap<String, List<T>> getMap() {
         return map;
     }
 
@@ -44,16 +44,16 @@ public class MetadataRest {
      *               they are passed to this method.
      * @return this instance, to support chaining calls for easy initialization.
      */
-    public MetadataRest put(String key, MetadataValueRest... values) {
+    public MetadataRest put(String key, T... values) {
         // determine highest explicitly ordered value
         int highest = -1;
-        for (MetadataValueRest value : values) {
+        for (T value : values) {
             if (value.getPlace() > highest) {
                 highest = value.getPlace();
             }
         }
         // add any non-explicitly ordered values after highest
-        for (MetadataValueRest value : values) {
+        for (T value : values) {
             if (value.getPlace() < 0) {
                 highest++;
                 value.setPlace(highest);

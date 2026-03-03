@@ -109,6 +109,7 @@ public class DiscoverFacetResultsConverter {
         }
 
         facetEntryRest.setFacetLimit(field.getFacetLimit());
+        facetEntryRest.setOpenByDefault(field.isOpenByDefault());
 
         //We requested one extra facet value. Check if that value is present to indicate that there are more results
         facetEntryRest.setHasMore(facetResults.size() > page.getPageSize());

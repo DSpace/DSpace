@@ -8,7 +8,7 @@
 package org.dspace.content.dao;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -56,7 +56,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return iterator over items
      * @throws SQLException if database error
      */
-    Iterator<Item> findByLastModifiedSince(Context context, Date since)
+    Iterator<Item> findByLastModifiedSince(Context context, Instant since)
         throws SQLException;
 
     Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException;
@@ -78,7 +78,23 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
         throws SQLException;
 
     Iterator<Item> findByMetadataField(Context context, MetadataField metadataField, String value,
-                                              boolean inArchive) throws SQLException;
+                                               boolean inArchive) throws SQLException;
+
+    /**
+     * Find items by metadata field value, excluding items that are not the latest version
+     * in their version history. This method returns only items that are either:
+     * - Not versioned at all, OR
+     * - The latest version in their version history
+     *
+     * @param context        DSpace context object
+     * @param metadataField  metadata field to search
+     * @param value          field value to match (if null, matches any value)
+     * @param inArchive      whether to search in archived items only
+     * @return iterator over items matching the criteria, excluding old versions
+     * @throws SQLException if database error
+     */
+    Iterator<Item> findByMetadataFieldExcludingOldVersions(Context context, MetadataField metadataField, String value,
+                                                           boolean inArchive) throws SQLException;
 
     /**
      * Returns all the Items that belong to the specified aollections (if any)
@@ -177,7 +193,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @throws SQLException if database error
      */
     Iterator<Item> findAll(Context context, boolean archived,
-                                  boolean withdrawn, boolean discoverable, Date lastModified)
+                                  boolean withdrawn, boolean discoverable, Instant lastModified)
         throws SQLException;
 
     /**

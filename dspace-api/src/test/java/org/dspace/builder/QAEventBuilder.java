@@ -7,7 +7,7 @@
  */
 package org.dspace.builder;
 
-import java.util.Date;
+import java.time.Instant;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -42,7 +42,7 @@ public class QAEventBuilder extends AbstractBuilder<QAEvent, QAEventService> {
      * */
     private String relatedItem;
     private double trust = 0.5;
-    private Date lastUpdate = new Date();
+    private Instant lastUpdate = Instant.now();
 
     protected QAEventBuilder(Context context) {
         super(context);
@@ -99,7 +99,7 @@ public class QAEventBuilder extends AbstractBuilder<QAEvent, QAEventService> {
         this.trust = trust;
         return this;
     }
-    public QAEventBuilder withLastUpdate(final Date lastUpdate) {
+    public QAEventBuilder withLastUpdate(final Instant lastUpdate) {
         this.lastUpdate = lastUpdate;
         return this;
     }

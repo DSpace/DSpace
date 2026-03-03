@@ -7,12 +7,13 @@
  */
 package org.dspace.discovery.indexobject;
 
-import static org.apache.commons.lang3.time.DateFormatUtils.format;
-
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +25,7 @@ import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.util.SolrUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -124,7 +126,9 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
         doc.addField("type", ldnMessage.getType());
         addFacetIndex(doc, "activity_stream_type", ldnMessage.getActivityStreamType(),
             ldnMessage.getActivityStreamType());
-        addFacetIndex(doc, "coar_notify_type", ldnMessage.getCoarNotifyType(), ldnMessage.getCoarNotifyType());
+        if (ldnMessage.getCoarNotifyType() != null) {
+            addFacetIndex(doc, "coar_notify_type", ldnMessage.getCoarNotifyType(), ldnMessage.getCoarNotifyType());
+        }
         doc.addField("queue_attempts", ldnMessage.getQueueAttempts());
         doc.addField("queue_attempts_sort", ldnMessage.getQueueAttempts());
 
@@ -137,20 +141,19 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
         return doc;
     }
 
-    private void indexDateFieldForFacet(SolrInputDocument doc, Date queueLastStartTime) {
+    private void indexDateFieldForFacet(SolrInputDocument doc, Instant queueLastStartTime) {
         if (queueLastStartTime != null) {
-            String value = format(queueLastStartTime, "yyyy-MM-dd");
+            String value = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.ofInstant(queueLastStartTime,
+                                                                                       ZoneOffset.UTC));
             addFacetIndex(doc, "queue_last_start_time", value, value);
             doc.addField("queue_last_start_time", value);
-            doc.addField("queue_last_start_time_dt", queueLastStartTime);
+            doc.addField("queue_last_start_time_dt", SolrUtils.getDateFormatter().format(queueLastStartTime));
             doc.addField("queue_last_start_time_min", value);
             doc.addField("queue_last_start_time_min_sort", value);
             doc.addField("queue_last_start_time_max", value);
             doc.addField("queue_last_start_time_max_sort", value);
-            doc.addField("queue_last_start_time.year",
-                Integer.parseInt(format(queueLastStartTime, "yyyy")));
-            doc.addField("queue_last_start_time.year_sort",
-                Integer.parseInt(format(queueLastStartTime, "yyyy")));
+            doc.addField("queue_last_start_time.year", queueLastStartTime.atZone(ZoneOffset.UTC).getYear());
+            doc.addField("queue_last_start_time.year_sort", queueLastStartTime.atZone(ZoneOffset.UTC).getYear());
         }
     }
 

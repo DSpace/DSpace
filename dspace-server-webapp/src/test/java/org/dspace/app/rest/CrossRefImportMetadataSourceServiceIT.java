@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import jakarta.el.MethodNotFoundException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -135,7 +134,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         }
     }
 
-    @Test(expected = MethodNotFoundException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void crossRefImportMetadataFindMatchingRecordsTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)

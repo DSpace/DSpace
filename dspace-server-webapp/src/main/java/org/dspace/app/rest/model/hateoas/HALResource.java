@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 
@@ -56,7 +57,7 @@ public abstract class HALResource<T> extends EntityModel<T> {
             if (StringUtils.isNotBlank(name)) {
                 List<Link> list = this.getLinks(link.getRel());
                 // If a link of this name doesn't already exist in the list, add it
-                if (!list.stream().anyMatch((l -> StringUtils.equalsIgnoreCase(l.getName(), name)))) {
+                if (!list.stream().anyMatch((l -> Strings.CI.equals(l.getName(), name)))) {
                     super.add(link);
                 }
             }

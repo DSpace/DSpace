@@ -8,9 +8,9 @@
 package org.dspace.eperson.dao.impl;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -180,7 +180,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     }
 
     @Override
-    public List<EPerson> findNotActiveSince(Context context, Date date) throws SQLException {
+    public List<EPerson> findNotActiveSince(Context context, Instant date) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, EPerson.class);
         Root<EPerson> ePersonRoot = criteriaQuery.from(EPerson.class);

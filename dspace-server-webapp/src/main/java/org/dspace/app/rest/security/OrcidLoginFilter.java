@@ -7,7 +7,12 @@
  */
 package org.dspace.app.rest.security;
 
+import static org.dspace.authenticate.OrcidAuthenticationBean.ORCID_AUTH_ATTRIBUTE;
+import static org.dspace.authenticate.OrcidAuthenticationBean.ORCID_DEFAULT_REGISTRATION_URL;
+import static org.dspace.authenticate.OrcidAuthenticationBean.ORCID_REGISTRATION_TOKEN;
+
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 
 import jakarta.servlet.FilterChain;
@@ -15,6 +20,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.OrcidAuthentication;
@@ -45,7 +51,8 @@ public class OrcidLoginFilter extends StatelessLoginFilter {
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private OrcidAuthenticationBean orcidAuthentication = new DSpace().getServiceManager()
-        .getServiceByName("orcidAuthentication", OrcidAuthenticationBean.class);
+                                                                      .getServiceByName("orcidAuthentication",
+                                                                                        OrcidAuthenticationBean.class);
 
     public OrcidLoginFilter(String url, String httpMethod, AuthenticationManager authenticationManager,
                                      RestAuthenticationService restAuthenticationService) {
@@ -66,13 +73,13 @@ public class OrcidLoginFilter extends StatelessLoginFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,
-        Authentication auth) throws IOException, ServletException {
+                                            Authentication auth) throws IOException, ServletException {
 
 
         DSpaceAuthentication dSpaceAuthentication = (DSpaceAuthentication) auth;
 
         log.debug("Orcid authentication successful for EPerson {}. Sending back temporary auth cookie",
-            dSpaceAuthentication.getName());
+                  dSpaceAuthentication.getName());
 
         restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication, true);
 
@@ -81,26 +88,42 @@ public class OrcidLoginFilter extends StatelessLoginFilter {
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-        AuthenticationException failed) throws IOException, ServletException {
+                                              AuthenticationException failed) throws IOException, ServletException {
 
         Context context = ContextUtil.obtainContext(request);
 
-        if (orcidAuthentication.isUsed(context, request)) {
-            String baseRediredirectUrl = configurationService.getProperty("dspace.ui.url");
-            String redirectUrl = baseRediredirectUrl + "/error?status=401&code=orcid.generic-error";
-            response.sendRedirect(redirectUrl); // lgtm [java/unvalidated-url-redirection]
-        } else {
+        if (!orcidAuthentication.isUsed(context, request)) {
             super.unsuccessfulAuthentication(request, response, failed);
+            return;
         }
 
+        String baseRediredirectUrl = configurationService.getProperty("dspace.ui.url");
+        String redirectUrl = baseRediredirectUrl + "/error?status=401&code=orcid.generic-error";
+        Object registrationToken = request.getAttribute(ORCID_REGISTRATION_TOKEN);
+        if (registrationToken != null) {
+            final String orcidRegistrationDataUrl =
+                configurationService.getProperty("orcid.registration-data.url", ORCID_DEFAULT_REGISTRATION_URL);
+            redirectUrl = baseRediredirectUrl + MessageFormat.format(orcidRegistrationDataUrl, registrationToken);
+            if (log.isDebugEnabled()) {
+                log.debug(
+                    "Orcid authentication failed for user with ORCID {}.",
+                    request.getAttribute(ORCID_AUTH_ATTRIBUTE)
+                );
+                log.debug("Redirecting to {} for registration completion.", redirectUrl);
+            }
+        }
+
+        response.sendRedirect(redirectUrl); // lgtm [java/unvalidated-url-redirection]
+        this.closeOpenContext(request);
     }
 
     /**
      * After successful login, redirect to the DSpace URL specified by this Orcid
      * request (in the "redirectUrl" request parameter). If that 'redirectUrl' is
      * not valid or trusted for this DSpace site, then return a 400 error.
-     * @param  request
-     * @param  response
+     *
+     * @param request
+     * @param response
      * @throws IOException
      */
     private void redirectAfterSuccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -123,14 +146,14 @@ public class OrcidLoginFilter extends StatelessLoginFilter {
             allowedHostNames.add(Utils.getHostName(url));
         }
 
-        if (StringUtils.equalsAnyIgnoreCase(redirectHostName, allowedHostNames.toArray(new String[0]))) {
+        if (Strings.CI.equalsAny(redirectHostName, allowedHostNames.toArray(new String[0]))) {
             log.debug("Orcid redirecting to " + redirectUrl);
             response.sendRedirect(redirectUrl);
         } else {
             log.error("Invalid Orcid redirectURL=" + redirectUrl +
-                ". URL doesn't match hostname of server or UI!");
+                          ". URL doesn't match hostname of server or UI!");
             response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                "Invalid redirectURL! Must match server or ui hostname.");
+                               "Invalid redirectURL! Must match server or ui hostname.");
         }
     }
 

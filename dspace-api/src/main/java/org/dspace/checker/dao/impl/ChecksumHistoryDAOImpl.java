@@ -8,10 +8,9 @@
 package org.dspace.checker.dao.impl;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.Query;
-import jakarta.persistence.TemporalType;
 import org.dspace.checker.ChecksumHistory;
 import org.dspace.checker.ChecksumResultCode;
 import org.dspace.checker.dao.ChecksumHistoryDAO;
@@ -40,12 +39,12 @@ public class ChecksumHistoryDAOImpl extends AbstractHibernateDAO<ChecksumHistory
     }
 
     @Override
-    public int deleteByDateAndCode(Context context, Date retentionDate, ChecksumResultCode resultCode)
+    public int deleteByDateAndCode(Context context, Instant retentionDate, ChecksumResultCode resultCode)
         throws SQLException {
         String hql = "delete from ChecksumHistory where processEndDate < :processEndDate AND checksumResult" +
             ".resultCode=:resultCode";
         Query query = createQuery(context, hql);
-        query.setParameter("processEndDate", retentionDate, TemporalType.TIMESTAMP);
+        query.setParameter("processEndDate", retentionDate);
         query.setParameter("resultCode", resultCode);
         return query.executeUpdate();
     }

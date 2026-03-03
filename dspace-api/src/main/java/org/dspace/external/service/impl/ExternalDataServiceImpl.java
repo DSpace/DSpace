@@ -108,8 +108,9 @@ public class ExternalDataServiceImpl implements ExternalDataService {
         }
 
         log.info(LogHelper.getHeader(context, "create_item_from_externalDataObject", "Created item" +
-            "with id: " + item.getID() + " from source: " + externalDataObject.getSource() + " with identifier: " +
-            externalDataObject.getId()));
+                                     " with id: " + item.getID() +
+                                     " from source: " + externalDataObject.getSource() +
+                                     " with identifier: " + externalDataObject.getId()));
         try {
             List<SuggestionProvider> providers = suggestionService.getSuggestionProviders();
             if (providers != null) {

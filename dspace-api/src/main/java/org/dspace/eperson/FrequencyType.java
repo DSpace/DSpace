@@ -7,9 +7,16 @@
  */
 package org.dspace.eperson;
 
-import java.text.SimpleDateFormat;
+import static java.time.temporal.TemporalAdjusters.nextOrSame;
+import static java.time.temporal.TemporalAdjusters.previousOrSame;
+
+import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.YearMonth;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.Calendar;
 
 import org.apache.commons.codec.binary.StringUtils;
 
@@ -33,31 +40,50 @@ public enum FrequencyType {
     public static String findLastFrequency(String frequency) {
         String startDate = "";
         String endDate = "";
-        Calendar cal = Calendar.getInstance();
-        // Full ISO 8601 is e.g.
-        SimpleDateFormat fullIsoStart = new SimpleDateFormat("yyyy-MM-dd'T'00:00:00'Z'");
-        SimpleDateFormat fullIsoEnd = new SimpleDateFormat("yyyy-MM-dd'T'23:59:59'Z'");
         switch (frequency) {
             case "D":
-                cal.add(Calendar.DAY_OF_MONTH, -1);
-                endDate = fullIsoEnd.format(cal.getTime());
-                startDate = fullIsoStart.format(cal.getTime());
+                // Frequency is anything updated yesterday.
+                // startDate is beginning of day yesterday
+                Instant startOfYesterday = ZonedDateTime.now(ZoneOffset.UTC).minusDays(1)
+                                                        .with(LocalTime.MIN)
+                                                        .toInstant();
+                startDate = startOfYesterday.toString();
+                // endDate is end of day yesterday
+                Instant endOfYesterday = ZonedDateTime.now(ZoneOffset.UTC).minusDays(1)
+                                                      .with(LocalTime.MAX)
+                                                      .toInstant();
+                endDate = endOfYesterday.toString();
                 break;
             case "M":
-                int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-                cal.add(Calendar.DAY_OF_MONTH, -dayOfMonth);
-                endDate = fullIsoEnd.format(cal.getTime());
-                cal.add(Calendar.MONTH, -1);
-                cal.add(Calendar.DAY_OF_MONTH, 1);
-                startDate = fullIsoStart.format(cal.getTime());
+                // Frequency is anything updated last month.
+                // startDate is beginning of last month (first day of month at start of day)
+                Instant startOfLastMonth = YearMonth.now(ZoneOffset.UTC)
+                                                    .minusMonths(1)
+                                                    .atDay(1)
+                                                    .atStartOfDay().toInstant(ZoneOffset.UTC);
+                startDate = startOfLastMonth.toString();
+                // endDate is end of last month (last day of month at end of day)
+                Instant endOfLastMonth = YearMonth.now(ZoneOffset.UTC)
+                                                  .minusMonths(1)
+                                                  .atEndOfMonth()
+                                                  .atTime(LocalTime.MAX).toInstant(ZoneOffset.UTC);
+
+                endDate = endOfLastMonth.toString();
                 break;
             case "W":
-                cal.add(Calendar.DAY_OF_WEEK, -1);
-                int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK) - 1;
-                cal.add(Calendar.DAY_OF_WEEK, -dayOfWeek);
-                endDate = fullIsoEnd.format(cal.getTime());
-                cal.add(Calendar.DAY_OF_WEEK, -6);
-                startDate = fullIsoStart.format(cal.getTime());
+                // Frequency is anything updated last week
+                // startDate is beginning of last week (Sunday, beginning of the day)
+                Instant startOfLastWeek = ZonedDateTime.now(ZoneOffset.UTC).minusWeeks(1)
+                                                       .with(previousOrSame(DayOfWeek.SUNDAY))
+                                                       .with(LocalTime.MIN)
+                                                       .toInstant();
+                startDate = startOfLastWeek.toString();
+                // End date is end of last week (Saturday, end of day)
+                Instant endOfLastWeek = ZonedDateTime.now(ZoneOffset.UTC).minusWeeks(1)
+                                                     .with(nextOrSame(DayOfWeek.SATURDAY))
+                                                     .with(LocalTime.MAX)
+                                                     .toInstant();
+                endDate = endOfLastWeek.toString();
                 break;
             default:
                 return null;

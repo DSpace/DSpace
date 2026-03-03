@@ -12,12 +12,14 @@ import static org.dspace.iiif.canvasdimension.Util.checkDimensions;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.content.Bitstream;
 import org.dspace.iiif.util.IIIFSharedUtils;
 
@@ -35,14 +37,10 @@ public class IIIFApiQueryServiceImpl implements IIIFApiQueryService {
     public int[] getImageDimensions(Bitstream bitstream) {
         int[] arr = new int[2];
         String path = IIIFSharedUtils.getInfoJsonPath(bitstream);
-        URL url;
         BufferedReader in = null;
-        try {
-            url = new URL(path);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-            in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
+        try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
+            CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(path));
+            in = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
             String inputLine;
             StringBuilder response = new StringBuilder();
             while ((inputLine = in.readLine()) != null) {

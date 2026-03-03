@@ -27,13 +27,13 @@ import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.util.Util;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,33 +120,34 @@ public class OpenaireRestConnector {
         params.add(new BasicNameValuePair("grant_type", "client_credentials"));
         httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpResponse getResponse = httpClient.execute(httpPost);
+        try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
+            HttpResponse getResponse = httpClient.execute(httpPost);
 
-        JSONObject responseObject = null;
-        try (InputStream is = getResponse.getEntity().getContent();
-                BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
-            String inputStr;
-            // verify if we have basic json
-            while ((inputStr = streamReader.readLine()) != null && responseObject == null) {
-                if (inputStr.startsWith("{") && inputStr.endsWith("}") && inputStr.contains("access_token")
-                        && inputStr.contains("expires_in")) {
-                    try {
-                        responseObject = new JSONObject(inputStr);
-                    } catch (Exception e) {
-                        // Not as valid as I'd hoped, move along
-                        responseObject = null;
+            JSONObject responseObject = null;
+            try (InputStream is = getResponse.getEntity().getContent();
+                 BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
+                String inputStr;
+                // verify if we have basic json
+                while ((inputStr = streamReader.readLine()) != null && responseObject == null) {
+                    if (inputStr.startsWith("{") && inputStr.endsWith("}") && inputStr.contains("access_token")
+                            && inputStr.contains("expires_in")) {
+                        try {
+                            responseObject = new JSONObject(inputStr);
+                        } catch (Exception e) {
+                            // Not as valid as I'd hoped, move along
+                            responseObject = null;
+                        }
                     }
                 }
             }
-        }
-        if (responseObject == null || !responseObject.has("access_token") || !responseObject.has("expires_in")) {
-            throw new IOException("Unable to grab the access token using provided service url, client id and secret");
-        }
+            if (responseObject == null || !responseObject.has("access_token") || !responseObject.has("expires_in")) {
+                throw new IOException("Unable to grab the access token using provided service url, " +
+                        "client id and secret");
+            }
 
-        return new OpenaireRestToken(responseObject.get("access_token").toString(),
-                Long.valueOf(responseObject.get("expires_in").toString()));
-
+            return new OpenaireRestToken(responseObject.get("access_token").toString(),
+                    Long.valueOf(responseObject.get("expires_in").toString()));
+        }
     }
 
     /**
@@ -171,42 +172,43 @@ public class OpenaireRestConnector {
                 httpGet.addHeader("Authorization", "Bearer " + accessToken);
             }
 
-            HttpClient httpClient = HttpClientBuilder.create().build();
-            getResponse = httpClient.execute(httpGet);
+            try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
+                getResponse = httpClient.execute(httpGet);
 
-            StatusLine status = getResponse.getStatusLine();
+                StatusLine status = getResponse.getStatusLine();
 
-            // registering errors
-            switch (status.getStatusCode()) {
-                case HttpStatus.SC_NOT_FOUND:
-                    // 404 - Not found
-                case HttpStatus.SC_FORBIDDEN:
-                    // 403 - Invalid Access Token
-                case 429:
-                    // 429 - Rate limit abuse for unauthenticated user
-                    Header[] limitUsed = getResponse.getHeaders("x-ratelimit-used");
-                    Header[] limitMax = getResponse.getHeaders("x-ratelimit-limit");
+                // registering errors
+                switch (status.getStatusCode()) {
+                    case HttpStatus.SC_NOT_FOUND:
+                        // 404 - Not found
+                    case HttpStatus.SC_FORBIDDEN:
+                        // 403 - Invalid Access Token
+                    case 429:
+                        // 429 - Rate limit abuse for unauthenticated user
+                        Header[] limitUsed = getResponse.getHeaders("x-ratelimit-used");
+                        Header[] limitMax = getResponse.getHeaders("x-ratelimit-limit");
 
-                    if (limitUsed.length > 0) {
-                        String limitMsg = limitUsed[0].getValue();
-                        if (limitMax.length > 0) {
-                            limitMsg = limitMsg.concat(" of " + limitMax[0].getValue());
+                        if (limitUsed.length > 0) {
+                            String limitMsg = limitUsed[0].getValue();
+                            if (limitMax.length > 0) {
+                                limitMsg = limitMsg.concat(" of " + limitMax[0].getValue());
+                            }
+                            getGotError(new NoHttpResponseException(status.getReasonPhrase() + " with usage limit "
+                                            + limitMsg),
+                                    url + '/' + file);
+                        } else {
+                            // 429 - Rate limit abuse
+                            getGotError(new NoHttpResponseException(status.getReasonPhrase()), url + '/' + file);
                         }
-                        getGotError(
-                                new NoHttpResponseException(status.getReasonPhrase() + " with usage limit " + limitMsg),
-                                url + '/' + file);
-                    } else {
-                        // 429 - Rate limit abuse
-                        getGotError(new NoHttpResponseException(status.getReasonPhrase()), url + '/' + file);
-                    }
-                    break;
-                default:
-                    // 200 or other
-                    break;
-            }
+                        break;
+                    default:
+                        // 200 or other
+                        break;
+                }
 
-            // do not close this httpClient
-            result = getResponse.getEntity().getContent();
+                // do not close this httpClient
+                result = getResponse.getEntity().getContent();
+            }
         } catch (MalformedURLException e1) {
             getGotError(e1, url + '/' + file);
         } catch (Exception e) {

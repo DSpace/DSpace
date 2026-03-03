@@ -19,25 +19,28 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -55,6 +58,7 @@ import org.dspace.eperson.Group;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.AopTestUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -113,7 +117,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
-            authorizeServiceSpy = spy(authorizeService);
+            // Use mock with spiedInstance for Mockito 5.x compatibility with Spring proxies
+            // (Mockito 5.x doesn't allow spy() directly on Spring proxies as it detects them as mocks)
+            // Note: spiedInstance requires the mocked type to match the actual instance type
+            Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
+            authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
+                withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
             // "Wire" our spy to be used by the current loaded object services
             // (To ensure these services use the spy instead of the real service)
             ReflectionTestUtils.setField(collectionService, "authorizeService", authorizeServiceSpy);
@@ -255,7 +264,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         it.setDiscoverable(true);
          // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
         Iterator<Item> all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
-                DateUtils.addDays(it.getLastModified(),1));
+                it.getLastModified().plus(1, ChronoUnit.DAYS));
         assertThat("Returned list should not be null", all, notNullValue());
         boolean added = false;
         while (all.hasNext()) {
@@ -268,7 +277,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertFalse("List should not contain item when passing a date newer than item last-modified date", added);
          // Test 2: Using a past 'modified since' date, we should get a non-null list containing our item
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
-                DateUtils.addDays(it.getLastModified(),-1));
+                it.getLastModified().minus(1, ChronoUnit.DAYS));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
         while (all.hasNext()) {
@@ -284,7 +293,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         it.setArchived(true);
          // Test 4: Using a past 'modified since' date, we should get a non-null list containing our item
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
-                DateUtils.addDays(it.getLastModified(),-1));
+                it.getLastModified().minus(1, ChronoUnit.DAYS));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
         while (all.hasNext()) {
@@ -298,7 +307,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
          // Test 6: Make sure non-discoverable items are not returned, regardless of archived/withdrawn state
         it.setDiscoverable(false);
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
-                DateUtils.addDays(it.getLastModified(),-1));
+                it.getLastModified().minus(1, ChronoUnit.DAYS));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
         while (all.hasNext()) {
@@ -322,7 +331,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         it.setDiscoverable(false);
          // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
         Iterator<Item> all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
-                DateUtils.addDays(it.getLastModified(),1));
+                it.getLastModified().plus(1, ChronoUnit.DAYS));
         assertThat("Returned list should not be null", all, notNullValue());
         boolean added = false;
         while (all.hasNext()) {
@@ -335,7 +344,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertFalse("List should not contain item when passing a date newer than item last-modified date", added);
          // Test 2: Using a past 'modified since' date, we should get a non-null list containing our item
         all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
-                DateUtils.addDays(it.getLastModified(),-1));
+                it.getLastModified().minus(1, ChronoUnit.DAYS));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
         while (all.hasNext()) {
@@ -350,7 +359,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         it.setDiscoverable(true);
          // Test 4: Now we should still get a non-null list with NO items since item is discoverable
         all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
-                DateUtils.addDays(it.getLastModified(),-1));
+                it.getLastModified().minus(1, ChronoUnit.DAYS));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
         while (all.hasNext()) {
@@ -411,7 +420,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testGetLastModified() {
         assertThat("testGetLastModified 0", it.getLastModified(), notNullValue());
-        assertTrue("testGetLastModified 1", DateUtils.isSameDay(it.getLastModified(), new Date()));
+        assertEquals("testGetLastModified is same day", it.getLastModified().atZone(ZoneOffset.UTC).toLocalDate(),
+                     LocalDate.now(ZoneOffset.UTC));
     }
 
     /**
@@ -1093,7 +1103,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testRemoveDSpaceLicenseAuth() throws Exception {
         // First create a bundle for test
         context.turnOffAuthorisationSystem();
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
         context.restoreAuthSystemState();
@@ -1115,7 +1125,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testRemoveDSpaceLicenseNoAuth() throws Exception {
         // First create a bundle for test
         context.turnOffAuthorisationSystem();
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
         context.restoreAuthSystemState();
@@ -1131,7 +1141,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testRemoveLicensesAuth() throws Exception {
         // First create test content
         context.turnOffAuthorisationSystem();
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
 
@@ -1165,7 +1175,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testRemoveLicensesNoAuth() throws Exception {
         // First create test content
         context.turnOffAuthorisationSystem();
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
 
@@ -1374,7 +1384,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testReplaceAllBitstreamPolicies() throws Exception {
         context.turnOffAuthorisationSystem();
         //we add some bundles for the test
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
 
@@ -1449,7 +1459,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         }
 
         //we add some bundles for the test
-        String name = "LICENSE";
+        String name = Constants.LICENSE_BUNDLE_NAME;
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
 
@@ -1595,9 +1605,46 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         Collection collection = it.getCollections().get(0);
         it.setOwningCollection(collection);
-        ItemService itemServiceSpy = spy(itemService);
+        // Use mock with custom default answer for Mockito 5.x compatibility with Spring proxies
+        final ItemService realItemService = itemService;
+        ItemService itemServiceSpy = mock(ItemService.class, withSettings().defaultAnswer(invocation -> {
+            try {
+                return invocation.getMethod().invoke(realItemService, invocation.getArguments());
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause();
+            }
+        }));
 
         itemService.move(context, it, collection, collection);
+        context.restoreAuthSystemState();
+        assertThat("testMoveSameCollection 0", it.getOwningCollection(), notNullValue());
+        assertThat("testMoveSameCollection 1", it.getOwningCollection(), equalTo(collection));
+        verify(itemServiceSpy, times(0)).delete(context, it);
+    }
+
+    /**
+     * Test of move with inherit default policies method, of class Item, where both Collections are the same.
+     */
+    @Test
+    public void testMoveSameCollectionWithInheritDefaultPolicies() throws Exception {
+        context.turnOffAuthorisationSystem();
+        while (it.getCollections().size() > 1) {
+            it.removeCollection(it.getCollections().get(0));
+        }
+
+        Collection collection = it.getCollections().get(0);
+        it.setOwningCollection(collection);
+        // Use mock with custom default answer for Mockito 5.x compatibility with Spring proxies
+        final ItemService realItemService = itemService;
+        ItemService itemServiceSpy = mock(ItemService.class, withSettings().defaultAnswer(invocation -> {
+            try {
+                return invocation.getMethod().invoke(realItemService, invocation.getArguments());
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause();
+            }
+        }));
+
+        itemService.move(context, it, collection, collection, true);
         context.restoreAuthSystemState();
         assertThat("testMoveSameCollection 0", it.getOwningCollection(), notNullValue());
         assertThat("testMoveSameCollection 1", it.getOwningCollection(), equalTo(collection));

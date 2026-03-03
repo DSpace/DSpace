@@ -24,4 +24,9 @@
         <property name="eventService" ref="org.dspace.services.EventService"/>
     </bean>
 
+    <!-- Matomo events recording -->
+    <bean class="org.dspace.matomo.MatomoEventListener">
+        <property name="eventService" ref="org.dspace.services.EventService"/>
+    </bean>
+
 </beans>

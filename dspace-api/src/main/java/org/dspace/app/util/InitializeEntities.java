@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.cli.CommandLine;
@@ -63,38 +62,88 @@ public class InitializeEntities {
      * @throws ParseException       If something goes wrong with the parsing
      */
     public static void main(String[] argv) throws SQLException, AuthorizeException, ParseException {
+        runInitializeEntities(argv);
+        // Note: Do NOT call System.exit() on success - let the JVM exit naturally.
+        // This allows launcher.xml scripts to be called via reflection in tests.
+    }
+
+    /**
+     * Run the initialize-entities logic.
+     * This method is called by main() for CLI usage and directly by tests.
+     *
+     * @param argv the command line arguments
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     * @throws ParseException     if command line parsing error
+     */
+    public static void runInitializeEntities(String[] argv) throws SQLException, AuthorizeException, ParseException {
         InitializeEntities initializeEntities = new InitializeEntities();
+        // Set up command-line options and parse arguments
         CommandLineParser parser = new DefaultParser();
         Options options = createCommandLineOptions();
-        CommandLine line = parser.parse(options,argv);
+        CommandLine line = parser.parse(options, argv);
+        // First of all, check if the help option was entered or a required argument is missing
+        if (checkHelpEntered(options, line)) {
+            return;
+        }
+        // Get the file location from the command line
         String fileLocation = getFileLocationFromCommandLine(line);
-        checkHelpEntered(options, line);
+        if (fileLocation == null) {
+            return;
+        }
+        // Run the script
         initializeEntities.run(fileLocation);
     }
-    private static void checkHelpEntered(Options options, CommandLine line) {
-        if (line.hasOption("h")) {
+
+    /**
+     * Check if the help option was entered or a required argument is missing. If so, print help.
+     * @param options the defined command-line options
+     * @param line the parsed command-line arguments
+     * @return true if help was printed
+     */
+    private static boolean checkHelpEntered(Options options, CommandLine line) {
+        if (line.hasOption("h") || !line.hasOption("f")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("Initialize Entities", options);
-            System.exit(0);
+            return true;
         }
+        return false;
     }
+
+    /**
+     * Get the file path from the command-line argument.
+     * @param line the parsed command-line arguments
+     * @return the file path, or null if no file argument was entered
+     */
     private static String getFileLocationFromCommandLine(CommandLine line) {
         String query = line.getOptionValue("f");
         if (StringUtils.isEmpty(query)) {
             System.out.println("No file location was entered");
             log.info("No file location was entered");
-            System.exit(1);
+            return null;
         }
         return query;
     }
 
+    /**
+     * Create the command-line options
+     * @return the command-line options
+     */
     protected static Options createCommandLineOptions() {
         Options options = new Options();
-        options.addOption("f", "file", true, "the location for the file containing the xml data");
+        options.addOption("f", "file", true, "the path to the file containing the " +
+                "relationship definitions (e.g. ${dspace.dir}/config/entities/relationship-types.xml)");
+        options.addOption("h", "help", false, "print this message");
 
         return options;
     }
 
+    /**
+     * Run the script for the given file location
+     * @param fileLocation the file location
+     * @throws SQLException If something goes wrong initializing context or inserting relationship types
+     * @throws AuthorizeException  If the script user fails to authorize while inserting relationship types
+     */
     private void run(String fileLocation) throws SQLException, AuthorizeException {
         Context context = new Context();
         context.turnOffAuthorisationSystem();
@@ -102,11 +151,18 @@ public class InitializeEntities {
         context.complete();
     }
 
+    /**
+     * Parse the XML file at fileLocation to create relationship types in the database
+     * @param context DSpace context
+     * @param fileLocation the full or relative file path to the relationship types XML
+     * @throws AuthorizeException If the script user fails to authorize while inserting relationship types
+     */
     private void parseXMLToRelations(Context context, String fileLocation) throws AuthorizeException {
         try {
             File fXmlFile = new File(fileLocation);
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            // This XML builder will allow external entities, so the relationship types XML should
+            // be considered trusted by administrators
+            DocumentBuilder dBuilder = XMLUtils.getTrustedDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
 
             doc.getDocumentElement().normalize();
@@ -158,15 +214,15 @@ public class InitializeEntities {
 
                     for (int j = 0; j < leftCardinalityList.getLength(); j++) {
                         Node node = leftCardinalityList.item(j);
-                        leftCardinalityMin = getString(leftCardinalityMin,(Element) node, "min");
-                        leftCardinalityMax = getString(leftCardinalityMax,(Element) node, "max");
+                        leftCardinalityMin = getCardinalityMinString(leftCardinalityMin,(Element) node, "min");
+                        leftCardinalityMax = getCardinalityMinString(leftCardinalityMax,(Element) node, "max");
 
                     }
 
                     for (int j = 0; j < rightCardinalityList.getLength(); j++) {
                         Node node = rightCardinalityList.item(j);
-                        rightCardinalityMin = getString(rightCardinalityMin,(Element) node, "min");
-                        rightCardinalityMax = getString(rightCardinalityMax,(Element) node, "max");
+                        rightCardinalityMin = getCardinalityMinString(rightCardinalityMin,(Element) node, "min");
+                        rightCardinalityMax = getCardinalityMinString(rightCardinalityMax,(Element) node, "max");
 
                     }
                     populateRelationshipType(context, leftType, rightType, leftwardType, rightwardType,
@@ -182,13 +238,39 @@ public class InitializeEntities {
         }
     }
 
-    private String getString(String leftCardinalityMin,Element node, String minOrMax) {
+    /**
+     * Extract the min or max value for the left or right cardinality from the node text content
+     * @param leftCardinalityMin current left cardinality min
+     * @param node node to extract the min or max value from
+     * @param minOrMax element tag name to parse
+     * @return final left cardinality min
+     */
+    private String getCardinalityMinString(String leftCardinalityMin, Element node, String minOrMax) {
         if (node.getElementsByTagName(minOrMax).getLength() > 0) {
             leftCardinalityMin = node.getElementsByTagName(minOrMax).item(0).getTextContent();
         }
         return leftCardinalityMin;
     }
 
+    /**
+     * Populate the relationship type based on values parsed from the XML relationship types configuration
+     *
+     * @param context DSpace context
+     * @param leftType left relationship type (e.g. "Publication").
+     * @param rightType right relationship type (e.g. "Journal").
+     * @param leftwardType leftward relationship type (e.g. "isAuthorOfPublication").
+     * @param rightwardType rightward relationship type (e.g. "isPublicationOfAuthor").
+     * @param leftCardinalityMin left cardinality min
+     * @param leftCardinalityMax left cardinality max
+     * @param rightCardinalityMin right cardinality min
+     * @param rightCardinalityMax right cardinality max
+     * @param copyToLeft copy metadata values to left if right side is deleted
+     * @param copyToRight copy metadata values to right if left side is deleted
+     * @param tilted set a tilted relationship side (left or right) if there are many relationships going one way
+     *               to help performance (e.g. authors with 1000s of publications)
+     * @throws SQLException if database error occurs while saving the relationship type
+     * @throws AuthorizeException if authorization error occurs while saving the relationship type
+     */
     private void populateRelationshipType(Context context, String leftType, String rightType, String leftwardType,
                                           String rightwardType, String leftCardinalityMin, String leftCardinalityMax,
                                           String rightCardinalityMin, String rightCardinalityMax,

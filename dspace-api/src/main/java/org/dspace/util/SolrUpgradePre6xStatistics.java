@@ -9,9 +9,9 @@ package org.dspace.util;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -210,7 +210,7 @@ public class SolrUpgradePre6xStatistics {
      */
     private long logTime(boolean fromStart) {
         long ret = 0;
-        long cur = new Date().getTime();
+        long cur = Instant.now().toEpochMilli();
         if (lastTime == -1) {
             startTime = cur;
         } else if (fromStart) {

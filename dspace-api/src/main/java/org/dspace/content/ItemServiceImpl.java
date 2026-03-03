@@ -10,9 +10,9 @@ package org.dspace.content;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,10 +22,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
@@ -63,6 +63,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
@@ -297,7 +298,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         Optional<MetadataValue> templateItemEntityType = getDSpaceEntityType(templateItem);
 
         if (template && colEntityType.isPresent() && templateItemEntityType.isPresent() &&
-            !StringUtils.equals(colEntityType.get().getValue(), templateItemEntityType.get().getValue())) {
+            !Strings.CS.equals(colEntityType.get().getValue(), templateItemEntityType.get().getValue())) {
             throw new IllegalStateException("The template item has entity type : (" +
                 templateItemEntityType.get().getValue() + ") different than collection entity type : " +
                 colEntityType.get().getValue());
@@ -415,20 +416,20 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
+    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Instant since)
         throws SQLException {
         return itemDAO.findAll(context, true, true, true, since);
     }
 
     @Override
-    public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
+    public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Instant since)
         throws SQLException {
         return itemDAO.findAll(context, true, true, false, since);
     }
 
     @Override
     public void updateLastModified(Context context, Item item) throws SQLException, AuthorizeException {
-        item.setLastModified(new Date());
+        item.setLastModified(Instant.now());
         update(context, item);
         //Also fire a modified event since the item HAS been modified
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(), null, getIdentifiers(context, item)));
@@ -480,15 +481,16 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // now add authorization policies from owning item
         // hmm, not very "multiple-inclusion" friendly
-        authorizeService.inheritPolicies(context, item, bundle);
+        authorizeService.inheritPolicies(context, item, bundle, true);
 
         // Add the bundle to in-memory list
         item.addBundle(bundle);
         bundle.addItem(item);
 
         context.addEvent(new Event(Event.ADD, Constants.ITEM, item.getID(),
-                                   Constants.BUNDLE, bundle.getID(), bundle.getName(),
-                                   getIdentifiers(context, item)));
+            Constants.BUNDLE, bundle.getID(),
+            bundle.getName(), DetailType.DSO_NAME,
+            getIdentifiers(context, item)));
     }
 
     @Override
@@ -501,7 +503,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             + item.getID() + ",bundle_id=" + bundle.getID()));
 
         context.addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(),
-                                   Constants.BUNDLE, bundle.getID(), bundle.getName(), getIdentifiers(context, item)));
+            Constants.BUNDLE, bundle.getID(), bundle.getName(), DetailType.DSO_NAME,
+            getIdentifiers(context, item)));
 
         bundleService.delete(context, bundle);
     }
@@ -563,8 +566,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         update(context, item);
         context.restoreAuthSystemState();
 
-        context.addEvent(new Event(Event.CREATE, Constants.ITEM, item.getID(),
-                null, getIdentifiers(context, item)));
+        context.addEvent(new Event(Event.CREATE, Constants.ITEM, item.getID(), null,
+                                   DetailType.DSO_SUMMARY, getIdentifiers(context, item)));
 
         log.info(LogHelper.getHeader(context, "create_item", "item_id=" + item.getID()));
 
@@ -582,8 +585,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         update(context, item);
         context.restoreAuthSystemState();
 
-        context.addEvent(new Event(Event.CREATE, Constants.ITEM, item.getID(),
-                                   null, getIdentifiers(context, item)));
+        context.addEvent(new Event(Event.CREATE, Constants.ITEM, item.getID(), null,
+                                   DetailType.DSO_SUMMARY, getIdentifiers(context, item)));
 
         log.info(LogHelper.getHeader(context, "create_item", "item_id=" + item.getID()));
 
@@ -594,7 +597,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public void removeDSpaceLicense(Context context, Item item) throws SQLException, AuthorizeException, IOException {
         // get all bundles with name "LICENSE" (these are the DSpace license
         // bundles)
-        List<Bundle> bunds = getBundles(item, "LICENSE");
+        List<Bundle> bunds = getBundles(item, Constants.LICENSE_BUNDLE_NAME);
 
         for (Bundle bund : bunds) {
             // FIXME: probably serious troubles with Authorizations
@@ -681,13 +684,15 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         if (item.isMetadataModified() || item.isModified()) {
             // Set the last modified date
-            item.setLastModified(new Date());
+            item.setLastModified(Instant.now());
 
             itemDAO.save(context, item);
 
             if (item.isMetadataModified()) {
-                context.addEvent(new Event(Event.MODIFY_METADATA, item.getType(), item.getID(), item.getDetails(),
-                                           getIdentifiers(context, item)));
+                context.addEvent(new Event(Event.MODIFY_METADATA, item.getType(), item.getID(),
+                    item.getMetadataEventDetails(), DetailType.DSO_SUMMARY,
+                    getIdentifiers(context, item)));
+                item.clearMetadataEventDetails();
             }
 
             context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(),
@@ -736,7 +741,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         update(context, item);
 
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(),
-                                   "WITHDRAW", getIdentifiers(context, item)));
+            "WITHDRAW", DetailType.ACTION, getIdentifiers(context, item)));
 
         // switch all READ authorization policies to WITHDRAWN_READ
         authorizeService.switchPoliciesAction(context, item, Constants.READ, Constants.WITHDRAWN_READ);
@@ -791,7 +796,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         update(context, item);
 
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(),
-                                   "REINSTATE", getIdentifiers(context, item)));
+            "REINSTATE", DetailType.ACTION, getIdentifiers(context, item)));
 
         // restore all WITHDRAWN_READ authorization policies back to READ
         for (Bundle bnd : item.getBundles()) {
@@ -833,7 +838,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         authorizeService.authorizeAction(context, item, Constants.REMOVE);
 
         context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(),
-                                   item.getHandle(), getIdentifiers(context, item)));
+            item.getHandle(), DetailType.HANDLE, getIdentifiers(context, item)));
 
         log.info(LogHelper.getHeader(context, "delete_item", "item_id="
             + item.getID()));
@@ -921,7 +926,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         log.info(LogHelper.getHeader(context, "remove_bundle", "item_id="
             + item.getID() + ",bundle_id=" + b.getID()));
         context
-            .addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(), Constants.BUNDLE, b.getID(), b.getName()));
+            .addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(), Constants.BUNDLE, b.getID(),
+                b.getName(), DetailType.DSO_NAME));
     }
 
     protected void removeVersion(Context context, Item item) throws AuthorizeException, SQLException {
@@ -1046,8 +1052,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             // if come from InstallItem: remove all submission/workflow policies
             authorizeService.removeAllPoliciesByDSOAndType(context, mybundle, ResourcePolicy.TYPE_SUBMISSION);
             authorizeService.removeAllPoliciesByDSOAndType(context, mybundle, ResourcePolicy.TYPE_WORKFLOW);
-            addCustomPoliciesNotInPlace(context, mybundle, defaultItemPolicies);
-            addDefaultPoliciesNotInPlace(context, mybundle, defaultCollectionBundlePolicies);
+            authorizeService.addCustomPoliciesNotInPlace(context, mybundle, defaultItemPolicies);
+            authorizeService.addDefaultPoliciesNotInPlace(context, mybundle, defaultCollectionBundlePolicies);
 
             for (Bitstream bitstream : mybundle.getBitstreams()) {
                 // If collection has default READ policies, remove the bundle's READ policies.
@@ -1093,8 +1099,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         throws SQLException, AuthorizeException {
         authorizeService.removeAllPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_SUBMISSION);
         authorizeService.removeAllPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_WORKFLOW);
-        addCustomPoliciesNotInPlace(context, bitstream, defaultItemPolicies);
-        addDefaultPoliciesNotInPlace(context, bitstream, defaultCollectionPolicies);
+        authorizeService.addCustomPoliciesNotInPlace(context, bitstream, defaultItemPolicies);
+        authorizeService.addDefaultPoliciesNotInPlace(context, bitstream, defaultCollectionPolicies);
     }
 
     @Override
@@ -1132,7 +1138,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_WORKFLOW);
 
             // add default policies only if not already in place
-            addDefaultPoliciesNotInPlace(context, item, defaultCollectionPolicies);
+            authorizeService.addDefaultPoliciesNotInPlace(context, item, defaultCollectionPolicies);
         } finally {
             context.restoreAuthSystemState();
         }
@@ -1141,11 +1147,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public void move(Context context, Item item, Collection from, Collection to)
         throws SQLException, AuthorizeException, IOException {
-
-        // If the two collections are the same, do nothing.
-        if (from.equals(to)) {
-            return;
-        }
 
         // Use the normal move method, and default to not inherit permissions
         this.move(context, item, from, to, false);
@@ -1159,6 +1160,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // only do write authorization if user is not an editor
         if (!canEdit(context, item)) {
             authorizeService.authorizeAction(context, item, Constants.WRITE);
+        }
+
+        // If the two collections are the same, do nothing.
+        if (from.equals(to)) {
+            return;
         }
 
         // Move the Item from one Collection to the other
@@ -1261,43 +1267,38 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
      *
      * @param context                    DSpace context
      * @param discoverQuery
+     * @param q                          query string
      * @return                           discovery search result objects
-     * @throws SQLException              if something goes wrong
      * @throws SearchServiceException    if search error
      */
-    private DiscoverResult retrieveItemsWithEdit(Context context, DiscoverQuery discoverQuery)
-        throws SQLException, SearchServiceException {
-        EPerson currentUser = context.getCurrentUser();
-        if (!authorizeService.isAdmin(context)) {
-            String userId = currentUser != null ? "e" + currentUser.getID().toString() : "e";
-            Stream<String> groupIds = groupService.allMemberGroupsSet(context, currentUser).stream()
-                .map(group -> "g" + group.getID());
-            String query = Stream.concat(Stream.of(userId), groupIds)
-                .collect(Collectors.joining(" OR ", "edit:(", ")"));
-            discoverQuery.addFilterQueries(query);
+    private DiscoverResult retrieveItemsWithEdit(Context context, DiscoverQuery discoverQuery, String q)
+        throws SearchServiceException {
+        if (StringUtils.isNotBlank(q)) {
+            discoverQuery.setQuery(q);
         }
+        discoverQuery.addRequiredAuthorization(Constants.WRITE);
         return searchService.search(context, discoverQuery);
     }
 
     @Override
-    public List<Item> findItemsWithEdit(Context context, int offset, int limit)
-        throws SQLException, SearchServiceException {
+    public List<Item> findItemsWithEdit(Context context, String q, int offset, int limit)
+        throws SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
         discoverQuery.setStart(offset);
         discoverQuery.setMaxResults(limit);
-        DiscoverResult resp = retrieveItemsWithEdit(context, discoverQuery);
+        DiscoverResult resp = retrieveItemsWithEdit(context, discoverQuery, q);
         return resp.getIndexableObjects().stream()
             .map(solrItems -> ((IndexableItem) solrItems).getIndexedObject())
             .collect(Collectors.toList());
     }
 
     @Override
-    public int countItemsWithEdit(Context context) throws SQLException, SearchServiceException {
+    public int countItemsWithEdit(Context context, String q) throws SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setMaxResults(0);
         discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
-        DiscoverResult resp = retrieveItemsWithEdit(context, discoverQuery);
+        DiscoverResult resp = retrieveItemsWithEdit(context, discoverQuery, q);
         return (int) resp.getTotalSearchResults();
     }
 
@@ -1322,91 +1323,7 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     */
 
-    /**
-     * Add the default policies, which have not been already added to the given DSpace object
-     *
-     * @param context                   The relevant DSpace Context.
-     * @param dso                       The DSpace Object to add policies to
-     * @param defaultCollectionPolicies list of policies
-     * @throws SQLException       An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
-     */
-    protected void addDefaultPoliciesNotInPlace(Context context, DSpaceObject dso,
-        List<ResourcePolicy> defaultCollectionPolicies) throws SQLException, AuthorizeException {
-        boolean appendMode = configurationService
-                .getBooleanProperty("core.authorization.installitem.inheritance-read.append-mode", false);
-        for (ResourcePolicy defaultPolicy : defaultCollectionPolicies) {
-            if (!authorizeService
-                .isAnIdenticalPolicyAlreadyInPlace(context, dso, defaultPolicy.getGroup(), Constants.READ,
-                    defaultPolicy.getID()) &&
-                   (!appendMode && isNotAlreadyACustomRPOfThisTypeOnDSO(context, dso) ||
-                    appendMode && shouldBeAppended(context, dso, defaultPolicy))) {
-                ResourcePolicy newPolicy = resourcePolicyService.clone(context, defaultPolicy);
-                newPolicy.setdSpaceObject(dso);
-                newPolicy.setAction(Constants.READ);
-                newPolicy.setRpType(ResourcePolicy.TYPE_INHERITED);
-                resourcePolicyService.update(context, newPolicy);
-            }
-        }
-    }
 
-    private void addCustomPoliciesNotInPlace(Context context, DSpaceObject dso, List<ResourcePolicy> customPolicies)
-            throws SQLException, AuthorizeException {
-        boolean customPoliciesAlreadyInPlace = authorizeService
-                .findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM).size() > 0;
-        if (!customPoliciesAlreadyInPlace) {
-            authorizeService.addPolicies(context, customPolicies, dso);
-        }
-    }
-
-    /**
-     * Check whether or not there is already an RP on the given dso, which has actionId={@link Constants.READ} and
-     * resourceTypeId={@link ResourcePolicy.TYPE_CUSTOM}
-     *
-     * @param context DSpace context
-     * @param dso     DSpace object to check for custom read RP
-     * @return True if there is no RP on the item with custom read RP, otherwise false
-     * @throws SQLException If something goes wrong retrieving the RP on the DSO
-     */
-    private boolean isNotAlreadyACustomRPOfThisTypeOnDSO(Context context, DSpaceObject dso) throws SQLException {
-        List<ResourcePolicy> readRPs = resourcePolicyService.find(context, dso, Constants.READ);
-        for (ResourcePolicy readRP : readRPs) {
-            if (readRP.getRpType() != null && readRP.getRpType().equals(ResourcePolicy.TYPE_CUSTOM)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Check if the provided default policy should be appended or not to the final
-     * item. If an item has at least one custom READ policy any anonymous READ
-     * policy with empty start/end date should be skipped
-     *
-     * @param context       DSpace context
-     * @param dso           DSpace object to check for custom read RP
-     * @param defaultPolicy The policy to check
-     * @return
-     * @throws SQLException If something goes wrong retrieving the RP on the DSO
-     */
-    private boolean shouldBeAppended(Context context, DSpaceObject dso, ResourcePolicy defaultPolicy)
-            throws SQLException {
-        boolean hasCustomPolicy = resourcePolicyService.find(context, dso, Constants.READ)
-                                                       .stream()
-                                                       .filter(rp -> (Objects.nonNull(rp.getRpType()) &&
-                                                            Objects.equals(rp.getRpType(), ResourcePolicy.TYPE_CUSTOM)))
-                                                       .findFirst()
-                                                       .isPresent();
-
-        boolean isAnonimousGroup = Objects.nonNull(defaultPolicy.getGroup())
-                && StringUtils.equals(defaultPolicy.getGroup().getName(), Group.ANONYMOUS);
-
-        boolean datesAreNull = Objects.isNull(defaultPolicy.getStartDate())
-                && Objects.isNull(defaultPolicy.getEndDate());
-
-        return !(hasCustomPolicy && isAnonimousGroup && datesAreNull);
-    }
 
     /**
      * Returns an iterator of Items possessing the passed metadata field, or only
@@ -1449,6 +1366,27 @@ prevent the generation of resource policy entry values with null dspace_object a
             throws SQLException, AuthorizeException {
         String[] mdValueByField = getMDValueByField(metadataField);
         return findArchivedByMetadataField(context, mdValueByField[0], mdValueByField[1], mdValueByField[2], value);
+    }
+
+    @Override
+    public Iterator<Item> findArchivedByMetadataFieldExcludingOldVersions(Context context, String schema,
+                                                                          String element, String qualifier,
+                                                                          String value)
+            throws SQLException, AuthorizeException {
+        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        if (mds == null) {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
+        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        if (mdf == null) {
+            throw new IllegalArgumentException(
+                    "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
+
+        if (Item.ANY.equals(value)) {
+            return itemDAO.findByMetadataFieldExcludingOldVersions(context, mdf, null, true);
+        }
+        return itemDAO.findByMetadataFieldExcludingOldVersions(context, mdf, value, true);
     }
 
     /**
@@ -1694,7 +1632,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public Iterator<Item> findByLastModifiedSince(Context context, Date last)
+    public Iterator<Item> findByLastModifiedSince(Context context, Instant last)
         throws SQLException {
         return itemDAO.findByLastModifiedSince(context, last);
     }

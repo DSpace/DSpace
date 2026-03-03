@@ -11,8 +11,6 @@ import static java.lang.Integer.MAX_VALUE;
 import org.dspace.xoai.app.BasicConfiguration;
 import org.dspace.xoai.services.api.xoai.ItemRepositoryResolver;
 import org.dspace.xoai.services.impl.xoai.DSpaceItemRepositoryResolver;
-import org.jtwig.spring.JtwigViewResolver;
-import org.jtwig.spring.boot.config.JtwigViewResolverConfigurer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -20,31 +18,37 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
+import org.thymeleaf.spring6.view.ThymeleafViewResolver;
+import org.thymeleaf.templatemode.TemplateMode;
 
 /**
- * OAI-PMH webapp configuration. Replaces the old web.xml
+ * OAI-PMH webapp configuration. Replaces the old web.xml.
+ * This webapp used JTwig in earlier versions and has been refactored to
+ * use Thymeleaf instead.
  * <p>
  * This @Configuration class is automatically discovered by Spring Boot via a @ComponentScan
  * on the org.dspace.app.configuration package.
  * <p>
  *
  *
- * @author Tim Donohue
+ * @author Kim Shepherd
  */
 @Configuration
 // Import additional configuration and beans from BasicConfiguration
 @Import(BasicConfiguration.class)
 // Scan for controllers in this package
 @ComponentScan("org.dspace.xoai.controller")
-public class OAIWebConfig implements WebMvcConfigurer, JtwigViewResolverConfigurer {
+public class OAIWebConfig implements WebMvcConfigurer {
 
     // Path where OAI is deployed. Defaults to "oai"
     // NOTE: deployment on this path is handled by org.dspace.xoai.controller.DSpaceOAIDataProvider
     @Value("${oai.path:oai}")
     private String oaiPath;
 
-    private static final String TWIG_HTML_EXTENSION = ".twig.html";
     private static final String VIEWS_LOCATION = "classpath:/templates/";
+    private static final String HTML_EXTENSION = ".html";
 
     /**
      * Ensure all resources under src/main/resources/static/ directory are available
@@ -58,13 +62,38 @@ public class OAIWebConfig implements WebMvcConfigurer, JtwigViewResolverConfigur
     }
 
     /**
-     * Configure the Jtwig template engine for Spring Boot
-     * Ensures Jtwig looks for templates in proper location with proper extension
+     * Configure the Thymeleaf template resolver
      **/
-    @Override
-    public void configure(JtwigViewResolver viewResolver) {
-        viewResolver.setPrefix(VIEWS_LOCATION);
-        viewResolver.setSuffix(TWIG_HTML_EXTENSION);
+    @Bean
+    public SpringResourceTemplateResolver templateResolver() {
+        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
+        templateResolver.setPrefix(VIEWS_LOCATION);
+        templateResolver.setSuffix(HTML_EXTENSION);
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+        templateResolver.setCacheable(true);
+        return templateResolver;
+    }
+
+    /**
+     * Configure the Thymeleaf template engine
+     **/
+    @Bean
+    public SpringTemplateEngine templateEngine() {
+        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver());
+        templateEngine.setEnableSpringELCompiler(true);
+        return templateEngine;
+    }
+
+    /**
+     * Configure the Thymeleaf view resolver
+     **/
+    @Bean
+    public ThymeleafViewResolver viewResolver() {
+        ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
+        viewResolver.setTemplateEngine(templateEngine());
+        viewResolver.setCharacterEncoding("UTF-8");
+        return viewResolver;
     }
 
     @Bean
@@ -72,4 +101,3 @@ public class OAIWebConfig implements WebMvcConfigurer, JtwigViewResolverConfigur
         return new DSpaceItemRepositoryResolver();
     }
 }
-
