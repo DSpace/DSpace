@@ -175,7 +175,7 @@ jobs:
       - name: Build and push image to ${{ env.DOCKER_BUILD_REGISTRY }}
         if: ${{ ! matrix.isPr }}
         id: docker_build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           build-contexts: |
             ${{ inputs.dockerfile_additional_contexts }}
@@ -231,7 +231,7 @@ jobs:
       # with direct tarball export. This includes: dspace-dependencies, dspace-solr, dspace-postgres-loadsql
       - name: Build and push image to local TAR file (docker-container driver)
         if: ${{ matrix.arch == 'linux/amd64' && (!matrix.isPr || (inputs.build_id != 'dspace-prod' && inputs.build_id != 'dspace-test' && inputs.build_id != 'dspace-cli')) }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           build-contexts: |
             ${{ inputs.dockerfile_additional_contexts }}
@@ -255,7 +255,7 @@ jobs:
       # The docker driver doesn't support tarball export, so we use 'load: true' and then 'docker save'.
       - name: Build image (docker driver for local dependencies access)
         if: ${{ matrix.arch == 'linux/amd64' && matrix.isPr && (inputs.build_id == 'dspace-prod' || inputs.build_id == 'dspace-test' || inputs.build_id == 'dspace-cli') }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           build-contexts: |
             ${{ inputs.dockerfile_additional_contexts }}
