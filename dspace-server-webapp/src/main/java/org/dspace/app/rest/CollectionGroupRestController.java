@@ -16,7 +16,7 @@ import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
@@ -233,7 +233,7 @@ public class CollectionGroupRestController {
             .getAuthorizedGroups(context, collection, Constants.DEFAULT_ITEM_READ);
         if (itemGroups != null && !itemGroups.isEmpty()) {
             Group itemReadGroup = itemGroups.get(0);
-            if (itemReadGroup != null && !StringUtils.equalsIgnoreCase(itemReadGroup.getName(), Group.ANONYMOUS)) {
+            if (itemReadGroup != null && !Strings.CI.equals(itemReadGroup.getName(), Group.ANONYMOUS)) {
                 throw new UnprocessableEntityException(
                     "Unable to create a new default read group because either the group already exists or multiple " +
                         "groups are assigned the default privileges.");
@@ -273,7 +273,7 @@ public class CollectionGroupRestController {
         List<Group> itemGroups = authorizeService.getAuthorizedGroups(context, collection, Constants.DEFAULT_ITEM_READ);
         if (itemGroups != null && !itemGroups.isEmpty()) {
             Group itemReadGroup = itemGroups.get(0);
-            if (itemReadGroup == null || StringUtils.equalsIgnoreCase(itemReadGroup.getName(), Group.ANONYMOUS)) {
+            if (itemReadGroup == null || Strings.CI.equals(itemReadGroup.getName(), Group.ANONYMOUS)) {
                 throw new UnprocessableEntityException(
                     "Unable to delete the default read group because it's the default");
             }
@@ -315,7 +315,7 @@ public class CollectionGroupRestController {
             .getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
         if (bitstreamGroups != null && !bitstreamGroups.isEmpty()) {
             Group bitstreamGroup = bitstreamGroups.get(0);
-            if (bitstreamGroup != null && !StringUtils.equalsIgnoreCase(bitstreamGroup.getName(), Group.ANONYMOUS)) {
+            if (bitstreamGroup != null && !Strings.CI.equals(bitstreamGroup.getName(), Group.ANONYMOUS)) {
                 throw new UnprocessableEntityException(
                     "Unable to create a new default read group because either the group already exists or multiple " +
                         "groups are assigned the default privileges.");
@@ -357,8 +357,8 @@ public class CollectionGroupRestController {
             .getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
         if (bitstreamGroups != null && !bitstreamGroups.isEmpty()) {
             Group bitstreamReadGroup = bitstreamGroups.get(0);
-            if (bitstreamReadGroup == null || StringUtils
-                .equalsIgnoreCase(bitstreamReadGroup.getName(), Group.ANONYMOUS)) {
+            if (bitstreamReadGroup == null || Strings
+                .CI.equals(bitstreamReadGroup.getName(), Group.ANONYMOUS)) {
                 throw new UnprocessableEntityException(
                     "Unable to delete the default read group because it's the default");
             }

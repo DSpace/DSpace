@@ -743,6 +743,24 @@ public interface ItemService
             throws SQLException, AuthorizeException;
 
     /**
+     * Returns an iterator of in archive items possessing the passed metadata field, or only
+     * those matching the passed value, if value is not Item.ANY. This method excludes items
+     * that are not the latest version in their version history (old versions of versioned items).
+     *
+     * @param context   DSpace context object
+     * @param schema    metadata field schema
+     * @param element   metadata field element
+     * @param qualifier metadata field qualifier
+     * @param value     field value or Item.ANY to match any value
+     * @return an iterator over the items matching that authority value, excluding old versions
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     */
+    Iterator<Item> findArchivedByMetadataFieldExcludingOldVersions(Context context, String schema, String element,
+                                                                   String qualifier, String value)
+        throws SQLException, AuthorizeException;
+
+    /**
      * Returns an iterator of Items possessing the passed metadata field, or only
      * those matching the passed value, if value is not Item.ANY
      *
@@ -915,23 +933,23 @@ public interface ItemService
     /**
       * finds all items for which the current user has editing rights
       * @param context DSpace context object
+      * @param q search query
       * @param offset page offset
       * @param limit  page size limit
       * @return list of items for which the current user has editing rights
-      * @throws SQLException
       * @throws SearchServiceException
       */
-    List<Item> findItemsWithEdit(Context context, int offset, int limit)
-        throws SQLException, SearchServiceException;
+    List<Item> findItemsWithEdit(Context context, String q, int offset, int limit)
+        throws SearchServiceException;
 
     /**
     * counts all items for which the current user has editing rights
     * @param context DSpace context object
+    * @param q search query
     * @return list of items for which the current user has editing rights
-    * @throws SQLException
     * @throws SearchServiceException
     */
-    int countItemsWithEdit(Context context) throws SQLException, SearchServiceException;
+    int countItemsWithEdit(Context context, String q) throws SearchServiceException;
 
     /**
      * Check if the supplied item is an inprogress submission

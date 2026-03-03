@@ -19,7 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
 import org.dspace.core.ReloadableEntity;
@@ -140,7 +140,7 @@ public class MetadataValue implements ReloadableEntity<Integer> {
      * @param language new language
      */
     public void setLanguage(String language) {
-        if (StringUtils.equals(language, Item.ANY)) {
+        if (Strings.CS.equals(language, Item.ANY)) {
             language = null;
         }
         this.language = language;

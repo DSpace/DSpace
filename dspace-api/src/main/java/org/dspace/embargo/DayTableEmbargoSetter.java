@@ -79,7 +79,7 @@ public class DayTableEmbargoSetter extends DefaultEmbargoSetter {
     private Properties getTermProperties() {
         Properties termProps = new Properties();
 
-        String terms[] = DSpaceServicesFactory.getInstance().getConfigurationService()
+        String[] terms = DSpaceServicesFactory.getInstance().getConfigurationService()
                                               .getArrayProperty("embargo.terms.days");
 
         if (terms != null) {

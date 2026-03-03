@@ -63,7 +63,7 @@ public class METSDisseminationCrosswalk
     private static final Namespace METS_NS = Namespace
         .getNamespace("mets", "http://www.loc.gov/METS/");
 
-    private static final Namespace namespaces[] = {METS_NS, MODS_NS, XLINK_NS};
+    private static final Namespace[] namespaces = {METS_NS, MODS_NS, XLINK_NS};
 
     /**
      * URL of METS XML Schema
