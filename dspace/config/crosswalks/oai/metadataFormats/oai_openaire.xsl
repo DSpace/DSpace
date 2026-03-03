@@ -858,13 +858,13 @@
     <!-- datacite:sizes -->
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_size.html -->
     <xsl:template match="doc:element[@name='bundles']/doc:element[@name='bundle']" mode="datacite">
-        <datacite:sizes>
-            <xsl:if test="doc:field[@name='name' and text()='ORIGINAL']">
+        <xsl:if test="doc:field[@name='name' and text()='ORIGINAL']">
+            <datacite:sizes>
                 <xsl:for-each select="doc:element[@name='bitstreams']/doc:element[@name='bitstream']">
                     <xsl:apply-templates select="." mode="datacite"/>
                 </xsl:for-each>
-            </xsl:if>
-        </datacite:sizes>
+            </datacite:sizes>
+        </xsl:if>
     </xsl:template>
     
      <!-- datacite:size -->
