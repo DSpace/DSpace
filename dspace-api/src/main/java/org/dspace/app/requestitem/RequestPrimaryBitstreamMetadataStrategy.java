@@ -32,7 +32,7 @@ import org.springframework.lang.NonNull;
  * Failover to the RequestItemSubmitterStrategy.
  *
  */
-public class RequestPrimaryBitstreamMetadataStrategy extends RequestItemSubmitterStrategy {
+public class RequestPrimaryBitstreamMetadataStrategy implements RequestItemAuthorExtractor {
 
     protected String emailMetadata;
     protected String fullNameMetadata;
@@ -80,7 +80,7 @@ public class RequestPrimaryBitstreamMetadataStrategy extends RequestItemSubmitte
                 if (null != fullNameMetadata) {
                     nameVals = bitstreamService.getMetadataByMetadataString(bitstream, fullNameMetadata);
                 } else {
-                    nameVals = Collections.EMPTY_LIST;
+                    nameVals = Collections.emptyList();
                 }
                 boolean useNames = vals.size() == nameVals.size();
                 if (!vals.isEmpty()) {
@@ -104,31 +104,8 @@ public class RequestPrimaryBitstreamMetadataStrategy extends RequestItemSubmitte
                     return authors;
                 }
             }
-            return Collections.EMPTY_LIST;
-        } else {
-            // Uses the basic strategy to look for the original submitter
-            authors = super.getRequestItemAuthor(context, item);
-
-            // Remove from the list authors that do not have email addresses.
-            for (RequestItemAuthor author : authors) {
-                if (null == author.getEmail()) {
-                    authors.remove(author);
-                }
-            }
-
-            if (authors.isEmpty()) { // No author email addresses!  Fall back
-                //First get help desk name and email
-                String email = configurationService.getProperty("mail.helpdesk");
-                String name = configurationService.getProperty("mail.helpdesk.name");
-                // If help desk mail is null get the mail and name of admin
-                if (email == null) {
-                    email = configurationService.getProperty("mail.admin");
-                    name = configurationService.getProperty("mail.admin.name");
-                }
-                authors.add(new RequestItemAuthor(name, email));
-            }
-            return authors;
         }
+        return Collections.emptyList();
     }
 
     public void setEmailMetadata(@NonNull String emailMetadata) {
