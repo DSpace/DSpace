@@ -1,0 +1,285 @@
+name: DSpace Build & Deploy
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: interacoes/dspace-backend
+  DSPACE_INSTALL_DIR: /dspaceinstall
+
+jobs:
+  # ──────────────────────────────────────────────────────────────────────
+  # JOB 1: Build Maven + ant fresh_install + gera imagem Docker + push
+  # ──────────────────────────────────────────────────────────────────────
+  build-and-publish:
+    name: Build, Install & Publish Image
+    runs-on: ubuntu-latest
+
+    # PostgreSQL local para o ant fresh_install poder conectar
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: dspace
+          POSTGRES_USER: dspace
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD_DEV }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dspace"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    permissions:
+      contents: read
+      packages: write   # necessário para push no GHCR
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Cache Maven ~/.m2
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Instalar Ant
+        run: sudo apt-get install -y ant
+
+      - name: Criar diretório de instalação
+        run: sudo mkdir -p $DSPACE_INSTALL_DIR && sudo chown $USER $DSPACE_INSTALL_DIR
+
+      - name: Habilitar pgcrypto no PostgreSQL
+        run: |
+          PGPASSWORD=${{ secrets.DB_PASSWORD_DEV }} psql \
+            -h localhost -U dspace -d dspace \
+            -c "CREATE EXTENSION IF NOT EXISTS pgcrypto;"
+
+      - name: Criar arquivo local.cfg
+        run: |
+          cat > dspace/config/local.cfg << EOF
+          dspace.dir = $DSPACE_INSTALL_DIR
+          dspace.server.url = https://dev.interacoes.ltap.ifce.edu.br/server
+          dspace.server.ssr.url = https://dev.interacoes.ltap.ifce.edu.br/server
+          dspace.ui.url = https://dev.interacoes.ltap.ifce.edu.br
+          dspace.name = InterAções - SASE/MEC
+          dspace.shortname = InterAções
+          default.language = pt_BR
+
+          solr.server = http://localhost:8983/solr
+          solr.multicorePrefix =
+
+          db.url = jdbc:postgresql://localhost:5432/dspace
+          db.driver = org.postgresql.Driver
+          db.dialect = org.dspace.util.DSpacePostgreSQLDialect
+          db.username = dspace
+          db.password = ${{ secrets.DB_PASSWORD_DEV }}
+          db.schema = public
+          db.maxconnections = 30
+          db.maxwait = 10000
+          db.minidle = 0
+          db.maxidle = 10
+          db.initialsize = 0
+          db.maxconnlifetime = -1
+          db.removeabandoned = false
+          db.removeabandonedtimeout = 300
+
+          logging.server.include-after-request = false
+          logging.server.include-client-info = false
+          logging.server.include-headers = false
+          logging.server.include-payload = false
+          logging.server.include-query-string = false
+          logging.server.include-stacktrace-for-httpcode = 422
+          logging.server.max-payload-length = 10000
+
+          mail.server = smtp.sendgrid.net
+          mail.server.port = 587
+          mail.server.use.tls = true
+          mail.server.use.ssl = false
+          mail.server.username = apikey
+          mail.server.password = ${{ secrets.SMTP_PASSWD }}
+          mail.from.address = no-reply@ltap.ifce.edu.br
+          EOF
+
+      - name: mvn package
+        run: |
+          mvn --batch-mode \
+              -Denforcer.skip=true \
+              package \
+              -DskipTests
+
+      - name: ant fresh_install
+        run: |
+          cd dspace/target/dspace-installer
+          ant fresh_install
+
+      - name: dspace database migrate
+        run: |
+          $DSPACE_INSTALL_DIR/bin/dspace database migrate
+
+      # Copia o resultado do ant fresh_install para dentro do contexto
+      # de build do Docker (COPY só enxerga paths relativos ao contexto)
+      # Sobrescreve local.cfg com configurações de produção APÓS o ant
+      # O ant usou localhost, a imagem Docker usará os containers da rede
+      - name: Gerar local.cfg de produção
+        run: |
+          cat > $DSPACE_INSTALL_DIR/config/local.cfg << EOF
+          dspace.dir = /dspaceinstall
+          dspace.server.url = https://dev.interacoes.ltap.ifce.edu.br/server
+          dspace.server.ssr.url = https://dev.interacoes.ltap.ifce.edu.br/server
+          dspace.ui.url = https://dev.interacoes.ltap.ifce.edu.br
+          dspace.name = InterAções - SASE/MEC
+          dspace.shortname = InterAções
+          default.language = pt_BR
+
+          solr.server = http://dspace-solr:8983/solr
+          solr.multicorePrefix =
+
+          db.url = jdbc:postgresql://dspace-db:5432/dspace
+          db.driver = org.postgresql.Driver
+          db.dialect = org.dspace.util.DSpacePostgreSQLDialect
+          db.username = dspace
+          db.password = ${{ secrets.DB_PASSWORD_DEV }}
+          db.schema = public
+          db.maxconnections = 30
+          db.maxwait = 10000
+          db.minidle = 0
+          db.maxidle = 10
+          db.initialsize = 0
+          db.maxconnlifetime = -1
+          db.removeabandoned = false
+          db.removeabandonedtimeout = 300
+
+          logging.server.include-after-request = false
+          logging.server.include-client-info = false
+          logging.server.include-headers = false
+          logging.server.include-payload = false
+          logging.server.include-query-string = false
+          logging.server.include-stacktrace-for-httpcode = 422
+          logging.server.max-payload-length = 10000
+
+          mail.server = smtp.sendgrid.net
+          mail.server.port = 587
+          mail.server.use.tls = true
+          mail.server.use.ssl = false
+          mail.server.username = apikey
+          mail.server.password = ${{ secrets.SMTP_PASSWD }}
+          mail.from.address = no-reply@ltap.ifce.edu.br
+          EOF
+
+      - name: Copiar instalação para contexto do Docker
+        run: |
+          # Copia o CONTEÚDO de /dspaceinstall (não a pasta em si)
+          # usando /. no final garante que copia apenas o conteúdo interno
+          mkdir -p ./dspace-installed
+          cp -R $DSPACE_INSTALL_DIR/. ./dspace-installed/
+          echo "==> Verificando estrutura copiada..."
+          ls -la ./dspace-installed/
+          echo "==> Verificando config..."
+          ls -la ./dspace-installed/config/ | head -20
+          echo "==> Verificando webapps..."
+          ls -la ./dspace-installed/webapps/
+
+      - name: Login no GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Definir nome da imagem em lowercase
+        id: image_name
+        run: echo "value=$(echo '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
+      - name: Extrair metadata da imagem (tags e labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.image_name.outputs.value }}
+          tags: |
+            type=sha,prefix=sha-
+            type=raw,value=latest
+
+      - name: Build e push da imagem Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  # ──────────────────────────────────────────────────────────────────────
+  # JOB 2: Deploy no servidor remoto
+  # ──────────────────────────────────────────────────────────────────────
+  deploy:
+    name: Deploy no servidor
+    runs-on: ubuntu-latest
+    needs: build-and-publish
+
+    steps:
+      - name: Configurar chave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY_DEV }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${{ secrets.VPS_HOST_DEV }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy no servidor
+        run: |
+          ssh -o StrictHostKeyChecking=no "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST_DEV }}" bash << 'REMOTE'
+            set -e
+
+            # Carrega variáveis do .env no servidor
+            set -a
+            source /home/interacoes/dspace-solr-postgres/.env
+            set +a
+
+            echo "==> Login no GHCR..."
+            docker login ghcr.io -u "$GHCR_ACTOR" --password "$GHCR_TOKEN"
+
+            echo "==> Tags disponíveis no GHCR..."
+            curl -s -u "$GHCR_ACTOR:$GHCR_TOKEN" \
+              "https://ghcr.io/v2/interacoes/dspace-backend/tags/list" || true
+
+            echo "==> IMAGE que será usada: $IMAGE"
+
+            echo "==> Pull da nova imagem..."
+            docker pull "$IMAGE"
+
+            echo "==> Parando container anterior (se existir)..."
+            docker stop dspace-backend || true
+            docker rm   dspace-backend || true
+
+            echo "==> Criando rede se não existir..."
+            docker network create dspace-net-develop || true
+
+            echo "==> Conectando containers de banco e solr na rede..."
+            docker network connect dspace-net-develop dspace-db || true
+            docker network connect dspace-net-develop dspace-solr || true
+
+            echo "==> Subindo novo container..."
+            docker run -d \
+              --name dspace-backend \
+              --restart unless-stopped \
+              --network dspace-net-develop \
+              -p 8080:8080 \
+              -v /home/interacoes/dspace-solr-postgres/assetstore:/dspaceinstall/assetstore \
+              "$IMAGE"
+
+            echo "==> Deploy concluído!"
+          REMOTE
