@@ -150,6 +150,169 @@
             </row>
 
         </form>
+        <form name="interset">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Nome do Projeto</label>
+                    <input-type>onebox</input-type>
+                    <hint>Insira o nome do projeto.</hint>
+                    <required>Campo obrigatório.</required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Eixo Temático</label>
+                    <input-type value-pairs-name="eixoTematico">dropdown</input-type>
+                    <hint>Selecione o eixo temático relacionado a rede interset.</hint>
+                    <required>Campo obrigatório.</required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Esfera do projeto</label>
+                    <input-type value-pairs-name="esferas">dropdown</input-type>
+                    <hint>Selecione a esfera do projeto.</hint>
+                    <required>Campo obrigatório.</required>
+                </field>
+            </row>
+
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Instituição Pública de Educação Superior</label>
+                    <input-type value-pairs-name="instituicao">dropdown</input-type>
+                    <hint>Insira o nome da usando a Instituição Pública de Educação Superior.</hint>
+                </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>campi</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Nome do Campi</label>
+                    <input-type>onebox</input-type>
+                    <hint>Insira o nome do Campi.</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>objective</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Objetivos</label>
+                    <input-type>textarea</input-type>
+                    <hint>Adicione os objetivos do projeto.</hint>
+                    <required>Campo obrigatório.</required>
+                </field>
+            </row>
+
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Municipio</label>
+                    <input-type>onebox</input-type>
+                    <hint>Selecione o municío do projeto.</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>municipio</vocabulary>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>target-audience</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Público-Alvo</label>
+                    <input-type>onebox</input-type>
+                    <hint>Descreva o público-alvo do projeto.</hint>
+                </field>
+            </row>
+
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>results</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Resultados Esperados/Alcançados</label>
+                    <input-type>textarea</input-type>
+                    <hint>Descreva os resultados esperados e/ou alcançados.</hint>
+                </field>
+            </row>
+
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>coordinator</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Nome do(s) Coordenador(es)</label>
+                    <input-type>onebox</input-type>
+                    <hint>Informe o(s) nome(s) do(s) coordenador(es) do projeto.</hint>
+                </field>
+            </row>
+
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>scholarship-holder</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Bolsistas</label>
+                    <input-type>onebox</input-type>
+                    <hint>Informe os bolsistas vinculados ao projeto.</hint>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>editor</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Parcerias Intersetoriais</label>
+                    <input-type>onebox</input-type>
+                    <hint>Informe as parcerias intersetoriais envolvidas</hint>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>intersectoral-agent</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Agentes Intersetoriais</label>
+                    <input-type>onebox</input-type>
+                    <hint>Informe os agentes intersetoriais envolvidos.</hint>
+                </field>
+            </row>
+
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>socialmedia</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Redes Sociais</label>
+                    <input-type>onebox</input-type>
+                    <hint>Informe links de redes sociais (Instagram, YouTube, etc.).</hint>
+                </field>
+            </row>
+        </form>
         <form name="evento">
             <row>
                 <field>
@@ -335,7 +498,7 @@
                     <repeatable>false</repeatable>
                     <label>Responsável</label>
                     <input-type>onebox</input-type>
-                    <hint>Insira o responsável pela ação.</hint>
+                    <hint>Insira o responsável.</hint>
                     <required>Campo obrigatório.</required>
                 </field>
 
@@ -1640,6 +1803,7 @@
     <form-value-pairs>
 
         <value-pairs value-pairs-name="nucleoTematico" dc-term="type">
+            <pair><displayed-value>Não se aplica</displayed-value><stored-value>Não se aplica</stored-value></pair>
             <pair><displayed-value>Busca ativa escolar</displayed-value><stored-value>Busca ativa escolar</stored-value></pair>
             <pair><displayed-value>Educação ambiental e emergência climática</displayed-value><stored-value>Educação ambiental e emergência climática</stored-value></pair>
             <pair><displayed-value>Educação inclusiva</displayed-value><stored-value>Educação inclusiva</stored-value></pair>
@@ -1654,6 +1818,17 @@
             <pair><displayed-value>Programa Saúde na Escola</displayed-value><stored-value>Programa Saúde na Escola</stored-value></pair>
             <pair><displayed-value>Recomposição de Aprendizagem</displayed-value><stored-value>Recomposição de Aprendizagem</stored-value></pair>
             <pair><displayed-value>Segurança e Proteção no Ambiente Escolar</displayed-value><stored-value>Segurança e Proteção no Ambiente Escolar</stored-value></pair>
+
+
+        </value-pairs>
+        <value-pairs value-pairs-name="eixoTematico" dc-term="type">
+            <pair><displayed-value>Busca ativa</displayed-value><stored-value>Busca ativa</stored-value></pair>
+            <pair><displayed-value>Educação de Jovens e Adultos (EJA)</displayed-value><stored-value>Educação de Jovens e Adultos (EJA)</stored-value></pair>
+            <pair><displayed-value>Desenvolvimento Agrário</displayed-value><stored-value>Desenvolvimento Agrário</stored-value></pair>
+            <pair><displayed-value>Popularização da Ciência</displayed-value><stored-value>Popularização da Ciência</stored-value></pair>
+            <pair><displayed-value>Saúde Coletiva</displayed-value><stored-value>Saúde Coletiva</stored-value></pair>
+            <pair><displayed-value>Valorização do Patrimônio Cultural, Histórico e Natural</displayed-value><stored-value>Valorização do Patrimônio Cultural, Histórico e Natural</stored-value></pair>
+            <pair><displayed-value>Educação para a Emancipação</displayed-value><stored-value>Educação para a Emancipação</stored-value></pair>
         </value-pairs>
 
         <value-pairs value-pairs-name="esferas" dc-term="type">
@@ -1704,6 +1879,36 @@
             <pair>
                 <displayed-value>Videos</displayed-value>
                 <stored-value>Videos</stored-value>
+            </pair>
+        </value-pairs>
+        <value-pairs value-pairs-name="instituicao" dc-term="type">
+            <pair>
+                <displayed-value>Instituto Federal do Ceará (IFCE)</displayed-value>
+                <stored-value>Instituto Federal do Ceará (IFCE)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Universidade da Integração Internacional da Lusofonia Afro-Brasileira (UNILAB)</displayed-value>
+                <stored-value>Universidade da Integração Internacional da Lusofonia Afro-Brasileira (UNILAB)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Universidade Estadual do Ceará (UECE)</displayed-value>
+                <stored-value>Universidade Estadual do Ceará (UECE)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Universidade Estadual do Vale do Acaraú (UVA)</displayed-value>
+                <stored-value>Universidade Estadual do Vale do Acaraú (UVA)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Universidade Federal do Cariri (UFCA)</displayed-value>
+                <stored-value>Universidade Federal do Cariri (UFCA)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Universidade Federal do Ceará (UFC)</displayed-value>
+                <stored-value>Universidade Federal do Ceará (UFC)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Universidade Regional do Cariri (URCA)</displayed-value>
+                <stored-value>Universidade Regional do Cariri (URCA)</stored-value>
             </pair>
         </value-pairs>
         <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">

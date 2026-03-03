@@ -674,4 +674,51 @@
     <element>description</element>
     <qualifier>event</qualifier>
   </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>description</element>
+        <qualifier>target-audience</qualifier>
+        <scope_note>Público-alvo do projeto.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>description</element>
+        <qualifier>results</qualifier>
+        <scope_note>Resultados esperados e/ou alcançados.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>contributor</element>
+        <qualifier>coordinator</qualifier>
+        <scope_note>Nome do(s) coordenador(es) do projeto.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>contributor</element>
+        <qualifier>scholarship-holder</qualifier>
+        <scope_note>Bolsistas vinculados ao projeto.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>contributor</element>
+        <qualifier>intersectoral-agent</qualifier>
+        <scope_note>Agentes intersetoriais envolvidos do projeto</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <qualifier>socialmedia</qualifier>
+        <scope_note>Links de redes sociais relacionadas do projeto.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>dc</schema>
+        <dc-element>coverage</dc-element>
+        <dc-qualifier>campi</dc-qualifier>
+        <scope_note>Nome do Campi</scope_note>
+    </dc-type>
 </dspace-dc-types>

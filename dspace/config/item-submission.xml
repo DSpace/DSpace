@@ -63,7 +63,7 @@
 <!--        <name-map collection-entity-type="Download" submission-name="Download"/>-->
         <name-map collection-handle="123456789/3" submission-name="Youtube"/>
         <name-map collection-handle="123456789/4" submission-name="Evento"/>
-
+        <name-map collection-handle="123456789/71" submission-name="Interset"/>
 
         <name-map collection-entity-type="Publication" submission-name="Publication"/>
         <name-map collection-entity-type="Person" submission-name="Person"/>
@@ -118,14 +118,20 @@
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-
         </step-definition>
+
         <step-definition id="contato" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-
         </step-definition>
+
+        <step-definition id="interset" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
 
         <!-- The following set of DescribeStep <step-definition>s all point to forms (of the same name) which are
              defined in submission-forms.xml -->
@@ -362,6 +368,14 @@
             <step id="contato"/>
             <step id="upload"/>
         </submission-process>
+
+        <submission-process name="Interset">
+            <step id="collection"/>
+            <step id="interset"/>
+            <step id="contato"/>
+            <step id="upload"/>
+        </submission-process>
+
         <submission-process name="Download">
             <step id="collection"/>
             <step id="downloadPage"/>
