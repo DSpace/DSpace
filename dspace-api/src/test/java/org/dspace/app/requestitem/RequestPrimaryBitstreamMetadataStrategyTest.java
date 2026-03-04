@@ -8,7 +8,9 @@
 package org.dspace.app.requestitem;
 
 import static org.junit.Assert.assertEquals;
-
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -24,6 +26,8 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -32,6 +36,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+/**
+ * Test RequestPrimaryBitstreamMetadataStrategy
+ * @author paulo-graca
+ *
+ */
 public class RequestPrimaryBitstreamMetadataStrategyTest extends AbstractUnitTest {
 
     private static final String AUTHOR_EMAIL = "john.doe@example.com";
@@ -47,9 +56,13 @@ public class RequestPrimaryBitstreamMetadataStrategyTest extends AbstractUnitTes
 
     private Bundle bundle;
 
+    private static BitstreamService bitstreamService;
+
     @BeforeClass
     public static void setUpClass() throws SQLException {
         AbstractBuilder.init(); // AbstractUnitTest doesn't do this for us.
+
+        bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
         Context ctx = new Context();
         ctx.turnOffAuthorisationSystem();
@@ -68,6 +81,10 @@ public class RequestPrimaryBitstreamMetadataStrategyTest extends AbstractUnitTes
 
     @Before
     public void setUp() throws Exception {
+        String text = "test";
+        InputStream inputStream = new ByteArrayInputStream(
+                text.getBytes(StandardCharsets.UTF_8)
+        );
         context = new Context();
         context.setCurrentUser(johnDoe);
         context.turnOffAuthorisationSystem();
@@ -75,7 +92,7 @@ public class RequestPrimaryBitstreamMetadataStrategyTest extends AbstractUnitTes
         Collection collection = CollectionBuilder.createCollection(context, community).build();
         item = ItemBuilder.createItem(context, collection).build();
         bundle = BundleBuilder.createBundle(context, item).withName(Constants.DEFAULT_BUNDLE_NAME).build();
-        BitstreamBuilder.createBitstream(context, bundle, null)
+        BitstreamBuilder.createBitstream(context, bundle, inputStream)
                 .withMetadata("person", "email", null, null, AUTHOR_EMAIL)
                 .withMetadata("dc", "contributor", "author", null, AUTHOR_NAME).build();
         context.restoreAuthSystemState();
@@ -93,6 +110,7 @@ public class RequestPrimaryBitstreamMetadataStrategyTest extends AbstractUnitTes
         RequestPrimaryBitstreamMetadataStrategy instance = new RequestPrimaryBitstreamMetadataStrategy();
         instance.setEmailMetadata(BITSTREAM_REQUEST_EMAIL_FIELD);
         instance.setFullNameMetadata(BITSTREAM_REQUEST_NAME_FIELD);
+        instance.bitstreamService = bitstreamService;
 
         List<RequestItemAuthor> author = instance.getRequestItemAuthor(context, item);
         assertEquals("Wrong bitstream author address", AUTHOR_EMAIL, author.get(0).getEmail());
