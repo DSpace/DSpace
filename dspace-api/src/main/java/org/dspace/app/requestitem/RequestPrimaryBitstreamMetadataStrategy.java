@@ -76,14 +76,15 @@ public class RequestPrimaryBitstreamMetadataStrategy implements RequestItemAutho
             if (bitstream != null) {
                 List<MetadataValue> vals = bitstreamService.getMetadataByMetadataString(bitstream, emailMetadata);
 
-                List<MetadataValue> nameVals;
-                if (null != fullNameMetadata) {
-                    nameVals = bitstreamService.getMetadataByMetadataString(bitstream, fullNameMetadata);
-                } else {
-                    nameVals = Collections.emptyList();
-                }
-                boolean useNames = vals.size() == nameVals.size();
                 if (!vals.isEmpty()) {
+                    List<MetadataValue> nameVals;
+                    if (null != fullNameMetadata) {
+                        nameVals = bitstreamService.getMetadataByMetadataString(bitstream, fullNameMetadata);
+                    } else {
+                        nameVals = Collections.emptyList();
+                    }
+                    boolean useNames = vals.size() == nameVals.size();
+
                     authors = new ArrayList<>(vals.size());
                     for (int authorIndex = 0; authorIndex < vals.size(); authorIndex++) {
                         String email = vals.get(authorIndex).getValue();
