@@ -8,8 +8,10 @@
 package org.dspace.app.requestitem;
 
 import static org.junit.Assert.assertEquals;
+
 import java.sql.SQLException;
 import java.util.List;
+
 import org.dspace.AbstractUnitTest;
 import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.BitstreamBuilder;
