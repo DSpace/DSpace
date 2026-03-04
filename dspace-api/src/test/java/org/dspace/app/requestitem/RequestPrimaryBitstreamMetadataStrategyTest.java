@@ -8,6 +8,7 @@
 package org.dspace.app.requestitem;
 
 import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
