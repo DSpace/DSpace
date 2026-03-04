@@ -50,7 +50,7 @@ public class EPersonCLITool {
     private static final Option OPT_PHONE = new Option("t", "telephone", true, "telephone number, empty for none");
     private static final Option OPT_LANGUAGE = new Option("l", "language", true, "the person's preferred language");
     private static final Option OPT_REQUIRE_CERTIFICATE = new Option("c", "requireCertificate", true,
-                                                                     "if 'true', an X.509 certificate will be " +
+                                                                     "if 'true', a certificate will be " +
                                                                          "required for login");
     private static final Option OPT_CAN_LOGIN = new Option("C", "canLogIn", true, "'true' if the user can log in");
 
@@ -86,7 +86,25 @@ public class EPersonCLITool {
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      */
-    public static void main(String argv[])
+    public static void main(String[] argv)
+        throws ParseException, SQLException, AuthorizeException {
+        int status = runCLITool(argv);
+        System.exit(status);
+    }
+
+    /**
+     * Run the EPerson CLI tool and return an exit code.
+     * This method is separated from main() to make the class testable without
+     * relying on SecurityManager to intercept System.exit() calls.
+     *
+     * @param argv the command line arguments
+     * @return exit code (0 for success, non-zero for errors)
+     * @throws ParseException     Base for Exceptions thrown during parsing of a command-line.
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
+     */
+    public static int runCLITool(String[] argv)
         throws ParseException, SQLException, AuthorizeException {
         final OptionGroup VERBS = new OptionGroup();
         VERBS.addOption(VERB_ADD);
@@ -132,7 +150,7 @@ public class EPersonCLITool {
             }
         }
 
-        System.exit(status);
+        return status;
     }
 
     /**

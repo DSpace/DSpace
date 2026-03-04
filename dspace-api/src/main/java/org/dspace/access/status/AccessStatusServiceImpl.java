@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.access.status.service.AccessStatusService;
@@ -92,8 +92,8 @@ public class AccessStatusServiceImpl implements AccessStatusService {
 
     private String getAccessStatusCalculationType(String key) {
         String value = configurationService.getProperty(key, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS);
-        if (!StringUtils.equalsIgnoreCase(value, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS) &&
-            !StringUtils.equalsIgnoreCase(value, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER)) {
+        if (!Strings.CI.equals(value, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS) &&
+            !Strings.CI.equals(value, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER)) {
             log.warn("The configuration parameter \"" + key
                 + "\" contains an invalid value. Valid values include: 'anonymous' and 'current'.");
             value = DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS;

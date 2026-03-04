@@ -18,6 +18,7 @@ import java.util.Objects;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
@@ -364,7 +365,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
     private String getDsoType(String dsoType) throws IllegalArgumentException {
         for (IndexFactory indexFactory : indexableFactories) {
-            if (StringUtils.equalsIgnoreCase(indexFactory.getType(), dsoType)) {
+            if (Strings.CI.equals(indexFactory.getType(), dsoType)) {
                 return indexFactory.getType();
             }
         }

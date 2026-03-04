@@ -8,6 +8,7 @@
 package org.dspace.app.rest.security;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,11 +16,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.core.Context;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 /**
  * This class will filter /api/authn/login requests to try and authenticate them. Keep in mind, this filter runs *after*
@@ -54,7 +58,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
     public StatelessLoginFilter(String url, String httpMethod, AuthenticationManager authenticationManager,
                                 RestAuthenticationService restAuthenticationService) {
         // NOTE: attemptAuthentication() below will only be triggered by requests that match both this URL and method
-        super(new AntPathRequestMatcher(url, httpMethod));
+        super(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.valueOf(httpMethod),url));
         this.authenticationManager = authenticationManager;
         this.restAuthenticationService = restAuthenticationService;
     }
@@ -133,6 +137,27 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed!");
         log.error("Authentication failed (status:{})",
                   HttpServletResponse.SC_UNAUTHORIZED, failed);
+        this.closeOpenContext(request);
+    }
+
+    /**
+     * Manually closes the open {@link Context} if one exists. We need to do this manually because
+     * {@link #continueChainBeforeSuccessfulAuthentication} is {@code false} by default, which prevents the
+     * {@link org.dspace.app.rest.filter.DSpaceRequestContextFilter} from being called. Without this call, the request
+     * would leave an open database connection.
+     *
+     * @param request The current request.
+     */
+    protected void closeOpenContext(HttpServletRequest request) {
+        if (ContextUtil.isContextAvailable(request)) {
+            try (Context context = ContextUtil.obtainContext(request)) {
+                if (context != null && context.isValid()) {
+                    context.complete();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

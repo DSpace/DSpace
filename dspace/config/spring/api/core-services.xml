@@ -174,5 +174,10 @@
 
     <bean class="org.dspace.correctiontype.service.impl.CorrectionTypeServiceImpl"/>
 
+    <bean id="org.dspace.app.customurl.CustomUrlService" class="org.dspace.app.customurl.service.CustomUrlServiceImpl"/>
+
+    <bean id="org.dspace.app.customurl.consumer.CustomUrlConsumerConfig"
+          class="org.dspace.app.customurl.consumer.CustomUrlConsumerConfig"/>
+
 </beans>
 

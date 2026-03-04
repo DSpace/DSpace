@@ -26,7 +26,7 @@ import java.util.UUID;
 
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.exception.ResourceAlreadyExistsException;
@@ -283,6 +283,8 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         itemService.addMetadata(context, item, "dc", "title", null, null, fullName);
         itemService.addMetadata(context, item, "person", "email", null, null, ePerson.getEmail());
         itemService.addMetadata(context, item, "dspace", "object", "owner", null, fullName, id, CF_ACCEPTED);
+        itemService.addMetadata(context, item, "person", "familyName", null, null, ePerson.getLastName());
+        itemService.addMetadata(context, item, "person", "givenName", null, null, ePerson.getFirstName());
 
         item = installItemService.installItem(context, workspaceItem);
 

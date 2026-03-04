@@ -14,6 +14,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.core.Constants;
 
 /**
@@ -89,8 +90,8 @@ public class URLUtils {
         }
 
         boolean isPrefix;
-        isPrefix = StringUtils.equals(candidateURL.getProtocol(), patternURL.getProtocol());
-        isPrefix &= StringUtils.equals(candidateURL.getHost(), patternURL.getHost());
+        isPrefix = Strings.CS.equals(candidateURL.getProtocol(), patternURL.getProtocol());
+        isPrefix &= Strings.CS.equals(candidateURL.getHost(), patternURL.getHost());
         isPrefix &= candidatePort == patternPort;
 
         String[] candidateElements = StringUtils.split(candidateURL.getPath(), '/');

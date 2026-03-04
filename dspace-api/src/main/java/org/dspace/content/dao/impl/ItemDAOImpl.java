@@ -192,6 +192,49 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
+    public Iterator<Item> findByMetadataFieldExcludingOldVersions(Context context, MetadataField metadataField,
+                                                                   String value, boolean inArchive)
+        throws SQLException {
+        // This query finds items matching the metadata criteria that are NOT old versions.
+        // It uses a LEFT JOIN to the Version table to check version status:
+        // - If v.id IS NULL: item has no version (not versioned) - include it
+        // - If v.versionNumber equals MAX for that VersionHistory: it's the latest - include it
+        String hqlQueryString =
+            "SELECT item.id FROM Item as item " +
+            "JOIN item.metadata metadatavalue " +
+            "LEFT JOIN Version v ON item.id = v.item.id " +
+            "WHERE item.inArchive = :in_archive " +
+            "AND metadatavalue.metadataField = :metadata_field ";
+
+        if (value != null) {
+            hqlQueryString += "AND STR(metadatavalue.value) = :text_value ";
+        }
+
+        // Include item if:
+        // 1. It has no version record (v.id IS NULL) - not a versioned item
+        // 2. It IS the latest version in its history
+        hqlQueryString +=
+            "AND (v.id IS NULL OR v.versionNumber = (" +
+            "   SELECT MAX(v2.versionNumber) FROM Version v2 " +
+            "   WHERE v2.versionHistory = v.versionHistory " +
+            "   AND v2.item IS NOT NULL" +
+            ")) " +
+            "ORDER BY item.id";
+
+        Query query = createQuery(context, hqlQueryString);
+
+        query.setParameter("in_archive", inArchive);
+        query.setParameter("metadata_field", metadataField);
+        if (value != null) {
+            query.setParameter("text_value", value);
+        }
+
+        @SuppressWarnings("unchecked")
+        List<UUID> uuids = query.getResultList();
+        return new UUIDIterator<Item>(context, uuids, Item.class, this);
+    }
+
+    @Override
     public List<Item> findByMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
             List<UUID> collectionUuids, String regexClause, long offset, int limit) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);

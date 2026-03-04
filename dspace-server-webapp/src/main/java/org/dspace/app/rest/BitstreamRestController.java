@@ -128,7 +128,7 @@ public class BitstreamRestController {
         Context context = ContextUtil.obtainContext(request);
         // Find bitstream
         Bitstream bit = bitstreamService.find(context, uuid);
-        if (bit == null) {
+        if (bit == null || bit.isDeleted()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
@@ -221,6 +221,8 @@ public class BitstreamRestController {
             if ((dispositionThreshold >= 0 && filesize > dispositionThreshold)
                     || checkFormatForContentDisposition(format)) {
                 httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_ATTACHMENT);
+            } else {
+                httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_INLINE);
             }
 
             // Send the data

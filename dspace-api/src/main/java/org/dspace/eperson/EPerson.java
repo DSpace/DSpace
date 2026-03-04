@@ -20,6 +20,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.content.CacheableDSpaceObject;
 import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.content.Item;
@@ -136,10 +137,10 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
         if (!this.getID().equals(other.getID())) {
             return false;
         }
-        if (!StringUtils.equals(this.getEmail(), other.getEmail())) {
+        if (!Strings.CS.equals(this.getEmail(), other.getEmail())) {
             return false;
         }
-        if (!StringUtils.equals(this.getFullName(), other.getFullName())) {
+        if (!Strings.CS.equals(this.getFullName(), other.getFullName())) {
             return false;
         }
         return true;
@@ -366,7 +367,7 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
 
     @Override
     public String getName() {
-        return getEmail();
+        return this.getFullName();
     }
 
     String getDigestAlgorithm() {

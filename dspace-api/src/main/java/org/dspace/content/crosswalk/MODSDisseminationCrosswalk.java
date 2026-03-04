@@ -109,7 +109,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      * Fill in the plugin alias table from DSpace configuration entries
      * for configuration files for flavors of MODS crosswalk:
      */
-    private static String aliases[] = null;
+    private static String[] aliases = null;
 
     static {
         List<String> aliasList = new ArrayList<>();
@@ -117,11 +117,11 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         for (String key : keys) {
             aliasList.add(key.substring(CONFIG_PREFIX.length()));
         }
-        aliases = (String[]) aliasList.toArray(new String[aliasList.size()]);
+        aliases = aliasList.toArray(new String[0]);
     }
 
     public static String[] getPluginNames() {
-        return (String[]) ArrayUtils.clone(aliases);
+        return ArrayUtils.clone(aliases);
     }
 
     /**
@@ -133,7 +133,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     private static final Namespace XLINK_NS =
         Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
 
-    private static final Namespace namespaces[] = {MODS_NS, XLINK_NS};
+    private static final Namespace[] namespaces = {MODS_NS, XLINK_NS};
 
     /**
      * URL of MODS XML Schema
@@ -259,7 +259,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             while (pe.hasMoreElements()) {
                 String qdc = pe.nextElement();
                 String val = modsConfig.getProperty(qdc);
-                String pair[] = val.split("\\s+\\|\\s+", 2);
+                String[] pair = val.split("\\s+\\|\\s+", 2);
                 if (pair.length < 2) {
                     log.warn("Illegal MODS mapping in " + propsFile.toString() + ", line = " +
                                  qdc + " = " + val);

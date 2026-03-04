@@ -71,7 +71,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     protected static String rootTemplate = "/node";
     protected static String idAttribute = "id";
     protected static String labelAttribute = "label";
-    protected static String pluginNames[] = null;
+    protected static String[] pluginNames = null;
     protected String vocabularyName = null;
     protected InputSource vocabulary = null;
     protected Boolean suggestHierarchy = false;
@@ -97,7 +97,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             initPluginNames();
         }
 
-        return (String[]) ArrayUtils.clone(pluginNames);
+        return ArrayUtils.clone(pluginNames);
     }
 
     private static synchronized void initPluginNames() {

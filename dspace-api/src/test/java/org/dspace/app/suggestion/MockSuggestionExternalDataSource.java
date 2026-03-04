@@ -10,7 +10,7 @@ package org.dspace.app.suggestion;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.core.Context;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.AbstractExternalDataProvider;
@@ -56,7 +56,7 @@ public class MockSuggestionExternalDataSource extends AbstractExternalDataProvid
 
     @Override
     public boolean supports(String source) {
-        return StringUtils.equals(NAME, source);
+        return Strings.CS.equals(NAME, source);
     }
 
     @Override

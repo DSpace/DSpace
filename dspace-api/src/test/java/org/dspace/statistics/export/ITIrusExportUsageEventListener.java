@@ -116,6 +116,7 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
         configurationService.setProperty("irus.statistics.tracker.enabled", true);
         configurationService.setProperty("irus.statistics.tracker.type-field", "dc.type");
         configurationService.setProperty("irus.statistics.tracker.type-value", "Excluded type");
+        configurationService.setProperty("oai.identifier.prefix", "localhost");
 
 
         context.turnOffAuthorisationSystem();

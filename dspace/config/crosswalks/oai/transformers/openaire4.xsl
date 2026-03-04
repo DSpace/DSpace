@@ -12,8 +12,8 @@
 
     <!-- 
         Formatting dc.date.issued
-        based on what Openaire4 specifies for issued dates 
-        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationdate.html
+        based on what OpenAIRE4 specifies for issued dates 
+        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_publicationdate.html
     -->
     <xsl:template
         match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']/doc:element/doc:field/text()">
@@ -80,7 +80,7 @@
         Normalizing dc.rights according to COAR Controlled Vocabulary for
         Access Rights (Version 1.0) (http://vocabularies.coar-repositories.org/documentation/access_rights/)
         available at
-        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_accessrights.html#definition-and-usage-instruction
+        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_accessrights.html#definition-and-usage-instruction
     -->
     <xsl:template
         match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field/text()">
@@ -116,7 +116,7 @@
     <!-- Modifying and normalizing dc.type according to COAR Controlled Vocabulary for Resource Type 
         Genres (Version 2.0) (http://vocabularies.coar-repositories.org/documentation/resource_types/)
         available at 
-        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationtype.html#attribute-uri-m
+        https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_publicationtype.html#attribute-uri-m
     -->
     <xsl:template
         match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field/text()">

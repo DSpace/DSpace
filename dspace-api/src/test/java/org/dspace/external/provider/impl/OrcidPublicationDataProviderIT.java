@@ -30,7 +30,7 @@ import java.util.function.Predicate;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Unmarshaller;
-import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -404,10 +404,10 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
     }
 
     private Predicate<MetadataValueDTO> metadata(String schema, String element, String qualifier, String value) {
-        return dto -> StringUtils.equals(schema, dto.getSchema())
-            && StringUtils.equals(element, dto.getElement())
-            && StringUtils.equals(qualifier, dto.getQualifier())
-            && StringUtils.equals(value, dto.getValue());
+        return dto -> Strings.CS.equals(schema, dto.getSchema())
+            && Strings.CS.equals(element, dto.getElement())
+            && Strings.CS.equals(qualifier, dto.getQualifier())
+            && Strings.CS.equals(value, dto.getValue());
     }
 
     private OrcidTokenResponseDTO buildTokenResponse(String accessToken) {

@@ -73,7 +73,7 @@ public class RoleCrosswalk
      */
     @Override
     public Namespace[] getNamespaces() {
-        Namespace result[] = new Namespace[1];
+        Namespace[] result = new Namespace[1];
         result[0] = RoleDisseminator.DSROLES_NS;
         return result;
     }

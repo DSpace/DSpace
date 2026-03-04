@@ -113,7 +113,7 @@ public class SyndicationFeed {
         configurationService.getProperty("webui.feed.item.date", defaultDateField);
 
     // metadata field for Item description in entry:
-    private static final String descriptionFields[] =
+    private static final String[] descriptionFields =
         DSpaceServicesFactory.getInstance().getConfigurationService()
                              .getArrayProperty("webui.feed.item.description", defaultDescriptionFields);
 
