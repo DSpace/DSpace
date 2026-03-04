@@ -33,6 +33,58 @@ public class RelatedEntityItemEnhancerUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedEntityItemEnhancerUtils.class);
 
+    /**
+     * Retrieves and organizes the current virtual metadata fields on an item, grouped by
+     * their source entity authority values.
+     *
+     * <p><strong>Purpose:</strong></p>
+     * <p>This method creates a mapping between source entity UUIDs and their corresponding
+     * virtual metadata values, enabling the enhancer to determine what virtual metadata
+     * currently exists and which source entities they came from.</p>
+     *
+     * <p><strong>Virtual Metadata Pairing:</strong></p>
+     * <p>The method pairs {@code cris.virtualsource.[qualifier]} fields (containing source UUIDs)
+     * with {@code cris.virtual.[qualifier]} fields (containing the actual values) based on their
+     * position order in the metadata arrays.</p>
+     *
+     * <p><strong>Inconsistency Handling:</strong></p>
+     * <p>When the number of source and virtual metadata fields don't match (data corruption scenario):</p>
+     * <ul>
+     *   <li><strong>More sources than values:</strong> Extra sources are ignored</li>
+     *   <li><strong>More values than sources:</strong> Extra values are associated with random UUIDs
+     *       to enable cleanup as obsolete metadata</li>
+     * </ul>
+     *
+     * <p><strong>Return Structure:</strong></p>
+     * <p>Returns a Map where:</p>
+     * <ul>
+     *   <li><strong>Key:</strong> Source entity UUID (from {@code cris.virtualsource.[qualifier]} values)</li>
+     *   <li><strong>Value:</strong> List of {@link MetadataValue} objects from {@code cris.virtual.[qualifier]}
+     *       that were derived from that source entity</li>
+     * </ul>
+     *
+     * <p><strong>Example:</strong></p>
+     * <pre>
+     * Item has:
+     * - cris.virtualsource.author[0] = "person-uuid-123"
+     * - cris.virtualsource.author[1] = "person-uuid-456"
+     * - cris.virtual.author[0] = "0000-0000-0000-0000"
+     * - cris.virtual.author[1] = "John Doe"
+     *
+     * Returns:
+     * {
+     *   "person-uuid-123" → [MetadataValue("0000-0000-0000-0000")],
+     *   "person-uuid-456" → [MetadataValue("John Doe")]
+     * }
+     * </pre>
+     *
+     * @param item             the item to analyze for current virtual metadata
+     * @param virtualQualifier the qualifier used for the virtual metadata fields (e.g., "author", "project")
+     * @return a map grouping virtual metadata values by their source entity UUIDs
+     * @see RelatedEntityItemEnhancer#enhance(org.dspace.core.Context, Item, boolean)
+     * @see RelatedEntityItemEnhancer#VIRTUAL_METADATA_SCHEMA
+     * @see RelatedEntityItemEnhancer#VIRTUAL_SOURCE_METADATA_ELEMENT
+     */
     public Map<String, List<MetadataValue>> getCurrentVirtualsMap(Item item, String virtualQualifier) {
         Map<String, List<MetadataValue>> currentVirtualsMap = new HashMap<String, List<MetadataValue>>();
         List<MetadataValue> sources = itemService.getMetadata(item, RelatedEntityItemEnhancer.VIRTUAL_METADATA_SCHEMA,

@@ -39,6 +39,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authority.service.impl.ItemSearcherByMetadata;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -920,6 +921,54 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         itemDAO.delete(context, item);
     }
 
+    /**
+     * Performs authority reference cleanup when an item is deleted and the
+     * {@code item-deletion.authority-cleanup.enabled} configuration is set to {@code true}.
+     *
+     * <p><strong>Purpose:</strong></p>
+     * <p>When an entity item (Person, Organization, Project, etc.) is deleted, other items
+     * throughout the repository may still have metadata fields that reference the deleted
+     * entity through authority control values. This method systematically locates and
+     * handles these orphaned authority references to maintain data integrity.</p>
+     *
+     * <p><strong>Configuration-Driven Behavior:</strong></p>
+     * <p>This method only executes when {@code item-deletion.authority-cleanup.enabled} is
+     * {@code true}. The cleanup behavior for each metadata field is controlled by
+     * configuration properties:</p>
+     * <ul>
+     *   <li><strong>{@code authority.cleanup.<metadata-field>}</strong> - Field-specific cleanup mode</li>
+     *   <li><strong>{@code authority.cleanup.default}</strong> - Default cleanup mode for unspecified fields</li>
+     * </ul>
+     *
+     * <p><strong>Cleanup Process:</strong></p>
+     * <ol>
+     *   <li><strong>Identify Authority-Controlled Fields:</strong> Determines which metadata fields
+     *       are authority-controlled based on the deleted item's entity type</li>
+     *   <li><strong>Find Related Items:</strong> Searches for all items containing authority references
+     *       to the deleted item's UUID in their metadata fields</li>
+     *   <li><strong>Apply Cleanup Strategy:</strong> For each affected metadata field, applies the
+     *       configured cleanup mode to handle the orphaned authority reference</li>
+     *   <li><strong>Update and Uncache:</strong> Persists changes and clears Hibernate cache to
+     *       ensure immediate visibility of updates</li>
+     * </ol>
+     *
+     * <p><strong>Cleanup Modes:</strong></p>
+     * <ul>
+     *   <li><strong>{@code BUSINESS}</strong> - Replaces the UUID authority with the deleted item's
+     *       business identifier (e.g., DOI, ORCID, handle) prefixed with {@code REFERENCE::}.
+     *       This preserves the metadata value while indicating the source entity is no longer active.</li>
+     *   <li><strong>{@code CLEAN_ALL}</strong> - Completely removes the metadata value and its
+     *       authority reference. Use this for metadata that becomes meaningless without the entity.</li>
+     * </ul>
+     *
+     * @param context     the DSpace context for database operations and authorization
+     * @param deletedItem the item being deleted that may be referenced by authority values in other items
+     * @throws SQLException       if database operations fail during authority cleanup
+     * @throws AuthorizeException if the current user lacks permission to modify related items
+     * @see AuthorityValueService#AUTHORITY_CLEANUP_BUSINESS_MODE
+     * @see AuthorityValueService#AUTHORITY_CLEANUP_CLEAN_ALL_MODE
+     * @see org.dspace.content.authority.service.ChoiceAuthorityService#getAuthorityControlledFieldsByEntityType
+     */
     private void removeAuthorityReferences(Context context, Item deletedItem) throws SQLException, AuthorizeException {
         String uuidOfDeletedItem = deletedItem.getID().toString();
         List<String> controlledFields = getAuthorityControlledFieldsByItemEntityType(deletedItem);

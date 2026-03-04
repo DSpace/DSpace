@@ -10,7 +10,7 @@ package org.dspace.core;
 import org.dspace.content.MetadataFieldName;
 
 /**
- * Class with constants specific of broad DSpace-CRIS features
+ * Class with constants specific to CRIS features in DSpace
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it
  * @version $Revision$
@@ -18,10 +18,9 @@ import org.dspace.content.MetadataFieldName;
 public class CrisConstants {
     /**
      * The value stored in nested metadata that were left empty to keep them in the
-     * same number than the parent leading metadata
+     * same number as the parent leading metadata
      */
     public static final String PLACEHOLDER_PARENT_METADATA_VALUE = "#PLACEHOLDER_PARENT_METADATA_VALUE#";
-    public static final String DSPACE_BASE_VERSION = "DSpace 8.2";
     public static final MetadataFieldName MD_ENTITY_TYPE = new MetadataFieldName("dspace", "entity", "type");
     public static final MetadataFieldName MD_SUBMISSION_TYPE = new MetadataFieldName("cris", "submission",
                                                                                      "definition");

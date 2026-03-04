@@ -269,14 +269,6 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
             List<String> values, List<String> authorities, List<Integer> confidences, Supplier<Integer> placeSupplier)
                     throws SQLException {
-
-        return addMetadata(context, dso, metadataField, lang, values, authorities, confidences, placeSupplier, null);
-    }
-
-    public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
-        List<String> values, List<String> authorities, List<Integer> confidences, Supplier<Integer> placeSupplier,
-        Integer securityLevel) throws SQLException {
-
         // Throw an error if we are attempting to add empty values
         if (values == null || values.isEmpty()) {
             throw new IllegalArgumentException("Cannot add empty values to a new metadata field " +
@@ -784,7 +776,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     Relationship relationship = relationshipService.find(context, Integer.parseInt(relationshipId));
 
                     if (relationship != null) {
-                        if (relationship.getLeftItem() == (Item) dso) {
+                        if (relationship.getLeftItem().equals(dso)) {
                             relationship.setLeftPlace(mvPlace);
                         } else {
                             relationship.setRightPlace(mvPlace);

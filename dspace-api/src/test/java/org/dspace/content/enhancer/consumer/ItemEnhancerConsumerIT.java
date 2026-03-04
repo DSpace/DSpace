@@ -281,17 +281,6 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
         publication = commitAndReload(publication);
 
         List<MetadataValue> values = publication.getMetadata();
-
-        List<MetadataValue> depts = getMetadataValues(publication, "cris.virtualsource.department");
-        depts.forEach(mv -> {
-            System.out.println("Field: " + mv.getMetadataField().getQualifier());
-            System.out.println("Value: '" + mv.getValue() + "' (" + mv.getValue().getClass() + ")");
-            System.out.println("Conf: " + mv.getConfidence() + " (" + mv.getConfidence() + ")");
-            System.out.println("Auth: " + mv.getAuthority());
-        });
-        System.out.println("Expected value: '" + person3.getID().toString() + "'");
-
-
         assertThat(values, hasSize(20));
         assertThat(values, hasItem(with("dc.contributor.author", "Walter White", person1.getID().toString(), 0, 600)));
         assertThat(values, hasItem(with("dc.contributor.author", "John Smith", person2.getID().toString(), 1, 600)));

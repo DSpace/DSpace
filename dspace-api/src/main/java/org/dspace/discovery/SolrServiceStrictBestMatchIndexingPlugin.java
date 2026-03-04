@@ -20,11 +20,54 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 
 /**
- * Implementation of {@link SolrServiceIndexPlugin} that creates an index for
- * the best match using some more strict configuration.
+ * A "strict" version of {@link SolrServiceBestMatchIndexingPlugin} that applies aggressive
+ * normalization and filtering policies to create highly standardized index values for
+ * improved name matching accuracy in search and authority control systems.
+ *
+ * <p><strong>Key Difference from Standard Best Match Plugin:</strong></p>
+ * <p>While {@link SolrServiceBestMatchIndexingPlugin} preserves original name formatting
+ * and uses {@link org.dspace.util.PersonNameUtil#getAllNameVariants} to generate variants,
+ * this strict plugin applies configurable normalization rules to create simplified,
+ * standardized versions of names that enable more reliable fuzzy matching.</p>
+ *
+ * <p><strong>Normalization Policies:</strong></p>
+ * <p>The plugin applies the following strict normalization rules (all configurable):</p>
+ * <ul>
+ *   <li><strong>Case Normalization:</strong> {@code solr-service.strict-best-match.exclude.letter-case=true}
+ *       <br/>Converts all text to lowercase for case-insensitive matching</li>
+ *   <li><strong>Punctuation Removal:</strong> {@code solr-service.strict-best-match.exclude.punctuation=true}
+ *       <br/>Removes all punctuation characters (periods, commas, apostrophes, etc.)</li>
+ *   <li><strong>Dash Normalization:</strong> {@code solr-service.strict-best-match.exclude.dash=true}
+ *       <br/>Converts special dashes (‐) to spaces for consistent hyphenated name handling</li>
+ *   <li><strong>Number Removal:</strong> {@code solr-service.strict-best-match.exclude.numbers=true}
+ *       <br/>Strips out numeric characters that may appear in names or titles</li>
+ *   <li><strong>Whitespace Normalization:</strong> {@code solr-service.strict-best-match.exclude
+ *   .normalize-whitespaces=true}
+ *       <br/>Collapses multiple spaces and trims leading/trailing whitespace</li>
+ * </ul>
+ *
+ * <p><strong>Comparative Example:</strong></p>
+ * <pre>
+ * Original Name: "Dr. María González-Rodríguez, Ph.D."
+ *
+ * Standard Best Match Plugin (bestmatch_s):
+ * - "Dr. María González-Rodríguez, Ph.D."
+ * - "María González-Rodríguez"
+ * - "González-Rodríguez, María"
+ * - "M. González-Rodríguez"
+ * - "González-Rodríguez, M."
+ * - (preserves original formatting and generates variants)
+ *
+ * Strict Best Match Plugin (bestmatchstrict_s):
+ * - "dr maria gonzalez rodriguez phd"
+ * - "maria gonzalez rodriguez"
+ * - "gonzalez rodriguez maria"
+ * - (heavily normalized, simplified versions)
+ * </pre>
  *
  * @author Stefano Maffei at 4science.it
- *
+ * @see SolrServiceBestMatchIndexingPlugin
+ * @see org.dspace.util.PersonNameUtil
  */
 public class SolrServiceStrictBestMatchIndexingPlugin extends SolrServiceBestMatchIndexingPlugin {
 

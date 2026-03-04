@@ -48,6 +48,33 @@ public final class PersonNameUtil {
         return variants;
     }
 
+    /**
+     * Generates name variants from separate first and last name components.
+     * This method creates multiple formatting variations to improve name matching
+     * and discovery in search systems.
+     * 
+     * <p>For single first names, generates:</p>
+     * <ul>
+     *   <li>Standard order: "John Smith"</li>
+     *   <li>Reversed order: "Smith John"</li>
+     *   <li>Abbreviated forms: "J Smith", "J. Smith"</li>
+     *   <li>Abbreviated reversed: "Smith J", "Smith J."</li>
+     * </ul>
+     * 
+     * <p>For multiple first names (e.g., "John Paul"), delegates to
+     * {@link #getNameVariants(String[], String)} which generates additional
+     * combinations including:</p>
+     * <ul>
+     *   <li>Individual first name combinations with last name</li>
+     *   <li>Abbreviated versions of each first name</li>
+     *   <li>Pairwise combinations of first names</li>
+     *   <li>All variations in both standard and reversed order</li>
+     * </ul>
+     * 
+     * @param firstName the first name (may contain multiple space-separated names)
+     * @param lastName the last name
+     * @return list of all generated name variants, empty if either parameter is blank
+     */
     private static List<String> getNameVariants(String firstName, String lastName) {
         List<String> variants = new ArrayList<String>();
 
@@ -99,6 +126,37 @@ public final class PersonNameUtil {
         return variants;
     }
 
+    /**
+     * Generates name variants from a list of full name strings by creating
+     * all possible permutations of name components.
+     * 
+     * <p>This method processes full names that may be in various formats
+     * (e.g., "Smith, John", "John Paul Smith", etc.) and generates all
+     * possible permutations of the name components to improve matching.</p>
+     * 
+     * <p>Processing steps:</p>
+     * <ul>
+     *   <li>Removes null entries from the input list</li>
+     *   <li>Removes commas and normalizes spacing using {@link #removeComma(String)}</li>
+     *   <li>Removes duplicate names</li>
+     *   <li>For each unique name, generates all permutations via {@link #getAllNamePermutations(String, String)}</li>
+     *   <li>Removes duplicate permutations from final result</li>
+     * </ul>
+     * 
+     * <p>Example: "John Paul Smith" generates permutations like:</p>
+     * <ul>
+     *   <li>"John Paul Smith"</li>
+     *   <li>"John Smith Paul"</li>
+     *   <li>"Paul John Smith"</li>
+     *   <li>"Paul Smith John"</li>
+     *   <li>"Smith John Paul"</li>
+     *   <li>"Smith Paul John"</li>
+     * </ul>
+     * 
+     * @param fullNames list of full name strings to process
+     * @param uuid person UUID for logging purposes (when names are too long)
+     * @return list of all generated name permutations
+     */
     private static List<String> getNameVariants(List<String> fullNames, String uuid) {
         return fullNames.stream()
             .filter(Objects::nonNull)

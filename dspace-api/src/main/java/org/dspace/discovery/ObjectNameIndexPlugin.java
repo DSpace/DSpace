@@ -18,11 +18,26 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implementation of {@link ObjectNameIndexPlugin} which indexes the objectname
- * to retrieve alternatives
+ * Implementation of {@link SolrServiceIndexPlugin} that creates a unified search field
+ * for object names by consolidating title and name metadata from various sources
+ * into the "objectname" Solr field.
  *
- * @author Stefano Maffei at 4science.com
+ * <p><strong>Purpose and Functionality:</strong></p>
+ * <p>This plugin addresses the challenge of searching for DSpace objects across different
+ * entity types (Publications, Persons, Organizations) by creating a standardized "objectname"
+ * field that contains the primary identifying text for each object. It enables users to
+ * search for any DSpace object using a single field, regardless of whether it's a publication
+ * title, person name, or other entity name.</p>
  *
+ * <p><strong>Configuration:</strong></p>
+ * <p>The plugin is configured through Spring configuration with the {@code fields}
+ * property that specifies which metadata fields should be indexed into the unified
+ * objectname field. Configured in {@code dspace/config/spring/api/discovery.xml}.</p>
+ *
+ * @author Stefano Maffei at 4science.it
+ * @see SolrServiceIndexPlugin
+ * @see ItemAuthorityLookupIndexPlugin
+ * @see org.dspace.discovery.SearchService
  */
 public class ObjectNameIndexPlugin implements SolrServiceIndexPlugin {
 

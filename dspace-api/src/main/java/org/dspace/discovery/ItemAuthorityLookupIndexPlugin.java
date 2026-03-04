@@ -18,11 +18,46 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implementation of {@link ItemAuthorityLookupIndexPlugin} which adds
- * additional values in the itemauthoritylookup field
+ * Implementation of {@link SolrServiceIndexPlugin} that enhances person entity searchability
+ * by consolidating name-related metadata fields into a unified 'itemauthoritylookup' index field.
+ *
+ * <p><strong>Purpose and Functionality:</strong></p>
+ * <p>This plugin addresses the challenge of searching for persons across multiple name variants
+ * and formats by creating a consolidated searchable index. It extracts values from various
+ * name-related metadata fields and aggregates them into the 'itemauthoritylookup' field,
+ * enabling comprehensive person lookup operations regardless of how names are stored.</p>
+ *
+ * <p><strong>Configuration:</strong></p>
+ * <p>The plugin is configured through Spring configuration with the {@code additionalFields}
+ * property that specifies which metadata fields should be indexed for authority lookup.
+ * Configured in {@code dspace/config/spring/api/discovery.xml}.
+ * </p>
+ *
+ * <p><strong>Search Scenarios:</strong></p>
+ * <p>Consider a person entity with the following metadata:</p>
+ * <pre>
+ * crisrp.name = "Dr. John Smith"
+ * person.name.variant = "J. Smith"
+ * person.name.variant = "Johnny Smith"
+ * person.name.translated = "ジョン・スミス" (Japanese)
+ * person.givenName = "John"
+ * person.familyName = "Smith"
+ *
+ * After indexing, itemauthoritylookup contains:
+ * ["Dr. John Smith", "J. Smith", "Johnny Smith", "ジョン・スミス", "John", "Smith"]
+ *
+ * This enables successful searches for:
+ * - "John Smith" (matches givenName + familyName)
+ * - "J. Smith" (matches variant)
+ * - "Johnny" (matches variant)
+ * - "ジョン" (matches translated name)
+ * - "Dr. Smith" (partial match of primary name)
+ * </pre>
  *
  * @author Stefano Maffei at 4science.it
- *
+ * @see SolrServiceIndexPlugin
+ * @see org.dspace.content.authority.service.ChoiceAuthorityService
+ * @see org.dspace.content.authority.service.MetadataAuthorityService
  */
 public class ItemAuthorityLookupIndexPlugin implements SolrServiceIndexPlugin {
 

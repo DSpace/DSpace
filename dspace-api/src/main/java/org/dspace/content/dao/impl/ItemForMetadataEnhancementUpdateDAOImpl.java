@@ -23,15 +23,22 @@ import org.hibernate.query.NativeQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Hibernate implementation of the Database Access Object interface class for
- * the ItemForMetadataEnhancementUpdate object. This class is responsible for
- * all database calls for the ItemForMetadataEnhancementUpdate object and is
- * autowired by spring This class should never be accessed directly.
+ * Implementation of {@link ItemForMetadataEnhancementUpdateDAO} using native SQL queries.
+ * 
+ * @see ItemForMetadataEnhancementUpdateDAO
+ * @see org.dspace.content.enhancer.consumer.ItemEnhancerConsumer
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class ItemForMetadataEnhancementUpdateDAOImpl implements ItemForMetadataEnhancementUpdateDAO {
     @Autowired
     ConfigurationService configurationService;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * <p><strong>Implementation:</strong> Uses a direct SQL DELETE statement for immediate
+     * removal without the overhead of entity loading and Hibernate state management.</p>
+     */
     @Override
     public void removeItemForUpdate(Context context, UUID itemToRemove) {
         try {
@@ -46,6 +53,15 @@ public class ItemForMetadataEnhancementUpdateDAOImpl implements ItemForMetadataE
 
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * <strong>Implementation:</strong> Performs an atomic SELECT and DELETE operation.
+     * Uses ORDER BY date_queued ASC to process items in first-in-first-out (FIFO) order
+     * for fair queue processing.
+     * </p>
+     */
     @Override
     public UUID pollItemToUpdate(Context context) {
         try {
@@ -72,6 +88,13 @@ public class ItemForMetadataEnhancementUpdateDAOImpl implements ItemForMetadataE
 
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * <p><strong>Query Logic:</strong> Searches for all items containing {@code cris.virtualsource.*}
+     * metadata fields where the first 36 characters (UUID portion) match the updated entity's UUID.
+     * This covers both direct references and qualified references like "uuid::qualifier".</p>
+     */
     @Override
     public int saveAffectedItemsForUpdate(Context context, UUID uuid) {
         try {
@@ -132,25 +155,17 @@ public class ItemForMetadataEnhancementUpdateDAOImpl implements ItemForMetadataE
     }
 
     /**
-     * The Hibernate Session used in the current thread
+     * Retrieves the current Hibernate session for executing native SQL queries.
+     * 
+     * <p>This method accesses the DSpace service manager to obtain the current
+     * database session, bypassing the normal Hibernate entity management for
+     * direct SQL execution.</p>
      *
-     * @return the current Session.
-     * @throws SQLException
+     * @return the current Hibernate Session for the thread
+     * @throws SQLException if the database session cannot be obtained
      */
     private Session getHibernateSession() throws SQLException {
         DBConnection dbConnection = new DSpace().getServiceManager().getServiceByName(null, DBConnection.class);
         return ((Session) dbConnection.getSession());
-    }
-
-    public UUID ConvertByteArrayToUUID(byte[] bytea) {
-        long mostSigBits = 0;
-        long leastSigBits = 0;
-        for (int i = 0; i < 8; i++) {
-            mostSigBits = (mostSigBits << 8) | (bytea[i] & 0xff);
-            leastSigBits = (leastSigBits << 8) | (bytea[i + 8] & 0xff);
-        }
-
-        UUID uuid = new UUID(mostSigBits, leastSigBits);
-        return uuid;
     }
 }
