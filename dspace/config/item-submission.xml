@@ -63,6 +63,7 @@
         <name-map collection-entity-type="Journal" submission-name="Journal"/>
         <name-map collection-entity-type="JournalVolume" submission-name="JournalVolume"/>
         <name-map collection-entity-type="JournalIssue" submission-name="JournalIssue"/>
+        <name-map collection-entity-type="Dataset" submission-name="Dataset"/>
 
         <!-- Example of configuration using a community handle to map an Item Submission Process.
 
@@ -149,6 +150,11 @@
             <type>submission-form</type>
         </step-definition>
         <step-definition id="journalIssueStep" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="datasetStep" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
@@ -396,6 +402,19 @@
         <submission-process name="JournalIssue">
             <step id="collection"/>
             <step id="journalIssueStep"/>
+            <step id="upload"/>
+            <step id="license"/>
+        </submission-process>
+
+        <!--
+        Submission Process for 'Dataset' Entities.
+        To enable: create a collection for Datasets and add it to the <submission-map> tag linking to this process
+         -->
+        <submission-process name="Dataset">
+            <step id="collection"/>
+            <!-- Datasets use a custom first step, but share page 2 with "traditional" Item form -->
+            <step id="datasetStep"/>
+            <step id="traditionalpagetwo"/>
             <step id="upload"/>
             <step id="license"/>
         </submission-process>

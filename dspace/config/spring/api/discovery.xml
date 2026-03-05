@@ -91,6 +91,11 @@
                 <!-- Used to display related items on single-item pages, because a relationship does not always point to the latest version of the related item -->
                 <entry key="publication-relationships" value-ref="publicationRelationships"/>
 
+                <entry key="dataset" value-ref="dataset"/>
+                <!-- Same as the "dataset" configuration, but does NOT filter out older versions of items -->
+                <!-- Used to display related items on single-item pages, because a relationship does not always point to the latest version of the related item -->
+                <entry key="dataset-relationships" value-ref="datasetRelationships"/>
+
                 <entry key="person" value-ref="person"/>
                 <!-- Same as the "person" configuration, but does NOT filter out older versions of items -->
                 <!-- Used to display related items on single-item pages, because a relationship does not always point to the latest version of the related item -->
@@ -1206,6 +1211,7 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <ref bean="searchFilterIsDatasetOfPublicationRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1276,6 +1282,7 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <ref bean="searchFilterIsDatasetOfPublicationRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1316,6 +1323,145 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
+    <bean id="dataset" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <property name="id" value="publication"/>
+        <property name="indexAlways" value="true"/>
+        <!--Which sidebar facets are to be displayed-->
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterContentInOriginalBundle"/>
+                <ref bean="searchFilterEntityType"/>
+            </list>
+        </property>
+        <!-- Set TagCloud configuration per discovery configuration -->
+        <property name="tagCloudFacetConfiguration" ref="defaultTagCloudFacetConfiguration"/>
+        <!--The search filters which can be used on the discovery search page-->
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterTitle" />
+                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterContentInOriginalBundle"/>
+                <ref bean="searchFilterFileNameInOriginalBundle" />
+                <ref bean="searchFilterFileDescriptionInOriginalBundle" />
+                <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterIsAuthorOfDatasetRelation"/>
+                <ref bean="searchFilterIsProjectOfDatasetRelation"/>
+                <ref bean="searchFilterIsOrgUnitOfDatasetRelation"/>
+                <ref bean="searchFilterIsPublicationOfDatasetRelation"/>
+            </list>
+        </property>
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortScore" />
+                        <ref bean="sortTitle" />
+                        <ref bean="sortDateIssued" />
+                        <ref bean="sortDateAccessioned"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all
+            queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find items, communities and collections-->
+                <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:Dataset</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
+            </list>
+        </property>
+        <!--The configuration for the recent submissions-->
+        <property name="recentSubmissionConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
+                <property name="metadataSortField" value="dc.date.accessioned" />
+                <property name="type" value="date"/>
+                <property name="max" value="20"/>
+                <!-- If enabled the collection home page will not display metadata but show a pageable list of recent submissions -->
+                <property name="useAsHomePage" value="false"/>
+            </bean>
+        </property>
+
+        <!-- When true a "did you mean" example will be displayed, value can be true or false -->
+        <property name="spellCheckEnabled" value="true"/>
+    </bean>
+
+    <bean id="datasetRelationships" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <property name="id" value="publicationRelationships"/>
+        <property name="indexAlways" value="true"/>
+        <!--Which sidebar facets are to be displayed-->
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterContentInOriginalBundle"/>
+                <ref bean="searchFilterEntityType"/>
+            </list>
+        </property>
+        <!-- Set TagCloud configuration per discovery configuration -->
+        <property name="tagCloudFacetConfiguration" ref="defaultTagCloudFacetConfiguration"/>
+        <!--The search filters which can be used on the discovery search page-->
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterTitle" />
+                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterContentInOriginalBundle"/>
+                <ref bean="searchFilterFileNameInOriginalBundle" />
+                <ref bean="searchFilterFileDescriptionInOriginalBundle" />
+                <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterIsAuthorOfDatasetRelation"/>
+                <ref bean="searchFilterIsProjectOfDatasetRelation"/>
+                <ref bean="searchFilterIsOrgUnitOfDatasetRelation"/>
+                <ref bean="searchFilterIsDatasetOfPublicationRelation"/>
+            </list>
+        </property>
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortScore" />
+                        <ref bean="sortTitle" />
+                        <ref bean="sortDateIssued" />
+                        <ref bean="sortDateAccessioned"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all
+            queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find items, communities and collections-->
+                <!-- NOTE: NOT filtered on latestVersion = true -->
+                <value>search.resourcetype:Item AND entityType_keyword:Dataset</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
+            </list>
+        </property>
+        <!--The configuration for the recent submissions-->
+        <property name="recentSubmissionConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
+                <property name="metadataSortField" value="dc.date.accessioned" />
+                <property name="type" value="date"/>
+                <property name="max" value="20"/>
+                <!-- If enabled the collection home page will not display metadata but show a pageable list of recent submissions -->
+                <property name="useAsHomePage" value="false"/>
+            </bean>
+        </property>
+
+        <!-- When true a "did you mean" example will be displayed, value can be true or false -->
+        <property name="spellCheckEnabled" value="true"/>
+    </bean>
+
     <bean id="person" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
         <property name="id" value="person"/>
         <property name="indexAlways" value="true"/>
@@ -1338,6 +1484,7 @@
                 <ref bean="searchFilterIsOrgUnitOfPersonRelation"/>
                 <ref bean="searchFilterIsProjectOfPersonRelation"/>
                 <ref bean="searchFilterIsPublicationOfAuthorRelation"/>
+                <ref bean="searchFilterIsDatasetOfAuthorRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1400,6 +1547,7 @@
                 <ref bean="searchFilterIsOrgUnitOfPersonRelation"/>
                 <ref bean="searchFilterIsProjectOfPersonRelation"/>
                 <ref bean="searchFilterIsPublicationOfAuthorRelation"/>
+                <ref bean="searchFilterIsDatasetOfAuthorRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1458,6 +1606,7 @@
                 <ref bean="searchFilterIsOrgUnitOfProjectRelation"/>
                 <ref bean="searchFilterIsPersonOfProjectRelation"/>
                 <ref bean="searchFilterIsPublicationOfProjectRelation"/>
+                <ref bean="searchFilterIsDatasetOfProjectRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1512,6 +1661,7 @@
                 <ref bean="searchFilterIsOrgUnitOfProjectRelation"/>
                 <ref bean="searchFilterIsPersonOfProjectRelation"/>
                 <ref bean="searchFilterIsPublicationOfProjectRelation"/>
+                <ref bean="searchFilterIsDatasetOfProjectRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1572,6 +1722,7 @@
                 <ref bean="searchFilterIsPersonOfOrgUnitRelation"/>
                 <ref bean="searchFilterIsProjectOfOrgUnitRelation"/>
                 <ref bean="searchFilterIsPublicationOfOrgUnitRelation"/>
+                <ref bean="searchFilterIsDatasetOfOrgUnitRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1636,6 +1787,7 @@
                 <ref bean="searchFilterIsPersonOfOrgUnitRelation"/>
                 <ref bean="searchFilterIsProjectOfOrgUnitRelation"/>
                 <ref bean="searchFilterIsPublicationOfOrgUnitRelation"/>
+                <ref bean="searchFilterIsDatasetOfOrgUnitRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -3193,6 +3345,94 @@
         <property name="metadataFields">
             <list>
                 <value>relation.isProjectOfFundingAgency.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsAuthorOfDatasetRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isAuthorOfDataset"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isAuthorOfDataset.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsDatasetOfAuthorRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isDatasetOfAuthor"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isDatasetOfAuthor.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsProjectOfDatasetRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isProjectOfDataset"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isProjectOfDataset.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsDatasetOfProjectRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isProjectOfDataset"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isDatasetOfProject.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsOrgUnitOfDatasetRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isOrgUnitOfDataset"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isOrgUnitOfDataset.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsDatasetOfOrgUnitRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isDatasetOfOrgUnit"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isDatasetOfOrgUnit.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsDatasetOfPublicationRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isDatasetOfPublication"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isDatasetOfPublication.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsPublicationOfDatasetRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isPublicationOfDataset"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isPublicationOfDataset.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
