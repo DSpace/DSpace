@@ -3155,6 +3155,28 @@
         <property name="pageSize" value="10"/>
     </bean>
 
+    <bean id="searchFilterIsAdvisorOfPublicationRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isAdvisorOfPublication"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isAdvisorOfPublication.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsPublicationOfAdvisorRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isPublicationOfAdvisor"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isPublicationOfAdvisor.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
     <bean id="searchFilterIsContributorOfPublicationRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
         <property name="indexFieldName" value="isContributorOfPublication"/>
         <property name="metadataFields">
