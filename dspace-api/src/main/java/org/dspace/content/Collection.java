@@ -269,7 +269,7 @@ public class Collection extends CacheableDSpaceObject implements DSpaceObjectLeg
         setModified();
     }
 
-    void removeCommunity(Community community) {
+    public void removeCommunity(Community community) {
         this.communities.remove(community);
         setModified();
     }
