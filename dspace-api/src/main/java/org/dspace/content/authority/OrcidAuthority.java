@@ -174,8 +174,8 @@ public class OrcidAuthority extends ItemAuthority {
     }
 
     private String getTitle(ExpandedResult result) {
-        String givenName = result.getGivenNames();
-        String familyName = result.getFamilyNames();
+        String givenName =  StringUtils.defaultString(result.getGivenNames());
+        String familyName = StringUtils.defaultString(result.getFamilyNames());
 
         String capitalizedFamilyName = capitalizeFully(familyName);
         String capitalizedGivenName = capitalizeFully(givenName);
