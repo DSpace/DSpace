@@ -162,8 +162,8 @@ public class OpenAlexPublicationByAuthorIdExternalSourcesIT extends AbstractCont
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.issn']",
                                            Matchers.hasSize(3)))
                        .andExpect(
-                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.doi'][0].value")
-                               .value("10.1016/s0021-9258(19)52451-6"))
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.relation.hasversion'][0].value")
+                               .value("https://doi.org/10.1016/s0021-9258(19)52451-6"))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.language.iso'][0].value")
                                       .value("en"))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.title'][0].value")
@@ -355,8 +355,8 @@ public class OpenAlexPublicationByAuthorIdExternalSourcesIT extends AbstractCont
                                 .andExpect(jsonPath("$._embedded.item.metadata['dc.identifier.issn']",
                                                     Matchers.hasSize(3)))
                                 .andExpect(
-                                    jsonPath("$._embedded.item.metadata['dc.identifier.doi'][0].value")
-                                        .value("10.1016/s0021-9258(19)52451-6"))
+                                    jsonPath("$._embedded.item.metadata['dc.relation.hasversion'][0].value")
+                                        .value("https://doi.org/10.1016/s0021-9258(19)52451-6"))
                                 .andExpect(jsonPath("$._embedded.item.metadata['dc.language.iso'][0].value")
                                                .value("en"))
                                 .andExpect(jsonPath("$._embedded.item.metadata['dc.title'][0].value")
