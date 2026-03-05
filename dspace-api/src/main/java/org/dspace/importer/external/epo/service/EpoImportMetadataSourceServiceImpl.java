@@ -14,6 +14,7 @@ import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -163,7 +164,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     private Map<String, String> getLoginHeaderParams() {
         Map<String, String> params = new HashMap<String, String>();
         String authString = consumerKey + ":" + consumerSecret;
-        params.put("Authorization", "Basic " + Base64.encode(authString.getBytes()));
+        params.put("Authorization", "Basic " + Base64.getEncoder().encodeToString(authString.getBytes()));
         params.put("Content-type", "application/x-www-form-urlencoded");
         return params;
     }
