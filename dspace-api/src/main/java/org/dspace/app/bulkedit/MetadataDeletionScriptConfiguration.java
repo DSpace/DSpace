@@ -13,7 +13,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 /**
  * The {@link ScriptConfiguration} for the {@link MetadataDeletion} script.
  */
-public class MetadataDeletionScriptConfiguration<T extends MetadataDeletion> extends ScriptConfiguration<T> {
+public class MetadataDeletionScriptConfiguration<T extends MetadataDeletion<?>> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 

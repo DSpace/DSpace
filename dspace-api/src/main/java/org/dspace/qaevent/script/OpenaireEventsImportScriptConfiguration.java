@@ -19,7 +19,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  *
  */
-public class OpenaireEventsImportScriptConfiguration<T extends OpenaireEventsImport> extends ScriptConfiguration<T> {
+public class OpenaireEventsImportScriptConfiguration<T extends OpenaireEventsImport<?>> extends ScriptConfiguration<T> {
 
     /*
     private AuthorizeService authorizeService;

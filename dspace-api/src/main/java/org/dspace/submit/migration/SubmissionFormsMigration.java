@@ -26,8 +26,8 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
 
 /**
  * Script (config {@link SubmissionFormsMigrationCliScriptConfiguration}) to transform the old input-forms.xml and
@@ -36,7 +36,7 @@ import org.dspace.utils.DSpace;
  *
  * @author Maria Verdonck (Atmire) on 13/11/2020
  */
-public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigrationCliScriptConfiguration> {
+public class SubmissionFormsMigration<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     private boolean help = false;
     private String inputFormsFilePath = null;
@@ -63,6 +63,17 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
     private static final String CONTENT_DTD_INPUT_FORMS_DUMMY =
         "<!ELEMENT input-forms (form-map, form-definitions, form-value-pairs) >";
     private List<File> tempFiles = new ArrayList<>();
+
+    /**
+     * Constructor for SubmissionFormsMigration script.
+     * Migrates submission forms from DSpace 6 format to DSpace 7 format
+     * using XSLT transformations for compatibility upgrades.
+     * 
+     * @param scriptConfiguration The script configuration defining migration parameters and file paths
+     */
+    public SubmissionFormsMigration(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     @Override
     public void internalRun() throws TransformerException {
@@ -190,11 +201,5 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
     private void throwParseException(String message) throws ParseException {
         handler.logError(message);
         throw new ParseException(message);
-    }
-
-    @Override
-    public SubmissionFormsMigrationCliScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager().getServiceByName("submission-forms-migrate",
-            SubmissionFormsMigrationCliScriptConfiguration.class);
     }
 }

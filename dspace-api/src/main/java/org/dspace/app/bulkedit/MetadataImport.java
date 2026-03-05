@@ -62,10 +62,10 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
@@ -76,7 +76,7 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  *
  * @author Stuart Lewis
  */
-public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfiguration> {
+public class MetadataImport<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     /**
      * The DSpaceCSV object we're processing
@@ -150,6 +150,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
      */
     protected static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataImport.class);
 
+
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
@@ -164,6 +165,17 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                                                                    .getAuthorityValueService();
     protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    /**
+     * Constructor for MetadataImport script.
+     * Imports metadata from CSV files to update or create items in the repository,
+     * supporting batch operations with validation and relationship management.
+     * 
+     * @param scriptConfiguration The script configuration defining import file and processing options
+     */
+    public MetadataImport(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -288,12 +300,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
      */
     protected boolean determineChange(DSpaceRunnableHandler handler) throws IOException {
         return true;
-    }
-
-    @Override
-    public MetadataImportScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager().getServiceByName("metadata-import",
-                                                                 MetadataImportScriptConfiguration.class);
     }
 
 

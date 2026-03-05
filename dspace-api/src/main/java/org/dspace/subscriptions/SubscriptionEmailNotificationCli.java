@@ -7,9 +7,21 @@
  */
 package org.dspace.subscriptions;
 
+import org.dspace.scripts.configuration.ScriptConfiguration;
+
 /**
  * Extension of {@link SubscriptionEmailNotification} for CLI.
  */
-public class SubscriptionEmailNotificationCli extends SubscriptionEmailNotification {
+public class SubscriptionEmailNotificationCli<T extends ScriptConfiguration<?>>
+    extends SubscriptionEmailNotification<T> {
 
+    /**
+     * Constructor for SubscriptionEmailNotificationCli.
+     * Command-line interface wrapper for SubscriptionEmailNotification script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
+     */
+    public SubscriptionEmailNotificationCli(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 }

@@ -30,7 +30,7 @@ import org.dspace.utils.DSpace;
  *
  * @param  <T> the {@link BulkAccessControl} type
  */
-public class BulkAccessControlScriptConfiguration<T extends BulkAccessControl> extends ScriptConfiguration<T> {
+public class BulkAccessControlScriptConfiguration<T extends BulkAccessControl<?>> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 

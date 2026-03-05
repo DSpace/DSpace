@@ -10,17 +10,20 @@ package org.dspace.app.scripts;
 import org.apache.commons.cli.ParseException;
 import org.dspace.app.rest.converter.ScriptConverter;
 import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.utils.DSpace;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * Script used to test the type conversion in the {@link ScriptConverter}
  */
-public class TypeConversionTestScript extends DSpaceRunnable<TypeConversionTestScriptConfiguration> {
+public class TypeConversionTestScript<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
-
-    public TypeConversionTestScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-                           .getServiceByName("type-conversion-test", TypeConversionTestScriptConfiguration.class);
+    /**
+     * Constructor for the TypeConversionTestScript
+     *
+     * @param scriptConfiguration
+     */
+    public TypeConversionTestScript(T scriptConfiguration) {
+        super(scriptConfiguration);
     }
 
     public void setup() throws ParseException {

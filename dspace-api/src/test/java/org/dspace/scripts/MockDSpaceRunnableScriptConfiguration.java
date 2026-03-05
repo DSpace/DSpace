@@ -13,7 +13,8 @@ import org.apache.commons.cli.Options;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.impl.MockDSpaceRunnableScript;
 
-public class MockDSpaceRunnableScriptConfiguration<T extends MockDSpaceRunnableScript> extends ScriptConfiguration<T> {
+public class MockDSpaceRunnableScriptConfiguration<T extends MockDSpaceRunnableScript<?>>
+    extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 
