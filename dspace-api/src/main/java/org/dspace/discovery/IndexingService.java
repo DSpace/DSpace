@@ -9,6 +9,7 @@ package org.dspace.discovery;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
@@ -44,6 +45,20 @@ public interface IndexingService {
     void indexContent(Context context, IndexableObject dso,
                       boolean force, boolean commit, boolean preDb) throws SQLException, SearchServiceException;
 
+    /**
+     * Apply the provided plugins as atomic Solr updates for the given object, leaving all other index
+     * fields intact.
+     *
+     * @param context  The DSpace Context
+     * @param dso      The object to update
+     * @param force    unused; kept for symmetry with the other indexContent overloads
+     * @param commit   if true, commit after applying the plugins
+     * @param plugins  the plugins to apply
+     */
+    void indexContent(Context context, IndexableObject dso,
+                      boolean force, boolean commit, List<SolrServiceIndexPlugin> plugins)
+            throws SQLException, SearchServiceException;
+
     void unIndexContent(Context context, IndexableObject dso)
         throws SQLException, IOException;
 
@@ -66,6 +81,16 @@ public interface IndexingService {
     void updateIndex(Context context, boolean force);
 
     void updateIndex(Context context, boolean force, String type);
+
+    /**
+     * Iterate over all indexed objects and apply the provided plugins as atomic updates,
+     * leaving all other index fields intact.
+     *
+     * @param context  The DSpace Context
+     * @param force    unused; kept for symmetry with the other updateIndex overloads
+     * @param plugins  the plugins to apply
+     */
+    void updateIndex(Context context, boolean force, List<SolrServiceIndexPlugin> plugins);
 
     void cleanIndex() throws IOException, SQLException, SearchServiceException;
 

@@ -9,6 +9,7 @@
 package org.dspace.discovery;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 /**
@@ -84,6 +85,10 @@ public enum IndexClientOptions {
         options.addOption("s", "spellchecker", false, "Rebuild the spellchecker, can be combined with -b and -f.");
         options.addOption("f", "force", false,
                           "if updating existing index, force each handle to be reindexed even if uptodate");
+        options.addOption(Option.builder("p").longOpt("plugin").hasArgs()
+                .desc("run one or more indexing plugins (by class name) on all indexed objects without a full "
+                        + "reindex; can be combined with -i to restrict scope to a single object")
+                .build());
         options.addOption("h", "help", false, "print this help message");
         return options;
     }

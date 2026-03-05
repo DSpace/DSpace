@@ -50,6 +50,7 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.MoreLikeThisParams;
@@ -344,7 +345,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      */
     @Override
     public void updateIndex(Context context, boolean force) {
-        updateIndex(context, force, null);
+        updateIndex(context, force, (String) null);
     }
 
     @Override
@@ -395,6 +396,25 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         log.info("Solr commit complete for type {}", indexableObjectService.getType());
                     }
                 }
+            }
+        } catch (IOException | SQLException | SolrServerException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void updateIndex(Context context, boolean force, List<SolrServiceIndexPlugin> plugins) {
+        try {
+            for (IndexFactory indexableObjectService : indexObjectServiceFactory.getIndexFactories()) {
+                final Iterator<IndexableObject> indexableObjects = indexableObjectService.findAll(context);
+                while (indexableObjects.hasNext()) {
+                    final IndexableObject indexableObject = indexableObjects.next();
+                    applyPluginsAtomic(context, indexableObject, plugins);
+                    context.uncacheEntity(indexableObject.getIndexedObject());
+                }
+            }
+            if (solrSearchCore.getSolr() != null) {
+                solrSearchCore.getSolr().commit();
             }
         } catch (IOException | SQLException | SolrServerException e) {
             log.error(e.getMessage(), e);
@@ -1744,6 +1764,43 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         if (commit) {
             commit();
         }
+    }
+
+    @Override
+    public void indexContent(Context context, IndexableObject dso, boolean force, boolean commit,
+                             List<SolrServiceIndexPlugin> plugins) throws SearchServiceException, SQLException {
+        try {
+            applyPluginsAtomic(context, dso, plugins);
+        } catch (IOException | SolrServerException e) {
+            throw new SearchServiceException(e.getMessage(), e);
+        }
+        if (commit) {
+            commit();
+        }
+    }
+
+    /**
+     * Collect contributions from the given plugins into a single atomic-update Solr document and submit it.
+     * Only fields actually written by the plugins are touched; all other index fields are left intact.
+     */
+    private void applyPluginsAtomic(Context context, IndexableObject indexableObject,
+                                    List<SolrServiceIndexPlugin> plugins) throws IOException, SolrServerException {
+        SolrInputDocument pluginDoc = new SolrInputDocument();
+        for (SolrServiceIndexPlugin plugin : plugins) {
+            plugin.additionalIndex(context, indexableObject, pluginDoc);
+        }
+        if (pluginDoc.isEmpty() || solrSearchCore.getSolr() == null) {
+            return;
+        }
+        SolrInputDocument atomicDoc = new SolrInputDocument();
+        atomicDoc.setField(SearchUtils.RESOURCE_UNIQUE_ID, indexableObject.getUniqueIndexID());
+        for (SolrInputField field : pluginDoc) {
+            List<Object> values = new ArrayList<>(field.getValues());
+            Map<String, Object> atomicOp = new HashMap<>();
+            atomicOp.put("set", values.size() == 1 ? values.get(0) : values);
+            atomicDoc.setField(field.getName(), atomicOp);
+        }
+        solrSearchCore.getSolr().add(atomicDoc);
     }
 
     @Override

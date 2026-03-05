@@ -9,11 +9,15 @@ package org.dspace.discovery;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -51,6 +55,20 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         if (indexClientOptions == IndexClientOptions.HELP) {
             printHelp();
             return;
+        }
+
+        // Resolve optional plugin list (-p)
+        List<SolrServiceIndexPlugin> plugins = new ArrayList<>();
+        if (commandLine.hasOption('p')) {
+            if (indexClientOptions == IndexClientOptions.BUILD ||
+                    indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
+                throw new IllegalArgumentException(
+                        "-p (plugin) cannot be combined with -b (build): a full rebuild always applies all plugins. ");
+            }
+            plugins = resolvePlugins(commandLine.getOptionValues('p'));
+            handler.logInfo("Running plugin(s): " + StringUtils.join(plugins.stream()
+                                                                            .map(p -> p.getClass().getName())
+                                                                            .collect(Collectors.toList()), ", "));
         }
 
         /** Acquire from dspace-services in future */
@@ -128,20 +146,34 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         } else if (indexClientOptions == IndexClientOptions.INDEX) {
             handler.logInfo("Indexing " + commandLine.getOptionValue('i') + " force " + commandLine.hasOption("f"));
             final long startTimeMillis = System.currentTimeMillis();
-            final long count = indexAll(indexer, context, indexableObject.get(), numThreads);
+            final long count;
+            if (!plugins.isEmpty()) {
+                indexer.indexContent(context, indexableObject.get(), true, true, plugins);
+                count = 1;
+            } else {
+                count = indexAll(indexer, context, indexableObject.get(), numThreads);
+            }
             final long seconds = (System.currentTimeMillis() - startTimeMillis) / 1000;
             handler.logInfo("Indexed " + count + " object" + (count > 1 ? "s" : "") + " in " + seconds + " seconds");
         } else if (indexClientOptions == IndexClientOptions.UPDATE ||
             indexClientOptions == IndexClientOptions.UPDATEANDSPELLCHECK) {
             handler.logInfo("Updating Index");
-            indexer.updateIndex(context, false);
+            if (!plugins.isEmpty()) {
+                indexer.updateIndex(context, false, plugins);
+            } else {
+                indexer.updateIndex(context, false);
+            }
             if (indexClientOptions == IndexClientOptions.UPDATEANDSPELLCHECK) {
                 checkRebuildSpellCheck(commandLine, indexer);
             }
         } else if (indexClientOptions == IndexClientOptions.FORCEUPDATE ||
             indexClientOptions == IndexClientOptions.FORCEUPDATEANDSPELLCHECK) {
             handler.logInfo("Updating Index");
-            indexer.updateIndex(context, true);
+            if (!plugins.isEmpty()) {
+                indexer.updateIndex(context, true, plugins);
+            } else {
+                indexer.updateIndex(context, true);
+            }
             if (indexClientOptions == IndexClientOptions.FORCEUPDATEANDSPELLCHECK) {
                 checkRebuildSpellCheck(commandLine, indexer);
             }
@@ -166,6 +198,45 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         indexClientOptions = IndexClientOptions.getIndexClientOption(commandLine);
         numThreads = configurationService.getIntProperty("discovery.index.threads", 1);
     }
+
+    /**
+     * Resolves the given class names to registered {@link SolrServiceIndexPlugin} beans.
+     *
+     * If a class name cannot be found on the classpath the method fails and lists all available plugin
+     *       class names
+     * If the class exists but is not registered as a {@link SolrServiceIndexPlugin} Spring bean the
+     *       method fails and lists all supported plugin class names
+     *
+     * @param classNames fully-qualified class names of the plugins to run
+     * @return resolved plugin instances, in the same order as {@code classNames}
+     */
+    private List<SolrServiceIndexPlugin> resolvePlugins(String[] classNames) {
+        List<SolrServiceIndexPlugin> available = DSpaceServicesFactory.getInstance()
+                .getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
+        List<String> availableNames = available.stream()
+                .map(p -> p.getClass().getName())
+                .collect(Collectors.toList());
+
+        List<SolrServiceIndexPlugin> result = new ArrayList<>();
+        for (String className : classNames) {
+            try {
+                Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                throw new IllegalArgumentException(
+                        "Plugin class not found: " + className + ". Available plugins: \n - " +
+                                String.join("\n - ", availableNames));
+            }
+            SolrServiceIndexPlugin plugin = available.stream()
+                    .filter(p -> p.getClass().getName().equals(className))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Plugin " + className + " is not a registered SolrServiceIndexPlugin bean. "
+                                    + "Supported plugins: \n - " + String.join("\n - ", availableNames)));
+            result.add(plugin);
+        }
+        return result;
+    }
+
 
     /**
      * Indexes the given object and all children, if applicable.
