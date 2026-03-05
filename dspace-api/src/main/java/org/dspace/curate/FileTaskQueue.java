@@ -121,7 +121,13 @@ public class FileTaskQueue implements TaskQueue {
                         while ((entryStr = reader.readLine()) != null) {
                             entryStr = entryStr.trim();
                             if (entryStr.length() > 0) {
-                                entrySet.add(new TaskQueueEntry(entryStr));
+                                // Assuming entryStr is a delimited string, e.g., "epersonId|submitTime|tasks|objId"
+                                String[] parts = entryStr.split("\\|");
+                                if (parts.length == 4) {
+                                    entrySet.add(new TaskQueueEntry(parts[0], parts[1], parts[2], parts[3]));
+                                } else {
+                                    log.error("Malformed queue entry: " + entryStr);
+                                }
                             }
                         }
                     } finally {
