@@ -32,6 +32,26 @@ public interface ResourcePolicyService {
     public ResourcePolicy find(Context context, int id) throws SQLException;
 
     /**
+     * Finds all ResourcePolicies in the database with pagination.
+     *
+     * @param context The relevant DSpace Context.
+     * @param offset  The number of records to skip.
+     * @param limit   The number of records to retrieve.
+     * @return A list of ResourcePolicy objects.
+     * @throws SQLException If a database error occurs.
+     */
+    public List<ResourcePolicy> findAll(Context context, int offset, int limit) throws SQLException;
+
+    /**
+     * Counts the total number of ResourcePolicies in the database.
+     *
+     * @param context The relevant DSpace Context.
+     * @return The total number of policies.
+     * @throws SQLException If a database error occurs.
+     */
+    public int countAll(Context context) throws SQLException;
+
+    /**
      * Persist a model object.
      *
      * @param context
@@ -299,6 +319,31 @@ public interface ResourcePolicyService {
      * @throws SQLException  if database error
      */
     public int countByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException;
+
+    /**
+     * Return a paginated list of policies based on embargo date presence criteria
+     * 
+     * @param context      DSpace context object
+     * @param hasStartDate filter for start date presence, null=any, true=required, false=must be absent
+     * @param hasEndDate   filter for end date presence, null=any, true=required, false=must be absent
+     * @param offset       the position of the first result to return
+     * @param limit        paging limit
+     * @return             list of resource policies
+     * @throws SQLException if database error
+     */
+    public List<ResourcePolicy> findByDate(Context context, Boolean hasStartDate, Boolean hasEndDate,
+                                                   int offset, int limit) throws SQLException;
+
+    /**
+     * Count all the resource policies based on embargo date presence criteria
+     * 
+     * @param context      DSpace context object
+     * @param hasStartDate filter for start date presence, null=any, true=required, false=must be absent
+     * @param hasEndDate   filter for end date presence, null=any, true=required, false=must be absent
+     * @return             total policies
+     * @throws SQLException if database error
+     */
+    public int countByDate(Context context, Boolean hasStartDate, Boolean hasEndDate) throws SQLException;
 
     /**
      * Check if the resource policy identified with (id) belong to ePerson
