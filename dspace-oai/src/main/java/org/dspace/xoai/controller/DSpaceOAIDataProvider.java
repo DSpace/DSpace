@@ -40,6 +40,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.config.XOAIManagerResolver;
 import org.dspace.xoai.services.api.config.XOAIManagerResolverException;
@@ -71,7 +72,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class DSpaceOAIDataProvider {
     private static final Logger log = getLogger(DSpaceOAIDataProvider.class);
 
-    private Transformer htmlTransformer = null;
+    private TransformerFactory htmlTransformerFactory = null;
+    private byte[] htmlTransformerSource = null;
 
     @Autowired
     XOAICacheService cacheService;
@@ -85,24 +87,28 @@ public class DSpaceOAIDataProvider {
     IdentifyResolver identifyResolver;
     @Autowired
     SetRepositoryResolver setRepositoryResolver;
+    @Autowired
+    ConfigurationService configurationService;
 
     private DSpaceResumptionTokenFormatter resumptionTokenFormat = new DSpaceResumptionTokenFormatter();
 
     @PostConstruct
-    public void setUpHTMLTransformer() {
+    public void setUpHTMLTransformerFactory() {
         try {
             XOAIManager manager = xoaiManagerResolver.getManager();
-            if (manager.hasStyleSheet()) {
+            if (configurationService.getBooleanProperty("oai.html", true) && manager.hasStyleSheet()) {
                 ResourceLoader resourceLoader = new DefaultResourceLoader();
                 String styleSheetPath = manager.getStyleSheet();
                 Resource styleSheetResource = resourceLoader.getResource("classpath:" + styleSheetPath);
-                Source htmlTransformSource
-                    = new StreamSource(new ByteArrayInputStream(styleSheetResource.getContentAsByteArray()));
-                TransformerFactory transformerFactory
-                    = TransformerFactory.newInstance();
-                htmlTransformer = transformerFactory.newTransformer(htmlTransformSource);
+                htmlTransformerSource = styleSheetResource.getContentAsByteArray();
+                htmlTransformerFactory = TransformerFactory.newInstance();
+                // run for potential exceptions only as a sanity check on the XSLT:
+                htmlTransformerFactory.newTransformer(
+                        new StreamSource(new ByteArrayInputStream(htmlTransformerSource)));
             }
         } catch (Exception e) {
+            htmlTransformerFactory = null;
+            htmlTransformerSource = null;
             log.warn("Could not set up HTML transformer for OAI-PMH app: " + e.toString());
         }
     }
@@ -147,7 +153,7 @@ public class DSpaceOAIDataProvider {
 
             boolean shouldServeAsHTML = false;
             List<MediaType> acceptMediaTypes = MediaType.parseMediaTypes(request.getHeader("Accept"));
-            if (htmlTransformer != null) {
+            if (htmlTransformerFactory != null) {
                 response.addHeader("Vary", "Accept");
                 for (MediaType acceptMediaType : acceptMediaTypes) {
                     if (acceptMediaType.includes(MediaType.TEXT_XML) ||
@@ -183,6 +189,8 @@ public class DSpaceOAIDataProvider {
                 OutputStream responseOut = response.getOutputStream();
                 Source source = new StreamSource(new ByteArrayInputStream(((ByteArrayOutputStream) out).toByteArray()));
                 Result result = new StreamResult(responseOut);
+                Transformer htmlTransformer = htmlTransformerFactory.newTransformer(
+                        new StreamSource(new ByteArrayInputStream(htmlTransformerSource)));
                 htmlTransformer.transform(source, result);
                 out = responseOut;
             }
