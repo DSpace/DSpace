@@ -22,8 +22,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.io.RandomAccessReadBuffer;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -67,10 +67,6 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     protected final Set<String> PDF_MIMES = new HashSet<>(2);
 
     /**
-     * A set of MIME types that refer to a JPEG, PNG, or GIF
-     */
-    protected final Set<String> RASTER_MIMES = new HashSet<>();
-    /**
      * A set of MIME types that refer to a SVG
      */
     protected final Set<String> SVG_MIMES = new HashSet<>();
@@ -103,15 +99,13 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     public void afterPropertiesSet() throws Exception {
         // Add valid format MIME types to set. This could be put in the Schema
         // instead.
-        //Populate RASTER_MIMES
+        //Populate SVG_MIMES
         SVG_MIMES.add("image/jpeg");
         SVG_MIMES.add("image/pjpeg");
         SVG_MIMES.add("image/png");
         SVG_MIMES.add("image/gif");
-        //Populate SVG_MIMES
         SVG_MIMES.add("image/svg");
         SVG_MIMES.add("image/svg+xml");
-
 
         //Populate PDF_MIMES
         PDF_MIMES.add("application/pdf");
@@ -250,17 +244,17 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     public Pair<byte[], Long> makeCitedDocument(Context context, Bitstream bitstream)
             throws IOException, SQLException {
 
-        try (
-                var result = new PDDocument();
-                var source = loadDocumentFromDB(context, bitstream)
-        ) {
+        PDDocument result = new PDDocument();
+        PDDocument source = loadDocumentFromDB(context, bitstream);
+        try {
             var item = (Item) bitstreamService.getParentObject(context, bitstream);
-
             try (var cover = coverPageService.renderCoverDocument(item)) {
                 addCoverPageToDocument(result, source, cover);
-
                 return documentAsBytes(result);
             }
+        } finally {
+            source.close();
+            result.close();
         }
     }
 
@@ -275,38 +269,30 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     private static Pair<byte[], Long> documentAsBytes(PDDocument document) throws IOException {
 
         document.setAllSecurityToBeRemoved(true);
-
         //We already have the full PDF in memory, so keep it there
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
             document.save(out);
             byte[] data = out.toByteArray();
             return Pair.of(data, (long) data.length);
+        } finally {
+            out.close();
         }
     }
 
-    private void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDDocument coverPage) {
-        var sourcePages = sourceDocument.getDocumentCatalog().getPages();
-        var coverPages = coverPage.getDocumentCatalog().getPages();
+    private void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDDocument coverPage)
+            throws IOException {
+
+        PDFMergerUtility mergerUtility = new PDFMergerUtility();
 
         if (isCitationFirstPage()) {
             //citation as cover page
-
-            for (var page: coverPages) {
-                document.addPage(page);
-            }
-
-            for (PDPage sourcePage : sourcePages) {
-                document.addPage(sourcePage);
-            }
+            mergerUtility.appendDocument(document, coverPage);
+            mergerUtility.appendDocument(document, sourceDocument);
         } else {
             //citation as tail page
-            for (PDPage sourcePage : sourcePages) {
-                document.addPage(sourcePage);
-            }
-
-            for (var page: coverPages) {
-                document.addPage(page);
-            }
+            mergerUtility.appendDocument(document, sourceDocument);
+            mergerUtility.appendDocument(document, coverPage);
         }
     }
 }
