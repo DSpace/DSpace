@@ -152,7 +152,7 @@ jobs:
       # https://github.com/actions/download-artifact
       - name: Download dspace-dependencies image artifact
         if: ${{ matrix.isPr && (inputs.build_id == 'dspace-prod' || inputs.build_id == 'dspace-test' || inputs.build_id == 'dspace-cli') && matrix.arch == 'linux/amd64' }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: docker-image-dspace-dependencies-linux-amd64
           path: /tmp/docker
@@ -299,7 +299,7 @@ jobs:
       - docker-build
     steps:
       - name: Download Docker build digests
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: /tmp/digests
           # Download digests for both AMD64 and ARM64 into same directory
