@@ -5,12 +5,65 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
+#set($mimetype = "text/html")
 #set($subject = "${config.get('dspace.name')}: Item export requested is ready for download")
-The item export you requested from the repository is now ready for download.
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YItem Export Request Success</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #4caf50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .info-box {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .signature {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p>The item export you requested from the repository is now ready for download.</p>
 
-You may download the compressed file using the following link:
-${params[0]}
+        <p>You may download the compressed file using the following link:</p>
 
-This file will remain available for at least ${params[1]} hours.
+        <p><a href="${params[0]}" class="button">Download Export</a></p>
 
-The ${config.get('dspace.name')} Team
+        <p>If you're unable to click the button, you can copy and paste the following link into your browser:</p>
+        <p>${params[0]}</p>
+
+        <div class="info-box">
+            This file will remain available for at least ${params[1]} hours.
+        </div>
+
+        <p class="signature">The ${config.get('dspace.name')} Team</p>
+    </div>
+</body>
+</html>
