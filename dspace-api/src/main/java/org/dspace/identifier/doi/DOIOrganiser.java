@@ -56,6 +56,25 @@ public class DOIOrganiser {
 
     private static final Logger LOG = LogManager.getLogger(DOIOrganiser.class);
 
+    /**
+     * Number of DOIs to fetch per batch during bulk operations.
+     */
+    private static final int BATCH_SIZE = 100;
+
+    /**
+     * Functional interface for a DOI processing operation.
+     */
+    @FunctionalInterface
+    private interface DOIOperation {
+        /**
+         * Process a single DOI.
+         *
+         * @param doi the DOI to process.
+         * @throws Exception if processing fails.
+         */
+        void process(DOI doi) throws Exception;
+    }
+
     private final DOIIdentifierProvider provider;
     private final Context context;
     private boolean quiet;
@@ -217,107 +236,27 @@ public class DOIOrganiser {
         }
 
         if (line.hasOption('s')) {
-            try {
-                List<DOI> dois = doiService
-                    .getDOIsByStatus(context, Arrays.asList(DOIIdentifierProvider.TO_BE_RESERVED));
-                if (dois.isEmpty()) {
-                    System.err.println("There are no objects in the database "
-                                           + "that could be reserved.");
-                }
-
-                for (DOI doi : dois) {
-                    doi = context.reloadEntity(doi);
-                    try {
-                        organiser.reserve(doi);
-                        context.commit();
-                    } catch (RuntimeException e) {
-                        System.err.format("DOI %s for object %s reservation failed, skipping:  %s%n",
-                                doi.getDSpaceObject().getID().toString(),
-                                doi.getDoi(), e.getMessage());
-                        context.rollback();
-                    }
-                }
-            } catch (SQLException ex) {
-                System.err.println("Error in database connection:" + ex.getMessage());
-                ex.printStackTrace(System.err);
-            }
+            List<Integer> statuses = Arrays.asList(DOIIdentifierProvider.TO_BE_RESERVED);
+            processBatched(context, doiService, statuses, organiser::reserve, "reservation");
         }
 
         if (line.hasOption('r')) {
-            try {
-                List<DOI> dois = doiService
-                    .getDOIsByStatus(context, Arrays.asList(DOIIdentifierProvider.TO_BE_REGISTERED));
-                if (dois.isEmpty()) {
-                    System.err.println("There are no objects in the database "
-                                           + "that could be registered.");
-                }
-                for (DOI doi : dois) {
-                    doi = context.reloadEntity(doi);
-                    try {
-                        organiser.register(doi);
-                        context.commit();
-                    } catch (SQLException e) {
-                        System.err.format("DOI %s for object %s registration failed, skipping:  %s%n",
-                                doi.getDSpaceObject().getID().toString(),
-                                doi.getDoi(), e.getMessage());
-                        context.rollback();
-                    }
-                }
-            } catch (SQLException ex) {
-                System.err.format("Error in database connection:  %s%n", ex.getMessage());
-                ex.printStackTrace(System.err);
-            } catch (RuntimeException ex) {
-                System.err.format("Error registering DOI identifier:  %s%n", ex.getMessage());
-            }
+            List<Integer> statuses = Arrays.asList(DOIIdentifierProvider.TO_BE_REGISTERED);
+            processBatched(context, doiService, statuses, organiser::register, "registration");
         }
 
         if (line.hasOption('u')) {
-            try {
-                List<DOI> dois = doiService.getDOIsByStatus(context, Arrays.asList(
-                    DOIIdentifierProvider.UPDATE_BEFORE_REGISTRATION,
-                    DOIIdentifierProvider.UPDATE_RESERVED,
-                    DOIIdentifierProvider.UPDATE_REGISTERED));
-                if (dois.isEmpty()) {
-                    System.err.println("There are no objects in the database "
-                                           + "whose metadata needs an update.");
-                }
-
-                for (DOI doi : dois) {
-                    doi = context.reloadEntity(doi);
-                    organiser.update(doi);
-                    context.commit();
-                }
-            } catch (SQLException ex) {
-                System.err.println("Error in database connection:" + ex.getMessage());
-                ex.printStackTrace(System.err);
-            }
+            List<Integer> statuses = Arrays.asList(
+                DOIIdentifierProvider.UPDATE_BEFORE_REGISTRATION,
+                DOIIdentifierProvider.UPDATE_RESERVED,
+                DOIIdentifierProvider.UPDATE_REGISTERED);
+            processBatched(context, doiService, statuses, organiser::update, "update");
         }
 
         if (line.hasOption('d')) {
-            try {
-                List<DOI> dois = doiService
-                    .getDOIsByStatus(context, Arrays.asList(DOIIdentifierProvider.TO_BE_DELETED));
-                if (dois.isEmpty()) {
-                    System.err.println("There are no objects in the database "
-                                           + "that could be deleted.");
-                }
-
-                for (DOI doi : dois) {
-                    doi = context.reloadEntity(doi);
-                    try {
-                        organiser.delete(doi.getDoi());
-                        context.commit();
-                    } catch (SQLException e) {
-                        System.err.format("DOI %s for object %s deletion failed, skipping:  %s%n",
-                                doi.getDSpaceObject().getID().toString(),
-                                doi.getDoi(), e.getMessage());
-                        context.rollback();
-                    }
-                }
-            } catch (SQLException ex) {
-                System.err.println("Error in database connection:" + ex.getMessage());
-                ex.printStackTrace(System.err);
-            }
+            List<Integer> statuses = Arrays.asList(DOIIdentifierProvider.TO_BE_DELETED);
+            processBatched(context, doiService, statuses,
+                           doi -> organiser.delete(doi.getDoi()), "deletion");
         }
 
         if (line.hasOption("reserve-doi")) {
@@ -379,6 +318,58 @@ public class DOIOrganiser {
             }
         }
 
+    }
+
+    /**
+     * Process all DOIs matching the given statuses in batches.
+     * Each batch queries from offset 0 because successfully processed DOIs change status and
+     * drop out of subsequent queries. Stops when a batch is empty or an entire batch fails
+     * (to prevent infinite loops).
+     *
+     * @param context     current DSpace session.
+     * @param doiService  the DOI service to query.
+     * @param statuses    the statuses to query for.
+     * @param operation   the operation to perform on each DOI.
+     * @param processName a human-readable name for the operation (for logging).
+     */
+    private static void processBatched(Context context, DOIService doiService,
+                                       List<Integer> statuses, DOIOperation operation,
+                                       String processName) {
+        try {
+            List<DOI> batch;
+            boolean firstBatch = true;
+            do {
+                batch = doiService.getDOIsByStatus(context, statuses, BATCH_SIZE, 0);
+                if (firstBatch && batch.isEmpty()) {
+                    System.err.println("There are no objects in the database "
+                                           + "that could be processed for " + processName + ".");
+                }
+                firstBatch = false;
+
+                int succeeded = 0;
+                for (DOI doi : batch) {
+                    doi = context.reloadEntity(doi);
+                    try {
+                        operation.process(doi);
+                        context.commit();
+                        succeeded++;
+                    } catch (Exception e) {
+                        System.err.format("DOI %s %s failed, skipping: %s%n",
+                                          doi.getDoi(), processName, e.getMessage());
+                        context.rollback();
+                    }
+                }
+                // If no DOI in this batch succeeded, stop to prevent an infinite loop.
+                if (!batch.isEmpty() && succeeded == 0) {
+                    System.err.println("Entire batch failed for " + processName
+                                           + ", stopping to prevent infinite loop.");
+                    break;
+                }
+            } while (!batch.isEmpty());
+        } catch (SQLException ex) {
+            System.err.println("Error in database connection: " + ex.getMessage());
+            ex.printStackTrace(System.err);
+        }
     }
 
     /**
