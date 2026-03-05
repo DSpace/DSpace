@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -4199,30 +4200,34 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             calendar2.set(Calendar.DATE, 31);
             Date embargoEndDate = calendar2.getTime();
 
+            // Convert Date objects to LocalDate for ResourcePolicyBuilder
+            LocalDate embargoStartLocalDate = embargoStartDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate embargoEndLocalDate = embargoEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
             // Create ResourcePolicies with different date combinations
             ResourcePolicy rpWithStartDate = ResourcePolicyBuilder.createResourcePolicy(context, admin, null)
                     .withAction(Constants.READ)
                     .withDspaceObject(item)
-                    .withStartDate(embargoStartDate)
+                    .withStartDate(embargoStartLocalDate)
                     .build();
 
             ResourcePolicy rpWithEndDate = ResourcePolicyBuilder.createResourcePolicy(context, admin, null)
                     .withAction(Constants.READ)
                     .withDspaceObject(item)
-                    .withEndDate(embargoEndDate)
+                    .withEndDate(embargoEndLocalDate)
                     .build();
 
             ResourcePolicy rpWithEndDate2 = ResourcePolicyBuilder.createResourcePolicy(context, admin, null)
                     .withAction(Constants.READ)
                     .withDspaceObject(item)
-                    .withEndDate(embargoEndDate)
+                    .withEndDate(embargoEndLocalDate)
                     .build();
 
             ResourcePolicy rpWithBothDates = ResourcePolicyBuilder.createResourcePolicy(context, admin, null)
                     .withAction(Constants.READ)
                     .withDspaceObject(item)
-                    .withStartDate(embargoStartDate)
-                    .withEndDate(embargoEndDate)
+                    .withStartDate(embargoStartLocalDate)
+                    .withEndDate(embargoEndLocalDate)
                     .build();
 
             ResourcePolicy rpWithoutDates = ResourcePolicyBuilder.createResourcePolicy(context, admin, null)
