@@ -1291,59 +1291,6 @@
         <property name="exposeMinAndMaxValue" value="true"/>
     </bean>
 
-<!--    &lt;!&ndash; Override default site-wide configuration to include multilanguage facets &ndash;&gt;-->
-<!--    <bean id="defaultConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration">-->
-<!--        <property name="id" value="defaultConfiguration"/>-->
-<!--        <property name="sidebarFacets">-->
-<!--            <list>-->
-<!--                <ref bean="searchFilterTypes" />-->
-<!--                <ref bean="searchFilterAuthor" />-->
-<!--                <ref bean="searchFilterSubject" />-->
-<!--                <ref bean="searchFilterIssued" />-->
-<!--                <ref bean="searchFilterContentInOriginalBundle"/>-->
-<!--                <ref bean="searchFilterEntityType"/>-->
-<!--                <ref bean="searchFilterLanguage" />-->
-<!--            </list>-->
-<!--        </property>-->
-<!--        <property name="searchFilters">-->
-<!--            <list>-->
-<!--                <ref bean="searchFilterTypes" />-->
-<!--                <ref bean="searchFilterTitle" />-->
-<!--                <ref bean="searchFilterAuthor" />-->
-<!--                <ref bean="searchFilterSubject" />-->
-<!--                <ref bean="searchFilterIssued" />-->
-<!--                <ref bean="searchFilterContentInOriginalBundle"/>-->
-<!--                <ref bean="searchFilterFileNameInOriginalBundle" />-->
-<!--                <ref bean="searchFilterFileDescriptionInOriginalBundle" />-->
-<!--                <ref bean="searchFilterEntityType"/>-->
-<!--                <ref bean="searchFilterIsAuthorOfPublicationRelation"/>-->
-<!--                <ref bean="searchFilterIsProjectOfPublicationRelation"/>-->
-<!--                <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>-->
-<!--                <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>-->
-<!--                <ref bean="searchFilterIsJournalOfPublicationRelation"/>-->
-<!--                <ref bean="searchFilterLanguage" />-->
-<!--            </list>-->
-<!--        </property>-->
-<!--        <property name="searchSortConfiguration">-->
-<!--            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">-->
-<!--                <property name="sortFields">-->
-<!--                    <list>-->
-<!--                        <ref bean="sortScore" />-->
-<!--                        <ref bean="sortTitle" />-->
-<!--                        <ref bean="sortDateIssued" />-->
-<!--                        <ref bean="sortDateAccessioned"/>-->
-<!--                    </list>-->
-<!--                </property>-->
-<!--            </bean>-->
-<!--        </property>-->
-<!--        <property name="defaultFilterQueries">-->
-<!--            <list>-->
-<!--                <value>(search.resourcetype:Item AND latestVersion:true) OR search.resourcetype:Collection OR search.resourcetype:Community</value>-->
-<!--                <value>-withdrawn:true AND -discoverable:false</value>-->
-<!--            </list>-->
-<!--        </property>-->
-<!--    </bean>-->
-
     <!-- Configuration for multilanguage facets testing -->
     <bean id="multilanguage-types" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           parent="defaultConfiguration">
