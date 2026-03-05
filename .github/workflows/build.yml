@@ -91,7 +91,7 @@ jobs:
 
       # Download artifacts from previous 'tests' job
       - name: Download coverage artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
 
       # Now attempt upload to Codecov using its action.
       # NOTE: We use a retry action to retry the Codecov upload if it fails the first time.
