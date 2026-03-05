@@ -40,6 +40,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.config.XOAIManagerResolver;
 import org.dspace.xoai.services.api.config.XOAIManagerResolverException;
@@ -87,12 +89,14 @@ public class DSpaceOAIDataProvider {
     SetRepositoryResolver setRepositoryResolver;
 
     private DSpaceResumptionTokenFormatter resumptionTokenFormat = new DSpaceResumptionTokenFormatter();
+    private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
+            .getConfigurationService();
 
     @PostConstruct
     public void setUpHTMLTransformer() {
         try {
             XOAIManager manager = xoaiManagerResolver.getManager();
-            if (manager.hasStyleSheet()) {
+            if (configurationService.getBooleanProperty("oai.html") && manager.hasStyleSheet()) {
                 ResourceLoader resourceLoader = new DefaultResourceLoader();
                 String styleSheetPath = manager.getStyleSheet();
                 Resource styleSheetResource = resourceLoader.getResource("classpath:" + styleSheetPath);
