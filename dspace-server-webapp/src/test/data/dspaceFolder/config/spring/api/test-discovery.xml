@@ -26,6 +26,8 @@
     <bean id="solrServiceResourceIndexPlugin" class="org.dspace.discovery.SolrServiceResourceRestrictionPlugin" scope="prototype"/>
     <alias name="solrServiceResourceIndexPlugin" alias="org.dspace.discovery.SolrServiceResourceRestrictionPlugin"/>
 
+    <bean id="SolrServiceIndexSuggestFieldPlugin" class="org.dspace.discovery.SolrServiceIndexSuggestFieldPlugin" scope="prototype"/>
+
     <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
     <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">
         <property name="map">

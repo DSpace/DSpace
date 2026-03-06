@@ -483,6 +483,22 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
    </form>
 
+   <form name="vocabulary-suggest-test">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>subject</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Subject Keywords</label>
+         <input-type>tag</input-type>
+         <hint>Enter appropriate subject keywords or phrases. </hint>
+         <required></required>
+         <vocabulary type="suggest">subject</vocabulary>
+       </field>
+     </row>
+   </form>
+
  </form-definitions>
 
 

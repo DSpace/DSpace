@@ -190,6 +190,19 @@
         </analyzer>
     </fieldType>
 
+    <fieldType name="suggestAutoComplete" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+        <analyzer type="index">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.TrimFilterFactory"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.TrimFilterFactory"/>
+
+        </analyzer>
+    </fieldType>
+
     <fieldType name="keywordFilter" class="solr.TextField" sortMissingLast="true" omitNorms="true">
         <analyzer>
             <!--Treats the entire field as a single token, regardless of its content-->
@@ -355,7 +368,8 @@
     <dynamicField name="random_*" type="random" />
 
      <field name="customurl" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
-
+    <!-- Dynamic field used in the suggestion index plugin to store tokens -->
+    <dynamicField name="*_suggest" type="suggestAutoComplete" indexed="true" stored="true" multiValued="true"/>
  </fields>
 
  <uniqueKey>search.uniqueid</uniqueKey>
