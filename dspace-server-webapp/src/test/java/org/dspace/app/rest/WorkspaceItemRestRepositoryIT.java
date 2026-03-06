@@ -42,6 +42,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -2277,6 +2278,78 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     Matchers.is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
                             "New Title", "2017-10-17", "ExtraEntry"))))
         ;
+    }
+
+    @Test
+    public void patchUpdateNestedMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        eperson = context.reloadEntity(eperson);
+
+        //** GIVEN **
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection nestedMetadataCollection =
+            CollectionBuilder.createCollection(context, parentCommunity, "123456789/nested-metadata-test")
+                             .withName("Nested Metadata Test Collection")
+                             .build();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        context.commit();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, nestedMetadataCollection)
+                                                  .withTitle("Workspace Item 1")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        // ** WHEN **
+        // Consolidate all operations into a single list for one PATCH call
+        List<Operation> patchOperations = new ArrayList<>();
+
+        // 1. Add Author
+        Map<String, String> authorValue = new HashMap<>();
+        authorValue.put("value", "Smith, John");
+        patchOperations.add(
+            new AddOperation("/sections/publicationStepGroup/dc.contributor.author", Arrays.asList(authorValue)));
+
+        // 2. Add Editor (required for validation)
+        Map<String, String> editorValue = new HashMap<>();
+        editorValue.put("value", "Doe, Jane");
+        patchOperations.add(
+            new AddOperation("/sections/publicationStepGroup/dc.contributor.editor", Arrays.asList(editorValue)));
+
+        // 3. Add Nested Affiliation (tests recursive resolution)
+        Map<String, String> affiliationValue = new HashMap<>();
+        affiliationValue.put("value", "University of Example");
+        patchOperations.add(new AddOperation("/sections/publicationStepGroup/oairecerif.author.affiliation",
+                                             Arrays.asList(affiliationValue)));
+
+        String patchBody = getPatchContent(patchOperations);
+
+        // Perform a single PATCH call
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                         .content(patchBody)
+                                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.errors").doesNotExist());
+
+        // ** THEN **
+        // Verify that all changes have been persisted correctly
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(
+                                jsonPath("$.sections.publicationStepGroup['dc.contributor.author'][0].value").value(
+                                    "Smith, John"))
+                            .andExpect(
+                                jsonPath("$.sections.publicationStepGroup['dc.contributor.editor'][0].value").value(
+                                    "Doe, Jane"))
+                            .andExpect(jsonPath(
+                                "$.sections.publicationStepGroup['oairecerif.author.affiliation'][0].value").value(
+                                "University of Example"));
     }
 
     @Test

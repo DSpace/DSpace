@@ -66,6 +66,7 @@
     <bean class="org.dspace.alerts.SystemWideAlertServiceImpl"/>
 
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
+    <bean class="org.dspace.content.authority.AuthorityServiceUtils"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
 
     <bean class="org.dspace.profile.ResearcherProfileServiceImpl"/>
@@ -134,6 +135,8 @@
 
     <bean class="org.dspace.util.FrontendUrlService"/>
 
+    <bean class="org.dspace.content.security.MetadataSecurityServiceImpl"/>
+
     <!-- Configurable workflow services -->
     <bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.CollectionRoleServiceImpl"/>
@@ -154,6 +157,7 @@
     <bean class="org.dspace.discovery.indexobject.WorkspaceItemIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.MetadataFieldIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.LDNMessageEntityIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.content.security.CrisSecurityServiceImpl"/>
 
     <!-- OIDC Authentication -->
     <bean class="org.dspace.authenticate.OidcAuthenticationBean" id="oidcAuthentication"/>
@@ -168,7 +172,7 @@
     <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
 
     <bean class="org.dspace.content.ItemFilterServiceImpl"/>
-    
+
     <!-- Submission Config Service -->
     <bean class="org.dspace.submit.service.SubmissionConfigServiceImpl"/>
 

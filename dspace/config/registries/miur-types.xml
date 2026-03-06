@@ -1,0 +1,88 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Miur Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>miur</name>
+        <namespace>http://dspace.org/miur</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>miur</schema>
+        <element>journal</element>
+        <qualifier>startdate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>miur</schema>
+        <element>journal</element>
+        <qualifier>enddate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>miur</schema>
+        <element>journal</element>
+        <qualifier>type</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>miur</schema>
+        <element>identifier</element>
+        <qualifier>ance</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>miur</schema>
+        <element>person</element>
+        <qualifier>cf</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>miur</schema>
+        <element>type</element>
+        <qualifier>referee</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>miur</schema>
+        <element>patent</element>
+        <qualifier>relevance</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>miur</schema>
+        <element>bitstream</element>
+        <qualifier>synch</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>miur</schema>
+        <element>journal</element>
+        <qualifier>othertitle</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>miur</schema>
+        <element>journal</element>
+        <qualifier>ance</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>miur</schema>
+        <element>type</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+</dspace-dc-types>

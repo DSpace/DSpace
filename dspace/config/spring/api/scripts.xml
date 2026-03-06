@@ -67,6 +67,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleanerCli"/>
     </bean>
 
+    <bean id="bulk-import" class="org.dspace.app.bulkedit.BulkImportCliScriptConfiguration">
+        <property name="description" value="Perform the bulk import of an excel file with a list of item to add, update or remove"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.BulkImportCli"/>
+    </bean>
+
     <bean id="filter-media" class="org.dspace.app.mediafilter.MediaFilterScriptConfiguration">
         <property name="description" value="Perform the media filtering to extract full text from documents and to create thumbnails"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.mediafilter.MediaFilterScript"/>
@@ -122,5 +127,10 @@
     <bean id="itemDeletionStrategy" class="org.dspace.deletion.process.strategies.ItemDeletionStrategy" />
     <bean id="communityDeletionStrategy" class="org.dspace.deletion.process.strategies.CommunityDeletionStrategy" />
     <bean id="collectionDeletionStrategy" class="org.dspace.deletion.process.strategies.CollectionDeletionStrategy" />
+
+    <bean id="item-enhancer" class="org.dspace.content.enhancer.script.ItemEnhancerScriptConfiguration">
+        <property name="description" value="Script that allows to enhance all items"/>
+        <property name="dspaceRunnableClass" value="org.dspace.content.enhancer.script.ItemEnhancerScript"/>
+    </bean>
 
 </beans>
