@@ -4468,7 +4468,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
                                     .param("query", "title"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath(
-                           "$._embedded.searchResult._embedded.objects[0].hitHighlights['dc.title']",
+                           "$._embedded.objects[0].hitHighlights['dc.title']",
                            contains("This is a &lt;a&gt;test&lt;&#x2F;a&gt; <em>title</em>")));
     }
 
@@ -4496,7 +4496,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
                                     .param("query", "title"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath(
-                           "$._embedded.searchResult._embedded.objects[0].hitHighlights['dc.title']",
+                           "$._embedded.objects[0].hitHighlights['dc.title']",
                            contains("This is a <a>test</a> <em>title</em>")));
     }
 }
