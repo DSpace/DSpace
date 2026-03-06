@@ -391,7 +391,6 @@ public interface CollectionService
      * NOTE: for better performance, this method retrieves its results from an
      *       index (cache) and does not query the database directly.
      *       This means that results may be stale or outdated until https://github.com/DSpace/DSpace/issues/2853 is resolved"
-     *
      * @param context          DSpace Context
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
@@ -413,7 +412,7 @@ public interface CollectionService
      *       index (cache) and does not query the database directly.
      *       This means that results may be stale or outdated until
      *       https://github.com/DSpace/DSpace/issues/2853 is resolved"
-     * 
+     *
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
      *                         an autosuggest feature over the collection name
@@ -461,7 +460,6 @@ public interface CollectionService
      *       and does not query the database directly.
      *       This means that results may be stale or outdated until
      *       https://github.com/DSpace/DSpace/issues/2853 is resolved."
-     *
      * @param context          DSpace Context
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
@@ -480,7 +478,6 @@ public interface CollectionService
      *       and does not query the database directly.
      *       This means that results may be stale or outdated until
      *       https://github.com/DSpace/DSpace/issues/2853 is resolved."
-     *
      * @param context          DSpace Context
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
