@@ -729,7 +729,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                    // should return with 200 OK
                    .andExpect(status().isOk())
                    // should contain no search results
-                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                   .andExpect(jsonPath("$.page", is(
                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
                    )));
 
@@ -750,11 +750,11 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                    // should return with 200 OK
                    .andExpect(status().isOk())
                    // should contain no search results
-                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                   .andExpect(jsonPath("$.page", is(
                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
                    )))
                    // should match mapped item title
-                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                   .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                        SearchResultMatcher.matchOnItemName("item", "items", "Mapped item")
                    )));
     }
@@ -797,11 +797,11 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                    // should return with 200 OK
                    .andExpect(status().isOk())
                    // should contain no search results
-                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                   .andExpect(jsonPath("$.page", is(
                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
                    )))
                    // should match mapped item title
-                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                   .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                        SearchResultMatcher.matchOnItemName("item", "items", "Mapped item")
                    )));
 
@@ -817,7 +817,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                    // should return with 200 OK
                    .andExpect(status().isOk())
                    // should contain no search results
-                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                   .andExpect(jsonPath("$.page", is(
                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
                    )));
     }
