@@ -1,0 +1,166 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-parent</artifactId>
+        <version>10.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>dspace-shell</artifactId>
+    <packaging>jar</packaging>
+
+    <name>DSpace Spring Shell</name>
+
+    <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/..</root.basedir>
+        <!-- Default resource delimiter for Spring Boot, so it doesn't clash with Spring ${} placeholders-->
+        <resource.delimiter>@</resource.delimiter>
+        <spring-shell.version>3.4.1</spring-shell.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.shell</groupId>
+                <artifactId>spring-shell-dependencies</artifactId>
+                <version>${spring-shell.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Override Boot -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+
+        <!-- Needed to support Spring @Configuration classes (to register servlets/beans with Spring Boot webapp) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${spring-boot.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+                <!-- Spring JCL is unnecessary and conflicts with commons-logging when both are on classpath -->
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jcl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Spring Shell -->
+        <dependency>
+            <groupId>org.springframework.shell</groupId>
+            <artifactId>spring-shell-starter</artifactId>
+            <version>${spring-shell.version}</version>
+        </dependency>
+
+        <!-- Internal -->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>additions</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Web API - required by apis -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.springframework.shell</groupId>
+            <artifactId>spring-shell-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JUnit 5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Mockito -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- AssertJ -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Awaitility (para testes assíncronos) -->
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- H2 Database (para testes) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <finalName>dspace</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>org.dspace.shell.DSpaceShellApplication</mainClass>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>
