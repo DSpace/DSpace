@@ -181,13 +181,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         getClient(authToken).perform(modifiedRequest)
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("searchresult")))
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 // assume everything fits on one page
                 PageMatcher.pageEntryWithTotalPagesAndElements(
                     0, 20, searchResultMatchers.size() == 0 ? 0 : 1, searchResultMatchers.size()
                 )
             )))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 searchResultMatchers
             )));
     }
