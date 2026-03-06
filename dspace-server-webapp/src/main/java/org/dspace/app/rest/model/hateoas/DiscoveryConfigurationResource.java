@@ -7,13 +7,17 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import org.dspace.app.rest.model.SearchFacetEntryRest;
+import org.dspace.app.rest.model.DiscoveryConfigurationRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
-@RelNameDSpaceResource(SearchFacetEntryRest.NAME)
-public class SearchFacetEntryResource extends DSpaceResource<SearchFacetEntryRest> {
-    public SearchFacetEntryResource(SearchFacetEntryRest data, Utils utils) {
+/**
+ * The Resource representation of a {@link DiscoveryConfigurationRest} object.
+ */
+@RelNameDSpaceResource(DiscoveryConfigurationRest.NAME)
+public class DiscoveryConfigurationResource extends DSpaceResource<DiscoveryConfigurationRest> {
+
+    public DiscoveryConfigurationResource(DiscoveryConfigurationRest data, Utils utils) {
         super(data, utils);
     }
 }

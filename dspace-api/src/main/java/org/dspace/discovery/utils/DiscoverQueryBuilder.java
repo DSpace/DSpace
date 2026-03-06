@@ -89,7 +89,6 @@ public class DiscoverQueryBuilder implements InitializingBean {
                           sortProperty, sortDirection);
     }
 
-
     /**
      * Build a discovery query
      *
@@ -109,19 +108,75 @@ public class DiscoverQueryBuilder implements InitializingBean {
                                     String query, List<QueryBuilderSearchFilter> searchFilters,
                                     List<String> dsoTypes, Integer pageSize, Long offset, String sortProperty,
                                     String sortDirection)
+        throws IllegalArgumentException, SearchServiceException {
+        return buildQuery(context, scope, discoveryConfiguration, query, searchFilters, dsoTypes, pageSize, offset,
+            sortProperty, sortDirection, true);
+    }
+
+    /**
+     * Build a discovery query
+     *
+     * @param context                the DSpace context
+     * @param scope                  the scope for this discovery query
+     * @param discoveryConfiguration the discovery configuration for this discovery query
+     * @param query                  the query string for this discovery query
+     * @param searchFilters          the search filters for this discovery query
+     * @param dsoTypes               only include search results with one of these types
+     * @param pageSize               the page size for this discovery query
+     * @param offset                 the offset for this discovery query
+     * @param sortProperty           the sort property for this discovery query
+     * @param sortDirection          the sort direction for this discovery query
+     * @param hitHighlighting        enable hitHighlighting of fields
+     */
+    public DiscoverQuery buildQuery(Context context, IndexableObject scope,
+                                    DiscoveryConfiguration discoveryConfiguration,
+                                    String query, List<QueryBuilderSearchFilter> searchFilters,
+                                    List<String> dsoTypes, Integer pageSize, Long offset, String sortProperty,
+                                    String sortDirection, boolean hitHighlighting)
+        throws IllegalArgumentException, SearchServiceException {
+        return buildQuery(context, scope, discoveryConfiguration, query, searchFilters, dsoTypes, pageSize, offset,
+            sortProperty, sortDirection, hitHighlighting, true);
+    }
+
+
+    /**
+     * Build a discovery query
+     *
+     * @param context                the DSpace context
+     * @param scope                  the scope for this discovery query
+     * @param discoveryConfiguration the discovery configuration for this discovery query
+     * @param query                  the query string for this discovery query
+     * @param searchFilters          the search filters for this discovery query
+     * @param dsoTypes               only include search results with one of these types
+     * @param pageSize               the page size for this discovery query
+     * @param offset                 the offset for this discovery query
+     * @param sortProperty           the sort property for this discovery query
+     * @param sortDirection          the sort direction for this discovery query
+     * @param hitHighlighting        enable hitHighlighting of fields
+     * @param addFaceting            add facets
+     */
+    public DiscoverQuery buildQuery(Context context, IndexableObject scope,
+                                    DiscoveryConfiguration discoveryConfiguration,
+                                    String query, List<QueryBuilderSearchFilter> searchFilters,
+                                    List<String> dsoTypes, Integer pageSize, Long offset, String sortProperty,
+                                    String sortDirection, boolean hitHighlighting, boolean addFaceting)
             throws IllegalArgumentException, SearchServiceException {
 
         DiscoverQuery queryArgs = buildCommonDiscoverQuery(context, discoveryConfiguration, query, searchFilters,
                                                            dsoTypes);
 
         //When all search criteria are set, configure facet results
-        addFaceting(context, scope, queryArgs, discoveryConfiguration);
+        if (addFaceting) {
+            addFaceting(context, scope, queryArgs, discoveryConfiguration);
+        }
 
         //Configure pagination and sorting
         configurePagination(pageSize, offset, queryArgs);
         configureSorting(sortProperty, sortDirection, queryArgs, discoveryConfiguration.getSearchSortConfiguration());
 
-        addDiscoveryHitHighlightFields(discoveryConfiguration, queryArgs);
+        if (hitHighlighting) {
+            addDiscoveryHitHighlightFields(discoveryConfiguration, queryArgs);
+        }
         return queryArgs;
     }
 
@@ -346,7 +401,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
         String sortBy;// Attempt to find the default one, if none found we use SCORE
         sortBy = "score";
         if (searchSortConfiguration.getDefaultSortField() != null) {
-            sortBy = searchSortConfiguration.getDefaultSortField().getMetadataField();
+            sortBy = searchSortConfiguration.getDefaultSortField().getSortField();
         } else if (Objects.nonNull(searchSortConfiguration.getSortFields()) &&
                 !searchSortConfiguration.getSortFields().isEmpty()) {
             DiscoverySortFieldConfiguration defaultSort = searchSortConfiguration.getSortFields().get(0);

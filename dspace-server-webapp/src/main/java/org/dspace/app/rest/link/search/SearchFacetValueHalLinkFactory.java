@@ -9,9 +9,13 @@ package org.dspace.app.rest.link.search;
 
 import java.util.LinkedList;
 
-import org.dspace.app.rest.model.SearchFacetEntryRest;
+import org.dspace.app.rest.RestResourceController;
+import org.dspace.app.rest.link.HalLinkFactory;
+import org.dspace.app.rest.model.SearchFacetInformation;
 import org.dspace.app.rest.model.SearchFacetValueRest;
 import org.dspace.app.rest.model.hateoas.SearchFacetValueResource;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
@@ -23,31 +27,40 @@ import org.springframework.web.util.UriComponentsBuilder;
  * HalLinkService addLinks method if the given resource is eligible.
  */
 @Component
-public class SearchFacetValueHalLinkFactory extends DiscoveryRestHalLinkFactory<SearchFacetValueResource> {
+public class SearchFacetValueHalLinkFactory extends HalLinkFactory<SearchFacetValueResource, RestResourceController> {
+    @Autowired
+    protected ConfigurationService configurationService;
 
     @Override
     protected void addLinks(SearchFacetValueResource halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
+        halResource.removeLinks();
 
-        if (halResource.getSearchData() != null && halResource.getFacetData() != null && halResource
-            .getValueData() != null) {
+        String dspaceServerUrl = configurationService.getProperty("dspace.server.url");
+        UriComponentsBuilder builder = UriComponentsBuilder
+            .fromUriString(dspaceServerUrl + "/api/discover/searchresults/search/objects");
+        addDiscoveryParameters(builder, halResource.getContent());
+        list.add(buildLink("search", builder.build().encode().toUriString()));
+    }
 
-            UriComponentsBuilder builder = buildSearchBaseLink(halResource.getSearchData());
-
-            addFilterForFacetValue(builder, halResource.getFacetData(), halResource.getValueData());
-
-            list.add(buildLink("search", builder.build().encode().toUriString()));
-
+    private void addDiscoveryParameters(UriComponentsBuilder builder, SearchFacetValueRest value) {
+        if (value != null && value.getFacetInformation() != null) {
+            SearchFacetInformation information = value.getFacetInformation();
+            information.appendQueryParameters(builder, false);
+            if (information.getFacetName() != null) {
+                builder.queryParam("f." + information.getFacetName(),
+                    value.getFilterValue() + "," + value.getFilterType());
+            }
         }
+    }
+
+    @Override
+    protected Class<RestResourceController> getControllerClass() {
+        return RestResourceController.class;
     }
 
     @Override
     protected Class<SearchFacetValueResource> getResourceClass() {
         return SearchFacetValueResource.class;
-    }
-
-    private void addFilterForFacetValue(final UriComponentsBuilder baseLink,
-                                        SearchFacetEntryRest facetData, SearchFacetValueRest valueData) {
-        baseLink.queryParam("f." + facetData.getName(), valueData.getFilterValue() + "," + valueData.getFilterType());
     }
 }

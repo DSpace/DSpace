@@ -7,62 +7,46 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.PagedModel;
 
 /**
  * This class' purpose is to create a container for the information used in the SearchResultsResource
  */
-public class SearchResultsRest extends DiscoveryResultsRest {
+public class SearchResultsRest extends DiscoveryResultsRest implements ExtendedPagedRest<SearchResultEntryRest> {
+    public static final String NAME = "searchresult";
+    public static final String PLURAL_NAME = "searchresults";
 
     @JsonIgnore
-    private long totalNumberOfResults;
+    private PagedModel<SearchResultEntryRest> pagedModel;
 
-    @JsonIgnore
-    List<SearchResultEntryRest> searchResults;
-
-    @JsonIgnore
-    List<SearchFacetEntryRest> facets;
-
-    public List<SearchResultEntryRest> getSearchResults() {
-        return searchResults;
+    public SearchResultsRest(PagedModel<SearchResultEntryRest> pagedModel) {
+        this.pagedModel = pagedModel;
     }
 
-    public void setSearchResults(final List<SearchResultEntryRest> searchResults) {
-        this.searchResults = searchResults;
+    @Override
+    public String getType() {
+        return NAME;
     }
 
-    public void addSearchResult(SearchResultEntryRest searchResultEntry) {
-        if (searchResults == null) {
-            searchResults = new LinkedList<>();
-        }
-
-        searchResults.add(searchResultEntry);
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
-
-    public long getTotalNumberOfResults() {
-        return totalNumberOfResults;
-    }
-
-    public void setTotalNumberOfResults(long totalNumberOfResults) {
-        this.totalNumberOfResults = totalNumberOfResults;
-    }
-
-    public void addFacetEntry(final SearchFacetEntryRest facetEntry) {
-        if (facets == null) {
-            facets = new LinkedList<>();
-        }
-
-        facets.add(facetEntry);
-    }
-
-    public List<SearchFacetEntryRest> getFacets() {
-        return facets;
+    /**
+     * Extend the PagedModel with search-result properties to expose in the REST API
+     */
+    public SearchResultsPagedModel getPagedModel() {
+        SearchResultsPagedModel model = new SearchResultsPagedModel(pagedModel);
+        model.setScope(getScope());
+        model.setQuery(getQuery());
+        model.setAppliedFilters(getAppliedFilters());
+        model.setSort(getSort());
+        model.setConfiguration(getConfiguration());
+        return model;
     }
 
     public static class AppliedFilter {

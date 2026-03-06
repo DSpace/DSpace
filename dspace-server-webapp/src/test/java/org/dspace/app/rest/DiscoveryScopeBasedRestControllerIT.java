@@ -10,7 +10,6 @@ package org.dspace.app.rest;
 import static org.dspace.app.rest.matcher.FacetEntryMatcher.defaultFacetMatchers;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -275,7 +274,6 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(parentCommunity1.getID())))
 
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                    .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
                            FacetEntryMatcher.authorFacet(),
@@ -283,10 +281,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                    );
 
         getClient().perform(get("/api/discover/facets/parentcommunity1field")
-                                    .param("scope", String.valueOf(parentCommunity1.getID())))
+                                    .param("scope", String.valueOf(parentCommunity1.getID()))
+                                    .param("embed", "values"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
-                   .andExpect(jsonPath("$._embedded.values",
+                   .andExpect(jsonPath("$._embedded.values._embedded.values",
                                        containsInAnyOrder(
                                                FacetValueMatcher.matchEntry("parentcommunity1field",
                                                                             "parentcommunity1field-item111", 1),
@@ -316,7 +314,6 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(subcommunity11.getID())))
 
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                    .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
                            FacetEntryMatcher.authorFacet(),
@@ -324,10 +321,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                    );
 
         getClient().perform(get("/api/discover/facets/subcommunity11field")
-                                    .param("scope", String.valueOf(subcommunity11.getID())))
+                                    .param("scope", String.valueOf(subcommunity11.getID()))
+                                    .param("embed", "values"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
-                   .andExpect(jsonPath("$._embedded.values",
+                   .andExpect(jsonPath("$._embedded.values._embedded.values",
                                        containsInAnyOrder(
                                                FacetValueMatcher.matchEntry("subcommunity11field",
                                                                             "subcommunity11field-item111", 1),
@@ -348,7 +345,6 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection111.getID())))
 
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                    .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
                            FacetEntryMatcher.authorFacet(),
@@ -356,10 +352,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                    );
 
         getClient().perform(get("/api/discover/facets/collection111field")
-                                    .param("scope", String.valueOf(collection111.getID())))
+                                    .param("scope", String.valueOf(collection111.getID()))
+                                    .param("embed", "values"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
-                   .andExpect(jsonPath("$._embedded.values",
+                   .andExpect(jsonPath("$._embedded.values._embedded.values",
                                        containsInAnyOrder(
                                                FacetValueMatcher.matchEntry("collection111field",
                                                                             "collection111field-item111", 1),
@@ -379,7 +375,6 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection112.getID())))
 
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                    .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
                            FacetEntryMatcher.authorFacet(),
@@ -387,10 +382,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                    );
 
         getClient().perform(get("/api/discover/facets/subcommunity11field")
-                                    .param("scope", String.valueOf(collection112.getID())))
+                                    .param("scope", String.valueOf(collection112.getID()))
+                                    .param("embed", "values"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
-                   .andExpect(jsonPath("$._embedded.values",
+                   .andExpect(jsonPath("$._embedded.values._embedded.values",
                                        containsInAnyOrder(
                                                FacetValueMatcher.matchEntry("subcommunity11field",
                                                                             "subcommunity11field-item112", 1)
@@ -408,7 +403,6 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(subcommunity12.getID())))
 
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                    .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
                            FacetEntryMatcher.authorFacet(),
@@ -416,10 +410,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                    );
 
         getClient().perform(get("/api/discover/facets/parentcommunity1field")
-                                    .param("scope", String.valueOf(subcommunity12.getID())))
+                                    .param("scope", String.valueOf(subcommunity12.getID()))
+                                    .param("embed", "values"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
-                   .andExpect(jsonPath("$._embedded.values",
+                   .andExpect(jsonPath("$._embedded.values._embedded.values",
                                        containsInAnyOrder(
                                                FacetValueMatcher.matchEntry("parentcommunity1field",
                                                                             "parentcommunity1field-item121", 1),
@@ -440,7 +434,6 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection121.getID())))
 
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                    .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
                            FacetEntryMatcher.authorFacet(),
@@ -448,10 +441,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                    );
 
         getClient().perform(get("/api/discover/facets/collection121field")
-                                    .param("scope", String.valueOf(collection121.getID())))
+                                    .param("scope", String.valueOf(collection121.getID()))
+                                    .param("embed", "values"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
-                   .andExpect(jsonPath("$._embedded.values",
+                   .andExpect(jsonPath("$._embedded.values._embedded.values",
                                        containsInAnyOrder(
                                                FacetValueMatcher.matchEntry("collection121field",
                                                                             "collection121field-item121", 1)
@@ -469,7 +462,6 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection122.getID())))
 
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                    .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
                            FacetEntryMatcher.authorFacet(),
@@ -477,10 +469,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                    );
 
         getClient().perform(get("/api/discover/facets/parentcommunity1field")
-                                    .param("scope", String.valueOf(collection122.getID())))
+                                    .param("scope", String.valueOf(collection122.getID()))
+                                    .param("embed", "values"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
-                   .andExpect(jsonPath("$._embedded.values",
+                   .andExpect(jsonPath("$._embedded.values._embedded.values",
                                        containsInAnyOrder(
                                                FacetValueMatcher.matchEntry("parentcommunity1field",
                                                                             "parentcommunity1field-item122", 1),
@@ -500,7 +492,6 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(parentCommunity2.getID())))
 
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                    .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(defaultFacetMatchers))
                    );
@@ -515,7 +506,6 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(subcommunity21.getID())))
 
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                    .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
                            FacetEntryMatcher.authorFacet(),
@@ -523,10 +513,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                    );
 
         getClient().perform(get("/api/discover/facets/subcommunity21field")
-                                    .param("scope", String.valueOf(subcommunity21.getID())))
+                                    .param("scope", String.valueOf(subcommunity21.getID()))
+                                    .param("embed", "values"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
-                   .andExpect(jsonPath("$._embedded.values",
+                   .andExpect(jsonPath("$._embedded.values._embedded.values",
                                        containsInAnyOrder(
                                                FacetValueMatcher.matchEntry("subcommunity21field",
                                                                             "subcommunity21field-item211", 1),
@@ -547,7 +537,6 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection211.getID())))
 
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                    .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
                            FacetEntryMatcher.authorFacet(),
@@ -555,10 +544,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                    );
 
         getClient().perform(get("/api/discover/facets/collection211field")
-                                    .param("scope", String.valueOf(collection211.getID())))
+                                    .param("scope", String.valueOf(collection211.getID()))
+                                    .param("embed", "values"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
-                   .andExpect(jsonPath("$._embedded.values",
+                   .andExpect(jsonPath("$._embedded.values._embedded.values",
                                        containsInAnyOrder(
                                                FacetValueMatcher.matchEntry("collection211field",
                                                                             "collection211field-item211", 1),
@@ -578,7 +567,6 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection212.getID())))
 
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                    .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
                            FacetEntryMatcher.authorFacet(),
@@ -586,10 +574,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                    );
 
         getClient().perform(get("/api/discover/facets/subcommunity21field")
-                                    .param("scope", String.valueOf(collection212.getID())))
+                                    .param("scope", String.valueOf(collection212.getID()))
+                                    .param("embed", "values"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
-                   .andExpect(jsonPath("$._embedded.values",
+                   .andExpect(jsonPath("$._embedded.values._embedded.values",
                                        containsInAnyOrder(
                                                FacetValueMatcher.matchEntry("subcommunity21field",
                                                                             "subcommunity21field-item212", 1)
@@ -606,7 +594,6 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(subcommunity22.getID())))
 
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                    .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(defaultFacetMatchers))
                    );
@@ -621,7 +608,6 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection221.getID())))
 
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                    .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
                            FacetEntryMatcher.authorFacet(),
@@ -629,10 +615,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                    );
 
         getClient().perform(get("/api/discover/facets/collection221field")
-                                    .param("scope", String.valueOf(collection221.getID())))
+                                    .param("scope", String.valueOf(collection221.getID()))
+                                    .param("embed", "values"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
-                   .andExpect(jsonPath("$._embedded.values",
+                   .andExpect(jsonPath("$._embedded.values._embedded.values",
                                        containsInAnyOrder(
                                                FacetValueMatcher.matchEntry("collection221field",
                                                                             "collection221field-item221", 1)
@@ -650,7 +636,6 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection222.getID())))
 
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                    .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(defaultFacetMatchers))
                    );
