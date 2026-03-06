@@ -32,7 +32,7 @@ public class MediaFilterScriptConfiguration<T extends MediaFilterScript> extends
         Options options = new Options();
         options.addOption("v", "verbose", false, "print all extracted text and other details to STDOUT");
         options.addOption("q", "quiet", false, "do not print anything except in the event of errors.");
-        options.addOption("f", "force", false, "force all bitstreams to be processed");
+        options.addOption("f", "force", false, "force all bitstreams to be processed (overrides fromdate)");
         options.addOption("i", "identifier", true,
             "ONLY process bitstreams belonging to the provided handle identifier");
         options.addOption("m", "maximum", true, "process no more than maximum items");
