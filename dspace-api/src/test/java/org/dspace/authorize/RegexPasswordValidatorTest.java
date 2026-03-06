@@ -13,8 +13,8 @@ import static org.mockito.Mockito.when;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.services.ConfigurationService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 

@@ -20,6 +20,7 @@
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>21</java.version>
         <spring.version>7.0.2</spring.version>
+        <spring-ldap.version>3.3.6</spring-ldap.version>
         <spring-boot.version>4.0.1</spring-boot.version>
         <spring-security.version>7.0.2</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>7.1.13.Final</hibernate.version>
@@ -27,8 +28,6 @@
         <expressly.version>6.0.0</expressly.version>
         <postgresql.driver.version>42.7.10</postgresql.driver.version>
         <flyway.version>10.22.0</flyway.version>
-        <!-- Solr 10.0.0 RC3 - artifacts must be installed locally until official release
-             TODO: Update to official Solr 10.0.0 release when available on Maven Central -->
         <solr.client.version>10.0.0</solr.client.version>
         <lucene.version>10.3.2</lucene.version>
         <!-- ZooKeeper version matching Solr 10.0.0 -->
@@ -1565,6 +1564,31 @@
                 <artifactId>jetty-ee9-webapp</artifactId>
                 <version>${jetty.version}</version>
                 <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-alpn-client</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-alpn-java-client</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-client</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.http2</groupId>
+                <artifactId>jetty-http2-client</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.http2</groupId>
+                <artifactId>jetty-http2-client-transport</artifactId>
+                <version>${jetty.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty.http2</groupId>

@@ -550,11 +550,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
         </dependency>
-  <dependency>
-   <groupId>org.apache.httpcomponents.client5</groupId>
-   <artifactId>httpclient5</artifactId>
-   <version>5.4.4</version>
-  </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.6</version>
+        </dependency>
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
@@ -687,13 +687,7 @@
    <version>4.0.1</version>
    <scope>test</scope>
   </dependency>
-        <!-- Required for ITs to ensure they use Apache HttpClient in AbstractWebClientIntegrationTest -->
-        <dependency>
-            <groupId>org.apache.httpcomponents.client5</groupId>
-            <artifactId>httpclient5</artifactId>
-            <version>5.6</version>
-            <scope>test</scope>
-        </dependency>
+        <!-- httpclient5 is already a compile-scope dependency, so it is available for tests too -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security-test</artifactId>
