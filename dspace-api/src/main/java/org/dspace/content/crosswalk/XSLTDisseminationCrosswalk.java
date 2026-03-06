@@ -44,6 +44,9 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersioningService;
 import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -105,6 +108,8 @@ public class XSLTDisseminationCrosswalk
             = ContentServiceFactory.getInstance().getItemService();
     protected static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+    protected static final VersioningService versionService
+            = VersionServiceFactory.getInstance().getVersionService();
 
     private static final String[] aliases = makeAliases(DIRECTION);
 
@@ -226,7 +231,7 @@ public class XSLTDisseminationCrosswalk
         }
 
         try {
-            Document ddim = new Document(createDIM(dso));
+            Document ddim = new Document(createDIM(context, dso));
             JDOMResult result = new JDOMResult();
             xform.transform(new JDOMSource(ddim), result);
             Element root = result.getDocument().getRootElement();
@@ -271,7 +276,7 @@ public class XSLTDisseminationCrosswalk
 
         try {
             JDOMResult result = new JDOMResult();
-            xform.transform(new JDOMSource(createDIM(dso).getChildren()), result);
+            xform.transform(new JDOMSource(createDIM(context, dso).getChildren()), result);
             List<Content> contentList = result.getResult();
             // Transform List<Content> into List<Element>
             List<Element> elementList = contentList.stream()
@@ -313,11 +318,12 @@ public class XSLTDisseminationCrosswalk
     /**
      * Generate an intermediate representation of a DSpace object.
      *
+     * @param context A DSpace context (currently unused)
      * @param dso  The DSpace object to build a representation of.
      * @param dcvs list of metadata
      * @return element
      */
-    public static Element createDIM(DSpaceObject dso, List<MetadataValueDTO> dcvs) {
+    public static Element createDIM(Context context, DSpaceObject dso, List<MetadataValueDTO> dcvs) {
         Element dim = new Element("dim", DIM_NS);
         String type = Constants.typeText[dso.getType()];
         dim.setAttribute("dspaceType", type);
@@ -335,13 +341,20 @@ public class XSLTDisseminationCrosswalk
     /**
      * Generate an intermediate representation of a DSpace object.
      *
+     * @param context A DSpace context
      * @param dso The dspace object to build a representation of.
      * @return element
      */
-    public static Element createDIM(DSpaceObject dso) {
+    public static Element createDIM(Context context, DSpaceObject dso)
+            throws SQLException {
         if (dso.getType() == Constants.ITEM) {
             Item item = (Item) dso;
-            return createDIM(dso, item2Metadata(item));
+            Element dim = createDIM(context, dso, item2Metadata(item));
+            Version version = versionService.getVersion(context, item);
+            if (version != null) {
+                dim.setAttribute("itemVersion", String.valueOf(version.getVersionNumber()));
+            }
+            return dim;
         } else {
             Element dim = new Element("dim", DIM_NS);
             String type = Constants.typeText[dso.getType()];
