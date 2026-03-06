@@ -378,14 +378,15 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
 
     private String getNodeValue(String key, String locale, boolean useHierarchy) {
         try {
-            Node node = getNode(key, locale);
+            String nodeId = getNodeIdFromAuthorityKey(key);
+            Node node = getNode(nodeId, locale);
             if (Objects.isNull(node)) {
                 return null;
             }
             if (useHierarchy) {
                 return this.buildString(node);
             } else {
-                return node.getAttributes().getNamedItem(valueAttribute).getNodeValue();
+                return node.getAttributes().getNamedItem(labelAttribute).getNodeValue();
             }
         } catch (XPathExpressionException e) {
             return ("");
