@@ -20,8 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.ExtractMetadataStepException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ErrorRest;
@@ -58,9 +58,11 @@ import org.dspace.importer.external.service.ImportService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.submit.factory.SubmissionServiceFactory;
 import org.dspace.submit.service.SubmissionConfigService;
+import org.dspace.validation.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -77,7 +79,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer>
     implements ReloadableEntityObjectRepository<WorkspaceItem, Integer> {
 
-    public static final String OPERATION_PATH_SECTIONS = "sections";
+    public static final String OPERATION_PATH_SECTIONS = ValidationService.OPERATION_PATH_SECTIONS;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemRestRepository.class);
 
@@ -95,9 +97,6 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Autowired
     ConfigurationService configurationService;
-
-    @Autowired
-    WorkspaceItemConverter workspaceItemConverter;
 
     @Autowired
     SubmissionService submissionService;
@@ -204,13 +203,20 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                       Patch patch) throws SQLException, AuthorizeException {
         List<Operation> operations = patch.getOperations();
         WorkspaceItemRest wsi = findOne(context, id);
+        if (wsi == null) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
+        }
         WorkspaceItem source = wis.find(context, id);
         for (Operation op : operations) {
             //the value in the position 0 is a null value
             String[] path = op.getPath().substring(1).split("/", 3);
             if (OPERATION_PATH_SECTIONS.equals(path[0])) {
                 String section = path[1];
-                submissionService.evaluatePatchToInprogressSubmission(context, request, source, wsi, section, op);
+                try {
+                    submissionService.evaluatePatchToInprogressSubmission(context, request, source, wsi, section, op);
+                } catch (ExtractMetadataStepException e) {
+                    log.warn(e.getMessage(), e);
+                }
             } else {
                 throw new DSpaceBadRequestException(
                     "Patch path operation need to starts with '" + OPERATION_PATH_SECTIONS + "'");
@@ -225,6 +231,11 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         WorkspaceItem witem = null;
         try {
             witem = wis.find(context, id);
+            if (witem == null) {
+                throw new ResourceNotFoundException(
+                        WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME +
+                            " with id: " + id + " not found");
+            }
             wis.deleteAll(context, witem);
             context.addEvent(new Event(Event.DELETE, Constants.ITEM, witem.getItem().getID(), null,
                 itemService.getIdentifiers(context, witem.getItem())));

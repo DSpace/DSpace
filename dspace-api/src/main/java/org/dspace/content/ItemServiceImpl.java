@@ -7,12 +7,20 @@
  */
 package org.dspace.content;
 
+import static org.dspace.authority.service.AuthorityValueService.AUTHORITY_CLEANUP_BUSINESS_MODE;
+import static org.dspace.authority.service.AuthorityValueService.AUTHORITY_CLEANUP_CLEAN_ALL_MODE;
+import static org.dspace.authority.service.AuthorityValueService.AUTHORITY_CLEANUP_PROPERTY_PREFIX;
+import static org.dspace.authority.service.AuthorityValueService.REFERENCE;
+import static org.dspace.authority.service.AuthorityValueService.SPLIT;
+import static org.dspace.content.authority.Choices.CF_UNSET;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -30,6 +39,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authority.service.impl.ItemSearcherByMetadata;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -54,11 +64,15 @@ import org.dspace.contentreport.QueryPredicate;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.DiscoverResultItemIterator;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.discovery.indexobject.IndexableWorkflowItem;
+import org.dspace.discovery.indexobject.IndexableWorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
@@ -184,6 +198,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Autowired
     private VersionHistoryService versionHistoryService;
 
+    @Autowired
+    private List<ItemSearcherByMetadata> itemSearcherByMetadata;
+
     protected ItemServiceImpl() {
     }
 
@@ -297,14 +314,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         Optional<MetadataValue> colEntityType = getDSpaceEntityType(collection);
         Optional<MetadataValue> templateItemEntityType = getDSpaceEntityType(templateItem);
 
-        if (template && colEntityType.isPresent() && templateItemEntityType.isPresent() &&
+        if (colEntityType.isPresent() && templateItemEntityType.isPresent() &&
             !Strings.CS.equals(colEntityType.get().getValue(), templateItemEntityType.get().getValue())) {
             throw new IllegalStateException("The template item has entity type : (" +
                 templateItemEntityType.get().getValue() + ") different than collection entity type : " +
                 colEntityType.get().getValue());
         }
 
-        if (template && colEntityType.isPresent() && templateItemEntityType.isEmpty()) {
+        if (colEntityType.isPresent() && templateItemEntityType.isEmpty()) {
             MetadataValue original = colEntityType.get();
             MetadataField metadataField = original.getMetadataField();
             MetadataSchema metadataSchema = metadataField.getMetadataSchema();
@@ -894,8 +911,113 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         item.clearCollections();
         item.setOwningCollection(null);
 
+        // remove authority references
+        if (configurationService.getBooleanProperty("item-deletion.authority-cleanup.enabled", false)) {
+            removeAuthorityReferences(context, item);
+        }
+
         // Finally remove item row
         itemDAO.delete(context, item);
+    }
+
+    private void removeAuthorityReferences(Context context, Item deletedItem) throws SQLException, AuthorizeException {
+        String uuidOfDeletedItem = deletedItem.getID().toString();
+        List<String> controlledFields = getAuthorityControlledFieldsByItemEntityType(deletedItem);
+
+        Iterator<Item> itemsToFixAuthority =
+            this.findRelatedItemsByAuthorityControlledFields(context, deletedItem, Arrays.asList(uuidOfDeletedItem));
+
+        while (itemsToFixAuthority.hasNext()) {
+            Item itemToProcess = itemsToFixAuthority.next();
+
+            for (String controlledField : controlledFields) {
+                List<MetadataValue> metadataValuesWithAuthorityToUpdate = getMetadataWithAuthority(itemToProcess,
+                                                                                                   controlledField,
+                                                                                                   uuidOfDeletedItem);
+
+                if (CollectionUtils.isEmpty(metadataValuesWithAuthorityToUpdate)) {
+                    continue;
+                }
+
+                String cleanUpMode = getCleanUpMode(controlledField);
+
+                for (MetadataValue metadataValue : metadataValuesWithAuthorityToUpdate) {
+                    applyCleanUpMode(context, deletedItem, itemToProcess, metadataValue, cleanUpMode);
+                }
+            }
+            update(context, itemToProcess);
+            context.uncacheEntity(itemToProcess);
+        }
+    }
+
+    private List<MetadataValue> getMetadataWithAuthority(Item item, String metadataField, String authority) {
+        if (isValidMetadata(metadataField)) {
+            return getMetadataByMetadataString(item, metadataField).stream()
+                                                                   .filter(metadataValue -> StringUtils.equals(
+                                                                       metadataValue.getAuthority(), authority))
+                                                                   .collect(Collectors.toList());
+        }
+        return List.of();
+    }
+
+    public boolean isValidMetadata(String metadataField) {
+        if (metadataField.split(Pattern.quote(".")).length > 3) {
+            return false;
+        }
+        return true;
+    }
+
+    private void applyCleanUpMode(Context context, Item deletedItem, Item itemToProcess,
+                                  MetadataValue metadataValueWithAuthorityToUpdate, String cleanUpMode)
+        throws SQLException {
+
+        switch (cleanUpMode) {
+            case AUTHORITY_CLEANUP_BUSINESS_MODE:
+                replaceAuthorityWithItemBusinessIdentifier(deletedItem, metadataValueWithAuthorityToUpdate);
+                break;
+            case AUTHORITY_CLEANUP_CLEAN_ALL_MODE:
+                removeMetadataValues(context, itemToProcess, Arrays.asList(metadataValueWithAuthorityToUpdate));
+                break;
+            default:
+                log.error("The configured mode:" + cleanUpMode + " for metadata:"
+                              + metadataValueWithAuthorityToUpdate.getMetadataField().toString() + " is not supported");
+        }
+    }
+
+    private void replaceAuthorityWithItemBusinessIdentifier(Item deletedItem, MetadataValue mvWithAuthorityToUpdate) {
+        String authority = getBusinesIdentifier(deletedItem)
+            .map(businessId -> REFERENCE + businessId)
+            .orElse(null);
+
+        mvWithAuthorityToUpdate.setAuthority(authority);
+        mvWithAuthorityToUpdate.setConfidence(CF_UNSET);
+    }
+
+    private String getCleanUpMode(String metadataField) {
+        String mode = configurationService.getProperty(AUTHORITY_CLEANUP_PROPERTY_PREFIX + metadataField);
+        if (StringUtils.isBlank(mode)) {
+            mode = configurationService.getProperty(AUTHORITY_CLEANUP_PROPERTY_PREFIX + "default");
+        }
+        return mode;
+    }
+
+    private List<String> getAuthorityControlledFieldsByItemEntityType(Item item) {
+        String entityType = this.getEntityType(item);
+        return choiceAuthorityService.getAuthorityControlledFieldsByEntityType(entityType)
+                                     .stream()
+                                     .filter(field -> isValidMetadata(field))
+                                     .map(field -> field.replaceAll("_", "."))
+                                     .collect(Collectors.toList());
+    }
+
+    private Optional<String> getBusinesIdentifier(Item item) {
+        for (ItemSearcherByMetadata itemSearcherByMetadata : itemSearcherByMetadata) {
+            String businessIdentifier = getMetadata(item, itemSearcherByMetadata.getMetadata());
+            if (StringUtils.isNotBlank(businessIdentifier)) {
+                return Optional.of(itemSearcherByMetadata.getAuthorityPrefix() + SPLIT + businessIdentifier);
+            }
+        }
+        return Optional.empty();
     }
 
     protected void removeRequest(Context context, Item item) throws SQLException {
@@ -1148,6 +1270,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public void move(Context context, Item item, Collection from, Collection to)
         throws SQLException, AuthorizeException, IOException {
 
+        // If the two collections are the same, do nothing.
+        if (from.equals(to)) {
+            return;
+        }
+
         // Use the normal move method, and default to not inherit permissions
         this.move(context, item, from, to, false);
     }
@@ -1254,7 +1381,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             if (!isInProgressSubmission(context, item)) {
                 return true;
             }
-            return false;
+            return researcherProfileService.isAuthorOf(context, context.getCurrentUser(), item);
         }
 
         return collectionService.canEditBoolean(context, item.getOwningCollection(), false);
@@ -1369,10 +1496,9 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public Iterator<Item> findArchivedByMetadataFieldExcludingOldVersions(Context context, String schema,
-                                                                          String element, String qualifier,
-                                                                          String value)
-            throws SQLException, AuthorizeException {
+    public Iterator<Item> findUnfilteredByMetadataField(Context context, String schema, String element,
+                                                        String qualifier, String value)
+        throws SQLException, AuthorizeException {
         MetadataSchema mds = metadataSchemaService.find(context, schema);
         if (mds == null) {
             throw new IllegalArgumentException("No such metadata schema: " + schema);
@@ -1380,7 +1506,28 @@ prevent the generation of resource policy entry values with null dspace_object a
         MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
         if (mdf == null) {
             throw new IllegalArgumentException(
-                    "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+                "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
+
+        if (Item.ANY.equals(value)) {
+            return itemDAO.findByMetadataField(context, mdf, null);
+        }
+        return itemDAO.findByMetadataField(context, mdf, value);
+    }
+
+    @Override
+    public Iterator<Item> findArchivedByMetadataFieldExcludingOldVersions(Context context, String schema,
+                                                                          String element, String qualifier,
+                                                                          String value)
+        throws SQLException, AuthorizeException {
+        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        if (mds == null) {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
+        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        if (mdf == null) {
+            throw new IllegalArgumentException(
+                "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
 
         if (Item.ANY.equals(value)) {
@@ -1538,6 +1685,12 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
+    public Iterator<Item> findByLikeAuthorityValue(Context context, String likeAuthority,
+                                                   Boolean inArchive) throws SQLException {
+        return itemDAO.findByLikeAuthorityValue(context, likeAuthority, inArchive);
+    }
+
+    @Override
     public Iterator<Item> findByMetadataFieldAuthority(Context context, String mdString, String authority)
         throws SQLException, AuthorizeException {
         String[] elements = getElementsFilled(mdString);
@@ -1606,9 +1759,10 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    protected void getAuthoritiesAndConfidences(String fieldKey, Collection collection, List<String> values,
-                                                List<String> authorities, List<Integer> confidences, int i) {
-        Choices c = choiceAuthorityService.getBestMatch(fieldKey, values.get(i), collection, null);
+    protected void getAuthoritiesAndConfidences(String fieldKey, int dsoType, Collection collection,
+                                                List<String> values, List<String> authorities,
+                                                List<Integer> confidences, int i) {
+        Choices c = choiceAuthorityService.getBestMatch(fieldKey, values.get(i), dsoType, collection, null);
         authorities.add(c.values.length > 0 && c.values[0] != null ? c.values[0].authority : null);
         confidences.add(c.confidence);
     }
@@ -1704,6 +1858,10 @@ prevent the generation of resource policy entry values with null dspace_object a
     @Override
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang,
                                            boolean enableVirtualMetadata) {
+
+        enableVirtualMetadata = enableVirtualMetadata
+            && configurationService.getBooleanProperty("item.enable-virtual-metadata", false);
+
         if (!enableVirtualMetadata) {
             log.debug("Called getMetadata for " + item.getID() + " without enableVirtualMetadata");
             return super.getMetadata(item, schema, element, qualifier, lang);
@@ -1714,7 +1872,9 @@ prevent the generation of resource policy entry values with null dspace_object a
             List<MetadataValue> dbMetadataValues = item.getMetadata();
 
             List<MetadataValue> fullMetadataValueList = new LinkedList<>();
-            fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
+            if (configurationService.getBooleanProperty("item.enable-virtual-metadata", false)) {
+                fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
+            }
             fullMetadataValueList.addAll(dbMetadataValues);
 
             item.setCachedMetadata(MetadataValueComparators.sort(fullMetadataValueList));
@@ -1724,13 +1884,29 @@ prevent the generation of resource policy entry values with null dspace_object a
         // Build up list of matching values based on the cache
         List<MetadataValue> values = new ArrayList<>();
         for (MetadataValue dcv : item.getCachedMetadata()) {
-            if (match(schema, element, qualifier, lang, dcv)) {
+            if (match(schema, element, qualifier, dcv)) {
                 values.add(dcv);
             }
         }
 
+        values = getFilteredMetadataValuesByLanguage(values, lang);
+
         // Create an array of matching values
         return values;
+    }
+
+    @Override
+    public String getEntityType(Item item) {
+        return getMetadataFirstValue(item, new MetadataFieldName("dspace.entity.type"), Item.ANY);
+    }
+
+    @Override
+    public void setEntityType(Context context, Item item, String entityType) {
+        try {
+            setMetadataSingleValue(context, item, new MetadataFieldName("dspace.entity.type"), null, entityType);
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
     }
 
     /**
@@ -1745,7 +1921,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                 //Retrieve the applicable relationship
                 Relationship rs = relationshipService.find(context,
                         ((RelationshipMetadataValue) rr).getRelationshipId());
-                if (rs.getLeftItem().equals(dso)) {
+                if (rs.getLeftItem().getID().equals(dso.getID())) {
                     rs.setLeftPlace(place);
                 } else {
                     rs.setRightPlace(place);
@@ -1774,7 +1950,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                 "exist!");
         }
 
-        final Supplier<Integer> placeSupplier =  () -> place;
+        final Supplier<Integer> placeSupplier = () -> place;
 
         return addMetadata(context, dso, metadataField, lang, Arrays.asList(value),
                 Arrays.asList(authority), Arrays.asList(confidence), placeSupplier)
@@ -1875,6 +2051,32 @@ prevent the generation of resource policy entry values with null dspace_object a
         for (OrcidQueue orcidQueueRecord : orcidQueueRecords) {
             orcidQueueService.delete(context, orcidQueueRecord);
         }
+    }
+
+    @Override
+    public Iterator<Item> findRelatedItemsByAuthorityControlledFields(Context c, Item item, List<String> authorities) {
+        String entityType = this.getEntityType(item);
+        String query = choiceAuthorityService.getAuthorityControlledFieldsByEntityType(entityType).stream()
+                                             .map(field -> getFieldFilter(field, authorities))
+                                             .collect(Collectors.joining(" OR "));
+
+        if (StringUtils.isEmpty(query)) {
+            return Collections.emptyIterator();
+        }
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.addDSpaceObjectFilter(IndexableItem.TYPE);
+        discoverQuery.addDSpaceObjectFilter(IndexableWorkspaceItem.TYPE);
+        discoverQuery.addDSpaceObjectFilter(IndexableWorkflowItem.TYPE);
+        discoverQuery.addFilterQueries(query);
+
+        return new DiscoverResultItemIterator(c, discoverQuery, false);
+    }
+
+    private String getFieldFilter(String field, List<String> authorities) {
+        return authorities.stream()
+                          .map(authority -> field.replaceAll("_", ".") + "_allauthority: \"" + authority + "\"")
+                          .collect(Collectors.joining(" OR "));
     }
 
     @Override

@@ -96,6 +96,9 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
     Iterator<Item> findByMetadataFieldExcludingOldVersions(Context context, MetadataField metadataField, String value,
                                                            boolean inArchive) throws SQLException;
 
+    Iterator<Item> findByMetadataField(Context context, MetadataField metadataField, String value)
+        throws SQLException;
+
     /**
      * Returns all the Items that belong to the specified aollections (if any)
      * and match the provided predicates.
@@ -119,6 +122,20 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
 
     Iterator<Item> findByAuthorityValue(Context context, MetadataField metadataField, String authority,
                                                boolean inArchive) throws SQLException;
+
+    /**
+     * Find all the items in the archive or not with a given authority key value in LIKE format.
+     *
+     * @param context       DSpace context object
+     * @param likeAuthority value that will be used with operator LIKE on field
+     *                      authority, it's possible to enter '%' to improve
+     *                      searching
+     * @param inArchive     true for archived items, null for all items (archived and not)
+     * @return
+     * @throws SQLException if database error
+     */
+    Iterator<Item> findByLikeAuthorityValue(Context context, String likeAuthority,
+                                            Boolean inArchive) throws SQLException;
 
     Iterator<Item> findArchivedByCollection(Context context, Collection collection, Integer limit,
                                                    Integer offset) throws SQLException;
@@ -230,5 +247,15 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
     int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn,
                    boolean discoverable)
         throws SQLException;
+
+    /**
+     * Get all Items matching the given ids.
+     * @param context          context
+     * @param ids              the list of ids
+     * @return result list of items
+     * @throws SQLException
+     */
+    Iterator<Item> findByIds(Context context, List<UUID> ids) throws SQLException;
+
 
 }

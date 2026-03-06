@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd" >
+
+    <!-- RelationshipAuthorizerImpl instance that matches all the relationship types 
+         and verify if the current user has WRITE policy on at least one of the two items  -->
+    <bean id="writePolicyRelationshipAuthorizer" class="org.dspace.authorize.relationship.RelationshipAuthorizerImpl">
+        <constructor-arg name="leftItemAuthorizer" ref="relationshipItemWritePolicyAuthorizer"/>
+        <constructor-arg name="rightItemAuthorizer" ref="relationshipItemWritePolicyAuthorizer"/>
+        <property name="andCondition" value="false"/>
+    </bean>
+    
+    <!-- RelationshipAuthorizerImpl instance that matches isResearchoutputsHiddenFor relationship type
+         and verify if the current user is the owner of the involved Person item -->
+    <bean id="isResearchoutputsHiddenForRelationshipAuthorizer" class="org.dspace.authorize.relationship.RelationshipAuthorizerImpl">
+        <constructor-arg name="leftItemAuthorizer" ref="relationshipItemAlwaysTrueAuthorizer"/>
+        <constructor-arg name="rightItemAuthorizer" ref="relationshipItemOwnerAuthorizer"/>
+        <property name="rightEntityType" value="Person" /> 
+        <property name="leftwardType" value="isResearchoutputsHiddenFor" />
+        <property name="rightwardType" value="notDisplayingResearchoutputs" />
+        <property name="andCondition" value="true"/>
+    </bean>
+    
+    <!-- RelationshipAuthorizerImpl instance that matches isProjectsHiddenFor relationship type
+         and verify if the current user is the owner of the involved Person item -->
+    <bean id="isProjectsHiddenForRelationshipAuthorizer" class="org.dspace.authorize.relationship.RelationshipAuthorizerImpl">
+        <constructor-arg name="leftItemAuthorizer" ref="relationshipItemAlwaysTrueAuthorizer"/>
+        <constructor-arg name="rightItemAuthorizer" ref="relationshipItemOwnerAuthorizer"/>
+        <property name="rightEntityType" value="Person" />
+        <property name="leftwardType" value="isProjectsHiddenFor" />
+        <property name="rightwardType" value="notDisplayingProjects" />
+        <property name="andCondition" value="true"/>
+    </bean>
+    
+    <!-- RelationshipAuthorizerImpl instance that matches isResearchoutputsSelectedFor relationship type
+         and verify if the current user is the owner of the involved Person item -->
+    <bean id="isResearchoutputsSelectedForRelationshipAuthorizer" class="org.dspace.authorize.relationship.RelationshipAuthorizerImpl">
+        <constructor-arg name="leftItemAuthorizer" ref="relationshipItemAlwaysTrueAuthorizer"/>
+        <constructor-arg name="rightItemAuthorizer" ref="relationshipItemOwnerAuthorizer"/>
+        <property name="rightEntityType" value="Person" />
+        <property name="leftwardType" value="isResearchoutputsSelectedFor" />
+        <property name="rightwardType" value="hasSelectedResearchoutputs" />
+        <property name="andCondition" value="true"/>
+    </bean>
+    
+    <!-- RelationshipAuthorizerImpl instance that matches isProjectsSelectedFor relationship type
+         and verify if the current user is the owner of the involved Person item -->
+    <bean id="isProjectsSelectedForRelationshipAuthorizer" class="org.dspace.authorize.relationship.RelationshipAuthorizerImpl">
+        <constructor-arg name="leftItemAuthorizer" ref="relationshipItemAlwaysTrueAuthorizer"/>
+        <constructor-arg name="rightItemAuthorizer" ref="relationshipItemOwnerAuthorizer"/>
+        <property name="rightEntityType" value="Person" />
+        <property name="leftwardType" value="isProjectsSelectedFor" />
+        <property name="rightwardType" value="hasSelectedProjects" />
+        <property name="andCondition" value="true"/>
+    </bean>
+    
+    <bean id="relationshipItemAlwaysTrueAuthorizer" class="org.dspace.authorize.relationship.RelationshipItemAlwaysTrueAuthorizer" />
+    <bean id="relationshipItemWritePolicyAuthorizer" class="org.dspace.authorize.relationship.RelationshipItemWritePolicyAuthorizer" />
+    <bean id="relationshipItemOwnerAuthorizer" class="org.dspace.authorize.relationship.RelationshipItemOwnerAuthorizer" />
+
+
+</beans>

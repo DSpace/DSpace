@@ -1642,4 +1642,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return null;
     }
 
+    @Override
+    public SolrSearchCore getSolrSearchCore() {
+        return solrSearchCore;
+    }
+
 }
