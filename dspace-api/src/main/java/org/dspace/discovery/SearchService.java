@@ -146,4 +146,16 @@ public interface SearchService {
     String calculateExtremeValue(Context context, String valueField,
                                  String sortField, DiscoverQuery.SORT_ORDER sortOrder)
         throws SearchServiceException;
+
+    /**
+     * Obtains the SolrSearchCore instance used to interact with the underlying
+     * search index.
+     * <p>
+     * This core is responsible for managing the SolrClient connection,
+     * executing search queries, and handling indexing operations for the
+     * discovery service.
+     * </p>
+     * * @return the SolrSearchCore service responsible for index management.
+     */
+    SolrSearchCore getSolrSearchCore();
 }

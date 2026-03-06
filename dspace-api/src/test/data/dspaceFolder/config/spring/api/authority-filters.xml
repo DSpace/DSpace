@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://www.springframework.org/schema/util
+                        http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<bean class="org.dspace.content.authority.EntityTypeAuthorityFilter">
+		<property name="supportedEntities">
+			<util:list>
+				<value>EntityOrg</value>
+				<value>EntityPerson</value>
+			</util:list>
+		</property>
+		<constructor-arg name="customQueries">
+			<util:list>
+				<value>dc.type:mytype</value>
+			</util:list>
+		</constructor-arg>
+	</bean>
+
+
+	<bean class="org.dspace.content.authority.AuthorityNameAuthorityFilter">
+		<property name="supportedAuthorities">
+			<util:list>
+				<value>EntityOrgAuthority</value>
+				<value>EntityPersonAuthority</value>
+			</util:list>
+		</property>
+		<constructor-arg name="customQueries">
+			<util:list>
+				<value>dc.type:mytype</value>
+			</util:list>
+		</constructor-arg>
+	</bean>
+
+</beans>

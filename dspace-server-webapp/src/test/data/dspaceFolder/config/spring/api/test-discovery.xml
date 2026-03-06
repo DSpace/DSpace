@@ -25,7 +25,21 @@
 
     <bean id="solrServiceResourceIndexPlugin" class="org.dspace.discovery.SolrServiceResourceRestrictionPlugin" scope="prototype"/>
     <alias name="solrServiceResourceIndexPlugin" alias="org.dspace.discovery.SolrServiceResourceRestrictionPlugin"/>
-
+    <bean id="solrServiceCrisValuePairsIndexPlugin" class="org.dspace.discovery.SolrServiceValuePairsIndexPlugin"/>
+    <bean id="itemAuthorityLookupIndexPlugin" class="org.dspace.discovery.ItemAuthorityLookupIndexPlugin">
+        <property name="additionalFields">
+            <list>
+                <value>crisrp.name</value>
+                <value>person.name.variant</value>
+                <value>person.name.translated</value>
+                <value>person.givenName</value>
+                <value>person.familyName</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="solrServiceBestMatchIndexingPlugin" class="org.dspace.discovery.SolrServiceBestMatchIndexingPlugin"/>
+    <bean id="solrServiceBestMatchStrictIndexingPlugin"
+          class="org.dspace.discovery.SolrServiceStrictBestMatchIndexingPlugin"/>
     <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
     <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">
         <property name="map">
@@ -94,6 +108,8 @@
                 <!-- Openaire4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
                 <entry key="openaireFundingAgency" value-ref="openaireFundingAgency"/>
                 <entry key="eperson_claims" value-ref="eperson_claims"/>
+                <!-- multilanguage types facet configuration -->
+                <entry key="123456789/language-test-1" value-ref="multilanguage-types"/>
                 <!-- COAR NOTIFY LDN MESSAGES configuration -->
                 <entry key="NOTIFY.incoming" value-ref="NOTIFY.incoming"/>
                 <entry key="NOTIFY.outgoing" value-ref="NOTIFY.outgoing"/>
@@ -1273,6 +1289,62 @@
         <property name="isOpenByDefault" value="true"/>
         <property name="pageSize" value="10"/>
         <property name="exposeMinAndMaxValue" value="true"/>
+    </bean>
+
+    <!-- Configuration for multilanguage facets testing -->
+    <bean id="multilanguage-types" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+          parent="defaultConfiguration">
+        <property name="id" value="multilanguage-types"/>
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterTypes" />
+                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterContentInOriginalBundle"/>
+                <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterLanguage" />
+            </list>
+        </property>
+        <!--The search filters which can be used on the discovery search page (same as defaultConfiguration above)-->
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterTypes" />
+                <ref bean="searchFilterTitle" />
+                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterContentInOriginalBundle"/>
+                <ref bean="searchFilterFileNameInOriginalBundle" />
+                <ref bean="searchFilterFileDescriptionInOriginalBundle" />
+                <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterIsAuthorOfPublicationRelation"/>
+                <ref bean="searchFilterIsProjectOfPublicationRelation"/>
+                <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
+                <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
+                <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <ref bean="searchFilterLanguage" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="searchFilterTypes" class="org.dspace.discovery.configuration.MultiLanguageDiscoverSearchFilterFacet">
+        <property name="indexFieldName" value="types" />
+        <property name="metadataFields">
+            <list>
+                <value>dc.type</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="searchFilterLanguage" class="org.dspace.discovery.configuration.MultiLanguageDiscoverSearchFilterFacet">
+        <property name="indexFieldName" value="language" />
+        <property name="metadataFields">
+            <list>
+                <value>dc.language.iso</value>
+                <value>person.knowsLanguage</value>
+            </list>
+        </property>
     </bean>
 
     <bean id="ldnMessageEntityBaseConfig"
