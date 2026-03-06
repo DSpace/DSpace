@@ -40,7 +40,7 @@ public class EditItemFeature implements AuthorizationFeature {
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException, SearchServiceException {
         if (object instanceof SiteRest) {
-            return itemService.countItemsWithEdit(context) > 0;
+            return itemService.countItemsWithEdit(context, "") > 0;
         } else if (object instanceof ItemRest) {
             Item item = (Item) utils.getDSpaceAPIObjectFromRest(context, object);
             return authService.authorizeActionBoolean(context, item, Constants.WRITE);

@@ -170,4 +170,23 @@ public class VersioningTest extends AbstractUnitTest {
         assertThat("Test_version_handle_delete", handleService.resolveToObject(context, handle), nullValue());
         context.restoreAuthSystemState();
     }
+
+    @Test
+    public void testGetVersionWithNullPointerException() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create item without version
+        Community community = communityService.create(null, context);
+        Collection col = collectionService.create(context, community);
+        WorkspaceItem is = workspaceItemService.create(context, col, false);
+        Item itemWithoutVersion = installItemService.installItem(context, is);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context, originalItem);
+        try {
+            Version result = versionHistoryService.getVersion(context, versionHistory, itemWithoutVersion);
+            assertThat("getVersion should return null for item without version", result, nullValue());
+        } catch (NullPointerException npe) {
+            fail("NullPointerException should not be thrown. Method should return null: " + npe.getMessage());
+        } finally {
+            context.restoreAuthSystemState();
+        }
+    }
 }

@@ -135,19 +135,33 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
-      # Last version of errorprone to support JDK 17 is 2.42.0
-      # TODO: Remove this after this ticket is resolved https://github.com/DSpace/DSpace/issues/11621
-      - dependency-name: "com.google.errorprone:*"
-        versions: [ ">=2.43.0" ]
       # Don't automatically update BouncyCastle because maven-gpg-plugin REQUIRES a very specific version or release
       # errors will occur. See https://github.com/DSpace/DSpace/pull/11696
       - dependency-name: "org.bouncycastle:*"
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # Ignore updates for jboss-logging because it is a "convergence only" dependency
+      # that we do not use directly (see comments in pom.xml).
+      - dependency-name: "org.jboss.logging:*"
+      # Don't try to update antlr4-runtime because it is a transitive dependency
+      # used by Hibernate and Solr. The version is pinned in pom.xml and should
+      # only be updated when required. See: https://github.com/DSpace/DSpace/pull/11989
+      - dependency-name: "org.antlr:antlr4-runtime"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+  # Also automatically update all our GitHub actions on the main branch
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    # Monthly dependency updates
+    schedule:
+      interval: "monthly"
+      time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
   ######################
   ## dspace-9_x branch
   ######################
@@ -277,18 +291,37 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
-      # Last version of errorprone to support JDK 17 is 2.42.0
+      # Last version of errorprone to support JDK 17 is 2.42.x
       - dependency-name: "com.google.errorprone:*"
-        versions: [ ">=2.43.0" ]
+        versions: [">=2.43.0"]
       # Don't automatically update BouncyCastle because maven-gpg-plugin REQUIRES a very specific version or release
       # errors will occur. See https://github.com/DSpace/DSpace/pull/11696
       - dependency-name: "org.bouncycastle:*"
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # Ignore updates for jboss-logging because it is a "convergence only" dependency
+      # that we do not use directly (see comments in pom.xml).
+      - dependency-name: "org.jboss.logging:*"
+      # Don't try to update antlr4-runtime because it is a transitive dependency
+      # used by Hibernate and Solr. The version is pinned in pom.xml and should
+      # only be updated when required. See: https://github.com/DSpace/DSpace/pull/11989
+      - dependency-name: "org.antlr:antlr4-runtime"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
+  # Also automatically update all our GitHub actions on the dspace-9_x branch
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: dspace-9_x
+    # Monthly dependency updates
+    schedule:
+      interval: "monthly"
+      time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
   ######################
   ## dspace-8_x branch
   ######################
@@ -418,18 +451,37 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
-      # Last version of errorprone to support JDK 17 is 2.42.0
+      # Last version of errorprone to support JDK 17 is 2.42.x
       - dependency-name: "com.google.errorprone:*"
-        versions: [ ">=2.43.0" ]
+        versions: [">=2.43.0"]
       # Don't automatically update BouncyCastle because maven-gpg-plugin REQUIRES a very specific version or release
       # errors will occur. See https://github.com/DSpace/DSpace/pull/11696
       - dependency-name: "org.bouncycastle:*"
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # Ignore updates for jboss-logging because it is a "convergence only" dependency
+      # that we do not use directly (see comments in pom.xml).
+      - dependency-name: "org.jboss.logging:*"
+      # Don't try to update antlr4-runtime because it is a transitive dependency
+      # used by Hibernate and Solr. The version is pinned in pom.xml and should
+      # only be updated when required. See: https://github.com/DSpace/DSpace/pull/11989
+      - dependency-name: "org.antlr:antlr4-runtime"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
+  # Also automatically update all our GitHub actions on the dspace-8_x branch
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: dspace-8_x
+    # Monthly dependency updates
+    schedule:
+      interval: "monthly"
+      time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7
   ######################
   ## dspace-7_x branch
   ######################
@@ -584,6 +636,21 @@ updates:
       # Ignore major/minor updates for Hibernate. Only patch updates can be automated.
       - dependency-name: "org.hibernate.*:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # Ignore updates for jboss-logging because it is a "convergence only" dependency
+      # that we do not use directly (see comments in pom.xml).
+      - dependency-name: "org.jboss.logging:*"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
+  # Also automatically update all our GitHub actions on the dspace-7_x branch
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: dspace-7_x
+    # Monthly dependency updates
+    schedule:
+      interval: "monthly"
+      time: "02:00"
+    # Allow updates to be delayed for a configurable number of days to mitigate
+    # some classes of supply chain attacks
+    cooldown:
+      default-days: 7

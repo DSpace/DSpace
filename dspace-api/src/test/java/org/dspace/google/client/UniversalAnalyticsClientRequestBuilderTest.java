@@ -8,7 +8,7 @@
 package org.dspace.google.client;
 
 import static java.util.List.of;
-import static org.apache.commons.lang.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.countMatches;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
