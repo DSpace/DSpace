@@ -21,7 +21,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
-public class IndexableObjectHighlightResultConverter implements DSpaceConverter<DiscoverResult.IndexableObjectHighlightResult, SearchResultEntryRest> {
+public class IndexableObjectHighlightResultConverter implements
+    DSpaceConverter<DiscoverResult.IndexableObjectHighlightResult, SearchResultEntryRest> {
     // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
     @Lazy
     @Autowired

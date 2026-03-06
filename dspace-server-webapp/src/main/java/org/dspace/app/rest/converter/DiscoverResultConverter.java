@@ -20,7 +20,6 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverResult;
-import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

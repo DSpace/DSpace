@@ -155,13 +155,13 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
             )))
             //These search results have to be shown in the embedded.objects section as these are the items
             // given in the structure defined above.
             //Seeing as everything fits onto one page, they have to all be present
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.hasItems(
                 SearchResultMatcher.match("core", "community", "communities"),
                 SearchResultMatcher.match("core", "community", "communities"),
                 //This has to be like this because collections don't have anything else
@@ -275,12 +275,12 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object has to look like this because of the query we specified, only two elements match
             // the query.
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
             )))
             //Only the two item elements match the query, therefore those are the only ones that can be in the
             // embedded.objects section
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.match("core", "item", "items"),
                 SearchResultMatcher.match("core", "item", "items")
             )))
@@ -370,13 +370,13 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page element has to look like this because it contains all the elements we've just created
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
             )))
             //The scope property has to be set to the value we entered in the parameters
             .andExpect(jsonPath("$.scope", is("test")))
             //All the elements created in the structure above have to be present in the embedded.objects section
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.hasItems(
                 SearchResultMatcher.match("core", "community", "communities"),
                 SearchResultMatcher.match("core", "community", "communities"),
                 //Collections are specified like this because they don't have any special properties
@@ -447,12 +447,12 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page element needs to look like this and only have three totalElements because we only want
             // the items (dsoType) and we only created three items
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
             )))
             //Only the three items can be present in the embedded.objects section as that's what we specified
             // in the dsoType parameter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.match("core", "item", "items"),
                 SearchResultMatcher.match("core", "item", "items"),
                 SearchResultMatcher.match("core", "item", "items")
@@ -472,12 +472,12 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             // The page element needs to look like this and only have four totalElements because we only want
             // the communities and the collections (dsoType) and we only created two of both types
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 4)
             )))
             // Only the two communities and the two collections can be present in the embedded.objects section
             // as that's what we specified in the dsoType parameter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.match("core", "community", "communities"),
                 SearchResultMatcher.match("core", "community", "communities"),
                 SearchResultMatcher.match("core", "collection", "collections"),
@@ -498,12 +498,12 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             // The page element needs to look like this and only have five totalElements because we only want
             // the collections and the items (dsoType) and we only created two collections and three items
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 5)
             )))
             // Only the two collections and the three items can be present in the embedded.objects section
             // as that's what we specified in the dsoType parameter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.match("core", "collection", "collections"),
                 SearchResultMatcher.match("core", "collection", "collections"),
                 SearchResultMatcher.match("core", "item", "items"),
@@ -527,12 +527,12 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             // The page element needs to look like this and have seven totalElements because we want
             // the communities, the collections and the items (dsoType) and we created two communities,
             // two collections and three items
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
             )))
             // The two communities, the two collections and the three items can be present in the embedded.objects
             // section as that's what we specified in the dsoType parameter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.match("core", "community", "communities"),
                 SearchResultMatcher.match("core", "community", "communities"),
                 SearchResultMatcher.match("core", "collection", "collections"),
@@ -601,12 +601,12 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object has to look like this and only contain three total elements because we only want
             // to get the items back
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
             )))
             //Only the three items can be present in the embedded.objects section as that's what we specified
             // in the dsoType parameter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.match("core", "item", "items"),
                 SearchResultMatcher.match("core", "item", "items"),
                 SearchResultMatcher.match("core", "item", "items")
@@ -614,7 +614,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //Here we want to match on the item name in a certain specified order because we want to check the
             // sort properly
             //We check whether the items are sorted properly as we expected
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.contains(
                 SearchResultMatcher.matchOnItemName("item", "items", "Public"),
                 SearchResultMatcher.matchOnItemName("item", "items", "Test"),
                 SearchResultMatcher.matchOnItemName("item", "items", "Testing")
@@ -691,12 +691,12 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //Page number 1 because that's the param we entered
             //TotalPages 4 because size = 2 and total elements is 7 -> 4 pages
             //We made 7 elements -> 7 total elements
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(1, 2, 4, 7)
             )))
             //These are the  two elements that'll be shown (because page = 1, so the third and fourth element
             // in the list) and they'll be the only ones because the size is 2
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.match(),
                 SearchResultMatcher.match()
             )))
@@ -773,11 +773,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //This is the only item that should be returned with the query given
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.contains(
                 SearchResultMatcher.matchOnItemName("item", "items", "Test")
             )))
             //There always needs to be a self link available
@@ -841,11 +841,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 5)
             )))
             //These are the items that aren't set to private
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.hasItems(
                 SearchResultMatcher.match("core", "community", "communities"),
                 SearchResultMatcher.match("core", "community", "communities"),
                 //Collections are specified like this because they don't have any special properties
@@ -854,7 +854,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
                 SearchResultMatcher.matchOnItemName("item", "items", "Test")
             )))
             //This is a private item, this shouldn't show up in the result
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+            .andExpect(jsonPath("$._embedded.objects",
                 Matchers.not(
                     Matchers.anyOf(
                         SearchResultMatcher.matchOnItemName("item", "items", "Test 2"),
@@ -929,7 +929,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //Make sure that the item with the private bitstream doesn't show up
@@ -998,11 +998,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results have to contain the items belonging to the scope specified
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.matchOnItemName("item", "items", "Test 2"),
                 SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
             )))
@@ -1068,17 +1068,17 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //Make sure that the search results contains the item with the correct scope
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.contains(
                 SearchResultMatcher.matchOnItemName("item", "items", "Test 2")
 //                        SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
             )))
             //Make sure that the search result doesn't contain the item that's set to private but does have
             // the correct scope
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.not(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.not(
                 Matchers.contains(
                     SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
                 ))))
@@ -1135,7 +1135,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.scope", is(collection1.getID().toString())))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", allOf(
+            .andExpect(jsonPath("$._embedded.objects", allOf(
                 hasSize(1),
                 hasJsonPath("$[0]._embedded.indexableObject", WorkspaceItemMatcher.matchProperties(wsi1))
             )));
@@ -1189,7 +1189,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.scope", is(collection1.getID().toString())))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", allOf(
+            .andExpect(jsonPath("$._embedded.objects", allOf(
                 hasSize(1),
                 hasJsonPath("$[0]._embedded.indexableObject", WorkflowItemMatcher.matchProperties(wfi1))
             )));
@@ -1246,12 +1246,12 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results has to contain the item with the query in the title and the hithighlight has
             // to be filled in with a string containing the query
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.contains(
                 SearchResultMatcher
                     .matchOnItemNameAndHitHighlight("item", "items",
                         "Public item 2", query, "dc.title")
@@ -1314,12 +1314,12 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results has to contain the item with the query in the title and the hithighlight has
             // to be filled in with a string containing the query
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 Matchers.allOf(
                     SearchResultMatcher
                         .matchOnItemName("item", "items", "Public item 2"),
@@ -1384,16 +1384,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results should not contain this
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.not(
-                Matchers.contains(
-                    SearchResultMatcher
-                        .matchOnItemNameAndHitHighlight("item", "items",
-                            "Public item 2", query, "dc.title")
-                ))))
+            .andExpect(jsonPath("$._embedded.objects").doesNotExist())
             //There always needs to be a self link available
             .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/searchresults/search/objects")))
         ;
@@ -1451,11 +1446,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results have to contain the items that match the searchFilter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.matchOnItemName("item", "items", "Test"),
                 SearchResultMatcher.matchOnItemName("item", "items", "Test 2")
             )))
@@ -1517,11 +1512,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results have to contain the items that match the searchFilter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.matchOnItemName("item", "items", "Test"),
                 SearchResultMatcher.matchOnItemName("item", "items", "Test 2")
             )))
@@ -1582,11 +1577,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results have to contain the items that match the searchFilter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItem(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.hasItem(
                 SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
             )))
             //There always needs to be a self link available
@@ -1647,11 +1642,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results have to contain the items that match the searchFilter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItem(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.hasItem(
                 SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
             )))
             //There always needs to be a self link available
@@ -1724,12 +1719,12 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //Page number 1 because that's the param we entered
             //TotalPages 4 because size = 2 and total elements is 7 -> 4 pages
             //We made 7 elements -> 7 total elements
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(1, 2, 4, 7)
             )))
             //These are the  two elements that'll be shown (because page = 1, so the third and fourth element
             // in the list) and they'll be the only ones because the size is 2
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.match(),
                 SearchResultMatcher.match()
             )))
@@ -1790,11 +1785,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results have to contain the items that match the searchFilter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.matchOnItemName("item", "items", "Test")
             )))
             //There always needs to be a self link available
@@ -1855,11 +1850,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results have to contain the items that match the searchFilter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.matchOnItemName("item", "items", "Test")
             )))
             //There always needs to be a self link available
@@ -1919,11 +1914,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results have to contain the items that match the searchFilter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.hasItems(
                 SearchResultMatcher.matchOnItemName("item", "items", "Test 2"),
                 SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
             )))
@@ -1985,11 +1980,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results have to contain the items that match the searchFilter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.hasItems(
                 SearchResultMatcher.matchOnItemName("item", "items", "Test 2"),
                 SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
             )))
@@ -2050,11 +2045,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results have to contain the items that match the searchFilter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItem(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.hasItem(
                 SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
             )))
             //There always needs to be a self link available
@@ -2115,11 +2110,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results have to contain the items that match the searchFilter
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItem(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.hasItem(
                 SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
             )))
             //There always needs to be a self link available
@@ -2218,11 +2213,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
             )))
             //This is the only item that should be returned with the query given
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.contains(
                 SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
             )))
 
@@ -2241,7 +2236,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
             )))
 
@@ -2304,15 +2299,15 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
             )))
             //This is the only item that should be returned with the query given
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.matchOnItemName("item", "items", "Test"),
                 SearchResultMatcher.matchOnItemName("item", "items", "TestItem2")
             )))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.not(Matchers.contains(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.not(Matchers.contains(
                 SearchResultMatcher.matchOnItemName("item", "items", "azeazeazeazeazeaze")
             ))))
 
@@ -2373,15 +2368,15 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
             )))
             //This is the only item that should be returned with the query given
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.contains(
                 SearchResultMatcher.matchOnItemName
                     ("item", "items", "Faithful Infidel: Exploring Conformity (2nd edition)")
             )))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+            .andExpect(jsonPath("$._embedded.objects",
                 Matchers.not(Matchers.containsInAnyOrder(
                     SearchResultMatcher.matchOnItemName("item", "items", "Test"),
                     SearchResultMatcher.matchOnItemName("item", "items", "NotAProperTestTitle")
@@ -2542,13 +2537,13 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$.type", is("searchresult")))
                 //There needs to be a page object that shows the total pages and total elements as well as the
                 // size and the current page (number)
-                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                .andExpect(jsonPath("$.page", is(
                     PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
                 )))
                 //These search results have to be shown in the embedded.objects section as these are the items
                 // given in the structure defined above.
                 //Seeing as everything fits onto one page, they have to all be present
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                     SearchResultMatcher.match("core", "community", "communities"),
                     SearchResultMatcher.match("core", "community", "communities"),
                     SearchResultMatcher.match("core", "item", "items"),
@@ -2669,14 +2664,14 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 5)
             )))
             // These search results have to be shown in the embedded.objects section
             // one public item, two workspaceitems and two worfklowitems submitted by our submitter user
             // as by the structure defined above.
             // Seeing as everything fits onto one page, they have to all be present
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 Matchers.allOf(
                     SearchResultMatcher.match("core", "item", "items"),
                     JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
@@ -2721,14 +2716,14 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
             )))
             // These search results have to be shown in the embedded.objects section two workspaceitems and one
             // worfklowitem submitted by the admin user as by the structure defined above. Please note that the
             // claimedTask should be not visible here as this is the workspace configuration
             //Seeing as everything fits onto one page, they have to all be present
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 Matchers.allOf(
                     SearchResultMatcher.match("submission", "workspaceitem", "workspaceitems"),
                     JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
@@ -2886,7 +2881,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
             )))
             //There always needs to be a self link
@@ -2905,7 +2900,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
             )))
             // These search results have to be shown in the embedded.objects section:
@@ -2914,7 +2909,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             // reviewer1.
             // Please note that the workspace items should not be visible here either.
             // Seeing as everything fits onto one page, they have to all be present
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 Matchers.allOf(
                     SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
                     JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
@@ -2945,14 +2940,14 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
             )))
             // These search results have to be shown in the embedded.objects section:
             // two workflow items and one claimed task.
             // For step 1 one submitted by the user and one submitted by the admin and none for step 2.
             //Seeing as everything fits onto one page, they have to all be present
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 Matchers.allOf(
                     SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
                     JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
@@ -2986,11 +2981,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
             )))
             // These search results have to be shown in the embedded.objects section
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 Matchers.allOf(
                     SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
                     JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
@@ -3138,7 +3133,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
             )))
             //There always needs to be a self link
@@ -3156,7 +3151,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
             )))
             //There always needs to be a self link
@@ -3175,14 +3170,14 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 4)
             )))
             // These search results have to be shown in the embedded.objects section:
             // three workflow items and one claimed task.
             // For step 1 one submitted by the user and one submitted by the admin and one for step 2.
             //Seeing as everything fits onto one page, they have to all be present
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 Matchers.allOf(
                     SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
                     JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
@@ -3223,7 +3218,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
             )))
             //There always needs to be a self link
@@ -3286,11 +3281,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results should be an empty list.
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.empty()))
+            .andExpect(jsonPath("$._embedded.objects").doesNotExist())
             //There always needs to be a self link available
             .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/searchresults/search/objects")))
 
@@ -3352,11 +3347,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             //The type has to be 'discover'
             .andExpect(jsonPath("$.type", is("searchresult")))
             //The page object needs to look like this
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntry(0, 20)
             )))
             //The search results should be an empty list.
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+            .andExpect(jsonPath("$._embedded.objects",
                 Matchers.containsInAnyOrder(
                     SearchResultMatcher.matchOnItemName("item", "items", "Private Test item 2"),
                     SearchResultMatcher.matchOnItemName("item", "items", "Withdrawn Test 2")
@@ -3438,10 +3433,10 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
 
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("searchresult")))
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
             )))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.contains(
                 SearchResultMatcher.matchOnItemName("item", "items", "Public Test Item")
             )))
             .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/searchresults/search/objects")));
@@ -3519,10 +3514,10 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
 
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("searchresult")))
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
             )))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.contains(
                 SearchResultMatcher.matchOnItemName("item", "items", "Public Test Item")
             )))
             .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/searchresults/search/objects")));
@@ -3600,10 +3595,10 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
 
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("searchresult")))
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
             )))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+            .andExpect(jsonPath("$._embedded.objects",
                 Matchers.containsInAnyOrder(
                     SearchResultMatcher.matchOnItemName("item", "items", "Public Test Item"),
                     SearchResultMatcher.matchOnItemName("item", "items", "Withdrawn Test Item"),
@@ -3674,10 +3669,10 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
 
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("searchresult")))
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
             )))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+            .andExpect(jsonPath("$._embedded.objects",
                 Matchers.contains(
                     SearchResultMatcher.matchOnItemName("item", "items", "Withdrawn Test Item")
                 )
@@ -3693,10 +3688,10 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
 
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("searchresult")))
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
             )))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+            .andExpect(jsonPath("$._embedded.objects",
                 Matchers.containsInAnyOrder(
                     SearchResultMatcher.matchOnItemName("item", "items", "Public Test Item"),
                     SearchResultMatcher.matchOnItemName("item", "items", "Private Test Item")
@@ -3713,10 +3708,10 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
 
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("searchresult")))
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
             )))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+            .andExpect(jsonPath("$._embedded.objects",
                 Matchers.containsInAnyOrder(
                     SearchResultMatcher.matchOnItemName("item", "items", "Public Test Item"),
                     SearchResultMatcher.matchOnItemName("item", "items", "Withdrawn Test Item")
@@ -3733,10 +3728,10 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
 
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("searchresult")))
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
             )))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+            .andExpect(jsonPath("$._embedded.objects",
                 Matchers.contains(
                     SearchResultMatcher.matchOnItemName("item", "items", "Private Test Item")
                 )
@@ -3805,10 +3800,10 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
 
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("searchresult")))
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
             )))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+            .andExpect(jsonPath("$._embedded.objects",
                 Matchers.contains(
                     SearchResultMatcher.matchOnItemName("item", "items", "Withdrawn Test Item")
                 )
@@ -3824,10 +3819,10 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
 
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("searchresult")))
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
             )))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+            .andExpect(jsonPath("$._embedded.objects",
                 Matchers.containsInAnyOrder(
                     SearchResultMatcher.matchOnItemName("item", "items", "Public Test Item"),
                     SearchResultMatcher.matchOnItemName("item", "items", "Private Test Item")
@@ -3844,10 +3839,10 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
 
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("searchresult")))
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
             )))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+            .andExpect(jsonPath("$._embedded.objects",
                 Matchers.containsInAnyOrder(
                     SearchResultMatcher.matchOnItemName("item", "items", "Public Test Item"),
                     SearchResultMatcher.matchOnItemName("item", "items", "Withdrawn Test Item")
@@ -3864,10 +3859,10 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
 
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("searchresult")))
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
             )))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+            .andExpect(jsonPath("$._embedded.objects",
                 Matchers.contains(
                     SearchResultMatcher.matchOnItemName("item", "items", "Private Test Item")
                 )
@@ -3932,10 +3927,10 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.query", is("Mathematical Theory")))
             .andExpect(jsonPath("$.configuration", is("workflow")))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.contains(
                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks")
             )))
-            .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(1)));
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         getClient(adminToken).perform(get("/api/discover/searchresults/search/objects")
                 .param("configuration", "workflow")
@@ -3944,11 +3939,11 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.query", is("Metaphysics")))
             .andExpect(jsonPath("$.configuration", is("workflow")))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks")
             )))
-            .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+            .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
 
     @Test
@@ -4007,12 +4002,12 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
                 .param("query", ""))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.configuration", is("workflow")))
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks")
             )))
-            .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(3)));
+            .andExpect(jsonPath("$.page.totalElements", is(3)));
     }
 
     @Test
@@ -4211,7 +4206,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
             )))
             //There always needs to be a self link
@@ -4227,7 +4222,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
             )))
             //There always needs to be a self link
@@ -4245,14 +4240,14 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 8)
             )))
             // These search results have to be shown in the embedded.objects section:
             // three workflow items and one claimed task.
             // For step 1 one submitted by the user and one submitted by the admin and one for step 2.
             //Seeing as everything fits onto one page, they have to all be present
-            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.objects", Matchers.containsInAnyOrder(
                 Matchers.allOf(
                     SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
                     JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
@@ -4315,7 +4310,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
             )))
             //There always needs to be a self link
@@ -4367,7 +4362,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
             )))
             //There always needs to be a self link
@@ -4420,7 +4415,7 @@ public class SearchResultRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.type", is("searchresult")))
             //There needs to be a page object that shows the total pages and total elements as well as the
             // size and the current page (number)
-            .andExpect(jsonPath("$._embedded.searchResult.page", is(
+            .andExpect(jsonPath("$.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
             )))
             //There always needs to be a self link
