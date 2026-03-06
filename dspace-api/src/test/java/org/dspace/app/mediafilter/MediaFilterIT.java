@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -31,7 +30,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.ItemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +40,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
 
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected Community topComm1;
     protected Community topComm2;
@@ -135,11 +132,22 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void mediaFilterScriptAllItemsTest() throws Exception {
         performMediaFilterScript(null);
-        Iterator<Item> items = itemService.findAll(context);
-        while (items.hasNext()) {
-            Item item = items.next();
-            checkItemHasBeenProcessed(item);
-        }
+        // Check all items created by this test (not all items in the DB,
+        // as other test classes may leave items without processable bitstreams)
+        checkItemHasBeenProcessed(item1_1_a);
+        checkItemHasBeenProcessed(item1_1_b);
+        checkItemHasBeenProcessed(item1_2_a);
+        checkItemHasBeenProcessed(item1_2_b);
+        checkItemHasBeenProcessed(item1_1_1_a);
+        checkItemHasBeenProcessed(item1_1_1_b);
+        checkItemHasBeenProcessed(item1_1_2_a);
+        checkItemHasBeenProcessed(item1_1_2_b);
+        checkItemHasBeenProcessed(item1_2_1_a);
+        checkItemHasBeenProcessed(item1_2_1_b);
+        checkItemHasBeenProcessed(item1_2_2_a);
+        checkItemHasBeenProcessed(item1_2_2_b);
+        checkItemHasBeenProcessed(item2_1_a);
+        checkItemHasBeenProcessed(item2_1_b);
     }
 
     @Test
