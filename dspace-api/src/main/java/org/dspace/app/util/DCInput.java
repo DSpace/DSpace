@@ -523,7 +523,7 @@ public class DCInput {
      * @return true when there is no type restriction or typeName is allowed
      */
     public boolean isAllowedFor(String typeName) {
-        if (typeBind.isEmpty()) {
+        if (typeName == null || typeName.isBlank() || typeBind.isEmpty()) {
             return true;
         }
 
