@@ -68,7 +68,7 @@ public class MetadataValueMatcher extends TypeSafeMatcher<MetadataValue> {
             Objects.equals(metadataValue.getMetadataField().toString('.'), field) &&
             Objects.equals(metadataValue.getLanguage(), language) &&
             Objects.equals(metadataValue.getAuthority(), authority) &&
-            Objects.equals(metadataValue.getPlace(), place) &&
+            (Objects.isNull(place) || Objects.equals(metadataValue.getPlace(), place)) &&
             Objects.equals(metadataValue.getConfidence(), confidence);
     }
 
@@ -79,6 +79,14 @@ public class MetadataValueMatcher extends TypeSafeMatcher<MetadataValue> {
 
     public static MetadataValueMatcher with(String field, String value) {
         return with(field, value, null, null, 0, -1);
+    }
+
+    public static MetadataValueMatcher withNoPlace(String field, String value) {
+        return with(field, value, null, null, null, -1);
+    }
+
+    public static MetadataValueMatcher withNoPlace(String field, String value, String authority) {
+        return with(field, value, null, authority, null, 600);
     }
 
     public static MetadataValueMatcher with(String field, String value, String authority, int place, int confidence) {

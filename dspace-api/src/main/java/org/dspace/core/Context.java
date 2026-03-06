@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -35,6 +36,7 @@ import org.dspace.event.service.EventService;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
+import org.hibernate.Session;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -475,6 +477,14 @@ public class Context implements AutoCloseable {
         }
     }
 
+    public void clear() {
+        try {
+            ((Session) dbConnection.getSession()).clear();
+            reloadContextBoundEntities();
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
 
     /**
      * Dispatch any events (cached in current Context) to configured EventListeners (consumers)
