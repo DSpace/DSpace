@@ -8,7 +8,6 @@
 package org.dspace.app.rest.exception;
 import java.io.Serial;
 
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.converter;
 
-import tools.jackson.databind.JsonNode;
 import org.dspace.app.rest.model.patch.Patch;
+import tools.jackson.databind.JsonNode;
 
 /**
  * <p>

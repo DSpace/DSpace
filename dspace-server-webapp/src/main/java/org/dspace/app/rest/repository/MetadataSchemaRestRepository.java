@@ -10,13 +10,10 @@ package org.dspace.app.rest.repository;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
-import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -32,8 +29,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-import java.io.IOException;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This is the repository responsible to manage MetadataSchema Rest object

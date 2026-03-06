@@ -8,7 +8,6 @@
 package org.dspace.matomo.client;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.function.BiConsumer;
 

@@ -14,7 +14,6 @@ import static org.dspace.core.Constants.COMMUNITY;
 import static org.dspace.core.Constants.READ;
 
 import java.io.IOException;
-import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,8 +21,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
@@ -57,6 +54,9 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.hateoas.Link;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This is the repository responsible to manage SubscriptionRest object

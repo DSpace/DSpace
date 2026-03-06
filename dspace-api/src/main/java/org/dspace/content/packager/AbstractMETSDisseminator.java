@@ -1371,7 +1371,7 @@ public abstract class AbstractMETSDisseminator
         return """
             * manifestOnly=[boolean]      \
             If true, only export the METS manifest (mets.xml) and don't export content files (defaults to false).
-            
+
             * unauthorized=[value]      \
             If 'skip', skip over any files which the user doesn't have authorization to read. \
             If 'zero', create a zero-length file for any files the user doesn't have authorization to read. \

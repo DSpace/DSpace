@@ -162,7 +162,7 @@ public class RegistryLoader {
                             "Load bitstream format or metadata registries into the database\n",
                             options,
                             """
-                            
+
                             Examples:
                              RegistryLoader -b bitstream-formats.xml
                              RegistryLoader -m dc-types.xml""",

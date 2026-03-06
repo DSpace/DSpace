@@ -17,7 +17,6 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.Filter;
 import jakarta.servlet.http.Cookie;
 import org.apache.commons.lang3.ArrayUtils;
@@ -50,6 +49,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.web.context.WebApplicationContext;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Abstract integration test class that will take care of setting up the Spring Boot environment to run

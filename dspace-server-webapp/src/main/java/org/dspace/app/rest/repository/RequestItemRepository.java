@@ -11,15 +11,12 @@ package org.dspace.app.rest.repository;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
-import tools.jackson.core.JacksonException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.UUID;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -55,6 +52,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.HtmlUtils;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 /**
  * Component to expose item requests and handle operations like create (request), put (grant/deny), and
  * email sending. Support for requested item access by a secure token / link is supported as well as the legacy

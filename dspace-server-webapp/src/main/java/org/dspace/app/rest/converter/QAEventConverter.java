@@ -11,8 +11,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
 import jakarta.annotation.PostConstruct;
 import org.dspace.app.rest.model.CorrectionTypeQAEventMessageRest;
 import org.dspace.app.rest.model.NotifyQAEventMessageRest;
@@ -28,8 +26,9 @@ import org.dspace.qaevent.service.dto.QAMessageDTO;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import java.io.IOException;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Implementation of {@link DSpaceConverter} that converts {@link QAEvent} to

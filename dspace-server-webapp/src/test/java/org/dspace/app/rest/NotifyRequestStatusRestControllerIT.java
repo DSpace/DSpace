@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 
-import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.model.Notification;
@@ -34,6 +33,7 @@ import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 
 /**

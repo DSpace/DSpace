@@ -147,7 +147,7 @@ public class DatabaseUtils {
                         if (!tableExists(connection, flyway.getConfiguration().getTable(), true)) {
                             System.out
                                 .println("""
-                                             
+
                                              NOTE: This database is NOT yet initialized for auto-migrations \
                                              (via Flyway).""");
                             // Determine which version of DSpace this looks like
@@ -159,7 +159,7 @@ public class DatabaseUtils {
                                     "All upgrades *after* version " + dbVersion + " will be run during the next " +
                                         "migration.");
                                 System.out.println("""
-                                                       
+
                                                        If you'd like to upgrade now, simply run 'dspace database \
                                                        migrate'.""");
                             }
@@ -311,12 +311,12 @@ public class DatabaseUtils {
                     if (flyway.getConfiguration().isCleanDisabled()) {
                         System.out.println(
                             """
-                            
+
                             WARNING: 'clean' command is currently disabled, as it is dangerous to run in \
                             Production scenarios!""");
                         System.out.println(
                             """
-                            
+
                             In order to run a 'clean' you first must enable it in your DSpace config by \
                             specifying 'db.cleanDisabled=false'.
                             """);

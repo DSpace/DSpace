@@ -11,7 +11,6 @@ import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 
 import java.sql.SQLException;
 
-import tools.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.repository.BitstreamRestRepository;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.JsonNode;
 
 /**
  * REST controller for handling bulk updates to Bitstream resources.

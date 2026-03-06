@@ -160,15 +160,19 @@ public class SHERPAServiceTest extends AbstractDSpaceTest {
 
         // Assert response has expected publication (metadata) URI
         String expectedSystemMetadataUri = "http://v2.sherpa.ac.uk/id/publication/23803";
-        assertTrue(expectedSystemMetadataUri.equals(response.getMetadata().getUri()), "Response metadata URI did not match expected '" + expectedSystemMetadataUri
-            + "' value");
+        assertTrue(
+            expectedSystemMetadataUri.equals(response.getMetadata().getUri()),
+            "Response metadata URI did not match expected '"
+                + expectedSystemMetadataUri + "' value");
 
         // Assert response has at least one policy
         assertTrue(CollectionUtils.isNotEmpty(response.getJournals().get(0).getPolicies()),
             "Response did not contain at least one archiving policy");
 
         // Assert response has at least one permitted version
-        assertTrue(CollectionUtils.isNotEmpty(response.getJournals().get(0).getPolicies().get(0).getPermittedVersions()),
+        assertTrue(
+            CollectionUtils.isNotEmpty(response.getJournals().get(0)
+                .getPolicies().get(0).getPermittedVersions()),
             "Response did not contain at least one permitted version");
 
         // Assert journal has at least one publisher
@@ -201,17 +205,23 @@ public class SHERPAServiceTest extends AbstractDSpaceTest {
         // Assert response has a publisher with name "Public Library of Science", or fail with message
         String expectedName = "Public Library of Science";
         assertEquals(expectedName,
-            response.getPublishers().get(0).getName(), "Publisher name did not match expected '" + expectedName + "' value");
+            response.getPublishers().get(0).getName(),
+            "Publisher name did not match expected '"
+                + expectedName + "' value");
 
         // Assert response has expected publisher URL
         String expectedUrl = "http://www.plos.org/";
-        assertEquals(expectedUrl, response.getPublishers().get(0).getUri(), "Response metadata URI did not match expected '" + expectedUrl
-            + "' value");
+        assertEquals(expectedUrl,
+            response.getPublishers().get(0).getUri(),
+            "Response metadata URI did not match expected '"
+                + expectedUrl + "' value");
 
         // Assert response has at expected publisher ID
         String expectedId = "112";
         assertEquals(expectedId,
-            response.getPublishers().get(0).getIdentifier(), "Response publisher ID did not match expected ID " + expectedId);
+            response.getPublishers().get(0).getIdentifier(),
+            "Response publisher ID did not match expected ID "
+                + expectedId);
     }
 
     /**

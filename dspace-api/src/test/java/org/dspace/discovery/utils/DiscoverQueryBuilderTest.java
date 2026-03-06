@@ -309,7 +309,9 @@ public class DiscoverQueryBuilderTest {
     @Test
     public void testInvalidSearchFilter2() throws Exception {
         assertThrows(IllegalArgumentException.class, () -> {
-            when(searchService.toFilterQuery(any(Context.class), any(String.class), any(String.class), any(String.class),
+            when(searchService.toFilterQuery(
+                any(Context.class), any(String.class),
+                any(String.class), any(String.class),
                 any(DiscoveryConfiguration.class)))
                 .thenThrow(SQLException.class);
 

@@ -149,12 +149,12 @@ public class UpdateHandlePrefix {
                         System.out.println("Error during re-indexing.");
                         System.out.println(
                             """
-                            
-                            
+
+
                             Automatic re-indexing failed. Please perform it manually.
-                            
+
                               [dspace]/bin/dspace index-discovery -b
-                            
+
                             When launching this command, your servlet container must be running.
                             """
                         );

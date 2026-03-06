@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest;
 
-import static java.util.regex.Pattern.compile;
 import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static java.util.regex.Pattern.compile;
 import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_UUID;
 

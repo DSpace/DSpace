@@ -13,7 +13,6 @@ import static org.dspace.authorize.ResourcePolicy.TYPE_CUSTOM;
 import static org.dspace.authorize.ResourcePolicy.TYPE_INHERITED;
 import static org.dspace.core.Constants.CONTENT_BUNDLE_NAME;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.time.LocalDate;

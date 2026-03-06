@@ -130,7 +130,7 @@ public class CanvasDimensionCLI {
             help.printHelp("CanvasDimension processor\n", options);
             System.out
                 .println("""
-                    
+
                     UUID example:    iiif-canvas-dimensions -e user@email.org \
                     -i 1086306d-8a51-43c3-98b9-c3b00f49105f""");
             System.out
@@ -174,7 +174,7 @@ public class CanvasDimensionCLI {
 
             if (skipIds == null || skipIds.length == 0) {   //display error, since no identifiers specified to skip
                 System.err.println("""
-                    
+
                     ERROR: -s (-skip) option requires at least one identifier to SKIP.
                     Make sure to separate multiple identifiers with a comma!
                     (e.g. -s 123456789/34,123456789/323)

@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
-import tools.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.dspace.app.rest.model.MockObject;
 import org.dspace.app.rest.model.MockObjectRest;
@@ -48,6 +47,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Tests functionality of {@link ConverterService}.
@@ -168,7 +168,8 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
     @Test
     public void toResourceWrongReturnType() {
         assertThrows(ClassCastException.class, () -> {
-            @SuppressWarnings("unused") MockHalResource mockHalResource = converter.toResource(MockObjectRest.create(0));
+            @SuppressWarnings("unused") MockHalResource mockHalResource =
+                converter.toResource(MockObjectRest.create(0));
         });
     }
 
@@ -279,7 +280,8 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
             } else if (value == null) {
                 fail("got null value, but expected a " + expectedClass + " for embed: " + rel);
             } else {
-                assertTrue(expectedClass.isAssignableFrom(value.getClass()), "got a " + value.getClass() + " value, but expected a "
+                assertTrue(expectedClass.isAssignableFrom(value.getClass()),
+                    "got a " + value.getClass() + " value, but expected a "
                         + expectedClass + " for embed: " + rel);
             }
         }

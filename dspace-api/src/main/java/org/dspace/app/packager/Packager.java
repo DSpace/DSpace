@@ -368,7 +368,7 @@ public class Packager {
                 System.out.println("\n\nWARNING -- You are running the packager in REPLACE mode.");
                 System.out.println(
                     """
-                    
+
                     REPLACE mode may be potentially dangerous as it will automatically remove and replace contents\
                      within DSpace.""");
                 System.out.println(

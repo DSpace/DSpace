@@ -16,7 +16,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.UUID;
 
-import tools.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.SiteMatcher;
 import org.dspace.app.rest.model.patch.Operation;
@@ -32,6 +31,7 @@ import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 public class SiteRestRepositoryIT extends AbstractControllerIntegrationTest {
 

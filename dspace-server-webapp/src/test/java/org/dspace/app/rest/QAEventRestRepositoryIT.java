@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import tools.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -69,6 +68,7 @@ import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for {@link QAEventRestRepository}.

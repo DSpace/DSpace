@@ -445,8 +445,9 @@ public class LogicalFilterTest extends AbstractUnitTest {
             condition.setParameters(missingParameters);
             filter.setStatement(condition);
             // Test this updated filter against the first item - expected outcome is false
-            assertFalse(filter.getResult(context, itemOne), "itemOne unexpectedly matched the 'dc.subject contains TEST' test" +
-                "(it has no dc.subject metadata value)");
+            assertFalse(filter.getResult(context, itemOne),
+                "itemOne unexpectedly matched the 'dc.subject contains TEST' test"
+                    + "(it has no dc.subject metadata value)");
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the MetadataValuesMatchCondition filter" + e.getMessage());
@@ -570,14 +571,17 @@ public class LogicalFilterTest extends AbstractUnitTest {
             filter.setStatement(condition);
 
             // Test the filter on itemOne - this item has one THUMBNAIL but zero ORIGINAL bitstreams: expect false
-            assertFalse(filter.getResult(context, itemOne), "itemOne unexpectedly matched the '>=1 and <=2 ORIGINAL bitstreams' test" +
-                    " (it has zero ORIGINAL bitstreams)");
+            assertFalse(filter.getResult(context, itemOne),
+                "itemOne unexpectedly matched the '>=1 and <=2 ORIGINAL bitstreams' test"
+                    + " (it has zero ORIGINAL bitstreams)");
             // Test the filter on itemTwo - this item has two ORIGINAL bitstreams: expect true
-            assertTrue(filter.getResult(context, itemTwo), "itemTwo unexpectedly did NOT match the '>=1 and <=2 ORIGINAL bitstreams' test" +
-                    " (it has 2 ORIGINAL bitstreams)");
+            assertTrue(filter.getResult(context, itemTwo),
+                "itemTwo unexpectedly did NOT match the '>=1 and <=2 ORIGINAL bitstreams' test"
+                    + " (it has 2 ORIGINAL bitstreams)");
             // Test the filter on itemTwo - this item has three ORIGINAL bitstreams: expect false
-            assertFalse(filter.getResult(context, itemThree), "itemThree unexpectedly did NOT match the '>=1 and <=2 ORIGINAL bitstreams' test" +
-                " (it has 3 ORIGINAL bitstreams)");
+            assertFalse(filter.getResult(context, itemThree),
+                "itemThree unexpectedly did NOT match the '>=1 and <=2 ORIGINAL bitstreams' test"
+                    + " (it has 3 ORIGINAL bitstreams)");
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the IsWithdrawnCondition filter: " + e.getMessage());

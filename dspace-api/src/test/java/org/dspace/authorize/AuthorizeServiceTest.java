@@ -95,9 +95,11 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
 
         try {
             // eperson1 should be able to write as it is a member of a group that has write permissions
-            Assertions.assertTrue(authorizeService.authorizeActionBoolean(context, eperson1, dso, Constants.WRITE, true));
+            Assertions.assertTrue(authorizeService.authorizeActionBoolean(
+                context, eperson1, dso, Constants.WRITE, true));
             // person2 shouldn't have write access
-            Assertions.assertFalse(authorizeService.authorizeActionBoolean(context, eperson2, dso, Constants.WRITE, true));
+            Assertions.assertFalse(authorizeService.authorizeActionBoolean(
+                context, eperson2, dso, Constants.WRITE, true));
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
@@ -216,7 +218,8 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
             Assertions.assertEquals(0,
                     newCustomPolicies.size(), "Bundle should not inherit custom policy from item, if false passed");
             Assertions.assertEquals(ResourcePolicy.TYPE_INHERITED,
-                    newInheritedPolicies.get(0).getRpType(), "Bundle should inherit non-custom, non-admin policies as usual");
+                    newInheritedPolicies.get(0).getRpType(),
+                    "Bundle should inherit non-custom, non-admin policies as usual");
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {

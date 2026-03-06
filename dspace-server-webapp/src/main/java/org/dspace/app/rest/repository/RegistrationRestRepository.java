@@ -10,10 +10,8 @@ package org.dspace.app.rest.repository;
 import static org.dspace.eperson.service.CaptchaService.REGISTER_ACTION;
 
 import java.io.IOException;
-import tools.jackson.core.JacksonException;
 import java.sql.SQLException;
 
-import tools.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,6 +51,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This is the repository that is responsible for managing Registration Rest objects

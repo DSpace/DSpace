@@ -7,10 +7,10 @@
  */
 package org.dspace.app.rest.model.patch;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nonnull;
 import org.springframework.data.rest.webmvc.json.patch.PatchException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * {@link LateObjectEvaluator} implementation that assumes values represented as JSON objects.

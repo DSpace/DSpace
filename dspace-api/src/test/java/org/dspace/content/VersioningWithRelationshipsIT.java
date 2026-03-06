@@ -3370,8 +3370,12 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
     }
 
     protected void verifySolrField(Item item, String fieldName, List<Object> expectedValues) throws Exception {
-        QueryResponse result = solrSearchCore.getSolr().query(new SolrQuery("search.resourcetype:\"Item\" AND search.resourceid:\"%s\"".formatted(item.getID()
-        )));
+        QueryResponse result = solrSearchCore.getSolr().query(
+            new SolrQuery(
+                ("search.resourcetype:\"Item\" AND"
+                    + " search.resourceid:\"%s\"")
+                    .formatted(item.getID())
+            ));
 
         SolrDocumentList docs = result.getResults();
         Assertions.assertEquals(1, docs.size());

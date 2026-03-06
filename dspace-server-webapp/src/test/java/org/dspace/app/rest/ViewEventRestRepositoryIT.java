@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.InputStream;
 import java.util.UUID;
 
-import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.request.SolrQuery;
@@ -37,6 +36,7 @@ import org.dspace.statistics.SolrStatisticsCore;
 import org.dspace.utils.DSpace;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 public class ViewEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 

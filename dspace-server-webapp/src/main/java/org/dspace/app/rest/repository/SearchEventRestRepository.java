@@ -8,9 +8,7 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
-import tools.jackson.core.JacksonException;
 
-import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.Strings;
@@ -25,6 +23,8 @@ import org.dspace.services.EventService;
 import org.dspace.usage.UsageSearchEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @Component(SearchEventRest.CATEGORY + "." + SearchEventRest.PLURAL_NAME)
 public class SearchEventRestRepository extends AbstractDSpaceRestRepository {

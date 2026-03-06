@@ -151,7 +151,7 @@ public class XSLTDisseminationCrosswalk
             LOG.warn("""
                          Possible INVALID schemaLocation (no space found) for crosswalk={},\
                           key={}schemaLocation
-                         	Correct format is "{namespace} {schema-URL}"\
+                             Correct format is "{namespace} {schema-URL}"\
                          """,
                     myAlias, prefix);
         }

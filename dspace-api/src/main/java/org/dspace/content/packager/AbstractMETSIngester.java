@@ -1366,18 +1366,18 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             flag). \
             If false, the ingester attempts to restore the Handles specified in the METS manifest (this is the \
             default when running in Restore/replace mode, using the -r flag).\s
-            
+
             * ignoreParent=[boolean]      \
             If true, the ingester will ignore any Parent object specified in the METS manifest itself, and instead \
             ingest under a new Parent object (this is the default when running in Submit mode, using the -s flag). \
             The new Parent object must be specified via the -p flag. \
             If false, the ingester attempts to restore the object directly under its old Parent (this is the default\
              when running in Restore/replace mode, using the -r flag).\s
-            
+
             * manifestOnly=[boolean]      \
             Specify true if the ingest package consists of just a METS manifest (mets.xml), without any content \
             files (defaults to false).
-            
+
             * validate=[boolean]      \
             If true, enable XML validation of METS file using schemas in document (default is true).""";
     }

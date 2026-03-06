@@ -9,7 +9,6 @@ package org.dspace.app.rest.model;
 
 import java.io.Serial;
 
-
 import org.dspace.app.rest.RestResourceController;
 
 /**

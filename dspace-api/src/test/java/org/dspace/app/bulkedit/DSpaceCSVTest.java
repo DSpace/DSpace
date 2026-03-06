@@ -51,7 +51,7 @@ public class DSpaceCSVTest extends AbstractUnitTest {
                 "+,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,\"Two line\n\ntitle\",\"Lewis, Stuart\",abstract",
                 """
                 +,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,"Empty lines
-                
+
                 should work too (DS-3245).","Lewis, \
                 Stuart",abstract""",
                 """

@@ -250,7 +250,9 @@ public class RequestItemTest extends AbstractUnitTest {
                 .build();
 
             // Try to authorize access to different bitstream
-            requestItemService.authorizeAccessByAccessToken(context, request, otherBitstream, request.getAccess_token());
+            requestItemService.authorizeAccessByAccessToken(
+                context, request, otherBitstream,
+                request.getAccess_token());
         });
     }
 
@@ -273,7 +275,9 @@ public class RequestItemTest extends AbstractUnitTest {
                 .build();
 
             // Try to access different bitstream when allfiles=false
-            requestItemService.authorizeAccessByAccessToken(context, request, otherBitstream, request.getAccess_token());
+            requestItemService.authorizeAccessByAccessToken(
+                context, request, otherBitstream,
+                request.getAccess_token());
         });
     }
 

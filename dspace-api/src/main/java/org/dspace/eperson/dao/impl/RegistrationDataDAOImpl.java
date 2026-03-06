@@ -10,9 +10,7 @@ package org.dspace.eperson.dao.impl;
 import java.sql.SQLException;
 import java.time.Instant;
 
-import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.dspace.core.AbstractHibernateDAO;

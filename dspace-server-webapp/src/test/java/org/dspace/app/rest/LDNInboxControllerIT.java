@@ -22,7 +22,6 @@ import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.List;
 
-import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.ldn.LDNMessageEntity;
@@ -56,6 +55,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import tools.jackson.databind.ObjectMapper;
 
 
 /**

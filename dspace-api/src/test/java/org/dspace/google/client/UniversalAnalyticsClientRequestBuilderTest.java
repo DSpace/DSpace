@@ -59,7 +59,8 @@ public class UniversalAnalyticsClientRequestBuilderTest {
             "/api/documents/123", "Test publication");
 
         assertThrows(IllegalArgumentException.class,
-            () -> requestBuilder.composeRequestsBody("G-12345", List.of(event)), "Only keys with G- prefix are supported");
+            () -> requestBuilder.composeRequestsBody("G-12345", List.of(event)),
+            "Only keys with G- prefix are supported");
 
     }
 

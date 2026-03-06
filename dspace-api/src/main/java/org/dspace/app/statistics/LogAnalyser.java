@@ -1262,42 +1262,42 @@ public class LogAnalyser {
             Usage Information:
             LogAnalyser [options [parameters]]
             -log [log directory]
-            	Optional
-            	Specify a directory containing log files
-            	Default uses [dspace.dir]/log from dspace.cfg
+                Optional
+                Specify a directory containing log files
+                Default uses [dspace.dir]/log from dspace.cfg
             -file [file name regex]
-            	Optional
-            	Specify a regular expression as the file name template.
-            	Currently this needs to be correctly escaped for Java string handling (FIXME)
-            	Default uses dspace.log*
+                Optional
+                Specify a regular expression as the file name template.
+                Currently this needs to be correctly escaped for Java string handling (FIXME)
+                Default uses dspace.log*
             -cfg [config file path]
-            	Optional
-            	Specify a config file to be used
-            	Default uses dstat.cfg in dspace config directory
+                Optional
+                Specify a config file to be used
+                Default uses dstat.cfg in dspace config directory
             -out [output file path]
-            	Optional
-            	Specify an output file to write results into
-            	Default uses dstat.dat in dspace log directory
+                Optional
+                Specify an output file to write results into
+                Default uses dstat.dat in dspace log directory
             -start [YYYY-MM-DD]
-            	Optional
-            	Specify the start date of the analysis
-            	If a start date is specified then no attempt to gather\s
-            	current database statistics will be made unless -lookup is
-            	also passed
-            	Default is to start from the earliest date records exist for
+                Optional
+                Specify the start date of the analysis
+                If a start date is specified then no attempt to gather\s
+                current database statistics will be made unless -lookup is
+                also passed
+                Default is to start from the earliest date records exist for
             -end [YYYY-MM-DD]
-            	Optional
-            	Specify the end date of the analysis
-            	If an end date is specified then no attempt to gather\s
-            	current database statistics will be made unless -lookup is
-            	also passed
-            	Default is to work up to the last date records exist for
+                Optional
+                Specify the end date of the analysis
+                If an end date is specified then no attempt to gather\s
+                current database statistics will be made unless -lookup is
+                also passed
+                Default is to work up to the last date records exist for
             -lookup
-            	Optional
-            	Force a lookup of the current database statistics
-            	Only needs to be used if date constraints are also in place
+                Optional
+                Force a lookup of the current database statistics
+                Only needs to be used if date constraints are also in place
             -help
-            	display this usage information
+                display this usage information
             """;
 
         System.out.println(usage);

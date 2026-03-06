@@ -186,7 +186,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
             ReflectionTestUtils.setField(workspaceItemService, "authorizeService", originalAuthorizeService);
             ReflectionTestUtils.setField(bundleService, "authorizeService", originalAuthorizeService);
             ReflectionTestUtils.setField(bitstreamService, "authorizeService", originalAuthorizeService);
-            ReflectionTestUtils.setField(AuthorizeServiceFactory.getInstance(), "authorizeService", originalAuthorizeService);
+            ReflectionTestUtils.setField(AuthorizeServiceFactory.getInstance(),
+                "authorizeService", originalAuthorizeService);
         }
 
         try {

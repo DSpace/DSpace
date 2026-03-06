@@ -303,7 +303,8 @@ public class OrcidClientImpl implements OrcidClient {
      * @return                      the response body
      * @throws OrcidClientException if the incoming response is not successful
      */
-    private <T> T executeAndUnmarshall(ClassicHttpRequest httpUriRequest, boolean handleNotFoundAsNull, Class<T> clazz) {
+    private <T> T executeAndUnmarshall(ClassicHttpRequest httpUriRequest,
+        boolean handleNotFoundAsNull, Class<T> clazz) {
         try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
             return executeAndReturns(() -> {
                 CloseableHttpResponse response = client.execute(httpUriRequest);
@@ -367,7 +368,9 @@ public class OrcidClientImpl implements OrcidClient {
 
     private HttpEntity convertToEntity(Object object) {
         try {
-            return new StringEntity(marshall(object), ContentType.create("application/vnd.orcid+xml", StandardCharsets.UTF_8));
+            return new StringEntity(marshall(object),
+                ContentType.create("application/vnd.orcid+xml",
+                    StandardCharsets.UTF_8));
         } catch (JAXBException ex) {
             throw new IllegalArgumentException("The given object cannot be sent to ORCID", ex);
         }

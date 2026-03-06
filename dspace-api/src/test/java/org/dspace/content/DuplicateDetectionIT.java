@@ -233,8 +233,9 @@ public class DuplicateDetectionIT extends AbstractIntegrationTestWithDatabase {
 
         // Make sure result list is size 1
         int size = 1;
-        assertEquals(size,
-                potentialDuplicates.size(), "Potential duplicates of item4 (special characters) should have size " + size);
+        assertEquals(size, potentialDuplicates.size(),
+            "Potential duplicates of item4 (special characters)"
+                + " should have size " + size);
 
         // The only member should be item 5
         assertEquals(item5.getID(),
@@ -289,7 +290,9 @@ public class DuplicateDetectionIT extends AbstractIntegrationTestWithDatabase {
 
         // The only member should be item 5
         assertEquals(item7.getID(),
-                potentialDuplicates.get(0).getUuid(), "Item 7's long title should match Item 6 as a potential duplicate");
+            potentialDuplicates.get(0).getUuid(),
+            "Item 7's long title should match Item 6"
+                + " as a potential duplicate");
 
     }
 

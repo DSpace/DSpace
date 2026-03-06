@@ -36,7 +36,6 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
-import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.matcher.RegistrationMatcher;
@@ -66,6 +65,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationTest {
 

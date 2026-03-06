@@ -8,7 +8,6 @@
 package org.dspace.app.rest.model;
 import java.io.Serial;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
 

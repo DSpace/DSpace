@@ -57,7 +57,7 @@ public class LoadLastLogin {
         throws IOException, SQLException, AuthorizeException {
         final String USAGE = """
             LoadLastLogin [options] path...path
-            
+
             'path's are paths to DSpace log files""";
 
         final String loginRE =

@@ -7,7 +7,6 @@
  */
 package org.dspace.util;
 
-import java.io.IOException;
 import java.time.LocalDate;
 
 import tools.jackson.core.JacksonException;

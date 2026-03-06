@@ -738,7 +738,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testAddItemNoAuth() throws Exception {
         assertThrows(AuthorizeException.class, () -> {
             // Disallow Collection ADD perms
-            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy)
+                .authorizeAction(context, collection, Constants.ADD);
 
             // create item first
             context.turnOffAuthorisationSystem();
@@ -1316,20 +1317,25 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         List<Collection> personACollectionsAdminCommA =
             collectionService.findAuthorized(context, null, List.of(Constants.ADD, Constants.ADMIN));
         assertTrue(personACollectionsAdminCommA.size() == 4, "testFindAuthorizedEPersonCommunityAdmin A");
-        assertTrue(personACollectionsAdminCommA
-            .containsAll(List.of(collectionA1, collectionD1, collectionC1, collectionC2)), "testFindAuthorizedEPersonCommunityAdmin A.A");
-        assertFalse(personACollectionsAdminCommA
-            .containsAll(List.of(collectionE1, collectionE2)), "testFindAuthorizedEPersonCommunityAdmin A.B");
+        assertTrue(personACollectionsAdminCommA.containsAll(
+            List.of(collectionA1, collectionD1, collectionC1,
+                collectionC2)),
+            "testFindAuthorizedEPersonCommunityAdmin A.A");
+        assertFalse(personACollectionsAdminCommA.containsAll(
+            List.of(collectionE1, collectionE2)),
+            "testFindAuthorizedEPersonCommunityAdmin A.B");
 
         //PersonB Can get AllCollection From Top to Bottom com ComE, but not from ComA
         context.setCurrentUser(epersonB);
         List<Collection> personACollectionsAdminCommE =
             collectionService.findAuthorized(context, null, List.of(Constants.ADD, Constants.ADMIN));
         assertTrue(personACollectionsAdminCommE.size() == 3, "testFindAuthorizedEPersonCommunityAdmin B");
-        assertFalse(personACollectionsAdminCommE
-            .containsAll(List.of(collectionA1, collectionC1, collectionC2)), "testFindAuthorizedEPersonCommunityAdmin B.A");
-        assertTrue(personACollectionsAdminCommE
-            .containsAll(List.of(collectionD1, collectionE1, collectionE2)), "testFindAuthorizedEPersonCommunityAdmin B.B");
+        assertFalse(personACollectionsAdminCommE.containsAll(
+            List.of(collectionA1, collectionC1, collectionC2)),
+            "testFindAuthorizedEPersonCommunityAdmin B.A");
+        assertTrue(personACollectionsAdminCommE.containsAll(
+            List.of(collectionD1, collectionE1, collectionE2)),
+            "testFindAuthorizedEPersonCommunityAdmin B.B");
     }
 
     /**

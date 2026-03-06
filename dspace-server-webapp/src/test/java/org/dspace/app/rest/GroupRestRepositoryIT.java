@@ -34,7 +34,6 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import tools.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
 import org.dspace.app.rest.exception.GroupNameNotProvidedException;
 import org.dspace.app.rest.matcher.EPersonMatcher;
@@ -70,6 +69,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Jonas Van Goolen - (jonas@atmire.com)

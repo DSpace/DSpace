@@ -7,7 +7,6 @@
  */
 package org.dspace.util;
 
-import java.io.IOException;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;

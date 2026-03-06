@@ -111,11 +111,14 @@ public class SHERPAService {
         while (numberOfTries < maxNumberOfTries && sherpaResponse == null) {
             numberOfTries++;
 
-            log.debug("Trying to contact SHERPA/RoMEO - attempt %d of %d; timeout is %d; sleep between timeouts is %d".formatted(
-                numberOfTries,
-                maxNumberOfTries,
-                timeout,
-                sleepBetweenTimeouts));
+            log.debug(
+                ("Trying to contact SHERPA/RoMEO - attempt %d of %d;"
+                    + " timeout is %d; sleep between timeouts is %d")
+                    .formatted(
+                        numberOfTries,
+                        maxNumberOfTries,
+                        timeout,
+                        sleepBetweenTimeouts));
 
             try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5)) {
                 Thread.sleep(sleepBetweenTimeouts);
@@ -214,11 +217,14 @@ public class SHERPAService {
         while (numberOfTries < maxNumberOfTries && sherpaResponse == null) {
             numberOfTries++;
 
-            log.debug("Trying to contact SHERPA/RoMEO - attempt %d of %d; timeout is %d; sleep between timeouts is %d".formatted(
-                numberOfTries,
-                maxNumberOfTries,
-                timeout,
-                sleepBetweenTimeouts));
+            log.debug(
+                ("Trying to contact SHERPA/RoMEO - attempt %d of %d;"
+                    + " timeout is %d; sleep between timeouts is %d")
+                    .formatted(
+                        numberOfTries,
+                        maxNumberOfTries,
+                        timeout,
+                        sleepBetweenTimeouts));
 
             try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5)) {
                 Thread.sleep(sleepBetweenTimeouts);

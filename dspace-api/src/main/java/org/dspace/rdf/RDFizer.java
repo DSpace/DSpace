@@ -523,8 +523,8 @@ public class RDFizer {
         if (line.hasOption("delete") && line.hasOption("delete-all")) {
             usage(options);
             System.err.println("""
-                                   
-                                   
+
+
                                    You cannot use the options --delete <handle> \
                                    and --delete-all together.""");
             System.exit(1);
@@ -534,8 +534,8 @@ public class RDFizer {
             && (line.hasOption("delete") || line.hasOption("delete-all"))) {
             usage(options);
             System.err.println("""
-                                   
-                                   
+
+
                                    You cannot use the option --convert-all \
                                    together with --delete or --delete-all.""");
             System.exit(1);
@@ -544,8 +544,8 @@ public class RDFizer {
             && (line.hasOption("delete") || line.hasOption("delete-all"))) {
             usage(options);
             System.err.println("""
-                                   
-                                   
+
+
                                    You cannot use the option --identifiers <handle> \
                                    together with --delete or --delete-all.""");
             System.exit(1);
@@ -554,8 +554,8 @@ public class RDFizer {
             && (line.hasOption("delete") || line.hasOption("delete-all"))) {
             usage(options);
             System.err.println("""
-                                   
-                                   
+
+
                                    You cannot use the option --stdout together \
                                    with --delete or --deleta-all.""");
             System.exit(1);
@@ -763,7 +763,7 @@ public class RDFizer {
         String cliSyntax = "[dspace-bin]/bin/dspace rdfizer [OPTIONS...]";
         String header = "";
         String footer = """
-            
+
             You cannot use the options --convert-all, --identifiers \
             or --stdout together with --delete or --delete-all.
             Please use at least one option out of --convert-all, --delete, \

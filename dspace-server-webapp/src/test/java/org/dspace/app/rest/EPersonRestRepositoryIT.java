@@ -47,7 +47,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import tools.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.exception.EPersonNameNotProvidedException;
@@ -90,6 +89,7 @@ import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 

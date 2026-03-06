@@ -17,8 +17,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
@@ -107,29 +107,29 @@ public class PubmedImportMetadataSourceServiceIT extends AbstractLiveImportInteg
                 described in the literature in the context of advanced clinical practice and promote new \
                 areas of research to improve the pedagogical approach to clinical reasoning in Advanced \
                 Practice Nursing.
-                
+
                 BACKGROUND: Clinical reasoning and clinical thinking are essential \
                 elements in the advanced nursing clinical practice decision-making process. The quality \
                 improvement of care is related to the development of those skills. Therefore, it is crucial \
                 to optimize teaching strategies that can enhance the role of clinical reasoning in advanced \
                 clinical practice.
-                
+
                 DESIGN: A scoping review was conducted using the framework developed \
                 by Arksey and O'Malley as a research strategy. Consistent with the nature of scoping reviews\
                 , a study protocol has been established.
-                
+
                 METHODS: The studies included and analyzed in \
                 this scoping review cover from January 2016 to June 2022. Primary studies and secondary \
                 revision studies, published in biomedical databases, were selected, including qualitative \
                 ones. Electronic databases used were: CINAHL, PubMed, Cochrane Library, Scopus, and OVID. \
                 Three authors independently evaluated the articles for titles, abstracts, and full text.
-                
+
                 RESULTS: 1433 articles were examined, applying the eligibility and exclusion criteria 73 \
                 studies were assessed for eligibility, and 27 were included in the scoping review. The \
                 results that emerged from the review were interpreted and grouped into three macro \
                 strategies (simulations-based education, art and visual thinking, and other learning \
                 approaches) and nineteen educational interventions.
-                
+
                 CONCLUSIONS: Among the different \
                 strategies, the simulations are the most used. Despite this, our scoping review reveals \
                 that is necessary to use different teaching strategies to stimulate critical thinking, \
@@ -138,9 +138,9 @@ public class PubmedImportMetadataSourceServiceIT extends AbstractLiveImportInteg
                 the learning outcomes necessary to acquire an adequate level of judgment and critical \
                 thinking. Therefore, it will be necessary to relate teaching methodologies with the skills \
                 developed.
-                
+
                 An unlabeled section of an abstract.
-                
+
                 An abstract section with no attributes\
                  at all, concerning.""");
         MetadatumDTO identifierOther = createMetadatumDTO("dc", "identifier", "other", "36708638");

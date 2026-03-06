@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import tools.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.model.PageRest;
 import org.dspace.app.rest.model.SearchEventRest;
 import org.dspace.app.rest.model.SearchResultsRest;
@@ -28,6 +27,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 public class SearchEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 

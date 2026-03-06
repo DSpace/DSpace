@@ -9,7 +9,6 @@ package org.dspace.app.rest.exception;
 
 import java.io.Serial;
 
-
 import org.dspace.core.I18nUtil;
 
 /**

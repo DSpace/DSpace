@@ -636,7 +636,8 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         // Assert the restored policy has same name, group and permission settings
         ResourcePolicy restoredPolicy = policiesRestored.get(0);
         assertEquals(policy.getGroup().getName(),
-                     restoredPolicy.getGroup().getName(), "testRestoreRestrictedCollection() restored policy group successfully");
+                     restoredPolicy.getGroup().getName(),
+                     "testRestoreRestrictedCollection() restored policy group successfully");
         assertEquals(policy.getAction(), restoredPolicy.getAction(),
                      "testRestoreRestrictedCollection() restored policy action successfully");
         assertEquals(policy.getRpName(), restoredPolicy.getRpName(),
@@ -679,7 +680,9 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
         // Assert the item count is one less
         assertEquals(numberOfItems - 1,
-                     itemService.countItems(context, testCollection), "testReplaceCollectionHierarchy() updated item count for collection " + testCollectionHandle);
+                     itemService.countItems(context, testCollection),
+                     "testReplaceCollectionHierarchy() updated item count for collection "
+                         + testCollectionHandle);
 
         // Replace Collection (and all child objects, recursively) from AIPs
         log.info("testReplaceCollectionHierarchy() - REPLACE Collection Hierarchy");
@@ -692,7 +695,9 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
         // Assert the Item count is same as before
         assertEquals(numberOfItems,
-                     itemService.countItems(context, testCollection), "testReplaceCollectionHierarchy() restored item count for collection " + testCollectionHandle);
+                     itemService.countItems(context, testCollection),
+                     "testReplaceCollectionHierarchy() restored item count for collection "
+                         + testCollectionHandle);
 
         log.info("testReplaceCollectionHierarchy() - END");
     }
@@ -856,7 +861,8 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         // Assert the restored policy has same name, group and permission settings
         ResourcePolicy restoredPolicy = policiesRestored.get(0);
         assertEquals(admin_policy.getGroup().getName(),
-                     restoredPolicy.getGroup().getName(), "testRestoreRestrictedItem() restored policy group successfully");
+                     restoredPolicy.getGroup().getName(),
+                     "testRestoreRestrictedItem() restored policy group successfully");
         assertEquals(admin_policy.getAction(), restoredPolicy.getAction(),
                      "testRestoreRestrictedItem() restored policy action successfully");
         assertEquals(admin_policy.getRpName(), restoredPolicy.getRpName(),

@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import tools.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.matcher.MetadataFieldMatcher;
 import org.dspace.app.rest.model.MetadataFieldRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -42,6 +41,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for the {@link org.dspace.app.rest.repository.MetadataFieldRestRepository}

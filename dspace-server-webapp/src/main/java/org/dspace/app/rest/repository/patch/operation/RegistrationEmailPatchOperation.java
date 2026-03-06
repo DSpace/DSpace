@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Optional;
 
-import tools.jackson.databind.JsonNode;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.JsonValueEvaluator;
@@ -25,6 +24,7 @@ import org.dspace.eperson.dto.RegistrationDataPatch;
 import org.dspace.eperson.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Implementation for RegistrationData email patches.

@@ -814,23 +814,23 @@ public class ReportGenerator {
             Usage Information:
             ReportGenerator [options [parameters]]
             -format [output format]
-            	Required
-            	Specify the format that you would like the output in
-            	Options:
-            		html
+                Required
+                Specify the format that you would like the output in
+                Options:
+                    html
             -in [aggregation file]
-            	Required
-            	Specify the aggregation data file to display
+                Required
+                Specify the aggregation data file to display
             -out [output file]
-            	Optional
-            	Specify the file to output the report to
-            	Default uses [dspace log directory]/report
+                Optional
+                Specify the file to output the report to
+                Default uses [dspace log directory]/report
             -map [map file]
-            	Optional
-            	Specify the map file to translate log file actions into human readable actions
-            	Default uses [dspace config directory]/dstat.map
+                Optional
+                Specify the map file to translate log file actions into human readable actions
+                Default uses [dspace config directory]/dstat.map
             -help
-            	display this usage information
+                display this usage information
             """;
 
         System.out.println(usage);

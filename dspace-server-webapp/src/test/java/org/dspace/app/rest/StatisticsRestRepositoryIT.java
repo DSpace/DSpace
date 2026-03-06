@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-import tools.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.matcher.UsageReportMatcher;
 import org.dspace.app.rest.model.UsageReportPointCityRest;
@@ -64,6 +63,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Integration test to test the /api/statistics/usagereports/ endpoints, see {@link UsageReportUtils} and

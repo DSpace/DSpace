@@ -145,7 +145,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
             ReflectionTestUtils.setField(communityService, "authorizeService", originalAuthorizeService);
             ReflectionTestUtils.setField(collectionService, "authorizeService", originalAuthorizeService);
             ReflectionTestUtils.setField(itemService, "authorizeService", originalAuthorizeService);
-            ReflectionTestUtils.setField(AuthorizeServiceFactory.getInstance(), "authorizeService", originalAuthorizeService);
+            ReflectionTestUtils.setField(AuthorizeServiceFactory.getInstance(),
+                "authorizeService", originalAuthorizeService);
         }
 
         super.destroy();

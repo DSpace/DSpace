@@ -20,7 +20,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import tools.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.MetadataSchemaConverter;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.MetadataschemaMatcher;
@@ -33,6 +32,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for the {@link org.dspace.app.rest.repository.MetadataSchemaRestRepository}

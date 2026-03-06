@@ -581,8 +581,12 @@ public class SolrImportExport {
                                      makeExportFilename(indexName, monthStartDate, docsThisMonth, i));
                 if (file.createNewFile() || overwrite) {
                     FileUtils.copyURLToFile(url, file);
-                    String message = "Solr export to file [%s] complete.  Export for Index [%s] Month [%s] Batch [%d] Num Docs [%d]".formatted(
-                        file.getCanonicalPath(), indexName, monthStart, i, docsThisMonth);
+                    String message =
+                        ("Solr export to file [%s] complete.  Export for"
+                            + " Index [%s] Month [%s] Batch [%d]"
+                            + " Num Docs [%d]").formatted(
+                            file.getCanonicalPath(), indexName,
+                            monthStart, i, docsThisMonth);
                     log.info(message);
                 } else if (file.exists()) {
                     String message = String.format(
