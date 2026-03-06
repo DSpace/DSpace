@@ -8,25 +8,24 @@
 package org.dspace.app.rest.converter;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.query.SearchQueryConverter;
-import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverResult;
-import org.dspace.discovery.IndexableObject;
-import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,59 +37,33 @@ public class DiscoverResultConverter {
     private static final Logger log = LogManager.getLogger();
 
     @Autowired
-    private List<IndexableObjectConverter> converters;
+    protected ConverterService converter;
 
     @Autowired
-    protected ConverterService converter;
+    protected Utils utils;
 
     @Autowired
     private SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter;
 
+    @Autowired
+    private PagedResourcesAssembler pageAssembler;
+
     public SearchResultsRest convert(final Context context, final String query, final List<String> dsoTypes,
                                      final String configurationName, final String scope,
                                      final List<SearchFilter> searchFilters, final Pageable page,
-                                     final DiscoverResult searchResult, final DiscoveryConfiguration configuration,
-                                     final Projection projection) {
+                                     final DiscoverResult searchResult, final Projection projection) {
+        List<DiscoverResult.IndexableObjectHighlightResult> results = searchResult.getAllHighlightedResults();
+        Page<SearchResultEntryRest> entries = converter.toRestPage(results, page, searchResult.getTotalSearchResults(),
+            utils.obtainProjection());
+        PagedModel<SearchResultEntryRest> pagedModel = pageAssembler
+            .toModel(entries.map((entry) -> converter.toResource(entry)));
 
-        SearchResultsRest resultsRest = new SearchResultsRest();
+        SearchResultsRest resultsRest = new SearchResultsRest(pagedModel);
         resultsRest.setProjection(projection);
 
         setRequestInformation(context, query, dsoTypes, configurationName, scope, searchFilters, page, resultsRest);
 
-        addSearchResults(searchResult, resultsRest, projection);
-
-        resultsRest.setTotalNumberOfResults(searchResult.getTotalSearchResults());
-        resultsRest.setPage(page);
-
         return resultsRest;
-    }
-
-    private void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest,
-                                  final Projection projection) {
-        for (IndexableObject dspaceObject : CollectionUtils.emptyIfNull(searchResult.getIndexableObjects())) {
-            SearchResultEntryRest resultEntry = new SearchResultEntryRest();
-            resultEntry.setProjection(projection);
-
-            //Convert the DSpace Object to its REST model
-            resultEntry.setIndexableObject(convertDSpaceObject(dspaceObject, projection));
-
-            //Add hit highlighting for this DSO if present
-            DiscoverResult.IndexableObjectHighlightResult highlightedResults = searchResult
-                .getHighlightedResults(dspaceObject);
-            if (highlightedResults != null && MapUtils.isNotEmpty(highlightedResults.getHighlightResults())) {
-                for (Map.Entry<String, List<String>> metadataHighlight : highlightedResults.getHighlightResults()
-                                                                                           .entrySet()) {
-                    resultEntry.addHitHighlights(metadataHighlight.getKey(), metadataHighlight.getValue());
-                }
-            }
-
-            resultsRest.addSearchResult(resultEntry);
-        }
-    }
-
-    private RestAddressableModel convertDSpaceObject(final IndexableObject indexableObject,
-                                                     final Projection projection) {
-        return converter.toRest(indexableObject.getIndexedObject(), projection);
     }
 
     private void setRequestInformation(final Context context, final String query, final List<String> dsoTypes,

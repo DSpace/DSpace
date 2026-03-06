@@ -101,7 +101,7 @@ public class SearchResultsRestRepository extends DSpaceRestRepository<SearchResu
 
         return discoverResultConverter
             .convert(context, query, dsoTypes, configuration, scope, searchFilters, page, searchResult,
-                discoveryConfiguration, utils.obtainProjection());
+                utils.obtainProjection());
     }
 
     @Override
