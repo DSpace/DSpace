@@ -14,10 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -71,6 +74,9 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
     @Autowired(required = true)
     protected ConfigurationService configurationService;
 
+    @Autowired(required = true)
+    protected GroupService groupService;
+
     protected MetadataExposureServiceImpl() {
 
     }
@@ -98,8 +104,31 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
         }
 
         if (hidden && context != null) {
-            // the administrator's override
+            // administrator's override: admins can always see hidden fields
             hidden = !authorizeService.isAdmin(context);
+        }
+
+        if (hidden && context != null) {
+            // Group-based override: resolve which groups list to use.
+            // Per-field key (metadata.hide.schema.element[.qualifier].groups) takes
+            // precedence over the global key (metadata.hide.groups).
+            // If neither is set the field remains hidden for non-admins.
+            String perFieldKey = CONFIG_PREFIX + schema + "." + element
+                    + (qualifier != null ? "." + qualifier : "") + ".groups";
+            String groupsConfig = configurationService.getProperty(perFieldKey);
+            if (StringUtils.isBlank(groupsConfig)) {
+                groupsConfig = configurationService.getProperty("metadata.hide.groups");
+            }
+            if (StringUtils.isNotBlank(groupsConfig)) {
+                for (String groupName : groupsConfig.split(",")) {
+                    String trimmedGroupName = groupName.trim();
+                    if (StringUtils.isNotBlank(trimmedGroupName)
+                            && groupService.isMember(context, trimmedGroupName)) {
+                        hidden = false;
+                        break;
+                    }
+                }
+            }
         }
 
         return hidden;
@@ -130,6 +159,12 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
             List<String> propertyKeys = configurationService.getPropertyKeys();
             for (String key : propertyKeys) {
                 if (key.startsWith(CONFIG_PREFIX)) {
+                    // Skip group-access control keys (global and per-field) that share
+                    // the prefix but are not field-hiding directives.
+                    // e.g. metadata.hide.groups  or  metadata.hide.dc.title.groups
+                    if (key.endsWith(".groups")) {
+                        continue;
+                    }
                     if (configurationService.getBooleanProperty(key, true)) {
                         String mdField = key.substring(CONFIG_PREFIX.length());
                         String[] segment = mdField.split("\\.", 3);
