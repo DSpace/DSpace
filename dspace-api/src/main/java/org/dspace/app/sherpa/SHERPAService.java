@@ -12,17 +12,18 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
@@ -110,12 +111,14 @@ public class SHERPAService {
         while (numberOfTries < maxNumberOfTries && sherpaResponse == null) {
             numberOfTries++;
 
-            log.debug(String.format(
-                "Trying to contact SHERPA/RoMEO - attempt %d of %d; timeout is %d; sleep between timeouts is %d",
-                numberOfTries,
-                maxNumberOfTries,
-                timeout,
-                sleepBetweenTimeouts));
+            log.debug(
+                ("Trying to contact SHERPA/RoMEO - attempt %d of %d;"
+                    + " timeout is %d; sleep between timeouts is %d")
+                    .formatted(
+                        numberOfTries,
+                        maxNumberOfTries,
+                        timeout,
+                        sleepBetweenTimeouts));
 
             try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5)) {
                 Thread.sleep(sleepBetweenTimeouts);
@@ -125,10 +128,10 @@ public class SHERPAService {
 
                 // Execute the method
                 try (CloseableHttpResponse response = client.execute(method)) {
-                    int statusCode = response.getStatusLine().getStatusCode();
+                    int statusCode = response.getCode();
 
-                    log.debug(response.getStatusLine().getStatusCode() + ": "
-                            + response.getStatusLine().getReasonPhrase());
+                    log.debug(response.getCode() + ": "
+                            + response.getReasonPhrase());
 
                     if (statusCode != HttpStatus.SC_OK) {
                         sherpaResponse = new SHERPAPublisherResponse("SHERPA/RoMEO return not OK status: "
@@ -173,7 +176,7 @@ public class SHERPAService {
                 sherpaResponse = new SHERPAPublisherResponse(errorMessage);
             } finally {
                 if (method != null) {
-                    method.releaseConnection();
+                    method.reset();
                 }
             }
         }
@@ -214,12 +217,14 @@ public class SHERPAService {
         while (numberOfTries < maxNumberOfTries && sherpaResponse == null) {
             numberOfTries++;
 
-            log.debug(String.format(
-                "Trying to contact SHERPA/RoMEO - attempt %d of %d; timeout is %d; sleep between timeouts is %d",
-                numberOfTries,
-                maxNumberOfTries,
-                timeout,
-                sleepBetweenTimeouts));
+            log.debug(
+                ("Trying to contact SHERPA/RoMEO - attempt %d of %d;"
+                    + " timeout is %d; sleep between timeouts is %d")
+                    .formatted(
+                        numberOfTries,
+                        maxNumberOfTries,
+                        timeout,
+                        sleepBetweenTimeouts));
 
             try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5)) {
                 Thread.sleep(sleepBetweenTimeouts);
@@ -229,10 +234,10 @@ public class SHERPAService {
 
                 // Execute the method
                 try (CloseableHttpResponse response = client.execute(method)) {
-                    int statusCode = response.getStatusLine().getStatusCode();
+                    int statusCode = response.getCode();
 
-                    log.debug(response.getStatusLine().getStatusCode() + ": "
-                            + response.getStatusLine().getReasonPhrase());
+                    log.debug(response.getCode() + ": "
+                            + response.getReasonPhrase());
 
                     if (statusCode != HttpStatus.SC_OK) {
                         sherpaResponse = new SHERPAResponse("SHERPA/RoMEO return not OK status: "
@@ -276,7 +281,7 @@ public class SHERPAService {
                 sherpaResponse = new SHERPAResponse(errorMessage);
             } finally {
                 if (method != null) {
-                    method.releaseConnection();
+                    method.reset();
                 }
             }
         }
@@ -351,9 +356,9 @@ public class SHERPAService {
         // Set connection parameters
         int timeout = 5000;
         method.setConfig(RequestConfig.custom()
-            .setConnectionRequestTimeout(timeout)
-            .setConnectTimeout(timeout)
-            .setSocketTimeout(timeout)
+            .setConnectionRequestTimeout(timeout, TimeUnit.MILLISECONDS)
+            .setConnectTimeout(timeout, TimeUnit.MILLISECONDS)
+            .setResponseTimeout(timeout, TimeUnit.MILLISECONDS)
             .build());
 
         return method;

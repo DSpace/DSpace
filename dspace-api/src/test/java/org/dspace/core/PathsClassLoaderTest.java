@@ -8,7 +8,7 @@
 package org.dspace.core;
 
 import static org.apache.bcel.Const.ACC_PUBLIC;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,11 +17,11 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
 import org.apache.bcel.generic.ClassGen;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test the PathsClassLoader.
@@ -57,7 +57,7 @@ public class PathsClassLoaderTest {
     public PathsClassLoaderTest() {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
 
         // Create a name for a temporary class file.
@@ -110,15 +110,15 @@ public class PathsClassLoaderTest {
         }
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -136,12 +136,12 @@ public class PathsClassLoaderTest {
             jarFile.getCanonicalPath()};
         PathsClassLoader instance = new PathsClassLoader(parentCL, classpath);
         Class result = instance.findClass(className);
-        assertNotNull("Should return a Class from file", result);
+        assertNotNull(result, "Should return a Class from file");
 
         classpath[0] = jarFile.getCanonicalPath();
         instance = new PathsClassLoader(parentCL, classpath);
         result = instance.findClass(jarClassName);
-        assertNotNull("Should return a Class from JAR", result);
+        assertNotNull(result, "Should return a Class from JAR");
     }
 
 }

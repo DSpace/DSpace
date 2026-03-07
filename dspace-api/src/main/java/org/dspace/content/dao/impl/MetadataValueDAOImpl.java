@@ -74,10 +74,12 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
 
     @Override
     public void deleteByMetadataField(Context context, MetadataField metadataField) throws SQLException {
-        String queryString = "delete from MetadataValue where metadataField= :metadataField";
-        Query query = createQuery(context, queryString);
-        query.setParameter("metadataField", metadataField);
-        query.executeUpdate();
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        // Bulk HQL deletes don't update the persistence context, causing TransientPropertyValueException.
+        List<MetadataValue> values = findByField(context, metadataField);
+        for (MetadataValue value : values) {
+            delete(context, value);
+        }
     }
 
     @Override

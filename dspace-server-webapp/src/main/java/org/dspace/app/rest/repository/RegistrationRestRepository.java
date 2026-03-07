@@ -12,7 +12,6 @@ import static org.dspace.eperson.service.CaptchaService.REGISTER_ACTION;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,6 +51,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This is the repository that is responsible for managing Registration Rest objects
@@ -131,7 +132,7 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         try {
             ServletInputStream input = request.getInputStream();
             registrationRest = mapper.readValue(input, RegistrationRest.class);
-        } catch (IOException e1) {
+        } catch (IOException | JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
         if (StringUtils.isBlank(registrationRest.getEmail())) {

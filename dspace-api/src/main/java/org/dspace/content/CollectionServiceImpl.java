@@ -736,6 +736,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public void delete(Context context, Collection collection) throws SQLException, AuthorizeException, IOException {
+        // Reload collection to ensure it's attached to the current session
+        // (Required for Hibernate 7 which may have detached entities during test cleanup)
+        collection = context.reloadEntity(collection);
+        if (collection == null) {
+            return;
+        }
+
         log.info(LogHelper.getHeader(context, "delete_collection",
                                       "collection_id=" + collection.getID()));
 
@@ -814,8 +821,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         Iterator<Community> owningCommunities = collection.getCommunities().iterator();
         while (owningCommunities.hasNext()) {
             Community owningCommunity = owningCommunities.next();
+            // Reload community to ensure it's attached to the current session
+            // (Required for Hibernate 7 which may have detached entities during test cleanup)
+            owningCommunity = context.reloadEntity(owningCommunity);
             collection.removeCommunity(owningCommunity);
-            owningCommunity.removeCollection(collection);
+            if (owningCommunity != null) {
+                owningCommunity.removeCollection(collection);
+            }
         }
 
         collectionDAO.delete(context, collection);

@@ -608,8 +608,8 @@ public class DOIOrganiser {
         } catch (IdentifierException ex) {
             String message;
             if (!(ex instanceof DOIIdentifierException)) {
-                message = String.format("Registering DOI %s for object %s:  the registrar returned an error.",
-                                        doiRow.getDoi(), dso.getID());
+                message = "Registering DOI %s for object %s:  the registrar returned an error.".formatted(
+                    doiRow.getDoi(), dso.getID());
             } else {
                 DOIIdentifierException doiIdentifierException = (DOIIdentifierException) ex;
                 message = "It wasn't possible to update this identifier:  "

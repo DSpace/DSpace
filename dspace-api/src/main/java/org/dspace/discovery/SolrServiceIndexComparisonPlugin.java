@@ -53,18 +53,18 @@ public class SolrServiceIndexComparisonPlugin implements SolrServiceIndexPlugin 
             return;
         }
         // Otherwise, continue with item indexing. Handle items, workflow items, and workspace items
-        if (idxObj instanceof IndexableItem) {
-            indexItemComparisonValue(context, ((IndexableItem) idxObj).getIndexedObject(), document);
-        } else if (idxObj instanceof IndexableWorkspaceItem) {
-            WorkspaceItem workspaceItem = ((IndexableWorkspaceItem) idxObj).getIndexedObject();
+        if (idxObj instanceof IndexableItem item3) {
+            indexItemComparisonValue(context, item3.getIndexedObject(), document);
+        } else if (idxObj instanceof IndexableWorkspaceItem item2) {
+            WorkspaceItem workspaceItem = item2.getIndexedObject();
             if (workspaceItem != null) {
                 Item item = workspaceItem.getItem();
                 if (item != null) {
                     indexItemComparisonValue(context, item, document);
                 }
             }
-        } else if (idxObj instanceof IndexableWorkflowItem) {
-            WorkflowItem workflowItem = ((IndexableWorkflowItem) idxObj).getIndexedObject();
+        } else if (idxObj instanceof IndexableWorkflowItem item1) {
+            WorkflowItem workflowItem = item1.getIndexedObject();
             if (workflowItem != null) {
                 Item item = workflowItem.getItem();
                 if (item != null) {

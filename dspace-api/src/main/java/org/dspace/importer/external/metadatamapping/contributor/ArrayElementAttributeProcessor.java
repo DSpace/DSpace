@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This Processor allows to extract attribute values of an array.
@@ -52,7 +52,7 @@ public class ArrayElementAttributeProcessor implements JsonPathMetadataProcessor
         Collection<String> values = new ArrayList<>();
         while (array.hasNext()) {
             JsonNode element = array.next();
-            String value = element.at(elementAttribute).textValue();
+            String value = element.at(elementAttribute).asString();
             if (StringUtils.isNoneBlank(value)) {
                 values.add(value);
             }
@@ -65,7 +65,7 @@ public class ArrayElementAttributeProcessor implements JsonPathMetadataProcessor
         JsonNode body = null;
         try {
             body = mapper.readTree(json);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Unable to process json response.", e);
         }
         return body;

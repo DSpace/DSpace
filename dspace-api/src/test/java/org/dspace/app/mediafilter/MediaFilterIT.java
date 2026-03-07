@@ -7,12 +7,11 @@
  */
 package org.dspace.app.mediafilter;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -31,9 +30,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.ItemService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests of {@link MediaFilterScript}.
@@ -42,7 +40,6 @@ import org.junit.Test;
  */
 public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
 
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected Community topComm1;
     protected Community topComm2;
@@ -70,7 +67,7 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
     protected Item item2_1_a;
     protected Item item2_1_b;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException, SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         topComm1 = CommunityBuilder.createCommunity(context).withName("Parent Community1").build();
@@ -135,11 +132,22 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void mediaFilterScriptAllItemsTest() throws Exception {
         performMediaFilterScript(null);
-        Iterator<Item> items = itemService.findAll(context);
-        while (items.hasNext()) {
-            Item item = items.next();
-            checkItemHasBeenProcessed(item);
-        }
+        // Check all items created by this test (not all items in the DB,
+        // as other test classes may leave items without processable bitstreams)
+        checkItemHasBeenProcessed(item1_1_a);
+        checkItemHasBeenProcessed(item1_1_b);
+        checkItemHasBeenProcessed(item1_2_a);
+        checkItemHasBeenProcessed(item1_2_b);
+        checkItemHasBeenProcessed(item1_1_1_a);
+        checkItemHasBeenProcessed(item1_1_1_b);
+        checkItemHasBeenProcessed(item1_1_2_a);
+        checkItemHasBeenProcessed(item1_1_2_b);
+        checkItemHasBeenProcessed(item1_2_1_a);
+        checkItemHasBeenProcessed(item1_2_1_b);
+        checkItemHasBeenProcessed(item1_2_2_a);
+        checkItemHasBeenProcessed(item1_2_2_b);
+        checkItemHasBeenProcessed(item2_1_a);
+        checkItemHasBeenProcessed(item2_1_b);
     }
 
     @Test
@@ -188,21 +196,24 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
 
     private void checkItemHasBeenNotProcessed(Item item) throws IOException, SQLException, AuthorizeException {
         List<Bundle> textBundles = item.getBundles("TEXT");
-        assertTrue("The item " + item.getName() + " should NOT have the TEXT bundle", textBundles.size() == 0);
+        assertTrue(textBundles.size() == 0, "The item " + item.getName() + " should NOT have the TEXT bundle");
     }
 
     private void checkItemHasBeenProcessed(Item item) throws IOException, SQLException, AuthorizeException {
         String expectedFileName = Strings.CS.endsWith(item.getName(), "_a") ? "test.csv.txt" : "test.txt.txt";
         String expectedContent = Strings.CS.endsWith(item.getName(), "_a") ? "data3,3" : "quick brown fox";
         List<Bundle> textBundles = item.getBundles("TEXT");
-        assertTrue("The item " + item.getName() + " has NOT the TEXT bundle", textBundles.size() == 1);
+        assertTrue(textBundles.size() == 1, "The item " + item.getName() + " has NOT the TEXT bundle");
         List<Bitstream> bitstreams = textBundles.get(0).getBitstreams();
-        assertTrue("The item " + item.getName() + " has NOT exactly 1 bitstream in the TEXT bundle",
-                bitstreams.size() == 1);
-        assertTrue("The text bitstream in the " + item.getName() + " is NOT named properly [" + expectedFileName + "]",
-                Strings.CS.equals(bitstreams.get(0).getName(), expectedFileName));
-        assertTrue("The text bitstream in the " + item.getName() + " doesn't contain the proper content ["
-                + expectedContent + "]", Strings.CS.contains(getContent(bitstreams.get(0)), expectedContent));
+        assertTrue(bitstreams.size() == 1,
+                "The item " + item.getName() + " has NOT exactly 1 bitstream in the TEXT bundle");
+        assertTrue(Strings.CS.equals(bitstreams.get(0).getName(), expectedFileName),
+                "The text bitstream in the " + item.getName() + " is NOT named properly [" + expectedFileName + "]");
+        assertTrue(
+            Strings.CS.contains(getContent(bitstreams.get(0)), expectedContent),
+            "The text bitstream in the " + item.getName()
+                + " doesn't contain the proper content ["
+                + expectedContent + "]");
     }
 
     private CharSequence getContent(Bitstream bitstream) throws IOException, SQLException, AuthorizeException {

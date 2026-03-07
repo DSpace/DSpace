@@ -7,8 +7,6 @@
  */
 package org.dspace.app.ldn.processor;
 
-import static java.lang.String.format;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +14,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpResponseException;
+import org.apache.hc.client5.http.HttpResponseException;
+import org.apache.hc.core5.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.LDNMessageEntity;
@@ -219,7 +217,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
             if (Objects.isNull(item)) {
                 throw new HttpResponseException(HttpStatus.SC_NOT_FOUND,
-                    format("Item with uuid %s not found", uuid));
+                    "Item with uuid %s not found".formatted(uuid));
             }
             return item;
         }
@@ -227,21 +225,21 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
         if (Objects.isNull(handle)) {
             throw new HttpResponseException(HttpStatus.SC_NOT_FOUND,
-                format("Handle not found for %s", url));
+                "Handle not found for %s".formatted(url));
         }
 
         DSpaceObject object = handleService.resolveToObject(context, handle);
 
         if (Objects.isNull(object)) {
             throw new HttpResponseException(HttpStatus.SC_NOT_FOUND,
-                format("Item with handle %s not found", handle));
+                "Item with handle %s not found".formatted(handle));
         }
 
         if (object.getType() == Constants.ITEM) {
             item = (Item) object;
         } else {
             throw new HttpResponseException(HttpStatus.SC_UNPROCESSABLE_ENTITY,
-                format("Handle %s does not resolve to an item", handle));
+                "Handle %s does not resolve to an item".formatted(handle));
         }
         return item;
     }

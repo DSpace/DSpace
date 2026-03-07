@@ -173,8 +173,8 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     }
 
     private String getLogMessage(String message) {
-        return String
-            .format("Process id: %d, script name: %s, message: %s", processId, scriptName, message);
+        return "Process id: %d, script name: %s, message: %s"
+            .formatted(processId, scriptName, message);
     }
 
     @Override

@@ -125,10 +125,12 @@ public class VersioningConsumer implements Consumer {
         // get latest item
         Item latestItem = latestVersion.getItem();
         if (latestItem == null) {
-            String msg = String.format(
-                "Illegal state: Obtained version history of item with uuid %s, handle %s, but the latest item is null",
-                item.getID(), item.getHandle()
-            );
+            String msg =
+                ("Illegal state: Obtained version history of item"
+                    + " with uuid %s, handle %s,"
+                    + " but the latest item is null").formatted(
+                    item.getID(), item.getHandle()
+                );
             log.error(msg);
             throw new IllegalStateException(msg);
         }

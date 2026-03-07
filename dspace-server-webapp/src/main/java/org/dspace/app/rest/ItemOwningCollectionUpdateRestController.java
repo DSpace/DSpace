@@ -37,8 +37,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -79,7 +79,7 @@ public class ItemOwningCollectionUpdateRestController {
      * @throws IOException        If something goes wrong
      * @throws AuthorizeException If the user is not authorized to perform the move action
      */
-    @RequestMapping(method = RequestMethod.PUT, consumes = {"text/uri-list"})
+    @PutMapping( consumes = {"text/uri-list"})
     @PreAuthorize("hasPermission(#uuid, 'ITEM','WRITE')")
     @PostAuthorize("returnObject != null")
     public CollectionRest move(@PathVariable UUID uuid,

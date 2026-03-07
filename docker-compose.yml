@@ -92,7 +92,7 @@ services:
       additional_contexts:
         solrconfigs: ./dspace/solr/
       args:
-        SOLR_VERSION: "${SOLR_VER:-9.8}"
+        SOLR_VERSION: "${SOLR_VER:-10.0}"
     networks:
       dspacenet:
     ports:

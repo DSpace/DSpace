@@ -11,12 +11,13 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 
 import java.util.List;
 
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.HttpResponseInterceptor;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.http.HttpRequestInterceptor;
+import org.apache.hc.core5.http.HttpResponseInterceptor;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,8 +69,12 @@ public class DSpaceHttpClientFactory {
         if (setProxy) {
             clientBuilder.setRoutePlanner(proxyRoutePlanner);
         }
-        getRequestInterceptors().forEach(clientBuilder::addInterceptorLast);
-        getResponseInterceptors().forEach(clientBuilder::addInterceptorLast);
+        for (HttpRequestInterceptor interceptor : getRequestInterceptors()) {
+            clientBuilder.addRequestInterceptorLast(interceptor);
+        }
+        for (HttpResponseInterceptor interceptor : getResponseInterceptors()) {
+            clientBuilder.addResponseInterceptorLast(interceptor);
+        }
         return clientBuilder;
     }
 
@@ -91,9 +96,12 @@ public class DSpaceHttpClientFactory {
      * @return              the client
      */
     public CloseableHttpClient buildWithoutAutomaticRetries(int maxConnTotal) {
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(maxConnTotal);
+
         HttpClientBuilder clientBuilder = HttpClientBuilder.create()
                 .disableAutomaticRetries()
-                .setMaxConnTotal(maxConnTotal);
+                .setConnectionManager(connectionManager);
         return build(clientBuilder, true);
     }
 
@@ -113,8 +121,12 @@ public class DSpaceHttpClientFactory {
         if (setProxy) {
             clientBuilder.setRoutePlanner(proxyRoutePlanner);
         }
-        getRequestInterceptors().forEach(clientBuilder::addInterceptorLast);
-        getResponseInterceptors().forEach(clientBuilder::addInterceptorLast);
+        for (HttpRequestInterceptor interceptor : getRequestInterceptors()) {
+            clientBuilder.addRequestInterceptorLast(interceptor);
+        }
+        for (HttpResponseInterceptor interceptor : getResponseInterceptors()) {
+            clientBuilder.addResponseInterceptorLast(interceptor);
+        }
         return clientBuilder.build();
     }
 

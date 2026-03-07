@@ -11,15 +11,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This class is responsible for extracting and contributing author name metadata
@@ -96,7 +96,7 @@ public class OpenAlexAuthorNameContributor extends SimpleJsonPathMetadataContrib
         JsonNode jsonNode = convertStringJsonToJsonNode(fullJson);
         JsonNode node = jsonNode.at(query);
 
-        if (node.isArray() || node.isNull() || StringUtils.isBlank(node.asText())) {
+        if (node.isArray() || node.isNull() || StringUtils.isBlank(node.asString())) {
             return metadata;
         }
 
@@ -131,13 +131,13 @@ public class OpenAlexAuthorNameContributor extends SimpleJsonPathMetadataContrib
     }
 
     private String getStringValue(JsonNode node) {
-        if (node.isTextual()) {
-            return node.textValue();
+        if (node.isString()) {
+            return node.asString();
         }
         if (node.isNumber()) {
             return node.numberValue().toString();
         }
-        log.error("It wasn't possible to convert the value of the following JsonNode:" + node.asText());
+        log.error("It wasn't possible to convert the value of the following JsonNode:" + node.asString());
         return StringUtils.EMPTY;
     }
 
@@ -146,7 +146,7 @@ public class OpenAlexAuthorNameContributor extends SimpleJsonPathMetadataContrib
         JsonNode body = null;
         try {
             body = mapper.readTree(json);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Unable to process json response.", e);
         }
         return body;

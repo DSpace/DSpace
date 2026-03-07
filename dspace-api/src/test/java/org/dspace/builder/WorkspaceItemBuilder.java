@@ -10,6 +10,7 @@ package org.dspace.builder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.ldn.NotifyPatternToTrigger;
@@ -144,10 +145,24 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
             }
             item = c.reloadEntity(item);
             if (item != null) {
+                // Delete any NotifyPatternToTrigger entries that reference this item before deleting the item.
+                // Required for Hibernate 7 compatibility - must delete referencing entities before the Item.
+                deleteNotifyPatternsForItem(c, item);
                 deleteItem(c, item);
             }
             c.complete();
             indexingService.commit();
+        }
+    }
+
+    /**
+     * Delete all NotifyPatternToTrigger entries that reference the given Item.
+     * This must be done before deleting the Item to avoid TransientPropertyValueException in Hibernate 7.
+     */
+    private void deleteNotifyPatternsForItem(Context c, Item itemToClean) throws SQLException {
+        List<NotifyPatternToTrigger> patterns = notifyPatternToTriggerService.findByItem(c, itemToClean);
+        for (NotifyPatternToTrigger pattern : patterns) {
+            notifyPatternToTriggerService.delete(c, pattern);
         }
     }
 

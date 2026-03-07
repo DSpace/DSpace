@@ -17,8 +17,6 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -54,6 +52,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.HtmlUtils;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 /**
  * Component to expose item requests and handle operations like create (request), put (grant/deny), and
  * email sending. Support for requested item access by a secure token / link is supported as well as the legacy
@@ -283,7 +283,7 @@ public class RequestItemRepository
         JsonNode responseMessageNode = requestBody.findValue("responseMessage");
         String message = null;
         if (responseMessageNode != null && !responseMessageNode.isNull()) {
-            message = responseMessageNode.asText();
+            message = responseMessageNode.asString();
         }
 
         // Set the decision date (now)`
@@ -295,13 +295,13 @@ public class RequestItemRepository
         if (accessPeriod != null && !accessPeriod.isNull()) {
             // The request item service is responsible for parsing and setting the expiry date based
             // on a delta like "+7DAYS" or special string like "FOREVER", or a formatted date
-            requestItemService.setAccessExpiry(ri, accessPeriod.asText());
+            requestItemService.setAccessExpiry(ri, accessPeriod.asString());
         }
 
         JsonNode responseSubjectNode = requestBody.findValue("subject");
         String subject = null;
         if (responseSubjectNode != null && !responseSubjectNode.isNull()) {
-            subject = responseSubjectNode.asText();
+            subject = responseSubjectNode.asString();
         }
         requestItemService.update(context, ri);
 

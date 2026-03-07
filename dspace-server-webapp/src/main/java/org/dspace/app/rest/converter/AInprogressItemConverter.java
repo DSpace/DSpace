@@ -110,11 +110,12 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
                 try {
                     stepClass = loader.loadClass(stepConfig.getProcessingClassName());
 
-                    Object stepInstance = stepClass.newInstance();
+                    Object stepInstance = stepClass.getDeclaredConstructor().newInstance();
 
                     if (stepInstance instanceof DataProcessingStep) {
                         // load the interface for this step
-                        DataProcessingStep stepProcessing = (DataProcessingStep) stepClass.newInstance();
+                        DataProcessingStep stepProcessing =
+                            (DataProcessingStep) stepClass.getDeclaredConstructor().newInstance();
                         witem.getSections()
                             .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
                     } else if (!(stepInstance instanceof RestProcessingStep)) {
