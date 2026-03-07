@@ -245,6 +245,13 @@
       </dependency>
       <!-- Solr Core is only needed for Integration Tests (to run a MockSolrServer) -->
       <!-- The following Solr / Lucene dependencies also support integration tests -->
+      <!-- solr-solrj-streaming is needed for Solr 10.x EmbeddedSolrServer -->
+      <dependency>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-solrj-streaming</artifactId>
+         <version>${solr.client.version}</version>
+         <scope>test</scope>
+      </dependency>
       <dependency>
          <groupId>org.apache.solr</groupId>
          <artifactId>solr-core</artifactId>
@@ -262,6 +269,96 @@
             </exclusion>
          </exclusions>
       </dependency>
+      <!-- Solr 10 solr-core POM has broken transitive deps (missing Jackson 2 versions), -->
+      <!-- so its transitive dependencies (Jersey, OpenTelemetry, Curator) are not resolved. -->
+      <!-- We must declare them explicitly, same as in dspace-api/pom.xml. -->
+      <dependency>
+         <groupId>org.glassfish.jersey.core</groupId>
+         <artifactId>jersey-server</artifactId>
+         <version>3.1.11</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.glassfish.jersey.media</groupId>
+         <artifactId>jersey-media-json-jackson</artifactId>
+         <version>3.1.11</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>io.opentelemetry</groupId>
+         <artifactId>opentelemetry-api</artifactId>
+         <version>1.56.0</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>io.opentelemetry</groupId>
+         <artifactId>opentelemetry-sdk</artifactId>
+         <version>1.56.0</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>io.opentelemetry</groupId>
+         <artifactId>opentelemetry-sdk-metrics</artifactId>
+         <version>1.56.0</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>io.opentelemetry</groupId>
+         <artifactId>opentelemetry-sdk-common</artifactId>
+         <version>1.56.0</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>io.opentelemetry.instrumentation</groupId>
+         <artifactId>opentelemetry-runtime-telemetry-java17</artifactId>
+         <version>2.22.0-alpha</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>io.opentelemetry.instrumentation</groupId>
+         <artifactId>opentelemetry-runtime-telemetry-java8</artifactId>
+         <version>2.22.0-alpha</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>io.opentelemetry.semconv</groupId>
+         <artifactId>opentelemetry-semconv</artifactId>
+         <version>1.37.0</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>io.opentelemetry</groupId>
+         <artifactId>opentelemetry-exporter-prometheus</artifactId>
+         <version>1.56.0-alpha</version>
+         <scope>test</scope>
+      </dependency>
+      <!-- Curator framework is required by Solr 10.x EmbeddedSolrServer -->
+      <dependency>
+         <groupId>org.apache.curator</groupId>
+         <artifactId>curator-framework</artifactId>
+         <version>5.9.0</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.curator</groupId>
+         <artifactId>curator-client</artifactId>
+         <version>5.9.0</version>
+         <scope>test</scope>
+      </dependency>
+      <!-- Jackson 2 dataformat-cbor is used by Solr 10's CborResponseWriter -->
+      <dependency>
+         <groupId>com.fasterxml.jackson.dataformat</groupId>
+         <artifactId>jackson-dataformat-cbor</artifactId>
+         <version>2.18.0</version>
+         <scope>test</scope>
+      </dependency>
+      <!-- HPPC is required by Solr 10.x EmbeddedSolrServer -->
+      <dependency>
+         <groupId>com.carrotsearch</groupId>
+         <artifactId>hppc</artifactId>
+         <version>0.10.0</version>
+         <scope>test</scope>
+      </dependency>
       <dependency>
          <groupId>org.apache.lucene</groupId>
          <artifactId>lucene-analysis-icu</artifactId>
@@ -275,6 +372,66 @@
       <dependency>
          <groupId>org.apache.lucene</groupId>
          <artifactId>lucene-analysis-stempel</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-queries</artifactId>
+         <version>${lucene.version}</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-suggest</artifactId>
+         <version>${lucene.version}</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-misc</artifactId>
+         <version>${lucene.version}</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-queryparser</artifactId>
+         <version>${lucene.version}</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-join</artifactId>
+         <version>${lucene.version}</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-highlighter</artifactId>
+         <version>${lucene.version}</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-grouping</artifactId>
+         <version>${lucene.version}</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-facet</artifactId>
+         <version>${lucene.version}</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-spatial-extras</artifactId>
+         <version>${lucene.version}</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-sandbox</artifactId>
+         <version>${lucene.version}</version>
          <scope>test</scope>
       </dependency>
       <dependency>
