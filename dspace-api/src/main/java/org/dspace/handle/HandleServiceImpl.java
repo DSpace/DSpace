@@ -9,7 +9,6 @@ package org.dspace.handle;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -212,25 +211,26 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public void unbindHandle(Context context, DSpaceObject dso)
         throws SQLException {
-        Iterator<Handle> handles = dso.getHandles().iterator();
-        if (handles.hasNext()) {
-            while (handles.hasNext()) {
-                final Handle handle = handles.next();
-                handles.remove();
+        // Use a direct query to find handles by DSO, rather than accessing the lazy
+        // collection on the entity (which may trigger LazyInitializationException in Hibernate 7).
+        List<Handle> handles = handleDAO.getHandlesByDSpaceObject(context, dso);
+        if (!handles.isEmpty()) {
+            for (Handle handle : handles) {
                 //Only set the "resouce_id" column to null when unbinding a handle.
                 // We want to keep around the "resource_type_id" value, so that we
                 // can verify during a restore whether the same *type* of resource
                 // is reusing this handle!
                 handle.setDSpaceObject(null);
 
-
-                handleDAO.save(context, handle);
-
                 log.debug("Unbound Handle {} from object {} id={}",
                     () -> handle.getHandle(),
                     () -> Constants.typeText[dso.getType()],
                     () -> dso.getID());
             }
+            // Flush to ensure handle FK is nullified in the database before
+            // the DSpaceObject row is deleted. Required for Hibernate 7 which
+            // may batch entity deletes before entity updates within a flush.
+            context.flush();
         } else {
             log.trace(
                 "Cannot find Handle entry to unbind for object {} id={}. Handle could have been unbound before.",

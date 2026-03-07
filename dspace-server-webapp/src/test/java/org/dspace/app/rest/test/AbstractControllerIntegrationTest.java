@@ -87,9 +87,9 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     public static final String REST_SERVER_URL = "http://localhost/api/";
     public static final String BASE_REST_SERVER_URL = "http://localhost";
 
-    // Our standard/expected content type
-    protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
-                                                    MediaTypes.HAL_JSON.getSubtype(), StandardCharsets.UTF_8);
+    // Our standard/expected content type (Spring HATEOAS 3.x / Spring Boot 4 uses VND_HAL_JSON)
+    protected MediaType contentType = new MediaType(MediaTypes.VND_HAL_JSON.getType(),
+                                                    MediaTypes.VND_HAL_JSON.getSubtype(), StandardCharsets.UTF_8);
 
     protected MediaType textUriContentType = RestMediaTypes.TEXT_URI_LIST;
 

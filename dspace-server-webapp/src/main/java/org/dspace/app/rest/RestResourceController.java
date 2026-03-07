@@ -378,7 +378,7 @@ public class RestResourceController implements InitializingBean {
      * @throws HttpRequestMethodNotSupportedException   If something goes wrong
      */
     @PostMapping( value = {"", "/"},
-                    consumes = {"application/json", "application/hal+json"})
+                    consumes = {"application/json", "application/hal+json", "application/vnd.hal+json"})
     public ResponseEntity<RepresentationModel<?>> post(HttpServletRequest request,
                                                        @PathVariable String apiCategory,
                                                        @PathVariable String model,
@@ -1197,7 +1197,7 @@ public class RestResourceController implements InitializingBean {
      * @return the relevant REST resource
      */
     @PutMapping( value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT,
-        consumes = {"application/json", "application/hal+json"})
+        consumes = {"application/json", "application/hal+json", "application/vnd.hal+json"})
     public DSpaceResource<RestAddressableModel> put(HttpServletRequest request,
                                                     @PathVariable String apiCategory, @PathVariable String model,
                                                     @PathVariable Integer id,
@@ -1253,7 +1253,7 @@ public class RestResourceController implements InitializingBean {
      * @return the relevant REST resource
      */
     @PutMapping( value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_HEX32,
-        consumes = {"application/json", "application/hal+json"})
+        consumes = {"application/json", "application/hal+json", "application/vnd.hal+json"})
     public DSpaceResource<RestAddressableModel> put(HttpServletRequest request,
                                                     @PathVariable String apiCategory, @PathVariable String model,
                                                     @PathVariable String id,

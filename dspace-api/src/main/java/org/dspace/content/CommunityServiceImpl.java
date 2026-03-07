@@ -496,6 +496,13 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public void delete(Context context, Community community) throws SQLException, AuthorizeException, IOException {
+        // Reload community to ensure it's attached to the current session
+        // (Required for Hibernate 7 which may have detached entities during recursive cleanup)
+        community = context.reloadEntity(community);
+        if (community == null) {
+            return;
+        }
+
         // Check authorisation
         // FIXME: If this was a subcommunity, it is first removed from it's
         // parent.

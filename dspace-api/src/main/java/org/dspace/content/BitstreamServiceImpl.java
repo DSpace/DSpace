@@ -281,6 +281,12 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public void delete(Context context, Bitstream bitstream) throws SQLException, AuthorizeException {
+        // Reload bitstream to ensure it's attached to the current session
+        // (Required for Hibernate 7 which may have detached entities during cascading deletes)
+        bitstream = context.reloadEntity(bitstream);
+        if (bitstream == null) {
+            return;
+        }
 
         // changed to a check on delete
         // Check authorisation
