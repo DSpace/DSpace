@@ -623,6 +623,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Required by Spring Boot 4's TransactionAutoConfiguration (AspectJ mode) -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
+            <scope>test</scope>
+        </dependency>
         <!-- Jersey dependencies required by Solr 10.x EmbeddedSolrServer for tests -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>

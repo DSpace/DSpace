@@ -35,8 +35,8 @@ import org.springframework.boot.web.servlet.support.ErrorPageFilter;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.AbstractJacksonHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -93,7 +93,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
     protected MediaType textUriContentType = RestMediaTypes.TEXT_URI_LIST;
 
-    protected HttpMessageConverter mappingJackson2HttpMessageConverter;
+    protected HttpMessageConverter jacksonHttpMessageConverter;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -107,10 +107,10 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     @Autowired
     void setConverters(HttpMessageConverter<?>[] converters) {
 
-        this.mappingJackson2HttpMessageConverter = Arrays.asList(converters).stream().filter(
-            hmc -> hmc instanceof MappingJackson2HttpMessageConverter).findAny().get();
+        this.jacksonHttpMessageConverter = Arrays.asList(converters).stream().filter(
+            hmc -> hmc instanceof AbstractJacksonHttpMessageConverter).findAny().get();
 
-        Assertions.assertNotNull(this.mappingJackson2HttpMessageConverter,
+        Assertions.assertNotNull(this.jacksonHttpMessageConverter,
                              "the JSON message converter must not be null");
     }
 
