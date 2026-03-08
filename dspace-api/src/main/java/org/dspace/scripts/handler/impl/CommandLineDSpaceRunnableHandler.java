@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;

@@ -7,8 +7,8 @@
  */
 package org.dspace.app.suggestion.runnable;
 
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.utils.DSpace;
 

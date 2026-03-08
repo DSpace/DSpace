@@ -18,8 +18,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;

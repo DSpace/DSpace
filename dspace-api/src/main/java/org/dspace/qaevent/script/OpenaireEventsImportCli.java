@@ -7,8 +7,8 @@
  */
 package org.dspace.qaevent.script;
 
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.dspace.utils.DSpace;
 
 /**
