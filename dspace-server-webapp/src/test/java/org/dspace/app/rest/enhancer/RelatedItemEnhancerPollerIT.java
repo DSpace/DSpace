@@ -61,7 +61,7 @@ public class RelatedItemEnhancerPollerIT extends AbstractIntegrationTestWithData
     public void setup() throws Exception {
         final DSpace dspace = new DSpace();
         ConfigurationService configurationService = dspace.getConfigurationService();
-        configurationService.setProperty("item.enable-virtual-metadata", false);
+        configurationService.setProperty("relationship.enable-virtual-metadata", false);
         itemService = ContentServiceFactory.getInstance().getItemService();
         itemEnhancerService = dspace.getSingletonService(ItemEnhancerService.class);
         spyItemEnhancerService = spy(itemEnhancerService);

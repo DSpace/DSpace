@@ -1909,7 +1909,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                                            boolean enableVirtualMetadata) {
 
         enableVirtualMetadata = enableVirtualMetadata
-            && configurationService.getBooleanProperty("item.enable-virtual-metadata", false);
+            && configurationService.getBooleanProperty("relationship.enable-virtual-metadata", true);
 
         if (!enableVirtualMetadata) {
             log.debug("Called getMetadata for " + item.getID() + " without enableVirtualMetadata");
@@ -1921,7 +1921,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             List<MetadataValue> dbMetadataValues = item.getMetadata();
 
             List<MetadataValue> fullMetadataValueList = new LinkedList<>();
-            if (configurationService.getBooleanProperty("item.enable-virtual-metadata", false)) {
+            if (configurationService.getBooleanProperty("relationship.enable-virtual-metadata", true)) {
                 fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
             }
             fullMetadataValueList.addAll(dbMetadataValues);
