@@ -207,7 +207,9 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
 
         // Add a LASTMODDATE for items
         if (dso.getType() == Constants.ITEM) {
-            metsHdr.setLASTMODDATE(java.util.Date.from(((Item) dso).getLastModified()));
+            metsHdr.setLASTMODDATE(
+                    java.util.Date.from(((Item) dso).getLastModified()) // NOPMD - required by third-party API
+            );
         }
 
         // Agent Custodian - name custodian, the DSpace Archive, by handle.

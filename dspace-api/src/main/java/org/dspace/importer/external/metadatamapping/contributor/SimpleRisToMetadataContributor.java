@@ -63,6 +63,7 @@ public class SimpleRisToMetadataContributor implements MetadataContributor<Map<S
         return metadataFieldMapping;
     }
 
+    @Override
     public void setMetadataFieldMapping(MetadataFieldMapping<Map<String, List<String>>,
                                         MetadataContributor<Map<String, List<String>>>> metadataFieldMapping) {
         this.metadataFieldMapping = metadataFieldMapping;

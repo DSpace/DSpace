@@ -64,6 +64,7 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
     public void perform(Context context, DSpaceRunnableHandler handler, String subscriptionType, String frequency) {
         List<IndexableObject> communityItems = new ArrayList<>();
         List<IndexableObject> collectionsItems = new ArrayList<>();

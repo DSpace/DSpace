@@ -370,6 +370,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     /**
      * Removes all documents from the Lucene index
      */
+    @Override
     public void deleteIndex() {
         try {
             final List<IndexFactory> indexableObjectServices = indexObjectServiceFactory.

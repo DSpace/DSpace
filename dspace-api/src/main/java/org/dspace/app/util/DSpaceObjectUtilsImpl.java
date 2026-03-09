@@ -34,6 +34,7 @@ public class DSpaceObjectUtilsImpl implements DSpaceObjectUtils {
      * @return the DSpaceObject if any with the supplied uuid
      * @throws SQLException
      */
+    @Override
     public DSpaceObject findDSpaceObject(Context context, UUID uuid) throws SQLException {
         for (DSpaceObjectService<? extends DSpaceObject> dSpaceObjectService :
             contentServiceFactory.getDSpaceObjectServices()) {

@@ -26,6 +26,7 @@ public class HarvestScriptConfiguration<T extends Harvest> extends ScriptConfigu
     }
 
 
+    @Override
     public Options getOptions() {
         Options options = new Options();
         options.addOption("p", "purge", false, "delete all items in the collection");

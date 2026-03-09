@@ -297,6 +297,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     }
 
 
+    @Override
     public void setup() throws ParseException {
         useTemplate = false;
         filename = null;
