@@ -152,7 +152,7 @@ jobs:
       # https://github.com/actions/download-artifact
       - name: Download dspace-dependencies image artifact
         if: ${{ matrix.isPr && (inputs.build_id == 'dspace-prod' || inputs.build_id == 'dspace-test' || inputs.build_id == 'dspace-cli') && matrix.arch == 'linux/amd64' }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: docker-image-dspace-dependencies-linux-amd64
           path: /tmp/docker
@@ -175,7 +175,7 @@ jobs:
       - name: Build and push image to ${{ env.DOCKER_BUILD_REGISTRY }}
         if: ${{ ! matrix.isPr }}
         id: docker_build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           build-contexts: |
             ${{ inputs.dockerfile_additional_contexts }}
@@ -231,7 +231,7 @@ jobs:
       # with direct tarball export. This includes: dspace-dependencies, dspace-solr, dspace-postgres-loadsql
       - name: Build and push image to local TAR file (docker-container driver)
         if: ${{ matrix.arch == 'linux/amd64' && (!matrix.isPr || (inputs.build_id != 'dspace-prod' && inputs.build_id != 'dspace-test' && inputs.build_id != 'dspace-cli')) }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           build-contexts: |
             ${{ inputs.dockerfile_additional_contexts }}
@@ -255,7 +255,7 @@ jobs:
       # The docker driver doesn't support tarball export, so we use 'load: true' and then 'docker save'.
       - name: Build image (docker driver for local dependencies access)
         if: ${{ matrix.arch == 'linux/amd64' && matrix.isPr && (inputs.build_id == 'dspace-prod' || inputs.build_id == 'dspace-test' || inputs.build_id == 'dspace-cli') }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           build-contexts: |
             ${{ inputs.dockerfile_additional_contexts }}
@@ -299,7 +299,7 @@ jobs:
       - docker-build
     steps:
       - name: Download Docker build digests
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: /tmp/digests
           # Download digests for both AMD64 and ARM64 into same directory
