@@ -89,8 +89,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  * <p><strong>Virtual Metadata Structure:</strong></p>
  * <p>Creates two types of virtual metadata fields with the configured qualifier:</p>
  * <ul>
- *   <li><strong>{@code cris.virtual.[qualifier]}:</strong> Contains the actual copied values</li>
- *   <li><strong>{@code cris.virtualsource.[qualifier]}:</strong> Contains the UUID of the source entity</li>
+ *   <li><strong>{@code dspace.virtual.[qualifier]}:</strong> Contains the actual copied values</li>
+ *   <li><strong>{@code dspace.virtualsource.[qualifier]}:</strong> Contains the UUID of the source entity</li>
  * </ul>
  *
  * <p><strong>Use Cases:</strong></p>
@@ -149,7 +149,7 @@ public class RelatedEntityItemEnhancer extends AbstractItemEnhancer {
      *   <li><strong>Copy Metadata:</strong> For each related entity found, copies values from
      *       configured metadata fields (e.g., person.identifier.orcid) into virtual metadata
      *       fields on the current item</li>
-     *   <li><strong>Maintain Relationships:</strong> Creates {@code cris.virtualsource.*} fields
+     *   <li><strong>Maintain Relationships:</strong> Creates {@code dspace.virtualsource.*} fields
      *       to track which virtual metadata came from which related entity for dependency management</li>
      *   <li><strong>Handle Missing Entities:</strong> When a related entity is not found or has
      *       no values, inserts placeholder values to maintain metadata field consistency</li>
@@ -165,9 +165,9 @@ public class RelatedEntityItemEnhancer extends AbstractItemEnhancer {
      * 
      * <p><strong>Virtual Metadata Structure:</strong></p>
      * <ul>
-     *   <li><strong>{@code cris.virtual.[qualifier]}:</strong> Contains the actual copied values
+     *   <li><strong>{@code dspace.virtual.[qualifier]}:</strong> Contains the actual copied values
      *       from related entities (e.g., ORCID identifiers, names, affiliations)</li>
-     *   <li><strong>{@code cris.virtualsource.[qualifier]}:</strong> Contains the UUID of the
+     *   <li><strong>{@code dspace.virtualsource.[qualifier]}:</strong> Contains the UUID of the
      *       related entity that provided each virtual value, enabling dependency tracking</li>
      * </ul>
      * 
@@ -177,8 +177,8 @@ public class RelatedEntityItemEnhancer extends AbstractItemEnhancer {
      * Person entity uuid-123 has: person.identifier.orcid = "0000-0000-0000-0000"
      * 
      * After enhancement, Publication gains:
-     * - cris.virtual.author-orcid = "0000-0000-0000-0000"
-     * - cris.virtualsource.author-orcid = "uuid-123"
+     * - dspace.virtual.author-orcid = "0000-0000-0000-0000"
+     * - dspace.virtualsource.author-orcid = "uuid-123"
      * </pre>
      *
      * 

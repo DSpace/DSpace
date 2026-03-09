@@ -8,7 +8,7 @@
 package org.dspace.authority.service.impl;
 
 import static org.dspace.content.Item.ANY;
-import static org.dspace.content.MetadataSchemaEnum.CRIS;
+import static org.dspace.content.MetadataSchemaEnum.DSPACE;
 
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -98,7 +98,7 @@ public class ItemSearchServiceImpl implements ItemSearchService {
 
     private Iterator<Item> findByCrisSourceId(Context context, String crisSourceId) {
         try {
-            return itemService.findUnfilteredByMetadataField(context, CRIS.getName(), "sourceId", null, crisSourceId);
+            return itemService.findUnfilteredByMetadataField(context, DSPACE.getName(), "sourceId", null, crisSourceId);
         } catch (SQLException | AuthorizeException e) {
             throw new RuntimeException("An error occurs searching items by crisSourceId " + crisSourceId, e);
         }

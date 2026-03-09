@@ -185,7 +185,7 @@ public class CleanUpAuthorityRelationMetadataIT extends AbstractControllerIntegr
 
     @Test
     public void checkBusinessModeAndPersonItemWithoutAnyBusinessIdentifierTest() throws Exception {
-        configurationService.setProperty("authority.controlled.cris.virtual.department", "true");
+        configurationService.setProperty("authority.controlled.dspace.virtual.department", "true");
         configurationService.setProperty("item-deletion.authority-cleanup.enabled", true);
         // configure BUSINESS_MODE for dc.contributor.author metadata
         configurationService.setProperty(AUTHORITY_CLEANUP_PROPERTY_PREFIX + "dc.contributor.author",

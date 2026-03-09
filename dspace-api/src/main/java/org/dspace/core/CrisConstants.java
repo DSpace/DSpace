@@ -22,10 +22,10 @@ public class CrisConstants {
      */
     public static final String PLACEHOLDER_PARENT_METADATA_VALUE = "#PLACEHOLDER_PARENT_METADATA_VALUE#";
     public static final MetadataFieldName MD_ENTITY_TYPE = new MetadataFieldName("dspace", "entity", "type");
-    public static final MetadataFieldName MD_SUBMISSION_TYPE = new MetadataFieldName("cris", "submission",
+    public static final MetadataFieldName MD_SUBMISSION_TYPE = new MetadataFieldName("dspace", "submission",
                                                                                      "definition");
-    public static final MetadataFieldName MD_WORKFLOW_NAME = new MetadataFieldName("cris", "workflow", "name");
-    public static final MetadataFieldName MD_SHARED_WORKSPACE = new MetadataFieldName("cris", "workspace", "shared");
+    public static final MetadataFieldName MD_WORKFLOW_NAME = new MetadataFieldName("dspace", "workflow", "name");
+    public static final MetadataFieldName MD_SHARED_WORKSPACE = new MetadataFieldName("dspace", "workspace", "shared");
 
     /**
      * Make the constructor private as it is an utility class

@@ -170,7 +170,7 @@
     </bean>
 
     <bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByLegacyId">
-        <constructor-arg value="cris.legacyId"></constructor-arg>
+        <constructor-arg value="dspace.legacyId"></constructor-arg>
         <constructor-arg value="LEGACY-ID"></constructor-arg>
     </bean>
 

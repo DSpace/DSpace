@@ -852,11 +852,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             case "entity-type":
                 return new String[] { "dspace", "entity", "type" };
             case "submission-type":
-                return new String[] { MetadataSchemaEnum.CRIS.getName(), "submission", "definition" };
+                return new String[] { MetadataSchemaEnum.DSPACE.getName(), "submission", "definition" };
             case "workflow-name":
-                return new String[] { MetadataSchemaEnum.CRIS.getName(), "workflow", "name" };
+                return new String[] { MetadataSchemaEnum.DSPACE.getName(), "workflow", "name" };
             case "shared-workspace":
-                return new String[] { MetadataSchemaEnum.CRIS.getName(), "workspace", "shared" };
+                return new String[] { MetadataSchemaEnum.DSPACE.getName(), "workspace", "shared" };
             default:
                 return new String[] {null, null, null};
         }

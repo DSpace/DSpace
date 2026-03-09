@@ -43,8 +43,8 @@ public class RelatedEntityItemEnhancerUtils {
      * currently exists and which source entities they came from.</p>
      *
      * <p><strong>Virtual Metadata Pairing:</strong></p>
-     * <p>The method pairs {@code cris.virtualsource.[qualifier]} fields (containing source UUIDs)
-     * with {@code cris.virtual.[qualifier]} fields (containing the actual values) based on their
+     * <p>The method pairs {@code dspace.virtualsource.[qualifier]} fields (containing source UUIDs)
+     * with {@code dspace.virtual.[qualifier]} fields (containing the actual values) based on their
      * position order in the metadata arrays.</p>
      *
      * <p><strong>Inconsistency Handling:</strong></p>
@@ -58,18 +58,18 @@ public class RelatedEntityItemEnhancerUtils {
      * <p><strong>Return Structure:</strong></p>
      * <p>Returns a Map where:</p>
      * <ul>
-     *   <li><strong>Key:</strong> Source entity UUID (from {@code cris.virtualsource.[qualifier]} values)</li>
-     *   <li><strong>Value:</strong> List of {@link MetadataValue} objects from {@code cris.virtual.[qualifier]}
+     *   <li><strong>Key:</strong> Source entity UUID (from {@code dspace.virtualsource.[qualifier]} values)</li>
+     *   <li><strong>Value:</strong> List of {@link MetadataValue} objects from {@code dspace.virtual.[qualifier]}
      *       that were derived from that source entity</li>
      * </ul>
      *
      * <p><strong>Example:</strong></p>
      * <pre>
      * Item has:
-     * - cris.virtualsource.author[0] = "person-uuid-123"
-     * - cris.virtualsource.author[1] = "person-uuid-456"
-     * - cris.virtual.author[0] = "0000-0000-0000-0000"
-     * - cris.virtual.author[1] = "John Doe"
+     * - dspace.virtualsource.author[0] = "person-uuid-123"
+     * - dspace.virtualsource.author[1] = "person-uuid-456"
+     * - dspace.virtual.author[0] = "0000-0000-0000-0000"
+     * - dspace.virtual.author[1] = "John Doe"
      *
      * Returns:
      * {

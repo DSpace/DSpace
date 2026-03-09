@@ -91,7 +91,7 @@ public class ItemForMetadataEnhancementUpdateDAOImpl implements ItemForMetadataE
     /**
      * {@inheritDoc}
      * 
-     * <p><strong>Query Logic:</strong> Searches for all items containing {@code cris.virtualsource.*}
+     * <p><strong>Query Logic:</strong> Searches for all items containing {@code dspace.virtualsource.*}
      * metadata fields where the first 36 characters (UUID portion) match the updated entity's UUID.
      * This covers both direct references and qualified references like "uuid::qualifier".</p>
      */
@@ -100,7 +100,7 @@ public class ItemForMetadataEnhancementUpdateDAOImpl implements ItemForMetadataE
         try {
             Session session = getHibernateSession();
             MetadataSchemaService schemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
-            MetadataSchema schema = schemaService.find(context, "cris");
+            MetadataSchema schema = schemaService.find(context, "dspace");
             String sqlInsertOrUpdate;
             if ("org.h2.Driver".equals(configurationService.getProperty("db.driver"))) {
                 // H2 doesn't support the INSERT OR UPDATE statement so let's do in two steps

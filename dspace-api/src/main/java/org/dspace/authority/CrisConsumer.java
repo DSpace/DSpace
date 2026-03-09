@@ -10,7 +10,7 @@ package org.dspace.authority;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.dspace.content.MetadataSchemaEnum.CRIS;
+import static org.dspace.content.MetadataSchemaEnum.DSPACE;
 
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -295,7 +295,7 @@ public class CrisConsumer implements Consumer {
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, useOfTemplate(metadata));
         Item relatedItem = workspaceItem.getItem();
-        itemService.addMetadata(context, relatedItem, CRIS.getName(), "sourceId", null, null, crisSourceId);
+        itemService.addMetadata(context, relatedItem, DSPACE.getName(), "sourceId", null, null, crisSourceId);
         if (!hasEntityType(relatedItem, entityType)) {
             log.error("Inconstent configuration the related item " + relatedItem.getID().toString() + ", created from "
                 + item.getID().toString() + " (" + metadata.getMetadataField().toString('.') + ")"

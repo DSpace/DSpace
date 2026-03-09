@@ -58,8 +58,8 @@
          What it does:
          - Finds Person entities linked via dc.contributor.author or dc.contributor.editor
          - Copies person.affiliation.name values
-         - Creates cris.virtual.department fields on the Publication/Product/Patent
-         - Creates cris.virtualsource.department fields tracking source Person UUIDs
+         - Creates dspace.virtual.department fields on the Publication/Product/Patent
+         - Creates dspace.virtualsource.department fields tracking source Person UUIDs
          
          Use case:
          - Enable faceted search by author affiliation/department
@@ -67,8 +67,8 @@
          - Identify publications with authors from specific organizations
          
          Example result on a Publication:
-         - cris.virtual.department = "Computer Science Department"
-         - cris.virtualsource.department = "person-uuid-123" -->
+         - dspace.virtual.department = "Computer Science Department"
+         - dspace.virtualsource.department = "person-uuid-123" -->
     <bean class="org.dspace.content.enhancer.impl.RelatedEntityItemEnhancer" >
         <property name="sourceEntityTypes" ref="researchOutputsEntityTypes" />
         <property name="sourceItemMetadataFields">
@@ -91,8 +91,8 @@
          What it does:
          - Finds Person entities linked via dc.contributor.author or dc.contributor.editor
          - Copies person.identifier.orcid values
-         - Creates cris.virtual.orcid fields on the Publication/Product/Patent
-         - Creates cris.virtualsource.orcid fields tracking source Person UUIDs
+         - Creates dspace.virtual.orcid fields on the Publication/Product/Patent
+         - Creates dspace.virtualsource.orcid fields tracking source Person UUIDs
          
          Use case:
          - Enable faceted search by author ORCID
@@ -101,8 +101,8 @@
          - Support ORCID integration and validation workflows
          
          Example result on a Publication:
-         - cris.virtual.orcid = "0000-0001-2345-6789"
-         - cris.virtualsource.orcid = "person-uuid-123"
+         - dspace.virtual.orcid = "0000-0001-2345-6789"
+         - dspace.virtualsource.orcid = "person-uuid-123"
          
          Note: If a Person has no ORCID, a placeholder value (#PLACEHOLDER_PARENT_METADATA_VALUE#)
          is stored. When the Person later adds an ORCID, cascade updates will populate

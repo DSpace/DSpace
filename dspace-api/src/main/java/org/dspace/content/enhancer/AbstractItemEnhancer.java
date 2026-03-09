@@ -23,18 +23,18 @@ public abstract class AbstractItemEnhancer implements ItemEnhancer {
      * <p>
      * The virtual qualifier is a metadata qualifier that serves as the suffix for
      * dynamically generated virtual metadata fields. These fields follow the pattern
-     * {@code cris.virtual.<virtualQualifier>} and {@code cris.virtualsource.<virtualQualifier>}.
+     * {@code dspace.virtual.<virtualQualifier>} and {@code dspace.virtualsource.<virtualQualifier>}.
      * </p>
      * <p>
      * Virtual metadata fields are used to copy and denormalize metadata from related
      * entities onto the current item. For example, if an item has authors linked
      * through authority control, a virtualQualifier of "orcid" would create
-     * {@code cris.virtual.orcid} fields containing ORCID identifiers from the
+     * {@code dspace.virtual.orcid} fields containing ORCID identifiers from the
      * linked author entities.
      * </p>
      * <p>
-     * The {@code cris.virtual.<qualifier>} fields contain the actual copied values,
-     * while {@code cris.virtualsource.<qualifier>} fields track the authority
+     * The {@code dspace.virtual.<qualifier>} fields contain the actual copied values,
+     * while {@code dspace.virtualsource.<qualifier>} fields track the authority
      * sources (UUIDs) of the related entities from which the values were derived.
      * </p>
      * 
@@ -51,17 +51,17 @@ public abstract class AbstractItemEnhancer implements ItemEnhancer {
      * Sets the virtual qualifier used to construct virtual metadata field names.
      * <p>
      * The virtual qualifier defines the suffix for dynamically generated virtual
-     * metadata fields that follow the pattern {@code cris.virtual.<virtualQualifier>}
-     * and {@code cris.virtualsource.<virtualQualifier>}.
+     * metadata fields that follow the pattern {@code dspace.virtual.<virtualQualifier>}
+     * and {@code dspace.virtualsource.<virtualQualifier>}.
      * </p>
      * <p>
      * This qualifier determines what type of virtual metadata will be created by
      * this enhancer. Common examples include:
      * </p>
      * <ul>
-     * <li>"orcid" - creates {@code cris.virtual.orcid} fields with ORCID identifiers
+     * <li>"orcid" - creates {@code dspace.virtual.orcid} fields with ORCID identifiers
      *     from linked author entities</li>
-     * <li>"department" - creates {@code cris.virtual.department} fields with
+     * <li>"department" - creates {@code dspace.virtual.department} fields with
      *     department names from linked affiliation entities</li>
      * </ul>
      * 

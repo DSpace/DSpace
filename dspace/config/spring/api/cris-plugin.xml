@@ -54,7 +54,7 @@
        2. Optionally fetches additional metadata to populate parent item fields
     
     D) IF authority value is blank or not set:
-       1. Generates cris.sourceId using MD5 hash of metadata value (or UUID if configured)
+       1. Generates dspace.sourceId using MD5 hash of metadata value (or UUID if configured)
        2. Creates new entity using internal metadata mappings (SOURCE_INTERNAL)
        3. Populates entity from parent item metadata (e.g., oairecerif.author.affiliation)
        
@@ -113,8 +113,8 @@
                   oairecerif.author.affiliation = "MIT"
                   authority = (blank)
        System:
-       - Generates cris.sourceId = MD5("JANE SMITH") or random UUID
-       - Searches for Person with matching cris.sourceId
+       - Generates dspace.sourceId = MD5("JANE SMITH") or random UUID
+       - Searches for Person with matching dspace.sourceId
        - If not found:
          * Creates Person entity with dc.title = "Jane Smith"
          * Copies oairecerif.author.affiliation → person.affiliation.name = "MIT"
@@ -403,7 +403,7 @@
 
 	<!-- Search entities by legacy identifier -->
 	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByLegacyId">
-		<constructor-arg value="cris.legacyId"></constructor-arg>
+		<constructor-arg value="dspace.legacyId"></constructor-arg>
 		<constructor-arg value="LEGACY-ID"></constructor-arg>
 	</bean>
 
