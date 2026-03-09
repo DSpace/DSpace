@@ -81,6 +81,20 @@
 
     <dc-type>
         <schema>crisrp</schema>
+        <element>name</element>
+        <qualifier>translated</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>name</element>
+        <qualifier>variant</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
         <element>workgroup</element>
         <qualifier></qualifier>
         <scope_note></scope_note>
