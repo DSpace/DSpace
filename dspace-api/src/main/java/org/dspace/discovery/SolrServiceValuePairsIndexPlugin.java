@@ -209,7 +209,7 @@ public class SolrServiceValuePairsIndexPlugin implements SolrServiceIndexPlugin 
         document.addField(fieldNameWithLanguage + "_filter", filterField);
         document.addField(fieldNameWithLanguage + SOLR_FIELD_SUFFIX_FACET_PREFIXES, prefixField);
         document.addField(fieldNameWithLanguage + "_ac", valueLowerCase + separator + value);
-        if (document.containsKey(searchFilter.getIndexFieldName() + "_authority")) {
+        if (StringUtils.isNotBlank(authority)) {
             document.addField(fieldNameWithLanguage + "_authority", authority);
         }
     }
