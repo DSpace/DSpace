@@ -29,8 +29,6 @@ import org.springframework.lang.NonNull;
 
 /**
  * Try to look to an Item's primary bitstreams metadata for the corresponding author name and email.
- * Failover to the RequestItemSubmitterStrategy.
- *
  */
 public class RequestPrimaryBitstreamMetadataStrategy implements RequestItemAuthorExtractor {
 
