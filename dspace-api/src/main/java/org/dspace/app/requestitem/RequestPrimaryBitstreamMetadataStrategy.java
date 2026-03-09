@@ -28,7 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 
 /**
- * Try to look to an Item's primary bitstreams metadata for the corresponding author name and email.
+ * Try to look to an Item's primary bitstreams metadata for the corresponding
+ * author name and email.
+ * You need to specify emailMetadata and fullNameMetadata metadata fields on
+ * your spring configurations.
  */
 public class RequestPrimaryBitstreamMetadataStrategy implements RequestItemAuthorExtractor {
 
@@ -47,6 +50,16 @@ public class RequestPrimaryBitstreamMetadataStrategy implements RequestItemAutho
     public RequestPrimaryBitstreamMetadataStrategy() {
     }
 
+    /**
+     * Retrieve the author to contact for when requesting a copy of the
+     * given item. The contacts are based on the metadata stored in the primary
+     * bitstream of that particular item.
+     *
+     * @param context DSpace context object
+     * @param item item to request
+     * @return Names and email addresses to send the request to.
+     * @throws SQLException if database error
+     */
     @Override
     @NonNull
     public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
@@ -107,10 +120,18 @@ public class RequestPrimaryBitstreamMetadataStrategy implements RequestItemAutho
         return Collections.emptyList();
     }
 
+    /**
+     * Email field setter
+     * @param emailMetadata
+     */
     public void setEmailMetadata(@NonNull String emailMetadata) {
         this.emailMetadata = emailMetadata;
     }
 
+    /**
+     * Full Name field setter
+     * @param fullNameMetadata
+     */
     public void setFullNameMetadata(@NonNull String fullNameMetadata) {
         this.fullNameMetadata = fullNameMetadata;
     }
