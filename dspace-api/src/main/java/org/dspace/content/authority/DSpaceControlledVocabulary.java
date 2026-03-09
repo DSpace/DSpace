@@ -62,8 +62,9 @@ import org.xml.sax.InputSource;
 public class DSpaceControlledVocabulary extends SelfNamedPlugin implements HierarchicalAuthority {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
-    protected static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
-        "'abcdefghijklmnopqrstuvwxyz'),%s)]";
+    protected static String xpathTemplate = "//node[contains(translate(@label," +
+        "'ABCDEFGHIJKLMNOPQRSTUVWXYZÁÀÂÄÃÅĄĂĆČÇĎĐÉÈÊËĘĚÍÌÎÏŁĽŃŇÑÓÒÔÖÕŐŔŘŚŠŞŤŢÚÙÛÜŮŰÝŸŹŽŻ'," +
+        "'abcdefghijklmnopqrstuvwxyzáàâäãåąăćčçďđéèêëęěíìîïłľńňñóòôöõőŕřśšşťţúùûüůűýÿźžż'),%s)]";
     protected static String idTemplate = "//node[@id = %s]";
     protected static String idTemplateQuoted = "//node[@id = '%s']";
     protected static String labelTemplate = "//node[@label = %s]";
