@@ -287,7 +287,8 @@ public class AuditSolrServiceImpl implements AuditService {
         if (audit.getEpersonUUID() != null) {
             solrInDoc.addField(EPERSON_UUID_FIELD, audit.getEpersonUUID().toString());
         }
-        solrInDoc.addField(DATETIME_FIELD, audit.getDatetime());
+        solrInDoc.addField(DATETIME_FIELD,
+                java.util.Date.from(audit.getDatetime())); // NOPMD - required by third-party API
         if (audit.getDetail() != null) {
             solrInDoc.addField(DETAIL_FIELD, audit.getDetail());
         }
