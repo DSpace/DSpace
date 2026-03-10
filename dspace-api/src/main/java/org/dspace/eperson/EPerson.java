@@ -134,16 +134,13 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
             return false;
         }
         final EPerson other = (EPerson) obj;
-        if (!this.getID().equals(other.getID())) {
-            return false;
+        if (this.getID().equals(other.getID())) {
+            return true;
         }
         if (!Strings.CS.equals(this.getEmail(), other.getEmail())) {
             return false;
         }
-        if (!Strings.CS.equals(this.getFullName(), other.getFullName())) {
-            return false;
-        }
-        return true;
+        return Strings.CS.equals(this.getFullName(), other.getFullName());
     }
 
     /**

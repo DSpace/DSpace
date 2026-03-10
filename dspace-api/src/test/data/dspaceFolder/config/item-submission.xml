@@ -39,6 +39,7 @@
         <name-map collection-handle="123456789/modeA" submission-name="modeA"/>
         <name-map collection-handle="123456789/mode2" submission-name="modeB"/>
         <name-map collection-handle="123456789/patent-test" submission-name="patent"/>
+        <name-map collection-handle="123456789/publication-1" submission-name="publication"/>
     </submission-map>
 
 
@@ -167,6 +168,37 @@
             <heading>submit.progressbar.describe.patent_references</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
+        </step-definition>
+        <!-- publication steps [START] -->
+        <step-definition id="publication" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="publication_indexing" mandatory="true">
+            <heading>submit.progressbar.describe.publication_indexing</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="publication_bibliographic_details" mandatory="true">
+            <heading>submit.progressbar.describe.publication_bibliographic_details</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="publication_references" mandatory="true">
+            <heading>submit.progressbar.describe.publication_references</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="person" mandatory="true">
+            <heading>submit.progressbar.describe.person</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="detect-duplicate" mandatory="false">
+            <heading>submit.progressbar.duplicates</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DuplicateDetectionStep</processing-class>
+            <type>duplicates</type>
         </step-definition>
         <!-- publication steps [END]   -->
 
@@ -450,6 +482,26 @@
         <submission-process name="orgunit">
             <step id="collection" />
             <step id="orgunit" />
+            <step id="license" />
+        </submission-process>
+
+        <submission-process name="publication">
+            <step id="collection" />
+            <step id="extraction" />
+            <step id="publication" />
+            <step id="publication_indexing" />
+            <step id="publication_bibliographic_details" />
+            <step id="publication_references" />
+            <step id="detect-duplicate"/>
+            <step id="upload" />
+            <step id="license" />
+        </submission-process>
+
+        <submission-process name="person">
+            <step id="collection" />
+            <step id="person" />
+            <step id="detect-duplicate" />
+            <step id="upload" />
             <step id="license" />
         </submission-process>
 
