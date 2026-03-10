@@ -103,7 +103,7 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, S
      */
     @Override
     @PreAuthorize("permitAll()")
-    // Security is checked internaly in EditItemModeServiceImpl.hasAccess
+    // Security is checked internally in EditItemModeServiceImpl.hasAccess
     public EditItemRest findOne(Context context, String data) {
         EditItem editItem = null;
         String uuid = null;
