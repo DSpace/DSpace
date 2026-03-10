@@ -46,6 +46,8 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
 
     protected static final String PRE = ImageMagickThumbnailFilter.class.getName();
 
+    private Item item;
+
     static {
         String s = configurationService.getProperty(PRE + ".ProcessStarter");
         ProcessStarter.setGlobalSearchPath(s);
@@ -143,6 +145,23 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
             op.density(Integer.valueOf(density));
         }
 
+        // Get custom page number from metadata if available
+        int pageNumber = 0;
+        String pageNumberStr = itemService.getMetadataFirstValue(this.item, "dspace", "thumbnail", "page", Item.ANY);
+        try {
+            if (pageNumberStr != null) {
+                pageNumber = Integer.parseInt(pageNumberStr);
+                pageNumber -= 1; // Convert to zero-based index
+                if (pageNumber < 0) {
+                    pageNumber = 0;
+                }
+            }
+        } catch (NumberFormatException e) {
+            System.err.format("dspace.thumbnail.page metadata contains an invalid page number: %s%n",
+                    pageNumberStr);
+            pageNumber = 0;
+        }
+
         // Check the PDF's MediaBox and CropBox to see if they are the same.
         // If not, then tell ImageMagick to use the CropBox when generating
         // the thumbnail because the CropBox is generally used to define the
@@ -152,9 +171,9 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         // CropBox. Note: we don't need to do anything special to detect if
         // the CropBox is missing or empty because pdfbox will set it to the
         // same size as the MediaBox if it doesn't exist. Also note that we
-        // only need to check the first page, since that's what we use for
-        // generating the thumbnail (PDPage uses a zero-based index).
-        PDPage pdfPage = Loader.loadPDF(f).getPage(0);
+        // check the page specified by the metadata, or the first page if not set
+        // (PDPage uses a zero-based index).
+        PDPage pdfPage = Loader.loadPDF(f).getPage(pageNumber);
         PDRectangle pdfPageMediaBox = pdfPage.getMediaBox();
         PDRectangle pdfPageCropBox = pdfPage.getCropBox();
 
@@ -163,7 +182,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
             op.define("pdf:use-cropbox=true");
         }
 
-        String s = "[0]";
+        String s = "[" + pageNumber + "]";
         op.addImage(f.getAbsolutePath() + s);
         if (configurationService.getBooleanProperty(PRE + ".flatten", true)) {
             op.flatten();
@@ -191,6 +210,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
 
     @Override
     public boolean preProcessBitstream(Context c, Item item, Bitstream source, boolean verbose) throws Exception {
+        this.item = item;
         String nsrc = source.getName();
         for (Bundle b : itemService.getBundles(item, "THUMBNAIL")) {
             for (Bitstream bit : b.getBitstreams()) {
