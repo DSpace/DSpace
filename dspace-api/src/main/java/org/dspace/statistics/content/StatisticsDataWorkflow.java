@@ -196,7 +196,8 @@ public class StatisticsDataWorkflow extends StatisticsData {
                 .query(getQuery(), null, null, 1, 0, null, null, null, null, "time", true, facetMinCount);
             if (0 < oldestRecord.getResults().getNumFound()) {
                 SolrDocument solrDocument = oldestRecord.getResults().get(0);
-                ZonedDateTime oldestDate = ((java.util.Date) solrDocument.getFieldValue("time"))
+                ZonedDateTime oldestDate = ((java.util.Date) // NOPMD - required by third-party API
+                        solrDocument.getFieldValue("time"))
                     .toInstant().atZone(ZoneOffset.UTC);
                 //Store the date, we only need to retrieve this once !
                 try {

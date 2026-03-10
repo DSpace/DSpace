@@ -48,11 +48,14 @@ public class ShortLivedJWTTokenHandler extends JWTTokenHandler {
             JWSVerifier verifier = new MACVerifier(buildSigningKey(ePerson));
 
             //If token is valid and not expired return eperson in token
-            java.util.Date expirationTime = jwtClaimsSet.getExpirationTime();
+            java.util.Date expirationTime = // NOPMD - required by third-party API
+                    jwtClaimsSet.getExpirationTime();
             return signedJWT.verify(verifier)
                 && expirationTime != null
                 //Ensure expiration timestamp is after the current time
-                && DateUtils.isAfter(expirationTime, java.util.Date.from(Instant.now()), 0);
+                && DateUtils.isAfter(expirationTime,
+                    java.util.Date.from(Instant.now() // NOPMD - required by third-party API
+                    ), 0);
         }
     }
 

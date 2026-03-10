@@ -22,6 +22,7 @@ public class ExternalSourceEntryRestConverter implements DSpaceConverter<Externa
     @Autowired
     private MetadataValueDTOListConverter metadataConverter;
 
+    @Override
     public ExternalSourceEntryRest convert(ExternalDataObject modelObject, Projection projection) {
         ExternalSourceEntryRest externalSourceEntryRest = new ExternalSourceEntryRest();
         externalSourceEntryRest.setId(modelObject.getId());
@@ -33,6 +34,7 @@ public class ExternalSourceEntryRestConverter implements DSpaceConverter<Externa
         return externalSourceEntryRest;
     }
 
+    @Override
     public Class<ExternalDataObject> getModelClass() {
         return ExternalDataObject.class;
     }

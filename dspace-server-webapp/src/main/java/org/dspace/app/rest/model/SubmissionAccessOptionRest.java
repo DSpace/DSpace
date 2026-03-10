@@ -32,10 +32,12 @@ public class SubmissionAccessOptionRest extends BaseObjectRest<String> {
 
     private List<AccessConditionOptionRest> accessConditionOptions;
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }

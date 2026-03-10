@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class StatisticsSupportHalLinkFactory
     extends HalLinkFactory<StatisticsSupportResource, StatisticsRestController> {
+    @Override
     protected void addLinks(StatisticsSupportResource halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
 
@@ -28,10 +29,12 @@ public class StatisticsSupportHalLinkFactory
         list.add(buildLink("searchevents", getMethodOn().getSearchEvents()));
     }
 
+    @Override
     protected Class<StatisticsRestController> getControllerClass() {
         return StatisticsRestController.class;
     }
 
+    @Override
     protected Class<StatisticsSupportResource> getResourceClass() {
         return StatisticsSupportResource.class;
     }

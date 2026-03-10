@@ -335,6 +335,7 @@
                     </executions>
                     <configuration>
                         <failOnViolation>true</failOnViolation>
+                        <printFailingErrors>true</printFailingErrors>
                         <rulesets>
                             <ruleset>${root.basedir}/pmd-code-ruleset.xml</ruleset>
                         </rulesets>

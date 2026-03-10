@@ -29,10 +29,12 @@ public class SubmissionCOARNotifyRest extends BaseObjectRest<String> {
 
     private List<NotifyPattern> patterns;
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(final String id) {
         this.id = id;
     }
