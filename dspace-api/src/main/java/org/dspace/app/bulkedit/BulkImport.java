@@ -255,6 +255,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         try {
             this.reader = new DCInputsReader();
         } catch (DCInputsReaderException e) {
+            handler.handleException(e);
             throw new RuntimeException(e);
         }
 
@@ -282,7 +283,9 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         }
 
         if (!this.authorizeService.isAdmin(context, collection)) {
-            throw new IllegalArgumentException("The user is not an admin of the given collection");
+            String errMsg = "The user is not an admin of the given collection";
+            handler.logError(errMsg);
+            throw new IllegalArgumentException(errMsg);
         }
 
         try {
@@ -322,15 +325,21 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             String name = sheet.getSheetName();
 
             if (WorkbookUtils.isSheetEmpty(sheet)) {
-                throw new BulkImportException("The sheet " + name + " of the Workbook is empty");
+                String errMsg = "The sheet " + name + " of the Workbook is empty";
+                handler.logError(errMsg);
+                throw new BulkImportException(errMsg);
             }
 
             if (WorkbookUtils.isRowEmpty(sheet.getRow(0))) {
-                throw new BulkImportException("The header of sheet " + name + " of the Workbook is empty");
+                String errMsg = "The header of sheet " + name + " of the Workbook is empty";
+                handler.logError(errMsg);
+                throw new BulkImportException(errMsg);
             }
 
             if (isMetadataGroupsSheet(sheet) && !groups.contains(name)) {
-                throw new BulkImportException("The sheet name " + name + " is not a valid metadata group");
+                String errMsg = "The sheet name " + name + " is not a valid metadata group";
+                handler.logError(errMsg);
+                throw new BulkImportException(errMsg);
             }
 
             validateHeaders(sheet);
@@ -390,7 +399,9 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             String header = headers.get(i);
             String expected = mandatoryMainHeaders[i];
             if (!mandatoryMainHeaders[i].equals(header)) {
-                throw new BulkImportException("Wrong " + expected + " header on sheet " + sheetName + ": " + header);
+                String errMsg = "Wrong " + expected + " header on sheet " + sheetName + ": " + header;
+                handler.logError(errMsg);
+                throw new BulkImportException(errMsg);
             }
         }
 
@@ -405,8 +416,10 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         for (String optionalMainHeader : optionalMainHeaders) {
             int indexOfOptionalHeader = headers.indexOf(optionalMainHeader);
             if (indexOfOptionalHeader >= maxMainHeadersCount) {
-                throw new BulkImportException("The optional column " + optionalMainHeader
-                    + " present in sheet " + sheet.getSheetName() + " must be placed before the metadata fields");
+                String errMsg = "The optional column " + optionalMainHeader
+                    + " present in sheet " + sheet.getSheetName() + " must be placed before the metadata fields";
+                handler.logError(errMsg);
+                throw new BulkImportException(errMsg);
             }
         }
 
@@ -441,8 +454,10 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         }
 
         if (CollectionUtils.isNotEmpty(invalidMetadataMessages)) {
-            throw new BulkImportException("The following metadata fields of the sheet named '" + sheet.getSheetName()
-                + "' are invalid:" + invalidMetadataMessages);
+            String errMsg = "The following metadata fields of the sheet named '" + sheet.getSheetName()
+                + "' are invalid:" + invalidMetadataMessages;
+            handler.logError(errMsg);
+            throw new BulkImportException(errMsg);
         }
     }
 
@@ -826,8 +841,10 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private BinaryOperator<Integer> handleDuplication(Sheet sheet) {
         return (i1, i2) -> {
-            throw new BulkImportException("Sheet " + sheet.getSheetName() + " - Duplicated headers found on cells "
-                + (i1 + 1) + " and " + (i2 + 1));
+            String errMsg = "Sheet " + sheet.getSheetName() + " - Duplicated headers found on cells "
+                + (i1 + 1) + " and " + (i2 + 1);
+            handler.logError(errMsg);
+            throw new BulkImportException(errMsg);
         };
     }
 
@@ -1132,7 +1149,9 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     private Item updateItem(EntityRow entityRow) throws Exception {
         Item item = findItem(entityRow);
         if (item == null) {
-            throw new BulkImportException("No item to update found for entity with id " + entityRow.getId());
+            String errMsg = "No item to update found for entity with id " + entityRow.getId();
+            handler.logError(errMsg);
+            throw new BulkImportException(errMsg);
         }
 
         return updateItem(entityRow, item);
@@ -1583,10 +1602,9 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     private void handleValidationErrorOnRow(Row row, String message) {
         String sheetName = row.getSheet().getSheetName();
         String errorMessage = "Sheet " + sheetName + " - Row " + (row.getRowNum() + 1) + " - " + message;
+        handler.logError(errorMessage);
         if (abortOnError) {
             throw new BulkImportException(errorMessage);
-        } else {
-            handler.logError(errorMessage);
         }
     }
 

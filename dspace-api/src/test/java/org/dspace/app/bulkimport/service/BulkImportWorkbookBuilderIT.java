@@ -55,6 +55,9 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.dto.BitstreamDTO;
 import org.dspace.content.dto.ItemDTO;
 import org.dspace.content.dto.MetadataValueDTO;
@@ -62,6 +65,8 @@ import org.dspace.content.dto.ResourcePolicyDTO;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
@@ -89,6 +94,14 @@ public class BulkImportWorkbookBuilderIT extends AbstractIntegrationTestWithData
     private final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     private final GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
+    private PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
+
+    private ChoiceAuthorityService choiceAuthorityService = ContentAuthorityServiceFactory
+        .getInstance().getChoiceAuthorityService();
+
+    private MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory
+        .getInstance().getMetadataAuthorityService();
 
     private Collection publications;
 
@@ -118,7 +131,24 @@ public class BulkImportWorkbookBuilderIT extends AbstractIntegrationTestWithData
     public void testWorkbookBuildingFromItemDtos() throws Exception {
 
         configurationService.setProperty("uploads.local-folder", System.getProperty("java.io.tmpdir"));
+        choiceAuthorityService.getChoiceAuthoritiesNames(); // initialize the ChoiceAuthorityService
 
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] {
+                                             "org.dspace.content.authority.OrcidAuthority = AuthorAuthority"
+                                         });
+
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+
+        configurationService.setProperty("choices.plugin.dc.contributor.editor", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.editor", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.editor", "true");
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
         context.turnOffAuthorisationSystem();
 
         Item author = ItemBuilder.createItem(context, persons)
@@ -208,7 +238,7 @@ public class BulkImportWorkbookBuilderIT extends AbstractIntegrationTestWithData
 
         Item firstItem = getItemFromMessage(handler.getInfoMessages().get(7));
         assertThat(firstItem, notNullValue());
-        assertThat(firstItem.getMetadata(), hasSize(19));
+        assertThat(firstItem.getMetadata(), hasSize(17));
         assertThat(firstItem.getMetadata(), hasItems(
             with("dc.title", "Test Publication"),
             with("dc.date.issued", "2020/02/15"),
@@ -228,7 +258,7 @@ public class BulkImportWorkbookBuilderIT extends AbstractIntegrationTestWithData
 
         Item secondItem = getItemFromMessage(handler.getInfoMessages().get(10));
         assertThat(secondItem, notNullValue());
-        assertThat(secondItem.getMetadata(), hasSize(23));
+        assertThat(secondItem.getMetadata(), hasSize(21));
         assertThat(secondItem.getMetadata(), hasItems(
             with("dc.title", "Second Publication"),
             with("dc.date.issued", "2022/02/15"),

@@ -10,7 +10,6 @@ package org.dspace.app.scripts.handler.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
 
 /**
@@ -34,16 +33,6 @@ public class TestDSpaceRunnableHandler extends CommandLineDSpaceRunnableHandler 
     @Override
     public void handleException(String message, Exception e) {
         exception = e;
-
-        if (message != null) {
-            System.err.println(message);
-            errorMessages.add(message);
-        }
-        if (e != null) {
-            message = ExceptionUtils.getRootCauseMessage(e);
-            System.err.println(message);
-            errorMessages.add(message);
-        }
     }
 
     /**
