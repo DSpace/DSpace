@@ -221,6 +221,7 @@ public final class ProviderStack<T> {
         return new Iterator<T>() {
             protected ListIterator<ProviderHolder<T>> it = null;
 
+            @Override
             public synchronized boolean hasNext() {
                 if (it == null) {
                     it = providers.listIterator();
@@ -228,6 +229,7 @@ public final class ProviderStack<T> {
                 return it.hasNext();
             }
 
+            @Override
             public synchronized T next() {
                 if (it == null) {
                     it = providers.listIterator();
@@ -249,6 +251,7 @@ public final class ProviderStack<T> {
                 return t;
             }
 
+            @Override
             public void remove() {
                 it.remove();
             }
