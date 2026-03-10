@@ -188,7 +188,7 @@ public class DCInputSet {
                     return Optional.of(field);
                 } else {
                     String fullName = field.getFieldName();
-                    if (fullName.equals(fieldName)) {
+                    if (fullName != null && fullName.equals(fieldName)) {
                         return Optional.of(field);
                     }
                 }

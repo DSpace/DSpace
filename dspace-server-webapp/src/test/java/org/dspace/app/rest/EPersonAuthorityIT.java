@@ -18,6 +18,10 @@ import java.sql.SQLException;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.content.authority.EPersonAuthority;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -32,7 +36,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class EPersonAuthorityIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    private ConfigurationService configurationService;
+    ConfigurationService configurationService;
+
+    @Autowired
+    MetadataAuthorityService metadataAuthorityService;
+
+    @Autowired
+    ChoiceAuthorityService choiceAuthorityService;
+
+    @Autowired
+    PluginService pluginService;
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        choiceAuthorityService.getChoiceAuthoritiesNames(); // initialize the ChoiceAuthorityService
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] {
+                                             "org.dspace.content.authority.EPersonAuthority = EPersonAuthority"
+                                         });
+
+        configurationService.setProperty("choices.plugin.cris.policy.eperson", "EPersonAuthority");
+        configurationService.setProperty("cchoices.presentation.cris.policy.eperson", "suggest");
+        configurationService.setProperty("authority.controlled.cris.policy.eperson", "true");
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+        context.turnOffAuthorisationSystem();
+    }
 
     @Test
     public void testEPersonAuthorityWithFirstName() throws Exception {
