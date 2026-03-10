@@ -41,6 +41,7 @@ public final class HttpRequestImpl extends AbstractRequestImpl implements Reques
         return null;
     }
 
+    @Override
     public ServletResponse getServletResponse() {
         return servletResponse;
     }
