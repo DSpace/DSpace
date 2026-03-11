@@ -48,6 +48,8 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
     private Context context;
     private IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager()
             .getServiceByName(IndexingService.class.getName(), IndexingService.class);
+    private SolrSuggestService solrSuggestService = DSpaceServicesFactory.getInstance()
+        .getServiceManager().getServiceByName(SolrSuggestService.class.getName(), SolrSuggestService.class);
 
     private IndexClientOptions indexClientOptions;
 
@@ -84,14 +86,23 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             case REMOVE:
                 handler.logInfo("Removing " + commandLine.getOptionValue("r") + " from Index");
                 indexer.unIndexContent(context, indexableObject.get().getUniqueIndexID());
+                if (commandLine.hasOption("suggest")) {
+                    rebuildSuggestDictionaries();
+                }
                 break;
             case CLEAN:
                 handler.logInfo("Cleaning Index");
                 indexer.cleanIndex();
+                if (commandLine.hasOption("suggest")) {
+                    rebuildSuggestDictionaries();
+                }
                 break;
             case DELETE:
                 handler.logInfo("Deleting Index");
                 indexer.deleteIndex();
+                if (commandLine.hasOption("suggest")) {
+                    rebuildSuggestDictionaries();
+                }
                 break;
             case BUILD:
             case BUILDANDSPELLCHECK:
@@ -107,13 +118,25 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                 if (indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
                     checkRebuildSpellCheck(commandLine, indexer);
                 }
+                if (commandLine.hasOption("suggest")) {
+                    rebuildSuggestDictionaries();
+                }
                 break;
             case OPTIMIZE:
                 handler.logInfo("Optimizing search core.");
                 indexer.optimize();
+                if (commandLine.hasOption("suggest")) {
+                    rebuildSuggestDictionaries();
+                }
                 break;
             case SPELLCHECK:
                 checkRebuildSpellCheck(commandLine, indexer);
+                if (commandLine.hasOption("suggest")) {
+                    rebuildSuggestDictionaries();
+                }
+                break;
+            case SUGGEST:
+                rebuildSuggestDictionaries();
                 break;
             case INDEX:
                 handler.logInfo("Indexing " + commandLine.getOptionValue('i') + " force " + commandLine.hasOption("f"));
@@ -123,6 +146,9 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                 final long seconds = (Instant.now().toEpochMilli() - startTimeMillis) / 1000;
                 handler.logInfo("Indexed " + count + " object" + (count > 1 ? "s" : "") +
                                 " in " + seconds + " seconds");
+                if (commandLine.hasOption("suggest")) {
+                    rebuildSuggestDictionaries();
+                }
                 break;
             case UPDATE:
             case UPDATEANDSPELLCHECK:
@@ -131,6 +157,9 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                 if (indexClientOptions == IndexClientOptions.UPDATEANDSPELLCHECK) {
                     checkRebuildSpellCheck(commandLine, indexer);
                 }
+                if (commandLine.hasOption("suggest")) {
+                    rebuildSuggestDictionaries();
+                }
                 break;
             case FORCEUPDATE:
             case FORCEUPDATEANDSPELLCHECK:
@@ -138,6 +167,9 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                 indexer.updateIndex(context, true, type);
                 if (indexClientOptions == IndexClientOptions.FORCEUPDATEANDSPELLCHECK) {
                     checkRebuildSpellCheck(commandLine, indexer);
+                }
+                if (commandLine.hasOption("suggest")) {
+                    rebuildSuggestDictionaries();
                 }
                 break;
             default:
@@ -268,4 +300,15 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         indexer.buildSpellCheck();
     }
 
+    /**
+     * Rebuild all Solr suggest dictionaries
+     *
+     * @throws SearchServiceException in case of a solr exception
+     * @throws IOException            If I/O error occurs.
+     */
+    protected void rebuildSuggestDictionaries()
+            throws SearchServiceException, IOException {
+        handler.logInfo("Rebuilding all suggest dictionaries.");
+        solrSuggestService.rebuildAllDictionaries();
+    }
 }

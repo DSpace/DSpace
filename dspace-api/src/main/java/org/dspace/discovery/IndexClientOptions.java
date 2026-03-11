@@ -32,6 +32,7 @@ public enum IndexClientOptions {
     FORCEUPDATE,
     UPDATEANDSPELLCHECK,
     FORCEUPDATEANDSPELLCHECK,
+    SUGGEST,
     HELP;
 
     public static final String TYPE_OPTION = "t";
@@ -70,6 +71,9 @@ public enum IndexClientOptions {
                 return IndexClientOptions.FORCEUPDATE;
             } else if (commandLine.hasOption("s")) {
                 return IndexClientOptions.UPDATEANDSPELLCHECK;
+            } else if (commandLine.hasOption("suggest")
+                    && commandLine.getOptions().length == 1) {
+                return IndexClientOptions.SUGGEST;
             } else {
                 return IndexClientOptions.UPDATE;
             }
@@ -93,6 +97,8 @@ public enum IndexClientOptions {
                 "delete all records from existing index");
         options.addOption("b", "build", false, "(re)build index, wiping out current one if it exists");
         options.addOption("s", "spellchecker", false, "Rebuild the spellchecker, can be combined with -b and -f.");
+        options.addOption(null, "suggest", false, "Rebuild all suggest dictionaries. " +
+                "Can be used in combination with any other option that changes the index.");
         options.addOption("f", "force", false,
                           "if updating existing index, force each handle to be reindexed even if up-to-date");
         options.addOption("h", "help", false, "print this help message");
