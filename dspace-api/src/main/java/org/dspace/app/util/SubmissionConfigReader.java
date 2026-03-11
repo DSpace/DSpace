@@ -225,58 +225,28 @@ public class SubmissionConfigReader {
     }
 
     /**
-     * Returns the Item Submission process config used for a particular collection,
-     * or the default if none is defined for the collection
+     * Returns the Item Submission process configuration used for a particular collection.
+     * <p>
+     * This method implements a hierarchical lookup strategy to determine the appropriate
+     * submission configuration, checking in the following order:
+     * <ol>
+     *   <li><b>Collection metadata</b>: Checks the {@code cris.submission.definition} metadata field
+     *       on the collection object itself. This provides the highest priority override.</li>
+     *   <li><b>Collection handle mapping</b>: Looks up the collection's handle in the
+     *       {@code <name-map>} section of {@code item-submission.xml}.</li>
+     *   <li><b>Entity type mapping</b>: Attempts to match based on the collection's entity type,
+     *       checking both {@code collection-entity-type} metadata (standard DSpace) and
+     *       {@code entityType} metadata in lowercase (CRIS extension).</li>
+     *   <li><b>Community mapping</b>: Traverses parent communities to find a community-level
+     *       submission configuration mapping.</li>
+     *   <li><b>Default configuration</b>: Falls back to the submission process marked as
+     *       "default" in the {@code <submission-map>} section of {@code item-submission.xml}.</li>
+     * </ol>
      *
-     * @param  collectionHandle                collection's unique Handle
-     * @return                                 the SubmissionConfig representing the
-     *                                         item submission config
-     * @throws SubmissionConfigReaderException if no default submission process
-     *                                         configuration defined
-     */
-    public SubmissionConfig getSubmissionConfigByCollection(String collectionHandle) {
-        // get the name of the submission process config for this collection
-        String submitName = collectionToSubmissionConfig
-            .get(collectionHandle);
-        if (submitName == null) {
-            submitName = collectionToSubmissionConfig
-                .get(DEFAULT_COLLECTION);
-        }
-        if (submitName == null) {
-            throw new IllegalStateException(
-                "No item submission process configuration designated as 'default' in 'submission-map' section of " +
-                    "'item-submission.xml'.");
-        }
-        return getSubmissionConfigByName(submitName);
-    }
-
-
-    public SubmissionConfig getCorrectionSubmissionConfigByCollection(Collection collection) {
-        CollectionService collService = ContentServiceFactory.getInstance().getCollectionService();
-
-        String submitName =
-            collService.getMetadataFirstValue(
-                collection, "cris", "submission", "definition-correction", Item.ANY
-            );
-
-        if (submitName != null) {
-            SubmissionConfig subConfig = getSubmissionConfigByName(submitName);
-            if (subConfig != null) {
-                return subConfig;
-            }
-        }
-
-        return getSubmissionConfigByCollection(collection);
-    }
-
-    /**
-     * Returns the Item Submission process config used for a particular collection,
-     * or the default if none is defined for the collection
-     *
-     * @param collection the collection
-     * @return the SubmissionConfig representing the item submission config
-     * @throws SubmissionConfigReaderException if no default submission process
-     *                                         configuration defined
+     * @param collection the collection for which to retrieve the submission configuration
+     * @return the SubmissionConfig representing the item submission configuration
+     * @throws IllegalStateException if no default submission process configuration is defined
+     *                               in the 'submission-map' section of 'item-submission.xml'
      */
     public SubmissionConfig getSubmissionConfigByCollection(Collection collection) {
 
