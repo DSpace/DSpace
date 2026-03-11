@@ -9,6 +9,7 @@ package org.dspace.discovery;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -84,6 +85,31 @@ public class SolrSuggestService {
 
         } catch (SolrServerException | IOException e) {
             throw new RuntimeException("Unable to retrieve suggest response.", e);
+        }
+    }
+
+    public void rebuildDictionary(String dictionary) {
+        if (isAllowedDictionary(dictionary)) {
+            SolrClient solrClient = solrSearchCore.getSolr();
+            try {
+                SolrQuery solrQuery = new SolrQuery();
+                solrQuery.set("suggest", true);
+                solrQuery.set("suggest.dictionary", dictionary);
+                solrQuery.set("suggest.build", true);
+                solrQuery.setRequestHandler("/suggest");
+                QueryResponse response = solrClient.query(solrQuery);
+            } catch (SolrServerException | IOException e) {
+                log.error("Unable to rebuild dictionary {}: {}", dictionary, e.getMessage());
+            }
+        }
+    }
+
+    public void rebuildAllDictionaries() {
+        log.debug("Rebuilding all dictionaries");
+        List<String> allowedDictionaries = List.of(
+                configurationService.getArrayProperty("discovery.suggest.allowed-dictionaries"));
+        for (String dictionary : allowedDictionaries) {
+            rebuildDictionary(dictionary);
         }
     }
 

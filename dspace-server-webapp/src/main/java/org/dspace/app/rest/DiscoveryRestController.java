@@ -274,4 +274,42 @@ public class DiscoveryRestController implements InitializingBean {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    /**
+     * Build one or all Solr suggest dictionaries. Helpful to force rebuilds
+     * if metadata has changed significantly.
+     *
+     * @param dictionary the name of the suggest dictionary to rebuild
+     *                   of, if blank, indicator to rebuild all dictionaries
+     * @return ResponseEntity with suggestion results in Solr suggest response format
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @RequestMapping(method = RequestMethod.GET, value = "/suggest/build")
+    public ResponseEntity<RepresentationModel<?>> buildSuggestDictionary(
+        @RequestParam(name = "dict", required = false) String dictionary) {
+
+        if (StringUtils.isBlank(dictionary)) {
+            try {
+                solrSuggestService.rebuildAllDictionaries();
+                return ResponseEntity.status(HttpStatus.OK).build();
+            } catch (Exception e) {
+                log.error("Error building suggest dictionaries", e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        }
+
+        if (!solrSuggestService.isAllowedDictionary(dictionary)) {
+            log.warn("Suggest request for non-allowed dictionary: {}", dictionary);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        try {
+            solrSuggestService.rebuildDictionary(dictionary);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (Exception e) {
+            log.error("Error building suggest dictionary={}", dictionary, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
+
