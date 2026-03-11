@@ -159,4 +159,16 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
             }
         }
     }
+
+    /**
+     * Put state back into "not initialzed" and call init()
+     * This should be safe because isHidden also checks this state
+     * and calls init, and they'll both block until complete and the configuration
+     * is in place
+     */
+    public synchronized void reload() {
+        hiddenElementSets = null;
+        hiddenElementMaps = null;
+        init();
+    }
 }

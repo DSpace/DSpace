@@ -62,4 +62,11 @@ public interface MetadataExposureService {
      */
     public boolean isHidden(Context context, String schema, String element, String qualifier)
         throws SQLException;
+
+    /**
+     * Reloads hidden configuration. Useful if an urgent live change needs to be made
+     * and for testing (where we may prefer to add new hidden field config directly
+     * for a given test and not keep overloading cfg files for read at startup)
+     */
+    public void reload();
 }
