@@ -14,8 +14,6 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ScopeEnum;
 import org.dspace.app.rest.model.SubmissionFormFieldRest;
 import org.dspace.app.rest.model.SubmissionFormInputTypeRest;
@@ -51,8 +49,6 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     private static final String INPUT_TYPE_LOOKUP_NAME = "lookup-name";
     private static final String INPUT_TYPE_DROPDOWN = "dropdown";
 
-    private static final Logger log = LogManager.getLogger();
-
     @Autowired
     private AuthorityUtils authorityUtils;
 
@@ -82,7 +78,6 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
             rowRest.setFields(fields);
             rows.add(rowRest);
             for (DCInput dcinput : row) {
-                log.warn(dcinput.getFieldName() + ": " + dcinput.getVocabularyType());
                 fields.add(getField(dcinput, formName));
             }
         }
