@@ -61,8 +61,6 @@ public class MetadataValidator implements SubmissionStepValidator {
 
     private static final String ERROR_VALIDATION_DICTIONARY = "error.validation.dictionary";
 
-    public static final String WORKSPACE_ITEM_OPERATION_PATH_SECTIONS = "sections";
-
     private static final Logger log = LogManager.getLogger(MetadataValidator.class);
 
     private DCInputsReader inputReader;
@@ -270,8 +268,8 @@ public class MetadataValidator implements SubmissionStepValidator {
                         } else {
                             addError(errors,
                                     ERROR_VALIDATION_DICTIONARY + "." + input.getValidationDictionary(),
-                                    "/" + WORKSPACE_ITEM_OPERATION_PATH_SECTIONS
-                                            + "/" + config.getId() + "/" + input.getFieldName() + "/" + md.getPlace());
+                                    "/" + OPERATION_PATH_SECTIONS + "/" + config.getId()
+                                    + "/" + input.getFieldName() + "/" + md.getPlace());
                         }
                     }
                 } catch (ClassCastException e) {
