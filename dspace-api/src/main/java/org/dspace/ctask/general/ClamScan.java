@@ -27,6 +27,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.curate.Suspendable;
@@ -82,7 +83,7 @@ public class ClamScan extends AbstractCurationTask {
     }
 
     @Override
-    public int perform(DSpaceObject dso) throws IOException {
+    public int perform(Context context, DSpaceObject dso) throws IOException {
         status = Curator.CURATE_SKIP;
         logDebugMessage("The target dso is " + dso.getName());
         if (dso instanceof Item) {
@@ -106,7 +107,7 @@ public class ClamScan extends AbstractCurationTask {
                 Bundle bundle = bundles.get(0);
                 results = new ArrayList<String>();
                 for (Bitstream bitstream : bundle.getBitstreams()) {
-                    InputStream inputstream = bitstreamService.retrieve(Curator.curationContext(), bitstream);
+                    InputStream inputstream = bitstreamService.retrieve(context, bitstream);
                     logDebugMessage("Scanning " + bitstream.getName() + " . . . ");
                     int bstatus = scan(bitstream, inputstream, getItemHandle(item));
                     inputstream.close();

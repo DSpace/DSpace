@@ -45,7 +45,7 @@ public class PropertyParameterTestingTask
     }
 
     @Override
-    public int perform(DSpaceObject dso)
+    public int perform(Context ctx, DSpaceObject dso)
             throws IOException {
         LOG.info("Received 'perform' on {}", dso);
         return Curator.CURATE_SUCCESS;

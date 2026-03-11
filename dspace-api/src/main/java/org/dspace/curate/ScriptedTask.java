@@ -40,7 +40,7 @@ public interface ScriptedTask {
      * @return status code
      * @throws IOException if IO error
      */
-    public int performDso(DSpaceObject dso) throws IOException;
+    public int performDso(Context ctx, DSpaceObject dso) throws IOException;
 
     /**
      * Perform the curation task for passed id

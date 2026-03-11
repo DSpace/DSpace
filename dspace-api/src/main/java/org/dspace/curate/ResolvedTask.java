@@ -75,8 +75,8 @@ public class ResolvedTask {
      * @return status code
      * @throws IOException if error
      */
-    public int perform(DSpaceObject dso) throws IOException {
-        return unscripted() ? cTask.perform(dso) : sTask.performDso(dso);
+    public int perform(Context ctx, DSpaceObject dso) throws IOException {
+        return unscripted() ? cTask.perform(ctx, dso) : sTask.performDso(ctx, dso);
     }
 
     /**

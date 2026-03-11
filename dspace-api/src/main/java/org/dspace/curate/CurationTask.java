@@ -33,11 +33,12 @@ public interface CurationTask {
     /**
      * Perform the curation task upon passed DSO
      *
+     * @param ctx DSpace context object
      * @param dso the DSpace object
      * @return status code
      * @throws IOException if error
      */
-    int perform(DSpaceObject dso) throws IOException;
+    int perform(Context ctx, DSpaceObject dso) throws IOException;
 
     /**
      * Perform the curation task for passed id

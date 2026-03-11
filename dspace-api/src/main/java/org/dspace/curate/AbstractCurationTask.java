@@ -9,8 +9,12 @@ package org.dspace.curate;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -26,6 +30,8 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
@@ -47,7 +53,7 @@ public abstract class AbstractCurationTask implements CurationTask {
     protected HandleService handleService;
     protected ConfigurationService configurationService;
     protected DSpaceObjectUtils dspaceObjectUtils;
-    private static final Logger log = LogManager.getLogger();
+    protected EPersonService ePersonService;
 
     @Override
     public void init(Curator curator, String taskId) throws IOException {
@@ -58,10 +64,11 @@ public abstract class AbstractCurationTask implements CurationTask {
         handleService = HandleServiceFactory.getInstance().getHandleService();
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         dspaceObjectUtils = UtilServiceFactory.getInstance().getDSpaceObjectUtils();
+        ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     }
 
     @Override
-    public abstract int perform(DSpaceObject dso) throws IOException;
+    public abstract int perform(Context context, DSpaceObject dso) throws IOException;
 
     /**
      * Distributes a task through a DSpace container - a convenience method
@@ -80,32 +87,73 @@ public abstract class AbstractCurationTask implements CurationTask {
      * @param dso current DSpaceObject
      * @throws IOException if IO error
      */
-    protected void distribute(DSpaceObject dso) throws IOException {
+    private Integer total = null;
+    private int current = 0;
+    private Date start = null;
+    private Date last = null;
+    private final DecimalFormat df = new DecimalFormat("0.00");
+    private final int PAGE_SIZE = 100;
+    protected void distribute(Context context, DSpaceObject dso) throws IOException {
         try {
+            if (total == null) {
+                total = itemService.countTotal(context);
+                start = new Date();
+                last = start;
+            }
             //perform task on this current object
-            performObject(dso);
+            performObject(context, dso);
 
             //next, we'll try to distribute to all child objects, based on container type
             int type = dso.getType();
             if (Constants.COLLECTION == type) {
-                Iterator<Item> iter = itemService.findByCollection(Curator.curationContext(), (Collection) dso);
+                Collection collection = (Collection) dso;
+                System.out.println();
+                System.out.println("NEW COLLECTION: " + itemService.countItems(context, collection));
+                System.out.println();
+
+                Iterator<Item> iter = itemService.findByCollection(context,
+                        (Collection) context.reloadEntity(dso));
+                List<UUID> uuids = new ArrayList<>();
                 while (iter.hasNext()) {
-                    Item item = iter.next();
-                    performObject(item);
-                    Curator.curationContext().uncacheEntity(item);
+                    Item next = iter.next();
+                    uuids.add(next.getID());
+                    context.uncacheEntity(next);
+                }
+                context.commit();
+                for (UUID uuid : uuids) {
+                    Item item = itemService.find(context, uuid);
+                    if (++current % 1000 == 0) {
+                        Date now = new Date();
+                        float ms = (float) (now.getTime() - last.getTime());
+                        float avgSeconds = (float) (now.getTime() - start.getTime()) / 1000 / (current / 1000);
+                        Runtime runtime = Runtime.getRuntime();
+                        long usedMemory = runtime.totalMemory() - runtime.freeMemory();
+
+                        System.out.println(current + " / " + total + " -- " + ms +
+                                "ms - (avg " + df.format(avgSeconds) + "s per 1000) - Used memory: " +
+                                (usedMemory / (1024 * 1024)) + "MB");
+                        last = now;
+                    }
+                    performObject(context, item);
+                    context.commit();
                 }
             } else if (Constants.COMMUNITY == type) {
-                Community comm = (Community) dso;
+                Community comm = (Community) context.reloadEntity(dso);
                 for (Community subcomm : comm.getSubcommunities()) {
-                    distribute(subcomm);
+                    distribute(context, subcomm);
+                    context.uncacheEntity(subcomm);
                 }
+                comm = context.reloadEntity(comm);
                 for (Collection coll : comm.getCollections()) {
-                    distribute(coll);
+                    distribute(context, coll);
+                    context.uncacheEntity(coll);
                 }
+                context.uncacheEntity(comm);
             } else if (Constants.SITE == type) {
-                List<Community> topComm = communityService.findAllTop(Curator.curationContext());
+                List<Community> topComm = communityService.findAllTop(context);
                 for (Community comm : topComm) {
-                    distribute(comm);
+                    distribute(context, comm);
+                    context.uncacheEntity(comm);
                 }
             }
         } catch (SQLException sqlE) {
@@ -130,11 +178,11 @@ public abstract class AbstractCurationTask implements CurationTask {
      * @throws SQLException if database error
      * @throws IOException  if IO error
      */
-    protected void performObject(DSpaceObject dso) throws SQLException, IOException {
+    protected void performObject(Context context, DSpaceObject dso) throws SQLException, IOException {
         // By default this method only performs tasks on Items
         // (You should override this method if you want to perform task on all objects)
         if (dso.getType() == Constants.ITEM) {
-            performItem((Item) dso);
+            performItem(context, (Item) dso);
         }
 
         //no-op for all other types of DSpace Objects
@@ -154,19 +202,19 @@ public abstract class AbstractCurationTask implements CurationTask {
      * @throws SQLException if database error
      * @throws IOException  if IO error
      */
-    protected void performItem(Item item) throws SQLException, IOException {
+    protected void performItem(Context context, Item item) throws SQLException, IOException {
         // no-op - override when using 'distribute' method
     }
 
     @Override
     public int perform(Context ctx, String id) throws IOException {
-        DSpaceObject dso = null;
+        DSpaceObject dso;
         try {
             dso = dspaceObjectUtils.findDSpaceObject(ctx, id);
         } catch (SQLException sqlE) {
             throw new IOException(sqlE.getMessage(), sqlE);
         }
-        return (dso != null) ? perform(dso) : Curator.CURATE_FAIL;
+        return (dso != null) ? perform(ctx, dso) : Curator.CURATE_FAIL;
     }
 
     /**

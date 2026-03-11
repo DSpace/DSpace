@@ -43,6 +43,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.curate.Mutative;
@@ -217,7 +218,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     }
 
     @Override
-    public int perform(DSpaceObject dso) throws IOException {
+    public int perform(Context context, DSpaceObject dso) throws IOException {
 
         int status = Curator.CURATE_SKIP;
         StringBuilder resultSb = new StringBuilder();
@@ -238,7 +239,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
             List<MetadataValue> dcVals = itemService.getMetadataByMetadataString(item, lookupField);
             if (dcVals.size() > 0 && dcVals.get(0).getValue().length() > 0) {
                 String value = transform(dcVals.get(0).getValue(), lookupTransform);
-                status = callService(value, item, resultSb);
+                status = callService(context, value, item, resultSb);
             } else {
                 resultSb.append(" lacks metadata value required for service: ").append(lookupField);
                 status = Curator.CURATE_FAIL;
@@ -251,7 +252,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
         return status;
     }
 
-    protected int callService(String value, Item item, StringBuilder resultSb) throws IOException {
+    protected int callService(Context context, String value, Item item, StringBuilder resultSb) throws IOException {
         String callUrl = urlTemplate.replaceAll("\\{" + templateParam + "\\}", value);
         try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
             HttpGet req = new HttpGet(callUrl);
@@ -270,7 +271,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
                             // This next line triggers a false-positive XXE warning from LGTM, even though
                             // we disallow DTD parsing during initialization of docBuilder in init()
                             Document doc = docBuilder.parse(instream);  // lgtm [java/xxe]
-                            status = processResponse(doc, item, resultSb);
+                            status = processResponse(context, doc, item, resultSb);
                         } catch (SAXException saxE) {
                             log.error("caught exception: " + saxE);
                             resultSb.append(" unable to read response document");
@@ -298,7 +299,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
         }
     }
 
-    protected int processResponse(Document doc, Item item, StringBuilder resultSb) throws IOException {
+    protected int processResponse(Context context, Document doc, Item item, StringBuilder resultSb) throws IOException {
         boolean update = false;
         int status = Curator.CURATE_ERROR;
         List<String> values = new ArrayList<>();
@@ -310,7 +311,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
                 // if data found and we are mapping, check assignment policy
                 if (nodes.getLength() > 0 && info.getMapping() != null) {
                     if ("=>".equals(info.getMapping())) {
-                        itemService.clearMetadata(Curator.curationContext(), item, info.getSchema(), info.getElement(),
+                        itemService.clearMetadata(context, item, info.getSchema(), info.getElement(),
                                                   info.getQualifier(), Item.ANY);
                     } else if ("~>".equals(info.getMapping())) {
                         if (itemService
@@ -331,7 +332,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
                     String tvalue = transform(node.getFirstChild().getNodeValue(), info.getTransform());
                     // assign to metadata field if mapped && not present
                     if (info.getMapping() != null && !values.contains(tvalue)) {
-                        itemService.addMetadata(Curator.curationContext(), item, info.getSchema(), info.getElement(),
+                        itemService.addMetadata(context, item, info.getSchema(), info.getElement(),
                                                 info.getQualifier(), lang, tvalue);
                         update = true;
                     }
@@ -341,7 +342,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
             }
             // update Item if it has changed
             if (update) {
-                itemService.update(Curator.curationContext(), item);
+                itemService.update(context, item);
             }
             status = Curator.CURATE_SUCCESS;
         } catch (AuthorizeException authE) {
