@@ -27,7 +27,7 @@ import org.mockito.junit.MockitoJUnitRunner;
  * - "*" in list: all dictionaries are allowed (allow all)
  * - Explicit list: only those named dictionaries are allowed
  *
- * @author dataquest-dev
+ * @author Milan Majchrak (dspace at dataquest.sk)
  */
 @RunWith(MockitoJUnitRunner.class)
 public class SolrSuggestServiceTest {
