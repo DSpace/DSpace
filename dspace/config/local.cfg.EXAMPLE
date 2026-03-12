@@ -241,3 +241,9 @@ db.password = dspace
 #  LDN INBOX SETTINGS  #
 ########################
 ldn.enabled = true
+
+##########################
+# METADATA EXTRACTION #
+##########################
+# Grobid url.
+metadata.extraction.grobid.url =
