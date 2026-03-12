@@ -1607,6 +1607,27 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return ClientUtils.escapeQueryChars(query);
     }
 
+    /**
+     * Utility method to format an autocomplete query over a specific field. Combines the escaped query with a
+     * wildcard search over the specified {@code autocompleteField}. This field is typically non-tokenized and
+     * allows recovering searches containing spaces as a single value.
+     *
+     * @param query the user input to search for
+     * @param autocompleteField non-tokenized field used for wildcard autocomplete
+     * @return the constructed Solr query, or the original query if blank
+     */
+    @Override
+    public String formatAutoCompleteQuery(String query, String autocompleteField) {
+        if (StringUtils.isNotBlank(query)) {
+            StringBuilder buildQuery = new StringBuilder();
+            String escapedQuery = escapeQueryChars(query);
+            buildQuery.append("(").append(escapedQuery).append(" OR ").append(autocompleteField).append(":*")
+                .append(escapedQuery).append("*").append(")");
+            return buildQuery.toString();
+        }
+        return query;
+    }
+
     @Override
     public FacetYearRange getFacetYearRange(Context context, IndexableObject scope,
                                             DiscoverySearchFilterFacet facet, List<String> filterQueries,
