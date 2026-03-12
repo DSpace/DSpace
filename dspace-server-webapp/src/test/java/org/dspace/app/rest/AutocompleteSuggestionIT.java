@@ -461,4 +461,89 @@ public class AutocompleteSuggestionIT extends AbstractControllerIntegrationTest 
                                 .param("q", "test"))
                 .andExpect(status().isBadRequest());
     }
+
+    /**
+     * Test that when discovery.suggest.allowed-dictionaries is empty (not configured),
+     * ALL dictionaries are denied (HTTP 403).
+     */
+    @Test
+    public void emptyAllowedDictionariesShouldDenyAll() throws Exception {
+        // Set the allowed-dictionaries to an empty value
+        configurationService.setProperty("discovery.suggest.allowed-dictionaries", new String[]{});
+
+        String userToken = getAuthToken(eperson.getEmail(), password);
+
+        // Even a previously-allowed dictionary like "subject" should now be forbidden
+        getClient(userToken).perform(
+                        get("/api/discover/suggest")
+                                .param("dict", "subject")
+                                .param("q", "test"))
+                .andExpect(status().isForbidden());
+
+        // Another dictionary should also be forbidden
+        getClient(userToken).perform(
+                        get("/api/discover/suggest")
+                                .param("dict", "countries_file")
+                                .param("q", "test"))
+                .andExpect(status().isForbidden());
+    }
+
+    /**
+     * Test that when discovery.suggest.allowed-dictionaries contains the wildcard "*",
+     * ALL dictionaries are allowed (HTTP 200).
+     */
+    @Test
+    public void wildcardAllowedDictionariesShouldAllowAll() throws Exception {
+        // Set the allowed-dictionaries to wildcard
+        configurationService.setProperty("discovery.suggest.allowed-dictionaries", new String[]{"*"});
+
+        String userToken = getAuthToken(eperson.getEmail(), password);
+
+        // Any dictionary name should be allowed (returns 200, not 403)
+        getClient(userToken).perform(
+                        get("/api/discover/suggest")
+                                .param("dict", "subject")
+                                .param("q", "test"))
+                .andExpect(status().isOk());
+
+        // Even an arbitrary dictionary name should be allowed with wildcard
+        getClient(userToken).perform(
+                        get("/api/discover/suggest")
+                                .param("dict", "any_dictionary_name")
+                                .param("q", "test"))
+                .andExpect(status().isOk());
+    }
+
+    /**
+     * Test that the /suggest/build endpoint also respects empty allowed-dictionaries
+     * by returning 403 when the list is empty.
+     */
+    @Test
+    public void emptyAllowedDictionariesBuildShouldDenyAll() throws Exception {
+        configurationService.setProperty("discovery.suggest.allowed-dictionaries", new String[]{});
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // Building a specific dictionary should be forbidden when allowlist is empty
+        getClient(adminToken).perform(
+                        get("/api/discover/suggest/build")
+                                .param("dict", "subject"))
+                .andExpect(status().isForbidden());
+    }
+
+    /**
+     * Test that the /suggest/build endpoint works with wildcard "*" for any dictionary.
+     */
+    @Test
+    public void wildcardAllowedDictionariesBuildShouldAllowAll() throws Exception {
+        configurationService.setProperty("discovery.suggest.allowed-dictionaries", new String[]{"*"});
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // Building any specific dictionary should be allowed
+        getClient(adminToken).perform(
+                        get("/api/discover/suggest/build")
+                                .param("dict", "subject"))
+                .andExpect(status().isOk());
+    }
 }
