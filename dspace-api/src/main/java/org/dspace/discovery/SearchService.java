@@ -126,6 +126,15 @@ public interface SearchService {
      */
     String escapeQueryChars(String query);
 
+    /**
+     * Utility method to format an autocomplete query over a specific field.
+     *
+     * @param query to search for
+     * @param autocompleteField the field to use to autocomplete search, if null or empty no field is used
+     * @return the constructed solr query
+     */
+    String formatAutoCompleteQuery(String query, String autocompleteField);
+
     FacetYearRange getFacetYearRange(Context context, IndexableObject scope, DiscoverySearchFilterFacet facet,
             List<String> filterQueries, DiscoverQuery parentQuery)
                     throws SearchServiceException;
