@@ -29,7 +29,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -1092,11 +1091,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             discoverQuery.addFilterQueries("search.entitytype:" + entityType);
         }
         if (StringUtils.isNotBlank(q)) {
-            StringBuilder buildQuery = new StringBuilder();
-            String escapedQuery = ClientUtils.escapeQueryChars(q);
-            buildQuery.append("(").append(escapedQuery).append(" OR dc.title_sort:*")
-                .append(escapedQuery).append("*").append(")");
-            discoverQuery.setQuery(buildQuery.toString());
+            q = searchService.formatAutoCompleteQuery(q, "dc.title_sort");
+            discoverQuery.setQuery(q);
         }
         discoverQuery.addRequiredAuthorization(Constants.ADD);
         DiscoverResult resp = searchService.search(context, discoverQuery);
