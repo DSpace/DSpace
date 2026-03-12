@@ -42,6 +42,7 @@ import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchNotFoundException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.link.HalLinkService;
+import org.dspace.app.rest.model.ExtendedPagedRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
@@ -1069,6 +1070,9 @@ public class RestResourceController implements InitializingBean {
                 resources = ((Page<T>) searchResult).map(converter::toResource);
             }
             result = assembler.toModel(resources, link);
+        } else if (ExtendedPagedRest.class.isAssignableFrom(searchMethod.getReturnType())) {
+            ExtendedPagedRest pagedRest = (ExtendedPagedRest) searchResult;
+            result = pagedRest.getPagedModel();
         } else {
             if (searchResult == null) {
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);

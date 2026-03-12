@@ -14,6 +14,7 @@ import jakarta.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -41,6 +42,7 @@ public class DiscoverySortConfiguration {
         return defaultSortField;
     }
 
+    @Autowired(required = true)
     public void setDefaultSortField(DiscoverySortFieldConfiguration configuration) {
         this.defaultSortField = configuration;
     }
@@ -50,17 +52,18 @@ public class DiscoverySortConfiguration {
             return null;
         }
 
+        for (DiscoverySortFieldConfiguration sortFieldConfiguration : CollectionUtils.emptyIfNull(sortFields)) {
+            if (Strings.CS.equals(sortFieldConfiguration.getSortField(), sortField)) {
+                return sortFieldConfiguration;
+            }
+        }
+
         if (Strings.CI.equals(SCORE, sortField)) {
             DiscoverySortFieldConfiguration configuration = new DiscoverySortFieldConfiguration();
             configuration.setMetadataField(SCORE);
             return configuration;
         }
 
-        for (DiscoverySortFieldConfiguration sortFieldConfiguration : CollectionUtils.emptyIfNull(sortFields)) {
-            if (Strings.CS.equals(sortFieldConfiguration.getMetadataField(), sortField)) {
-                return sortFieldConfiguration;
-            }
-        }
         return null;
     }
 }

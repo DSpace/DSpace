@@ -14,6 +14,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.domain.Page;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * Class to embed a page in a HAL Resource
@@ -34,6 +35,10 @@ public class EmbeddedPage extends EmbeddedPageHeader {
         this.fullList = fullList;
         this.embeddedPageContent = new HashMap<>();
         embeddedPageContent.put(relation, page.getContent());
+    }
+
+    public UriComponentsBuilder getSelf() {
+        return this.self;
     }
 
     @JsonProperty(value = "_embedded")

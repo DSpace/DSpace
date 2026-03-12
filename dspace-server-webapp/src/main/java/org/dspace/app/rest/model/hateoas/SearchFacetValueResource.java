@@ -7,40 +7,17 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.app.rest.model.DiscoveryResultsRest;
-import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchFacetValueRest;
+import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
+import org.dspace.app.rest.utils.Utils;
 
 /**
  * This class' purpose is to create a container for the information, links and embeds for the facet values on various
  * endpoints
  */
-public class SearchFacetValueResource extends HALResource<SearchFacetValueRest> {
-
-    @JsonIgnore
-    private SearchFacetEntryRest facetData;
-
-    @JsonIgnore
-    private DiscoveryResultsRest searchData;
-
-    public SearchFacetValueResource(final SearchFacetValueRest data, final SearchFacetEntryRest facetData,
-                                    final DiscoveryResultsRest searchData) {
-        super(data);
-        this.facetData = facetData;
-        this.searchData = searchData;
-    }
-
-    public SearchFacetEntryRest getFacetData() {
-        return facetData;
-    }
-
-    public DiscoveryResultsRest getSearchData() {
-        return searchData;
-    }
-
-    @JsonIgnore
-    public SearchFacetValueRest getValueData() {
-        return getContent();
+@RelNameDSpaceResource(SearchFacetValueRest.NAME)
+public class SearchFacetValueResource extends DSpaceResource<SearchFacetValueRest> {
+    public SearchFacetValueResource(final SearchFacetValueRest data, Utils utils) {
+        super(data, utils);
     }
 }

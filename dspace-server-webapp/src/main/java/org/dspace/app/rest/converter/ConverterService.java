@@ -88,6 +88,10 @@ public class ConverterService {
     @Autowired
     private RequestService requestService;
 
+    public <M, R> R toRest(M modelObject, Projection projection) {
+        return toRest(modelObject, projection, null);
+    }
+
     /**
      * Converts the given model object to a rest object, using the appropriate {@link DSpaceConverter} and
      * the given projection.
@@ -99,6 +103,7 @@ public class ConverterService {
      *
      * @param modelObject the model object, which may be a JPA entity any other class for which a converter exists.
      * @param projection the projection to use.
+     * @param targetClass the class to target a converter, in case of inheritance resolving multiple converters
      * @param <M> the type of model object. A converter {@link Component} must exist that takes this as input.
      * @param <R> the inferred return type.
      * @return the converted object. If it's a {@link RestAddressableModel}, its
@@ -106,9 +111,9 @@ public class ConverterService {
      * @throws IllegalArgumentException if there is no compatible converter.
      * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
      */
-    public <M, R> R toRest(M modelObject, Projection projection) {
+    public <M, R> R toRest(M modelObject, Projection projection, @Nullable Class<M> targetClass) {
         M transformedModel = projection.transformModel(modelObject);
-        DSpaceConverter<M, R> converter = requireConverter(modelObject.getClass());
+        DSpaceConverter<M, R> converter = requireConverter(modelObject.getClass(), targetClass);
         R restObject = converter.convert(transformedModel, projection);
         if (restObject instanceof BaseObjectRest) {
             BaseObjectRest baseObjectRest = (BaseObjectRest) restObject;
@@ -202,13 +207,31 @@ public class ConverterService {
      * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
      */
     public <M, R> Page<R> toRestPage(List<M> modelObjects, Pageable pageable, Projection projection) {
+        return toRestPage(modelObjects, pageable, projection, null);
+    }
+
+    /**
+     * Converts a list of model objects to a page of rest objects using the given {@link Projection}.
+     *
+     * @param modelObjects the list of model objects.
+     * @param pageable the pageable.
+     * @param projection the projection to use.
+     * @param targetClass the class to target a converter, in case of inheritance resolving multiple converters
+     * @param <M> the model object class.
+     * @param <R> the rest object class.
+     * @return the page.
+     * @throws IllegalArgumentException if there is no compatible converter.
+     * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
+     */
+    public <M, R> Page<R> toRestPage(List<M> modelObjects, Pageable pageable, Projection projection,
+                                     @Nullable Class<M> targetClass) {
         if (pageable == null) {
             pageable = utils.getPageable(pageable);
         }
         List<M> pageableObjects = utils.getPageObjectList(modelObjects, pageable);
         List<R> transformedList = new LinkedList<>();
         for (M modelObject : pageableObjects) {
-            R transformedObject = toRest(modelObject, projection);
+            R transformedObject = toRest(modelObject, projection, targetClass);
             if (transformedObject != null) {
                 transformedList.add(transformedObject);
             }
@@ -254,7 +277,22 @@ public class ConverterService {
      * @throws IllegalArgumentException if there is no such converter.
      */
     <M, R> DSpaceConverter<M, R> getConverter(Class<M> sourceClass) {
-        return (DSpaceConverter<M, R>) requireConverter(sourceClass);
+        return (DSpaceConverter<M, R>) requireConverter(sourceClass, null);
+    }
+
+    /**
+     * Gets the converter supporting the given class as input.
+     *
+     * @param sourceClass the desired converter's input type.
+     * @param targetClass the desired input class for the converter, to target converters in case of inheritance.
+     *                    If null: best match is picked for the source class.
+     * @param <M> the converter's input type.
+     * @param <R> the converter's output type.
+     * @return the converter.
+     * @throws IllegalArgumentException if there is no such converter.
+     */
+    <M, R> DSpaceConverter<M, R> getConverter(Class<M> sourceClass, @Nullable Class<M> targetClass) {
+        return (DSpaceConverter<M, R>) requireConverter(sourceClass, targetClass);
     }
 
     /**
@@ -375,17 +413,28 @@ public class ConverterService {
      * Gets the converter that supports the given source/input class or throws an {@link IllegalArgumentException}.
      *
      * @param sourceClass the source/input class.
+     * @param targetClass the desired input class for the converter, to target converters in case of inheritance.
+     *                    If null: best match is picked for the source class.
      * @return the converter.
      * @throws IllegalArgumentException if not found.
      */
-    private DSpaceConverter requireConverter(Class sourceClass) {
-        if (converterMap.containsKey(sourceClass)) {
+    private DSpaceConverter requireConverter(Class sourceClass, @Nullable Class targetClass) {
+        if ((targetClass == null || sourceClass.equals(targetClass)) && converterMap.containsKey(sourceClass)) {
             return converterMap.get(sourceClass);
         }
+        Class bestMatch = null;
         for (Class converterSourceClass : converterMap.keySet()) {
-            if (converterSourceClass.isAssignableFrom(sourceClass)) {
+            if (targetClass != null && converterSourceClass.equals(targetClass)) {
                 return converterMap.get(converterSourceClass);
             }
+            if (converterSourceClass.isAssignableFrom(sourceClass)) {
+                if (bestMatch == null || bestMatch.isAssignableFrom(converterSourceClass)) {
+                    bestMatch = converterSourceClass;
+                }
+            }
+        }
+        if (bestMatch != null) {
+            return converterMap.get(bestMatch);
         }
         throw new IllegalArgumentException("No converter found to get rest class from " + sourceClass);
     }

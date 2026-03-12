@@ -9,6 +9,8 @@ package org.dspace.app.rest.link.search;
 
 import java.util.LinkedList;
 
+import org.dspace.app.rest.RestResourceController;
+import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.hateoas.SearchResultEntryResource;
 import org.dspace.app.rest.utils.Utils;
@@ -18,13 +20,11 @@ import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
 /**
- * This factory class provides a means to add links to the SearchResultsEntryResource. This method will be called
- * from the
- * HalLinkService addLinks method if the HalResource given is eligible.
+ * This class will add links to the SearchResultsResource. This method will be called when calling the higher up
+ * addLinks in the HalLinkService
  */
 @Component
-public class SearchResultEntryHalLinkFactory extends DiscoveryRestHalLinkFactory<SearchResultEntryResource> {
-
+public class SearchResultEntryHalLinkFactory extends HalLinkFactory<SearchResultEntryResource, RestResourceController> {
     @Autowired
     private Utils utils;
 
@@ -35,13 +35,17 @@ public class SearchResultEntryHalLinkFactory extends DiscoveryRestHalLinkFactory
 
         if (data != null && data.getIndexableObject() != null) {
             list.add(utils.linkToSingleResource(data.getIndexableObject(),
-                    SearchResultEntryResource.INDEXABLE_OBJECT_LINK));
+                SearchResultEntryResource.INDEXABLE_OBJECT_LINK));
         }
+    }
+
+    @Override
+    protected Class<RestResourceController> getControllerClass() {
+        return RestResourceController.class;
     }
 
     @Override
     protected Class<SearchResultEntryResource> getResourceClass() {
         return SearchResultEntryResource.class;
     }
-
 }
