@@ -28,6 +28,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.iiif.util.IIIFSharedUtils;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -124,7 +125,7 @@ public class ManifestService extends AbstractResourceService {
      * @return manifest domain object
      */
     private void populateManifest(Item item, Context context) {
-        String manifestId = getManifestId(item.getID());
+        String manifestId = IIIFSharedUtils.getManifestId(item.getID());
         manifestGenerator.setIdentifier(manifestId);
         manifestGenerator.setLabel(item.getName());
         setLogoContainer();
