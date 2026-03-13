@@ -17,6 +17,7 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 import static org.dspace.core.LogHelper.getHeader;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -27,9 +28,9 @@ import java.util.concurrent.Executors;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -111,7 +112,7 @@ public class AnonymizeStatistics {
                         .longOpt("help")
                         .desc("Print the usage of the script")
                         .hasArg(false)
-                        .build()
+                        .get()
         );
 
         options.addOption(
@@ -119,7 +120,7 @@ public class AnonymizeStatistics {
                         .longOpt("sleep")
                         .desc("Sleep a certain time given in milliseconds between each solr request")
                         .hasArg(true)
-                        .build()
+                        .get()
         );
 
         options.addOption(
@@ -127,7 +128,7 @@ public class AnonymizeStatistics {
                 .longOpt("batch")
                 .desc("The amount of Solr records to be processed per batch (defaults to 100)")
                 .hasArg(true)
-                .build()
+                .get()
         );
 
         options.addOption(
@@ -135,7 +136,7 @@ public class AnonymizeStatistics {
                 .longOpt("threads")
                 .desc("The amount of threads used by the script (defaults to 2")
                 .hasArg(true)
-                .build()
+                .get()
         );
 
         return options;
@@ -173,7 +174,13 @@ public class AnonymizeStatistics {
     }
 
     private static void printHelp(Options options) {
-        new HelpFormatter().printHelp("dsrun " + AnonymizeStatistics.class.getCanonicalName(), options);
+        try {
+            HelpFormatter.builder().get().printHelp(
+                "dsrun " + AnonymizeStatistics.class.getCanonicalName(),
+                null, options, null, false);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     private static void printInfo(String info) {

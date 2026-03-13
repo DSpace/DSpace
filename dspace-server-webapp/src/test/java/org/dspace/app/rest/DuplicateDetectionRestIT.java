@@ -46,7 +46,8 @@ import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -90,6 +91,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
     private final String item2IssueDate = "2012-10-17";
     private EPerson anotherEPerson;
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -109,7 +111,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
 
         col = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Test Collection")
-                .withWorkflowGroup(1, admin)
+                .withWorkflowGroup("reviewer", admin)
                 .build();
         simpleCol = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Test Collection without Workflow")
@@ -310,7 +312,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
         // Create a new collection with handle that maps to the test-duplicate-detection submission config
         col = CollectionBuilder.createCollection(context, parentCommunity, "123456789/test-duplicate-detection")
                 .withName("Test Collection with Duplicate Detection")
-                .withWorkflowGroup(1, admin)
+                .withWorkflowGroup("reviewer", admin)
                 .build();
         // Create a new workspace item with a similar title to Item 1 (1 edit distance). Reuse other items
         // metadata for the rest, as it is not relevant.

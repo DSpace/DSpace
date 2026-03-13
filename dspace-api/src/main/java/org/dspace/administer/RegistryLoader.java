@@ -9,6 +9,7 @@ package org.dspace.administer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,9 +24,9 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
@@ -157,14 +158,19 @@ public class RegistryLoader {
      * @param options the command-line options
      */
     private static void printHelp(Options options) {
-        HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("RegistryLoader",
-                            "Load bitstream format or metadata registries into the database\n",
-                            options,
-                            "\nExamples:\n" +
-                            " RegistryLoader -b bitstream-formats.xml\n" +
-                            " RegistryLoader -m dc-types.xml",
-                            true);
+        try {
+            HelpFormatter.builder().get().printHelp("RegistryLoader",
+                "Load bitstream format or metadata registries into the database\n",
+                options,
+                """
+
+                Examples:
+                 RegistryLoader -b bitstream-formats.xml
+                 RegistryLoader -m dc-types.xml""",
+                true);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     /**

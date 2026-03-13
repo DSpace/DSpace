@@ -175,7 +175,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
         commandLine = new DefaultParser().parse(getScriptConfiguration().getOptions(), args);
         Builder builder = new DefaultParser().builder();
         builder.setStripLeadingAndTrailingQuotes(false);
-        commandLine = builder.build().parse(getScriptConfiguration().getOptions(), args);
+        commandLine = builder.get().parse(getScriptConfiguration().getOptions(), args);
         setup();
         return StepResult.Continue;
     }

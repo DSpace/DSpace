@@ -18,7 +18,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -31,7 +30,6 @@ import org.dspace.app.audit.MetadataEvent;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.handle.Handle;
-import org.hibernate.annotations.GenericGenerator;
 
 /**
  * Abstract base class for DSpace objects
@@ -41,8 +39,7 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "dspaceobject")
 public abstract class DSpaceObject implements Serializable, ReloadableEntity<java.util.UUID> {
     @Id
-    @GeneratedValue(generator = "predefined-uuid")
-    @GenericGenerator(name = "predefined-uuid", strategy = "org.dspace.content.PredefinedUUIDGenerator")
+    @PredefinedUUID
     @Column(name = "uuid", unique = true, nullable = false, insertable = true, updatable = false)
     protected java.util.UUID id;
 

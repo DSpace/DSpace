@@ -89,7 +89,7 @@ public class OptimizeSelectCollection {
         stopWatch.start("findAuthorized");
         List<Collection> collections = collectionService.findAuthorized(context, null, Constants.ADD);
         stopWatch.stop();
-        long defaultMS = stopWatch.getLastTaskTimeMillis();
+        long defaultMS = stopWatch.getLastTaskInfo().getTimeMillis();
 
         stopWatch.start("ListingCollections");
         System.out.println("Legacy Find Authorized");
@@ -99,7 +99,7 @@ public class OptimizeSelectCollection {
         stopWatch.start("findAuthorizedOptimized");
         List<Collection> collectionsOptimized = collectionService.findAuthorizedOptimized(context, Constants.ADD);
         stopWatch.stop();
-        long optimizedMS = stopWatch.getLastTaskTimeMillis();
+        long optimizedMS = stopWatch.getLastTaskInfo().getTimeMillis();
         timeSavedMS += defaultMS - optimizedMS;
 
 
