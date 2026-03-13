@@ -17,9 +17,9 @@ services:
       # __P__ => "." (e.g. dspace__P__dir => dspace.dir)
       # __D__ => "-" (e.g. google__D__metadata => google-metadata)
       # db.url: Ensure we are using the 'dspacedb' image for our database
-      db__P__url: 'jdbc:postgresql://dspacedb:5432/dspace'
+      db__P__url: ${db__P__url:-jdbc:postgresql://dspacedb:5432/dspace}
       # solr.server: Ensure we are using the 'dspacesolr' image for Solr
-      solr__P__server: http://dspacesolr:8983/solr
+      solr__P__server: ${solr__P__server:-http://dspacesolr:8983/solr}
     volumes:
     # Keep DSpace assetstore directory between reboots
     - assetstore:/dspace/assetstore
