@@ -12,9 +12,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
@@ -64,7 +64,7 @@ public class MicrosoftTranslator extends AbstractTranslator {
             HttpGet hm = new HttpGet(url);
             try (CloseableHttpResponse httpResponse = client.execute(hm)) {
                 log.debug("Response code from API call is " + httpResponse);
-                if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                if (httpResponse.getCode() == 200) {
                     String response = IOUtils.toString(httpResponse.getEntity().getContent(),
                             StandardCharsets.ISO_8859_1);
                     response = response
