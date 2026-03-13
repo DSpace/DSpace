@@ -35,6 +35,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.Site;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
@@ -512,7 +513,13 @@ public class PackageUtils {
                 return wsi.getItem();
 
             case Constants.SITE:
-                return siteService.findSite(context);
+                Site site = siteService.findSite(context);
+                if (site == null) {
+                    // Site may not exist yet if this is a fresh database and the
+                    // SiteServiceInitializer callback has not yet run. Create it now.
+                    site = siteService.createSite(context);
+                }
+                return site;
             default:
                 return null;
         }
