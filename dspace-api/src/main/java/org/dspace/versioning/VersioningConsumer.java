@@ -32,6 +32,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexEventConsumer;
 import org.dspace.event.Consumer;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.dspace.orcid.OrcidHistory;
 import org.dspace.orcid.OrcidQueue;
@@ -125,10 +126,12 @@ public class VersioningConsumer implements Consumer {
         // get latest item
         Item latestItem = latestVersion.getItem();
         if (latestItem == null) {
-            String msg = String.format(
-                "Illegal state: Obtained version history of item with uuid %s, handle %s, but the latest item is null",
-                item.getID(), item.getHandle()
-            );
+            String msg =
+                ("Illegal state: Obtained version history of item"
+                    + " with uuid %s, handle %s,"
+                    + " but the latest item is null").formatted(
+                    item.getID(), item.getHandle()
+                );
             log.error(msg);
             throw new IllegalStateException(msg);
         }
@@ -154,7 +157,7 @@ public class VersioningConsumer implements Consumer {
         //Due to the need to reindex the item in the search
         //and browse index we need to fire a new event
         ctx.addEvent(new Event(
-            Event.MODIFY, item.getType(), item.getID(), null, itemService.getIdentifiers(ctx, item)
+            Event.MODIFY, item.getType(), item.getID(), null, DetailType.INFO, itemService.getIdentifiers(ctx, item)
         ));
     }
 
@@ -312,14 +315,16 @@ public class VersioningConsumer implements Consumer {
         Item leftItem = relationship.getLeftItem();
         itemsToProcess.add(leftItem);
         ctx.addEvent(new Event(
-            Event.MODIFY, leftItem.getType(), leftItem.getID(), null, itemService.getIdentifiers(ctx, leftItem)
+            Event.MODIFY, leftItem.getType(), leftItem.getID(), null,
+            DetailType.INFO, itemService.getIdentifiers(ctx, leftItem)
         ));
 
         // reindex right item
         Item rightItem = relationship.getRightItem();
         itemsToProcess.add(rightItem);
         ctx.addEvent(new Event(
-            Event.MODIFY, rightItem.getType(), rightItem.getID(), null, itemService.getIdentifiers(ctx, rightItem)
+            Event.MODIFY, rightItem.getType(), rightItem.getID(), null,
+            DetailType.INFO, itemService.getIdentifiers(ctx, rightItem)
         ));
     }
 

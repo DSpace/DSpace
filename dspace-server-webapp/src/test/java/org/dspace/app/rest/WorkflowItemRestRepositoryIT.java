@@ -72,9 +72,9 @@ import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.util.LinkedMultiValueMap;
@@ -99,7 +99,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     @Autowired
     private WorkspaceItemService workspaceItemService;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
 
@@ -128,9 +128,9 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup("reviewer", admin).build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup("reviewer", admin).build();
 
 
         //2. Three workflow items in two different collections
@@ -184,9 +184,9 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup("reviewer", admin).build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup("reviewer", admin).build();
 
         //2. Three workflow items in two different collections
         XmlWorkflowItem workflowItem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
@@ -253,9 +253,9 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup("reviewer", admin).build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
-                .withWorkflowGroup(1, eperson).build();
+                .withWorkflowGroup("reviewer", eperson).build();
 
 
         //2. Three workflow items in two different collections
@@ -305,7 +305,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup("reviewer", admin).build();
 
         //2. a workflow item
         XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
@@ -347,19 +347,19 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .withPassword(password).build();
 
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer1).build();
+                .withWorkflowGroup("reviewer", reviewer1).build();
 
         EPerson reviewer2 = EPersonBuilder.createEPerson(context).withEmail("reviewer2@example.com")
                 .withPassword(password).build();
 
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
-                .withWorkflowGroup(2, reviewer2).build();
+                .withWorkflowGroup("editor", reviewer2).build();
 
         EPerson reviewer3 = EPersonBuilder.createEPerson(context).withEmail("reviewer3@example.com")
                 .withPassword(password).build();
 
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("Collection 3")
-                .withWorkflowGroup(3, reviewer3).build();
+                .withWorkflowGroup("finaleditor", reviewer3).build();
 
         //2. three workflow items in the three collections (this will lead to pool task)
         XmlWorkflowItem witem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
@@ -476,7 +476,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup("reviewer", admin).build();
 
         //2. a workflow item
         XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
@@ -541,9 +541,9 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup("reviewer", admin).build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup("reviewer", admin).build();
 
         //2. create two users to use as submitters
         EPerson submitter1 = EPersonBuilder.createEPerson(context)
@@ -645,7 +645,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup("reviewer", admin).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -722,7 +722,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup("reviewer", admin).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -839,7 +839,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                               .withName("Parent Community")
                                               .build();
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                    .withWorkflowGroup(1, admin).build();
+                    .withWorkflowGroup("reviewer", admin).build();
 
             //2. create a normal user to use as submitter
             EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -898,7 +898,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup("reviewer", admin).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -942,7 +942,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, eperson).build();
+                .withWorkflowGroup("reviewer", eperson).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -998,7 +998,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(2, eperson).build();
+                .withWorkflowGroup("editor", eperson).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1053,7 +1053,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    @Ignore(value = "This demonstrate the bug logged in DS-4179")
+    @Disabled(value = "This demonstrate the bug logged in DS-4179")
     /**
      * Verify that update of metadata is forbidden in step 1.
      *
@@ -1068,7 +1068,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, eperson).build();
+                .withWorkflowGroup("reviewer", eperson).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1127,7 +1127,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(3, eperson).build();
+                .withWorkflowGroup("finaleditor", eperson).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1196,7 +1196,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, eperson).build();
+                .withWorkflowGroup("reviewer", eperson).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1399,7 +1399,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, eperson).build();
+                .withWorkflowGroup("reviewer", eperson).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1468,7 +1468,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community")
                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, eperson).build();
+                .withWorkflowGroup("reviewer", eperson).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1680,7 +1680,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                                           .withWorkflowGroup(1, admin).build();
+                                           .withWorkflowGroup("reviewer", admin).build();
 
         //2. a workflow item
         XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
@@ -1716,7 +1716,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                                           .withWorkflowGroup(1, admin).build();
+                                           .withWorkflowGroup("reviewer", admin).build();
 
 
         context.restoreAuthSystemState();
@@ -1738,7 +1738,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                                           .withWorkflowGroup(1, admin).build();
+                                           .withWorkflowGroup("reviewer", admin).build();
 
 
         Item item = ItemBuilder.createItem(context, col1).build();
@@ -1770,7 +1770,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                                           .withWorkflowGroup(1, admin).build();
+                                           .withWorkflowGroup("reviewer", admin).build();
 
 
         XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
@@ -1801,7 +1801,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                                           .withWorkflowGroup(1, admin).build();
+                                           .withWorkflowGroup("reviewer", admin).build();
 
 
         XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
@@ -1835,19 +1835,19 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withPassword(password).build();
 
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         EPerson reviewer2 = EPersonBuilder.createEPerson(context).withEmail("reviewer2@example.com")
                                           .withPassword(password).build();
 
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
-                                           .withWorkflowGroup(2, reviewer2).build();
+                                           .withWorkflowGroup("editor", reviewer2).build();
 
         EPerson reviewer3 = EPersonBuilder.createEPerson(context).withEmail("reviewer3@example.com")
                                           .withPassword(password).build();
 
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("Collection 3")
-                                           .withWorkflowGroup(3, reviewer3).build();
+                                           .withWorkflowGroup("finaleditor", reviewer3).build();
 
         //2. three workflow items in the three collections (this will lead to pool task)
         XmlWorkflowItem witem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
@@ -1929,7 +1929,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                                           .withWorkflowGroup(1, admin).build();
+                                           .withWorkflowGroup("reviewer", admin).build();
 
         //2. a workflow item
         XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
@@ -2365,7 +2365,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         Collection collection1 = CollectionBuilder.createCollection(context, parentCommunity)
                                                   .withName("Collection 1")
-                                                  .withWorkflowGroup(1, reviewer1)
+                                                  .withWorkflowGroup("reviewer", reviewer1)
                                                   .build();
 
         Bitstream bitstream = null;
@@ -2502,7 +2502,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         Collection collection1 = CollectionBuilder.createCollection(context, parentCommunity)
                                                   .withName("Collection 1")
-                                                  .withWorkflowGroup(1, reviewer1)
+                                                  .withWorkflowGroup("reviewer", reviewer1)
                                                   .build();
 
         context.setCurrentUser(submitter);
@@ -2609,7 +2609,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity, "123456789/test-hidden")
                                                  .withName("Collection 1")
-                                                 .withWorkflowGroup(1, eperson)
+                                                 .withWorkflowGroup("reviewer", eperson)
                                                  .build();
 
         XmlWorkflowItem workflowItem = WorkflowItemBuilder.createWorkflowItem(context, collection)

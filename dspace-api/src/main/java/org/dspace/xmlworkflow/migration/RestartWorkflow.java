@@ -7,14 +7,16 @@
  */
 package org.dspace.xmlworkflow.migration;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -74,8 +76,12 @@ public class RestartWorkflow {
             String eperson = null; // db ID or email
 
             if (line.hasOption('h')) {
-                HelpFormatter myhelp = new HelpFormatter();
-                myhelp.printHelp("RestartWorkflow\n", options);
+                try {
+                    HelpFormatter.builder().get().printHelp(
+                        "RestartWorkflow", null, options, null, false);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
                 System.exit(0);
             }
             if (line.hasOption('n')) {

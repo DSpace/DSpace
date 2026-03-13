@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
-import com.ibm.icu.text.Normalizer;
+import com.ibm.icu.text.Normalizer2;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.suggestion.SuggestionEvidence;
 import org.dspace.content.Item;
@@ -136,14 +136,14 @@ public class AuthorNamesScorer implements EvidenceScorer {
      * @return cleaned up string
      * */
     private String normalize(String value) {
-        String norm = Normalizer.normalize(value, Normalizer.NFD);
+        String norm = Normalizer2.getNFDInstance().normalize(value);
         // Removes diacritical marks
         norm = norm.replaceAll("\\p{M}", "");
         CharsetDetector cd = new CharsetDetector();
         cd.setText(value.getBytes());
         CharsetMatch detect = cd.detect();
         if (detect != null && detect.getLanguage() != null) {
-            norm = norm.replaceAll("[^\\p{L}]", " ").toLowerCase(new Locale(detect.getLanguage()));
+            norm = norm.replaceAll("[^\\p{L}]", " ").toLowerCase(Locale.of(detect.getLanguage()));
         } else {
             norm = norm.replaceAll("[^\\p{L}]", " ").toLowerCase();
         }

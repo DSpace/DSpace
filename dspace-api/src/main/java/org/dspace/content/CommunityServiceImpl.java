@@ -220,7 +220,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             super.setMetadataSingleValue(context, community, field, null, value);
         }
 
-        community.addDetails(field.toString());
     }
 
     @Override
@@ -274,7 +273,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         communityDAO.save(context, community);
         if (community.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, community.getID(), null,
-                                       getIdentifiers(context, community)));
+                                       DetailType.INFO, getIdentifiers(context, community)));
             community.clearModified();
         }
         if (community.isMetadataModified()) {
@@ -308,7 +307,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         // register this as the admin group
         community.setAdmins(admins);
         context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, community.getID(),
-                                             null, getIdentifiers(context, community)));
+                                   null, DetailType.INFO, getIdentifiers(context, community)));
         return admins;
     }
 
@@ -325,7 +324,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         // Remove the link to the community table.
         community.setAdmins(null);
         context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, community.getID(),
-                                             null, getIdentifiers(context, community)));
+                                   null, DetailType.INFO, getIdentifiers(context, community)));
     }
 
     @Override
@@ -496,6 +495,13 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public void delete(Context context, Community community) throws SQLException, AuthorizeException, IOException {
+        // Reload community to ensure it's attached to the current session
+        // (Required for Hibernate 7 which may have detached entities during recursive cleanup)
+        community = context.reloadEntity(community);
+        if (community == null) {
+            return;
+        }
+
         // Check authorisation
         // FIXME: If this was a subcommunity, it is first removed from it's
         // parent.
@@ -553,6 +559,13 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
      */
     protected void rawDelete(Context context, Community community)
         throws SQLException, AuthorizeException, IOException {
+        // Reload community to ensure it's attached to the current session
+        // (Required for Hibernate 7 which may have detached entities during test cleanup)
+        community = context.reloadEntity(community);
+        if (community == null) {
+            return;
+        }
+
         log.info(LogHelper.getHeader(context, "delete_community",
                                       "community_id=" + community.getID()));
 
@@ -594,11 +607,27 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         Group g = community.getAdministrators();
 
+        // Clear the admin reference before deleting to avoid FK constraint violation
+        // when Hibernate flushes the Group delete before the Community delete
+        // (Required for Hibernate 7 which may flush in different order during queries)
+        if (g != null) {
+            community.setAdmins(null);
+        }
+
+        // Remove all resource policies right before removing the community entity.
+        // Must happen after all authorization checks but before communityDAO.delete() to prevent
+        // Hibernate 7 TransientPropertyValueException when managed ResourcePolicies reference
+        // a removed Community entity during auto-flush.
+        authorizeService.removeAllPolicies(context, community);
+
         // Delete community row
         communityDAO.delete(context, community);
 
-        // Remove administrators group - must happen after deleting community
+        // Flush to ensure the Community delete is executed before we delete the admin Group
+        // (Required for Hibernate 7 which may not auto-flush in correct FK order)
+        context.flush();
 
+        // Remove administrators group - must happen after deleting community
         if (g != null) {
             groupService.delete(context, g);
         }
@@ -683,6 +712,12 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public DSpaceObject getParentObject(Context context, Community community) throws SQLException {
+        // Reload community to ensure it's attached to the current session
+        // (Required for Hibernate 7 which may have detached entities during test cleanup)
+        community = context.reloadEntity(community);
+        if (community == null) {
+            return null;
+        }
         List<Community> parentCommunities = community.getParentCommunities();
         if (CollectionUtils.isNotEmpty(parentCommunities)) {
             return parentCommunities.iterator().next();
@@ -695,7 +730,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     public void updateLastModified(Context context, Community community) {
         //Also fire a modified event since the community HAS been modified
         context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY,
-                                   community.getID(), null, getIdentifiers(context, community)));
+                                   community.getID(), null, DetailType.INFO, getIdentifiers(context, community)));
 
     }
 

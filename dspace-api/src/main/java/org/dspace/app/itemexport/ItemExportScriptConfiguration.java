@@ -36,26 +36,26 @@ public class ItemExportScriptConfiguration<T extends ItemExport> extends ScriptC
 
         options.addOption(Option.builder("t").longOpt("type")
                 .desc("type: COLLECTION or ITEM")
-                .hasArg().required().build());
+                .hasArg().required().get());
         options.addOption(Option.builder("i").longOpt("id")
                 .desc("ID or handle of thing to export")
-                .hasArg().required().build());
+                .hasArg().required().get());
         options.addOption(Option.builder("n").longOpt("number")
                 .desc("sequence number to begin exporting items with")
-                .hasArg().required(false).build());
+                .hasArg().required(false).get());
         options.addOption(Option.builder("m").longOpt("migrate")
                 .desc("export for migration (remove handle and metadata that will be re-created in new system)")
-                .hasArg(false).required(false).build());
+                .hasArg(false).required(false).get());
 
         // as pointed out by Peter Dietz this provides similar functionality to export metadata
         // but it is needed since it directly exports to Simple Archive Format (SAF)
         options.addOption(Option.builder("x").longOpt("exclude-bitstreams")
                 .desc("do not export bitstreams")
-                .hasArg(false).required(false).build());
+                .hasArg(false).required(false).get());
 
         options.addOption(Option.builder("h").longOpt("help")
                 .desc("help")
-                .hasArg(false).required(false).build());
+                .hasArg(false).required(false).get());
 
         return options;
     }

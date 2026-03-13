@@ -118,7 +118,6 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     public void setSequenceID(int sid) {
         sequenceId = sid;
         setMetadataModified();
-        addDetails("SequenceID");
     }
 
     /**

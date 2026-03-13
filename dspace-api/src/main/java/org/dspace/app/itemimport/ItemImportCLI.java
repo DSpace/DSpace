@@ -10,7 +10,7 @@ package org.dspace.app.itemimport;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.List;
@@ -131,8 +131,10 @@ public class ItemImportCLI extends ItemImport {
                 sourcedir = itemImportService.unzip(myZipFile, workDir.getAbsolutePath());
             } else {
                 // manage zip via remote url
-                Optional<InputStream> optionalFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
-                Optional<InputStream> validationFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
+                Optional<InputStream> optionalFileStream =
+                    Optional.ofNullable(URI.create(zipfilename).toURL().openStream());
+                Optional<InputStream> validationFileStream =
+                    Optional.ofNullable(URI.create(zipfilename).toURL().openStream());
                 try {
                     if (optionalFileStream.isPresent()) {
                         // validate zip file via url

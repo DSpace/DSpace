@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -286,10 +285,9 @@ public class XMLUtils {
      */
     @SuppressWarnings("checkstyle:Regexp")
     public static SAXBuilder getSAXBuilder(boolean validate) {
-        SAXBuilder saxBuilder = new SAXBuilder();
-        if (validate) {
-            saxBuilder.setValidation(true);
-        }
+        SAXBuilder saxBuilder = validate
+            ? new SAXBuilder(org.jdom2.input.sax.XMLReaders.XSDVALIDATING)
+            : new SAXBuilder();
         // No DOCTYPE / DTDs
         saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         // No external general entities
@@ -347,7 +345,7 @@ public class XMLUtils {
                 try {
                     // Could not be parsed as a URI.
                     // Second, try to parse it as a Path and convert to URI.
-                    fileUri = Paths.get(systemId).toUri();
+                    fileUri = Path.of(systemId).toUri();
                 } catch (Exception e2) {
                     // Doesn't appear to be a valid URI or a Path, so we'll have to throw an error.
                     throw new SAXException("Invalid URI or path: " + systemId, e2);
@@ -375,14 +373,14 @@ public class XMLUtils {
 
             Path resolvedPath;
             try {
-                resolvedPath = Paths.get(fileUri).toAbsolutePath().normalize();
+                resolvedPath = Path.of(fileUri).toAbsolutePath().normalize();
             } catch (Exception e) {
                 throw new SAXException("Invalid path: " + systemId, e);
             }
 
             boolean isAllowed = false;
             for (String basePath : allowedBasePaths) {
-                Path allowedPath = Paths.get(basePath).toAbsolutePath().normalize();
+                Path allowedPath = Path.of(basePath).toAbsolutePath().normalize();
                 if (resolvedPath.startsWith(allowedPath)) {
                     isAllowed = true;
                     break;
@@ -523,14 +521,14 @@ public class XMLUtils {
             Path resolvedPath;
             try {
                 // Resolve to an absolute path
-                resolvedPath = Paths.get(uri).toAbsolutePath().normalize();
+                resolvedPath = Path.of(uri).toAbsolutePath().normalize();
             } catch (Exception e) {
                 throw new TransformerException("Invalid path: " + uri, e);
             }
 
             boolean isAllowed = false;
             for (String basePath : allowedBasePaths) {
-                Path allowedPath = Paths.get(basePath).toAbsolutePath().normalize();
+                Path allowedPath = Path.of(basePath).toAbsolutePath().normalize();
                 if (resolvedPath.startsWith(allowedPath)) {
                     isAllowed = true;
                     break;

@@ -56,7 +56,7 @@ public class TestConsumer implements Consumer {
     public void consume(Context ctx, Event event) throws Exception {
         EPerson ep = ctx.getCurrentUser();
         String user = (ep == null) ? "(none)" : ep.getEmail();
-        EventDetail detail = event.getDetail();
+        EventDetail detail = event.getDetailList().isEmpty() ? null : event.getDetailList().get(0);
 
         String msg = "EVENT: called TestConsumer.consume(): EventType="
             + event.getEventTypeAsString()

@@ -12,6 +12,7 @@ import static org.dspace.eperson.service.EPersonService.MD_PHONE;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -20,11 +21,11 @@ import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -134,10 +135,10 @@ public class EPersonCLITool {
         } else if (command.hasOption(VERB_LIST.getOpt())) {
             status = cmdList(context, argv);
         } else if (command.hasOption('h')) {
-            new HelpFormatter().printHelp("user [options]", globalOptions);
+            printCliHelp("user [options]", globalOptions);
         } else {
             System.err.println("Unknown operation.");
-            new HelpFormatter().printHelp("user [options]", globalOptions);
+            printCliHelp("user [options]", globalOptions);
             context.abort();
             status = 1;
         }
@@ -189,7 +190,7 @@ public class EPersonCLITool {
         }
 
         if (command.hasOption('h')) {
-            new HelpFormatter().printHelp("user --add [options]", options);
+            printCliHelp("user --add [options]", options);
             return 0;
         }
 
@@ -270,7 +271,7 @@ public class EPersonCLITool {
         }
 
         if (command.hasOption('h')) {
-            new HelpFormatter().printHelp("user --delete [options]", options);
+            printCliHelp("user --delete [options]", options);
             return 0;
         }
 
@@ -360,7 +361,7 @@ public class EPersonCLITool {
         }
 
         if (command.hasOption('h')) {
-            new HelpFormatter().printHelp("user --modify [options]", options);
+            printCliHelp("user --modify [options]", options);
             return 0;
         }
 
@@ -491,5 +492,20 @@ public class EPersonCLITool {
      */
     void setConsoleService(ConsoleService service) {
         consoleService = service;
+    }
+
+    /**
+     * Print CLI help for the given options.
+     *
+     * @param cmdSyntax the command syntax
+     * @param options   the options
+     */
+    private static void printCliHelp(String cmdSyntax, Options options) {
+        try {
+            HelpFormatter.builder().get().printHelp(
+                cmdSyntax, null, options, null, false);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 }
