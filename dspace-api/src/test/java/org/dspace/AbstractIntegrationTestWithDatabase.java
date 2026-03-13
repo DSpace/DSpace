@@ -7,7 +7,7 @@
  */
 package org.dspace;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -40,9 +40,9 @@ import org.dspace.statistics.MockSolrStatisticsCore;
 import org.dspace.statistics.SolrStatisticsCore;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.jdom2.Document;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Abstract Test class that will initialize the in-memory database
@@ -89,7 +89,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      * This method builds on the initialization in AbstractDSpaceIntegrationTest, and
      * initializes the in-memory database for tests that need it.
      */
-    @BeforeClass
+    @BeforeAll
     public static void initDatabase() {
         try {
             // Update/Initialize the database to latest version (via Flyway)
@@ -116,7 +116,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         try {
             //Start a new context
@@ -177,15 +177,28 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      *
      * @throws java.lang.Exception passed through.
      */
-    @After
+    @AfterEach
     public void destroy() throws Exception {
+        // Track the first cleanup exception so we can re-throw it after completing all cleanup steps.
+        // This ensures Solr cores are reset and builder caches are cleared even when object cleanup fails,
+        // preventing cascading failures in subsequent tests.
+        Exception cleanupException = null;
+
         // Cleanup our global context object
         try {
             AbstractBuilder.cleanupObjects();
-            parentCommunity = null;
+        } catch (Exception e) {
+            cleanupException = e;
+        }
+        parentCommunity = null;
+        try {
             cleanupContext();
         } catch (Exception e) {
-            throw new RuntimeException("Error cleaning up builder objects & context object", e);
+            if (cleanupException != null) {
+                cleanupException.addSuppressed(e);
+            } else {
+                cleanupException = e;
+            }
         }
 
         ServiceManager serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
@@ -215,16 +228,17 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             .getServiceByName(QAEventService.class.getName(), MockQAEventService.class);
         qaEventService.reset();
 
-        try {
-            // Reload our ConfigurationService (to reset configs to defaults again)
-            DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
+        // Reload our ConfigurationService (to reset configs to defaults again)
+        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
 
-            AbstractBuilder.cleanupBuilderCache();
+        AbstractBuilder.cleanupBuilderCache();
 
-            // NOTE: we explicitly do NOT destroy our default eperson & admin as they
-            // are cached and reused for all tests. This speeds up all tests.
-        } catch (Exception e) {
-            throw new RuntimeException("Error reloading configuration & resetting builders", e);
+        // NOTE: we explicitly do NOT destroy our default eperson & admin as they
+        // are cached and reused for all tests. This speeds up all tests.
+
+        if (cleanupException != null) {
+            throw new RuntimeException("Error cleaning up builder objects & context object",
+                                       cleanupException);
         }
     }
 
@@ -253,7 +267,42 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      * @throws Exception if there's an error cleaning up after running the command.
      */
     public int runDSpaceScript(String... args) throws Exception {
+        // Track whether authorization was turned off before running the script.
+        // Need to handle the case where the context is in a bad state (e.g., MARKED_ROLLBACK).
+        boolean authorizationWasOff = false;
         try {
+            authorizationWasOff = context.isValid() && context.ignoreAuthorization();
+        } catch (Exception e) {
+            // Context is in a bad state, treat as invalid
+        }
+        try {
+            // For Hibernate 7: We need to commit the test's data to the database so the script
+            // can see it, and we must CLOSE the session completely to avoid detached entity issues.
+            // The script will create its own Context with a fresh session.
+            //
+            // With ThreadLocalSessionContext, closing the session unbinds it from the thread,
+            // allowing the script to get a completely fresh session when it creates its Context.
+            try {
+                if (context.isValid()) {
+                    context.complete();  // Commit and close the session
+                }
+            } catch (Exception e) {
+                // If complete() fails (e.g., MARKED_ROLLBACK), try to abort and close
+                try {
+                    context.abort();
+                } catch (Exception ignored) {
+                    // Best effort cleanup
+                }
+            }
+
+            // Evict all entities from the second-level cache to ensure the script
+            // gets fresh entities from the database. In Hibernate 7, entities loaded
+            // from L2 cache can sometimes cause "Detached entity passed to persist" errors.
+            ServiceManager serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
+            org.hibernate.SessionFactory sessionFactory = serviceManager
+                    .getServiceByName("sessionFactory", org.hibernate.SessionFactory.class);
+            sessionFactory.getCache().evictAllRegions();
+
             // Load up the ScriptLauncher's configuration
             Document commandConfigs = ScriptLauncher.getConfig(kernelImpl);
 
@@ -271,8 +320,17 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                 return status;
             }
         } finally {
-            if (!context.isValid()) {
-                setUp();
+            // After the script runs, we always need a fresh context for the test to continue.
+            // The script will have closed its own context, and the test's original context
+            // was closed before running the script.
+            context = new Context(Context.Mode.READ_WRITE);
+            // Reload the eperson into the new session to avoid detached entity issues
+            eperson = EPersonServiceFactory.getInstance().getEPersonService()
+                    .find(context, eperson.getID());
+            context.setCurrentUser(eperson);
+            // Restore the authorization state if it was off before
+            if (authorizationWasOff) {
+                context.turnOffAuthorisationSystem();
             }
         }
     }
