@@ -23,14 +23,14 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.alerts.AllowSessionsEnum;
 import org.dspace.alerts.SystemWideAlert;
 import org.dspace.app.rest.model.SystemWideAlertRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.SystemWideAlertBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Test class to test the operations in the SystemWideAlertRestRepository

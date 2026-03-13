@@ -7,17 +7,17 @@
  */
 package org.dspace.app.rest.model;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class FacetConfigurationRestTest {
 
     FacetConfigurationRest facetConfigurationRest;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         facetConfigurationRest = new FacetConfigurationRest();
     }

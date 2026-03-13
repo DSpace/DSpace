@@ -13,7 +13,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 import org.dspace.xoai.tests.support.XmlMatcherBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RioxxXslTest extends AbstractXSLTest {
     @Test

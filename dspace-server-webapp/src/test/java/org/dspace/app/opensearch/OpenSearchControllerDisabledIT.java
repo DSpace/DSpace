@@ -14,8 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration test to test the /opensearch endpoint
@@ -26,7 +26,7 @@ public class OpenSearchControllerDisabledIT extends AbstractControllerIntegratio
 
     private ConfigurationService configurationService;
 
-    @Before
+    @BeforeEach
     public void init() throws Exception {
         // disable OpenSearch by configuration to test the disabled behaviour although its active in test config
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();

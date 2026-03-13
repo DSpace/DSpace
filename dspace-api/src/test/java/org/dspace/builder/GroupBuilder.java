@@ -94,10 +94,10 @@ public class GroupBuilder extends AbstractDSpaceObjectBuilder<Group> {
     private GroupBuilder createAdminGroup(final Context context, DSpaceObject container) {
         this.context = context;
         try {
-            if (container instanceof Collection) {
-                group = collectionService.createAdministrators(context, (Collection) container);
-            } else if (container instanceof Community) {
-                group = communityService.createAdministrators(context, (Community) container);
+            if (container instanceof Collection collection) {
+                group = collectionService.createAdministrators(context, collection);
+            } else if (container instanceof Community community) {
+                group = communityService.createAdministrators(context, community);
             } else {
                 handleException(new IllegalArgumentException("DSpaceObject must be collection or community. " +
                         "Type: " + container.getType()));

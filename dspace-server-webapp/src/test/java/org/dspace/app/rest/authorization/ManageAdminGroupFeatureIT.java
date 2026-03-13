@@ -26,8 +26,8 @@ import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.Constants;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -52,7 +52,7 @@ public class ManageAdminGroupFeatureIT extends AbstractControllerIntegrationTest
     final String feature = "canManageAdminGroup";
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();

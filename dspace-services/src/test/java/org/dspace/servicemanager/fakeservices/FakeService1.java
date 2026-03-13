@@ -7,6 +7,7 @@
  */
 package org.dspace.servicemanager.fakeservices;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class FakeService1 implements ConfigChangeListener, ServiceChangeListener,
                                      Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public int triggers = 0;

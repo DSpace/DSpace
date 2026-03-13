@@ -23,8 +23,8 @@ import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
 import org.dspace.services.ConfigurationService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class EPersonRegistrationFeatureIT extends AbstractControllerIntegrationTest {
@@ -52,7 +52,7 @@ public class EPersonRegistrationFeatureIT extends AbstractControllerIntegrationT
     public static final String[] SHIB_ONLY = {"org.dspace.authenticate.ShibAuthentication"};
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         epersonRegistrationFeature = authorizationFeatureService.find(EPersonRegistrationFeature.NAME);

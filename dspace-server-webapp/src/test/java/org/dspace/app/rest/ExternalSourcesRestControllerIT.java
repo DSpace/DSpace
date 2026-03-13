@@ -14,43 +14,30 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.matcher.ExternalSourceEntryMatcher;
 import org.dspace.app.rest.matcher.ExternalSourceMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.builder.CollectionBuilder;
-import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EntityTypeBuilder;
-import org.dspace.builder.WorkflowItemBuilder;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.EntityType;
-import org.dspace.core.CrisConstants;
 import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.service.ExternalDataService;
-import org.dspace.services.ConfigurationService;
-import org.dspace.util.UUIDUtils;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrationTest {
-
-    @Autowired
-    private ConfigurationService configurationService;
 
     @Autowired
     private ExternalDataService externalDataService;
 
     String token;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -92,11 +79,9 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource(
                                     "openalexFunder", "openalexFunder", false),
                                 ExternalSourceMatcher.matchExternalSource(
-                                    "openalexJournal", "openalexJournal", false),
-                                ExternalSourceMatcher.matchExternalSource(
-                                    "authorAuthority", "authorAuthority", false)
-                                )))
-                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(21)));
+                                    "openalexJournal", "openalexJournal", false)
+                            )))
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(20)));
     }
 
     @Test
@@ -224,7 +209,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                                           .withWorkflowGroup(1, admin).build();
+                                           .withWorkflowGroup("reviewer", admin).build();
 
         //2. a workflow item
         XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
@@ -280,7 +265,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                                           .withWorkflowGroup(1, admin).build();
+                                           .withWorkflowGroup("reviewer", admin).build();
 
         //2. a workflow item
         XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
@@ -335,7 +320,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                                           .withWorkflowGroup(1, admin).build();
+                                           .withWorkflowGroup("reviewer", admin).build();
 
         //2. a workflow item
         XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)

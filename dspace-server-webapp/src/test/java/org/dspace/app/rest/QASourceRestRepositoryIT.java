@@ -27,8 +27,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.services.ConfigurationService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -44,7 +44,7 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
 
     private Item target;
 
-    @Before
+    @BeforeEach
     public void setup() {
         context.turnOffAuthorisationSystem();
 

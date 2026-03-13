@@ -7,14 +7,14 @@
  */
 package org.dspace.servicemanager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -27,14 +27,14 @@ public class DSpaceKernelManagerTest {
     DSpaceKernelManager kernelManager;
     DSpaceKernelImpl kernelImpl;
 
-    @Before
+    @BeforeEach
     public void init() {
         kernelImpl = DSpaceKernelInit.getKernel(null);
         kernelImpl.start(); // init the kernel
         kernelManager = new DSpaceKernelManager();
     }
 
-    @After
+    @AfterEach
     public void destroy() {
         if (kernelImpl != null) {
             // cleanup the kernel

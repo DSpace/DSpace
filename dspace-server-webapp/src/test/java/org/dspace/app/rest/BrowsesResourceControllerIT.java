@@ -41,7 +41,7 @@ import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
@@ -166,12 +166,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -273,14 +269,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
             .withName("Sub Community")
             .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 1")
-                                           .build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 2")
-                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -465,14 +455,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-            .withName("Collection 1")
-            .withEntityType("Publication")
-            .build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-            .withName("Collection 2")
-            .withEntityType("Publication")
-            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -520,7 +504,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //Verify that they're sorted alphabetically
                    .andExpect(
                        jsonPath("$._embedded.entries",
-                                contains(
+                            contains(
                                 BrowseEntryResourceMatcher.matchBrowseEntry("Church studies", "VR110103", 2),
                                 BrowseEntryResourceMatcher.matchBrowseEntry("History of religion", "VR110102", 3),
                                 BrowseEntryResourceMatcher.matchBrowseEntry("Missionary studies", "VR110104", 1)
@@ -570,12 +554,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Two public items with the same subject and another public item that contains that same subject, but also
         // another one
@@ -695,14 +675,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 1")
-                                           .build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 2")
-                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Two public items with the same subject and another public item that contains that same subject, but also
         // another one
@@ -822,14 +796,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 1")
-                                           .build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 2")
-                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Two public items with the same subject and another public item that contains that same subject, but also
         // another one
@@ -952,12 +920,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Two public items that are readable by Anonymous
         Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -1089,14 +1053,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 1")
-                                           .build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 2")
-                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Two public items that are readable by Anonymous
         Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -1227,16 +1185,14 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
 
         //2. Twenty-one public items that are readable by Anonymous
         for (int i = 0; i <= 20; i++) {
             ItemBuilder.createItem(context, col1)
-                  .withTitle("Public item " + String.format("%02d", i))
+                  .withTitle("Public item " + "%02d".formatted(i))
                   .withIssueDate("2017-10-17")
-                  .withAuthor("Test, Author" + String.format("%02d", i))
+                  .withAuthor("Test, Author" + "%02d".formatted(i))
                   .withSubject("Java").withSubject("Unit Testing")
                   .build();
         }
@@ -1295,12 +1251,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. 7 public items that are readable by Anonymous
         Item item1 = ItemBuilder.createItem(context, col1)
@@ -1449,14 +1401,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 1")
-                                           .build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 2")
-                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. 7 public items that are readable by Anonymous
         Item item1 = ItemBuilder.createItem(context, col1)
@@ -1582,12 +1528,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. 7 public items that are readable by Anonymous
         Item item1 = ItemBuilder.createItem(context, col1)
@@ -1715,9 +1657,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //Verify that the startsWith parameter is included in the links
                     .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=C")));
 
-    }
-
-    ;
+    };
 
     @Test
     public void testBrowseByEntriesStartsWithAndDiacritics() throws Exception {
@@ -1731,14 +1671,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withName("Collection 1")
-                                           .withEntityType("Publication")
-                                           .build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                                           .withName("Collection 2")
-                                           .withEntityType("Publication")
-                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. 4 public items that are readable by Anonymous
         Item item1 = ItemBuilder.createItem(context, col1)
@@ -1875,9 +1809,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //Verify that the startsWith parameter is included in the links
                    .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=Guión")));
 
-    }
-
-    ;
+    };
 
     @Test
     public void testBrowseByItemsStartsWith() throws Exception {
@@ -1891,12 +1823,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. 7 public items that are readable by Anonymous
         Item item1 = ItemBuilder.createItem(context, col1)
@@ -2066,12 +1994,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                                           .withEntityType("Publication")
-                                           .withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. 7 public items that are readable by Anonymous
         Item item1 = ItemBuilder.createItem(context, col1)
@@ -2222,8 +2146,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-            .withEntityType("Publication").withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
 
         //2. 2 public items that are readable by Anonymous
         Item item1 = ItemBuilder.createItem(context, col1)
@@ -2305,14 +2228,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                .withName("Collection 1")
-                .withEntityType("Publication")
-                .build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                .withName("Collection 2")
-                .withEntityType("Publication")
-                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Two public items that are readable by Anonymous
         Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -2361,17 +2278,14 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                .withName("Collection 1")
-                .withEntityType("Publication")
-                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
 
         //2. Twenty-one public items that are readable by Anonymous
         for (int i = 0; i <= 20; i++) {
             ItemBuilder.createItem(context, col1)
-                       .withTitle("Public item " + String.format("%02d", i))
+                       .withTitle("Public item " + "%02d".formatted(i))
                        .withIssueDate("2017-10-17")
-                       .withAuthor("Test, Author" + String.format("%02d", i))
+                       .withAuthor("Test, Author" + "%02d".formatted(i))
                        .withSubject("Java").withSubject("Unit Testing")
                        .build();
         }
@@ -2439,14 +2353,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                .withName("Collection 1")
-                .withEntityType("Publication")
-                .build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1)
-                .withName("Collection 2")
-                .withEntityType("Publication")
-                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         Item item1 = ItemBuilder.createItem(context, col1)
                                 .withTitle("Item 1")

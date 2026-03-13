@@ -43,11 +43,11 @@ public class SuggestionMatcher {
                 hasJsonPath("$.metadata['dc.title'][0].value", is("Title Suggestion " + suggestionId )),
                 hasJsonPath("$.metadata['dc.source'][0].value", is("Source 1")),
                 hasJsonPath("$.metadata['dc.source'][1].value", is("Source 2")),
-                hasJsonPath("$.score", is(String.format("%.2f", score))),
+                hasJsonPath("$.score", is("%.2f".formatted(score))),
                 hasJsonPath("$.evidences." + evidenceName, Matchers.is(
                         hasJsonPath("$",
                                 Matchers.allOf(
-                                        hasJsonPath("$.score", is(String.format("%.2f", evidenceScore))),
+                                        hasJsonPath("$.score", is("%.2f".formatted(evidenceScore))),
                                         hasJsonPath("$.notes", is(evidenceNote))))
                         )),
                 hasJsonPath("$.type", is("suggestion"))

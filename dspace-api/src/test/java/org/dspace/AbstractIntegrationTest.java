@@ -13,13 +13,13 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 import org.dspace.utils.DSpace;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 
 /**
  * This is the base class for Integration Tests. It inherits from the class
@@ -31,7 +31,7 @@ import org.junit.Ignore;
  *
  * @author pvillega
  */
-@Ignore
+@Disabled
 public class AbstractIntegrationTest extends AbstractUnitTest {
 
     /**
@@ -51,7 +51,7 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
     private boolean localCfgChanged = false;
 
     @Override
-    @Before
+    @BeforeEach
     /**
      * Extend the {@link AbstractUnitTest#init} method to deal with extra
      * configuration that can be manipulated at runtime during the Integration Test
@@ -61,7 +61,7 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
         String extraConfPath = getLocalConfigurationFilePath();
         FileChannel fileOpen;
         try {
-            fileOpen = FileChannel.open(Paths.get(extraConfPath), StandardOpenOption.READ);
+            fileOpen = FileChannel.open(Path.of(extraConfPath), StandardOpenOption.READ);
             initialLocalCfgSize = fileOpen.size();
             fileOpen.close();
         } catch (IOException e) {
@@ -70,7 +70,7 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
     }
 
     @Override
-    @After
+    @AfterEach
     /**
      * Extend the {@link AbstractUnitTest#destroy} method to deal with extra
      * configurations that can be manipulated at runtime during the Integration Test
@@ -91,7 +91,7 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
         }
         String extraConfPath = getLocalConfigurationFilePath();
         try {
-            FileChannel.open(Paths.get(extraConfPath), StandardOpenOption.WRITE)
+            FileChannel.open(Path.of(extraConfPath), StandardOpenOption.WRITE)
                 .truncate(initialLocalCfgSize).close();
             localCfgChanged = false;
             // sleep to give the time to the configuration to note the change

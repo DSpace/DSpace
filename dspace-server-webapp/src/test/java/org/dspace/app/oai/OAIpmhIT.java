@@ -37,13 +37,13 @@ import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.config.XOAIManagerResolver;
 import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * Integration test to verify the /oai endpoint is responding as a valid OAI-PMH endpoint.
@@ -67,11 +67,14 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
     private final String DEFAULT_CONTEXT = ROOT_PATH + DEFAULT_CONTEXT_PATH;
 
     // Mock to ensure XOAI caching is disabled for all tests (see @Before method)
-    @MockBean
+    // TODO: @MockBean is deprecated in Spring Boot 3.4+ - migrate to new testing approach when Spring Boot provides it
+    // See: https://github.com/spring-projects/spring-boot/issues/38754
+    @MockitoBean
     private XOAICacheService xoaiCacheService;
 
     // Spy on the current EarliestDateResolver bean, to allow us to change behavior in tests below
-    @SpyBean
+    // TODO: @SpyBean is deprecated - see comment above about Spring Boot test migration
+    @MockitoSpyBean
     private EarliestDateResolver earliestDateResolver;
 
     // XOAI's BaseDateProvider (used for date-based testing below)
@@ -79,7 +82,8 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
 
     // Spy on the current XOAIManagerResolver bean, to allow us to change behavior of XOAIManager in tests
     // See also: createMockXOAIManager() method
-    @SpyBean
+    // TODO: @SpyBean is deprecated - see comment above about Spring Boot test migration
+    @MockitoSpyBean
     private XOAIManagerResolver xoaiManagerResolver;
 
     // Beans required by createMockXOAIManager()
@@ -89,7 +93,7 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
     private DSpaceFilterResolver filterResolver;
 
 
-    @Before
+    @BeforeEach
     public void onlyRunIfConfigExists() {
         // These integration tests REQUIRE that OAIWebConfig is found/available (as this class deploys OAI)
         // If this class is not available, the below "Assume" will cause all tests to be SKIPPED
@@ -97,7 +101,7 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
         try {
             Class.forName("org.dspace.app.configuration.OAIWebConfig");
         } catch (ClassNotFoundException ce) {
-            Assume.assumeNoException(ce);
+            Assumptions.assumeTrue(false, "OAIWebConfig not available: " + ce.getMessage());
         }
 
         // Disable XOAI Caching for ALL tests

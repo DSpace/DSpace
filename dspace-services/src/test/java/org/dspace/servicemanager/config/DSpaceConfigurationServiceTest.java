@@ -7,11 +7,12 @@
  */
 package org.dspace.servicemanager.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -30,9 +31,9 @@ import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -48,7 +49,7 @@ public class DSpaceConfigurationServiceTest {
     // Path to our main test config file (local.properties)
     private String propertyFilePath;
 
-    @Before
+    @BeforeEach
     public void init() {
         configurationService = new DSpaceConfigurationService();
 
@@ -84,7 +85,7 @@ public class DSpaceConfigurationServiceTest {
         l = null;
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         configurationService = null;
     }
@@ -116,24 +117,28 @@ public class DSpaceConfigurationServiceTest {
         l = null;
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testVariableReplacementCircular() {
-        // add a circular reference
-        configurationService.loadConfig("circular", "${circular}");
+        assertThrows(IllegalStateException.class, () -> {
+            // add a circular reference
+            configurationService.loadConfig("circular", "${circular}");
 
-        // try to get the value (should throw an error)
-        configurationService.getProperty("circular");
+            // try to get the value (should throw an error)
+            configurationService.getProperty("circular");
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testVariableReplacementIndirectCircular() {
-        // add a circular reference
-        configurationService.loadConfig("circular", "${circular}");
-        // add an indirect reference to that circular reference
-        configurationService.loadConfig("indirect.circular", "$indirect ${circular}");
+        assertThrows(IllegalStateException.class, () -> {
+            // add a circular reference
+            configurationService.loadConfig("circular", "${circular}");
+            // add an indirect reference to that circular reference
+            configurationService.loadConfig("indirect.circular", "$indirect ${circular}");
 
-        // try to get the value (should throw an error)
-        configurationService.getProperty("indirect.circular");
+            // try to get the value (should throw an error)
+            configurationService.getProperty("indirect.circular");
+        });
     }
 
     /**
@@ -698,7 +703,7 @@ public class DSpaceConfigurationServiceTest {
         when(spy.isValidDSpaceHome("/mydspace")).thenReturn(true);
 
         // Assert Home is the same as System Property
-        assertEquals("System property set", "/mydspace", spy.getDSpaceHome(null));
+        assertEquals("/mydspace", spy.getDSpaceHome(null), "System property set");
 
         // reset DSPACE_HOME to previous value
         System.setProperty(DSpaceConfigurationService.DSPACE_HOME, previousValue);
@@ -717,7 +722,7 @@ public class DSpaceConfigurationServiceTest {
         when(spy.isValidDSpaceHome("/mydspace")).thenReturn(true);
 
         // Assert System Property overrides the value passed in, if it is valid
-        assertEquals("System property override", "/mydspace", spy.getDSpaceHome("/myotherdspace"));
+        assertEquals("/mydspace", spy.getDSpaceHome("/myotherdspace"), "System property override");
 
         // reset DSPACE_HOME to previous value
         System.setProperty(DSpaceConfigurationService.DSPACE_HOME, previousValue);
@@ -736,7 +741,7 @@ public class DSpaceConfigurationServiceTest {
         when(spy.isValidDSpaceHome("/mydspace")).thenReturn(true);
 
         // Assert provided home is used
-        assertEquals("Home based on passed in value", "/mydspace", spy.getDSpaceHome("/mydspace"));
+        assertEquals("/mydspace", spy.getDSpaceHome("/mydspace"), "Home based on passed in value");
 
         // reset DSPACE_HOME to previous value
         System.setProperty(DSpaceConfigurationService.DSPACE_HOME, previousValue);

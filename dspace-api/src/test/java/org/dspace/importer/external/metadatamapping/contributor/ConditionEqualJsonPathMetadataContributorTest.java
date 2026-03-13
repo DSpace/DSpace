@@ -7,8 +7,8 @@
  */
 package org.dspace.importer.external.metadatamapping.contributor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.Collection;
@@ -16,15 +16,18 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  **/
+@ExtendWith(MockitoExtension.class)
 public class ConditionEqualJsonPathMetadataContributorTest {
 
     private final String json = "{\"field\": \"expectedValue\"}";
@@ -35,7 +38,7 @@ public class ConditionEqualJsonPathMetadataContributorTest {
     @InjectMocks
     private ConditionEqualJsonPathMetadataContributor contributor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         contributor.setRightOperand("expectedValue");

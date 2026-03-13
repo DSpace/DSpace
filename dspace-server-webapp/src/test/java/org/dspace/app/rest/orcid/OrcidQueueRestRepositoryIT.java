@@ -29,7 +29,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.orcid.OrcidQueue;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

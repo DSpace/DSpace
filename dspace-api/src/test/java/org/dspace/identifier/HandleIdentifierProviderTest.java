@@ -7,7 +7,7 @@
  */
 package org.dspace.identifier;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.util.Map;
@@ -16,11 +16,11 @@ import java.util.Properties;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.ApplicationContext;
@@ -55,7 +55,7 @@ public class HandleIdentifierProviderTest
     /**
      * The special test bean for the target class is defined here.
      */
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         ServiceManager serviceManager = kernelImpl.getServiceManager();
 
@@ -82,17 +82,17 @@ public class HandleIdentifierProviderTest
     /**
      * Clean up special test Spring stuff.
      */
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
         // Clean up testing ApplicationContext and any beans within.
         applicationContext.close();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -152,7 +152,7 @@ public class HandleIdentifierProviderTest
             String message = expResult ?
                 "This provider should support " + identifier :
                 "This provider should not support " + identifier;
-            assertEquals(message, expResult, result);
+            assertEquals(expResult, result, message);
         }
     }
 

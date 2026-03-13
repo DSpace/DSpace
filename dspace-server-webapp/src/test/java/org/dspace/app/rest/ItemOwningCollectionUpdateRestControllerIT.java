@@ -27,7 +27,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControllerIntegrationTest {
 
