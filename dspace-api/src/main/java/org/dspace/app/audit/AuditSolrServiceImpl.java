@@ -27,10 +27,10 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery.ORDER;
+import org.apache.solr.client.solrj.request.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -192,14 +192,14 @@ public class AuditSolrServiceImpl implements AuditService {
         boolean result = false;
         if (configurationService.getBooleanProperty("audit.item.in-workflow")) {
             result = poolTaskService.findAll(context).stream()
-                    .anyMatch(pt -> StringUtils.equalsIgnoreCase(pt.getWorkflowItem().getItem().getID().toString(),
-                            item.getID().toString()));
+                    .anyMatch(pt -> pt.getWorkflowItem().getItem().getID().toString()
+                            .equalsIgnoreCase(item.getID().toString()));
         }
 
         if (!result && configurationService.getBooleanProperty("audit.item.in-workspace")) {
             result = workspaceItemService.findAll(context).stream()
-                    .anyMatch(wi -> StringUtils.equalsIgnoreCase(wi.getItem().getID().toString(),
-                            item.getID().toString()));
+                    .anyMatch(wi -> wi.getItem().getID().toString()
+                            .equalsIgnoreCase(item.getID().toString()));
         }
 
         return result;
