@@ -14,7 +14,6 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.PropertyRest;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -30,7 +29,6 @@ public class ConfigurationRestRepository extends DSpaceRestRepository<PropertyRe
     private ConfigurationService configurationService;
     private List<String> exposedProperties;
 
-    @Autowired
     public ConfigurationRestRepository(ConfigurationService configurationService) {
         this.configurationService = configurationService;
         this.exposedProperties = Arrays.asList(configurationService.getArrayProperty("rest.properties.exposed"));

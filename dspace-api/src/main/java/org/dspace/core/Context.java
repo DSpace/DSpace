@@ -442,18 +442,6 @@ public class Context implements AutoCloseable {
         }
 
         try {
-            // Flush pending changes to the database BEFORE dispatching events.
-            // This ensures all entities are persisted and prevents "Detached entity passed to persist"
-            // errors in Hibernate 7 when event consumers trigger auto-flush with queries.
-            if (dbConnection != null) {
-                dbConnection.flushSession();
-                // Clear the session after flushing to prevent detached entity issues during event dispatch.
-                // In Hibernate 7, if entities with cascade=PERSIST relationships are in the session,
-                // queries in event consumers can trigger auto-flush which fails on detached references.
-                // Clearing the session ensures event consumers load fresh entities from the database.
-                dbConnection.uncacheEntities();
-            }
-
             // Dispatch events before committing changes to the database,
             // as the consumers may change something too
             dispatchEvents();
@@ -463,7 +451,8 @@ public class Context implements AutoCloseable {
             }
 
             if (dbConnection != null) {
-                // Commit our changes (this closes the transaction but leaves database connection open)
+                // Commit our changes (this closes the transaction but
+                // leaves database connection open)
                 dbConnection.commit();
                 reloadContextBoundEntities();
             }

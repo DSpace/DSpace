@@ -59,8 +59,8 @@ import org.springframework.hateoas.TemplateVariables;
 import org.springframework.hateoas.UriTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -259,7 +259,7 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
      * @throws IOException
      * @throws SQLException
      */
-    @RequestMapping(method = RequestMethod.GET, value = "find", params = "id")
+    @GetMapping( value = "find", params = "id")
     @SuppressWarnings("unchecked")
     public void getDSObyIdentifier(HttpServletRequest request,
                                    HttpServletResponse response,

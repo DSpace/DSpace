@@ -39,8 +39,8 @@ public class SolrServiceIndexCollectionSubmittersPlugin implements SolrServiceIn
 
     @Override
     public void additionalIndex(Context context, IndexableObject idxObj, SolrInputDocument document) {
-        if (idxObj instanceof IndexableCollection) {
-            Collection col = ((IndexableCollection) idxObj).getIndexedObject();
+        if (idxObj instanceof IndexableCollection collection) {
+            Collection col = collection.getIndexedObject();
             if (col != null) {
                 try {
                     // Index groups with ADMIN rights on the Collection, on

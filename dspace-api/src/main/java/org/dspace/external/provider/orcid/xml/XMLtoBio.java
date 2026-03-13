@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 import org.orcid.jaxb.model.v3.release.record.Person;
-import org.orcid.jaxb.model.v3.release.record.Record;
 import org.orcid.jaxb.model.v3.release.search.Result;
 import org.orcid.jaxb.model.v3.release.search.Search;
 import org.xml.sax.SAXException;
@@ -60,15 +59,6 @@ public class XMLtoBio extends Converter<List<Result>> {
         try {
             person = (Person) unmarshall(xml, Person.class);
             return person;
-        } catch (SAXException | URISyntaxException e) {
-            log.error(e);
-        }
-        return null;
-    }
-
-    public Record convertToRecord(InputStream xml) {
-        try {
-            return (Record) unmarshall(xml, Record.class);
         } catch (SAXException | URISyntaxException e) {
             log.error(e);
         }

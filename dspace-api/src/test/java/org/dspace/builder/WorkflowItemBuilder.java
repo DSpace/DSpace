@@ -77,7 +77,6 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
             workflowItem = workflowService.start(context, workspaceItem);
             workspaceItem = null;
             context.dispatchEvents();
-            indexingService.commit();
             return workflowItem;
         } catch (Exception e) {
             return handleException(e);
@@ -132,7 +131,6 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
                 deleteItem(c, item);
             }
             c.complete();
-            indexingService.commit();
         }
     }
 
@@ -278,7 +276,6 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
             }
             c.complete();
         }
-        indexingService.commit();
     }
 
 }

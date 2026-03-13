@@ -24,8 +24,7 @@ public final class HibernateProxyHelper {
      * almost always better to use the entity name!
      */
     public static Class getClassWithoutInitializingProxy(Object object) {
-        if (object instanceof HibernateProxy) {
-            HibernateProxy proxy = (HibernateProxy) object;
+        if (object instanceof HibernateProxy proxy) {
             LazyInitializer li = proxy.getHibernateLazyInitializer();
             return li.getPersistentClass();
         } else {

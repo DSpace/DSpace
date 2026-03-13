@@ -34,10 +34,10 @@ public final class OrderedServiceComparator implements Comparator<Object>, Seria
          * is less than, equal to, or greater than the second.
          */
         int comparison = 0;
-        if (arg0 instanceof OrderedService &&
-            arg1 instanceof OrderedService) {
-            int p0 = ((OrderedService) arg0).getOrder();
-            int p1 = ((OrderedService) arg1).getOrder();
+        if (arg0 instanceof OrderedService service &&
+            arg1 instanceof OrderedService service1) {
+            int p0 = service.getOrder();
+            int p1 = service1.getOrder();
             if (p0 <= 0 && p1 <= 0) {
                 comparison = 0; // both zero or less so equal
             } else if (p0 <= 0) {

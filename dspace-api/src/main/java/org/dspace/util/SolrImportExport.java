@@ -322,7 +322,7 @@ public class SolrImportExport {
 
             // commit changes
             HttpJettySolrClient origSolr = new HttpJettySolrClient.Builder(origSolrUrl).build();
-            origSolr.commit();
+            origSolr.commit(true, true, true);
 
             // swap back (statistics now going to actual core name in actual data dir)
             swapRequest = new CoreAdminRequest();
@@ -339,7 +339,7 @@ public class SolrImportExport {
             importIndex(tempIndexName, exportDir, origSolrUrl, false);
 
             // commit changes
-            origSolr.commit();
+            origSolr.commit(true, true, true);
 
             // unload now-temp core (temp core name)
             CoreAdminRequest.unloadCore(tempIndexName, false, false, adminSolr);
@@ -441,7 +441,7 @@ public class SolrImportExport {
             solr.request(contentStreamUpdateRequest);
         }
 
-        solr.commit(true, true);
+        solr.commit(true, true, true);
     }
 
     /**
@@ -478,7 +478,7 @@ public class SolrImportExport {
     public static void clearIndex(String solrUrl) throws IOException, SolrServerException {
         HttpJettySolrClient solr = new HttpJettySolrClient.Builder(solrUrl).build();
         solr.deleteByQuery("*:*");
-        solr.commit();
+        solr.commit(true, true, true);
         solr.optimize();
     }
 

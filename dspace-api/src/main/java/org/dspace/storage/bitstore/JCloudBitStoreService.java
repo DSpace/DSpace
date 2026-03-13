@@ -437,8 +437,8 @@ public class JCloudBitStoreService extends BaseBitStoreService {
         String type = MediaType.OCTET_STREAM.toString();
 
         /* attempt to get type if the source is a Bitstream */
-        if (byteSource instanceof BitstreamByteSource) {
-            type = getMIMEType(((BitstreamByteSource) byteSource).getBitstream());
+        if (byteSource instanceof BitstreamByteSource source) {
+            type = getMIMEType(source.getBitstream());
         }
 
         BlobStore blobStore = blobStoreContext.getBlobStore();
