@@ -11,8 +11,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -28,9 +28,9 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit Tests for class MetadataValue
@@ -83,7 +83,7 @@ public class MetadataValueTest extends AbstractUnitTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -114,7 +114,7 @@ public class MetadataValueTest extends AbstractUnitTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         try {
@@ -148,7 +148,7 @@ public class MetadataValueTest extends AbstractUnitTest {
      */
     @Test
     public void testGetDSpaceObject() {
-        assertTrue("testGetItemId 0", mv.getDSpaceObject().equals(it));
+        assertTrue(mv.getDSpaceObject().equals(it), "testGetItemId 0");
     }
 
     /**
@@ -277,7 +277,7 @@ public class MetadataValueTest extends AbstractUnitTest {
         metadataValueService.create(context, it, mf);
         List<MetadataValue> found = metadataValueService.findByField(context, mf);
         assertThat("testFind 0", found, notNullValue());
-        assertTrue("testFind 1", found.size() >= 1);
+        assertTrue(found.size() >= 1, "testFind 1");
     }
 
     /**

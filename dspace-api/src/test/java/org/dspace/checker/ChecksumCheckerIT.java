@@ -8,8 +8,8 @@
 package org.dspace.checker;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.SQLException;
 import java.time.Instant;
@@ -30,16 +30,16 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ChecksumCheckerIT extends AbstractIntegrationTestWithDatabase {
     protected List<Bitstream> bitstreams;
     protected MostRecentChecksumService checksumService =
         CheckerServiceFactory.getInstance().getMostRecentChecksumService();
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -83,7 +83,7 @@ public class ChecksumCheckerIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
     }
 
-    @After
+    @AfterEach
     public void cleanUp() throws SQLException {
         // Need to clean up ChecksumHistory because of a referential integrity
         // constraint violation between the most_recent_checksum table and
@@ -106,8 +106,8 @@ public class ChecksumCheckerIT extends AbstractIntegrationTestWithDatabase {
         for (Bitstream bitstream: bitstreams) {
             MostRecentChecksum checksum = checksumService.findByBitstream(context, bitstream);
             Instant lastChecksumDate = checksum.getProcessStartDate();
-            assertTrue("lastChecksumDate (" + lastChecksumDate + ") <= checkerStartDate (" + checkerStartDate + ")",
-                lastChecksumDate.isBefore(checkerStartDate));
+            assertTrue(lastChecksumDate.isBefore(checkerStartDate),
+                "lastChecksumDate (" + lastChecksumDate + ") <= checkerStartDate (" + checkerStartDate + ")");
         }
 
         // Dispatcher that throws an exception when a third bitstream is
@@ -137,11 +137,11 @@ public class ChecksumCheckerIT extends AbstractIntegrationTestWithDatabase {
 
             bitstreamCount = bitstreamCount + 1;
             if (bitstreamCount <= 2) {
-                assertTrue("lastChecksumDate (" + lastChecksumDate + ") <= checkerStartDate (" + checkerStartDate + ")",
-                    lastChecksumDate.isAfter(checkerStartDate));
+                assertTrue(lastChecksumDate.isAfter(checkerStartDate),
+                    "lastChecksumDate (" + lastChecksumDate + ") <= checkerStartDate (" + checkerStartDate + ")");
             } else {
-                assertTrue("lastChecksumDate (" + lastChecksumDate + ") >= checkerStartDate (" + checkerStartDate + ")",
-                    lastChecksumDate.isBefore(checkerStartDate));
+                assertTrue(lastChecksumDate.isBefore(checkerStartDate),
+                    "lastChecksumDate (" + lastChecksumDate + ") >= checkerStartDate (" + checkerStartDate + ")");
             }
         }
     }
