@@ -8,12 +8,15 @@
 package org.dspace.solr;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -101,28 +104,52 @@ public class MockSolrServer {
      * @return connection to the named core.
      */
     private static synchronized SolrClient initSolrServerForCore(final String coreName) {
+        log.info("DEBUG: initSolrServerForCore called for core '{}'", coreName);
         SolrClient server = loadedCores.get(coreName);
         if (server == null) {
+            log.info("DEBUG: Core '{}' not in cache, initializing...", coreName);
             initSolrContainer();
 
-            server = new EmbeddedSolrServer(container, coreName) {
-                // This ugliness should be fixed in Solr 8.9.
-                // https://issues.apache.org/jira/browse/SOLR-15085
-                @Override public void close() { // Copied from Solr's own tests
-                    // Do not close shared core container!
+            log.info("DEBUG: Container initialized, checking if core '{}' exists...", coreName);
+
+            // Check if the requested core is available
+            if (container != null) {
+                Collection<String> availableCores = container.getAllCoreNames();
+                log.info("DEBUG: Available cores: {}", availableCores);
+                if (!availableCores.contains(coreName)) {
+                    log.warn("DEBUG: Requested core '{}' is NOT in available cores list!", coreName);
                 }
-            };
+            }
+
+            try {
+                log.info("DEBUG: Creating EmbeddedSolrServer for core '{}'...", coreName);
+                server = new EmbeddedSolrServer(container, coreName) {
+                    // This ugliness should be fixed in Solr 8.9.
+                    // https://issues.apache.org/jira/browse/SOLR-15085
+                    @Override public void close() { // Copied from Solr's own tests
+                        // Do not close shared core container!
+                    }
+                };
+                log.info("DEBUG: EmbeddedSolrServer created successfully for core '{}'", coreName);
+            } catch (Exception e) {
+                log.error("DEBUG: Failed to create EmbeddedSolrServer for core '{}'", coreName, e);
+                throw new RuntimeException("Failed to create EmbeddedSolrServer for core: " + coreName, e);
+            }
 
             //Start with an empty index
             try {
+                log.info("DEBUG: Clearing index for core '{}'...", coreName);
                 server.deleteByQuery("*:*");
                 server.commit();
+                log.info("DEBUG: Index cleared successfully for core '{}'", coreName);
             } catch (SolrServerException | IOException e) {
-                log.error("Failed to empty Solr index:  {}", e.getMessage(), e);
+                log.error("DEBUG: Failed to empty Solr index for core '{}': {}", coreName, e.getMessage(), e);
             }
 
             loadedCores.put(coreName, server);
             log.info("SOLR Server for core {} initialized", coreName);
+        } else {
+            log.info("DEBUG: Core '{}' already in cache, reusing", coreName);
         }
         return server;
     }
@@ -172,12 +199,71 @@ public class MockSolrServer {
      */
     private static synchronized void initSolrContainer() {
         if (container == null) {
-            Path solrDir = Paths.get(AbstractDSpaceIntegrationTest.getDspaceDir(), "solr");
-            log.info("Initializing SOLR CoreContainer with directory {}",
+            String dspaceDir = AbstractDSpaceIntegrationTest.getDspaceDir();
+            log.info("DEBUG: dspace.dir system property = {}", dspaceDir);
+
+            if (dspaceDir == null) {
+                log.error("DEBUG: dspace.dir is NULL! This will cause Solr initialization to fail.");
+                throw new IllegalStateException("dspace.dir system property is not set");
+            }
+
+            Path solrDir = Path.of(dspaceDir, "solr");
+            log.info("DEBUG: Initializing SOLR CoreContainer with directory {}",
                     solrDir.toAbsolutePath().toString());
-            container = new CoreContainer(solrDir, new Properties());
-            container.load();
-            log.info("SOLR CoreContainer initialized");
+
+            // Check if directory exists and list contents
+            if (Files.exists(solrDir)) {
+                log.info("DEBUG: Solr directory exists: {}", solrDir);
+                try (Stream<Path> files = Files.list(solrDir)) {
+                    String contents = files.map(p -> p.getFileName().toString())
+                                           .collect(Collectors.joining(", "));
+                    log.info("DEBUG: Solr directory contents: [{}]", contents);
+                } catch (IOException e) {
+                    log.warn("DEBUG: Could not list solr directory contents", e);
+                }
+
+                // Check for solr.xml
+                Path solrXml = solrDir.resolve("solr.xml");
+                if (Files.exists(solrXml)) {
+                    log.info("DEBUG: solr.xml exists at {}", solrXml);
+                    try {
+                        String xmlContent = Files.readString(solrXml);
+                        log.info("DEBUG: solr.xml content: {}", xmlContent);
+                    } catch (IOException e) {
+                        log.warn("DEBUG: Could not read solr.xml", e);
+                    }
+                } else {
+                    log.error("DEBUG: solr.xml NOT FOUND at {}", solrXml);
+                }
+            } else {
+                log.error("DEBUG: Solr directory does NOT exist: {}", solrDir);
+            }
+
+            try {
+                log.info("DEBUG: Creating CoreContainer...");
+                container = new CoreContainer(solrDir, new Properties());
+                log.info("DEBUG: CoreContainer created, calling load()...");
+                container.load();
+                log.info("DEBUG: CoreContainer.load() completed");
+
+                // Log container status after load
+                log.info("DEBUG: Container status - isShutDown: {}", container.isShutDown());
+
+                // Try to get available cores
+                Collection<String> coreNames = container.getAllCoreNames();
+                log.info("DEBUG: Available cores after load: {}", coreNames);
+
+                if (coreNames.isEmpty()) {
+                    log.warn("DEBUG: No cores found after container.load()! This may cause issues.");
+                }
+            } catch (Exception e) {
+                log.error("DEBUG: Exception during CoreContainer initialization", e);
+                throw new RuntimeException("Failed to initialize Solr CoreContainer", e);
+            }
+
+            log.info("SOLR CoreContainer initialized successfully");
+        } else {
+            log.info("DEBUG: CoreContainer already initialized, reusing existing instance");
         }
     }
 
