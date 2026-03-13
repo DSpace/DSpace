@@ -19,7 +19,6 @@ import org.dspace.matomo.model.MatomoRequestDetails;
 import org.dspace.matomo.model.MatomoRequestDetailsBuilder;
 import org.dspace.matomo.model.MatomoRequestDetailsSplitter;
 import org.dspace.usage.UsageEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This class groups together {@code capacity} requests that will be sent as one bulk request
@@ -36,8 +35,8 @@ public class MatomoAsyncBulkRequestHandler extends MatomoAbstractHandler {
 
 
     public MatomoAsyncBulkRequestHandler(
-        @Autowired MatomoRequestDetailsBuilder builder,
-        @Autowired MatomoClient matomoClient,
+        MatomoRequestDetailsBuilder builder,
+        MatomoClient matomoClient,
         int capacity
     ) {
         super(matomoClient, builder);

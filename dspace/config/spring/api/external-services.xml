@@ -267,12 +267,6 @@
                 <value>Person</value>
             </list>
         </property>
-        <property name="externalIdentifiers">
-            <map>
-                <entry key="Scopus Author ID" value="person.identifier.scopus-author-id"/>
-                <entry key="Researcher ID" value="person.identifier.rid"/>
-            </map>
-        </property>
     </bean>
 
     <bean id="orcidRestConnector" class="org.dspace.external.OrcidRestConnector">

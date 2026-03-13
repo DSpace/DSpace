@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.exception;
 
+import java.io.Serial;
+
 /**
  * This exception is thrown when the provided current password is wrong.
  *
@@ -14,6 +16,7 @@ package org.dspace.app.rest.exception;
  */
 public class WrongCurrentPasswordException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 7774965236190392985L;
 
     public WrongCurrentPasswordException(String message) {

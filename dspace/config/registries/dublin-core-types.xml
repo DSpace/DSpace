@@ -487,91 +487,6 @@
   </dc-type>
 
   <dc-type>
-    <schema>dc</schema>
-    <element>relation</element>
-    <qualifier>product</qualifier>
-    <scope_note>References product for related item.</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>dc</schema>
-    <element>relation</element>
-    <qualifier>journal</qualifier>
-    <scope_note>References journal for related item.</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>dc</schema>
-    <element>relation</element>
-    <qualifier>orgunit</qualifier>
-    <scope_note>References orgunit for related item.</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>dc</schema>
-    <element>relation</element>
-    <qualifier>project</qualifier>
-    <scope_note>References project for related item.</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>dc</schema>
-    <element>relation</element>
-    <qualifier>conference</qualifier>
-    <scope_note>References conference for related item.</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>dc</schema>
-    <element>relation</element>
-    <qualifier>publication</qualifier>
-    <scope_note>References a related publication.</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>dc</schema>
-    <element>relation</element>
-    <qualifier>isbn</qualifier>
-    <scope_note>References a related ISBN source</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>dc</schema>
-    <element>relation</element>
-    <qualifier>doi</qualifier>
-    <scope_note>References a related DOI source</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>dc</schema>
-    <element>relation</element>
-    <qualifier>issn</qualifier>
-    <scope_note>References a related ISSN source</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>dc</schema>
-    <element>relation</element>
-    <qualifier>equipment</qualifier>
-    <scope_note>References an Equipment that generated the current resource</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>dc</schema>
-    <element>relation</element>
-    <qualifier>references</qualifier>
-    <scope_note>References a related output of this product</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>dc</schema>
-    <element>relation</element>
-    <qualifier>patent</qualifier>
-    <scope_note>References a Patent / parent Patent</scope_note>
-  </dc-type>
-
-
-  <dc-type>
 	<schema>dc</schema>
     <element>rights</element>
     <!-- unqualified -->
@@ -689,13 +604,6 @@
         <qualifier>license</qualifier>
         <scope_note></scope_note>
     </dc-type>
-
-  <dc-type>
-    <schema>dc</schema>
-    <element>identifier</element>
-    <qualifier>patentnumber</qualifier>
-    <scope_note>The Patent Number Identifier</scope_note>
-  </dc-type>
 
     <dc-type>
         <schema>dc</schema>

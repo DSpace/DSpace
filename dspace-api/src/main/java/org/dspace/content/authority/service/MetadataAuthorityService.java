@@ -9,9 +9,7 @@ package org.dspace.content.authority.service;
 
 import java.util.List;
 
-import org.dspace.content.Collection;
 import org.dspace.content.MetadataField;
-import org.dspace.core.Constants;
 
 /**
  * Broker for metadata authority settings configured for each metadata field.
@@ -47,23 +45,9 @@ public interface MetadataAuthorityService {
      * Predicate - is field authority-controlled?
      *
      * @param metadataField metadata field
-     * @param dsoType       the type of dspace object to consider (Item, Bitstream,
-     *                      etc?.) as defined in the {@link Constants}
-     * @param collection    the DSpace collection that own or will own the DSpace
      * @return true/false
      */
-    public boolean isAuthorityAllowed(MetadataField metadataField, int dsoType, Collection collection);
-
-    /**
-     * Predicate - is field allowing authority?
-     *
-     * @param fieldKey      field key in the format [schema]_[element]_[qualifier] (e.g., "dc_contributor_author")
-     * @param dsoType       the type of dspace object to consider (Item, Bitstream,
-     *                      etc?.) as defined in the {@link Constants}
-     * @param collection    the DSpace collection that own or will own the DSpace
-     * @return true/false
-     */
-    public boolean isAuthorityAllowed(String fieldKey, int dsoType, Collection collection);
+    public boolean isAuthorityControlled(MetadataField metadataField);
 
     /**
      * Predicate - is field authority-controlled?
@@ -72,16 +56,6 @@ public interface MetadataAuthorityService {
      * @return true/false
      */
     public boolean isAuthorityControlled(String fieldKey);
-
-    /**
-     * Predicate - is field authority-controlled?
-     *
-     * @param metadataField metadata field
-     * @return true/false
-     * @deprecated Use {@link #isAuthorityAllowed(MetadataField, int, Collection)} instead
-     */
-    @Deprecated
-    public boolean isAuthorityControlled(MetadataField metadataField);
 
     /**
      * Predicate - is authority value required for field?
@@ -98,6 +72,7 @@ public interface MetadataAuthorityService {
      * @return true/false
      */
     public boolean isAuthorityRequired(String fieldKey);
+
 
     /**
      * Construct a single key from the tuple of schema/element/qualifier
@@ -135,9 +110,7 @@ public interface MetadataAuthorityService {
      * are in the form <code>schema.element[.qualifier]</code>
      *
      * @return the list of metadata field with authority control
-     * @deprecated Use authority-controlled field discovery via submission forms instead
      */
-    @Deprecated
     public List<String> getAuthorityMetadata();
 
     /**
