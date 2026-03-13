@@ -11,13 +11,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Utility class for performing metadata patch tests sourced from a common json file (see constructor).
@@ -56,7 +56,7 @@ public class MetadataPatchSuite {
                     checkResponse("GET", client, get(url), expectedMetadata, expectedStatus);
                 }
             } catch (Throwable t) {
-                Assert.fail("Metadata patch test '" + testNode.get("name") + "' failed.\n" + "Request body: "
+                Assertions.fail("Metadata patch test '" + testNode.get("name") + "' failed.\n" + "Request body: "
                         + requestBody + "\n" + "Error: " + (t instanceof AssertionError ? "" : t.getClass().getName())
                         + t.getMessage());
             }
@@ -82,10 +82,11 @@ public class MetadataPatchSuite {
         if (expectedStatus >= 200 && expectedStatus < 300) {
           String responseBody = resultActions.andReturn().getResponse().getContentAsString();
           JsonNode responseJson =  mapper.readTree(responseBody);
-          String responseMetadata = responseJson.get("metadata").toString();
-          if (!responseMetadata.equals(expectedMetadata)) {
-              Assert.fail("Expected metadata in " + verb + " response: " + expectedMetadata
-                      + "\nGot metadata in " + verb + " response: " + responseMetadata);
+          JsonNode responseMetadata = responseJson.get("metadata");
+          JsonNode expectedMetadataJson = mapper.readTree(expectedMetadata);
+          if (!responseMetadata.equals(expectedMetadataJson)) {
+              Assertions.fail("Expected metadata in " + verb + " response: " + expectedMetadata
+                      + "\nGot metadata in " + verb + " response: " + responseMetadata.toString());
           }
         }
     }

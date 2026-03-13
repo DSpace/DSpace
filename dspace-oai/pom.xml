@@ -47,19 +47,17 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.6</version>
+        </dependency>
 
         <!-- OAI Data Provider Framework -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>xoai</artifactId>
             <version>${xoai.version}</version>
-            <exclusions>
-                <!-- Use version provided by SolrJ -->
-                <exclusion>
-                    <groupId>com.fasterxml.woodstox</groupId>
-                    <artifactId>woodstox-core</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Java Injection -->
@@ -111,13 +109,17 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
         </dependency>
-
-        <!-- Testing -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
+      <dependency>
+         <groupId>org.hamcrest</groupId>
+         <artifactId>hamcrest-junit</artifactId>
+         <version>2.0.0.0</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.junit.jupiter</groupId>
+         <artifactId>junit-jupiter</artifactId>
+         <scope>test</scope>
+      </dependency>
         <!-- Note: XOAI requires hamcrest both for testing and runtime -->
         <!-- As our Parent POM sets this to 'test' scope, we must override it -->
         <dependency>

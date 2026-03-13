@@ -104,7 +104,7 @@ public class VersionManager {
         while (bundles.hasNext()) {
             Bundle bundle = bundles.next();
             if (exempt != null &&
-                bundle.getID() != exempt.getID()) {
+                !bundle.getID().equals(exempt.getID())) {
                 bundles.remove();
                 bundleService
                     .removeBitstream(context, bundle,

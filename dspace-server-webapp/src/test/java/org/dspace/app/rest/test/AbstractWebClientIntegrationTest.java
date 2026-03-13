@@ -12,11 +12,11 @@ import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.TestApplication;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpEntity;
@@ -24,7 +24,6 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * Abstract web client integration test class that will initialize the Spring Boot test environment by starting up
@@ -42,16 +41,13 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @see org.dspace.app.rest.test.AbstractControllerIntegrationTest
  */
 // Run tests with JUnit 4 and Spring TestContext Framework
-@RunWith(SpringRunner.class)
-// Specify main class to use to load Spring ApplicationContext
-// ALSO tell Spring to start a web server on a random port
-// NOTE: By default, Spring caches and reuses ApplicationContext for each integration test (to speed up tests)
-// See: https://docs.spring.io/spring/docs/current/spring-framework-reference/testing.html#integration-testing
 @SpringBootTest(classes = TestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 // Load DSpace initializers in Spring ApplicationContext (to initialize DSpace Kernel & Configuration)
 @ContextConfiguration(initializers = { DSpaceKernelInitializer.class, DSpaceConfigurationInitializer.class })
 // Load our src/test/resources/application-test.properties to override some settings in default application.properties
 @TestPropertySource(locations = "classpath:application-test.properties")
+// Enable auto-configuration of TestRestTemplate (moved to separate module in Spring Boot 4)
+@AutoConfigureTestRestTemplate
 public class AbstractWebClientIntegrationTest extends AbstractIntegrationTestWithDatabase {
     // (Random) port chosen for test web server
     @LocalServerPort
@@ -66,7 +62,7 @@ public class AbstractWebClientIntegrationTest extends AbstractIntegrationTestWit
     protected ApplicationContext applicationContext;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
 
