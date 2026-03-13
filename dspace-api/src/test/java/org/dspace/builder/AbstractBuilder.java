@@ -30,6 +30,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.builder.util.AbstractBuilderCleanupUtil;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -328,6 +329,15 @@ public abstract class AbstractBuilder<T, S> {
         bit = c.reloadEntity(bit);
         c.turnOffAuthorisationSystem();
         if (bit != null) {
+            // In Hibernate 7, cascade deletes may not properly mark bitstreams as deleted.
+            // If the bitstream isn't deleted yet, delete it first before expunging.
+            if (!bit.isDeleted()) {
+                // Remove from any bundles first
+                for (Bundle bundle : bit.getBundles()) {
+                    bundle.removeBitstream(bit);
+                }
+                bitstreamService.delete(c, bit);
+            }
             bitstreamService.expunge(c, bit);
         }
     }

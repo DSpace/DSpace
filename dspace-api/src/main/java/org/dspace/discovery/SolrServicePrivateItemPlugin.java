@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;

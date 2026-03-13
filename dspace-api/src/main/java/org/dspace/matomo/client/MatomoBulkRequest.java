@@ -10,9 +10,9 @@ package org.dspace.matomo.client;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.dspace.matomo.model.MatomoRequestDetails;
 import org.dspace.matomo.model.MatomoRequestDetailsListConverter;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Request that will be sent to Matomo tracking endpoint
