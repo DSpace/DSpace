@@ -24,7 +24,6 @@ import org.mockito.junit.MockitoJUnitRunner;
  *
  * The allowed-dictionaries config behavior should be:
  * - Empty/null list: no dictionaries are allowed (deny all)
- * - "*" in list: all dictionaries are allowed (allow all)
  * - Explicit list: only those named dictionaries are allowed
  *
  * @author Milan Majchrak (dspace at dataquest.sk)
@@ -72,18 +71,6 @@ public class SolrSuggestServiceTest {
     }
 
     /**
-     * When the allowed-dictionaries config contains "*", all dictionaries should be allowed.
-     */
-    @Test
-    public void wildcardConfigShouldAllowAll() {
-        when(configurationService.getArrayProperty(CONFIG_KEY)).thenReturn(new String[]{"*"});
-
-        assertThat(solrSuggestService.isAllowedDictionary("subject"), is(true));
-        assertThat(solrSuggestService.isAllowedDictionary("authors"), is(true));
-        assertThat(solrSuggestService.isAllowedDictionary("any_random_name"), is(true));
-    }
-
-    /**
      * When the allowed-dictionaries config contains explicit names,
      * only those names should be allowed.
      */
@@ -96,30 +83,5 @@ public class SolrSuggestServiceTest {
         assertThat(solrSuggestService.isAllowedDictionary("countries_file"), is(true));
         assertThat(solrSuggestService.isAllowedDictionary("authors"), is(false));
         assertThat(solrSuggestService.isAllowedDictionary("not_in_list"), is(false));
-    }
-
-    /**
-     * When the wildcard "*" is mixed with explicit names, all dictionaries should still be allowed.
-     */
-    @Test
-    public void wildcardMixedWithExplicitShouldAllowAll() {
-        when(configurationService.getArrayProperty(CONFIG_KEY))
-                .thenReturn(new String[]{"subject", "*", "countries_file"});
-
-        assertThat(solrSuggestService.isAllowedDictionary("subject"), is(true));
-        assertThat(solrSuggestService.isAllowedDictionary("anything_else"), is(true));
-    }
-
-    /**
-     * Whitespace-trimmed names should still match.
-     */
-    @Test
-    public void trimmedNamesShouldMatch() {
-        when(configurationService.getArrayProperty(CONFIG_KEY))
-                .thenReturn(new String[]{" subject ", " countries_file "});
-
-        assertThat(solrSuggestService.isAllowedDictionary("subject"), is(true));
-        assertThat(solrSuggestService.isAllowedDictionary("countries_file"), is(true));
-        assertThat(solrSuggestService.isAllowedDictionary("authors"), is(false));
     }
 }

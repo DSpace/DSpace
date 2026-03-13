@@ -9,7 +9,6 @@ package org.dspace.discovery;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -35,8 +34,6 @@ public class SolrSuggestService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
-    private static final String WILDCARD_ALL = "*";
-
     @Autowired
     protected SolrSearchCore solrSearchCore;
     @Autowired
@@ -49,7 +46,6 @@ public class SolrSuggestService {
     /**
      * Check whether the given dictionary name is in the configured allowlist.
      * If no allowlist is configured (empty or null), no dictionaries are allowed.
-     * If the allowlist contains "*", all dictionaries are allowed.
      * Otherwise, only explicitly listed dictionary names are allowed.
      *
      * @param dictionary the dictionary name to check
@@ -61,13 +57,7 @@ public class SolrSuggestService {
         if (allowed == null || allowed.length == 0) {
             return false;
         }
-        List<String> allowedList = Arrays.stream(allowed)
-                .map(String::trim)
-                .toList();
-        if (allowedList.contains(WILDCARD_ALL)) {
-            return true;
-        }
-        return allowedList.contains(dictionary);
+        return Arrays.asList(allowed).contains(dictionary);
     }
 
     /**
@@ -108,24 +98,15 @@ public class SolrSuggestService {
             log.debug("No allowed dictionaries configured, skipping rebuild");
             return;
         }
-        List<String> allowedDictionaries = Arrays.stream(allowed)
-                .map(String::trim)
-                .toList();
-        if (allowedDictionaries.contains(WILDCARD_ALL)) {
-            sendBuildRequest(null);
-            return;
-        }
-        for (String dictionary : allowedDictionaries) {
-            rebuildDictionary(dictionary);
+        for (String dictionary : allowed) {
+            sendBuildRequest(dictionary);
         }
     }
 
     private SolrQuery createSuggestQuery(String dictionary) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.set("suggest", true);
-        if (dictionary != null) {
-            solrQuery.set("suggest.dictionary", dictionary);
-        }
+        solrQuery.set("suggest.dictionary", dictionary);
         solrQuery.setRequestHandler("/suggest");
         return solrQuery;
     }
@@ -137,7 +118,7 @@ public class SolrSuggestService {
             solrQuery.set("suggest.build", true);
             solrClient.query(solrQuery);
         } catch (SolrServerException | IOException e) {
-            log.error("Unable to rebuild dictionary {}: {}", dictionary != null ? dictionary : WILDCARD_ALL, e.getMessage());
+            log.error("Unable to rebuild dictionary {}: {}", dictionary, e.getMessage());
         }
     }
 
