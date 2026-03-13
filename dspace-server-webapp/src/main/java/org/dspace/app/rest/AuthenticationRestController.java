@@ -46,6 +46,8 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -89,7 +91,7 @@ public class AuthenticationRestController implements InitializingBean {
             .register(this, Arrays.asList(Link.of("/api/" + AuthnRest.CATEGORY, AuthnRest.NAME)));
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public AuthnResource authn() {
         AuthnRest authnRest = new AuthnRest();
         authnRest.setProjection(utils.obtainProjection());
@@ -106,7 +108,7 @@ public class AuthenticationRestController implements InitializingBean {
      * @return AuthenticationStatusResource
      * @throws SQLException
      */
-    @RequestMapping(value = "/status", method = RequestMethod.GET)
+    @GetMapping("/status")
     public AuthenticationStatusResource status(HttpServletRequest request, HttpServletResponse response)
             throws SQLException {
         Context context = ContextUtil.obtainContext(request);
@@ -145,7 +147,7 @@ public class AuthenticationRestController implements InitializingBean {
      * @return
      * @throws SQLException
      */
-    @RequestMapping(value = "/status/specialGroups", method = RequestMethod.GET)
+    @GetMapping("/status/specialGroups")
     public EntityModel retrieveSpecialGroups(Pageable page, PagedResourcesAssembler assembler,
                 HttpServletRequest request, HttpServletResponse response)
             throws SQLException {
@@ -173,7 +175,7 @@ public class AuthenticationRestController implements InitializingBean {
      * @param password password
      * @return ResponseEntity with information about whether login was successful or failed
      */
-    @RequestMapping(value = "/login", method = {RequestMethod.POST})
+    @PostMapping("/login")
     public ResponseEntity login(HttpServletRequest request, @RequestParam(name = "user", required = false) String user,
                                 @RequestParam(name = "password", required = false) String password) {
         //If you can get here, you should be authenticated, the actual login is handled by spring security
@@ -199,7 +201,7 @@ public class AuthenticationRestController implements InitializingBean {
      * @return        The created short lived token
      */
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    @RequestMapping(value = "/shortlivedtokens", method = RequestMethod.POST)
+    @PostMapping("/shortlivedtokens")
     public AuthenticationTokenResource shortLivedToken(HttpServletRequest request) {
         return shortLivedTokenResponse(request);
     }

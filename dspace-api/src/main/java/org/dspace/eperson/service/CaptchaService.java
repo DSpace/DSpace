@@ -38,7 +38,7 @@ public interface CaptchaService {
     public static String bytesToHex(byte[] bytes) {
         StringBuilder stringBuilder = new StringBuilder();
         for (byte b : bytes) {
-            stringBuilder.append(String.format("%02x", b));
+            stringBuilder.append("%02x".formatted(b));
         }
         return stringBuilder.toString();
     }

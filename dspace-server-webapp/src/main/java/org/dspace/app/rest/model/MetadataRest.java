@@ -65,7 +65,7 @@ public class MetadataRest<T extends MetadataValueRest> {
 
     @Override
     public boolean equals(Object object) {
-        return object instanceof MetadataRest && ((MetadataRest) object).getMap().equals(map);
+        return object instanceof MetadataRest mr && mr.getMap().equals(map);
     }
 
     @Override

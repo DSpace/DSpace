@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.Strings;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.suggestion.SolrSuggestionProvider;
 import org.dspace.app.suggestion.Suggestion;
@@ -38,8 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class PublicationLoader extends SolrSuggestionProvider {
-
-    private static final Logger log = LogManager.getLogger(PublicationLoader.class);
 
     protected List<String> names;
 
@@ -126,11 +122,7 @@ public class PublicationLoader extends SolrSuggestionProvider {
             loaded = metadata.size();
             List<Suggestion> records = reduceAndTransform(researcher, metadata);
             for (Suggestion record : records) {
-                try {
-                    solrSuggestionStorageService.addSuggestion(record, false, false);
-                } catch (SolrServerException | IOException e) {
-                    log.error("Failed to add suggestion: {}", record.getID(), e);
-                }
+                solrSuggestionStorageService.addSuggestion(record, false, false);
             }
         }
         solrSuggestionStorageService.commit();

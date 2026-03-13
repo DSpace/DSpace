@@ -27,7 +27,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Table(name = "systemwidealert")
 public class SystemWideAlert implements ReloadableEntity<Integer> {
 
@@ -153,12 +153,12 @@ public class SystemWideAlert implements ReloadableEntity<Integer> {
      */
     @Override
     public boolean equals(Object other) {
-        return (other instanceof SystemWideAlert &&
-                new EqualsBuilder().append(this.getID(), ((SystemWideAlert) other).getID())
-                                   .append(this.getMessage(), ((SystemWideAlert) other).getMessage())
-                                   .append(this.getAllowSessions(), ((SystemWideAlert) other).getAllowSessions())
-                                   .append(this.getCountdownTo(), ((SystemWideAlert) other).getCountdownTo())
-                                   .append(this.isActive(), ((SystemWideAlert) other).isActive())
+        return (other instanceof SystemWideAlert swa &&
+                new EqualsBuilder().append(this.getID(), swa.getID())
+                                   .append(this.getMessage(), swa.getMessage())
+                                   .append(this.getAllowSessions(), swa.getAllowSessions())
+                                   .append(this.getCountdownTo(), swa.getCountdownTo())
+                                   .append(this.isActive(), swa.isActive())
                                    .isEquals());
     }
 

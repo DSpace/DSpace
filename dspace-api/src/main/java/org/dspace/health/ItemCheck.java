@@ -62,8 +62,8 @@ public class ItemCheck extends Check {
         Context context = new Context();
         try {
             for (Map.Entry<String, Integer> name_count : getCommunities(context)) {
-                ret += String.format("Community [%s]: %d\n",
-                                     name_count.getKey(), name_count.getValue());
+                ret += "Community [%s]: %d\n".formatted(
+                    name_count.getKey(), name_count.getValue());
                 tot_cnt += name_count.getValue();
             }
         } catch (SQLException e) {
@@ -77,24 +77,20 @@ public class ItemCheck extends Check {
             error(e);
         }
 
-        ret += String.format(
-            "\nPublished items (archived, not withdrawn): %d\n", tot_cnt);
+        ret += "\nPublished items (archived, not withdrawn): %d\n".formatted(tot_cnt);
         try {
-            ret += String.format(
-                "Withdrawn items: %d\n", itemService.countWithdrawnItems(context));
-            ret += String.format(
-                "Not published items (in workspace or workflow mode): %d\n",
+            ret += "Withdrawn items: %d\n".formatted(itemService.countWithdrawnItems(context));
+            ret += "Not published items (in workspace or workflow mode): %d\n".formatted(
                 itemService.countNotArchivedItems(context));
 
             for (Map.Entry<Integer, Long> row : workspaceItemService.getStageReachedCounts(context)) {
-                ret += String.format("\tIn Stage %s: %s\n",
-                                     row.getKey(), //"stage_reached"
-                                     row.getValue() //"cnt"
+                ret += "\tIn Stage %s: %s\n".formatted(
+                    row.getKey(), //"stage_reached"
+                    row.getValue() //"cnt"
                 );
             }
 
-            ret += String.format(
-                "\tWaiting for approval (workflow items): %d\n",
+            ret += "\tWaiting for approval (workflow items): %d\n".formatted(
                 workflowItemService.countAll(context));
 
         } catch (SQLException e) {
@@ -113,28 +109,28 @@ public class ItemCheck extends Check {
 
     public String getObjectSizesInfo(Context context) throws SQLException {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Count %-14s: %s\n", "Bitstream",
-                                String.valueOf(bitstreamService.countTotal(context))));
-        sb.append(String.format("Count %-14s: %s\n", "Bundle",
-                                String.valueOf(bundleService.countTotal(context))));
-        sb.append(String.format("Count %-14s: %s\n", "Collection",
-                                String.valueOf(collectionService.countTotal(context))));
-        sb.append(String.format("Count %-14s: %s\n", "Community",
-                                String.valueOf(communityService.countTotal(context))));
-        sb.append(String.format("Count %-14s: %s\n", "MetadataValue",
-                                String.valueOf(metadataValueService.countTotal(context))));
-        sb.append(String.format("Count %-14s: %s\n", "EPerson",
-                                String.valueOf(ePersonService.countTotal(context))));
-        sb.append(String.format("Count %-14s: %s\n", "Item",
-                                String.valueOf(itemService.countTotal(context))));
-        sb.append(String.format("Count %-14s: %s\n", "Handle",
-                                String.valueOf(handleService.countTotal(context))));
-        sb.append(String.format("Count %-14s: %s\n", "Group",
-                                String.valueOf(groupService.countTotal(context))));
-        sb.append(String.format("Count %-14s: %s\n", "BasicWorkflowItem",
-                                String.valueOf(workflowItemService.countAll(context))));
-        sb.append(String.format("Count %-14s: %s\n", "WorkspaceItem",
-                                String.valueOf(workspaceItemService.countTotal(context))));
+        sb.append("Count %-14s: %s\n".formatted("Bitstream",
+            String.valueOf(bitstreamService.countTotal(context))));
+        sb.append("Count %-14s: %s\n".formatted("Bundle",
+            String.valueOf(bundleService.countTotal(context))));
+        sb.append("Count %-14s: %s\n".formatted("Collection",
+            String.valueOf(collectionService.countTotal(context))));
+        sb.append("Count %-14s: %s\n".formatted("Community",
+            String.valueOf(communityService.countTotal(context))));
+        sb.append("Count %-14s: %s\n".formatted("MetadataValue",
+            String.valueOf(metadataValueService.countTotal(context))));
+        sb.append("Count %-14s: %s\n".formatted("EPerson",
+            String.valueOf(ePersonService.countTotal(context))));
+        sb.append("Count %-14s: %s\n".formatted("Item",
+            String.valueOf(itemService.countTotal(context))));
+        sb.append("Count %-14s: %s\n".formatted("Handle",
+            String.valueOf(handleService.countTotal(context))));
+        sb.append("Count %-14s: %s\n".formatted("Group",
+            String.valueOf(groupService.countTotal(context))));
+        sb.append("Count %-14s: %s\n".formatted("BasicWorkflowItem",
+            String.valueOf(workflowItemService.countAll(context))));
+        sb.append("Count %-14s: %s\n".formatted("WorkspaceItem",
+            String.valueOf(workspaceItemService.countTotal(context))));
         return sb.toString();
     }
 
@@ -161,27 +157,22 @@ public class ItemCheck extends Check {
             Long size = row.getValue();
             total_size += size;
             Collection col = row.getKey();
-            ret.append(String.format(
-                "\t%s:  %s\n", CollectionDropDown.collectionPath(context, col),
+            ret.append("\t%s:  %s\n".formatted(CollectionDropDown.collectionPath(context, col),
                 FileUtils.byteCountToDisplaySize((long) size)));
         }
-        ret.append(String.format(
-            "Total size:              %s\n", FileUtils.byteCountToDisplaySize(total_size)));
+        ret.append("Total size:              %s\n".formatted(FileUtils.byteCountToDisplaySize(total_size)));
 
-        ret.append(String.format(
-            "Resource without policy: %d\n", bitstreamService.countBitstreamsWithoutPolicy(context)));
+        ret.append("Resource without policy: %d\n".formatted(bitstreamService.countBitstreamsWithoutPolicy(context)));
 
-        ret.append(String.format(
-            "Deleted bitstreams:      %d\n", bitstreamService.countDeletedBitstreams(context)));
+        ret.append("Deleted bitstreams:      %d\n".formatted(bitstreamService.countDeletedBitstreams(context)));
 
         String list_str = "";
         List<Bitstream> bitstreamOrphans = bitstreamService.getNotReferencedBitstreams(context);
         for (Bitstream orphan : bitstreamOrphans) {
             UUID id = orphan.getID();
-            list_str += String.format("%s, ", id);
+            list_str += "%s, ".formatted(id);
         }
-        ret.append(String.format(
-            "Orphan bitstreams:       %d [%s]\n", bitstreamOrphans.size(), list_str));
+        ret.append("Orphan bitstreams:       %d [%s]\n".formatted(bitstreamOrphans.size(), list_str));
 
         return ret.toString();
     }

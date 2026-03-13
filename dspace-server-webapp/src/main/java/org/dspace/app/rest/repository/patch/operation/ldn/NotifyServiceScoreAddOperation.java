@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.repository.patch.operation.ldn;
 
-import static java.lang.String.format;
-
 import java.math.BigDecimal;
 import java.sql.SQLException;
 
@@ -57,11 +55,11 @@ public class NotifyServiceScoreAddOperation extends PatchOperation<NotifyService
         try {
             scoreBigDecimal = new BigDecimal(score.toString());
         } catch (Exception e) {
-            throw new DSpaceBadRequestException(format("Score out of range [0, 1] %s", score.toString()));
+            throw new DSpaceBadRequestException("Score out of range [0, 1] %s".formatted(score.toString()));
         }
         if (scoreBigDecimal.compareTo(java.math.BigDecimal.ZERO) == -1 ||
             scoreBigDecimal.compareTo(java.math.BigDecimal.ONE) == 1) {
-            throw new UnprocessableEntityException(format("Score out of range [0, 1] %s",
+            throw new UnprocessableEntityException("Score out of range [0, 1] %s".formatted(
                 scoreBigDecimal.setScale(4).toPlainString()));
         }
         notifyServiceEntity.setScore(scoreBigDecimal);

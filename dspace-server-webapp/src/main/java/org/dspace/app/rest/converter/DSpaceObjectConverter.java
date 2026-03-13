@@ -52,6 +52,7 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
     @Autowired
     RequestService requestService;
 
+
     @Override
     public R convert(M obj, Projection projection) {
         R resource = newInstance();
@@ -63,8 +64,7 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
         resource.setName(obj.getName());
 
         MetadataValueList metadataValues = getPermissionFilteredMetadata(
-            ContextUtil.obtainCurrentRequestContext(), obj, projection
-        );
+                ContextUtil.obtainCurrentRequestContext(), obj);
         resource.setMetadata(converter.toRest(metadataValues, projection));
         return resource;
     }

@@ -28,7 +28,7 @@ public class EmptyWorkflowGroupException extends IllegalStateException {
     private final UUID groupId;
 
     public EmptyWorkflowGroupException(UUID ePersonId, UUID groupId) {
-        super(String.format(msgFmt, ePersonId, groupId));
+        super(msgFmt.formatted(ePersonId, groupId));
         this.ePersonId = ePersonId;
         this.groupId = groupId;
     }

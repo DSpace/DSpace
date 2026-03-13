@@ -20,8 +20,8 @@ import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -41,7 +41,7 @@ public class RelationshipRestController {
      * Method to change the left item of a relationship with a given item in the body
      * @return The modified relationship
      */
-    @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/leftItem",
+    @PutMapping( value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/leftItem",
             consumes = {"text/uri-list"})
     public RelationshipRest updateRelationshipLeft(@PathVariable Integer id, HttpServletResponse response,
                                                    HttpServletRequest request) throws SQLException {
@@ -54,7 +54,7 @@ public class RelationshipRestController {
      * Method to change the right item of a relationship with a given item in the body
      * @return The modified relationship
      */
-    @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/rightItem",
+    @PutMapping( value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/rightItem",
             consumes = {"text/uri-list"})
     public RelationshipRest updateRelationshipRight(@PathVariable Integer id, HttpServletResponse response,
                                                     HttpServletRequest request) throws SQLException {

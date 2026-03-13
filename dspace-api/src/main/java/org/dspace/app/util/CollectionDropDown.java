@@ -130,7 +130,7 @@ public class CollectionDropDown {
 
         @Override
         public boolean equals(Object o) {
-            return o != null && o instanceof CollectionPathEntry && this.compareTo((CollectionPathEntry) o) == 0;
+            return o != null && o instanceof CollectionPathEntry cpe && this.compareTo(cpe) == 0;
         }
 
         @Override

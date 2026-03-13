@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +29,8 @@ import org.dspace.services.EventService;
 import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @Component(ViewEventRest.CATEGORY + "." + ViewEventRest.PLURAL_NAME)
 public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
@@ -50,7 +51,7 @@ public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
         try {
             ServletInputStream input = req.getInputStream();
             viewEventRest = mapper.readValue(input, ViewEventRest.class);
-        } catch (IOException e1) {
+        } catch (IOException | JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
         if (viewEventRest.getTargetId() == null || StringUtils.isBlank(viewEventRest.getTargetType()) ||

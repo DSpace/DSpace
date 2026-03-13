@@ -8,7 +8,6 @@
 package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.projection.Projection;
 
 /**
@@ -46,6 +45,7 @@ public abstract class RestAddressableModel implements RestModel {
         this.projection = projection;
     }
 
+    @JsonIgnore
     /**
      * 
      * @return an unique string useful to unambiguously identify the type of rest
@@ -53,7 +53,6 @@ public abstract class RestAddressableModel implements RestModel {
      *         singular form. Examples include core.item, core.community,
      *         submission.workspaceitem, etc.
      */
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getUniqueType() {
         return getCategory() + "." + getType();
     }

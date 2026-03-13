@@ -1041,11 +1041,11 @@ public class SWORDAuthenticator {
      */
     public boolean canSubmitTo(SWORDContext context, DSpaceObject dso)
         throws DSpaceSWORDException {
-        if (dso instanceof org.dspace.content.Collection) {
+        if (dso instanceof org.dspace.content.Collection collection) {
             return this.canSubmitTo(
-                context, (org.dspace.content.Collection) dso);
+                context, collection);
         } else {
-            return dso instanceof Item && this.canSubmitTo(context, (Item) dso);
+            return dso instanceof Item i && this.canSubmitTo(context, i);
         }
     }
 }

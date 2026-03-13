@@ -54,8 +54,8 @@ public class SimpleMultiplePathContributor extends SimpleXpathMetadatumContribut
                     namespaces);
             List<Object> nodes = xpath.evaluate(t);
             for (Object el : nodes) {
-                if (el instanceof Element) {
-                    values.add(metadataFieldMapping.toDCValue(field, ((Element) el).getText()));
+                if (el instanceof Element element) {
+                    values.add(metadataFieldMapping.toDCValue(field, element.getText()));
                 } else {
                     log.warn("node of type: " + el.getClass());
                 }

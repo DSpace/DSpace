@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serial;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,6 +25,7 @@ import org.dspace.app.rest.RestResourceController;
     @LinkRest(name = BrowseIndexRest.LINK_ENTRIES, method = "listBrowseEntries")
 })
 public class BrowseIndexRest extends BaseObjectRest<String> {
+    @Serial
     private static final long serialVersionUID = -4870333170249999559L;
 
     public static final String NAME = "browse";

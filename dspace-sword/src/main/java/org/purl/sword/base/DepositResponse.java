@@ -84,8 +84,8 @@ public class DepositResponse {
      */
     public SWORDErrorDocument getErrorDocument()
         throws SWORDException {
-        if (entry instanceof SWORDErrorDocument) {
-            return (SWORDErrorDocument) entry;
+        if (entry instanceof SWORDErrorDocument document) {
+            return document;
         }
 
         throw new SWORDException("Requested document is not an Error Document.");

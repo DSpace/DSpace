@@ -241,7 +241,8 @@ public class IndexEventConsumer implements Consumer {
                 indexObject(ctx, iu, true);
             }
         } finally {
-            if (!objectsToUpdate.isEmpty() || !uniqueIdsToDelete.isEmpty()) {
+            if (!objectsToUpdate.isEmpty() || !uniqueIdsToDelete.isEmpty()
+                || !createdItemsToUpdate.isEmpty()) {
 
                 indexer.commit();
 

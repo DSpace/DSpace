@@ -55,7 +55,7 @@ public class DSpaceSetSpecResolver implements SetSpecResolver {
             throw new InvalidSetSpecException("Invalid handle " + handle);
         }
 
-        return String.format(getSetSpecFormat(Community.class), split[0], split[1]);
+        return getSetSpecFormat(Community.class).formatted(split[0], split[1]);
     }
 
     @Override

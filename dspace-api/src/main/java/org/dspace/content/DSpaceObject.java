@@ -60,7 +60,8 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
      * ordering while the list has been modified and not yet persisted
      * and reloaded.
      */
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject", orphanRemoval = true,
+               cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
     @OrderBy("metadataField, place")
     private List<MetadataValue> metadata = new ArrayList<>();
 
@@ -72,7 +73,8 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     @OrderBy("id ASC")
     private List<Handle> handles = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject",
+               cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
     private final List<ResourcePolicy> resourcePolicies = new ArrayList<>();
 
     /**

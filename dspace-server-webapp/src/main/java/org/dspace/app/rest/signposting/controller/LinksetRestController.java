@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.signposting.controller;
 
-import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 
@@ -51,9 +50,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -82,15 +81,14 @@ public class LinksetRestController {
     private final PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
 
     @PreAuthorize("permitAll()")
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public ResponseEntity getAll() {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
     }
 
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'READ')")
-    @RequestMapping(
+    @GetMapping(
             value = "/linksets" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/json",
-            method = RequestMethod.GET,
             produces = "application/linkset+json"
     )
     public LinksetRest getJson(HttpServletRequest request, @PathVariable UUID uuid) {
@@ -112,9 +110,8 @@ public class LinksetRestController {
     }
 
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'READ')")
-    @RequestMapping(
+    @GetMapping(
             value = "/linksets" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID,
-            method = RequestMethod.GET,
             produces = "application/linkset"
     )
     public String getLset(HttpServletRequest request, @PathVariable UUID uuid) {
@@ -138,7 +135,7 @@ public class LinksetRestController {
     // For example: if we pass uuid of Bitstream: hasPermission(#uuid, 'ITEM', 'READ') returns "true", because
     // it will use ItemService with uuid of bitstream.
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'READ') && hasPermission(#uuid, 'BITSTREAM', 'READ')")
-    @RequestMapping(value = "/links" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID, method = RequestMethod.GET)
+    @GetMapping("/links" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     public List<TypedLinkRest> getHeader(HttpServletRequest request, @PathVariable UUID uuid) {
         Context context = ContextUtil.obtainContext(request);
         DSpaceObject dso = findObject(context, uuid);
@@ -149,7 +146,7 @@ public class LinksetRestController {
     }
 
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'READ')")
-    @RequestMapping(value = "/describedby" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID, method = RequestMethod.GET)
+    @GetMapping("/describedby" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     public String getDescribedBy(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -188,7 +185,7 @@ public class LinksetRestController {
 
     private static void verifyItemIsDiscoverable(Item item) {
         if (!item.isDiscoverable()) {
-            String message = format("Item with uuid [%s] is not Discoverable", item.getID().toString());
+            String message = "Item with uuid [%s] is not Discoverable".formatted(item.getID().toString());
             throw new AccessDeniedException(message);
         }
     }

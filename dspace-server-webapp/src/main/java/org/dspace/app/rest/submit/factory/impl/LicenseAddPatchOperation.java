@@ -54,8 +54,8 @@ public class LicenseAddPatchOperation extends AddPatchOperation<String> {
 
         Boolean grant = null;
         // we are friendly with the client and accept also a string representation for the boolean
-        if (value instanceof String) {
-            grant = BooleanUtils.toBooleanObject((String) value);
+        if (value instanceof String string) {
+            grant = BooleanUtils.toBooleanObject(string);
         } else {
             grant = (Boolean) value;
         }

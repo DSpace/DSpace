@@ -122,8 +122,8 @@ public final class ProviderStack<T> {
             throw new IllegalArgumentException(
                 "Cannot place anything that implements NotProvider into the provider stack, failure for: " + provider);
         }
-        if (provider instanceof OrderedService) {
-            providerOrder = ((OrderedService) provider).getOrder();
+        if (provider instanceof OrderedService service) {
+            providerOrder = service.getOrder();
         }
         // place at the bottom of the stack
         providers.add(new ProviderHolder<T>(provider));

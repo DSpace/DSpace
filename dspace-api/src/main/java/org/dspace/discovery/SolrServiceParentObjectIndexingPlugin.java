@@ -27,8 +27,8 @@ public class SolrServiceParentObjectIndexingPlugin implements SolrServiceIndexPl
     @Override
     public void additionalIndex(Context context, IndexableObject idxObj, SolrInputDocument document) {
         try {
-            if (idxObj instanceof IndexableDSpaceObject) {
-                DSpaceObject dso = ((IndexableDSpaceObject) idxObj).getIndexedObject();
+            if (idxObj instanceof IndexableDSpaceObject object) {
+                DSpaceObject dso = object.getIndexedObject();
                 if (dso instanceof Community || dso instanceof Collection || dso instanceof Item) {
                     DSpaceObject parent = ContentServiceFactory.getInstance().getDSpaceObjectService(dso)
                                                                .getParentObject(context, dso);

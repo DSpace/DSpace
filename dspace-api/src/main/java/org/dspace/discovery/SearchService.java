@@ -126,15 +126,6 @@ public interface SearchService {
      */
     String escapeQueryChars(String query);
 
-    /**
-     * Utility method to format an autocomplete query over a specific field.
-     *
-     * @param query to search for
-     * @param autocompleteField the field to use to autocomplete search, if null or empty no field is used
-     * @return the constructed solr query
-     */
-    String formatAutoCompleteQuery(String query, String autocompleteField);
-
     FacetYearRange getFacetYearRange(Context context, IndexableObject scope, DiscoverySearchFilterFacet facet,
             List<String> filterQueries, DiscoverQuery parentQuery)
                     throws SearchServiceException;
@@ -155,16 +146,4 @@ public interface SearchService {
     String calculateExtremeValue(Context context, String valueField,
                                  String sortField, DiscoverQuery.SORT_ORDER sortOrder)
         throws SearchServiceException;
-
-    /**
-     * Obtains the SolrSearchCore instance used to interact with the underlying
-     * search index.
-     * <p>
-     * This core is responsible for managing the SolrClient connection,
-     * executing search queries, and handling indexing operations for the
-     * discovery service.
-     * </p>
-     * * @return the SolrSearchCore service responsible for index management.
-     */
-    SolrSearchCore getSolrSearchCore();
 }

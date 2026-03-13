@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import jakarta.persistence.Query;
@@ -193,25 +192,6 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
-    public Iterator<Item> findByMetadataField(Context context, MetadataField metadataField, String value)
-        throws SQLException {
-        String hqlQueryString = "SELECT item.id FROM Item as item join item.metadata metadatavalue " +
-            "WHERE metadatavalue.metadataField = :metadata_field";
-        if (value != null) {
-            hqlQueryString += " AND STR(metadatavalue.value) = :text_value";
-        }
-        Query query = createQuery(context, hqlQueryString);
-
-        query.setParameter("metadata_field", metadataField);
-        if (value != null) {
-            query.setParameter("text_value", value);
-        }
-        @SuppressWarnings("unchecked")
-        List<UUID> uuids = query.getResultList();
-        return new UUIDIterator<Item>(context, uuids, Item.class, this);
-    }
-
-    @Override
     public Iterator<Item> findByMetadataFieldExcludingOldVersions(Context context, MetadataField metadataField,
                                                                    String value, boolean inArchive)
         throws SQLException {
@@ -348,7 +328,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             }
         }
 
-        log.debug(String.format("Running custom query with %d filters", queryPredicates.size()));
+        log.debug("Running custom query with %d filters".formatted(queryPredicates.size()));
         return predicates;
     }
 
@@ -542,27 +522,4 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         return count(query);
 
     }
-
-    @Override
-    public Iterator<Item> findByLikeAuthorityValue(Context context,
-                                                   String likeAuthority, Boolean inArchive) throws SQLException {
-        String allItems = Objects.isNull(inArchive) ? "" : " item.inArchive=:in_archive AND ";
-        Query query = createQuery(context,
-                                  "SELECT DISTINCT item.id FROM Item as item join item.metadata metadatavalue "
-                                      + "WHERE" + allItems
-                                      + " metadatavalue.authority like :authority ORDER BY item.id");
-        if (Objects.nonNull(inArchive)) {
-            query.setParameter("in_archive", inArchive);
-        }
-        query.setParameter("authority", likeAuthority);
-        @SuppressWarnings("unchecked")
-        List<UUID> uuids = query.getResultList();
-        return new UUIDIterator<Item>(context, uuids, Item.class, this);
-    }
-
-    @Override
-    public Iterator<Item> findByIds(Context context, List<UUID> ids) throws SQLException {
-        return new UUIDIterator<Item>(context, ids, Item.class, this);
-    }
-
 }

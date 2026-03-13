@@ -398,7 +398,7 @@ public class SubmissionService {
             try {
                 stepClass = loader.loadClass(stepConfig.getProcessingClassName());
                 if (UploadableStep.class.isAssignableFrom(stepClass)) {
-                    Object stepInstance = stepClass.newInstance();
+                    Object stepInstance = stepClass.getDeclaredConstructor().newInstance();
                     stepInstancesAndConfigs.add(new Object[] {stepInstance, stepConfig});
                 }
             } catch (Exception e) {
@@ -407,8 +407,8 @@ public class SubmissionService {
         }
         for (Object[] stepInstanceAndCfg : stepInstancesAndConfigs) {
             UploadableStep uploadableStep = (UploadableStep) stepInstanceAndCfg[0];
-            if (uploadableStep instanceof ListenerProcessingStep) {
-                ((ListenerProcessingStep) uploadableStep).doPreProcessing(context, source);
+            if (uploadableStep instanceof ListenerProcessingStep step) {
+                step.doPreProcessing(context, source);
             }
         }
         for (Object[] stepInstanceAndCfg : stepInstancesAndConfigs) {
@@ -439,8 +439,8 @@ public class SubmissionService {
         }
         for (Object[] stepInstanceAndCfg : stepInstancesAndConfigs) {
             UploadableStep uploadableStep = (UploadableStep) stepInstanceAndCfg[0];
-            if (uploadableStep instanceof ListenerProcessingStep) {
-                ((ListenerProcessingStep) uploadableStep).doPostProcessing(context, source);
+            if (uploadableStep instanceof ListenerProcessingStep step) {
+                step.doPostProcessing(context, source);
             }
         }
         return errors;
@@ -481,7 +481,7 @@ public class SubmissionService {
             try {
                 stepClass = loader.loadClass(stepConfig.getProcessingClassName());
                 if (RestProcessingStep.class.isAssignableFrom(stepClass)) {
-                    Object stepInstance = stepClass.newInstance();
+                    Object stepInstance = stepClass.getDeclaredConstructor().newInstance();
                     stepInstancesAndConfigs.add(new Object[] { stepInstance, stepConfig });
                 } else {
                     throw new DSpaceBadRequestException("The submission step class specified by '"
@@ -499,8 +499,7 @@ public class SubmissionService {
                     "The section with name " + section + " does not exist in this submission!");
         }
         for (Object[] stepInstanceAndCfg : stepInstancesAndConfigs) {
-            if (stepInstanceAndCfg[0] instanceof ListenerProcessingStep) {
-                ListenerProcessingStep step = (ListenerProcessingStep) stepInstanceAndCfg[0];
+            if (stepInstanceAndCfg[0] instanceof ListenerProcessingStep step) {
                 step.doPreProcessing(context, source);
             }
         }
@@ -521,8 +520,7 @@ public class SubmissionService {
             }
         }
         for (Object[] stepInstanceAndCfg : stepInstancesAndConfigs) {
-            if (stepInstanceAndCfg[0] instanceof ListenerProcessingStep) {
-                ListenerProcessingStep step = (ListenerProcessingStep) stepInstanceAndCfg[0];
+            if (stepInstanceAndCfg[0] instanceof ListenerProcessingStep step) {
                 step.doPostProcessing(context, source);
             }
         }

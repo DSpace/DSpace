@@ -50,7 +50,7 @@ public class BitstreamLinksetProcessor extends BitstreamSignpostingProcessor {
                 String signpostingPath = configurationService.getProperty("signposting.path");
                 String baseUrl = configurationService.getProperty("dspace.ui.url");
 
-                String linksetUrl = String.format("%s/%s/linksets/%s", baseUrl, signpostingPath, item.getID());
+                String linksetUrl = "%s/%s/linksets/%s".formatted(baseUrl, signpostingPath, item.getID());
                 String linksetJsonUrl = linksetUrl + "/json";
                 List<LinksetNode> links = List.of(
                         new LinksetNode(linksetUrl, getRelation(), "application/linkset", buildAnchor(bitstream)),

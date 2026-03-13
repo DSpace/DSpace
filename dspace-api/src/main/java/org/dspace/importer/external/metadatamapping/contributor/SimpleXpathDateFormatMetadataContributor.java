@@ -57,14 +57,14 @@ public class SimpleXpathDateFormatMetadataContributor extends SimpleXpathMetadat
                           .compile(query,Filters.fpassthrough(), null, namespaces);
         List<Object> nodes = xpath.evaluate(element);
         for (Object el : nodes) {
-            if (el instanceof Element) {
-                values.add(getMetadatum(field, ((Element) el).getText()));
-            } else if (el instanceof Attribute) {
-                values.add(getMetadatum(field, ((Attribute) el).getValue()));
-            } else if (el instanceof String) {
-                values.add(getMetadatum(field, (String) el));
-            } else if (el instanceof Text) {
-                values.add(metadataFieldMapping.toDCValue(field, ((Text) el).getText()));
+            if (el instanceof Element element1) {
+                values.add(getMetadatum(field, element1.getText()));
+            } else if (el instanceof Attribute attribute) {
+                values.add(getMetadatum(field, attribute.getValue()));
+            } else if (el instanceof String string) {
+                values.add(getMetadatum(field, string));
+            } else if (el instanceof Text text) {
+                values.add(metadataFieldMapping.toDCValue(field, text.getText()));
             } else {
                 System.err.println("node of type: " + el.getClass());
             }

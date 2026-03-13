@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.Strings;
@@ -55,6 +53,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This is the repository responsible to manage Item Rest object
@@ -185,7 +186,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         try {
             ServletInputStream input = req.getInputStream();
             itemRest = mapper.readValue(input, ItemRest.class);
-        } catch (IOException e1) {
+        } catch (IOException | JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
@@ -220,7 +221,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         ItemRest itemRest = null;
         try {
             itemRest = mapper.readValue(jsonNode.toString(), ItemRest.class);
-        } catch (IOException e1) {
+        } catch (JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 

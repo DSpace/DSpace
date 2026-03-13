@@ -59,11 +59,11 @@ public abstract class AbstractSwordContentIngester
                                 DepositResult result)
         throws DSpaceSwordException, SwordError, SwordAuthException,
         SwordServerException {
-        if (dso instanceof Collection) {
-            return this.ingestToCollection(context, deposit, (Collection) dso,
+        if (dso instanceof Collection collection) {
+            return this.ingestToCollection(context, deposit, collection,
                                            verboseDescription, result);
-        } else if (dso instanceof Item) {
-            return this.ingestToItem(context, deposit, (Item) dso,
+        } else if (dso instanceof Item item) {
+            return this.ingestToItem(context, deposit, item,
                                      verboseDescription, result);
         }
         return null;
