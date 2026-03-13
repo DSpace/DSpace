@@ -9,6 +9,7 @@
 package org.dspace.eperson;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -19,12 +20,12 @@ import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -75,14 +76,24 @@ public class Groomer {
         } catch (ParseException ex) {
             System.err.println(ex.getMessage());
             if (!(ex instanceof MissingOptionException)) {
-                new HelpFormatter().printHelp(USAGE, options);
+                try {
+                    HelpFormatter.builder().get().printHelp(
+                        USAGE, null, options, null, false);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
             }
             System.exit(1);
         }
 
         // Help the user
         if (null == command || command.hasOption('h') || command.hasOption('?')) {
-            new HelpFormatter().printHelp(USAGE, options);
+            try {
+                HelpFormatter.builder().get().printHelp(
+                    USAGE, null, options, null, false);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
             System.exit(0);
         } else if (command.hasOption('a')) {
             // Scan for disused accounts

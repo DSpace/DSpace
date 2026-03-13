@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,9 +26,9 @@ import java.util.UUID;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -169,8 +170,12 @@ public class ItemUpdate {
             CommandLine line = parser.parse(options, argv);
 
             if (line.hasOption('h')) {
-                HelpFormatter myhelp = new HelpFormatter();
-                myhelp.printHelp("ItemUpdate", options);
+                try {
+                    HelpFormatter.builder().get().printHelp(
+                        "ItemUpdate", null, options, null, false);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
                 pr("");
                 pr("Examples:");
                 pr("  adding metadata:     ItemUpdate -e jsmith@mit.edu -s sourcedir -a dc.contributor -a dc.subject ");

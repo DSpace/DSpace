@@ -76,12 +76,12 @@ public class I18nUtil {
         int countTokens = st.countTokens();
         switch (countTokens) {
             case 1:
-                return new Locale(st.nextToken().trim());
+                return Locale.of(st.nextToken().trim());
             case 2:
-                return new Locale(st.nextToken().trim(), st.nextToken().trim());
+                return Locale.of(st.nextToken().trim(), st.nextToken().trim());
             case 3:
-                return new Locale(st.nextToken().trim(), st.nextToken().trim(),
-                                  st.nextToken().trim());
+                return Locale.of(st.nextToken().trim(), st.nextToken().trim(),
+                                 st.nextToken().trim());
             default:
                 return null;
         }
@@ -107,7 +107,7 @@ public class I18nUtil {
             return I18nUtil.getDefaultLocale();
         }
 
-        return I18nUtil.getSupportedLocale(new Locale(lang));
+        return I18nUtil.getSupportedLocale(Locale.of(lang));
     }
 
     /**
@@ -202,7 +202,7 @@ public class I18nUtil {
     public static Locale getSupportedLocale(String locale) {
         Locale currentLocale = null;
         if (locale != null) {
-            currentLocale = I18nUtil.getSupportedLocale(new Locale(locale));
+            currentLocale = I18nUtil.getSupportedLocale(Locale.of(locale));
         } else {
             currentLocale = I18nUtil.getDefaultLocale();
         }

@@ -8,6 +8,7 @@
 package org.dspace.administer;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
@@ -15,8 +16,8 @@ import java.util.UUID;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
@@ -71,8 +72,12 @@ public class CommunityFiliator {
         String childID = null;
 
         if (line.hasOption('h')) {
-            HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("CommunityFiliator\n", options);
+            try {
+                HelpFormatter.builder().get().printHelp(
+                    "CommunityFiliator", null, options, null, false);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
             System.out
                 .println("\nestablish a relationship: CommunityFiliator -s -p parentID -c childID");
             System.out

@@ -87,7 +87,7 @@ public class DCLanguage {
         } else if (language.equals("")) {
             return "N/A";
         } else {
-            locale = new Locale(language, country);
+            locale = Locale.of(language, country);
 
             return locale.getDisplayName();
         }

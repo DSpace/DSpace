@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -272,10 +271,9 @@ public class XMLUtils {
      * @return SAX document builder for use in XML parsing
      */
     public static SAXBuilder getSAXBuilder(boolean validate) {
-        SAXBuilder saxBuilder = new SAXBuilder();
-        if (validate) {
-            saxBuilder.setValidation(true);
-        }
+        SAXBuilder saxBuilder = validate
+            ? new SAXBuilder(org.jdom2.input.sax.XMLReaders.XSDVALIDATING)
+            : new SAXBuilder();
         // No DOCTYPE / DTDs
         saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         // No external general entities
@@ -338,14 +336,14 @@ public class XMLUtils {
 
             Path resolvedPath;
             try {
-                resolvedPath = Paths.get(filePath).toAbsolutePath().normalize();
+                resolvedPath = Path.of(filePath).toAbsolutePath().normalize();
             } catch (Exception e) {
                 throw new SAXException("Invalid path: " + systemId, e);
             }
 
             boolean isAllowed = false;
             for (String basePath : allowedBasePaths) {
-                Path allowedPath = Paths.get(basePath).toAbsolutePath().normalize();
+                Path allowedPath = Path.of(basePath).toAbsolutePath().normalize();
                 if (resolvedPath.startsWith(allowedPath)) {
                     isAllowed = true;
                     break;
