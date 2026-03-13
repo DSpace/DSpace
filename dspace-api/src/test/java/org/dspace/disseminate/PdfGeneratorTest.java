@@ -7,9 +7,10 @@
  */
 package org.dspace.disseminate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,9 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link PdfGenerator}.
@@ -30,7 +31,7 @@ public class PdfGeneratorTest {
     private Map<String, String> variables;
     private File testOutputFile;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         pdfGenerator = new PdfGenerator();
         variables = new HashMap<>();
@@ -40,7 +41,7 @@ public class PdfGeneratorTest {
         testOutputFile = new File("target/testCoverpage.pdf");
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (testOutputFile.exists()) {
             testOutputFile.delete();
@@ -50,18 +51,19 @@ public class PdfGeneratorTest {
     @Test
     public void testParseTemplate() {
         String html = pdfGenerator.parseTemplate("dspace_coverpage", variables);
-        assertNotNull("HTML output should not be null", html);
-        assertTrue("HTML should contain title", html.contains("Test Title"));
-        assertTrue("HTML should contain author", html.contains("Test Author"));
-        assertTrue("HTML should contain standard tags", html.contains("<html") || html.contains("<!DOCTYPE html>"));
+        assertNotNull(html, "HTML output should not be null");
+        assertTrue(html.contains("Test Title"), "HTML should contain title");
+        assertTrue(html.contains("Test Author"), "HTML should contain author");
+        assertTrue(html.contains("<html") || html.contains("<!DOCTYPE html>"),
+                   "HTML should contain standard tags");
     }
 
     @Test
     public void testGeneratePDDocument() throws IOException {
         String html = pdfGenerator.parseTemplate("dspace_coverpage", variables);
         try (PDDocument document = pdfGenerator.generate(html)) {
-            assertNotNull("Generated PDDocument should not be null", document);
-            assertEquals("Generated PDF should have 1 page", 1, document.getNumberOfPages());
+            assertNotNull(document, "Generated PDDocument should not be null");
+            assertEquals(1, document.getNumberOfPages(), "Generated PDF should have 1 page");
         }
     }
 
@@ -70,13 +72,13 @@ public class PdfGeneratorTest {
         String html = pdfGenerator.parseTemplate("dspace_coverpage", variables);
         pdfGenerator.generateToFile(html, testOutputFile);
 
-        assertTrue("Output file should exist", testOutputFile.exists());
-        assertTrue("Output file should not be empty", testOutputFile.length() > 0);
+        assertTrue(testOutputFile.exists(), "Output file should exist");
+        assertTrue(testOutputFile.length() > 0, "Output file should not be empty");
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testGenerateWithInvalidHtml() {
-        pdfGenerator.generate("<unclosed>tag");
+        assertThrows(RuntimeException.class, () -> pdfGenerator.generate("<unclosed>tag"));
     }
 
     @Test

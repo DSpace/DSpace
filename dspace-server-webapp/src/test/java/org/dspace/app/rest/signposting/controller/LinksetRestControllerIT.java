@@ -8,7 +8,7 @@
 package org.dspace.app.rest.signposting.controller;
 
 import static org.dspace.content.MetadataSchemaEnum.PERSON;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -41,9 +41,6 @@ import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
-import org.dspace.content.authority.service.ChoiceAuthorityService;
-import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipTypeService;
@@ -52,12 +49,13 @@ import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.SimpleMapConverter;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
 
+    private static final String doiPattern = "https://doi.org/{0}";
     private static final String orcidPattern = "http://orcid.org/{0}";
     private static final String doi = "10.1007/978-3-642-35233-1_18";
     private static final String PERSON_ENTITY_TYPE = "Person";
@@ -79,7 +77,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
     @Autowired
     private SimpleMapConverter mapConverterDSpaceToSchemaOrgUri;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -617,18 +615,6 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findTypedLinkForItemWithAuthor() throws Exception {
-        ChoiceAuthorityService choiceAuthorityService = ContentAuthorityServiceFactory
-            .getInstance().getChoiceAuthorityService();
-        choiceAuthorityService.getChoiceAuthoritiesNames(); // initialize the ChoiceAuthorityService
-        MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory
-            .getInstance().getMetadataAuthorityService();
-        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
-        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
-        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
-        configurationService.setProperty("cris.ItemAuthority.AuthorAuthority.entityType", "Person");
-        choiceAuthorityService.clearCache();
-        metadataAuthorityService.clearCache();
-
         String bitstreamContent = "ThisIsSomeDummyText";
         String bitstreamMimeType = "text/plain";
         String orcidValue = "orcidValue";
@@ -738,7 +724,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         // Make sure the bitstreams were successfully added.
-        assertTrue("There was a problem ingesting bitstreams.", bitstreamIDs.size() > itemBitstreamsLimit);
+        assertTrue(bitstreamIDs.size() > itemBitstreamsLimit, "There was a problem ingesting bitstreams.");
 
         String url = configurationService.getProperty("dspace.ui.url");
         String signpostingUrl = configurationService.getProperty("signposting.path");

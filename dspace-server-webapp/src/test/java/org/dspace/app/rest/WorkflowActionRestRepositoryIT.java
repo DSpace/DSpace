@@ -32,7 +32,7 @@ import org.dspace.xmlworkflow.state.actions.processingaction.ScoreReviewActionAd
 import org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction;
 import org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerActionAdvancedInfo;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for the {@link WorkflowActionRestRepository} controlled endpoints

@@ -41,8 +41,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.discovery.IndexingService;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
@@ -72,7 +72,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractEntityIntegrationTest
     private EPerson colAdmin;
     private EPerson itemAdmin;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

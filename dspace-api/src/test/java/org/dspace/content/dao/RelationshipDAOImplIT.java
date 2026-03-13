@@ -7,8 +7,8 @@
  */
 package org.dspace.content.dao;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +31,9 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by: Andrew Wood
@@ -74,7 +74,7 @@ public class RelationshipDAOImplIT extends AbstractIntegrationTest {
     /**
      * Initialize DSpace objects used for testing for each test
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -108,7 +108,7 @@ public class RelationshipDAOImplIT extends AbstractIntegrationTest {
     /**
      * Delete all initialized DSpace objects after each test
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         try {
@@ -134,8 +134,8 @@ public class RelationshipDAOImplIT extends AbstractIntegrationTest {
      */
     @Test
     public void testFindByItem() throws Exception {
-        assertEquals("TestFindByItem 0", relationshipsList, relationshipService.findByItem(context, itemOne,
-                -1, -1, false));
+        assertEquals(relationshipsList, relationshipService.findByItem(context, itemOne,
+                -1, -1, false), "TestFindByItem 0");
     }
 
     /**
@@ -146,8 +146,8 @@ public class RelationshipDAOImplIT extends AbstractIntegrationTest {
      */
     @Test
     public void testFindByRelationshipType() throws Exception {
-        assertEquals("TestByRelationshipType 0", relationshipsList, relationshipService.findByRelationshipType(context,
-                relationshipType));
+        assertEquals(relationshipsList, relationshipService.findByRelationshipType(context,
+                relationshipType), "TestByRelationshipType 0");
     }
 
     /**
@@ -158,7 +158,7 @@ public class RelationshipDAOImplIT extends AbstractIntegrationTest {
      */
     @Test
     public void testCountRows() throws Exception {
-        assertEquals("TestByRelationshipType 0", relationshipsList.size(), relationshipService.countTotal(context));
+        assertEquals(relationshipsList.size(), relationshipService.countTotal(context), "TestByRelationshipType 0");
     }
 
 

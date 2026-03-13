@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -27,10 +27,10 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.factory.IdentifierServiceFactory;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 /**
@@ -39,7 +39,7 @@ import org.springframework.http.MediaType;
  * @author Kim Shepherd
  */
 public class IdentifierRestRepositoryIT extends AbstractControllerIntegrationTest {
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         super.setUp();
     }
@@ -98,7 +98,7 @@ public class IdentifierRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    @Ignore
+    @Disabled
     /**
      * This test will check the return status code when no id is supplied. It currently fails as our
      * RestResourceController take the precedence over the pid controller returning a 404 Repository not found
@@ -172,7 +172,7 @@ public class IdentifierRestRepositoryIT extends AbstractControllerIntegrationTes
         // The DOI should not be null
         assertNotNull(doi);
         // The DOI status should be TO_BE_REGISTERED
-        Assert.assertEquals(DOIIdentifierProvider.TO_BE_REGISTERED, doi.getStatus());
+        Assertions.assertEquals(DOIIdentifierProvider.TO_BE_REGISTERED, doi.getStatus());
 
         // Now, set the DOI status back to pending and update
         doi.setStatus(DOIIdentifierProvider.PENDING);

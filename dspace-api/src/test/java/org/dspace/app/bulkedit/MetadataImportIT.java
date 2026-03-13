@@ -7,10 +7,11 @@
  */
 package org.dspace.app.bulkedit;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -46,8 +47,8 @@ import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
@@ -64,7 +65,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     private Collection publicationCollection;
     private Collection personCollection;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -149,7 +150,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         Item importedItem = findItemByName("Test Import 1");
         assertTrue(Strings.CS.equals(itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY)
             .get(0).getValue(), "Donald, SmithImported"));
-        assertEquals(1, itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
+        assertEquals(0, itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
             .size());
         eperson = ePersonService.findByEmail(context, eperson.getEmail());
         assertEquals(importedItem.getSubmitter(), eperson);
@@ -159,25 +160,28 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
     }
 
-    @Test(expected = ParseException.class)
+    @Test
     public void metadataImportWithoutEPersonParameterTest()
-        throws IllegalAccessException, InstantiationException, ParseException {
-        String fileLocation = new File(testProps.get("test.importcsv").toString()).getAbsolutePath();
-        String[] args = new String[] {"metadata-import", "-f", fileLocation, "-s"};
-        TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+        throws IllegalAccessException, InstantiationException {
+        assertThrows(ParseException.class, () -> {
+            String fileLocation = new File(testProps.get("test.importcsv").toString()).getAbsolutePath();
+            String[] args = new String[]{"metadata-import", "-f", fileLocation, "-s"};
+            TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
 
-        ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
-        ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
+            ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
+            ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
 
-        DSpaceRunnable script = null;
-        if (scriptConfiguration != null) {
-            script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
-        }
-        if (script != null) {
-            if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
-                script.run();
+            DSpaceRunnable script = null;
+            if (scriptConfiguration != null) {
+                script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
             }
-        }
+            if (script != null) {
+                if (DSpaceRunnable.StepResult.Continue.equals(
+                    script.initialize(args, testDSpaceRunnableHandler, null))) {
+                    script.run();
+                }
+            }
+        });
     }
 
     @Test

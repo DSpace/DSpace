@@ -7,9 +7,9 @@
  */
 package org.dspace.ctask.general;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,7 +28,7 @@ import org.dspace.identifier.VersionedHandleIdentifierProvider;
 import org.dspace.identifier.VersionedHandleIdentifierProviderWithCanonicalHandles;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Rudimentary test of the curation task.
@@ -73,8 +73,8 @@ public class CreateMissingIdentifiersIT
         curator.curate(context, item);
         System.out.format("With incompatible provider, result is '%s'.\n",
                 curator.getResult(TASK_NAME));
-        assertEquals("Curation should fail", Curator.CURATE_ERROR,
-                curator.getStatus(TASK_NAME));
+        assertEquals(Curator.CURATE_ERROR, curator.getStatus(TASK_NAME),
+                "Curation should fail");
 
         // Unregister this non-default provider
         unregisterProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
@@ -87,7 +87,7 @@ public class CreateMissingIdentifiersIT
          */
         curator.curate(context, item);
         int status = curator.getStatus(TASK_NAME);
-        assertEquals("Curation should succeed", Curator.CURATE_SUCCESS, status);
+        assertEquals(Curator.CURATE_SUCCESS, status, "Curation should succeed");
         configurationService.setProperty(P_TASK_DEF, prevTaskDef);
     }
 

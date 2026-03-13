@@ -8,11 +8,11 @@
 package org.dspace.saml2;
 
 import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -21,24 +21,24 @@ import org.dspace.AbstractDSpaceTest;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.saml2.core.Saml2X509Credential;
+import org.springframework.security.saml2.provider.service.registration.AssertingPartyMetadata;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
-import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration.AssertingPartyDetails;
 import org.springframework.security.saml2.provider.service.registration.Saml2MessageBinding;
 
 public class DSpaceRelyingPartyRegistrationRepositoryTest extends AbstractDSpaceTest {
     private static ConfigurationService configurationService;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeAll() {
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     }
 
-    @Before
+    @BeforeEach
     public void beforeEach() {
         resetConfigurationService();
     }
@@ -53,7 +53,7 @@ public class DSpaceRelyingPartyRegistrationRepositoryTest extends AbstractDSpace
 
         assertNotNull(registration);
 
-        AssertingPartyDetails assertingPartyDetails = registration.getAssertingPartyDetails();
+        AssertingPartyMetadata assertingPartyDetails = registration.getAssertingPartyMetadata();
 
         assertNotNull(assertingPartyDetails);
         assertEquals("urn:dev-vynkcnqhac3c0s10.us.auth0.com", assertingPartyDetails.getEntityId());
@@ -104,7 +104,7 @@ public class DSpaceRelyingPartyRegistrationRepositoryTest extends AbstractDSpace
 
         assertNotNull(registration);
 
-        AssertingPartyDetails assertingPartyDetails = registration.getAssertingPartyDetails();
+        AssertingPartyMetadata assertingPartyDetails = registration.getAssertingPartyMetadata();
 
         assertNotNull(assertingPartyDetails);
         assertEquals("my-entity-id", assertingPartyDetails.getEntityId());
@@ -149,7 +149,7 @@ public class DSpaceRelyingPartyRegistrationRepositoryTest extends AbstractDSpace
 
         assertNotNull(registration);
 
-        AssertingPartyDetails assertingPartyDetails = registration.getAssertingPartyDetails();
+        AssertingPartyMetadata assertingPartyDetails = registration.getAssertingPartyMetadata();
 
         assertNotNull(assertingPartyDetails);
         assertEquals("my-entity-id", assertingPartyDetails.getEntityId());

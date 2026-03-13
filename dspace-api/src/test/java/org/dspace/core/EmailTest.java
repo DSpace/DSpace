@@ -20,8 +20,8 @@ import jakarta.mail.internet.MimeMessage;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for email sender.
@@ -32,7 +32,7 @@ public class EmailTest
         extends AbstractDSpaceTest {
     private ConfigurationService config;
 
-    @Before
+    @BeforeEach
     public void init_test() {
         config = kernelImpl.getConfigurationService();
     }

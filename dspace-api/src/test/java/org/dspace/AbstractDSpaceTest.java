@@ -7,27 +7,30 @@
  */
 package org.dspace;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.ZoneOffset;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.TimeZone;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.rules.TestName;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 /**
  * DSpace Unit Tests need to initialize the DSpace Kernel / Service Mgr
@@ -42,14 +45,16 @@ import org.mockito.junit.MockitoJUnitRunner;
  * @see AbstractUnitTest
  * @see AbstractIntegrationTest
  */
-@Ignore
-@RunWith(MockitoJUnitRunner.class)
+@Disabled
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class AbstractDSpaceTest {
 
     /**
      * Default constructor
      */
-    protected AbstractDSpaceTest() { }
+    protected AbstractDSpaceTest() {
+    }
 
     /**
      * log4j category
@@ -67,11 +72,11 @@ public class AbstractDSpaceTest {
      */
     protected static DSpaceKernelImpl kernelImpl;
 
+
     /**
      * Obtain the TestName from JUnit, so that we can print it out in the test logs (see below)
      */
-    @Rule
-    public TestName testName = new TestName();
+    public String testName;
 
     /**
      * This method will be run before the first test as per @BeforeClass. It will
@@ -80,7 +85,7 @@ public class AbstractDSpaceTest {
      * This method loads our test properties to initialize our test environment,
      * and then starts the DSpace Kernel (which allows access to services).
      */
-    @BeforeClass
+    @BeforeAll
     public static void initKernel() {
         try {
             // All tests should assume UTC timezone by default (unless overridden in the test itself)
@@ -91,7 +96,7 @@ public class AbstractDSpaceTest {
             //load the properties of the tests
             testProps = new Properties();
             URL properties = AbstractDSpaceTest.class.getClassLoader()
-                                                   .getResource("test-config.properties");
+                .getResource("test-config.properties");
             testProps.load(properties.openStream());
 
             // Initialise the service manager kernel
@@ -107,25 +112,29 @@ public class AbstractDSpaceTest {
         }
     }
 
-    @Before
-    public void printTestMethodBefore() {
+    @BeforeEach
+    public void printTestMethodBefore(TestInfo testInfo) {
+        Optional<Method> testMethod = testInfo.getTestMethod();
+        if (testMethod.isPresent()) {
+            this.testName = testMethod.get().getName();
+        }
         // Log the test method being executed. Put lines around it to make it stand out.
         log.info("---");
-        log.info("Starting execution of test method: {}()",  testName.getMethodName());
+        log.info("Starting execution of test method: {}()", testName);
         log.info("---");
     }
 
-    @After
+    @AfterEach
     public void printTestMethodAfter() {
         // Log the test method just completed.
-        log.info("Finished execution of test method: {}()", testName.getMethodName());
+        log.info("Finished execution of test method: {}()", testName);
     }
 
     /**
      * This method will be run after all tests finish as per @AfterClass. It
      * will clean resources initialized by the @BeforeClass methods.
      */
-    @AfterClass
+    @AfterAll
     public static void destroyKernel() throws SQLException {
         //we clear the properties
         testProps.clear();

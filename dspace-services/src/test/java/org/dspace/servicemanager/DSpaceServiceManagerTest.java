@@ -7,11 +7,11 @@
  */
 package org.dspace.servicemanager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,9 +23,9 @@ import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.servicemanager.example.ConcreteExample;
 import org.dspace.servicemanager.fakeservices.FakeService1;
 import org.dspace.servicemanager.spring.SpringAnnotationBean;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Testing the main DSpace service manager.
@@ -38,14 +38,14 @@ public class DSpaceServiceManagerTest {
     DSpaceServiceManager dsm;
     DSpaceConfigurationService configurationService;
 
-    @Before
+    @BeforeEach
     public void init() {
         configurationService = new DSpaceConfigurationService();
 
         dsm = new DSpaceServiceManager(configurationService, SPRING_TEST_CONFIG_FILE);
     }
 
-    @After
+    @AfterEach
     public void shutdown() {
         if (dsm != null) {
             dsm.shutdown();

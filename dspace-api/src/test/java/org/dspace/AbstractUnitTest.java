@@ -7,7 +7,7 @@
  */
 package org.dspace;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.SQLException;
 
@@ -21,10 +21,10 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.storage.rdbms.DatabaseUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 
 
 /**
@@ -37,7 +37,7 @@ import org.junit.Ignore;
  * @author pvillega
  * @see AbstractDSpaceTest
  */
-@Ignore
+@Disabled
 public class AbstractUnitTest extends AbstractDSpaceTest {
     /**
      * log4j category
@@ -70,7 +70,7 @@ public class AbstractUnitTest extends AbstractDSpaceTest {
      * This method builds on the initialization in AbstractDSpaceTest, and
      * initializes the in-memory database for tests that need it.
      */
-    @BeforeClass
+    @BeforeAll
     public static void initDatabase() {
         try {
             // Update/Initialize the database to latest version (via Flyway)
@@ -89,7 +89,7 @@ public class AbstractUnitTest extends AbstractDSpaceTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     public void init() {
         try {
             //Start a new context
@@ -141,7 +141,7 @@ public class AbstractUnitTest extends AbstractDSpaceTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     public void destroy() {
         // Cleanup our global context object
         try {

@@ -31,8 +31,8 @@ import org.dspace.app.rest.utils.Utils;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -60,7 +60,7 @@ public class ShibbolethLoginFilterIT extends AbstractControllerIntegrationTest {
     private EPersonRest ePersonRest;
     private final String feature = CanChangePasswordFeature.NAME;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         super.setUp();
 

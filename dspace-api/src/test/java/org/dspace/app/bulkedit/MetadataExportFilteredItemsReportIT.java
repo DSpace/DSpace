@@ -8,8 +8,8 @@
 
 package org.dspace.app.bulkedit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,8 +37,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MetadataExportFilteredItemsReportIT extends AbstractIntegrationTestWithDatabase {
 
@@ -56,7 +56,7 @@ public class MetadataExportFilteredItemsReportIT extends AbstractIntegrationTest
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
 
@@ -81,7 +81,7 @@ public class MetadataExportFilteredItemsReportIT extends AbstractIntegrationTest
                     for (int k = 0; k < itemCountPerSubjectThenPerAuthor[s][a]; k++) {
                         ItemKey key = new ItemKey(collName, subject, author);
                         Item item = ItemBuilder.createItem(context, collection)
-                            .withTitle(String.format("%s item %d", subject, k))
+                            .withTitle("%s item %d".formatted(subject, k))
                             .withSubject(subject)
                             .withAuthor(author)
                             .withIssueDate(dateFunction.apply(s, a, k))
