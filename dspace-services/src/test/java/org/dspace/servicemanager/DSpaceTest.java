@@ -7,14 +7,14 @@
  */
 package org.dspace.servicemanager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.utils.DSpace;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Make sure the DSpace static cover works

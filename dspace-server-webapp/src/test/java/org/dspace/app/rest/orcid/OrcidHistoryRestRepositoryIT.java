@@ -57,9 +57,9 @@ import org.dspace.orcid.client.OrcidResponse;
 import org.dspace.orcid.exception.OrcidClientException;
 import org.dspace.orcid.service.impl.OrcidHistoryServiceImpl;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.orcid.jaxb.model.common.Iso3166Country;
 import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
@@ -98,7 +98,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
     private OrcidClient orcidClientMock;
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
 
@@ -150,7 +150,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
     }
 
-    @After
+    @AfterEach
     public void after() {
         orcidHistoryService.setOrcidClient(orcidClient);
     }

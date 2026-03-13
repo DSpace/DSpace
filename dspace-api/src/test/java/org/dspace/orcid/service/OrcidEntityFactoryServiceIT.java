@@ -38,8 +38,8 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.RelationshipType;
 import org.dspace.orcid.factory.OrcidServiceFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.orcid.jaxb.model.common.ContributorRole;
 import org.orcid.jaxb.model.common.FundingContributorRole;
 import org.orcid.jaxb.model.common.Iso3166Country;
@@ -76,7 +76,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
     private static final String isbn = "978-0-439-02348-1";
     private static final String issn = "1234-1234X";
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         entityFactoryService = OrcidServiceFactory.getInstance().getOrcidEntityFactoryService();

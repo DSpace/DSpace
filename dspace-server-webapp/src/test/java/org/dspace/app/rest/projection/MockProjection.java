@@ -42,8 +42,7 @@ public class MockProjection extends AbstractProjection {
      */
     @Override
     public <T> T transformModel(T modelObject) {
-        if (modelObject instanceof MockObject) {
-            MockObject mockObject = (MockObject) modelObject;
+        if (modelObject instanceof MockObject mockObject) {
             if (mockObject.getStoredId() != null) {
                 mockObject.setStoredId(mockObject.getStoredId() + 1);
             }
@@ -60,8 +59,7 @@ public class MockProjection extends AbstractProjection {
      */
     @Override
     public <T extends RestModel> T transformRest(T restObject) {
-        if (restObject instanceof MockObjectRest) {
-            MockObjectRest mockObjectRest = (MockObjectRest) restObject;
+        if (restObject instanceof MockObjectRest mockObjectRest) {
             if (mockObjectRest.getId() != null) {
                 mockObjectRest.setId(mockObjectRest.getId() * 3);
             }

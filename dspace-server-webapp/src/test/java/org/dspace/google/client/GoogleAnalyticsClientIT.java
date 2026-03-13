@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.utils.DSpace;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests that verifies the configured beans of

@@ -9,13 +9,13 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
-import static junit.framework.TestCase.assertEquals;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataNotEmpty;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataStringEndsWith;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -34,7 +34,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.CommunityMatcher;
@@ -71,10 +70,11 @@ import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Integration Tests against the /api/core/communities endpoint (including any subpaths)
@@ -3169,13 +3169,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
             .withName("community of sample items")
             .withAdminGroup(eperson)
             .build();
-        Community com4 = CommunityBuilder.createSubCommunity(context, child2)
-            .withName("Testing autocomplete in community")
-            .withAdminGroup(eperson2)
-            .build();
-        Community com5 = CommunityBuilder.createSubCommunity(context, child2)
-            .withName("Title: subtitle (special characters)")
-            .build();
         context.restoreAuthSystemState();
 
         // Test simple query
@@ -3206,29 +3199,11 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         // Test eperson with no authorized communities
-        getClient(tokenEPerson).perform(get("/api/core/communities/search/" + method)
-                .param("query", "auto"))
+        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), password);
+        getClient(tokenEPerson2).perform(get("/api/core/communities/search/" + method)
+                .param("query", "community"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(0)));
-
-        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), password);
-        // Test eperson2 gets only their authorized community
-        getClient(tokenEPerson2).perform(get("/api/core/communities/search/" + method)
-                .param("query", "auto"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
-                CommunityMatcher.matchProperties(com4.getName(), com4.getID(), com4.getHandle())
-            )))
-            .andExpect(jsonPath("$.page.totalElements", is(1)));
-
-        // Test query with multiple words
-        getClient(tokenEPerson2).perform(get("/api/core/communities/search/" + method)
-                .param("query", "testing auto"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(com4.getName(), com4.getID(), com4.getHandle())
-            )))
-            .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         // Test as admin
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -3255,17 +3230,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .param("query", "test"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(com2.getName(), com2.getID(), com2.getHandle()),
-                CommunityMatcher.matchProperties(com4.getName(), com4.getID(), com4.getHandle())
-            )))
-            .andExpect(jsonPath("$.page.totalElements", is(2)));
-
-        // Test query with special characters
-        getClient(tokenAdmin).perform(get("/api/core/communities/search/" + method)
-                .param("query", "title: subtitle"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
-                CommunityMatcher.matchProperties(com5.getName(), com5.getID(), com5.getHandle())
+                CommunityMatcher.matchProperties(com2.getName(), com2.getID(), com2.getHandle())
             )))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
 

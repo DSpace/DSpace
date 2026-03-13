@@ -144,31 +144,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
     protected WorkflowItemBuilder addMetadataValue(final String schema,
             final String element, final String qualifier, final String value) {
         try {
-            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, null, value);
-        } catch (Exception e) {
-            return handleException(e);
-        }
-        return this;
-    }
-
-    protected WorkflowItemBuilder addMetadataValue(String schema, String element, String qualifier, String language,
-                                                   String value, String authority, int confidence) {
-
-        try {
-            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, language,
-                                    value, authority, confidence);
-        } catch (Exception e) {
-            return handleException(e);
-        }
-
-        return this;
-    }
-
-    protected WorkflowItemBuilder addMetadataValue(final String schema,
-                                                   final String element, final String qualifier,
-                                                   final String language, final String value) {
-        try {
-            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, language, value);
+            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY, value);
         } catch (Exception e) {
             return handleException(e);
         }
@@ -178,8 +154,8 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
     protected WorkflowItemBuilder setMetadataSingleValue(final String schema,
             final String element, final String qualifier, final String value) {
         try {
-            itemService.setMetadataSingleValue(context, workspaceItem.getItem(), schema, element, qualifier, null,
-                                               value);
+            itemService.setMetadataSingleValue(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY,
+                    value);
         } catch (Exception e) {
             return handleException(e);
         }
@@ -208,10 +184,6 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         return setMetadataSingleValue(MetadataSchemaEnum.DC.getName(), "title", null, title);
     }
 
-    public WorkflowItemBuilder withTitleForLanguage(final String title, final String language) {
-        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "title", null, language, title);
-    }
-
     /**
      * Set the dc.date.issued field.
      *
@@ -230,28 +202,6 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
      */
     public WorkflowItemBuilder withAuthor(final String authorName) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
-    }
-
-    /**
-     * Set the dc.contributor.author field with authority
-     *
-     * @param authorName Author's full name.
-     * @param authority linked item UUID.
-     * @return this builder.
-     */
-    public WorkflowItemBuilder withAuthor(String authorName, String authority) {
-        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", null, authorName, authority,
-                                600);
-    }
-
-    /**
-     * Set the oairecerif.author.affiliation field
-     *
-     * @param affilation Affiliation full name.
-     * @return this builder.
-     */
-    public WorkflowItemBuilder withAuthorAffiliation(final String affilation) {
-        return addMetadataValue(MetadataSchemaEnum.OAIRECERIF.getName(), "author", "affiliation", affilation);
     }
 
     /**

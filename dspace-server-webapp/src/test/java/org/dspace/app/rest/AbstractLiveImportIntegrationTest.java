@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -18,10 +18,9 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Strings;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.entity.BasicHttpEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.BasicHttpEntity;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
@@ -43,8 +42,8 @@ public class AbstractLiveImportIntegrationTest extends AbstractControllerIntegra
     private void checkMetadataValue(List<MetadatumDTO> list, List<MetadatumDTO> list2) {
         assertEquals(list.size(), list2.size());
         for (int i = 0; i < list.size(); i++) {
-            assertTrue("'" + list.get(i).toString() + "' should be equal to '" + list2.get(i).toString() + "'",
-                       sameMetadatum(list.get(i), list2.get(i)));
+            assertTrue(sameMetadatum(list.get(i), list2.get(i)),
+                       "'" + list.get(i).toString() + "' should be equal to '" + list2.get(i).toString() + "'");
         }
     }
 
@@ -69,33 +68,17 @@ public class AbstractLiveImportIntegrationTest extends AbstractControllerIntegra
 
     protected CloseableHttpResponse mockResponse(String xmlExample, int statusCode, String reason)
             throws UnsupportedEncodingException {
-        BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
-        basicHttpEntity.setChunked(true);
-        basicHttpEntity.setContent(IOUtils.toInputStream(xmlExample));
+        BasicHttpEntity basicHttpEntity = new BasicHttpEntity(
+            IOUtils.toInputStream(xmlExample, "UTF-8"),
+            ContentType.APPLICATION_XML,
+            true  // chunked
+        );
 
         CloseableHttpResponse response = mock(CloseableHttpResponse.class);
-        when(response.getStatusLine()).thenReturn(statusLine(statusCode, reason));
+        when(response.getCode()).thenReturn(statusCode);
+        when(response.getReasonPhrase()).thenReturn(reason);
         when(response.getEntity()).thenReturn(basicHttpEntity);
         return response;
-    }
-
-    protected StatusLine statusLine(int statusCode, String reason) {
-        return new StatusLine() {
-            @Override
-            public ProtocolVersion getProtocolVersion() {
-                return new ProtocolVersion("http", 1, 1);
-            }
-
-            @Override
-            public int getStatusCode() {
-                return statusCode;
-            }
-
-            @Override
-            public String getReasonPhrase() {
-                return reason;
-            }
-        };
     }
 
 }

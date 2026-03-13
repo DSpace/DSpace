@@ -7,9 +7,10 @@
  */
 package org.dspace.discovery;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -24,8 +25,8 @@ import java.util.UUID;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 /**
@@ -43,7 +44,7 @@ public class DiscoverResultIteratorTest {
     private Item mockItem1;
     private Item mockItem2;
 
-    @Before
+    @BeforeEach
     public void setUp() throws SearchServiceException {
         // Mock dependencies
         mockSearchService = mock(SearchService.class);
@@ -116,16 +117,18 @@ public class DiscoverResultIteratorTest {
         }
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void testNextThrowsExceptionWhenNoMoreElements() {
-        try (MockedStatic<SearchUtils> mockedStatic = mockStatic(SearchUtils.class)) {
-            mockedStatic.when(SearchUtils::getSearchService).thenReturn(mockSearchService);
-            DiscoverResultIterator<Item, UUID> iterator =
-                new DiscoverResultIterator<>(mockContext, null, mockDiscoverQuery);
-            iterator.next();
-            iterator.next();
-            iterator.next();
-        }
+        assertThrows(NoSuchElementException.class, () -> {
+            try (MockedStatic<SearchUtils> mockedStatic = mockStatic(SearchUtils.class)) {
+                mockedStatic.when(SearchUtils::getSearchService).thenReturn(mockSearchService);
+                DiscoverResultIterator<Item, UUID> iterator =
+                    new DiscoverResultIterator<>(mockContext, null, mockDiscoverQuery);
+                iterator.next();
+                iterator.next();
+                iterator.next();
+            }
+        });
     }
 
     @Test

@@ -7,12 +7,12 @@
  */
 package org.dspace.eperson;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -48,8 +48,9 @@ import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mwood
@@ -89,7 +90,7 @@ public class EPersonTest extends AbstractUnitTest {
      * Other methods can be annotated with @Before here or in subclasses but no
      * execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -113,6 +114,7 @@ public class EPersonTest extends AbstractUnitTest {
         }
     }
 
+    @AfterEach
     @Override
     public void destroy() {
         context.turnOffAuthorisationSystem();
@@ -935,7 +937,7 @@ public class EPersonTest extends AbstractUnitTest {
         System.out.println("getType");
         int expResult = Constants.EPERSON;
         int result = eperson.getType();
-        assertEquals("Should return Constants.EPERSON", expResult, result);
+        assertEquals(expResult, result, "Should return Constants.EPERSON");
     }
 
     /**
@@ -959,7 +961,7 @@ public class EPersonTest extends AbstractUnitTest {
         context.restoreAuthSystemState();
         context.commit();
         EPerson findDeletedEperson = ePersonService.findByEmail(context, EMAIL);
-        assertNull("EPerson has not been deleted correctly!", findDeletedEperson);
+        assertNull(findDeletedEperson, "EPerson has not been deleted correctly!");
     }
 
     /**
@@ -1027,9 +1029,9 @@ public class EPersonTest extends AbstractUnitTest {
             }
         }
         item = itemService.find(context, item.getID());
-        assertNotNull("Could not load item after cascading deletion of the submitter.", item);
-        assertNull("Cascading deletion of an EPerson did not set the submitter of an submitted item null.",
-                item.getSubmitter());
+        assertNotNull(item, "Could not load item after cascading deletion of the submitter.");
+        assertNull(item.getSubmitter(),
+                "Cascading deletion of an EPerson did not set the submitter of an submitted item null.");
     }
 
     /**
@@ -1074,9 +1076,9 @@ public class EPersonTest extends AbstractUnitTest {
         try {
             WorkspaceItem restoredWsi = workspaceItemService.find(context, wsi.getID());
             Item restoredItem = itemService.find(context, item.getID());
-            assertNull("An unsubmited WorkspaceItem wasn't deleted while cascading deleting the submitter.",
-                       restoredWsi);
-            assertNull("An unsubmited Item wasn't deleted while cascading deleting the submitter.", restoredItem);
+            assertNull(restoredWsi,
+                       "An unsubmited WorkspaceItem wasn't deleted while cascading deleting the submitter.");
+            assertNull(restoredItem, "An unsubmited Item wasn't deleted while cascading deleting the submitter.");
         } catch (SQLException ex) {
             log.error("SQLException while trying to load previously stored. " + ex);
         }
@@ -1128,7 +1130,7 @@ public class EPersonTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         // check that the workflow item exists.
-        assertNotNull("Cannot find currently created WorkflowItem!", workflowItemService.find(context, wfiID));
+        assertNotNull(workflowItemService.find(context, wfiID), "Cannot find currently created WorkflowItem!");
 
         // delete the submitter
         try {
@@ -1151,9 +1153,9 @@ public class EPersonTest extends AbstractUnitTest {
 
         // check whether the workflow item still exists.
         WorkflowItem wfi = workflowItemService.find(context, wfiID);
-        assertNotNull("Could not load WorkflowItem after cascading deletion of the submitter.", wfi);
-        assertNull("Cascading deletion of an EPerson did not set the submitter of an submitted WorkflowItem null.",
-                wfi.getSubmitter());
+        assertNotNull(wfi, "Could not load WorkflowItem after cascading deletion of the submitter.");
+        assertNull(wfi.getSubmitter(),
+                "Cascading deletion of an EPerson did not set the submitter of an submitted WorkflowItem null.");
     }
 
     @Test

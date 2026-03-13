@@ -51,7 +51,7 @@ public class MarkerTask
                 context.restoreAuthSystemState();
             }
 
-            String result = String.format("Item %s marked.", item.getID().toString());
+            String result = "Item %s marked.".formatted(item.getID().toString());
             setResult(result);
             report(result);
 

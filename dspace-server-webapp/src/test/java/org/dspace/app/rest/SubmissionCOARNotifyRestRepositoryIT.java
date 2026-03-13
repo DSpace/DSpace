@@ -19,7 +19,7 @@ import org.dspace.app.rest.repository.SubmissionCoarNotifyRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.coarnotify.NotifyPattern;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration test class for {@link SubmissionCoarNotifyRestRepository}.
