@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ import org.dspace.app.rest.RestResourceController;
     @LinkRest(name = SuggestionRest.TARGET, method = "getTarget")
 })
 public class SuggestionRest extends BaseObjectRest<String> {
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final String NAME = "suggestion";
     public static final String PLURAL_NAME = "suggestions";

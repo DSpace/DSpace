@@ -23,14 +23,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.authority.orcid.Orcidv3AuthorityValue;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.util.SolrUtils;
-import org.orcid.jaxb.model.v3.release.record.Person;
 
 /**
  * @author Antoine Snyers (antoine at atmire.com)
@@ -68,14 +66,6 @@ public class AuthorityValue {
      * represents the last time that DSpace got updated information from its external source
      */
     private Instant lastModified;
-
-    private String serviceId;
-
-    /*
-     * Map containing key-value pairs filled in by "setValues(Person person)".
-     * This represents all dynamic information of the object.
-     */
-    protected Map<String, List<String>> otherMetadata = new HashMap<String, List<String>>();
 
     public AuthorityValue() {
     }
@@ -151,61 +141,6 @@ public class AuthorityValue {
     public void delete() {
         setDeleted(true);
         updateLastModifiedDate();
-    }
-
-    public String getServiceId() {
-        return serviceId;
-    }
-
-    public void setServiceId(String serviceId) {
-        this.serviceId = serviceId;
-    }
-
-    public Map<String, List<String>> getOtherMetadata() {
-        if (otherMetadata == null) {
-            otherMetadata = new HashMap<String, List<String>>();
-        }
-        return otherMetadata;
-    }
-
-    /**
-     * Adds additional metadata to this authority value.
-     * 
-     * <p>This method stores supplementary information that will be indexed in Solr
-     * using dynamic fields (with "label_" prefix) for enhanced authority searching.
-     * Multiple values can be added for the same label.</p>
-     * 
-     * <p><b>Example usage from ORCID integration:</b></p>
-     * <pre>
-     * // Store research keywords
-     * addOtherMetadata("keyword", "machine learning");
-     * addOtherMetadata("keyword", "neural networks");
-     * 
-     * // Store external identifiers
-     * addOtherMetadata("external_identifier", "ResearcherID: A-1234-2020");
-     * 
-     * // Store researcher URLs
-     * addOtherMetadata("researcher_url", "https://scholar.google.com/profile");
-     * 
-     * // Store biography
-     * addOtherMetadata("biography", "Professor of Computer Science...");
-     * </pre>
-     * 
-     * <p>These are indexed in Solr as {@code label_keyword}, {@code label_external_identifier}, etc.,
-     * and copied to {@code all_labels} for full-text searching across all additional metadata.</p>
-     * 
-     * @param label the category/type of additional metadata (e.g., "keyword", "external_identifier", "researcher_url")
-     * @param data the value to store for this metadata category
-     * @see #getOtherMetadata()
-     * @see Orcidv3AuthorityValue#setValues(Person) for real-world usage
-     */
-    public void addOtherMetadata(String label, String data) {
-        List<String> strings = otherMetadata.get(label);
-        if (strings == null) {
-            strings = new ArrayList<String>();
-        }
-        strings.add(data);
-        otherMetadata.put(label, strings);
     }
 
     /**

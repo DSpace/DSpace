@@ -102,7 +102,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
     @Override
     public void commit() {
         try {
-            getSolr().commit();
+            getSolr().commit(true, true, true);
         } catch (SolrServerException e) {
             log.error("Error while committing authority solr server", e);
         } catch (IOException e) {

@@ -419,8 +419,8 @@ public abstract class AbstractPackageIngester
         // So, we simply have to convert that Collection to a List
         java.util.Collection<String> coll = pkgIngestedMap.values();
 
-        if (coll instanceof List) {
-            return (List) coll;
+        if (coll instanceof List list) {
+            return list;
         } else {
             return new ArrayList(coll);
         }

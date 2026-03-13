@@ -53,8 +53,7 @@ public class DiscoverySortFieldConfiguration {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof DiscoverySortFieldConfiguration) {
-            DiscoverySortFieldConfiguration compareConfig = (DiscoverySortFieldConfiguration) obj;
+        if (obj != null && obj instanceof DiscoverySortFieldConfiguration compareConfig) {
             if (compareConfig.getMetadataField().equals(getMetadataField()) && compareConfig.getType()
                                                                                             .equals(getType())) {
                 return true;

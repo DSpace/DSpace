@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +29,7 @@ import org.dspace.app.rest.NotifyRequestStatusRestController;
 })
 public class NotifyRequestStatusRest extends RestAddressableModel {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final String CATEGORY = RestAddressableModel.LDN;
     public static final String NAME = "notifyrequests";

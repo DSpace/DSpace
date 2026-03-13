@@ -62,8 +62,8 @@ public class BitstreamMetadataReadPermissionEvaluatorPlugin extends RestObjectPe
             try {
                 UUID dsoUuid = UUID.fromString(targetId.toString());
                 DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, dsoUuid);
-                if (dso instanceof Bitstream) {
-                    return this.metadataReadPermissionOnBitstream(context, (Bitstream) dso);
+                if (dso instanceof Bitstream bitstream) {
+                    return this.metadataReadPermissionOnBitstream(context, bitstream);
                 }
             } catch (SQLException e) {
                 log.error(e::getMessage, e);

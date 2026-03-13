@@ -511,7 +511,7 @@ public class ViewEventRestRepositoryIT extends AbstractControllerIntegrationTest
                         .content(mapper.writeValueAsBytes(viewEventRest))
                         .contentType(contentType))
                 .andExpect(status().isCreated());
-        solrStatisticsCore.getSolr().commit();
+        solrStatisticsCore.getSolr().commit(true, true, true);
 
         // Query all statistics and verify it contains a document with the correct referrer
         SolrQuery solrQuery = new SolrQuery("*:*");

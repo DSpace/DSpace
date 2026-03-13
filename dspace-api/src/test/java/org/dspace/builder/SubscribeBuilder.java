@@ -16,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
@@ -48,7 +47,6 @@ public class SubscribeBuilder extends AbstractBuilder<Subscription, SubscribeSer
                 delete(c, subscription);
             }
             c.complete();
-            indexingService.commit();
         }
     }
 
@@ -65,19 +63,11 @@ public class SubscribeBuilder extends AbstractBuilder<Subscription, SubscribeSer
             }
             c.complete();
         }
-        indexingService.commit();
     }
 
     @Override
     public Subscription build() {
-        try {
-
-            context.dispatchEvents();
-
-            indexingService.commit();
-        } catch (SearchServiceException  e) {
-            log.error(e);
-        }
+        context.dispatchEvents();
         return subscription;
     }
 

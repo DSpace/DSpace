@@ -113,8 +113,8 @@ public class ImportService implements Destroyable {
         try {
             List<ImportRecord> recordList = new LinkedList<ImportRecord>();
             for (MetadataSource metadataSource : matchingImports(uri)) {
-                if (metadataSource instanceof QuerySource) {
-                    recordList.addAll(((QuerySource)metadataSource).findMatchingRecords(item));
+                if (metadataSource instanceof QuerySource source) {
+                    recordList.addAll(source.findMatchingRecords(item));
                 }
             }
             return recordList;
@@ -136,8 +136,8 @@ public class ImportService implements Destroyable {
         try {
             List<ImportRecord> recordList = new LinkedList<ImportRecord>();
             for (MetadataSource metadataSource : matchingImports(uri)) {
-                if (metadataSource instanceof QuerySource) {
-                    recordList.addAll(((QuerySource)metadataSource).findMatchingRecords(query));
+                if (metadataSource instanceof QuerySource source) {
+                    recordList.addAll(source.findMatchingRecords(query));
                 }
             }
             return recordList;
@@ -158,8 +158,8 @@ public class ImportService implements Destroyable {
         try {
             int total = 0;
             for (MetadataSource metadataSource : matchingImports(uri)) {
-                if (metadataSource instanceof QuerySource) {
-                    total += ((QuerySource)metadataSource).getRecordsCount(query);
+                if (metadataSource instanceof QuerySource source) {
+                    total += source.getRecordsCount(query);
                 }
             }
             return total;
@@ -180,8 +180,8 @@ public class ImportService implements Destroyable {
         try {
             int total = 0;
             for (MetadataSource metadataSource : matchingImports(uri)) {
-                if (metadataSource instanceof QuerySource) {
-                    total += ((QuerySource)metadataSource).getRecordsCount(query);
+                if (metadataSource instanceof QuerySource source) {
+                    total += source.getRecordsCount(query);
                 }
             }
             return total;
@@ -205,8 +205,8 @@ public class ImportService implements Destroyable {
         try {
             List<ImportRecord> recordList = new LinkedList<>();
             for (MetadataSource metadataSource : matchingImports(uri)) {
-                if (metadataSource instanceof QuerySource) {
-                    recordList.addAll(((QuerySource)metadataSource).getRecords(query, start, count));
+                if (metadataSource instanceof QuerySource source) {
+                    recordList.addAll(source.getRecords(query, start, count));
                 }
             }
             return recordList;
@@ -227,8 +227,8 @@ public class ImportService implements Destroyable {
         try {
             List<ImportRecord> recordList = new LinkedList<>();
             for (MetadataSource metadataSource : matchingImports(uri)) {
-                if (metadataSource instanceof QuerySource) {
-                    recordList.addAll(((QuerySource)metadataSource).getRecords(query));
+                if (metadataSource instanceof QuerySource source) {
+                    recordList.addAll(source.getRecords(query));
                 }
             }
             return recordList;
@@ -249,8 +249,7 @@ public class ImportService implements Destroyable {
     public ImportRecord getRecord(String uri, String id) throws MetadataSourceException {
         try {
             for (MetadataSource metadataSource : matchingImports(uri)) {
-                if (metadataSource instanceof QuerySource) {
-                    QuerySource querySource = (QuerySource)metadataSource;
+                if (metadataSource instanceof QuerySource querySource) {
                     if (querySource.getRecord(id) != null) {
                         return querySource.getRecord(id);
                     }
@@ -274,8 +273,7 @@ public class ImportService implements Destroyable {
     public ImportRecord getRecord(String uri, Query query) throws MetadataSourceException {
         try {
             for (MetadataSource metadataSource : matchingImports(uri)) {
-                if (metadataSource instanceof QuerySource) {
-                    QuerySource querySource = (QuerySource)metadataSource;
+                if (metadataSource instanceof QuerySource querySource) {
                     if (querySource.getRecord(query) != null) {
                         return querySource.getRecord(query);
                     }
@@ -310,8 +308,7 @@ public class ImportService implements Destroyable {
         ImportRecord importRecords = null;
         for (MetadataSource metadataSource : importSources.values()) {
             try (InputStream fileInputStream = new FileInputStream(file)) {
-                if (metadataSource instanceof FileSource) {
-                    FileSource fileSource = (FileSource)metadataSource;
+                if (metadataSource instanceof FileSource fileSource) {
                     if (fileSource.isValidSourceForFile(originalName)) {
                         importRecords = fileSource.getRecord(fileInputStream);
                         break;
@@ -337,8 +334,8 @@ public class ImportService implements Destroyable {
     @Override
     public void destroy() throws Exception {
         for (MetadataSource metadataSource : importSources.values()) {
-            if (metadataSource instanceof Destroyable) {
-                ((Destroyable) metadataSource).destroy();
+            if (metadataSource instanceof Destroyable destroyable) {
+                destroyable.destroy();
             }
         }
     }

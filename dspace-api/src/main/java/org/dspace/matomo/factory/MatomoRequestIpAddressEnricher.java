@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.matomo.model.MatomoRequestDetails;
 import org.dspace.service.ClientInfoService;
 import org.dspace.usage.UsageEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Adds the IP address of the client to the {@code MatomoRequestDetails}.
@@ -22,7 +21,7 @@ public class MatomoRequestIpAddressEnricher implements MatomoRequestDetailsEnric
 
     private final ClientInfoService clientInfoService;
 
-    public MatomoRequestIpAddressEnricher(@Autowired ClientInfoService clientInfoService) {
+    public MatomoRequestIpAddressEnricher(ClientInfoService clientInfoService) {
         this.clientInfoService = clientInfoService;
     }
 

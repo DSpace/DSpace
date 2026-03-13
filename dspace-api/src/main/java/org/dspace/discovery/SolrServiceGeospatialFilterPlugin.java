@@ -34,8 +34,8 @@ public class SolrServiceGeospatialFilterPlugin implements SolrServiceIndexPlugin
     ItemService itemService;
     @Override
     public void additionalIndex(Context context, IndexableObject indexableObject, SolrInputDocument document) {
-        if (indexableObject instanceof IndexableItem) {
-            Item item = ((IndexableItem) indexableObject).getIndexedObject();
+        if (indexableObject instanceof IndexableItem indexableItem) {
+            Item item = indexableItem.getIndexedObject();
             // Get configured field name
             String geospatialField = configurationService.getProperty("discovery.filter.geospatial.field");
             if (geospatialField == null) {

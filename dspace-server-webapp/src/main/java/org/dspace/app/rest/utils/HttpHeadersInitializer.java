@@ -177,8 +177,7 @@ public class HttpHeadersInitializer {
             String fallbackAsciiName = createFallbackAsciiName(this.fileName);
             String encodedUtf8Name = createEncodedUtf8Name(this.fileName);
 
-            String headerValue = String.format(
-                "%s; filename=\"%s\"; filename*=UTF-8''%s",
+            String headerValue = "%s; filename=\"%s\"; filename*=UTF-8''%s".formatted(
                 disposition,
                 fallbackAsciiName,
                 encodedUtf8Name

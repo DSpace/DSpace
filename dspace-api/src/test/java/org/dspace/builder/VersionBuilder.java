@@ -59,7 +59,6 @@ public class VersionBuilder extends AbstractBuilder<Version, VersioningService> 
         try {
             getService().update(context, version);
             context.dispatchEvents();
-            indexingService.commit();
         } catch (Exception e) {
             log.error("Error in VersionBuilder.build(), error: ", e);
         }
@@ -93,7 +92,6 @@ public class VersionBuilder extends AbstractBuilder<Version, VersioningService> 
             }
             context.complete();
         }
-        indexingService.commit();
     }
 
     public static void delete(Integer id)
@@ -106,7 +104,6 @@ public class VersionBuilder extends AbstractBuilder<Version, VersioningService> 
             }
             context.complete();
         }
-        indexingService.commit();
     }
 
 }

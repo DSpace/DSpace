@@ -17,10 +17,14 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class MetadataValueISSNExtractor implements ISSNItemExtractor {
-    @Autowired(required = true)
-    public ItemService itemService;
+    @Autowired
+    private ItemService itemService;
 
     private List<String> metadataList;
+
+    public void setItemService(ItemService itemService) {
+        this.itemService = itemService;
+    }
 
     public void setMetadataList(List<String> metadataList) {
         this.metadataList = metadataList;

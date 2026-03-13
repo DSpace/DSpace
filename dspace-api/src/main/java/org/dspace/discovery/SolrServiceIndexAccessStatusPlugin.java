@@ -31,8 +31,8 @@ public class SolrServiceIndexAccessStatusPlugin implements SolrServiceIndexPlugi
 
     @Override
     public void additionalIndex(Context context, IndexableObject indexableObject, SolrInputDocument document) {
-        if (indexableObject instanceof IndexableItem) {
-            Item item = ((IndexableItem) indexableObject).getIndexedObject();
+        if (indexableObject instanceof IndexableItem indexableItem) {
+            Item item = indexableItem.getIndexedObject();
             String accessStatus;
 
             try {

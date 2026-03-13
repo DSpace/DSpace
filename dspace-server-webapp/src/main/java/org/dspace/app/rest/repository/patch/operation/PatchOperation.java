@@ -47,7 +47,7 @@ public abstract class PatchOperation<M> {
         if (value == null) {
             throw new DSpaceBadRequestException("No value provided for the operation.");
         }
-        if (value instanceof String && (((String) value).trim().isBlank())) {
+        if (value instanceof String string && (string.trim().isBlank())) {
             throw new DSpaceBadRequestException("Value can't be empty or just spaces.");
         }
     }
@@ -62,8 +62,8 @@ public abstract class PatchOperation<M> {
     protected Boolean getBooleanOperationValue(Object value) {
         Boolean bool;
 
-        if (value instanceof String) {
-            bool = BooleanUtils.toBooleanObject((String) value);
+        if (value instanceof String string) {
+            bool = BooleanUtils.toBooleanObject(string);
             if (bool == null) {
                 // make sure the string was converted to boolean.
                 throw new DSpaceBadRequestException("Boolean value not provided.");

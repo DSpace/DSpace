@@ -36,8 +36,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -78,7 +78,7 @@ public class BitstreamBundleController {
      * @throws IOException
      * @throws AuthorizeException
      */
-    @RequestMapping(method = RequestMethod.PUT, consumes = {"text/uri-list"})
+    @PutMapping( consumes = {"text/uri-list"})
     @PreAuthorize("hasPermission(#uuid, 'BITSTREAM','WRITE')")
     @PostAuthorize("returnObject != null")
     public BundleRest move(@PathVariable UUID uuid, HttpServletResponse response,

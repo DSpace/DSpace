@@ -141,8 +141,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
                 context = new Context();
                 for (String communityString : citationEnabledCommunities) {
                     DSpaceObject dsoCommunity = handleService.resolveToObject(context, communityString.trim());
-                    if (dsoCommunity instanceof Community) {
-                        Community community = (Community) dsoCommunity;
+                    if (dsoCommunity instanceof Community community) {
                         List<Collection> collections = communityService.getAllCollections(context, community);
 
                         for (Collection collection : collections) {
@@ -195,8 +194,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         }
 
         DSpaceObject owningDSO = bitstreamService.getParentObject(context, bitstream);
-        if (owningDSO instanceof Item) {
-            Item item = (Item) owningDSO;
+        if (owningDSO instanceof Item item) {
 
             List<Collection> collections = item.getCollections();
 

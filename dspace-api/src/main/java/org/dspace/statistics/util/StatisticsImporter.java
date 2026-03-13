@@ -387,7 +387,7 @@ public class StatisticsImporter {
 
             // Commit at the end because it takes a while
             try {
-                solr.commit();
+                solr.commit(true, true, true);
             } catch (SolrServerException sse) {
                 System.err.println("Error committing statistics to solr server!");
                 sse.printStackTrace();

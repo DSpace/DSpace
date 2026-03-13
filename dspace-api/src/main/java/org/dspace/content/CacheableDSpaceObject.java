@@ -15,6 +15,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  * See hibernate-ehcache-config.xml for caching configurations for each DSpaceObject which extends this class.
  */
 @Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public abstract class CacheableDSpaceObject extends DSpaceObject {
 }

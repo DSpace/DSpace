@@ -40,9 +40,9 @@ public class DSpaceMetadataExistsFilter extends DSpaceFilter {
                 fields = getConfiguration().get("field");
             }
 
-            if (fields instanceof SimpleType) {
+            if (fields instanceof SimpleType type) {
                 this.fields = new ArrayList<String>();
-                this.fields.add(((SimpleType) fields).asString());
+                this.fields.add(type.asString());
             } else {
                 this.fields = new ArrayList<String>();
                 for (ParameterValue val : fields.asParameterList().getValues()) {

@@ -37,9 +37,9 @@ public class SiteRest extends DSpaceObjectRest {
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof SiteRest &&
-            new EqualsBuilder().append(this.getCategory(), ((SiteRest) object).getCategory())
-                               .append(this.getType(), ((SiteRest) object).getType())
+        return (object instanceof SiteRest sr &&
+            new EqualsBuilder().append(this.getCategory(), sr.getCategory())
+                               .append(this.getType(), sr.getType())
                                .isEquals());
     }
 

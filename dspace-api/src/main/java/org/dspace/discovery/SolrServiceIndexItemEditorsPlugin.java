@@ -39,8 +39,8 @@ public class SolrServiceIndexItemEditorsPlugin implements SolrServiceIndexPlugin
 
     @Override
     public void additionalIndex(Context context, IndexableObject idxObj, SolrInputDocument document) {
-        if (idxObj instanceof IndexableItem) {
-            Item item = ((IndexableItem) idxObj).getIndexedObject();
+        if (idxObj instanceof IndexableItem indexableItem) {
+            Item item = indexableItem.getIndexedObject();
             if (item != null) {
                 try {
                     // Index groups with ADMIN rights on Collections containing the Item, on

@@ -112,8 +112,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider implem
     @Override
     public void register(Context context, DSpaceObject dso, String identifier)
         throws IdentifierException {
-        if (dso instanceof Item && identifier != null) {
-            Item item = (Item) dso;
+        if (dso instanceof Item item && identifier != null) {
 
             // if identifier == 1234.5/100.4 reinstate the version 4 in the
             // version table if absent
@@ -199,8 +198,8 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider implem
             // versioned (e.g. 123456789/100) one
             // just register it.
             createNewIdentifier(context, dso, identifier);
-            if (dso instanceof Item) {
-                populateHandleMetadata(context, (Item) dso, identifier);
+            if (dso instanceof Item item) {
+                populateHandleMetadata(context, item, identifier);
             }
         } catch (SQLException ex) {
             throw new RuntimeException("Unable to create handle '"
@@ -276,8 +275,8 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider implem
         try {
             String handleId = null;
             VersionHistory history = null;
-            if (dso instanceof Item) {
-                history = versionHistoryService.findByItem(context, (Item) dso);
+            if (dso instanceof Item item) {
+                history = versionHistoryService.findByItem(context, item);
             }
 
             if (history != null) {

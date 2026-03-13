@@ -41,10 +41,10 @@ public class SearchSupportRest extends BaseObjectRest<String> {
 
     @Override
     public boolean equals(Object object) {
-        return (object instanceof SearchSupportRest &&
-            new EqualsBuilder().append(this.getCategory(), ((SearchSupportRest) object).getCategory())
-                               .append(this.getType(), ((SearchSupportRest) object).getType())
-                               .append(this.getController(), ((SearchSupportRest) object).getController())
+        return (object instanceof SearchSupportRest ssr &&
+            new EqualsBuilder().append(this.getCategory(), ssr.getCategory())
+                               .append(this.getType(), ssr.getType())
+                               .append(this.getController(), ssr.getController())
                                .isEquals());
     }
 

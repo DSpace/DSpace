@@ -20,7 +20,6 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.model.Event;
 import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This EventListener handles {@code UsageEvent}s and send them to all the {@code List<MatomoUsageEventHandler>}
@@ -37,9 +36,9 @@ public class MatomoEventListener extends AbstractUsageEventListener {
     private final List<MatomoUsageEventHandler> matomoUsageEventHandlers;
 
     public MatomoEventListener(
-        @Autowired List<MatomoUsageEventHandler> matomoUsageEventHandlers,
-        @Autowired ConfigurationService configurationService,
-        @Autowired BitstreamService bitstreamService
+        List<MatomoUsageEventHandler> matomoUsageEventHandlers,
+        ConfigurationService configurationService,
+        BitstreamService bitstreamService
     ) {
         this.matomoUsageEventHandlers = matomoUsageEventHandlers;
         this.configurationService = configurationService;

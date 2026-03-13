@@ -673,7 +673,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     public void removeIndex(String query) throws IOException,
         SolrServerException {
         solr.deleteByQuery(query);
-        solr.commit();
+        solr.commit(true, true, true);
     }
 
     @Override
@@ -744,7 +744,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
 
         public void commit() throws IOException, SolrServerException {
-            solr.commit();
+            solr.commit(true, true, true);
         }
 
         /**
@@ -795,7 +795,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
         try {
             processor.execute("-isBot:true");
-            solr.commit();
+            solr.commit(true, true, true);
         } catch (SolrServerException | IOException ex) {
             log.error("Failed while marking robot accesses.", ex);
         }
@@ -1492,7 +1492,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     @Override
     public void commit() throws IOException, SolrServerException {
-        solr.commit();
+        solr.commit(true, true, true);
     }
 
     protected void addDocumentsToFile(Context context, SolrDocumentList docs, File exportOutput)
