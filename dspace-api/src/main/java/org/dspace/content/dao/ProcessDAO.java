@@ -15,6 +15,7 @@ import org.dspace.content.ProcessStatus;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessQueryParameterContainer;
 
@@ -119,5 +120,15 @@ public interface ProcessDAO extends GenericDAO<Process> {
      * @throws SQLException If something goes wrong
      */
     int countByUser(Context context, EPerson user) throws SQLException;
+
+    /**
+     * Find all Processes that have the given Group in their groups list.
+     *
+     * @param context The relevant DSpace context
+     * @param group   The group to search for
+     * @return The list of all Processes referencing this Group
+     * @throws SQLException If something goes wrong
+     */
+    List<Process> findByGroup(Context context, Group group) throws SQLException;
 
 }

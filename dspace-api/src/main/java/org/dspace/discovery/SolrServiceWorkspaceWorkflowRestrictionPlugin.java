@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.Set;
 
 import org.apache.commons.lang3.Strings;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;

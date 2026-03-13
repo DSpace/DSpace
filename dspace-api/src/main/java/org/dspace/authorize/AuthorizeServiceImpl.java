@@ -274,8 +274,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         // In case the dso is an item and a corresponding workspace or workflow
         // item exist, we have to ignore custom policies (see DS-2614).
         boolean ignoreCustomPolicies = false;
-        if (o instanceof Bitstream) {
-            Bitstream b = (Bitstream) o;
+        if (o instanceof Bitstream b) {
 
             // Ensure that this is not a collection or community logo
             DSpaceObject parent = bitstreamService.getParentObject(c, b);
@@ -283,15 +282,15 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                 ignoreCustomPolicies = !isAnyItemInstalled(c, b.getBundles());
             }
         }
-        if (o instanceof Bundle) {
-            ignoreCustomPolicies = !isAnyItemInstalled(c, Arrays.asList(((Bundle) o)));
+        if (o instanceof Bundle bundle) {
+            ignoreCustomPolicies = !isAnyItemInstalled(c, Arrays.asList(bundle));
         }
-        if (o instanceof Item) {
+        if (o instanceof Item item) {
             // the isArchived check is fast and would exclude the possibility that the item
             // is a workspace or workflow without further queries
-            if (!((Item) o).isArchived() &&
-                    (workspaceItemService.findByItem(c, (Item) o) != null ||
-                    workflowItemService.findByItem(c, (Item) o) != null)) {
+            if (!item.isArchived() &&
+                    (workspaceItemService.findByItem(c, item) != null ||
+                    workflowItemService.findByItem(c, item) != null)) {
                 ignoreCustomPolicies = true;
             }
         }
@@ -381,6 +380,12 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         if (o == null) {
             return false;
         }
+
+        // Unproxy the DSpaceObject to get the actual entity type.
+        // In Hibernate 7 with JOINED inheritance, lazy-loaded DSpaceObjects
+        // return a DSpaceObject$HibernateProxy that cannot be cast to
+        // concrete subclasses (Item, Collection, etc.) needed by getParentObject().
+        o = (DSpaceObject) org.hibernate.Hibernate.unproxy(o);
 
         Boolean cachedResult = c.getCachedAuthorizationResult(o, Constants.ADMIN, e);
         if (cachedResult != null) {
@@ -827,7 +832,6 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                                                            int limit)
         throws SearchServiceException {
         List<Community> communities = new ArrayList<>();
-        query = searchService.formatAutoCompleteQuery(query, "dc.title_sort");
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + RESOURCE_TYPE_FIELD + ":" +
                 IndexableCommunity.TYPE, action, true,
@@ -865,7 +869,6 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public long countAuthorizedCommunityByAction(Context context, String query, int action)
         throws SearchServiceException {
-        query = searchService.formatAutoCompleteQuery(query, "dc.title_sort");
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + RESOURCE_TYPE_FIELD + ":" +
                 IndexableCommunity.TYPE, action, true,
@@ -909,7 +912,6 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             return collections;
         }
 
-        query = searchService.formatAutoCompleteQuery(query, "dc.title_sort");
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + RESOURCE_TYPE_FIELD + ":" +
                 IndexableCollection.TYPE, action, true,
@@ -947,7 +949,6 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public long countAuthorizedCollectionByAction(Context context, String query, int action)
         throws SearchServiceException {
-        query = searchService.formatAutoCompleteQuery(query, "dc.title_sort");
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + RESOURCE_TYPE_FIELD + ":" +
                 IndexableCollection.TYPE, action,

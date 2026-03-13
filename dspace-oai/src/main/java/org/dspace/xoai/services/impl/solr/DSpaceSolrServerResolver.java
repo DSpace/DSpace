@@ -11,9 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.dspace.service.impl.HttpConnectionPoolService;
-import org.dspace.services.factory.DSpaceServicesFactory;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.solr.SolrServerResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +27,10 @@ public class DSpaceSolrServerResolver implements SolrServerResolver {
     public SolrClient getServer() throws SolrServerException {
         if (server == null) {
             String serverUrl = configurationService.getProperty("oai.solr.url");
-            HttpConnectionPoolService httpConnectionPoolService
-                = DSpaceServicesFactory.getInstance()
-                                       .getServiceManager()
-                                       .getServiceByName("solrHttpConnectionPoolService",
-                                                         HttpConnectionPoolService.class);
             try {
-                server = new HttpSolrClient.Builder(serverUrl)
-                        .withHttpClient(httpConnectionPoolService.getClient())
+                // Note: Cannot use custom HttpClient with Solr 8.x as it requires HttpClient 4
+                // and we've upgraded to HttpClient 5. Solr will manage its own connections.
+                server = new HttpJettySolrClient.Builder(serverUrl)
                         .build();
                 log.debug("OAI Solr Server Initialized");
             } catch (Exception e) {

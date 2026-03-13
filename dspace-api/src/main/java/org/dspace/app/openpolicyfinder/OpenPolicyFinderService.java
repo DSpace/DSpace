@@ -12,17 +12,18 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
@@ -149,10 +150,10 @@ public class OpenPolicyFinderService {
 
                 // Execute the method
                 try (CloseableHttpResponse response = client.execute(method)) {
-                    int statusCode = response.getStatusLine().getStatusCode();
+                    int statusCode = response.getCode();
 
-                    log.debug(response.getStatusLine().getStatusCode() + ": "
-                            + response.getStatusLine().getReasonPhrase());
+                    log.debug(response.getCode() + ": "
+                            + response.getReasonPhrase());
 
                     if (statusCode != HttpStatus.SC_OK) {
                         opfResponse = new OpenPolicyFinderPublisherResponse(
@@ -202,7 +203,7 @@ public class OpenPolicyFinderService {
                 opfResponse = new OpenPolicyFinderPublisherResponse(errorMessage);
             } finally {
                 if (method != null) {
-                    method.releaseConnection();
+                    method.reset();
                 }
             }
         }
@@ -262,10 +263,10 @@ public class OpenPolicyFinderService {
 
                 // Execute the method
                 try (CloseableHttpResponse response = client.execute(method)) {
-                    int statusCode = response.getStatusLine().getStatusCode();
+                    int statusCode = response.getCode();
 
-                    log.debug(response.getStatusLine().getStatusCode() + ": "
-                            + response.getStatusLine().getReasonPhrase());
+                    log.debug(response.getCode() + ": "
+                            + response.getReasonPhrase());
 
                     if (statusCode != HttpStatus.SC_OK) {
                         opfResponse = new OpenPolicyFinderResponse(
@@ -314,7 +315,7 @@ public class OpenPolicyFinderService {
                 opfResponse = new OpenPolicyFinderResponse(errorMessage);
             } finally {
                 if (method != null) {
-                    method.releaseConnection();
+                    method.reset();
                 }
             }
         }
@@ -390,9 +391,9 @@ public class OpenPolicyFinderService {
 
         // Set connection parameters (uses the configured timeout from the openpolicyfinder.timeout property)
         method.setConfig(RequestConfig.custom()
-            .setConnectionRequestTimeout(this.timeout)
-            .setConnectTimeout(this.timeout)
-            .setSocketTimeout(this.timeout)
+            .setConnectionRequestTimeout(timeout, TimeUnit.MILLISECONDS)
+            .setConnectTimeout(timeout, TimeUnit.MILLISECONDS)
+            .setResponseTimeout(timeout, TimeUnit.MILLISECONDS)
             .build());
 
         return method;
