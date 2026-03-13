@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
@@ -56,6 +54,9 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.hateoas.Link;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This is the repository responsible to manage SubscriptionRest object
@@ -200,7 +201,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             }
         } catch (SQLException sqlException) {
             throw new SQLException(sqlException.getMessage(), sqlException);
-        } catch (IOException ioException) {
+        } catch (IOException | JacksonException ioException) {
             throw new UnprocessableEntityException("error parsing the body");
         }
     }
@@ -236,7 +237,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         SubscriptionRest subscriptionRest;
         try {
             subscriptionRest = mapper.readValue(jsonNode.toString(), SubscriptionRest.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new UnprocessableEntityException("Error parsing subscription json: " + e.getMessage(), e);
         }
 

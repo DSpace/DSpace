@@ -11,6 +11,7 @@ import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -57,7 +58,8 @@ public class ResourcePolicyConverter implements DSpaceConverter<ResourcePolicy, 
             model.setEperson(converterService.toRest(obj.getEPerson(), projection));
         }
         if (obj.getdSpaceObject() != null) {
-            model.setResource(converterService.toRest(obj.getdSpaceObject(), projection));
+            model.setResource(converterService.toRest(
+                Hibernate.unproxy(obj.getdSpaceObject()), projection));
         }
         return model;
     }

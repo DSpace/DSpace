@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -42,6 +41,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This is the repository responsible for managing the Bundle Rest object
@@ -144,6 +144,9 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
             }
             bundleService.update(context, bundle);
             context.commit();
+            // Reload bitstream into the new session after commit
+            // (required for Hibernate 7 which closes the session on commit)
+            bitstream = context.reloadEntity(bitstream);
         } catch (AuthorizeException | IOException | SQLException e) {
             String message = "Something went wrong with trying to create the single bitstream for file with filename: "
                     + fileName
