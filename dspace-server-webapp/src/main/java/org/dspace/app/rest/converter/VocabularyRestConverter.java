@@ -11,6 +11,7 @@ import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.ChoiceAuthority;
+import org.dspace.content.authority.LinkableEntityAuthority;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,6 +33,11 @@ public class VocabularyRestConverter implements DSpaceConverter<ChoiceAuthority,
         authorityRest.setHierarchical(authority.isHierarchical());
         authorityRest.setScrollable(authority.isScrollable());
         authorityRest.setPreloadLevel(authority.getPreloadLevel());
+        if (authority instanceof LinkableEntityAuthority) {
+            authorityRest.setEntity(((LinkableEntityAuthority) authority).getLinkedEntityType());
+            authorityRest.setExternalSource(((LinkableEntityAuthority) authority).getExternalSource());
+        }
+
         return authorityRest;
     }
 

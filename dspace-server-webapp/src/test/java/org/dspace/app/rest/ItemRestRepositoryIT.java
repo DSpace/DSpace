@@ -3052,7 +3052,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/items/" + item.getID()))
+        getClient(token).perform(get("/api/core/items/" + item.getID())
+                            .param("projection", "allLanguages"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
                    .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
@@ -3083,7 +3084,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/items/" + item.getID()))
+        getClient(token).perform(get("/api/core/items/" + item.getID())
+                                     .param("projection", "allLanguages"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
             .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
