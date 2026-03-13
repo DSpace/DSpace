@@ -116,6 +116,15 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
     protected HttpMessageConverter jacksonHttpMessageConverter;
 
+    /**
+     * Cached CSRF token cookie, to avoid fetching a new one for every MockMvc request.
+     * The CSRF token is a random UUID validated by stateless string comparison (cookie value == header value),
+     * so the same token can safely be reused across requests within a test instance.
+     * With the default PER_METHOD lifecycle, this cache auto-resets per test.
+     * With PER_CLASS lifecycle, the same token remains valid across all tests in the class.
+     */
+    private Cookie cachedCsrfTokenCookie;
+
     @Autowired
     private WebApplicationContext webApplicationContext;
 
@@ -366,9 +375,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
      */
     public RequestPostProcessor validCsrfToken() {
         return request -> {
-            // Obtain the current CSRF token cookie from the (mock) backend via GET request
-            // TODO: This method may be expensive for ITs as it GETs a new token for every request. We may want to
-            // investigate if caching the CSRF token would work without causing random test failures.
+            // Obtain the current CSRF token cookie from the (mock) backend via GET request (cached per test instance)
             Cookie csrfCookie = getCsrfTokenCookie();
 
             if (csrfCookie != null) {
@@ -401,9 +408,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
      */
     public RequestPostProcessor validCsrfTokenViaParam() {
         return request -> {
-            // Obtain the current CSRF token cookie from the (mock) backend via GET request
-            // TODO: This method may be expensive for ITs as it GETs a new token for every request. We may want to
-            // investigate if caching the CSRF token would work without causing random test failures.
+            // Obtain the current CSRF token cookie from the (mock) backend via GET request (cached per test instance)
             Cookie csrfCookie = getCsrfTokenCookie();
 
             if (csrfCookie != null) {
@@ -495,6 +500,11 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
      * @throws Exception
      */
     public Cookie getCsrfTokenCookie() {
+        // Return cached token if available. The CSRF token is a random UUID validated by stateless
+        // string comparison, so the same token can safely be reused across requests.
+        if (cachedCsrfTokenCookie != null) {
+            return cachedCsrfTokenCookie;
+        }
         try {
             // Set up a non-logging MockMvc builder to obtain the CSRF cookie
             // This call is not logged by default to avoid cluttering logs of ITs, but you can switch this to "true"
@@ -504,8 +514,10 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
             // Perform a GET request to our CSRF endpoint to obtain the current CSRF token
             MvcResult mvcResult = mockMvc.perform(get("/api/security/csrf")).andReturn();
 
-            // Read and return the Cookie which contains the CSRF token for DSpace
-            return mvcResult.getResponse().getCookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            // Read, cache, and return the Cookie which contains the CSRF token for DSpace
+            cachedCsrfTokenCookie = mvcResult.getResponse()
+                .getCookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            return cachedCsrfTokenCookie;
         } catch (Exception e) {
             log.error("Could not obtain the CSRF token cookie for Integration Tests", e);
         }
