@@ -139,9 +139,11 @@ public class SimpleZipContentIngester extends AbstractSwordContentIngester {
             while (zenum.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry) zenum.nextElement();
                 String entryName = entry.getName();
-                java.nio.file.Path entryPath = java.nio.file.Paths.get(entryName).normalize();
-                if (entryPath.isAbsolute() || entryPath.startsWith("..")) {
-                    throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, "Invalid zip entry: " + entryName);
+                // Validate zip entry name to prevent zip-slip attacks
+                if (entryName.contains("..") || entryName.startsWith("/")
+                        || entryName.startsWith("\\")) {
+                    throw new SwordError(UriRegistry.ERROR_BAD_REQUEST,
+                        "Invalid zip entry: " + entryName);
                 }
 
                 InputStream stream = zip.getInputStream(entry);
