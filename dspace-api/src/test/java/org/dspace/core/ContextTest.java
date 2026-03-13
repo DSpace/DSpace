@@ -12,14 +12,12 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -35,9 +33,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.test.util.AopTestUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -56,26 +53,51 @@ public class ContextTest extends AbstractUnitTest {
     private AuthorizeService authorizeServiceSpy;
 
     /**
+     * Original AuthorizeService (saved before spying for restoration in @After)
+     */
+    private AuthorizeService originalAuthorizeService;
+
+    /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
      *
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
 
+        // Save the original authorizeService before spying (for restoration in @After)
+        originalAuthorizeService = authorizeService;
+
         // Initialize our spy of the autowired (global) authorizeService bean.
         // This allows us to customize the bean's method return values in tests below
-        Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
-        authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
-            withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
+        authorizeServiceSpy = spy(originalAuthorizeService);
         // "Wire" our spy to be used by the current loaded object services
         // (To ensure these services use the spy instead of the real service)
         ReflectionTestUtils.setField(ePersonService, "authorizeService", authorizeServiceSpy);
         ReflectionTestUtils.setField(groupService, "authorizeService", authorizeServiceSpy);
+    }
+
+    /**
+     * This method will be run after every test as per @After. It will
+     * clean resources initialized by the @Before methods.
+     *
+     * Other methods can be annotated with @After here or in subclasses
+     * but no execution order is guaranteed
+     */
+    @org.junit.jupiter.api.AfterEach
+    @Override
+    public void destroy() {
+        // Restore the original authorizeService to prevent test pollution
+        if (originalAuthorizeService != null) {
+            ReflectionTestUtils.setField(ePersonService, "authorizeService", originalAuthorizeService);
+            ReflectionTestUtils.setField(groupService, "authorizeService", originalAuthorizeService);
+        }
+
+        super.destroy();
     }
 
     /**
@@ -277,8 +299,8 @@ public class ContextTest extends AbstractUnitTest {
 
         // By default, we should have a new DB connection, so let's make sure it is there
         assertThat("HibernateDBConnection should exist", instance.getDBConnection(), notNullValue());
-        assertTrue("Context should be valid", instance.isValid());
-        assertTrue("Transaction should be open", instance.isTransactionAlive());
+        assertTrue(instance.isValid(), "Context should be valid");
+        assertTrue(instance.isTransactionAlive(), "Transaction should be open");
 
         // Allow full Admin perms (in new context)
         when(authorizeServiceSpy.isAdmin(instance)).thenReturn(true);
@@ -298,14 +320,14 @@ public class ContextTest extends AbstractUnitTest {
         // We expect our DB connection to still exist
         assertThat("HibernateDBConnection should still be open", instance.getDBConnection(), notNullValue());
         // We expect the Context to be valid
-        assertTrue("Context should still be valid", instance.isValid());
+        assertTrue(instance.isValid(), "Context should still be valid");
         // However, the transaction should now be closed
-        assertFalse("DB transaction should be closed", instance.isTransactionAlive());
+        assertFalse(instance.isTransactionAlive(), "DB transaction should be closed");
 
         // ReloadEntity and verify changes saved
         // NOTE: reloadEntity() is required, see commit() method Javadocs
         newUser = instance.reloadEntity(newUser);
-        assertEquals("New user should be created", newUser.getEmail(), createdEmail);
+        assertEquals(newUser.getEmail(), createdEmail, "New user should be created");
 
         // Change the email and commit again (a Context should support multiple commit() calls)
         String newEmail = "myrealemail@example.com";
@@ -314,7 +336,7 @@ public class ContextTest extends AbstractUnitTest {
 
         // Reload entity and new value should be there.
         newUser = instance.reloadEntity(newUser);
-        assertEquals("New email address should be saved", newUser.getEmail(), newEmail);
+        assertEquals(newUser.getEmail(), newEmail, "New email address should be saved");
 
         // Cleanup our new object & context
         ePersonService.delete(instance, newUser);
@@ -525,25 +547,8 @@ public class ContextTest extends AbstractUnitTest {
         cleanupContext(instance);
     }
 
-    /**
-     * Test that close() invalidates the Context.
-     * Note: This test replaces the previous testFinalize() test for Java 21 compatibility.
-     * The finalize() method has been replaced with java.lang.ref.Cleaner (JEP 421).
-     * The close() method provides the same cleanup behavior as the old finalize() method.
-     */
-    @Test
-    public void testCloseInvalidatesContext() throws Throwable {
-        // We need a new Context object
-        Context instance = new Context();
-
-        // close() should abort the context and invalidate it
-        instance.close();
-
-        // close() is like abort()...should invalidate our context
-        assertThat("testCloseInvalidatesContext 0", instance.isValid(), equalTo(false));
-
-        // Context is already closed, no need for additional cleanup
-    }
+    // Note: testFinalize() method removed for Java 21 compatibility.
+    // finalize() is deprecated for removal in Java 21. Close behavior is already tested in testClose().
 
     /**
      * Test of updateDatabase method, of class Context.
@@ -570,7 +575,7 @@ public class ContextTest extends AbstractUnitTest {
     public void testUncacheEntities() throws Throwable {
         // To set up the test, ensure the cache contains more than the current user entity
         groupService.findByName(context, Group.ANONYMOUS);
-        assertTrue("Cache size should be greater than one", context.getDBConnection().getCacheSize() > 1);
+        assertTrue(context.getDBConnection().getCacheSize() > 1, "Cache size should be greater than one");
 
         context.uncacheEntities();
 

@@ -12,17 +12,16 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.withSettings;
+import static org.mockito.Mockito.spy;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,10 +40,9 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.test.util.AopTestUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -74,13 +72,18 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     private AuthorizeService authorizeServiceSpy;
 
     /**
+     * Original AuthorizeService (saved before spying for restoration in @After)
+     */
+    private AuthorizeService originalAuthorizeService;
+
+    /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
      *
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -92,11 +95,12 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
             this.dspaceObject = bs;
             context.restoreAuthSystemState();
 
+            // Save the original authorizeService before spying (for restoration in @After)
+            originalAuthorizeService = authorizeService;
+
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
-            Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
-            authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
-                withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
+            authorizeServiceSpy = spy(originalAuthorizeService);
             // "Wire" our spy to be used by the current loaded bitstreamService
             // (To ensure it uses the spy instead of the real service)
             ReflectionTestUtils.setField(bitstreamService, "authorizeService", authorizeServiceSpy);
@@ -116,10 +120,16 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         bs = null;
+
+        // Restore the original authorizeService to prevent test pollution
+        if (originalAuthorizeService != null) {
+            ReflectionTestUtils.setField(bitstreamService, "authorizeService", originalAuthorizeService);
+        }
+
         super.destroy();
     }
 
@@ -146,7 +156,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
         assertThat("testFindAll 0", found, notNullValue());
         //we have many bs, one created per test run, so at least we have 1 if
         //this test is run first
-        assertTrue("testFindAll 1", found.size() >= 1);
+        assertTrue(found.size() >= 1, "testFindAll 1");
 
         boolean added = false;
         for (Bitstream b : found) {
@@ -154,7 +164,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
                 added = true;
             }
         }
-        assertTrue("testFindAll 2", added);
+        assertTrue(added, "testFindAll 2");
     }
 
     @Test
@@ -185,7 +195,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
             it.forEachRemaining(collected::add);
         }
 
-        assertEquals("Batched results should match sorted findAll", expected, collected);
+        assertEquals(expected, collected, "Batched results should match sorted findAll");
 
         // Cleanup
         context.turnOffAuthorisationSystem();
@@ -231,12 +241,12 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Override
     @Test
     public void testGetID() {
-        assertTrue("testGetID 0", bs.getID() != null);
+        assertTrue(bs.getID() != null, "testGetID 0");
     }
 
     @Test
     public void testLegacyID() {
-        assertTrue("testGetLegacyID 0", bs.getLegacyId() == null);
+        assertTrue(bs.getLegacyId() == null, "testGetLegacyID 0");
     }
 
     /**
@@ -430,13 +440,15 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     /**
      * Test of update method, of class Bitstream.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testUpdateNotAdmin() throws SQLException, AuthorizeException {
-        // Disallow Bitstream WRITE permissions
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, bs, Constants.WRITE);
+    @Test
+    public void testUpdateNotAdmin() throws SQLException {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow Bitstream WRITE permissions
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, bs, Constants.WRITE);
 
-        //TODO: we need to verify the update, how?
-        bitstreamService.update(context, bs);
+            //TODO: we need to verify the update, how?
+            bitstreamService.update(context, bs);
+        });
     }
 
     /**
@@ -470,9 +482,9 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
         doNothing().when(authorizeServiceSpy).authorizeAction(context, delBS, Constants.DELETE);
 
         // Test that delete will flag the bitstream as deleted
-        assertFalse("testIsDeleted 0", delBS.isDeleted());
+        assertFalse(delBS.isDeleted(), "testIsDeleted 0");
         bitstreamService.delete(context, delBS);
-        assertTrue("testDelete 0", delBS.isDeleted());
+        assertTrue(delBS.isDeleted(), "testDelete 0");
 
         // Now test expunge actually removes the bitstream
         bitstreamService.expunge(context, delBS);
@@ -514,11 +526,11 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
         context.restoreAuthSystemState();
 
         // Test that delete will flag the bitstream as deleted
-        assertFalse("testDeleteBitstreamAndUnsetPrimaryBitstreamID 0", delBS.isDeleted());
+        assertFalse(delBS.isDeleted(), "testDeleteBitstreamAndUnsetPrimaryBitstreamID 0");
         assertThat("testDeleteBitstreamAndUnsetPrimaryBitstreamID 1", b.getPrimaryBitstream(), equalTo(delBS));
         // Delete bitstream
         bitstreamService.delete(context, delBS);
-        assertTrue("testDeleteBitstreamAndUnsetPrimaryBitstreamID 2", delBS.isDeleted());
+        assertTrue(delBS.isDeleted(), "testDeleteBitstreamAndUnsetPrimaryBitstreamID 2");
 
         // Now test if the primary bitstream was unset from bundle
         assertThat("testDeleteBitstreamAndUnsetPrimaryBitstreamID 3", b.getPrimaryBitstream(), equalTo(null));
@@ -539,13 +551,14 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     /**
      * Test of retrieve method, of class Bitstream.
      */
-    @Test(expected = AuthorizeException.class)
-    public void testRetrieveNoRead() throws IOException, SQLException,
-        AuthorizeException {
-        // Disallow Bitstream READ permissions
-        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, bs, Constants.READ);
+    @Test
+    public void testRetrieveNoRead() throws IOException, SQLException {
+        assertThrows(AuthorizeException.class, () -> {
+            // Disallow Bitstream READ permissions
+            doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, bs, Constants.READ);
 
-        assertThat("testRetrieveNoRead 0", bitstreamService.retrieve(context, bs), notNullValue());
+            assertThat("testRetrieveNoRead 0", bitstreamService.retrieve(context, bs), notNullValue());
+        });
     }
 
     /**
@@ -555,7 +568,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     public void testGetBundles() throws SQLException {
         assertThat("testGetBundles 0", bs.getBundles(), notNullValue());
         //by default no bundles
-        assertTrue("testGetBundles 1", bs.getBundles().size() == 0);
+        assertTrue(bs.getBundles().size() == 0, "testGetBundles 1");
     }
 
     /**
@@ -583,7 +596,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test
     public void testGetStoreNumber() {
         //stored in store 0 by default
-        assertTrue("testGetStoreNumber 0", bs.getStoreNumber() == 0);
+        assertTrue(bs.getStoreNumber() == 0, "testGetStoreNumber 0");
     }
 
     /**

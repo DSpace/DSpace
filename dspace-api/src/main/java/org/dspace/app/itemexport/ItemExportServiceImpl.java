@@ -150,6 +150,9 @@ public class ItemExportServiceImpl implements ItemExportService {
             logInfo("Exporting item to " + mySequenceNumber);
             Item item = i.next();
             exportItem(c, item, fullPath, mySequenceNumber, migrate, excludeBitstreams);
+            // Flush before uncaching to ensure all operations complete while entity is attached
+            // (Required for Hibernate 7 which is stricter about detached entity references)
+            c.flush();
             c.uncacheEntity(item);
             mySequenceNumber++;
         }
