@@ -28,6 +28,7 @@ import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.app.util.TypeBindUtils;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.RelationshipMetadataService;
@@ -76,8 +77,7 @@ public class DescribeStep extends AbstractProcessingStep {
 
     private void readField(InProgressSubmission obj, SubmissionStepConfig config, DataDescribe data,
                            DCInputSet inputConfig) throws DCInputsReaderException {
-        List<MetadataValue> documentTypes = itemService.getMetadataByMetadataString(obj.getItem(),
-                configurationService.getProperty("submit.type-bind.field", "dc.type"));
+        List<MetadataValue> documentTypes = TypeBindUtils.getTypeBindMetadataValues(obj);
 
         // Get list of all field names (including qualdrop names) allowed for this dc.type
         List<String> allowedFieldNames =

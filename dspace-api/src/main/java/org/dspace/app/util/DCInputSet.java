@@ -282,44 +282,9 @@ public class DCInputSet {
      * <p>Special handling for qualdrop_value fields: Both the base field name and all qualified variations
      * (field name + qualifier) are added to the list to ensure proper validation.</p>
      *
-     * @param documentTypeValue the document type to check against, for example "Article" or "Book"
+     * @param documentTypeValues the document types to check against, for example "Article, Book"
      * @return a list of field names that are allowed for the specified document type
      */
-    public List<String> populateAllowedFieldNames(String documentTypeValue) {
-        List<String> allowedFieldNames = new ArrayList<>();
-        // Before iterating each input for validation, run through all inputs + fields and populate a lookup
-        // map with inputs for this type. Because an input can be configured repeatedly in a form (for example
-        // it could be required for type Book, and allowed but not required for type Article), allowed=true will
-        // always take precedence
-        for (DCInput[] row : inputs) {
-            for (DCInput input : row) {
-                if (input.isQualdropValue()) {
-                    List<Object> inputPairs = input.getPairs();
-                    //starting from the second element of the list and skipping one every time because the display
-                    // values are also in the list and before the stored values.
-                    for (int i = 1; i < inputPairs.size(); i += 2) {
-                        String fullFieldname = input.getFieldName() + "." + inputPairs.get(i);
-                        if (input.isAllowedFor(documentTypeValue)) {
-                            if (!allowedFieldNames.contains(fullFieldname)) {
-                                allowedFieldNames.add(fullFieldname);
-                            }
-                            // For the purposes of qualdrop, we have to add the field name without the qualifier
-                            // too, or a required qualdrop will get confused and incorrectly reject a value
-                            if (!allowedFieldNames.contains(input.getFieldName())) {
-                                allowedFieldNames.add(input.getFieldName());
-                            }
-                        }
-                    }
-                } else {
-                    if (input.isAllowedFor(documentTypeValue) && !allowedFieldNames.contains(input.getFieldName())) {
-                        allowedFieldNames.add(input.getFieldName());
-                    }
-                }
-            }
-        }
-        return allowedFieldNames;
-    }
-
     public List<String> populateAllowedFieldNames(List<String> documentTypeValues) {
         List<String> allowedFieldNames = new ArrayList<>();
         // Before iterating each input for validation, run through all inputs + fields and populate a lookup

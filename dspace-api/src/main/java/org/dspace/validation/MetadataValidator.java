@@ -80,10 +80,11 @@ public class MetadataValidator implements SubmissionStepValidator {
         List<ValidationError> errors = new ArrayList<>();
 
         DCInputSet inputConfig = getDCInputSet(config);
-        String documentType = TypeBindUtils.getTypeBindValue(obj);
+        List<MetadataValue> documentTypes = TypeBindUtils.getTypeBindMetadataValues(obj);
 
         // Get list of all field names (including qualdrop names) allowed for this dc.type
-        List<String> allowedFieldNames = inputConfig.populateAllowedFieldNames(documentType);
+        List<String> allowedFieldNames =
+            inputConfig.populateAllowedFieldNames(documentTypes.stream().map(MetadataValue::getValue).toList());
 
         for (DCInput[] row : inputConfig.getFields()) {
             for (DCInput input : row) {
@@ -103,8 +104,10 @@ public class MetadataValidator implements SubmissionStepValidator {
 
                         // Check the lookup list. If no other inputs of the same field name allow this type,
                         // then remove. This includes field name without qualifier.
-                        if (!input.isAllowedFor(documentType) && (!allowedFieldNames.contains(fullFieldname)
-                            && !allowedFieldNames.contains(input.getFieldName()))) {
+                        if (((documentTypes.isEmpty() && !input.isAllowedFor("")) ||
+                            documentTypes.stream().noneMatch(dt -> input.isAllowedFor(dt.getValue()))) &&
+                            (!allowedFieldNames.contains(fullFieldname) &&
+                                !allowedFieldNames.contains(input.getFieldName()))) {
                             removeMetadataValues(context, obj.getItem(), mdv);
                         } else {
                             validateMetadataValues(obj.getCollection(), mdv, input, config, isAuthorityControlled,
@@ -132,19 +135,20 @@ public class MetadataValidator implements SubmissionStepValidator {
                 for (String fieldName : fieldsName) {
                     boolean valuesRemoved = false;
                     List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fieldName);
-                    if (!input.isAllowedFor(documentType)) {
+                    if ((documentTypes.isEmpty() && !input.isAllowedFor("")) ||
+                        documentTypes.stream().noneMatch(dt -> input.isAllowedFor(dt.getValue()))) {
                         // Check the lookup list. If no other inputs of the same field name allow this type,
                         // then remove. Otherwise, do not
                         if (!(allowedFieldNames.contains(fieldName))) {
                             removeMetadataValues(context, obj.getItem(), mdv);
                             valuesRemoved = true;
-                            log.debug("Stripping metadata values for " + input.getFieldName() + " on type "
-                                          + documentType + " as it is allowed by another input of the same field " +
-                                          "name");
+                            log.debug("Stripping metadata values for " + input.getFieldName() + " on type " +
+                                          documentTypes.stream().map(MetadataValue::getValue).toList() + " as it is" +
+                                          " allowed by another input of the same field name");
                         } else {
                             log.debug("Not removing unallowed metadata values for " + input.getFieldName() + " on type "
-                                          + documentType + " as it is allowed by another input of the same field " +
-                                          "name");
+                                          + documentTypes.stream().map(MetadataValue::getValue).toList() + " as it is" +
+                                          " allowed by another input of the same field name");
                         }
                     }
                     validateMetadataValues(obj.getCollection(), mdv, input, config,
@@ -155,7 +159,8 @@ public class MetadataValidator implements SubmissionStepValidator {
                         && !valuesRemoved) {
                         // Is the input required for *this* type? In other words, are we looking at a required
                         // input that is also allowed for this document type
-                        if (input.isAllowedFor(documentType)) {
+                        if ((documentTypes.isEmpty() && input.isAllowedFor("")) ||
+                            documentTypes.stream().anyMatch(dt -> input.isAllowedFor(dt.getValue()))) {
                             // since this field is missing add to list of error
                             // fields
                             addError(errors, ERROR_VALIDATION_REQUIRED,
