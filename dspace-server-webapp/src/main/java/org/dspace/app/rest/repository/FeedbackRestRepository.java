@@ -9,7 +9,6 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +27,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This is the Repository that takes care of the operations on the {@link FeedbackRest} objects
@@ -71,7 +72,7 @@ public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, I
 
         try {
             feedbackRest = mapper.readValue(req.getInputStream(), FeedbackRest.class);
-        } catch (IOException exIO) {
+        } catch (IOException | JacksonException exIO) {
             throw new UnprocessableEntityException("error parsing the body " + exIO.getMessage(), exIO);
         }
 

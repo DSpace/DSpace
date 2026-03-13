@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
@@ -48,6 +47,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Controller for exposition of default access condition
@@ -258,7 +259,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
         try {
             resourcePolicyRest = mapper.readValue(req.getInputStream(), ResourcePolicyRest.class);
-        } catch (IOException exIO) {
+        } catch (IOException | JacksonException exIO) {
             throw new UnprocessableEntityException("error parsing the body " + exIO.getMessage(), exIO);
         }
 

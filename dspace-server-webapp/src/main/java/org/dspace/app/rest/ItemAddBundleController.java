@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.converter.ConverterService;
@@ -39,9 +38,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Controller to add bundles to a certain item, indicated by a uuid in the request
@@ -88,7 +89,7 @@ public class ItemAddBundleController {
      *
      * @return The created BundleResource
      */
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'ADD')")
     public ResponseEntity<RepresentationModel<?>> addBundleToItem(@PathVariable UUID uuid,
                                                                   HttpServletRequest request,
@@ -105,7 +106,7 @@ public class ItemAddBundleController {
         BundleRest bundleRest;
         try {
             bundleRest = mapper.readValue(request.getInputStream(), BundleRest.class);
-        } catch (IOException excIO) {
+        } catch (IOException | JacksonException excIO) {
             throw new UnprocessableEntityException("Could not parse request body");
         }
 
