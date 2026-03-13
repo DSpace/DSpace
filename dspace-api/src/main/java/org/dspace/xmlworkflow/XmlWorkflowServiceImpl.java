@@ -51,6 +51,7 @@ import org.dspace.curate.service.XmlWorkflowCuratorService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
@@ -242,7 +243,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 // remove the WorkspaceItem
                 workspaceItemService.deleteWrapper(context, wsi);
                 context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wfi.getItem().getID(), null,
-                    itemService.getIdentifiers(context, wfi.getItem())));
+                    DetailType.INFO, itemService.getIdentifiers(context, wfi.getItem())));
 
             }
             context.restoreAuthSystemState();
@@ -414,7 +415,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                     throw new WorkflowException("Unprocessable request for the action " + currentStep.getId());
                 }
                 c.addEvent(new Event(Event.MODIFY, Constants.ITEM, wi.getItem().getID(), null,
-                        itemService.getIdentifiers(c, wi.getItem())));
+                        DetailType.INFO, itemService.getIdentifiers(c, wi.getItem())));
                 return processOutcome(c, user, workflow, currentStep, currentActionConfig, outcome, wi, false);
             } else {
                 throw new AuthorizeException("You are not allowed to to perform this task.");
@@ -813,7 +814,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             claimedTaskService.delete(c, task);
         }
         c.addEvent(new Event(Event.MODIFY, Constants.ITEM, wi.getItem().getID(), null,
-                itemService.getIdentifiers(c, wi.getItem())));
+                DetailType.INFO, itemService.getIdentifiers(c, wi.getItem())));
     }
 
     @Override
@@ -1099,7 +1100,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             + e.getID()));
 
         c.addEvent(new Event(Event.MODIFY, Constants.ITEM, wsi.getItem().getID(), null,
-                itemService.getIdentifiers(c, wsi.getItem())));
+                DetailType.INFO, itemService.getIdentifiers(c, wsi.getItem())));
 
         c.restoreAuthSystemState();
         return wsi;

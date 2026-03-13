@@ -120,7 +120,8 @@ public class IndexEventConsumer implements Consumer {
                     if (st == Constants.SITE || st == Constants.LDN_MESSAGE) {
                         // Update the indexable objects of type in event.detail of objects with ids in event.identifiers
                         for (String id : event.getIdentifiers()) {
-                            EventDetail detail = event.getDetail();
+                            EventDetail detail = event.getDetailList().isEmpty()
+                                ? null : event.getDetailList().get(0);
                             if (!detail.getDetailType().equals(DetailType.DSO_TYPE)) {
                                 break;
                             }

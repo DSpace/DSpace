@@ -8,6 +8,7 @@
 package org.dspace.sword;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.sql.SQLException;
 
@@ -122,10 +123,10 @@ public class CollectionLocation {
             }
 
             try {
-                URL url = new URL(dspaceUrl);
+                URL url = URI.create(dspaceUrl).toURL();
                 depositUrl = new URL(url.getProtocol(), url.getHost(),
                                      url.getPort(), "/sword/deposit").toString();
-            } catch (MalformedURLException e) {
+            } catch (MalformedURLException | IllegalArgumentException e) {
                 throw new DSpaceSWORDException(
                     "Unable to construct deposit urls, due to invalid dspace.server.url " +
                         e.getMessage(), e);

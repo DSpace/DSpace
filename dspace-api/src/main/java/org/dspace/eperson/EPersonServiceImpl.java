@@ -335,7 +335,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                 + e.getID()));
 
         context.addEvent(new Event(Event.CREATE, Constants.EPERSON, e.getID(),
-                null, getIdentifiers(context, e)));
+                null, DetailType.INFO, getIdentifiers(context, e)));
 
         return e;
     }
@@ -461,6 +461,9 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                     } else if (Strings.CS.equals(tableName, "resourcepolicy")) {
                         // we delete the EPerson, it won't need any rights anymore.
                         authorizeService.removeAllEPersonPolicies(context, ePerson);
+                        // Flush to ensure ResourcePolicy deletions are executed before EPerson deletion
+                        // (Required for Hibernate 7 which may not auto-flush in correct FK order)
+                        context.flush();
                     } else if (Strings.CS.equals(tableName, "cwf_pooltask")) {
                         PoolTaskService poolTaskService = XmlWorkflowServiceFactory.getInstance().getPoolTaskService();
                         poolTaskService.deleteByEperson(context, ePerson);
@@ -599,7 +602,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         // Check authorisation - if you're not the eperson
         // see if the authorization system says you can
         if (!context.ignoreAuthorization()
-                && ((context.getCurrentUser() == null) || (ePerson.getID() != context
+                && ((context.getCurrentUser() == null) || !ePerson.getID().equals(context
                 .getCurrentUser().getID()))) {
             authorizeService.authorizeAction(context, ePerson, Constants.WRITE);
         }
@@ -613,7 +616,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
         if (ePerson.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.EPERSON,
-                    ePerson.getID(), null, getIdentifiers(context, ePerson)));
+                    ePerson.getID(), null, DetailType.INFO, getIdentifiers(context, ePerson)));
             ePerson.clearModified();
         }
         if (ePerson.isMetadataModified()) {

@@ -14,6 +14,7 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.net.InetAddress;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -33,12 +34,12 @@ import com.maxmind.geoip2.model.CityResponse;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -76,7 +77,7 @@ public class StatisticsImporter {
     /**
      * Solr server connection
      */
-    private static HttpSolrClient solr;
+    private static HttpJettySolrClient solr;
 
     /**
      * GEOIP lookup service
@@ -408,8 +409,12 @@ public class StatisticsImporter {
      */
     private static void printHelp(Options options, int exitCode) {
         // print the help message
-        HelpFormatter myhelp = new HelpFormatter();
-        myhelp.printHelp("StatisticsImporter\n", options);
+        HelpFormatter myhelp = HelpFormatter.builder().get();
+        try {
+            myhelp.printHelp("StatisticsImporter", null, options, null, false);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         System.exit(exitCode);
     }
 
@@ -463,7 +468,7 @@ public class StatisticsImporter {
         if (verbose) {
             System.out.println("Writing to solr server at: " + sserver);
         }
-        solr = new HttpSolrClient.Builder(sserver).build();
+        solr = new HttpJettySolrClient.Builder(sserver).build();
 
         String dbPath = configurationService.getProperty("usage-statistics.dbfile");
         try {

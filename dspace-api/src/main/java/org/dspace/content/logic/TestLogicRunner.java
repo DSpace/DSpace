@@ -7,16 +7,18 @@
  */
 package org.dspace.content.logic;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -60,9 +62,9 @@ public class TestLogicRunner {
         options.addOption("a","all", false, "Run filter over all items");
 
         // initialize parser
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine line = null;
-        HelpFormatter helpformater = new HelpFormatter();
+        HelpFormatter helpformater = HelpFormatter.builder().get();
 
         try {
             line = parser.parse(options, argv);
@@ -72,7 +74,12 @@ public class TestLogicRunner {
         }
 
         if (line.hasOption("help")) {
-            helpformater.printHelp("\nTest the DSpace logical item filters\n", options);
+            try {
+                helpformater.printHelp("Test the DSpace logical item filters",
+                                       null, options, null, false);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
             System.exit(0);
         }
 
@@ -133,7 +140,12 @@ public class TestLogicRunner {
                     System.out.println("Error encountered processing items: " + e.getMessage());
                 }
             } else {
-                helpformater.printHelp("\nTest the DSpace logical item filters\n", options);
+                try {
+                    helpformater.printHelp("Test the DSpace logical item filters",
+                                           null, options, null, false);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
             }
         }
 
