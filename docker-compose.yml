@@ -22,18 +22,18 @@ services:
       # dspace__P__ui__P__url: http://localhost:4000
       # Set SSR URL to the Docker container name so that UI can contact container directly in Production mode.
       # (This is necessary for docker-compose-angular.yml as it uses production mode by default)
-      dspace__P__server__P__ssr__P__url: http://dspace:8080/server
-      dspace__P__name: 'DSpace Started with Docker Compose'
+      dspace__P__server__P__ssr__P__url: ${dspace__P__server__P__ssr__P__url:-http://dspace:8080/server}
+      dspace__P__name: ${dspace__P__name:-DSpace Started with Docker Compose}
       # db.url: Ensure we are using the 'dspacedb' image for our database
-      db__P__url: 'jdbc:postgresql://dspacedb:5432/dspace'
+      db__P__url: ${db__P__url:-jdbc:postgresql://dspacedb:5432/dspace}
       # solr.server: Ensure we are using the 'dspacesolr' image for Solr
-      solr__P__server: http://dspacesolr:8983/solr
+      solr__P__server: ${solr__P__server:-http://dspacesolr:8983/solr}
       # matomo.tracker.url: Ensure we are using the 'matomo' image for Matomo
-      matomo__P__tracker__P__url: http://matomo
+      matomo__P__tracker__P__url: ${matomo__P__tracker__P__url:-http://matomo}
       # proxies.trusted.ipranges: This setting is required for a REST API running in Docker to trust requests
       # from the host machine. This IP range MUST correspond to the 'dspacenet' subnet defined above.
-      proxies__P__trusted__P__ipranges: '172.23.0'
-      LOGGING_CONFIG: /dspace/config/log4j2-container.xml
+      proxies__P__trusted__P__ipranges: ${proxies__P__trusted__P__ipranges:-172.23.0}
+      LOGGING_CONFIG: ${LOGGING_CONFIG:-/dspace/config/log4j2-container.xml}
     image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-9_x-test}"
     build:
       context: .

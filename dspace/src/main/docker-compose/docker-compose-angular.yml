@@ -18,16 +18,17 @@ services:
     depends_on:
     - dspace
     environment:
-      DSPACE_UI_SSL: 'false'
-      DSPACE_UI_HOST: dspace-angular
-      DSPACE_UI_PORT: '4000'
-      DSPACE_UI_NAMESPACE: /
-      DSPACE_REST_SSL: 'false'
-      DSPACE_REST_HOST: localhost
-      DSPACE_REST_PORT: 8080
-      DSPACE_REST_NAMESPACE: /server
+      DSPACE_UI_SSL: ${DSPACE_UI_SSL:-false}
+      DSPACE_UI_HOST: ${DSPACE_UI_HOST:-dspace-angular}
+      DSPACE_UI_PORT: ${DSPACE_UI_PORT:-4000}
+      DSPACE_UI_NAMESPACE: ${DSPACE_UI_NAMESPACE:-/}
+      DSPACE_UI_BASEURL: ${DSPACE_UI_BASEURL:-http://localhost:4000}
+      DSPACE_REST_SSL: ${DSPACE_REST_SSL:-false}
+      DSPACE_REST_HOST: ${DSPACE_REST_HOST:-localhost}
+      DSPACE_REST_PORT: ${DSPACE_REST_PORT:-8080}
+      DSPACE_REST_NAMESPACE: ${DSPACE_REST_NAMESPACE:-/server}
       # Ensure SSR can use the 'dspace' Docker image directly (see docker-compose-rest.yml)
-      DSPACE_REST_SSRBASEURL: http://dspace:8080/server
+      DSPACE_REST_SSRBASEURL: ${DSPACE_REST_SSRBASEURL:-http://dspace:8080/server}
     image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-angular:${DSPACE_VER:-dspace-9_x-dist}"
     ports:
     - published: 4000
