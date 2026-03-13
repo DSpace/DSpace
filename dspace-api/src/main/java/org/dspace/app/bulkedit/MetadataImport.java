@@ -43,8 +43,6 @@ import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
-import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.EntityService;
@@ -166,9 +164,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                                                                    .getAuthorityValueService();
     protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
-    protected MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory
-        .getInstance()
-        .getMetadataAuthorityService();
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -989,7 +984,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 // Look for it in the actual list of Collections
                 boolean found = false;
                 for (Collection collection : actualCollections) {
-                    if (collection.getID() != item.getOwningCollection().getID()) {
+                    if (!collection.getID().equals(item.getOwningCollection().getID())) {
                         // Is it there?
                         if (csvcollection.equals(collection.getHandle())) {
                             found = true;
@@ -1143,18 +1138,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         dcv.setElement(element);
         dcv.setQualifier(qualifier);
         dcv.setLanguage(language);
-
-        final StringBuilder builder = new StringBuilder();
-        builder.append(schema).append("_").append(element);
-
-        if (StringUtils.isNotEmpty(qualifier)) {
-            builder.append("_").append(qualifier);
-        }
-
-        boolean isAuthorityControlled = metadataAuthorityService.isAuthorityAllowed(builder.toString(),
-                Constants.ITEM, null);
-
-        if (fromAuthority != null && isAuthorityControlled) {
+        if (fromAuthority != null) {
             if (value.indexOf(':') > 0) {
                 value = value.substring(0, value.indexOf(':'));
             }

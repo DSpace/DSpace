@@ -123,8 +123,8 @@ public class ItemUtils {
                 // Bitstream = primary bitstream in bundle -> true
                 // No primary bitstream found in bundle-> only the first one gets flagged as "primary"
                 if (b.getName() != null && b.getName().equals("ORIGINAL") && (b.getPrimaryBitstream() != null
-                        && b.getPrimaryBitstream().getID() == bit.getID()
-                        || b.getPrimaryBitstream() == null && bit.getID() == bits.get(0).getID())) {
+                        && b.getPrimaryBitstream().getID().equals(bit.getID())
+                        || b.getPrimaryBitstream() == null && bit.getID().equals(bits.get(0).getID()))) {
                     primary = true;
                 }
 
