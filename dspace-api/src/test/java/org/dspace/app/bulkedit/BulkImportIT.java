@@ -83,7 +83,6 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.Context;
 import org.dspace.core.CrisConstants;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
@@ -236,7 +235,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         List<String> errorMessages = handler.getErrorMessages();
         assertThat("Expected 1 error message", errorMessages, hasSize(1));
-        assertThat(errorMessages.get(0), containsString("Wrong ID header on sheet Main Entity: RID::123456789"));
+        assertThat(errorMessages.get(0), containsString("Wrong 'ID' header on sheet 'Main Entity': RID::123456789"));
     }
 
     @Test
@@ -333,7 +332,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         List<String> errorMessages = handler.getErrorMessages();
         assertThat("Expected 1 error message", errorMessages, hasSize(1));
-        assertThat(errorMessages.get(0), containsString("Sheet Main Entity - Duplicated headers found "
+        assertThat(errorMessages.get(0), containsString("Sheet 'Main Entity' - Duplicated headers found "
             + "on cells 3 and 4"));
     }
 
@@ -708,7 +707,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         List<String> errorMessages = handler.getErrorMessages();
         assertThat("Expected 1 error message", errorMessages, hasSize(1));
-        assertThat(errorMessages.get(0), containsString("Sheet dc.contributor.author - Row 2 - Invalid metadata "
+        assertThat(errorMessages.get(0), containsString("Sheet 'dc.contributor.author' - Row 2 - Invalid metadata "
             + "value Author1$$authority1$$xxx: invalid security level or confidence value xxx"));
 
         List<String> warningMessages = handler.getWarningMessages();
@@ -754,7 +753,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         List<String> errorMessages = handler.getErrorMessages();
         assertThat("Expected 1 error message", errorMessages, hasSize(1));
-        assertThat(errorMessages.get(0), containsString("Sheet dc.contributor.author - Row 2 - Invalid metadata "
+        assertThat(errorMessages.get(0), containsString("Sheet 'dc.contributor.author' - Row 2 - Invalid metadata "
             + "value Author1$$authority1$$xxx: invalid security level or confidence value xxx"));
 
         assertThat("Expected no warnings", handler.getWarningMessages(), empty());
@@ -1469,7 +1468,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             is("Start reading all the bitstream rows"),
             is("Found 1 bitstreams to process"),
             is("Found 1 items to process"),
-            containsString("Sheet bitstream-metadata - Row 2 - Bitstream created successfully")));
+            containsString("Sheet 'bitstream-metadata' - Row 2 - Bitstream created successfully")));
 
         Item item = getItemFromMessage(handler.getWarningMessages().get(0));
 
@@ -1525,10 +1524,10 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             is("Start reading all the bitstream rows"),
             is("Found 4 bitstreams to process"),
             is("Found 2 items to process"),
-            containsString("Sheet bitstream-metadata - Row 2 - Bitstream created successfully"),
-            containsString("Sheet bitstream-metadata - Row 3 - Bitstream created successfully"),
-            containsString("Sheet bitstream-metadata - Row 4 - Bitstream created successfully"),
-            containsString("Sheet bitstream-metadata - Row 5 - Bitstream created successfully")));
+            containsString("Sheet 'bitstream-metadata' - Row 2 - Bitstream created successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 3 - Bitstream created successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 4 - Bitstream created successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 5 - Bitstream created successfully")));
 
         Item item = getItemFromMessage(handler.getWarningMessages().get(0));
         Item item2 = getItemFromMessage(handler.getWarningMessages().get(1));
@@ -1584,7 +1583,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             is("Start reading all the bitstream rows"),
             is("Found 3 bitstreams to process"),
             is("Found 2 items to process"),
-            containsString("Sheet bitstream-metadata - Row 4 - Bitstream created successfully")));
+            containsString("Sheet 'bitstream-metadata' - Row 4 - Bitstream created successfully")));
 
         Item item = getItemFromMessage(handler.getWarningMessages().get(0));
         Item item2 = getItemFromMessage(handler.getWarningMessages().get(1));
@@ -1692,7 +1691,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
                     is("Start reading all the bitstream rows"),
                     is("Found 1 bitstreams to process"),
                     is("Found 2 items to process"),
-                    containsString("Sheet bitstream-metadata - Row 2 - Bitstream created successfully")));
+                    containsString("Sheet 'bitstream-metadata' - Row 2 - Bitstream created successfully")));
 
             Item item = getItemFromMessage(handler.getWarningMessages().get(0));
 
@@ -1751,7 +1750,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             is("Start reading all the bitstream rows"),
             is("Found 1 bitstreams to process"),
             is("Found 2 items to process"),
-            containsString("Sheet bitstream-metadata - Row 2 - Bitstream created successfully")));
+            containsString("Sheet 'bitstream-metadata' - Row 2 - Bitstream created successfully")));
 
         Item item = getItemFromMessage(handler.getWarningMessages().get(0));
 
@@ -1790,8 +1789,8 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
                 is("Start reading all the bitstream rows"),
                 is("Found 2 bitstreams to process"),
                 is("Found 2 items to process"),
-                containsString("Sheet bitstream-metadata - Row 2 - Bitstream created successfully"),
-                containsString("Sheet bitstream-metadata - Row 3 - Bitstream created successfully")));
+                containsString("Sheet 'bitstream-metadata' - Row 2 - Bitstream created successfully"),
+                containsString("Sheet 'bitstream-metadata' - Row 3 - Bitstream created successfully")));
 
         Item item = getItemFromMessage(handler.getWarningMessages().get(0));
         Item item2 = getItemFromMessage(handler.getWarningMessages().get(1));
@@ -1883,7 +1882,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             is("Start reading all the bitstream rows"),
             is("Found 1 bitstreams to process"),
             is("Found 1 items to process"),
-            containsString("Sheet bitstream-metadata - Row 2 - Bitstream created successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 2 - Bitstream created successfully"),
             containsString("Row 2 - Item updated successfully")));
 
         assertThat(getItemBitstreamsByBundle(publicationItem, "TEST-BUNDLE"), contains(
@@ -1930,9 +1929,9 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             is("Start reading all the bitstream rows"),
             is("Found 2 bitstreams to process"),
             is("Found 2 items to process"),
-            containsString("Sheet bitstream-metadata - Row 2 - Bitstream created successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 2 - Bitstream created successfully"),
             containsString("Row 2 - Item updated successfully"),
-            containsString("Sheet bitstream-metadata - Row 3 - Bitstream created successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 3 - Bitstream created successfully"),
             containsString("Row 3 - Item updated successfully")));
 
         assertThat(getItemBitstreamsByBundle(publicationItem, "ORIGINAL"), contains(
@@ -1979,7 +1978,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             is("Start reading all the bitstream rows"),
             is("Found 1 bitstreams to process"),
             is("Found 1 items to process"),
-            containsString("Sheet bitstream-metadata - Row 2 - Bitstream created successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 2 - Bitstream created successfully"),
             containsString("Row 2 - Item updated successfully")));
 
         // Assert that no new bundle was created from script
@@ -2017,7 +2016,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             is("Start reading all the bitstream rows"),
             is("Found 1 bitstreams to process"),
             is("Found 1 items to process"),
-            containsString("Sheet bitstream-metadata - Row 2 - Bitstream created successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 2 - Bitstream created successfully"),
             containsString("Row 2 - WorkflowItem created successfully")));
 
         // verify created item (ROW 2)
@@ -2105,7 +2104,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             is("Start reading all the bitstream rows"),
             is("Found 1 bitstreams to process"),
             is("Found 1 items to process"),
-            containsString("Sheet bitstream-metadata - Row 2 - Bitstream created successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 2 - Bitstream created successfully"),
             containsString("Row 2 - WorkflowItem created successfully")));
 
         // verify created item (ROW 2)
@@ -2182,9 +2181,9 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat(handler.getErrorMessages(), containsInAnyOrder(
-            "Sheet bitstream-metadata - Row 2 - Invalid ACCESS-CONDITION: [INAVALID_NAME]",
-            "Sheet bitstream-metadata - Row 3 - The access condition embargo requires a start date.",
-            "Sheet bitstream-metadata - Row 4 - The access condition embargo requires a start date."
+            "Sheet 'bitstream-metadata' - Row 2 - Invalid 'ACCESS-CONDITION': [INAVALID_NAME]",
+            "Sheet 'bitstream-metadata' - Row 3 - The access condition 'embargo' requires a start date.",
+            "Sheet 'bitstream-metadata' - Row 4 - The access condition 'embargo' requires a start date."
         ));
         assertThat("Expected no warnings", handler.getWarningMessages(), empty());
 
@@ -2194,11 +2193,11 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             is("Start reading all the bitstream rows"),
             is("Found 5 bitstreams to process"),
             is("Found 1 items to process"),
-            containsString("Sheet bitstream-metadata - Row 3 - Bitstream updated successfully"),
-            containsString("Sheet bitstream-metadata - Row 4 - Bitstream updated successfully"),
-            containsString("Sheet bitstream-metadata - Row 5 - Bitstream updated successfully"),
-            containsString("Sheet bitstream-metadata - Row 6 - Bitstream deleted successfully"),
-            containsString("Sheet bitstream-metadata - Row 7 - Bitstream updated successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 3 - Bitstream updated successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 4 - Bitstream updated successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 5 - Bitstream updated successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 6 - Bitstream deleted successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 7 - Bitstream updated successfully"),
             containsString("Row 2 - Item updated successfully")));
 
         publicationItem = context.reloadEntity(publicationItem);
@@ -2255,11 +2254,11 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), empty());
 
         assertThat(handler.getErrorMessages(), containsInAnyOrder(
-            is("Sheet bitstream-metadata - Row 2 - Invalid ACCESS-CONDITION: [INAVALID_NAME]"),
-            is("Sheet bitstream-metadata - Row 3 - The access condition embargo requires a start date."),
-            is("Sheet bitstream-metadata - Row 4 - The access condition embargo requires a start date."),
-            containsString("Sheet bitstream-metadata - Row 6 - No bitstream found at position 2 for Item with id"),
-            containsString("Sheet bitstream-metadata - Row 7 - No bitstream found at position 3 for Item with id")));
+            is("Sheet 'bitstream-metadata' - Row 2 - Invalid 'ACCESS-CONDITION': [INAVALID_NAME]"),
+            is("Sheet 'bitstream-metadata' - Row 3 - The access condition 'embargo' requires a start date."),
+            is("Sheet 'bitstream-metadata' - Row 4 - The access condition 'embargo' requires a start date."),
+            containsString("Sheet 'bitstream-metadata' - Row 6 - No bitstream found at position 2 for Item with id"),
+            containsString("Sheet 'bitstream-metadata' - Row 7 - No bitstream found at position 3 for Item with id")));
 
         assertThat(handler.getInfoMessages(), contains(
             is("Start reading all the metadata group rows"),
@@ -2267,9 +2266,9 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             is("Start reading all the bitstream rows"),
             is("Found 5 bitstreams to process"),
             is("Found 1 items to process"),
-            containsString("Sheet bitstream-metadata - Row 3 - Bitstream updated successfully"),
-            containsString("Sheet bitstream-metadata - Row 4 - Bitstream updated successfully"),
-            containsString("Sheet bitstream-metadata - Row 5 - Bitstream updated successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 3 - Bitstream updated successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 4 - Bitstream updated successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 5 - Bitstream updated successfully"),
             containsString("Row 2 - Item updated successfully")));
 
         item = context.reloadEntity(item);
@@ -2325,7 +2324,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             is("Start reading all the bitstream rows"),
             is("Found 1 bitstreams to process"),
             is("Found 1 items to process"),
-            containsString("Sheet bitstream-metadata - Row 2 - Bitstream updated successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 2 - Bitstream updated successfully"),
             containsString("Row 2 - Item updated successfully")));
 
         item = context.reloadEntity(item);
@@ -2406,15 +2405,10 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         discoverQuery.setMaxResults(limit);
         discoverQuery.addFilterQueries("search.resourcetype:" + resourceType);
         discoverQuery.addFilterQueries("dc.description:\"" + description + "\"");
-        // Use a fresh context to avoid lazy initialization errors after bulk import
-        try (Context searchContext = new Context()) {
-            DiscoverResult discoverResult = searchService.search(searchContext, discoverQuery);
-            List<IndexableObject> indexableObjects = discoverResult.getIndexableObjects();
-            assertEquals(size, indexableObjects.size());
-            assertEquals(totalFound, discoverResult.getTotalSearchResults());
-        } catch (Exception e) {
-            throw new SearchServiceException("Error performing search", e);
-        }
+        DiscoverResult discoverResult = searchService.search(context, discoverQuery);
+        List<IndexableObject> indexableObjects = discoverResult.getIndexableObjects();
+        assertEquals(size, indexableObjects.size());
+        assertEquals(totalFound, discoverResult.getTotalSearchResults());
     }
 
     @Test
@@ -2699,7 +2693,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat(handler.getErrorMessages(),
-            contains("The optional column DISCOVERABLE present in sheet Main "
+            contains("The optional column 'DISCOVERABLE' present in sheet 'Main' "
                 + "must be placed before the metadata fields"));
     }
 

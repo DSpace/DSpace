@@ -147,23 +147,23 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     public static final String ROW_ID = "ROW-ID";
 
 
-    public static final String ID_HEADER = "ID";
+    public static final String ID_HEADER = "id";
 
-    public static final String ACTION_HEADER = "ACTION";
+    public static final String ACTION_HEADER = "action";
 
-    public static final String DISCOVERABLE_HEADER = "DISCOVERABLE";
+    public static final String DISCOVERABLE_HEADER = "discoverable";
 
-    public static final String PARENT_ID_HEADER = "PARENT-ID";
+    public static final String PARENT_ID_HEADER = "parent-id";
 
-    public static final String FILE_PATH_HEADER = "FILE-PATH";
+    public static final String FILE_PATH_HEADER = "file-path";
 
-    public static final String BUNDLE_HEADER = "BUNDLE-NAME";
+    public static final String BUNDLE_HEADER = "bundle-name";
 
-    public static final String BITSTREAM_POSITION_HEADER = "POSITION";
+    public static final String BITSTREAM_POSITION_HEADER = "position";
 
-    public static final String ACCESS_CONDITION_HEADER = "ACCESS-CONDITION";
+    public static final String ACCESS_CONDITION_HEADER = "access-condition";
 
-    public static final String ADDITIONAL_ACCESS_CONDITION_HEADER = "ADDITIONAL-ACCESS-CONDITION";
+    public static final String ADDITIONAL_ACCESS_CONDITION_HEADER = "additional-access-condition";
 
     public static final String[] ENTITY_ROWS_SHEET_HEADERS = { ID_HEADER };
 
@@ -347,12 +347,12 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     }
 
     private void validateHeaders(Sheet sheet) {
-        List<String> headers = WorkbookUtils.getAllHeaders(sheet);
+        List<WorkbookUtils.HeaderPair> headers = WorkbookUtils.getAllHeaders(sheet);
         validateMainHeaders(sheet, headers);
         validateMetadataFields(sheet, headers);
     }
 
-    private void validateMainHeaders(Sheet sheet, List<String> headers) {
+    private void validateMainHeaders(Sheet sheet, List<WorkbookUtils.HeaderPair> headers) {
 
         String[] mandatoryMainHeaders = getMandatoryMainHeadersBySheetType(sheet);
         validateMandatoryMainHeaders(sheet, headers, mandatoryMainHeaders);
@@ -386,20 +386,23 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         }
     }
 
-    private void validateMandatoryMainHeaders(Sheet sheet, List<String> headers, String[] mandatoryMainHeaders) {
+    private void validateMandatoryMainHeaders(Sheet sheet, List<WorkbookUtils.HeaderPair> headers,
+        String[] mandatoryMainHeaders) {
 
         String sheetName = sheet.getSheetName();
 
         if (headers.size() < mandatoryMainHeaders.length) {
             throw new BulkImportException("The columns " + ArrayUtils.toString(mandatoryMainHeaders)
-                + " are required for the sheet " + sheetName);
+                + " are required for the sheet '" + sheetName + "'");
         }
 
         for (int i = 0; i < mandatoryMainHeaders.length; i++) {
-            String header = headers.get(i);
+            WorkbookUtils.HeaderPair headerPair = headers.get(i);
             String expected = mandatoryMainHeaders[i];
-            if (!mandatoryMainHeaders[i].equals(header)) {
-                String errMsg = "Wrong " + expected + " header on sheet " + sheetName + ": " + header;
+            if (!expected.equals(headerPair.normalized())) {
+                // Show expected header in uppercase (standard casing for special headers)
+                String errMsg = "Wrong '" + expected.toUpperCase()
+                    + "' header on sheet '" + sheetName + "': " + headerPair.original();
                 handler.logError(errMsg);
                 throw new BulkImportException(errMsg);
             }
@@ -407,17 +410,19 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     }
 
-    private void validateOptionalMainHeaders(Sheet sheet, List<String> headers, String[] mandatoryMainHeaders,
-        String[] optionalMainHeaders) {
+    private void validateOptionalMainHeaders(Sheet sheet, List<WorkbookUtils.HeaderPair> headers,
+        String[] mandatoryMainHeaders, String[] optionalMainHeaders) {
 
         long optionalHeadersCount = countOptionalHeaders(headers, optionalMainHeaders);
         long maxMainHeadersCount = mandatoryMainHeaders.length + optionalHeadersCount;
 
         for (String optionalMainHeader : optionalMainHeaders) {
-            int indexOfOptionalHeader = headers.indexOf(optionalMainHeader);
-            if (indexOfOptionalHeader >= maxMainHeadersCount) {
-                String errMsg = "The optional column " + optionalMainHeader
-                    + " present in sheet " + sheet.getSheetName() + " must be placed before the metadata fields";
+            int indexOfOptionalHeader = indexOfHeaderCaseInsensitive(headers, optionalMainHeader);
+            if (indexOfOptionalHeader != -1 && indexOfOptionalHeader >= maxMainHeadersCount) {
+                // Use the original header value from the Excel file for error message
+                String originalHeader = headers.get(indexOfOptionalHeader).original();
+                String errMsg = "The optional column '" + originalHeader
+                    + "' present in sheet '" + sheet.getSheetName() + "' must be placed before the metadata fields";
                 handler.logError(errMsg);
                 throw new BulkImportException(errMsg);
             }
@@ -425,17 +430,17 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     }
 
-    private void validateMetadataFields(Sheet sheet, List<String> headers) {
+    private void validateMetadataFields(Sheet sheet, List<WorkbookUtils.HeaderPair> headers) {
 
-        List<String> metadataFields = headers.subList(getFirstMetadataIndex(sheet), headers.size());
+        List<WorkbookUtils.HeaderPair> metadataFields = headers.subList(getFirstMetadataIndex(sheet), headers.size());
         List<String> expectedMetadataFields = getSubmissionFormMetadataBySheetType(sheet);
 
         List<String> invalidMetadataMessages = new ArrayList<>();
 
 
-        for (String metadataField : metadataFields) {
+        for (WorkbookUtils.HeaderPair metadataField : metadataFields) {
 
-            String metadata = getMetadataField(metadataField);
+            String metadata = getMetadataField(metadataField.normalized());
 
             if (StringUtils.isBlank(metadata)) {
                 invalidMetadataMessages.add("Empty metadata");
@@ -600,12 +605,14 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         String parentId = getParentIdFromRow(row);
 
         if (StringUtils.isBlank(parentId)) {
-            handleValidationErrorOnRow(row, "No " + PARENT_ID_HEADER + " set");
+            String originalHeader = getOriginalHeaderName(row.getSheet(), PARENT_ID_HEADER);
+            handleValidationErrorOnRow(row, "No " + originalHeader + " set");
             return false;
         }
 
         if (!isValidId(parentId, true)) {
-            handleValidationErrorOnRow(row, "Invalid " + PARENT_ID_HEADER + ": " + parentId);
+            String originalHeader = getOriginalHeaderName(row.getSheet(), PARENT_ID_HEADER);
+            handleValidationErrorOnRow(row, "Invalid " + originalHeader + ": " + parentId);
             return false;
         }
 
@@ -716,12 +723,14 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         String parentId = getParentIdFromRow(row);
 
         if (StringUtils.isBlank(parentId)) {
-            handleValidationErrorOnRow(row, "No " + PARENT_ID_HEADER + " set");
+            String originalHeader = getOriginalHeaderName(row.getSheet(), PARENT_ID_HEADER);
+            handleValidationErrorOnRow(row, "No " + originalHeader + " set");
             return false;
         }
 
         if (!isValidId(parentId, true)) {
-            handleValidationErrorOnRow(row, "Invalid " + PARENT_ID_HEADER + ": " + parentId);
+            String originalHeader = getOriginalHeaderName(row.getSheet(), PARENT_ID_HEADER);
+            handleValidationErrorOnRow(row, "Invalid " + originalHeader + ": " + parentId);
             return false;
         }
 
@@ -729,18 +738,25 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         String position = getCellValue(row, BITSTREAM_POSITION_HEADER);
 
         if (isAllBlank(filePath, position)) {
-            String message = format("Both %s and %s could not be empty", FILE_PATH_HEADER, BITSTREAM_POSITION_HEADER);
+            String originalFilePathHeader = getOriginalHeaderName(row.getSheet(), FILE_PATH_HEADER);
+            String originalPositionHeader = getOriginalHeaderName(row.getSheet(), BITSTREAM_POSITION_HEADER);
+            String message = format("Both %s and %s could not be empty",
+                                    originalFilePathHeader,
+                                    originalPositionHeader);
             handleValidationErrorOnRow(row, message);
             return false;
         }
 
         if (isInvalidBitstreamPosition(position)) {
-            handleValidationErrorOnRow(row, "Invalid " + BITSTREAM_POSITION_HEADER + ": " + position);
+            String originalHeader = getOriginalHeaderName(row.getSheet(), BITSTREAM_POSITION_HEADER);
+            handleValidationErrorOnRow(row, "Invalid " + originalHeader + ": " + position);
         }
 
         List<String> accessConditionsValidations = validateAccessConditions(row);
         if (CollectionUtils.isNotEmpty(accessConditionsValidations)) {
-            handleValidationErrorOnRow(row, "Invalid " + ACCESS_CONDITION_HEADER + ": " + accessConditionsValidations);
+            String originalHeader = getOriginalHeaderName(row.getSheet(), ACCESS_CONDITION_HEADER);
+            handleValidationErrorOnRow(row, "Invalid '" + originalHeader + "': "
+                + accessConditionsValidations);
             return false;
         }
 
@@ -836,12 +852,14 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     private Map<String, Integer> getHeaderMap(Sheet sheet) {
         return WorkbookUtils.getCells(sheet.getRow(0))
             .filter(cell -> StringUtils.isNotBlank(getCellValue(cell)))
-            .collect(toMap(cell -> getCellValue(cell), cell -> cell.getColumnIndex(), handleDuplication(sheet)));
+            .collect(toMap(cell -> getCellValue(cell).toLowerCase(),
+                           cell -> cell.getColumnIndex(),
+                           handleDuplication(sheet)));
     }
 
     private BinaryOperator<Integer> handleDuplication(Sheet sheet) {
         return (i1, i2) -> {
-            String errMsg = "Sheet " + sheet.getSheetName() + " - Duplicated headers found on cells "
+            String errMsg = "Sheet '" + sheet.getSheetName() + "' - Duplicated headers found on cells "
                 + (i1 + 1) + " and " + (i2 + 1);
             handler.logError(errMsg);
             throw new BulkImportException(errMsg);
@@ -946,7 +964,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             List<Bitstream> bitstreams = bitstreamsByBundle.get(uploadDetails.getBundleName());
 
             if (zeroBasedPosition >= bitstreams.size()) {
-                handler.logError("Sheet " + BITSTREAMS_SHEET_NAME + " - Row " + uploadDetails.getRow() +
+                handler.logError("Sheet '" + BITSTREAMS_SHEET_NAME + "' - Row " + uploadDetails.getRow() +
                     " - No bitstream found at position " + bitstreamPosition + " for Item with id " + item.getID());
                 continue;
             }
@@ -979,7 +997,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             throw new RuntimeException(e);
         }
 
-        handler.logInfo("Sheet " + BITSTREAMS_SHEET_NAME + " - Row " + uploadDetails.getRow()
+        handler.logInfo("Sheet '" + BITSTREAMS_SHEET_NAME + "' - Row " + uploadDetails.getRow()
             + " - Bitstream deleted successfully - ID: " + bitstream.getID());
     }
 
@@ -988,7 +1006,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         updateBitstreamMetadata(bitstream, uploadDetails);
         updateBitstreamPolicies(bitstream, item, uploadDetails);
 
-        handler.logInfo("Sheet " + BITSTREAMS_SHEET_NAME + " - Row " + uploadDetails.getRow()
+        handler.logInfo("Sheet '" + BITSTREAMS_SHEET_NAME + "' - Row " + uploadDetails.getRow()
             + " - Bitstream updated successfully - ID: " + bitstream.getID());
     }
 
@@ -1040,7 +1058,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
                 try {
                     aco.createResourcePolicy(context, obj, name, description, startDate, endDate);
                 } catch (Exception e) {
-                    handler.logError("Sheet " + BITSTREAMS_SHEET_NAME + " - Row "
+                    handler.logError("Sheet '" + BITSTREAMS_SHEET_NAME + "' - Row "
                         + uploadDetails.getRow() + " - " + e.getMessage());
                 }
                 break;
@@ -1073,7 +1091,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         setBitstreamPolicies(bitstream, uploadDetails);
         setBitstreamFormat(bitstream);
 
-        handler.logInfo("Sheet " + BITSTREAMS_SHEET_NAME + " - Row " + uploadDetails.getRow()
+        handler.logInfo("Sheet '" + BITSTREAMS_SHEET_NAME + "' - Row " + uploadDetails.getRow()
             + " - Bitstream created successfully - ID: " + bitstream.getID());
 
     }
@@ -1352,8 +1370,8 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
         Sheet sheet = row.getSheet();
 
-        List<String> headers = WorkbookUtils.getAllHeaders(sheet);
-        int headerIndex = headers.indexOf(header);
+        List<WorkbookUtils.HeaderPair> headers = WorkbookUtils.getAllHeaders(sheet);
+        int headerIndex = indexOfHeaderCaseInsensitive(headers, header);
 
         if (headerIndex != -1) {
             return WorkbookUtils.getCellValue(row, headerIndex);
@@ -1362,7 +1380,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         if (isOptionalHeader(sheet, header)) {
             return null;
         } else {
-            throw new IllegalStateException("Header not found " + header + " on sheet " + sheet.getSheetName());
+            throw new IllegalStateException("Header not found " + header + " on sheet '" + sheet.getSheetName() + "'");
         }
 
     }
@@ -1446,20 +1464,50 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         return BulkImportSheetType.getTypeFromSheet(sheet) == BulkImportSheetType.METADATA_GROUPS;
     }
 
-    private long countOptionalHeaders(List<String> headers, String[] optionalHeaders) {
+    private long countOptionalHeaders(List<WorkbookUtils.HeaderPair> headers, String[] optionalHeaders) {
         return headers.stream()
-            .filter(header -> ArrayUtils.contains(optionalHeaders, header))
+            .filter(header -> Arrays.stream(optionalHeaders)
+                .anyMatch(optionalHeader -> optionalHeader.equalsIgnoreCase(header.normalized())))
             .count();
     }
 
     private boolean isOptionalHeader(Sheet sheet, String header) {
         String[] optionalMainHeaders = getOptionalMainHeadersBySheetType(sheet);
-        return ArrayUtils.contains(optionalMainHeaders, header);
+        return Arrays.stream(optionalMainHeaders)
+            .anyMatch(optionalHeader -> optionalHeader.equalsIgnoreCase(header));
+    }
+
+    /**
+     * Find the index of a header in a list using case-insensitive comparison.
+     *
+     * @param headers      the list of header pairs
+     * @param targetHeader the header to find
+     * @return the index of the header, or -1 if not found
+     */
+    private int indexOfHeaderCaseInsensitive(List<WorkbookUtils.HeaderPair> headers, String targetHeader) {
+        for (int i = 0; i < headers.size(); i++) {
+            if (headers.get(i).normalized().equals(targetHeader)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Check if a list contains a header using case-insensitive comparison.
+     *
+     * @param headers      the list of header pairs
+     * @param targetHeader the header to find
+     * @return true if the header is found, false otherwise
+     */
+    private boolean containsHeaderCaseInsensitive(List<WorkbookUtils.HeaderPair> headers, String targetHeader) {
+        return headers.stream()
+            .anyMatch(header -> header.normalized().equals(targetHeader));
     }
 
     private int getFirstMetadataIndex(Sheet sheet) {
 
-        List<String> headers = WorkbookUtils.getAllHeaders(sheet);
+        List<WorkbookUtils.HeaderPair> headers = WorkbookUtils.getAllHeaders(sheet);
 
         String[] mandatoryHeaders = getMandatoryMainHeadersBySheetType(sheet);
         String[] optionalHeaders = getOptionalMainHeadersBySheetType(sheet);
@@ -1467,13 +1515,12 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         int firstMetadataIndex = mandatoryHeaders.length;
 
         for (String optionalHeader : optionalHeaders) {
-            if (headers.contains(optionalHeader)) {
+            if (containsHeaderCaseInsensitive(headers, optionalHeader)) {
                 firstMetadataIndex++;
             }
         }
 
         return firstMetadataIndex;
-
     }
 
     private boolean isUnknownMetadataField(String metadataField) {
@@ -1482,6 +1529,22 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
         }
+    }
+
+    /**
+     * Get the original header name (as it appears in the Excel file) for a given normalized header name.
+     *
+     * @param sheet      the sheet to search
+     * @param headerName the normalized (lowercase) header name to find
+     * @return the original header name, or the normalized name if not found
+     */
+    private String getOriginalHeaderName(Sheet sheet, String headerName) {
+        List<WorkbookUtils.HeaderPair> headers = WorkbookUtils.getAllHeaders(sheet);
+        return headers.stream()
+            .filter(h -> h.normalized().equals(headerName))
+            .map(WorkbookUtils.HeaderPair::original)
+            .findFirst()
+            .orElse(headerName);
     }
 
     private <T extends ChildRow> List<T> getOwnChildRows(Row row, List<T> childRows) {
@@ -1601,7 +1664,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private void handleValidationErrorOnRow(Row row, String message) {
         String sheetName = row.getSheet().getSheetName();
-        String errorMessage = "Sheet " + sheetName + " - Row " + (row.getRowNum() + 1) + " - " + message;
+        String errorMessage = "Sheet '" + sheetName + "' - Row " + (row.getRowNum() + 1) + " - " + message;
         handler.logError(errorMessage);
         if (abortOnError) {
             throw new BulkImportException(errorMessage);
