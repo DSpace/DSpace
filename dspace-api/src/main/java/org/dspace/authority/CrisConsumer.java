@@ -63,11 +63,11 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  * consumer performs the following:
  * </p>
  * * <ul>
- * <li><b>Identification:</b> It generates a unique {@code cris.sourceId} for
+ * <li><b>Identification:</b> It generates a unique {@code dspace.sourceId} for
  * the metadata value (usually an MD5 hash of the text or an ID from an
  * external authority like ORCID).</li>
  * <li><b>Lookup:</b> It searches for an existing Item that matches the
- * {@code entityType} and {@code cris.sourceId}.</li>
+ * {@code entityType} and {@code dspace.sourceId}.</li>
  * <li><b>Creation:</b> If no match is found, it automatically creates a new
  * Item of the required type in the appropriate Collection.</li>
  * <li><b>Enrichment:</b> It populates the related item with data using

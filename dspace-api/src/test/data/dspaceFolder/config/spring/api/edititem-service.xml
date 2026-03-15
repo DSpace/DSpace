@@ -177,11 +177,11 @@
     </bean>
 
 	<util:list id="usersMetadata" value-type="java.lang.String">
-       <value>cris.policy.eperson</value>
+       <value>dspace.policy.eperson</value>
     </util:list>
 
 	<util:list id="groupsMetadata" value-type="java.lang.String">
-       <value>cris.policy.group</value>
+       <value>dspace.policy.group</value>
     </util:list>
 
 	<util:list id="itemsMetadata" value-type="java.lang.String">

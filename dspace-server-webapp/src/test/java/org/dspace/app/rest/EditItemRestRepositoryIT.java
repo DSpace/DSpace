@@ -901,9 +901,9 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                 .withAuthor("Smith, Maria")
                                 .build();
 
-        itemService.addMetadata(context, itemA, "cris", "policy", "eperson", null, userA.getFullName(),
+        itemService.addMetadata(context, itemA, "dspace", "policy", "eperson", null, userA.getFullName(),
                                 userA.getID().toString(), 600);
-        itemService.addMetadata(context, itemA, "cris", "policy", "group", null, groupA.getName(),
+        itemService.addMetadata(context, itemA, "dspace", "policy", "group", null, groupA.getName(),
                                 groupA.getID().toString(), 600);
 
         EditItem editItem = new EditItem(context, itemA);
@@ -1115,13 +1115,13 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                              "org.dspace.content.authority.GroupAuthority = GroupAuthority"
                                          });
 
-        configurationService.setProperty("choices.plugin.cris.policy.eperson", "EPersonAuthority");
-        configurationService.setProperty("cchoices.presentation.cris.policy.eperson", "suggest");
-        configurationService.setProperty("authority.controlled.cris.policy.eperson", "true");
+        configurationService.setProperty("choices.plugin.dspace.policy.eperson", "EPersonAuthority");
+        configurationService.setProperty("cchoices.presentation.dspace.policy.eperson", "suggest");
+        configurationService.setProperty("authority.controlled.dspace.policy.eperson", "true");
 
-        configurationService.setProperty("choices.plugin.cris.policy.group", "GroupAuthority");
-        configurationService.setProperty("cchoices.presentation.cris.policy.group", "suggest");
-        configurationService.setProperty("authority.controlled.cris.policy.group", "true");
+        configurationService.setProperty("choices.plugin.dspace.policy.group", "GroupAuthority");
+        configurationService.setProperty("cchoices.presentation.dspace.policy.group", "suggest");
+        configurationService.setProperty("authority.controlled.dspace.policy.group", "true");
 
         pluginService.clearNamedPluginClasses();
         choiceAuthorityService.clearCache();
@@ -1155,9 +1155,9 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                 .withIssueDate("2015-06-25")
                                 .withAuthor("Mykhaylo, Boychuk").build();
 
-        itemService.addMetadata(context, itemA, "cris", "policy", "eperson", null, userA.getFullName(),
+        itemService.addMetadata(context, itemA, "dspace", "policy", "eperson", null, userA.getFullName(),
                                 userA.getID().toString(), 600);
-        itemService.addMetadata(context, itemA, "cris", "policy", "group", null, groupA.getName(),
+        itemService.addMetadata(context, itemA, "dspace", "policy", "group", null, groupA.getName(),
                                 groupA.getID().toString(), 600);
 
         EditItem editItem = new EditItem(context, itemA);
@@ -1199,13 +1199,13 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                              "org.dspace.content.authority.GroupAuthority = GroupAuthority"
                                          });
 
-        configurationService.setProperty("choices.plugin.cris.policy.eperson", "EPersonAuthority");
-        configurationService.setProperty("cchoices.presentation.cris.policy.eperson", "suggest");
-        configurationService.setProperty("authority.controlled.cris.policy.eperson", "true");
+        configurationService.setProperty("choices.plugin.dspace.policy.eperson", "EPersonAuthority");
+        configurationService.setProperty("cchoices.presentation.dspace.policy.eperson", "suggest");
+        configurationService.setProperty("authority.controlled.dspace.policy.eperson", "true");
 
-        configurationService.setProperty("choices.plugin.cris.policy.group", "GroupAuthority");
-        configurationService.setProperty("cchoices.presentation.cris.policy.group", "suggest");
-        configurationService.setProperty("authority.controlled.cris.policy.group", "true");
+        configurationService.setProperty("choices.plugin.dspace.policy.group", "GroupAuthority");
+        configurationService.setProperty("cchoices.presentation.dspace.policy.group", "suggest");
+        configurationService.setProperty("authority.controlled.dspace.policy.group", "true");
 
         pluginService.clearNamedPluginClasses();
         choiceAuthorityService.clearCache();
@@ -1238,9 +1238,9 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                 .withIssueDate("2015-06-25")
                                 .withAuthor("Mykhaylo, Boychuk").build();
 
-        itemService.addMetadata(context, itemA, "cris", "policy", "eperson", null, userA.getFullName(),
+        itemService.addMetadata(context, itemA, "dspace", "policy", "eperson", null, userA.getFullName(),
                                 userA.getID().toString(), 600);
-        itemService.addMetadata(context, itemA, "cris", "policy", "group", null, groupA.getName(),
+        itemService.addMetadata(context, itemA, "dspace", "policy", "group", null, groupA.getName(),
                                 groupA.getID().toString(), 600);
 
         EditItem editItem = new EditItem(context, itemA);

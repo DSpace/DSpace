@@ -230,7 +230,7 @@ public class SubmissionConfigReader {
      * This method implements a hierarchical lookup strategy to determine the appropriate
      * submission configuration, checking in the following order:
      * <ol>
-     *   <li><b>Collection metadata</b>: Checks the {@code cris.submission.definition} metadata field
+     *   <li><b>Collection metadata</b>: Checks the {@code dspace.submission.definition} metadata field
      *       on the collection object itself. This provides the highest priority override.</li>
      *   <li><b>Collection handle mapping</b>: Looks up the collection's handle in the
      *       {@code <name-map>} section of {@code item-submission.xml}.</li>
@@ -263,7 +263,7 @@ public class SubmissionConfigReader {
                     return subConfig;
                 }
             } catch (IllegalStateException e) {
-                log.error("The collection {} has an invalid cris.submission.definition value {}",
+                log.error("The collection {} has an invalid dspace.submission.definition value {}",
                           collection.getID().toString(), submitName, e);
             }
         }

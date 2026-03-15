@@ -115,11 +115,21 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
      * @return this.
      */
     public CollectionBuilder withNameForLanguage(final String name, final String language) {
-        return addMetadataValue(collection, MetadataSchemaEnum.DC.getName(), "title", null, language, name);
+        return addMetadataValue(collection,
+                                MetadataSchemaEnum.DC.getName(),
+                                "title",
+                                null,
+                                language,
+                                name);
     }
 
     public CollectionBuilder withSubmissionDefinition(final String name) {
-        return addMetadataValue(collection, MetadataSchemaEnum.DSPACE.getName(), "submission", "definition", null, name);
+        return addMetadataValue(collection,
+                                MetadataSchemaEnum.DSPACE.getName(),
+                                "submission",
+                                "definition",
+                                null,
+                                name);
     }
 
     /**

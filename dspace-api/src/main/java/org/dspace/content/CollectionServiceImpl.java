@@ -1069,7 +1069,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public boolean isSharedWorkspace(Context context, Collection collection) {
-        return toBoolean(getMetadataFirstValue(collection, "cris", "workspace", "shared", Item.ANY));
+        return toBoolean(getMetadataFirstValue(collection, "dspace", "workspace", "shared", Item.ANY));
     }
 
     @Override

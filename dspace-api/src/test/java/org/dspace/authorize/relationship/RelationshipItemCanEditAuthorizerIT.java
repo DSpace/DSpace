@@ -137,9 +137,9 @@ public class RelationshipItemCanEditAuthorizerIT extends AbstractIntegrationTest
                                              "org.dspace.content.authority.GroupAuthority = GroupAuthority"
                                          });
 
-        configurationService.setProperty("choices.plugin.cris.policy.eperson", "EPersonAuthority");
-        configurationService.setProperty("cchoices.presentation.cris.policy.eperson", "suggest");
-        configurationService.setProperty("authority.controlled.cris.policy.eperson", "true");
+        configurationService.setProperty("choices.plugin.dspace.policy.eperson", "EPersonAuthority");
+        configurationService.setProperty("cchoices.presentation.dspace.policy.eperson", "suggest");
+        configurationService.setProperty("authority.controlled.dspace.policy.eperson", "true");
 
         pluginService.clearNamedPluginClasses();
         choiceAuthorityService.clearCache();

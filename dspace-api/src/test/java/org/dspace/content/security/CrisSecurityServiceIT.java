@@ -212,13 +212,13 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
         configurationService.setProperty("authority.controlled.dc.contributor.editor", "true");
         configurationService.setProperty("cris.ItemAuthority.EditorAuthority.entityType", "Person");
 
-        configurationService.setProperty("choices.plugin.cris.policy.eperson", "EPersonAuthority");
-        configurationService.setProperty("cchoices.presentation.cris.policy.eperson", "suggest");
-        configurationService.setProperty("authority.controlled.cris.policy.eperson", "true");
+        configurationService.setProperty("choices.plugin.dspace.policy.eperson", "EPersonAuthority");
+        configurationService.setProperty("cchoices.presentation.dspace.policy.eperson", "suggest");
+        configurationService.setProperty("authority.controlled.dspace.policy.eperson", "true");
 
-        configurationService.setProperty("choices.plugin.cris.policy.group", "GroupAuthority");
-        configurationService.setProperty("cchoices.presentation.cris.policy.group", "suggest");
-        configurationService.setProperty("authority.controlled.cris.policy.group", "true");
+        configurationService.setProperty("choices.plugin.dspace.policy.group", "GroupAuthority");
+        configurationService.setProperty("cchoices.presentation.dspace.policy.group", "suggest");
+        configurationService.setProperty("authority.controlled.dspace.policy.group", "true");
 
         choiceAuthorityService.clearCache();
         metadataAuthorityService.clearCache();
@@ -269,8 +269,8 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
 
         AccessItemMode accessMode = buildAccessItemMode(CrisSecurity.CUSTOM);
-        when(accessMode.getUserMetadataFields()).thenReturn(List.of("cris.policy.eperson"));
-        when(accessMode.getGroupMetadataFields()).thenReturn(List.of("cris.policy.group"));
+        when(accessMode.getUserMetadataFields()).thenReturn(List.of("dspace.policy.eperson"));
+        when(accessMode.getGroupMetadataFields()).thenReturn(List.of("dspace.policy.group"));
         when(accessMode.getItemMetadataFields()).thenReturn(List.of("dc.contributor.author"));
 
         assertThat(crisSecurityService.hasAccess(context, item, eperson, accessMode), is(false));

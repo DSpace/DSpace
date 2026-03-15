@@ -296,8 +296,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         init(locale);
         try {
             String childId = getNodeIdFromAuthorityKey(childAuthKey);
-            Choice choice = createChoiceFromNode(getNodeByIdFromXPath(idParentTemplate, childId));
-            return choice;
+            return createChoiceFromNode(getNodeByIdFromXPath(idParentTemplate, childId));
         } catch (XPathExpressionException e) {
             log.error(e.getMessage(), e);
             return null;
@@ -338,12 +337,6 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             throw new IllegalArgumentException("Unexpected variable: " + variableName);
         });
         return (Node) xpath.evaluate(xpathTemplate, vocabulary, XPathConstants.NODE);
-    }
-
-    private Node getNodeFromXPath(String xpathExpression) throws XPathExpressionException {
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        Node node = (Node) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
-        return node;
     }
 
     private List<Choice> getChoicesFromNodeList(NodeList results, int start, int limit) {

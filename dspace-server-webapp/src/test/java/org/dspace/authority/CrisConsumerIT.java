@@ -236,7 +236,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
                    relatedItemtitle.getValue(), equalTo("Mario Rossi"));
 
         MetadataValueRest crisSourceId = findSingleMetadata(relatedItem, "dspace.sourceId");
-        assertThat("cris.sourceId value and author md5 hash should be equals", crisSourceId.getValue(),
+        assertThat("dspace.sourceId value and author md5 hash should be equals", crisSourceId.getValue(),
                    equalTo(generateMd5Hash("Mario Rossi")));
 
         MetadataValueRest entityType = findSingleMetadata(relatedItem, "dspace.entity.type");
@@ -289,7 +289,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         ItemRest relatedItem = getItemViaRestByID(authToken, UUID.fromString(journalAuthority));
 
         MetadataValueRest crisSourceId = findSingleMetadata(relatedItem, "dspace.sourceId");
-        assertThat("cris.sourceId and journal md5 hash should be equals",
+        assertThat("dspace.sourceId and journal md5 hash should be equals",
                    crisSourceId.getValue(), equalTo(generateMd5Hash("The Journal")));
 
         MetadataValueRest entityType = findSingleMetadata(relatedItem, "dspace.entity.type");
@@ -463,7 +463,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         ItemRest authorItem = getItemViaRestByID(authToken, UUID.fromString(authorAuthority));
 
         MetadataValueRest crisSourceId = findSingleMetadata(authorItem, "dspace.sourceId");
-        assertThat("cris.sourceId value and author md5 hash should be equals",
+        assertThat("dspace.sourceId value and author md5 hash should be equals",
                    crisSourceId.getValue(), equalTo(generateMd5Hash("Same Name")));
 
         MetadataValueRest entityType = findSingleMetadata(authorItem, "dspace.entity.type");
@@ -472,7 +472,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         ItemRest projectItem = getItemViaRestByID(authToken, UUID.fromString(projectAuthority));
 
         crisSourceId = findSingleMetadata(projectItem, "dspace.sourceId");
-        assertThat("cris.sourceId value and project md5 hash should be equals",
+        assertThat("dspace.sourceId value and project md5 hash should be equals",
                    crisSourceId.getValue(), equalTo(generateMd5Hash("Same Name")));
 
         entityType = findSingleMetadata(projectItem, "dspace.entity.type");
@@ -642,7 +642,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         assertThat("The author related item should not be archived", authorItem.getInArchive(), is(false));
 
         MetadataValueRest crisSourceId = findSingleMetadata(authorItem, "dspace.sourceId");
-        assertThat("cris.sourceId value and author md5 hash should be equals", crisSourceId.getValue(),
+        assertThat("dspace.sourceId value and author md5 hash should be equals", crisSourceId.getValue(),
                    equalTo(generateMd5Hash("Mario Rossi")));
 
         MetadataValueRest entityType = findSingleMetadata(authorItem, "dspace.entity.type");
@@ -653,7 +653,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         assertThat("The project related item should be archived", projectItem.getInArchive(), is(true));
 
         crisSourceId = findSingleMetadata(projectItem, "dspace.sourceId");
-        assertThat("cris.sourceId value and author md5 hash should be equals", crisSourceId.getValue(),
+        assertThat("dspace.sourceId value and author md5 hash should be equals", crisSourceId.getValue(),
                    equalTo(generateMd5Hash("Test project")));
 
         entityType = findSingleMetadata(projectItem, "dspace.entity.type");
@@ -708,7 +708,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
             String expectedName = author.getPlace() == 0 ? "Mario Rossi" : "Luigi Rossi";
             MetadataValueRest crisSourceId = findSingleMetadata(relatedItem, "dspace.sourceId");
-            assertThat("cris.sourceId value and author md5 hash should be equals", crisSourceId.getValue(),
+            assertThat("dspace.sourceId value and author md5 hash should be equals", crisSourceId.getValue(),
                        equalTo(generateMd5Hash(expectedName)));
 
             MetadataValueRest entityType = findSingleMetadata(relatedItem, "dspace.entity.type");

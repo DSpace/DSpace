@@ -56,9 +56,9 @@ public class EPersonAuthorityIT extends AbstractControllerIntegrationTest {
                                              "org.dspace.content.authority.EPersonAuthority = EPersonAuthority"
                                          });
 
-        configurationService.setProperty("choices.plugin.cris.policy.eperson", "EPersonAuthority");
-        configurationService.setProperty("cchoices.presentation.cris.policy.eperson", "suggest");
-        configurationService.setProperty("authority.controlled.cris.policy.eperson", "true");
+        configurationService.setProperty("choices.plugin.dspace.policy.eperson", "EPersonAuthority");
+        configurationService.setProperty("cchoices.presentation.dspace.policy.eperson", "suggest");
+        configurationService.setProperty("authority.controlled.dspace.policy.eperson", "true");
 
         pluginService.clearNamedPluginClasses();
         choiceAuthorityService.clearCache();
