@@ -65,9 +65,9 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     protected static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
         "'abcdefghijklmnopqrstuvwxyz'),%s)]";
     protected static String idTemplate = "//node[@id = %s]";
-    protected static String idTemplateQuoted = "//node[@id = '%s']";
+    protected static String idTemplateQuoted = "//node[@id = $nodeId]";
     protected static String labelTemplate = "//node[@label = %s]";
-    protected static String idParentTemplate = "//node[@id = '%s']/parent::isComposedBy/parent::node";
+    protected static String idParentTemplate = "//node[@id = $nodeId]/parent::isComposedBy/parent::node";
     protected static String rootTemplate = "/node";
     protected static String idAttribute = "id";
     protected static String labelAttribute = "label";
@@ -288,8 +288,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     public Choices getChoicesByParent(String authorityName, String parentAuthKey, int start, int limit, String locale) {
         init(locale);
         String parentId = getNodeIdFromAuthorityKey(parentAuthKey);
-        String xpathExpression = String.format(idTemplateQuoted, parentId);
-        return getChoicesByXpath(xpathExpression, start, limit);
+        return getChoicesByXpathWithId(idTemplateQuoted, parentId, start, limit);
     }
 
     @Override
@@ -297,8 +296,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         init(locale);
         try {
             String childId = getNodeIdFromAuthorityKey(childAuthKey);
-            String xpathExpression = String.format(idParentTemplate, childId);
-            Choice choice = createChoiceFromNode(getNodeFromXPath(xpathExpression));
+            Choice choice = createChoiceFromNode(getNodeByIdFromXPath(idParentTemplate, childId));
             return choice;
         } catch (XPathExpressionException e) {
             log.error(e.getMessage(), e);
@@ -328,9 +326,18 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
 
     private Node getNode(String key, String locale) throws XPathExpressionException {
         init(locale);
-        String xpathExpression = String.format(idTemplateQuoted, key);
-        Node node = getNodeFromXPath(xpathExpression);
-        return node;
+        return getNodeByIdFromXPath(idTemplateQuoted, key);
+    }
+
+    private Node getNodeByIdFromXPath(String xpathTemplate, String nodeId) throws XPathExpressionException {
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        xpath.setXPathVariableResolver(variableName -> {
+            if ("nodeId".equals(variableName.getLocalPart())) {
+                return nodeId;
+            }
+            throw new IllegalArgumentException("Unexpected variable: " + variableName);
+        });
+        return (Node) xpath.evaluate(xpathTemplate, vocabulary, XPathConstants.NODE);
     }
 
     private Node getNodeFromXPath(String xpathExpression) throws XPathExpressionException {
@@ -489,6 +496,43 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         XPath xpath = XPathFactory.newInstance().newXPath();
         try {
             Node parentNode = (Node) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
+            int count = 0;
+            if (parentNode != null) {
+                NodeList childNodes = (NodeList) xpath.evaluate(".//isComposedBy", parentNode, XPathConstants.NODE);
+                if (null != childNodes) {
+                    for (int i = 0; i < childNodes.getLength(); i++) {
+                        Node childNode = childNodes.item(i);
+                        if (childNode != null && "node".equals(childNode.getNodeName())) {
+                            if (count < start || choices.size() >= limit) {
+                                count++;
+                                continue;
+                            }
+                            count++;
+                            choices.add(createChoiceFromNode(childNode));
+                        }
+                    }
+                }
+                return new Choices(choices.toArray(new Choice[choices.size()]), start, count,
+                        Choices.CF_AMBIGUOUS, false);
+            }
+        } catch (XPathExpressionException e) {
+            log.warn(e.getMessage(), e);
+            return new Choices(true);
+        }
+        return new Choices(false);
+    }
+
+    private Choices getChoicesByXpathWithId(String xpathTemplate, String nodeId, int start, int limit) {
+        List<Choice> choices = new ArrayList<>();
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        xpath.setXPathVariableResolver(variableName -> {
+            if ("nodeId".equals(variableName.getLocalPart())) {
+                return nodeId;
+            }
+            throw new IllegalArgumentException("Unexpected variable: " + variableName);
+        });
+        try {
+            Node parentNode = (Node) xpath.evaluate(xpathTemplate, vocabulary, XPathConstants.NODE);
             int count = 0;
             if (parentNode != null) {
                 NodeList childNodes = (NodeList) xpath.evaluate(".//isComposedBy", parentNode, XPathConstants.NODE);
