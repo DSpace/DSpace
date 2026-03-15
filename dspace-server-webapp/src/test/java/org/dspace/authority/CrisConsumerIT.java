@@ -20,7 +20,6 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -62,8 +61,9 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
-import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.provider.impl.OrcidV3AuthorDataProvider;
+import org.dspace.orcid.client.OrcidClient;
+import org.dspace.orcid.client.OrcidConfiguration;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
@@ -74,6 +74,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MvcResult;
 
 /**
@@ -1132,14 +1133,20 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
     public void testOrcidImportFiller() throws Exception {
         // Authority configuration (AuthorAuthority) provided by setUp() method
 
-        OrcidRestConnector mockOrcidConnector = Mockito.mock(OrcidRestConnector.class);
-        OrcidRestConnector orcidConnector = orcidV3AuthorDataProvider.getOrcidRestConnector();
+        OrcidClient mockOrcidClient = Mockito.mock(OrcidClient.class);
+        OrcidClient realOrcidClient = (OrcidClient) ReflectionTestUtils
+            .getField(orcidV3AuthorDataProvider, "orcidClient");
+        OrcidConfiguration realOrcidConfig = (OrcidConfiguration) ReflectionTestUtils
+            .getField(orcidV3AuthorDataProvider, "orcidConfiguration");
+        OrcidConfiguration mockConfig = Mockito.mock(OrcidConfiguration.class);
+        when(mockConfig.isApiConfigured()).thenReturn(false);
 
-        orcidV3AuthorDataProvider.setOrcidRestConnector(mockOrcidConnector);
+        ReflectionTestUtils.setField(orcidV3AuthorDataProvider, "orcidClient", mockOrcidClient);
+        ReflectionTestUtils.setField(orcidV3AuthorDataProvider, "orcidConfiguration", mockConfig);
 
         String orcid = "0000-0002-9029-1854";
-        when(mockOrcidConnector.get(eq(orcid), any()))
-            .thenAnswer(i -> orcidPersonRecord.getInputStream());
+        org.orcid.jaxb.model.v3.release.record.Record mockRecord = loadOrcidRecord(orcidPersonRecord);
+        when(mockOrcidClient.getRecord(eq(orcid))).thenReturn(mockRecord);
 
         try {
 
@@ -1156,8 +1163,8 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
             context.restoreAuthSystemState();
 
-            verify(mockOrcidConnector).get(eq(orcid), any());
-            verifyNoMoreInteractions(mockOrcidConnector);
+            verify(mockOrcidClient).getRecord(eq(orcid));
+            verifyNoMoreInteractions(mockOrcidClient);
 
             String authToken = getAuthToken(submitter.getEmail(), password);
             ItemRest item = getItemViaRestByID(authToken, publication.getID());
@@ -1199,7 +1206,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
             context.restoreAuthSystemState();
 
-            verifyNoMoreInteractions(mockOrcidConnector);
+            verifyNoMoreInteractions(mockOrcidClient);
 
             item = getItemViaRestByID(authToken, anotherPublication.getID());
             authorMetadata = findSingleMetadata(item, "dc.contributor.author");
@@ -1207,9 +1214,22 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
 
         } finally {
-            orcidV3AuthorDataProvider.setOrcidRestConnector(orcidConnector);
+            ReflectionTestUtils.setField(orcidV3AuthorDataProvider, "orcidClient", realOrcidClient);
+            ReflectionTestUtils.setField(orcidV3AuthorDataProvider, "orcidConfiguration", realOrcidConfig);
         }
 
+    }
+
+    /**
+     * Load an ORCID Record object from a Spring Resource containing XML.
+     */
+    private org.orcid.jaxb.model.v3.release.record.Record loadOrcidRecord(Resource resource) throws Exception {
+        try (InputStream is = resource.getInputStream()) {
+            jakarta.xml.bind.JAXBContext jaxbContext = jakarta.xml.bind.JAXBContext
+                .newInstance(org.orcid.jaxb.model.v3.release.record.Record.class);
+            jakarta.xml.bind.Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            return (org.orcid.jaxb.model.v3.release.record.Record) unmarshaller.unmarshal(is);
+        }
     }
 
     @Test
