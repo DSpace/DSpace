@@ -216,6 +216,18 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
 
     public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException;
 
+    /**
+     * Find all bitstreams in the given assetstore, optionally excluding deleted ones.
+     *
+     * @param context        DSpace context object
+     * @param storeNumber    the assetstore number
+     * @param excludeDeleted if true, bitstreams marked as deleted are excluded
+     * @return an iterator over the matching bitstreams
+     * @throws SQLException if database error
+     */
+    public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber,
+                                                  boolean excludeDeleted) throws SQLException;
+
     public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException;
 
     int countTotal(Context context) throws SQLException;

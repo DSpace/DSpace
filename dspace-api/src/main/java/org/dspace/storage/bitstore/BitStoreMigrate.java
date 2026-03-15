@@ -62,6 +62,10 @@ public class BitStoreMigrate {
                               "Delete file from losing assetstore. (Default: Keep bitstream in old assetstore)");
             options.addOption("p", "print", false, "Print out current assetstore information");
             options.addOption("s", "size", true, "Batch commit size. (Default: 1, commit after each file transfer)");
+            options.addOption(null, "include-deleted", false,
+                              "Include bitstreams marked as deleted. (Default: deleted bitstreams are skipped)");
+            options.addOption(null, "stop-on-error", false,
+                              "Stop migration on first error. (Default: log errors and continue)");
             options.addOption("h", "help", false, "Help");
 
             try {
@@ -93,6 +97,9 @@ public class BitStoreMigrate {
             log.debug("deleteOldAssets = " + deleteOld);
 
 
+            boolean skipDeleted = !line.hasOption("include-deleted");
+            boolean continueOnError = !line.hasOption("stop-on-error");
+
             if (line.hasOption('a') && line.hasOption('b')) {
                 Integer sourceAssetstore = Integer.valueOf(line.getOptionValue('a'));
                 Integer destinationAssetstore = Integer.valueOf(line.getOptionValue('b'));
@@ -104,7 +111,8 @@ public class BitStoreMigrate {
                 }
 
                 bitstreamStorageService
-                    .migrate(context, sourceAssetstore, destinationAssetstore, deleteOld, batchCommitSize);
+                    .migrate(context, sourceAssetstore, destinationAssetstore, deleteOld, batchCommitSize,
+                             skipDeleted, continueOnError);
             } else {
                 printHelp(options);
                 System.exit(0);

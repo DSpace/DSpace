@@ -401,41 +401,72 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
      */
     @Override
     public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld,
-                        Integer batchCommitSize) throws IOException, SQLException, AuthorizeException {
-        //Find all the bitstreams on the old source, copy it to new destination, update store_number, save, remove old
-        Iterator<Bitstream> allBitstreamsInSource = bitstreamService.findByStoreNumber(context, assetstoreSource);
-        int processedCounter = 0;
+                        Integer batchCommitSize, boolean skipDeleted, boolean continueOnError)
+        throws IOException, SQLException, AuthorizeException {
+        Iterator<Bitstream> allBitstreamsInSource =
+            bitstreamService.findByStoreNumber(context, assetstoreSource, skipDeleted);
+        int successCounter = 0;
+        int errorCounter = 0;
+        int skippedCounter = 0;
 
         while (allBitstreamsInSource.hasNext()) {
             Bitstream bitstream = allBitstreamsInSource.next();
-            log.info("Copying bitstream:" + bitstream
-                .getID() + " from assetstore[" + assetstoreSource + "] to assetstore[" + assetstoreDestination + "] " +
-                         "Name:" + bitstream
-                .getName() + ", SizeBytes:" + bitstream.getSizeBytes());
 
-            InputStream inputStream = retrieve(context, bitstream);
-            this.getStore(assetstoreDestination).put(bitstream, inputStream);
-            bitstream.setStoreNumber(assetstoreDestination);
-            bitstreamService.update(context, bitstream);
-
-            if (deleteOld) {
-                log.info("Removing bitstream:" + bitstream.getID() + " from assetstore[" + assetstoreSource + "]");
-                this.getStore(assetstoreSource).remove(bitstream);
+            if (isRegisteredBitstream(bitstream.getInternalId())) {
+                log.info("Skipping registered bitstream:" + bitstream.getID());
+                skippedCounter++;
+                context.uncacheEntity(bitstream);
+                continue;
             }
 
-            processedCounter++;
+            log.info("Copying bitstream:" + bitstream.getID()
+                + " from assetstore[" + assetstoreSource + "] to assetstore[" + assetstoreDestination + "]"
+                + " Name:" + bitstream.getName() + ", SizeBytes:" + bitstream.getSizeBytes());
+
+            try {
+                InputStream inputStream = retrieve(context, bitstream);
+                this.getStore(assetstoreDestination).put(bitstream, inputStream);
+                bitstream.setStoreNumber(assetstoreDestination);
+                bitstreamService.update(context, bitstream);
+
+                if (deleteOld) {
+                    log.info("Removing bitstream:" + bitstream.getID()
+                        + " from assetstore[" + assetstoreSource + "]");
+                    this.getStore(assetstoreSource).remove(bitstream);
+                }
+
+                successCounter++;
+            } catch (IOException e) {
+                errorCounter++;
+                String errorMsg = "Failed to migrate bitstream:" + bitstream.getID()
+                    + " - " + e.getMessage();
+                if (continueOnError) {
+                    log.error(errorMsg, e);
+                    System.err.println("ERROR: " + errorMsg);
+                } else {
+                    throw new IOException(errorMsg, e);
+                }
+            }
+
             context.uncacheEntity(bitstream);
 
-            //modulo
-            if ((processedCounter % batchCommitSize) == 0) {
-                log.info("Migration Commit Checkpoint: " + processedCounter);
+            if (successCounter > 0 && (successCounter % batchCommitSize) == 0) {
+                log.info("Migration Commit Checkpoint: " + successCounter + " migrated"
+                    + (errorCounter > 0 ? ", " + errorCounter + " errors" : ""));
                 context.commit();
             }
         }
 
-        log.info(
-            "Assetstore Migration from assetstore[" + assetstoreSource + "] to assetstore[" + assetstoreDestination +
-                "] completed. " + processedCounter + " objects were transferred.");
+        // Commit any remaining bitstreams from the last partial batch
+        context.commit();
+
+        log.info("Assetstore Migration from assetstore[" + assetstoreSource
+            + "] to assetstore[" + assetstoreDestination + "] completed. "
+            + successCounter + " bitstreams migrated, "
+            + errorCounter + " errors, "
+            + skippedCounter + " skipped (registered).");
+        System.out.println("Migration completed: " + successCounter + " bitstreams migrated, "
+            + errorCounter + " errors, " + skippedCounter + " skipped (registered).");
     }
 
     @Override
