@@ -119,7 +119,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
     }
 
     public CollectionBuilder withSubmissionDefinition(final String name) {
-        return addMetadataValue(collection, "cris", "submission", "definition", null, name);
+        return addMetadataValue(collection, MetadataSchemaEnum.DSPACE.getName(), "submission", "definition", null, name);
     }
 
     /**
@@ -251,7 +251,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
      * @return this builder
      */
     public CollectionBuilder withSharedWorkspace() {
-        return setMetadataSingleValue(collection, "cris", "workspace", "shared", "true");
+        return setMetadataSingleValue(collection, MetadataSchemaEnum.DSPACE.getName(), "workspace", "shared", "true");
     }
 
     /**
