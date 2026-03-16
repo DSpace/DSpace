@@ -19,7 +19,7 @@ import com.rometools.modules.opensearch.OpenSearchModule;
 import com.rometools.modules.opensearch.entity.OSQuery;
 import com.rometools.modules.opensearch.impl.OpenSearchModuleImpl;
 import com.rometools.rome.io.FeedException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.content.DSpaceObject;

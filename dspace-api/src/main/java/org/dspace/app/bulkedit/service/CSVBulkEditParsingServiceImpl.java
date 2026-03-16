@@ -51,6 +51,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipTypeService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
@@ -308,7 +309,11 @@ public class CSVBulkEditParsingServiceImpl extends AbstractBulkEditParsingServic
         // Look to see if it should be removed
         BulkEditMetadataValue dcv = new BulkEditMetadataValue();
         dcv.setFromField(metadataField);
-        if (fromAuthority != null) {
+
+        boolean isAuthorityControlled = metadataAuthorityService.isAuthorityAllowed(
+            metadataField.getMetadataField("_"), Constants.ITEM, null);
+
+        if (fromAuthority != null && isAuthorityControlled) {
             if (value.indexOf(':') > 0) {
                 value = value.substring(0, value.indexOf(':'));
             }

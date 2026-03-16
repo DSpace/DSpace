@@ -41,16 +41,11 @@ ARG TARGET_DIR=dspace-installer
 # COPY the /install directory from 'build' container to /dspace-src in this container
 COPY --from=build /install /dspace-src
 WORKDIR /dspace-src
-# Create the initial install deployment using ANT
-ENV ANT_VERSION=1.10.13
-ENV ANT_HOME=/tmp/ant-$ANT_VERSION
-ENV PATH=$ANT_HOME/bin:$PATH
-# Download and install 'ant'
-RUN mkdir $ANT_HOME && \
-    curl --silent --show-error --location --fail --retry 5 --output /tmp/apache-ant.tar.gz \
-      https://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz && \
-    tar -zx --strip-components=1 -f /tmp/apache-ant.tar.gz -C $ANT_HOME && \
-    rm /tmp/apache-ant.tar.gz
+# Install Apache Ant
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ant \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
 # Run necessary 'ant' deploy scripts
 RUN ant init_installation update_configs update_code update_webapps
 

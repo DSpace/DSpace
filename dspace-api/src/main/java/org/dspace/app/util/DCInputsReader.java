@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.FactoryConfigurationError;
 
@@ -706,6 +707,62 @@ public class DCInputsReader {
             }
         }
         throw new DCInputsReaderException("No field configuration found!");
+    }
+
+
+    /**
+     * Resolves and retrieves {@link DCInputSet} definitions for nested metadata groups.
+     * <p>
+     * Scans the parent {@code formName} for fields with {@code input-type} 'group' or 'inline-group'.
+     * For each match, it resolves a sub-form using the naming convention:
+     * {@code [parentFormName]-[schema]-[element]-[qualifier]}
+     * </p>
+     * <ul>
+     * <li><b>group:</b> Standard nested container.</li>
+     * <li><b>inline-group:</b> UI hint for compact/horizontal layout.</li>
+     * </ul>
+     * <b>Example:</b> {@code publicationStepGroup} + {@code dc.contributor.author}
+     * &rarr; {@code publicationStepGroup-dc-contributor-author}
+     *
+     * @param formName The parent form identifier.
+     * @return List of resolved input sets for nested groups.
+     * @throws DCInputsReaderException if sub-form retrieval fails.
+     */
+    public List<DCInputSet> getInputsByGroup(String formName)
+        throws DCInputsReaderException {
+
+        List<DCInputSet> results = new ArrayList<DCInputSet>();
+
+        // cache miss - construct new DCInputSet
+        List<List<Map<String, String>>> pages = formDefns.get(formName);
+        if (pages == null) {
+            return results;
+        }
+
+        Iterator<List<Map<String, String>>> iterator = pages.iterator();
+
+        while (iterator.hasNext()) {
+            List<Map<String, String>> input = iterator.next();
+
+            for (Map<String, String> entry : input) {
+                Set<Map.Entry<String, String>> entrySet =
+                    entry.entrySet();
+
+                for (Map.Entry<String, String> attr : entrySet) {
+                    if (attr.getKey().equals("input-type") &&
+                        (attr.getValue().equals("group") || attr.getValue().equals("inline-group"))) {
+                        String schema = entry.get("dc-schema");
+                        String element = entry.get("dc-element");
+                        String qualifier = entry.get("dc-qualifier");
+                        String subFormName = formName + "-" + Utils.standardize(schema, element, qualifier, "-");
+                        results.add(getInputsByFormName(subFormName));
+                    }
+                }
+            }
+
+        }
+
+        return results;
     }
 
 }

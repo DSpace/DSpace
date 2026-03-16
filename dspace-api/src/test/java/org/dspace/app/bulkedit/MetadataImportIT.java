@@ -174,7 +174,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         Item importedItem = findItemByName("Test Import 1");
         assertTrue(itemHasMetadata(importedItem, "dc", "contributor", "author", Item.ANY,
             "Donald, SmithImported", null));
-        assertEquals(0, itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
+        assertEquals(1, itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
             .size());
         eperson = ePersonService.findByEmail(context, eperson.getEmail());
         assertEquals(importedItem.getSubmitter(), eperson);

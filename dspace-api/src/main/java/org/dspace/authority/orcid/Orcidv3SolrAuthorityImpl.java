@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
@@ -144,13 +144,12 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
             return null;
         }
         initializeAccessToken();
-        try {
-            InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"),
-                                                             accessToken);
+        try (InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"),
+                                                              accessToken)) {
             XMLtoBio converter = new XMLtoBio();
             return converter.convertSinglePerson(bioDocument);
-        } catch (OrcidConnectionException e) {
-            log.error("Error retrieving ORCID bio for ID=" + id, e);
+        } catch (OrcidConnectionException | IOException e) {
+            log.error("Error retrieving ORCID bio for ID={}", id, e);
             return null;
         }
     }

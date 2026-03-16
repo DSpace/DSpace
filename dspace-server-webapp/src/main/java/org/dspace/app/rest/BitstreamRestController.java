@@ -128,7 +128,7 @@ public class BitstreamRestController {
         Context context = ContextUtil.obtainContext(request);
         // Find bitstream
         Bitstream bit = bitstreamService.find(context, uuid);
-        if (bit == null) {
+        if (bit == null || bit.isDeleted()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
