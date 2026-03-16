@@ -280,7 +280,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
         context.commit();
@@ -431,7 +431,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
         context.commit();
@@ -474,7 +474,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -557,7 +557,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -618,7 +618,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -692,7 +692,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
         context.commit();
@@ -738,7 +738,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
         context.commit();
@@ -776,7 +776,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -823,7 +823,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -874,7 +874,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -939,7 +939,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -981,7 +981,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .withWorkflowGroup(1, eperson)
             .build();
@@ -1027,7 +1027,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -1382,12 +1382,12 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
         Collection persons = createCollection(context, community)
-            .withSubmissionDefinition("person")
+            .withSubmissionDefinition("person-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -1445,7 +1445,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Collection publication = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
         context.commit();
@@ -1500,7 +1500,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Collection publication = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
         context.commit();
@@ -1555,7 +1555,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Collection publication = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
         context.commit();
@@ -1602,7 +1602,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         try {
             context.turnOffAuthorisationSystem();
             Collection publication = createCollection(context, community)
-                    .withSubmissionDefinition("publication")
+                    .withSubmissionDefinition("publication-bulkimport")
                     .withAdminGroup(eperson)
                     .build();
             context.commit();
@@ -1650,7 +1650,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
             context.turnOffAuthorisationSystem();
             Collection publication = createCollection(context, community)
-                    .withSubmissionDefinition("publication")
+                    .withSubmissionDefinition("publication-bulkimport")
                     .withAdminGroup(eperson)
                     .build();
             context.commit();
@@ -1711,7 +1711,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Collection publication = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
         context.commit();
@@ -1765,7 +1765,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Collection publication = createCollection(context, community)
-                .withSubmissionDefinition("publication")
+                .withSubmissionDefinition("publication-bulkimport")
                 .withAdminGroup(eperson)
                 .build();
         context.commit();
@@ -1810,7 +1810,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Collection publication = createCollection(context, community)
-                .withSubmissionDefinition("publication")
+                .withSubmissionDefinition("publication-bulkimport")
                 .withAdminGroup(eperson)
                 .build();
         context.commit();
@@ -1854,7 +1854,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
     public void testUploadSingleBitstreamUpdate() throws Exception {
         context.turnOffAuthorisationSystem();
         Collection publication = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -1893,7 +1893,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
     public void testUploadMultipleBitstreamsUpdateMultiple() throws Exception {
         context.turnOffAuthorisationSystem();
         Collection publication = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -1946,7 +1946,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
     public void testUploadSingleBitstreamUpdateWithExistingBundle() throws Exception {
         context.turnOffAuthorisationSystem();
         Collection publication = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -1994,7 +1994,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -2081,7 +2081,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Collection publication = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -2144,7 +2144,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
 
         Collection publication = createCollection(context, community)
-                .withSubmissionDefinition("publication")
+                .withSubmissionDefinition("publication-bulkimport")
                 .withAdminGroup(eperson)
                 .build();
 
@@ -2226,7 +2226,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Collection publication = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -2282,7 +2282,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Collection publication = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -2346,7 +2346,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         // prepare data
         context.turnOffAuthorisationSystem();
         Collection publication = createCollection(context, community)
-                .withSubmissionDefinition("publication")
+                .withSubmissionDefinition("publication-bulkimport")
                 .withAdminGroup(eperson)
                 .build();
         Item publication1 = createItem(context, publication)
@@ -2445,7 +2445,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
         context.commit();
@@ -2513,7 +2513,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -2606,7 +2606,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 
@@ -2679,7 +2679,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Collection publications = createCollection(context, community)
-            .withSubmissionDefinition("publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .withAdminGroup(eperson)
             .build();
 

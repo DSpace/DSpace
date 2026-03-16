@@ -81,7 +81,6 @@ public class MetadataImportIT extends AbstractEntityIntegrationTest {
         Community community = CommunityBuilder.createCommunity(context).build();
         collection =
             CollectionBuilder.createCollection(context, community)
-                             .withAdminGroup(eperson)
                              .build();
         context.restoreAuthSystemState();
     }
@@ -101,7 +100,7 @@ public class MetadataImportIT extends AbstractEntityIntegrationTest {
         String[] csv = {"id,collection,dc.title,dc.contributor.author",
             "+," + collection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
 
-        performImportScript(csv, eperson);
+        performImportScript(csv, admin);
 
         Item importedItem = findItemByName("Test Import 1");
         assertTrue(
@@ -111,7 +110,7 @@ public class MetadataImportIT extends AbstractEntityIntegrationTest {
             )
         );
 
-        assertEquals(importedItem.getSubmitter(), eperson);
+        assertEquals(importedItem.getSubmitter(), admin);
 
         context.turnOffAuthorisationSystem();
         itemService.delete(context, itemService.find(context, importedItem.getID()));
