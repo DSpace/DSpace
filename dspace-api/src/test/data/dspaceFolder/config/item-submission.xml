@@ -39,7 +39,8 @@
         <name-map collection-handle="123456789/modeA" submission-name="modeA"/>
         <name-map collection-handle="123456789/mode2" submission-name="modeB"/>
         <name-map collection-handle="123456789/patent-test" submission-name="patent"/>
-        <name-map collection-handle="123456789/publication-1" submission-name="publication"/>
+        <name-map collection-handle="123456789/publication-1" submission-name="publication-bulkimport"/>
+        <name-map collection-handle="123456789/person" submission-name="person-bulkimport"/>
     </submission-map>
 
 
@@ -485,7 +486,7 @@
             <step id="license" />
         </submission-process>
 
-        <submission-process name="publication">
+        <submission-process name="publication-bulkimport">
             <step id="collection" />
             <step id="extraction" />
             <step id="publication" />
@@ -497,7 +498,7 @@
             <step id="license" />
         </submission-process>
 
-        <submission-process name="person">
+        <submission-process name="person-bulkimport">
             <step id="collection" />
             <step id="person" />
             <step id="detect-duplicate" />

@@ -20,7 +20,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.dspace.content.CacheableDSpaceObject;
 import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.content.Item;
@@ -120,9 +119,10 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
 
     /**
      * Return true if this object equals obj, false otherwise.
+     * Compares ID, email, and fullName for equality.
      *
      * @param obj another EPerson.
-     * @return true if EPerson objects are equal in ID, email, and full name
+     * @return true if EPerson objects are equal in ID
      */
     @Override
     public boolean equals(Object obj) {
@@ -134,13 +134,7 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
             return false;
         }
         final EPerson other = (EPerson) obj;
-        if (this.getID().equals(other.getID())) {
-            return true;
-        }
-        if (!Strings.CS.equals(this.getEmail(), other.getEmail())) {
-            return false;
-        }
-        return Strings.CS.equals(this.getFullName(), other.getFullName());
+        return this.getID().equals(other.getID());
     }
 
     /**

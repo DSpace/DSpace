@@ -118,9 +118,11 @@ public class BulkImportWorkbookBuilderIT extends AbstractIntegrationTestWithData
         parentCommunity = createCommunity(context).build();
         publications = createCollection(context, parentCommunity)
             .withEntityType("Publication")
+            .withSubmissionDefinition("publication-bulkimport")
             .build();
         persons = createCollection(context, parentCommunity)
             .withEntityType("Person")
+            .withSubmissionDefinition("person-bulkimport")
             .build();
         context.restoreAuthSystemState();
 
@@ -229,11 +231,11 @@ public class BulkImportWorkbookBuilderIT extends AbstractIntegrationTestWithData
             is("Start reading all the bitstream rows"),
             is("Found 4 bitstreams to process"),
             is("Found 2 items to process"),
-            containsString("Sheet bitstream-metadata - Row 2 - Bitstream created successfully"),
-            containsString("Sheet bitstream-metadata - Row 3 - Bitstream created successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 2 - Bitstream created successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 3 - Bitstream created successfully"),
             containsString("Row 2 - WorkflowItem created successfully"),
-            containsString("Sheet bitstream-metadata - Row 4 - Bitstream created successfully"),
-            containsString("Sheet bitstream-metadata - Row 5 - Bitstream created successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 4 - Bitstream created successfully"),
+            containsString("Sheet 'bitstream-metadata' - Row 5 - Bitstream created successfully"),
             containsString("Row 3 - WorkflowItem created successfully")));
 
         Item firstItem = getItemFromMessage(handler.getInfoMessages().get(7));
@@ -249,8 +251,8 @@ public class BulkImportWorkbookBuilderIT extends AbstractIntegrationTestWithData
             with("dc.subject", "DSpace", 2),
             with("dc.contributor.author", "White, Walter", authorId, 600),
             with("oairecerif.author.affiliation", PLACEHOLDER_PARENT_METADATA_VALUE),
-            with("cris.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE),
-            with("cris.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE)));
+            with("dspace.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE),
+            with("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE)));
 
         assertThat(getItemBitstreamsByBundle(firstItem, "ORIGINAL"), contains(
             bitstreamWith("Bitstream 1", "First bitstream content"),
@@ -269,10 +271,10 @@ public class BulkImportWorkbookBuilderIT extends AbstractIntegrationTestWithData
             with("dc.contributor.author", "Test User", testUser.getID().toString(), 1, 600),
             with("oairecerif.author.affiliation", PLACEHOLDER_PARENT_METADATA_VALUE),
             with("oairecerif.author.affiliation", "Company", 1),
-            with("cris.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE),
-            with("cris.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE),
-            with("cris.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE),
-            with("cris.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE)
+            with("dspace.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE),
+            with("dspace.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE),
+            with("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE),
+            with("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE)
         ));
 
         assertThat(getItemBitstreamsByBundle(secondItem, "ORIGINAL"), contains(
