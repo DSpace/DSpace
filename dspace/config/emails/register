@@ -1,18 +1,17 @@
-## E-mail sent to DSpace users when they register for an account
-##
-## Parameters: {0} is expanded to a special registration URL
-##
-## See org.dspace.core.Email for information on the format of this file.
-##
-#set($subject = "${config.get('dspace.name')} Account Registration")
+## E-mail enviado aos usuários do InterAcoes ao se registrarem
+
+#set($subject = "${config.get('dspace.name')} Cadastro de Conta" )
 #set($phone = ${config.get('mail.message.helpdesk.telephone')})
-To complete registration for a ${config.get('dspace.name')} account, please click the link below:
+
+
+Para concluir o cadastro de uma conta no ${config.get('dspace.name')}, clique no link abaixo:
 
   ${params[0]}
 
-If you need assistance with your account, please email ${config.get("mail.helpdesk")}
+##Se precisar de ajuda com sua conta, envie um e-mail para ${config.get("mail.helpdesk")}.
+
 #if( $phone )
-or call us at ${phone}.
+Ou entre em contato pelo telefone: ${phone}
 #end
 
-The ${config.get('dspace.name')} Team
+Equipe ${config.get('dspace.name')}
