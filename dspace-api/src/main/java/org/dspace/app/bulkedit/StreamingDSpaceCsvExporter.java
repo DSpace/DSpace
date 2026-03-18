@@ -40,13 +40,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Streaming CSV exporter that writes item metadata directly to a temporary file
  * instead of accumulating all data in memory. This avoids OutOfMemoryError for
- * large exports.
+ * large exports by extracting only lightweight string data from each Item and
+ * releasing the Hibernate entity immediately.
  *
- * <p>Uses a two-pass approach:
- * <ol>
- *   <li>Pass 1: Collect all unique metadata field headers (lightweight)</li>
- *   <li>Pass 2: Write CSV rows directly to a temp file</li>
- * </ol>
+ * <p>Uses a single-pass approach: iterates items once, extracting metadata into
+ * lightweight row data objects. Item entities are uncached immediately after
+ * extraction. The CSV is then written to a temp file from the extracted data.
  *
  * <p>This class is export-only. For CSV import, use {@link DSpaceCSV}.
  *
@@ -64,7 +63,7 @@ public class StreamingDSpaceCsvExporter {
      * Export items to CSV via streaming, returning an InputStream over a temp file.
      *
      * @param context               the DSpace context
-     * @param itemIteratorSupplier  supplier that provides a fresh item iterator (called twice)
+     * @param itemIteratorSupplier  supplier that provides a fresh item iterator (called once)
      * @param exportAll             whether to export all metadata including ignored fields
      * @param limit                 maximum number of items to export
      * @return an InputStream over the CSV content; caller must close it
@@ -80,25 +79,24 @@ public class StreamingDSpaceCsvExporter {
         String authoritySeparator = getConfigProperty("bulkedit.authorityseparator", "::");
         Map<String, String> ignoreFields = buildIgnoreMap();
 
-        // Pass 1: collect headers
+        // Single pass: iterate items once, extracting lightweight row data.
+        // Item entities are uncached immediately after extraction to avoid OOM.
         Set<String> headerSet = new LinkedHashSet<>();
-        Iterator<Item> pass1 = itemIteratorSupplier.get();
+        List<RowData> rows = new ArrayList<>();
+
+        Iterator<Item> items = itemIteratorSupplier.get();
         int itemCount = 0;
-        while (pass1.hasNext() && itemCount < limit) {
-            Item item = pass1.next();
+        while (items.hasNext() && itemCount < limit) {
+            Item item = items.next();
             itemCount++;
             if (item.getOwningCollection() == null) {
                 context.uncacheEntity(item);
                 continue;
             }
-            List<MetadataValue> md = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-            for (MetadataValue value : md) {
-                MetadataField metadataField = value.getMetadataField();
-                if (exportAll || okToExport(metadataField, ignoreFields)) {
-                    String key = buildMetadataKey(value);
-                    headerSet.add(key);
-                }
-            }
+
+            RowData row = extractRowData(item, exportAll, ignoreFields, authoritySeparator);
+            headerSet.addAll(row.metadata.keySet());
+            rows.add(row);
             context.uncacheEntity(item);
         }
 
@@ -106,7 +104,7 @@ public class StreamingDSpaceCsvExporter {
         List<String> sortedHeaders = new ArrayList<>(headerSet);
         Collections.sort(sortedHeaders);
 
-        // Pass 2: write rows to temp file
+        // Write CSV to temp file
         File tempFile = File.createTempFile("dspace-csv-export-", ".csv");
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(tempFile), StandardCharsets.UTF_8))) {
@@ -122,22 +120,11 @@ public class StreamingDSpaceCsvExporter {
             writer.newLine();
 
             // Write data rows
-            Iterator<Item> pass2 = itemIteratorSupplier.get();
-            int rowCount = 0;
-            while (pass2.hasNext() && rowCount < limit) {
-                Item item = pass2.next();
-                rowCount++;
-                if (item.getOwningCollection() == null) {
-                    context.uncacheEntity(item);
-                    continue;
-                }
-                writeItemRow(writer, item, sortedHeaders, fieldSeparator,
-                             valueSeparator, authoritySeparator,
-                             exportAll, ignoreFields);
-                context.uncacheEntity(item);
+            for (RowData row : rows) {
+                writeRow(writer, row, sortedHeaders, fieldSeparator, valueSeparator);
+                writer.newLine();
             }
         } catch (Exception e) {
-            // Clean up temp file on error
             tempFile.delete();
             throw e;
         }
@@ -146,16 +133,25 @@ public class StreamingDSpaceCsvExporter {
     }
 
     /**
-     * Write a single item as a CSV row.
+     * Extract lightweight row data from an Item, containing only strings.
+     * The caller should uncache the Item entity after calling this method.
      */
-    private void writeItemRow(BufferedWriter writer, Item item,
-                              List<String> sortedHeaders,
-                              String fieldSeparator, String valueSeparator,
-                              String authoritySeparator,
-                              boolean exportAll, Map<String, String> ignoreFields)
-        throws Exception {
-        // Build metadata map for this item: key -> list of values
-        Map<String, List<String>> metadataMap = new HashMap<>();
+    private RowData extractRowData(Item item, boolean exportAll,
+                                   Map<String, String> ignoreFields,
+                                   String authoritySeparator) {
+        RowData row = new RowData();
+        row.id = item.getID().toString();
+
+        // Collection values: owning first, then mapped
+        String owningHandle = item.getOwningCollection().getHandle();
+        row.collections.add(owningHandle);
+        for (Collection c : item.getCollections()) {
+            if (!Objects.equals(c.getHandle(), owningHandle)) {
+                row.collections.add(c.getHandle());
+            }
+        }
+
+        // Metadata
         List<MetadataValue> md = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (MetadataValue value : md) {
             MetadataField metadataField = value.getMetadataField();
@@ -167,38 +163,36 @@ public class StreamingDSpaceCsvExporter {
                         + authoritySeparator
                         + (value.getConfidence() != -1 ? value.getConfidence() : Choices.CF_ACCEPTED);
                 }
-                metadataMap.computeIfAbsent(key, k -> new ArrayList<>()).add(mdValue);
+                row.metadata.computeIfAbsent(key, k -> new ArrayList<>()).add(mdValue);
             }
         }
 
-        // Build collection values: owning first, then mapped
-        List<String> collectionValues = new ArrayList<>();
-        String owningHandle = item.getOwningCollection().getHandle();
-        collectionValues.add(owningHandle);
-        for (Collection c : item.getCollections()) {
-            if (!Objects.equals(c.getHandle(), owningHandle)) {
-                collectionValues.add(c.getHandle());
-            }
-        }
+        return row;
+    }
 
+    /**
+     * Write a row to the CSV writer.
+     */
+    private void writeRow(BufferedWriter writer, RowData row,
+                          List<String> sortedHeaders,
+                          String fieldSeparator, String valueSeparator) throws IOException {
         // Write id
         writer.write("\"");
-        writer.write(item.getID().toString());
+        writer.write(row.id);
         writer.write("\"");
         writer.write(fieldSeparator);
 
         // Write collection
-        writer.write(valueToCSV(collectionValues, valueSeparator));
+        writer.write(valueToCSV(row.collections, valueSeparator));
 
         // Write each metadata column
         for (String header : sortedHeaders) {
             writer.write(fieldSeparator);
-            List<String> values = metadataMap.get(header);
+            List<String> values = row.metadata.get(header);
             if (values != null && !"collection".equals(header)) {
                 writer.write(valueToCSV(values, valueSeparator));
             }
         }
-        writer.newLine();
     }
 
     /**
@@ -295,6 +289,16 @@ public class StreamingDSpaceCsvExporter {
             return "#";
         }
         return separator;
+    }
+
+    /**
+     * Lightweight data extracted from an Item for CSV export.
+     * Contains only strings, allowing the Item entity to be uncached immediately.
+     */
+    private static class RowData {
+        String id;
+        List<String> collections = new ArrayList<>();
+        Map<String, List<String>> metadata = new HashMap<>();
     }
 
     /**
