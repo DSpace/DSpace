@@ -9,6 +9,7 @@ package org.dspace.authority.orcid;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
@@ -39,7 +40,7 @@ public class MockOrcid extends Orcidv3SolrAuthorityImpl {
         // Mock getReadPublicAccessToken to return a mock token
         OrcidTokenResponseDTO mockToken = new OrcidTokenResponseDTO();
         mockToken.setAccessToken("mock-access-token");
-        when(mockOrcidClient.getReadPublicAccessToken()).thenReturn(mockToken);
+        lenient().when(mockOrcidClient.getReadPublicAccessToken()).thenReturn(mockToken);
         // Set via field injection workaround
         this.orcidClient = mockOrcidClient;
     }
