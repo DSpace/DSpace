@@ -13,8 +13,8 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -132,9 +132,9 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
         checkMetadataWithAnotherSchema();
         checkBitstream();
 
-        // confirm that TEMP_DIR still exists
+        // "add" reads directly from the ZIP, so no extraction directory is created
         File workTempDir = new File(workDir + File.separator + TEMP_DIR);
-        assertTrue(workTempDir.exists());
+        assertFalse(workTempDir.exists());
     }
 
     @Test
