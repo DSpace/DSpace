@@ -21,6 +21,7 @@ import org.dspace.orcid.exception.OrcidClientException;
 import org.dspace.orcid.model.OrcidTokenResponseDTO;
 import org.mockito.Mockito;
 import org.orcid.jaxb.model.v3.release.record.Person;
+import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedResult;
 import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
 
 /**
@@ -66,13 +67,17 @@ public class MockOrcid extends Orcidv3SolrAuthorityImpl {
      * @throws OrcidClientException if mock setup fails
      */
     public void setupSingleSearch() throws OrcidClientException {
-        // For single search, return empty results (the original mock loaded orcid-search.xml
-        // which contained a single result, but the actual person data is loaded separately)
-        ExpandedSearch emptySearch = new ExpandedSearch();
+        // Return a single search result matching orcid-search.xml (ORCID ID 0000-0002-9029-1854).
+        // This overrides the no-results mock for queries that match "Bollini".
+        ExpandedSearch singleResult = new ExpandedSearch();
+        ExpandedResult result = new ExpandedResult();
+        result.setOrcidId("0000-0002-9029-1854");
+        singleResult.getResults().add(result);
+        singleResult.setNumFound(1L);
         when(mockOrcidClient.expandedSearch(anyString(), anyString(), anyInt(), anyInt()))
-                .thenReturn(emptySearch);
+                .thenReturn(singleResult);
         when(mockOrcidClient.expandedSearch(anyString(), anyInt(), anyInt()))
-                .thenReturn(emptySearch);
+                .thenReturn(singleResult);
     }
 
     /**
