@@ -9,15 +9,14 @@ package org.dspace.curate;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,7 +36,6 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
-import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Curator orchestrates and manages the application of a one or more curation
@@ -98,8 +96,6 @@ public class Curator {
     protected ItemService itemService;
     protected HandleService handleService;
     protected DSpaceRunnableHandler handler;
-    protected int batchSize =
-            DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("curate.batch.size");
 
     /**
      * constructor that uses an handler for logging
@@ -475,46 +471,29 @@ public class Curator {
      * @return true if successful, false otherwise
      * @throws IOException if IO error
      */
-    private Integer total = null;
-    private int current = 0;
-    private Date start = null;
-    private Date last = null;
-    private final DecimalFormat df = new DecimalFormat("0.00");
     protected boolean doCollection(Context context, TaskRunner tr, Collection coll) throws IOException {
         try {
             if (!tr.run(context, coll)) {
                 return false;
             }
-            if (total == null) {
-                total = itemService.countTotal(context);
-                start = new Date();
-                last = start;
-            }
 
-            int offset = 0;
-            boolean hasNext;
-            do {
-                coll = context.reloadEntity(coll);
-                Iterator<Item> iter = itemService.findByCollection(context, coll, batchSize, offset);
-                hasNext = iter.hasNext();
-                while (iter.hasNext()) {
-                    Item item = iter.next();
-                    offset++;
-                    boolean shouldContinue = tr.run(context, item);
-                    if (!shouldContinue) {
-                        return false;
-                    }
-                    if (++current % 100 == 0) {
-                        Date now = new Date();
-                        float ms = (float) (now.getTime() - last.getTime());
-                        float avgSeconds = (float) (now.getTime() - start.getTime()) / 1000 / (current / 100);
-                        System.out.println(current + " / " + total + " -- " + ms +
-                                "ms - (avg " + df.format(avgSeconds) + "s per 100)");
-                        last = now;
-                    }
+            coll = context.reloadEntity(coll);
+            Iterator<Item> iter = itemService.findByCollection(context, coll);
+            List<UUID> uuids = new ArrayList<>();
+            while (iter.hasNext()) {
+                Item next = iter.next();
+                uuids.add(next.getID());
+                context.uncacheEntity(next);
+            }
+            context.commit();
+            for (UUID uuid : uuids) {
+                Item item = itemService.find(context, uuid);
+                boolean shouldContinue = tr.run(context, item);
+                if (!shouldContinue) {
+                    return false;
                 }
                 context.commit();
-            } while (hasNext);
+            }
         } catch (SQLException sqlE) {
             throw new IOException(sqlE.getMessage(), sqlE);
         }

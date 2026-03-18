@@ -9,9 +9,7 @@ package org.dspace.curate;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -87,30 +85,14 @@ public abstract class AbstractCurationTask implements CurationTask {
      * @param dso current DSpaceObject
      * @throws IOException if IO error
      */
-    private Integer total = null;
-    private int current = 0;
-    private Date start = null;
-    private Date last = null;
-    private final DecimalFormat df = new DecimalFormat("0.00");
-    private final int PAGE_SIZE = 100;
     protected void distribute(Context context, DSpaceObject dso) throws IOException {
         try {
-            if (total == null) {
-                total = itemService.countTotal(context);
-                start = new Date();
-                last = start;
-            }
             //perform task on this current object
             performObject(context, dso);
 
             //next, we'll try to distribute to all child objects, based on container type
             int type = dso.getType();
             if (Constants.COLLECTION == type) {
-                Collection collection = (Collection) dso;
-                System.out.println();
-                System.out.println("NEW COLLECTION: " + itemService.countItems(context, collection));
-                System.out.println();
-
                 Iterator<Item> iter = itemService.findByCollection(context,
                         (Collection) context.reloadEntity(dso));
                 List<UUID> uuids = new ArrayList<>();
@@ -122,18 +104,6 @@ public abstract class AbstractCurationTask implements CurationTask {
                 context.commit();
                 for (UUID uuid : uuids) {
                     Item item = itemService.find(context, uuid);
-                    if (++current % 1000 == 0) {
-                        Date now = new Date();
-                        float ms = (float) (now.getTime() - last.getTime());
-                        float avgSeconds = (float) (now.getTime() - start.getTime()) / 1000 / (current / 1000);
-                        Runtime runtime = Runtime.getRuntime();
-                        long usedMemory = runtime.totalMemory() - runtime.freeMemory();
-
-                        System.out.println(current + " / " + total + " -- " + ms +
-                                "ms - (avg " + df.format(avgSeconds) + "s per 1000) - Used memory: " +
-                                (usedMemory / (1024 * 1024)) + "MB");
-                        last = now;
-                    }
                     performObject(context, item);
                     context.commit();
                 }
