@@ -159,8 +159,4 @@
         <constructor-arg value="dc.publisher"/>
     </bean>
 
-    <bean class="java.lang.Integer" id="maxRetry">
-        <constructor-arg value="3"/>
-    </bean>
-
 </beans>

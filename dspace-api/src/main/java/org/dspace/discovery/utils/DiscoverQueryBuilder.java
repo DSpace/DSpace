@@ -18,6 +18,7 @@ import java.util.Objects;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
@@ -36,6 +37,7 @@ import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+import org.dspace.discovery.configuration.MultiLanguageDiscoverSearchFilterFacet;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.utils.parameter.QueryBuilderSearchFilter;
 import org.dspace.services.ConfigurationService;
@@ -241,12 +243,17 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
         } else {
 
+            String indexFieldName = facet.getIndexFieldName();
+            if (facet instanceof MultiLanguageDiscoverSearchFilterFacet) {
+                indexFieldName = context.getCurrentLocale().getLanguage() + "_" + indexFieldName;
+            }
+
             //Add one to our facet limit to make sure that if we have more then the shown facets that we show our
             // "show more" url
             int facetLimit = pageSize + 1;
             //This should take care of the sorting for us
             prefix = StringUtils.isNotBlank(prefix) ? prefix.toLowerCase() : null;
-            queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), facetLimit,
+            queryArgs.addFacetField(new DiscoverFacetField(indexFieldName, facet.getType(), facetLimit,
                                                            facet.getSortOrderSidebar(),
                                                            StringUtils.trimToNull(prefix)));
         }
@@ -364,7 +371,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
     private String getDsoType(String dsoType) throws IllegalArgumentException {
         for (IndexFactory indexFactory : indexableFactories) {
-            if (StringUtils.equalsIgnoreCase(indexFactory.getType(), dsoType)) {
+            if (Strings.CI.equals(indexFactory.getType(), dsoType)) {
                 return indexFactory.getType();
             }
         }
@@ -407,11 +414,19 @@ public class DiscoverQueryBuilder implements InitializingBean {
                     throw new IllegalArgumentException(searchFilter.getName() + " is not a valid search filter");
                 }
 
-                DiscoverFilterQuery filterQuery = searchService.toFilterQuery(context,
-                                                                              filter.getIndexFieldName(),
-                                                                              searchFilter.getOperator(),
-                                                                              searchFilter.getValue(),
-                                                                              discoveryConfiguration);
+                String field = filter.getIndexFieldName();
+                if (filter instanceof MultiLanguageDiscoverSearchFilterFacet) {
+                    field = context.getCurrentLocale().getLanguage() + "_" + field;
+                }
+
+                DiscoverFilterQuery filterQuery =
+                    searchService.toFilterQuery(
+                        context,
+                        field,
+                        searchFilter.getOperator(),
+                        searchFilter.getValue(),
+                        discoveryConfiguration
+                );
 
                 if (filterQuery != null) {
                     filterQueries.add(filterQuery.getFilterQuery());

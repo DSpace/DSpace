@@ -75,6 +75,7 @@ public class DailyReportEmailer {
             email.setContent("Checker Report", "report is attached ...");
             email.addAttachment(attachment, "checksum_checker_report.txt");
             email.addRecipient(configurationService.getProperty("mail.admin"));
+            log.info("Sending checker report email to " + configurationService.getProperty("mail.admin"));
             email.send();
         }
     }
@@ -109,18 +110,19 @@ public class DailyReportEmailer {
         Options options = new Options();
 
         options.addOption("h", "help", false, "Help");
-        options.addOption("d", "Deleted", false,
-                          "Send E-mail report for all bitstreams set as deleted for today");
-        options.addOption("m", "Missing", false,
-                          "Send E-mail report for all bitstreams not found in assetstore for today");
-        options.addOption("c", "Changed", false,
-                          "Send E-mail report for all bitstreams where checksum has been changed for today");
-        options.addOption("a", "All", false,
-                          "Send all E-mail reports");
-        options.addOption("u", "Unchecked", false,
-                          "Send the Unchecked bitstream report");
-        options.addOption("n", "Not Processed", false,
-                          "Send E-mail report for all bitstreams set to longer be processed for today");
+        options.addOption("d", "deleted", false,
+                          "Send email report for all bitstreams set as deleted for today");
+        options.addOption("m", "missing", false,
+                          "Send email report for all bitstreams not found in assetstore for today");
+        options.addOption("c", "changed", false,
+                          "Send email report for all bitstreams where checksum has been changed for today");
+        options.addOption("a", "all", false,
+                          "Send all email reports (used by default)");
+        options.addOption("u", "unchecked", false,
+                          "Send the unchecked (i.e. recently added) bitstream email report");
+        options.addOption("n", "not-processed", false,
+                          "Send email report for all bitstreams set to no longer be processed for today (includes"
+                            + " bitstreams marked as deleted or not found)");
 
         try {
             line = parser.parse(options, args);
@@ -133,13 +135,15 @@ public class DailyReportEmailer {
         if (line.hasOption('h')) {
             HelpFormatter myhelp = new HelpFormatter();
 
-            myhelp.printHelp("Checksum Reporter\n", options);
-            System.out.println("\nSend Deleted bitstream email report: DailyReportEmailer -d");
-            System.out.println("\nSend Missing bitstreams email report: DailyReportEmailer -m");
-            System.out.println("\nSend Checksum Changed email report: DailyReportEmailer -c");
-            System.out.println("\nSend bitstream not to be processed email report: DailyReportEmailer -n");
-            System.out.println("\nSend Un-checked bitstream report: DailyReportEmailer -u");
-            System.out.println("\nSend All email reports: DailyReportEmailer");
+            myhelp.printHelp("checker-emailer\n", options);
+            System.out.println("\nChecksum Checker Reporter usage examples:\n");
+            System.out.println(" - Send all email reports: checker-emailer -a");
+            System.out.println(" - Send deleted bitstream email report: checker-emailer -d");
+            System.out.println(" - Send missing bitstreams email report: checker-emailer -m");
+            System.out.println(" - Send checksum changed email report: checker-emailer -c");
+            System.out.println(" - Send bitstream not to be processed email report: checker-emailer -n");
+            System.out.println(" - Send unchecked bitstream email report: checker-emailer -u");
+            System.out.println("\nDefault (no arguments) is equivalent to 'checker-emailer -a'\n");
             System.exit(0);
         }
 
@@ -186,7 +190,9 @@ public class DailyReportEmailer {
                 writer.write("\n--------------------------------- Report Spacer ---------------------------\n\n");
                 numBitstreams += reporter.getBitstreamNotFoundReport(context, yesterday, tomorrow, writer);
                 writer.write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getNotToBeProcessedReport(context, yesterday, tomorrow, writer);
+                // not to be processed report includes deleted and not found bitstreams so it is not necessary to
+                // include the sum in the counter
+                reporter.getNotToBeProcessedReport(context, yesterday, tomorrow, writer);
                 writer.write("\n--------------------------------- Report Spacer ---------------------------\n\n");
                 numBitstreams += reporter.getUncheckedBitstreamsReport(context, writer);
                 writer.write("\n--------------------------------- End Report ---------------------------\n\n");

@@ -34,6 +34,8 @@
     <xsl:param name="prefix">10.5072/dspace-</xsl:param>
     <!-- The content of the following parameter will be used as element publisher. -->
     <xsl:param name="publisher">My University</xsl:param>
+    <!-- The content of the following variable will be used as the ROR of the publisher. If there is no ROR, leave this blank -->
+    <xsl:param name="publisherRor"></xsl:param>
     <!-- The content of the following variable will be used as element contributor with contributorType datamanager. -->
     <xsl:param name="datamanager"><xsl:value-of select="$publisher" /></xsl:param>
     <!-- The content of the following variable will be used as element contributor with contributorType hostingInstitution. -->
@@ -125,6 +127,11 @@
                         <xsl:value-of select="//dspace:field[@mdschema='dc' and @element='publisher'][1]" />
                     </xsl:when>
                     <xsl:otherwise>
+                        <xsl:if test="$publisherRor">
+                            <xsl:attribute name="publisherIdentifier" select="$publisherRor" />
+                            <xsl:attribute name="publisherIdentifierScheme">ROR</xsl:attribute>
+                            <xsl:attribute name="schemeURI">https://ror.org</xsl:attribute>
+                        </xsl:if>
                         <xsl:value-of select="$publisher" />
                     </xsl:otherwise>
                 </xsl:choose>
@@ -289,9 +296,12 @@
             <!--
                  DataCite (15)
                  Add version.
-                 As we currently do not link versions as related identifier, we skip
-                the version information too.
             -->
+            <xsl:if test="@itemVersion">
+                <xsl:element name="version">
+                    <xsl:value-of select="@itemVersion" />
+                </xsl:element>
+            </xsl:if>
 
             <!--
                 DataCite (16)
@@ -350,16 +360,23 @@
                 <xsl:if test="starts-with(string(text()), 'http://dx.doi.org/')">
                     <xsl:value-of select="substring(., 19)"/>
                 </xsl:if>
+                <xsl:if test="starts-with(string(text()), 'https://api.test.datacite.org/')">
+                    <xsl:value-of select="substring(., 31)"/>
+                </xsl:if>
             </identifier>
         </xsl:if>
     </xsl:template>
 
     <!-- DataCite (2) :: Creator -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']">
+        <xsl:variable name="authority" select="@authority"/>
         <creator>
             <creatorName>
                 <xsl:value-of select="." />
             </creatorName>
+            <xsl:call-template name="personOrcid">
+                <xsl:with-param name="authority_value" select="$authority"/>
+            </xsl:call-template>
         </creator>
     </xsl:template>
 
@@ -640,6 +657,21 @@
             </xsl:attribute>
             <xsl:value-of select="." />
         </xsl:element>
+    </xsl:template>
+
+    <!--
+        This template will return ORCiD nameIdentifier information based on a given authority value, if a person entity
+        is related with the publication and contains a value for the metadata field dc.identifier.orcid.
+    -->
+    <xsl:template name="personOrcid">
+        <xsl:param name="authority_value"/>
+        <xsl:if test="starts-with($authority_value, 'virtual::') and //dspace:field[@mdschema='person' and @element='identifier' and @qualifier='orcid' and @authority=$authority_value]">
+            <xsl:element name="nameIdentifier">
+                <xsl:attribute name="schemeURI">https://orcid.org/</xsl:attribute>
+                <xsl:attribute name="nameIdentifierScheme">ORCID</xsl:attribute>
+                <xsl:value-of select="//dspace:field[@mdschema='person' and @element='identifier' and @qualifier='orcid' and @authority=$authority_value]/text()"/>
+            </xsl:element>
+        </xsl:if>
     </xsl:template>
 
 </xsl:stylesheet>

@@ -8,7 +8,6 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
-import static jakarta.mail.internet.MimeUtility.encodeText;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
@@ -61,7 +60,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -366,7 +367,11 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         //2. A public item with a bitstream
 
         String bitstreamContent = "0123456789";
-        String bitstreamName = "ภาษาไทย";
+        String bitstreamName = "ภาษาไทย-com-acentuação.pdf";
+        String expectedAscii = "-com-acentuacao.pdf";
+        String expectedUtf8Encoded =
+        "%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2-"
+        + "com-acentua%C3%A7%C3%A3o.pdf";
 
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
 
@@ -390,7 +395,9 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
             //We expect the content disposition to have the encoded bitstream name
             .andExpect(header().string(
                 "Content-Disposition",
-                "attachment;filename=\"" + encodeText(bitstreamName) + "\""
+                String.format("attachment; filename=\"%s\"; filename*=UTF-8''%s",
+                              expectedAscii,
+                              expectedUtf8Encoded)
             ));
     }
 
@@ -983,7 +990,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
             // The citation cover page contains the item title.
             // We will now verify that the pdf text contains this title.
             String pdfText = extractPDFText(content);
-            assertTrue(StringUtils.contains(pdfText,"Public item citation cover page test 1"));
+            assertTrue(Strings.CS.contains(pdfText,"Public item citation cover page test 1"));
 
             // The dspace-api/src/test/data/dspaceFolder/assetstore/ConstitutionofIreland.pdf file contains 64 pages,
             // manually counted + 1 citation cover page
@@ -1007,7 +1014,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
         try (ByteArrayInputStream source = new ByteArrayInputStream(content);
              Writer writer = new StringWriter();
-             PDDocument pdfDoc = PDDocument.load(source)) {
+             PDDocument pdfDoc = Loader.loadPDF(new RandomAccessReadBuffer(source))) {
 
             pts.writeText(pdfDoc, writer);
             return writer.toString();
@@ -1016,7 +1023,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
     private int getNumberOfPdfPages(byte[] content) throws IOException {
         try (ByteArrayInputStream source = new ByteArrayInputStream(content);
-             PDDocument pdfDoc = PDDocument.load(source)) {
+            PDDocument pdfDoc = Loader.loadPDF(new RandomAccessReadBuffer(source))) {
             return pdfDoc.getNumberOfPages();
         }
     }

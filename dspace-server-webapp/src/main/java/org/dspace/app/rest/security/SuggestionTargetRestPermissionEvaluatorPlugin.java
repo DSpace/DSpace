@@ -15,7 +15,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.SuggestionTargetRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.Item;
@@ -52,8 +52,8 @@ public class SuggestionTargetRestPermissionEvaluatorPlugin extends RestObjectPer
             return false;
         }
 
-        if (!StringUtils.equalsIgnoreCase(targetType, SuggestionTargetRest.NAME)
-                && !StringUtils.startsWithIgnoreCase(targetType, SuggestionTargetRest.NAME)) {
+        if (!Strings.CI.equals(targetType, SuggestionTargetRest.NAME)
+                && !Strings.CI.startsWith(targetType, SuggestionTargetRest.NAME)) {
             return false;
         }
 
@@ -80,7 +80,7 @@ public class SuggestionTargetRestPermissionEvaluatorPlugin extends RestObjectPer
                 List<MetadataValue> mvalues = itemService.getMetadataByMetadataString(item, "dspace.object.owner");
                 if (mvalues != null) {
                     for (MetadataValue mv : mvalues) {
-                        if (StringUtils.equals(mv.getAuthority(), currentUser.getID().toString())) {
+                        if (Strings.CS.equals(mv.getAuthority(), currentUser.getID().toString())) {
                             return true;
                         }
                     }

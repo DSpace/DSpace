@@ -16,10 +16,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -170,13 +170,10 @@ public class SubmissionConfigReader {
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory
-                .newInstance();
-            factory.setValidating(false);
-            factory.setIgnoringComments(true);
-            factory.setIgnoringElementContentWhitespace(true);
-
-            DocumentBuilder db = factory.newDocumentBuilder();
+            // This document builder factory will *not* disable external
+            // entities as they can be useful in managing large forms, but
+            // it will restrict them to the config dir containing submission definitions
+            DocumentBuilder db = XMLUtils.getTrustedDocumentBuilder(configDir);
             Document doc = db.parse(uri);
             doNodes(doc);
         } catch (FactoryConfigurationError fe) {
@@ -335,7 +332,7 @@ public class SubmissionConfigReader {
         log.debug("Submission process config '" + submitName
                       + "' not in cache. Reloading from scratch.");
 
-        lastSubmissionConfig = new SubmissionConfig(StringUtils.equals(getDefaultSubmissionConfigName(), submitName),
+        lastSubmissionConfig = new SubmissionConfig(Strings.CS.equals(getDefaultSubmissionConfigName(), submitName),
                                                     submitName, steps);
 
         log.debug("Submission process config has "
@@ -474,7 +471,7 @@ public class SubmissionConfigReader {
         for (int i = 0; i < len; i++) {
             Node nd = nl.item(i);
             // process each step definition
-            if (StringUtils.equalsIgnoreCase(nd.getNodeName(), "step-definition")) {
+            if (Strings.CI.equals(nd.getNodeName(), "step-definition")) {
                 String stepID = getAttribute(nd, "id");
                 if (stepID == null) {
                     throw new SAXException(
