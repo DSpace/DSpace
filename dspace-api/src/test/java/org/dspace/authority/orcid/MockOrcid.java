@@ -9,6 +9,7 @@ package org.dspace.authority.orcid;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
@@ -68,15 +69,17 @@ public class MockOrcid extends Orcidv3SolrAuthorityImpl {
      */
     public void setupSingleSearch() throws OrcidClientException {
         // Return a single search result matching orcid-search.xml (ORCID ID 0000-0002-9029-1854).
-        // This overrides the no-results mock for queries that match "Bollini".
+        // Only matches queries containing "Bollini", leaving the no-results mock for other queries.
+        // In the 4-arg version (accessToken, query, start, rows) the query is the 2nd arg.
+        // In the 3-arg version (query, start, rows) the query is the 1st arg.
         ExpandedSearch singleResult = new ExpandedSearch();
         ExpandedResult result = new ExpandedResult();
         result.setOrcidId("0000-0002-9029-1854");
         singleResult.getResults().add(result);
         singleResult.setNumFound(1L);
-        when(mockOrcidClient.expandedSearch(anyString(), anyString(), anyInt(), anyInt()))
+        when(mockOrcidClient.expandedSearch(anyString(), contains("Bollini"), anyInt(), anyInt()))
                 .thenReturn(singleResult);
-        when(mockOrcidClient.expandedSearch(anyString(), anyInt(), anyInt()))
+        when(mockOrcidClient.expandedSearch(contains("Bollini"), anyInt(), anyInt()))
                 .thenReturn(singleResult);
     }
 
