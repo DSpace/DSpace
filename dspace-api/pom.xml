@@ -348,7 +348,7 @@
             <version>${ehcache.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
-             Caching dependencies for sherpa service. -->
+             Caching dependencies for Open Policy Finder service. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
