@@ -144,10 +144,10 @@
             <type>submission-form</type>
         </step-definition>
 
-        <step-definition id="sherpaPolicies" mandatory="true">
-            <heading>submit.progressbar.sherpapolicy</heading>
-            <processing-class>org.dspace.app.rest.submit.step.SherpaPolicyStep</processing-class>
-            <type>sherpaPolicy</type>
+        <step-definition id="opfPolicies" mandatory="true">
+            <heading>submit.progressbar.opfpolicy</heading>
+            <processing-class>org.dspace.app.rest.submit.step.OpenPolicyFinderPolicyStep</processing-class>
+            <type>opfPolicy</type>
         </step-definition>
 
         <step-definition id="identifiers">
@@ -240,7 +240,7 @@
             <!-- <step id="upload-with-embargo"/> -->
             <!-- <step id="extractionstep"/> -->
             <step id="defaultAC"/>
-            <step id="sherpaPolicies"/>
+            <step id="opfPolicies"/>
 
             <!--Step will be to Sign off on the License -->
             <step id="license"/>

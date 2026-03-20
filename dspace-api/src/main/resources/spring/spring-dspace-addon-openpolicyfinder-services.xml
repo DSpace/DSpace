@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config/> <!-- allows us to use spring annotations in beans -->
+
+    <!-- Jisc Open Policy Finder API service (formerly SHERPA/RoMEO) -->
+    <bean class="org.dspace.app.openpolicyfinder.OpenPolicyFinderService" id="org.dspace.app.openpolicyfinder.OpenPolicyFinderService">
+        <property name="maxNumberOfTries" value="3"/>
+        <property name="sleepBetweenTimeouts" value="2000"/>
+        <property name="timeout" value="5000"/>
+    </bean>
+
+    <bean class="org.dspace.app.openpolicyfinder.submit.OpenPolicyFinderSubmitService"
+          id="org.dspace.app.openpolicyfinder.submit.OpenPolicyFinderSubmitService">
+        <property name="openPolicyFinderService" ref="org.dspace.app.openpolicyfinder.OpenPolicyFinderService"/>
+        <property name="configuration" ref="org.dspace.app.openpolicyfinder.submit.OpenPolicyFinderSubmitConfigurationService"/>
+    </bean>
+
+    <bean class="org.dspace.app.openpolicyfinder.submit.OpenPolicyFinderSubmitConfigurationService"
+          id="org.dspace.app.openpolicyfinder.submit.OpenPolicyFinderSubmitConfigurationService">
+        <property name="issnItemExtractors">
+            <list>
+                <bean class="org.dspace.app.openpolicyfinder.submit.MetadataValueISSNExtractor">
+                    <property name="metadataList">
+                        <list>
+                            <value>dc.identifier.issn</value>
+                        </list>
+                    </property>
+                </bean>
+                <!-- Use the follow if you have the OpenPolicyFinderJournalTitle enabled
+                <bean class="org.dspace.app.openpolicyfinder.submit.MetadataAuthorityISSNExtractor">
+                    <property name="metadataList">
+                        <list>
+                            <value>dc.title.alternative</value>
+                        </list>
+                    </property>
+                </bean>  -->
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.dspace.app.openpolicyfinder.cache.OpenPolicyFinderCacheEvictService">
+         <property name="openPolicyFinderSubmitService"
+                   ref="org.dspace.app.openpolicyfinder.submit.OpenPolicyFinderSubmitService"/>
+         <property name="cacheManager" ref="cacheManager" />
+    </bean>
+</beans>
