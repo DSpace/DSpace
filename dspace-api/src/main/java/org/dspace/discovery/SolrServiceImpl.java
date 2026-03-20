@@ -1150,7 +1150,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         for (FacetField.Count facetValue : facetValues) {
                             String displayedValue = transformDisplayedValue(context, facetField.getName(),
                                                                             facetValue.getName());
+
                             String field = transformFacetField(facetFieldConfig, facetField.getName(), true);
+                            String currentLocalePrefix = context.getCurrentLocale().getLanguage() + "_";
+                            field = StringUtils.removeStart(field, currentLocalePrefix);
+
                             String authorityValue = transformAuthorityValue(context, facetField.getName(),
                                                                             facetValue.getName());
                             String sortValue = transformSortValue(context,
@@ -1661,6 +1665,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             }
         }
         return null;
+    }
+
+    @Override
+    public SolrSearchCore getSolrSearchCore() {
+        return solrSearchCore;
     }
 
 }

@@ -25,6 +25,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -125,29 +126,33 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                                        true);
 
                             for (int x = 0; x < values.size(); x++) {
+                                MetadataValue val = values.get(x);
+                                boolean hasChoiceAuthority = choiceAuthorityService
+                                        .isChoicesConfigured(metadataAuthorityService
+                                                .makeFieldKey(val.getSchema(), val.getElement(), val.getQualifier())
+                                                .toString(), item.getType(), collection);
+
                                 // Ensure that there is a value to index before
                                 // inserting it
-                                if (StringUtils.isEmpty(values.get(x).getValue())) {
+                                if (StringUtils.isEmpty(val.getValue())) {
                                     log.error("Null metadata value for item "
                                                   + item.getID()
                                                   + ", field: "
-                                                  + values.get(x).getMetadataField().toString()
+                                                  + val.getMetadataField().toString()
                                     );
                                 } else {
                                     if (bi.isAuthorityIndex()
-                                        && (values.get(x).getAuthority() == null || values.get(x)
-                                                                                          .getConfidence() <
-                                        minConfidence)) {
+                                            && (val.getAuthority() == null || val.getConfidence() < minConfidence)) {
                                         // if we have an authority index only
                                         // authored metadata will go here!
                                         log.debug("Skipping item="
                                                       + item.getID() + ", field="
-                                                      + values.get(x).getMetadataField().toString()
-                                                      + ", value=" + values.get(x).getValue()
+                                                      + val.getMetadataField().toString()
+                                                      + ", value=" + val.getValue()
                                                       + ", authority="
-                                                      + values.get(x).getAuthority()
+                                                      + val.getAuthority()
                                                       + ", confidence="
-                                                      + values.get(x).getConfidence()
+                                                      + val.getConfidence()
                                                       + " (BAD AUTHORITY)");
                                         continue;
                                     }
@@ -155,33 +160,27 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                     // is there any valid (with appropriate
                                     // confidence) authority key?
                                     if ((ignoreAuthority && !bi.isAuthorityIndex())
-                                        || (values.get(x).getAuthority() != null && values.get(x)
-                                                                                          .getConfidence() >=
-                                        minConfidence)) {
-                                        distFAuths.add(values.get(x).getAuthority());
-                                        distValuesForAC.add(values.get(x).getValue());
+                                            || (val.getAuthority() != null && val.getConfidence() >= minConfidence)) {
+                                        distFAuths.add(val.getAuthority());
+                                        distValuesForAC.add(val.getValue());
 
                                         String preferedLabel = null;
-                                        boolean ignorePrefered =
-                                            DSpaceServicesFactory
-                                                .getInstance()
-                                                .getConfigurationService()
-                                                .getPropertyAsType("discovery.browse.authority.ignore-prefered."
-                                                                       + bi.getName(),
-                                                                   DSpaceServicesFactory
-                                                                       .getInstance()
-                                                                       .getConfigurationService()
-                                                                       .getPropertyAsType(
-                                                                           "discovery.browse.authority.ignore-prefered",
-                                                                           Boolean.FALSE),
-                                                                   true);
-                                        if (!ignorePrefered) {
+                                        Boolean generalSetting = DSpaceServicesFactory.getInstance()
+                                                .getConfigurationService().getPropertyAsType(
+                                                        "discovery.browse.authority.ignore-preferred",
+                                                        Boolean.FALSE);
+                                        boolean ignorePrefered = DSpaceServicesFactory.getInstance()
+                                                .getConfigurationService().getPropertyAsType(
+                                                        "discovery.browse.authority.ignore-preferred." + bi.getName(),
+                                                        generalSetting, true);
+                                        if (!ignorePrefered && hasChoiceAuthority) {
                                             try {
                                                 preferedLabel = choiceAuthorityService
-                                                    .getLabel(values.get(x), collection, values.get(x).getLanguage());
+                                                        .getLabel(val, Constants.ITEM, collection,
+                                                                val.getLanguage());
                                             } catch (Exception e) {
                                                 log.warn("Failed to get preferred label for "
-                                                             + values.get(x).getMetadataField().toString('.'), e);
+                                                             + val.getMetadataField().toString('.'), e);
                                             }
                                         }
                                         List<String> variants = null;
@@ -199,13 +198,13 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                                                            "discovery.browse.authority.ignore-variants",
                                                                            Boolean.FALSE),
                                                                    true);
-                                        if (!ignoreVariants) {
+                                        if (!ignoreVariants && hasChoiceAuthority) {
                                             try {
                                                 variants = choiceAuthorityService
-                                                    .getVariants(values.get(x), collection);
+                                                    .getVariants(val, Constants.ITEM, collection);
                                             } catch (Exception e) {
                                                 log.warn("Failed to get variants for "
-                                                             + values.get(x).getMetadataField().toString(), e);
+                                                             + val.getMetadataField().toString(), e);
                                             }
                                         }
 
@@ -214,15 +213,24 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                             String nLabel = OrderFormat
                                                 .makeSortString(
                                                     preferedLabel,
-                                                    values.get(x).getLanguage(),
+                                                    val.getLanguage(),
                                                     bi.getDataType());
                                             distFValues
                                                 .add(nLabel
                                                          + SearchUtils.FILTER_SEPARATOR
                                                          + preferedLabel
                                                          + SearchUtils.AUTHORITY_SEPARATOR
-                                                         + values.get(x).getAuthority());
+                                                         + val.getAuthority());
                                             distValuesForAC.add(preferedLabel);
+                                        } else {
+                                            String nVal = OrderFormat.makeSortString(val.getValue(),
+                                                    val.getLanguage(), bi.getDataType());
+                                            distFValues.add(nVal
+                                                     + SearchUtils.FILTER_SEPARATOR
+                                                     + val.getValue()
+                                                     + SearchUtils.AUTHORITY_SEPARATOR
+                                                     + val.getAuthority());
+                                            distValuesForAC.add(nVal);
                                         }
 
                                         if (variants != null) {
@@ -230,14 +238,14 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                                 String nVal = OrderFormat
                                                     .makeSortString(
                                                         var,
-                                                        values.get(x).getLanguage(),
+                                                        val.getLanguage(),
                                                         bi.getDataType());
                                                 distFValues
                                                     .add(nVal
                                                              + SearchUtils.FILTER_SEPARATOR
                                                              + var
                                                              + SearchUtils.AUTHORITY_SEPARATOR
-                                                             + values.get(x).getAuthority());
+                                                             + val.getAuthority());
                                                 distValuesForAC.add(var);
                                             }
                                         }
@@ -248,15 +256,15 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                         // get the normalised version of the value
                                         String nVal = OrderFormat
                                             .makeSortString(
-                                                values.get(x).getValue(),
-                                                values.get(x).getLanguage(),
+                                                val.getValue(),
+                                                val.getLanguage(),
                                                 bi.getDataType());
                                         distFValues
                                             .add(nVal
                                                      + SearchUtils.FILTER_SEPARATOR
-                                                     + values.get(x).getValue());
-                                        distFVal.add(values.get(x).getValue());
-                                        distValuesForAC.add(values.get(x).getValue());
+                                                     + val.getValue());
+                                        distFVal.add(val.getValue());
+                                        distValuesForAC.add(val.getValue());
                                     }
                                 }
                             }

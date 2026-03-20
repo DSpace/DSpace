@@ -146,4 +146,12 @@ public interface Projection {
      */
     PageRequest getPagingOptions(String rel, HALResource<? extends RestAddressableModel> resource,
                                  Link... oldLinks);
+
+    /**
+     * This method will check if the current Projection allows allLanguage filter
+     * @return true if allowed, false otherwise
+     */
+    default boolean isAllLanguages() {
+        return false;
+    }
 }

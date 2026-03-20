@@ -66,6 +66,7 @@
     <bean class="org.dspace.alerts.SystemWideAlertServiceImpl"/>
 
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
+    <bean class="org.dspace.content.authority.AuthorityServiceUtils"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
 
     <bean class="org.dspace.profile.ResearcherProfileServiceImpl"/>
@@ -133,6 +134,8 @@
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 
     <bean class="org.dspace.util.FrontendUrlService"/>
+
+    <bean class="org.dspace.content.security.MetadataSecurityServiceImpl"/>
 
     <!-- Configurable workflow services -->
     <bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>

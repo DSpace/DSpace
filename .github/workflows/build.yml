@@ -25,7 +25,7 @@ jobs:
           #  - surefire.rerunFailingTestsCount => try again for flakey tests, and keep track of/report on number of retries
           - type: "Unit Tests"
             java: 21
-            mvnflags: "-DskipUnitTests=false -Dsurefire.rerunFailingTestsCount=2"
+            mvnflags: "-Dtest.argLine=-Xmx2048m -DskipUnitTests=false -Dsurefire.rerunFailingTestsCount=2"
             resultsdir: "**/target/surefire-reports/**"
           # NOTE: ITs skip all code validation checks, as they are already done by Unit Test job.
           #  - enforcer.skip     => Skip maven-enforcer-plugin rules
