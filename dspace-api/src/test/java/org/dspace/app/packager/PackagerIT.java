@@ -427,8 +427,12 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
             boolean foundSecond = false;
             for (Element element : manifest.getItemDmds()) {
                 String val = element.getValue();
-                if (val.contains("familyName"))  foundFirst  = true;
-                if (val.contains("secondFamily")) foundSecond = true;
+                if (val.contains("familyName")) {
+                    foundFirst  = true;
+                }
+                if (val.contains("secondFamily")) {
+                    foundSecond = true;
+                }
             }
             assertTrue("METS should contain first author familyName",   foundFirst);
             assertTrue("METS should contain second author secondFamily", foundSecond);
