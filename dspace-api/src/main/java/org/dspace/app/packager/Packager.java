@@ -15,8 +15,10 @@ import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -356,7 +358,7 @@ public class Packager {
 
         // Sanity checks on arg list: required args
         // REQUIRED: sourceFile, ePerson (-e), packageType (-t)
-        if (sourceFiles == null || eperson == null || myPackager.packageType == null) {
+        if (eperson == null || myPackager.packageType == null) {
             System.err.println("Error - missing a REQUIRED argument or option.\n");
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("PackageManager  [options]  package-file|-\n", options);
@@ -503,8 +505,12 @@ public class Packager {
             }
 
             //disseminate the requested object
-            for (String sourceFile : sourceFiles) {
-                myPackager.disseminate(context, dip, dso, pkgParams, sourceFile, relationalScope, dryRun);
+            if (sourceFiles == null || sourceFiles.length == 0) {
+                myPackager.disseminate(context, dip, dso, pkgParams, ".", relationalScope, dryRun);
+            } else {
+                for (String sourceFile : sourceFiles) {
+                    myPackager.disseminate(context, dip, dso, pkgParams, sourceFile, relationalScope, dryRun);
+                }
             }
         }
         return;
@@ -723,7 +729,21 @@ public class Packager {
         dsoToProcess.add(dsoParent);
 
         List<DSpaceObject> alreadyDissedDSOs = new ArrayList<>();
-        String orginalOutputPath = outputFile;
+        File outputFileRef = new File(outputFile);
+        String outputDir;
+        String filePrefix;
+        if (outputFileRef.isDirectory()) {
+            outputDir = outputFile;
+            filePrefix = "";
+        } else if (outputFileRef.getName().contains(".")) {
+            // e.g. "output.zip" or "path/to/output.zip"
+            filePrefix = outputFileRef.getName().replaceAll("\\.[^.]+$", "") + "_";
+            outputDir = outputFileRef.getParent() != null ? outputFileRef.getParent() : ".";
+        } else {
+            outputDir = ".";
+            filePrefix = "";
+        }
+        String extension = getMIMEType(pkgParams).split("/")[1];
         if (dryRun) {
             Set<UUID> relatedUUIDSet = new TreeSet<>();
             System.out.println("DRYRUN Listing UUIDs of DSpace Objects to be disseminated");
@@ -738,14 +758,12 @@ public class Packager {
             System.out.println("Total DSpace Objects: " + relatedUUIDSet.size());
         } else {
             for (DSpaceObject dso : dsoToProcess) {
-                // initialize output file
-                outputFile = orginalOutputPath;
                 String dsoType = Constants.typeText[dso.getType()];
-                String extension = getMIMEType(pkgParams).split("/")[1];
-                String fileName = "";
-                fileName = evalFileName(fileName, extension, dsoType, dso);
-                outputFile = outputFile.replaceAll(".([^.]*)$", "_" + fileName);
-                File pkgFile = new File(outputFile);
+                // initialize output file
+                String fileName = evalFileName("", extension, dsoType, dso);
+                String resolvedOutputFile = outputDir + File.separator + filePrefix + fileName;
+                File pkgFile = new File(resolvedOutputFile);
+
                 System.out.println("\nDisseminating DSpace " + Constants.typeText[dso.getType()] +
                         " [ hdl=" + dso.getHandle() + " ] to " + outputFile);
 
@@ -807,22 +825,37 @@ public class Packager {
                         }
                     }
                 } else {
-                    //otherwise, just disseminate a single object to a single package file
+                    // Disseminate the primary item
                     dip.disseminate(context, dso, pkgParams, pkgFile);
                     alreadyDissed.add(dso.getID());
 
                     if (pkgFile.exists()) {
                         System.out.println("\nCREATED package file: " + pkgFile.getCanonicalPath());
                     }
-                    //Diss all related items as well
-                    if (dso.getType() == 2) {
+
+                    // Walk the full relationship tree and disseminate each related item
+                    if (dso.getType() == Constants.ITEM) {
                         Item parentItem = (Item) dso;
-                        Set<UUID> relatedUUIDSet = treeService
-                                .getItemsInTree(context, parentItem, relationalScope, false);
-                        for (UUID uuid : relatedUUIDSet) {
+                        Queue<UUID> toProcess = new LinkedList<>(treeService
+                                .getItemsInTree(context, parentItem, relationalScope, false));
+                        while (!toProcess.isEmpty()) {
+                            UUID uuid = toProcess.poll();
                             if (!alreadyDissed.contains(uuid)) {
-                                disseminate(context, dip, dSpaceObjectService
-                                        .find(context, uuid), pkgParams, orginalOutputPath, relationalScope, dryRun);
+                                alreadyDissed.add(uuid);
+                                Item relatedItem = itemService.find(context, uuid);
+                                String relDsoType = Constants.typeText[relatedItem.getType()];
+                                String relFileName = evalFileName("", extension, relDsoType, relatedItem);
+                                String relOutputFile = outputDir + File.separator + filePrefix + relFileName;
+                                File relPkgFile = new File(relOutputFile);
+                                System.out.println("\nDisseminating DSpace " + relDsoType +
+                                        " [ hdl=" + relatedItem.getHandle() + " ] to " + relOutputFile);
+                                dip.disseminate(context, relatedItem, pkgParams, relPkgFile);
+                                if (relPkgFile.exists()) {
+                                    System.out.println("\nCREATED package file: " + relPkgFile.getCanonicalPath());
+                                }
+                                // Add this item's own relations to the queue
+                                toProcess.addAll(treeService
+                                        .getItemsInTree(context, relatedItem, relationalScope, false));
                             }
                         }
                     }
@@ -970,6 +1003,23 @@ public class Packager {
         Item parentItem = itemService.find(context, UUID.fromString(initUUID));
         String parentEntityTypeLabel = itemService
                 .getMetadataFirstValue(parentItem, "dspace", "entity", "type", null);
+
+        // Build a flat set of all UUIDs that SHOULD be related after this operation
+        Set<String> expectedChildUUIDs = new TreeSet<>();
+        for (String key : relsMap.keySet()) {
+            expectedChildUUIDs.addAll(relsMap.get(key));
+        }
+
+        // Remove any existing relationships whose child is NOT in the expected set
+        List<Relationship> existingRelationships = relationshipService.findByItem(context, parentItem);
+        for (Relationship existing : existingRelationships) {
+            Item otherItem = existing.getLeftItem().equals(parentItem) ? existing.getRightItem()
+                    : existing.getLeftItem();
+            if (!expectedChildUUIDs.contains(otherItem.getID().toString())) {
+                relationshipService.delete(context, existing);
+            }
+        }
+
         for (String key : relsMap.keySet()) {
             //This list will be in place order with respect to relationship side
             for (String childUUIDString : relsMap.get(key)) {
