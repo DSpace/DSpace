@@ -31,7 +31,7 @@ import org.mockito.Mockito;
 public class OpenAIRERestConnectorTest {
 
     @Test
-    public void searchProjectByKeywords() {
+    public void searchProjectByKeywords() throws IOException {
         try (InputStream is = this.getClass().getResourceAsStream("openaire-projects.xml");
                MockWebServer mockServer = new MockWebServer()) {
             String projects = new String(is.readAllBytes(), StandardCharsets.UTF_8)
@@ -56,8 +56,6 @@ public class OpenAIRERestConnectorTest {
                 assertTrue("Expected the query to contain the replaced keyword",
                         response.getHeader().getQuery().contains("DEADBEEF"));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }
