@@ -36,7 +36,7 @@
        2. If found: Links to existing entity (sets authority to entity UUID)
           - Does NOT modify the existing entity (preserves original data)
        3. If not found: Creates new entity using configured AuthorityImportFiller
-          a) Fetches data from external source (ORCID API, SHERPA API, etc.)
+          a) Fetches data from external source (ORCID API, Open Policy Finder API, etc.)
           b) Populates entity metadata using configured field mappings
           c) Links parent item to new entity (sets authority to entity UUID)
     
@@ -95,7 +95,7 @@
        System:
        - Searches for Journal with dc.identifier.issn = "0028-0836"
        - If not found: 
-         * Fetches journal data via SHERPAv2JournalISSNDataProvider
+         * Fetches journal data via OpenPolicyFinderJournalISSNDataProvider
          * Creates Journal entity with OA policies, publisher info, etc.
          * Sets dc.relation.ispartof authority to Journal UUID
     
@@ -159,7 +159,7 @@
 				<entry key="ORCID" value-ref="orcidImportFiller"/>
 				<!-- ISSN: Fetches Journal data from SHERPA/RoMEO API using ISSN identifier.
 				     Example: Creates Journal with OA policy data for ISSN 0028-0836 -->
-				<entry key="ISSN" value-ref="sherpaImportFiller"/>
+				<entry key="ISSN" value-ref="opfImportFiller"/>
 			</map>
 		</property>
 	</bean>
@@ -182,7 +182,7 @@
 	        Example: constant.person.jobTitle → person.jobTitle (value: "Worker")
 	     
 	     NOTE: These mappings only apply when using SOURCE_INTERNAL as the data source.
-	     External sources (ORCID, SHERPA) use their own data providers. -->
+	     External sources (ORCID, Open Policy Finder) use their own data providers. -->
 	<bean class="org.dspace.authority.filler.ItemMetadataImportFiller" id="fullItemMetadataConfiguration"
 		  abstract="true">
 		<property name="itemService" ref="org.dspace.content.ItemServiceImpl"/>
@@ -293,16 +293,16 @@
 		<constructor-arg name="authorityIdentifier" value="ORCID"/>
 	</bean>
 
-	<!-- SHERPA/RoMEO import filler: Fetches Journal entity data from SHERPA API.
-	     Uses SHERPAv2JournalISSNDataProvider to retrieve:
+	<!-- Open Policy Finder import filler: Fetches Journal entity data from OPF API.
+	     Uses OpenPolicyFinderJournalISSNDataProvider to retrieve:
 	     - Journal title and publisher
 	     - Open access policies (preprint, postprint, publisher version)
 	     - Embargo periods and licensing terms
 	     - Publication fees and other OA information
 	     Authority format: "will be referenced::ISSN::1234-5678" -->
-	<bean class="org.dspace.authority.filler.ExternalDataProviderImportFiller" id="sherpaImportFiller">
+	<bean class="org.dspace.authority.filler.ExternalDataProviderImportFiller" id="opfImportFiller">
 		<constructor-arg name="externalDataProvider"
-						 ref="org.dspace.external.provider.impl.SHERPAv2JournalISSNDataProvider"/>
+						 ref="org.dspace.external.provider.impl.OpenPolicyFinderJournalISSNDataProvider"/>
 		<constructor-arg name="authorityIdentifier" value="ISSN"/>
 	</bean>
 
