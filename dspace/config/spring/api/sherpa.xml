@@ -14,7 +14,7 @@
 		id="org.dspace.app.sherpa.submit.SHERPASubmitConfigurationService">
 		<property name="issnItemExtractors">
 			<list>
-				<bean class="org.dspace.app.sherpa.submit.MetadataValueISSNExtractor">
+				<bean class="org.dspace.app.sherpa.submit.MetadataValueISSNExtractor" autowire="byType">
 					<property name="metadataList">
 						<list>
 							<value>creativeworkseries.issn</value>
@@ -22,7 +22,7 @@
 					</property>
 				</bean>
 				<!-- Uncomment this bean if you have SHERPARoMEOJournalTitle enabled
-				<bean class="org.dspace.app.sherpa.submit.MetadataAuthorityISSNExtractor">
+				<bean class="org.dspace.app.sherpa.submit.MetadataAuthorityISSNExtractor" autowire="byType">
 					<property name="metadataList">
 						<list>
 							<value>dc.title.alternative</value>
