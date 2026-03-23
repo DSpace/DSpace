@@ -722,6 +722,7 @@ public interface ItemService
      * @return an iterator over the items matching that authority value
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
+     * @throws IOException        if IO error
      */
     Iterator<Item> findArchivedByMetadataField(Context context, String metadataField, String value)
             throws SQLException, AuthorizeException, IOException;
