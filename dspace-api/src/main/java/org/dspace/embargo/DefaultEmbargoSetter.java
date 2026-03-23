@@ -94,7 +94,6 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
             if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn
                 .equals(CreativeCommonsServiceImpl.CC_BUNDLE_NAME))) {
                 //AuthorizeManager.removePoliciesActionFilter(context, bn, Constants.READ);
-                generatePolicies(context, liftDate.toDate().toLocalDate(), null, bn, item.getOwningCollection());
                 for (Bitstream bs : bn.getBitstreams()) {
                     //AuthorizeManager.removePoliciesActionFilter(context, bs, Constants.READ);
                     generatePolicies(context, liftDate.toDate().toLocalDate(), null, bs, item.getOwningCollection());

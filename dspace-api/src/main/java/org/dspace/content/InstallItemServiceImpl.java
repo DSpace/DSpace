@@ -168,14 +168,14 @@ public class InstallItemServiceImpl implements InstallItemService {
         // NOTE: As of DSpace 4.0, DSpace no longer sets an issue date by default
         List<MetadataValue> currentDateIssued = itemService
             .getMetadata(item, MetadataSchemaEnum.DC.getName(), "date", "issued", Item.ANY);
-        itemService.clearMetadata(c, item, MetadataSchemaEnum.DC.getName(), "date", "issued", Item.ANY);
-        for (MetadataValue dcv : currentDateIssued) {
-            if (dcv.getValue() != null && dcv.getValue().equalsIgnoreCase("today")) {
-                DCDate issued = new DCDate(now.getYear(), now.getMonth(), now.getDay(), -1, -1, -1);
-                itemService.addMetadata(c, item, dcv.getMetadataField(), dcv.getLanguage(), issued.toString());
-            } else if (dcv.getValue() != null) {
-                itemService.addMetadata(c, item, dcv.getMetadataField(), dcv.getLanguage(), dcv.getValue());
-            }
+
+        List<MetadataValue> currentDateIssuedToRemove = currentDateIssued.stream()
+            .filter(mdv -> mdv.getValue() != null && mdv.getValue().equalsIgnoreCase("today")).toList();
+
+        itemService.removeMetadataValues(c, item, currentDateIssuedToRemove);
+        for (MetadataValue dcv : currentDateIssuedToRemove) {
+            DCDate issued = new DCDate(now.getYear(), now.getMonth(), now.getDay(), -1, -1, -1);
+            itemService.addMetadata(c, item, dcv.getMetadataField(), dcv.getLanguage(), issued.toString());
         }
 
         String provDescription = "Made available in DSpace on " + now

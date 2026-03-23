@@ -72,6 +72,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
 
         osw.write("\n");
         osw.write(msg("deleted-bitstream-intro"));
+        osw.write(" ");
         osw.write(applyDateFormatShort(startDate));
         osw.write(" ");
         osw.write(msg("date-range-to"));
@@ -113,7 +114,6 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
         osw.write("\n");
         osw.write(msg("checksum-did-not-match"));
         osw.write(" ");
-        osw.write("\n");
         osw.write(applyDateFormatShort(startDate));
         osw.write(" ");
         osw.write(msg("date-range-to"));

@@ -131,7 +131,7 @@ public class QAEventServiceImpl implements QAEventService {
         if (solr == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
                     .getProperty("qaevents.solr.server", "http://localhost:8983/solr/qaevent");
-            return new HttpSolrClient.Builder(solrService).build();
+            solr = new HttpSolrClient.Builder(solrService).build();
         }
         return solr;
     }
