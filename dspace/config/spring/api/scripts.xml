@@ -61,7 +61,7 @@
         <property name="description" value="Manage the OAI-PMH harvesting of external collections"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.harvest.HarvestCli"/>
     </bean>
-        
+
     <bean id="process-cleaner" class="org.dspace.administer.ProcessCleanerCliConfiguration">
         <property name="description" value="Cleanup all the old processes in the specified state"/>
         <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleanerCli"/>
@@ -71,12 +71,12 @@
         <property name="description" value="Perform the media filtering to extract full text from documents and to create thumbnails"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.mediafilter.MediaFilterScript"/>
     </bean>
-    
+
     <bean id="orcid-bulk-push" class="org.dspace.orcid.script.OrcidBulkPushScriptConfiguration">
         <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
         <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
     </bean>
-    
+
     <bean id="solr-database-resync" class="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCliScriptConfiguration">
         <property name="description" value="Update the database status of Items in solr"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCli"/>
@@ -114,9 +114,9 @@
         <property name="isVisibleFromUI" value="false"/>
     </bean>
 
-    <bean id="object-deletion" class="org.dspace.deletion.process.DSpaceObjectDeletionProcessScriptConfiguration" primary="true">
+    <bean id="object-deletion" class="org.dspace.deletion.process.DSpaceObjectDeletionProcessCliScriptConfiguration" primary="true">
         <property name="description" value="Permanently delete the given object along with all child objects. WARNING: This action cannot be undone." />
-        <property name="dspaceRunnableClass" value="org.dspace.deletion.process.DSpaceObjectDeletionProcess"/>
+        <property name="dspaceRunnableClass" value="org.dspace.deletion.process.DSpaceObjectDeletionProcessCli"/>
     </bean>
 
     <bean id="itemDeletionStrategy" class="org.dspace.deletion.process.strategies.ItemDeletionStrategy" />
