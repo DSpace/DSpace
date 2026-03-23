@@ -7,6 +7,8 @@
  */
 package org.dspace.content;
 
+import static org.dspace.content.RelationshipTreeService.SCOPE_ALL;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -72,7 +74,7 @@ public class PackagerFileService {
     }
 
     public List<FileNode> getFileNodeTree(Context context, String sourceFilesPath, String scope) throws SQLException {
-        return getFileNodes(context, sourceFilesPath, parseScope(scope), new HashSet<>());
+        return getFileNodes(context, sourceFilesPath, RelationshipTreeService.buildScopeMap(scope), new HashSet<>());
     }
 
     public List<String> getPathsInTree(Context context, String sourceFilePath, String scopeString) throws SQLException {
@@ -82,17 +84,6 @@ public class PackagerFileService {
             fileNodes.get(0).getTreePaths(filesInTree);
         }
         return filesInTree;
-    }
-
-    public Map<String, Boolean> parseScope(String scopeString) {
-        Map<String, Boolean> scope = new HashMap<>();
-        for (String part : scopeString.split(",")) {
-            String[] pair = part.split(":");
-            String relName = pair[0];
-            boolean recursive = pair.length == 2 && pair[1].toLowerCase().startsWith("r");
-            scope.put(relName, recursive);
-        }
-        return scope;
     }
 
     private String initUUID(String sourceFile) {
@@ -197,7 +188,7 @@ public class PackagerFileService {
             String uuid = null;
             String relName = relElement.getAttributeValue("ID").split("_")[1];
             int type;
-            if (scope.containsKey(relName) || scope.containsKey("*")) {
+            if (scope.containsKey(relName) || scope.containsKey(SCOPE_ALL)) {
                 // we care about this relationship
                 for (Object relElementChildren : relElement.getChildren()) {
                     //The children of relElementChildrenElement are that items MPTR elements
@@ -220,11 +211,10 @@ public class PackagerFileService {
                         childScope = new HashMap<>(scope);
                         // ..but exclude the current relName if it's non-recursive
                         boolean recursive = false;
-                        if (scope.containsKey("*")) { // default to the recursive setting for *, if specified
-                            recursive = scope.get("*");
+                        if (scope.containsKey(SCOPE_ALL)) {
+                            recursive = scope.get(SCOPE_ALL);
                             if (!recursive) {
-                                childScope.remove("*"); // don't go deeper by default if
-                                // non-recursive * is specified
+                                childScope.remove(SCOPE_ALL);
                             }
                         }
                         if (scope.containsKey(relName)) { // if exact relName is specified, prefer its recursive setting

@@ -31,28 +31,37 @@ public class RelationshipTreeService {
     @Autowired
     private RelationshipService relationshipService;
 
+    public static final String SCOPE_ALL = "all";
+    public static final String SCOPE_RECURSIVE_SUFFIX = ":r";
+
     public Node getTree(Context context, Item item, String scopeString) {
         Node node = null;
-        getNode(context, item, parseScope(scopeString), new HashSet<>(), -1, node);
+        getNode(context, item, buildScopeMap(scopeString), new HashSet<>(), -1, node);
         return node;
     }
 
     public Set<UUID> getItemsInTree(Context context, Item item, String scopeString, boolean includeRoot) {
         Set<UUID> itemsInTree = new HashSet<>();
         Node node = null;
-        getNode(context, item, parseScope(scopeString), itemsInTree, -1, node);
+        getNode(context, item, buildScopeMap(scopeString), itemsInTree, -1, node);
         if (!includeRoot) {
             itemsInTree.remove(item.getID());
         }
         return itemsInTree;
     }
 
-    private Map<String, Boolean> parseScope(String scopeString) {
+    public static Map<String, Boolean> buildScopeMap(String scopeString) {
         Map<String, Boolean> scope = new HashMap<>();
+        if (isScopeNone(scopeString)) {
+            return scope; // empty map = no traversal
+        }
+        if (isScopeAll(scopeString)) {
+            scope.put(SCOPE_ALL, true); // recursive by definition
+            return scope;
+        }
         for (String part : scopeString.split(",")) {
-            String[] pair = part.split(":");
-            String relName = pair[0];
-            boolean recursive = pair.length == 2 && pair[1].toLowerCase().startsWith("r");
+            boolean recursive = part.endsWith(SCOPE_RECURSIVE_SUFFIX);
+            String relName = recursive ? part.substring(0, part.length() - SCOPE_RECURSIVE_SUFFIX.length()) : part;
             scope.put(relName, recursive);
         }
         return scope;
@@ -91,7 +100,7 @@ public class RelationshipTreeService {
                 childItem = rel.getLeftItem();
                 childPlace = rel.getRightPlace();
             }
-            if (scope.containsKey(relName) || scope.containsKey("*")) {
+            if (scope.containsKey(relName) || scope.containsKey(SCOPE_ALL)) {
                 // we care about this relationship
                 SortedSet<Node> relatedItems = rels.get(relName);
                 if (relatedItems == null) {
@@ -106,10 +115,10 @@ public class RelationshipTreeService {
                     childScope = new HashMap<>(scope);
                     // ..but exclude the current relName if it's non-recursive
                     boolean recursive = false;
-                    if (scope.containsKey("*")) { // default to the recursive setting for *, if specified
-                        recursive = scope.get("*");
+                    if (scope.containsKey(SCOPE_ALL)) {
+                        recursive = scope.get(SCOPE_ALL);
                         if (!recursive) {
-                            childScope.remove("*"); // don't go deeper by default if non-recursive * is specified
+                            childScope.remove(SCOPE_ALL);
                         }
                     }
                     if (scope.containsKey(relName)) { // if exact relName is specified, prefer its recursive setting
@@ -165,6 +174,46 @@ public class RelationshipTreeService {
                     child.print(printStream, prefix + "    ");
                 }
             }
+        }
+    }
+
+
+    public static boolean isScopeAll(String scope) {
+        return SCOPE_ALL.equalsIgnoreCase(scope) || "*".equals(scope);
+    }
+
+    public static boolean isScopeNone(String scope) {
+        return scope == null || scope.isEmpty();
+    }
+
+    public static boolean isRecursive(String scope) {
+        if (isScopeNone(scope)) {
+            return false;
+        }
+        if (isScopeAll(scope)) {
+            return true;
+        }
+        return scope.endsWith(SCOPE_RECURSIVE_SUFFIX);
+    }
+
+    public static ParsedScope parseScope(String scope) {
+        if (isScopeNone(scope) || isScopeAll(scope)) {
+            return null;
+        }
+        boolean recursive = scope.endsWith(SCOPE_RECURSIVE_SUFFIX);
+        String typeName = recursive
+                ? scope.substring(0, scope.length() - SCOPE_RECURSIVE_SUFFIX.length())
+                : scope;
+        return new ParsedScope(typeName, recursive);
+    }
+
+    public static final class ParsedScope {
+        public final String typeName;
+        public final boolean recursive;
+
+        public ParsedScope(String typeName, boolean recursive) {
+            this.typeName  = typeName;
+            this.recursive = recursive;
         }
     }
 }

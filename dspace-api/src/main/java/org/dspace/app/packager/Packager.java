@@ -326,8 +326,7 @@ public class Packager {
         if (line.hasOption("relationalScope")) {
             relationalScope = line.getOptionValue("relationalScope");
         }
-        relationalScope = (relationalScope == null) ? "*" : relationalScope;
-        pkgParams.setProperty("scope", relationalScope);
+        pkgParams.setProperty("scope", relationalScope != null ? relationalScope : "");
         if (line.hasOption("dryRun")) {
             dryRun = true;
         }
@@ -836,6 +835,8 @@ public class Packager {
                     // Walk the full relationship tree and disseminate each related item
                     if (dso.getType() == Constants.ITEM) {
                         Item parentItem = (Item) dso;
+                        boolean recursive = RelationshipTreeService.isRecursive(relationalScope);
+
                         Queue<UUID> toProcess = new LinkedList<>(treeService
                                 .getItemsInTree(context, parentItem, relationalScope, false));
                         while (!toProcess.isEmpty()) {
@@ -854,8 +855,10 @@ public class Packager {
                                     System.out.println("\nCREATED package file: " + relPkgFile.getCanonicalPath());
                                 }
                                 // Add this item's own relations to the queue
-                                toProcess.addAll(treeService
-                                        .getItemsInTree(context, relatedItem, relationalScope, false));
+                                if (recursive) {
+                                    toProcess.addAll(treeService
+                                            .getItemsInTree(context, relatedItem, relationalScope, false));
+                                }
                             }
                         }
                     }

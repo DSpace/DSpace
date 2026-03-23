@@ -360,7 +360,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     public void packagerExportRelatedItemsFileNamingTest() throws Exception {
         File prefixFile = File.createTempFile("packagerRelNamingTest", ".zip");
         try {
-            performExportWithScopeScript(article.getHandle(), prefixFile, "*");
+            performExportWithScopeScript(article.getHandle(), prefixFile, "all");
             context.commit();
 
             String base = prefixFile.getAbsolutePath().replaceAll("\\.[^.]+$", "");
@@ -379,14 +379,14 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
-     * Disseminating article with -z "*" should transitively reach article2
+     * Disseminating article with -z "all" should transitively reach article2
      * (article -> author -> article2) and embed author metadata in article2's METS.
      */
     @Test
     public void packagerExportTransitiveRelationshipInMetsTest() throws Exception {
         File prefixFile = File.createTempFile("packagerTransitiveTest", ".zip");
         try {
-            performExportWithScopeScript(article.getHandle(), prefixFile, "*");
+            performExportWithScopeScript(article.getHandle(), prefixFile, "all");
             context.commit();
 
             String base = prefixFile.getAbsolutePath().replaceAll("\\.[^.]+$", "");
@@ -490,7 +490,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
                 article.getHandle().replace("/", "-") + ".zip");
         try {
             // First export
-            performExportScript(article.getHandle(), tempFile);
+            performExportWithScopeScript(article.getHandle(), tempFile, "all");
             context.commit();
             String id = getID();
 
@@ -535,7 +535,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void packagerReplaceRestoresRemovedRelationshipTest() throws Exception {
         try {
-            performExportScript(article.getHandle(), tempFile);
+            performExportWithScopeScript(article.getHandle(), tempFile, "all");
             context.commit();
 
             // Remove the relationship
@@ -573,7 +573,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     public void packagerReplaceRemovesAddedRelationshipTest() throws Exception {
         try {
             // Export with only the original relationships
-            performExportScript(article.getHandle(), tempFile);
+            performExportWithScopeScript(article.getHandle(), tempFile, "all");
             context.commit();
 
             // Add a brand-new author item and relate it to article
@@ -708,7 +708,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
-     * Verify that when disseminating with -z "*", no duplicate zip files are
+     * Verify that when disseminating with -z "all", no duplicate zip files are
      * created for items that appear multiple times in the relationship tree.
      * author appears in both article and article2 — should only produce ONE author zip.
      */
@@ -716,7 +716,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     public void packagerExportNoDuplicateZipsTest() throws Exception {
         File prefixFile = File.createTempFile("packagerNoDupTest", ".zip");
         try {
-            performExportWithScopeScript(article.getHandle(), prefixFile, "*");
+            performExportWithScopeScript(article.getHandle(), prefixFile, "all");
             context.commit();
 
             // Count files matching the author handle — must be exactly 1
@@ -730,6 +730,107 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         } finally {
             cleanupPrefixFiles("packagerNoDupTest");
             prefixFile.delete();
+        }
+    }
+
+    /**
+     * Disseminating with no -z scope should only produce the primary item zip,
+     * no related item zips at all — backward compatible default.
+     */
+    @Test
+    public void packagerExportNoScopeOnlyDisseminatesPrimaryItemTest() throws Exception {
+        File prefixFile = File.createTempFile("packagerNoScopeTest", ".zip");
+        try {
+            // No -z provided — use performExportScript which has no scope arg
+            performExportScript(article.getHandle(), prefixFile);
+            context.commit();
+
+            String base = prefixFile.getAbsolutePath().replaceAll("\\.[^.]+$", "");
+
+            File articleZip  = new File(base + "_ITEM@" + article.getHandle().replace("/", "-")  + ".zip");
+            File authorZip   = new File(base + "_ITEM@" + author.getHandle().replace("/", "-")   + ".zip");
+            File author2Zip  = new File(base + "_ITEM@" + author2.getHandle().replace("/", "-")  + ".zip");
+            File article2Zip = new File(base + "_ITEM@" + article2.getHandle().replace("/", "-") + ".zip");
+
+            assertTrue("Primary article zip should exist",                    articleZip.exists());
+            assertFalse("author zip should NOT exist without -z",             authorZip.exists());
+            assertFalse("author2 zip should NOT exist without -z",            author2Zip.exists());
+            assertFalse("article2 zip should NOT exist without -z",           article2Zip.exists());
+        } finally {
+            cleanupPrefixFiles("packagerNoScopeTest");
+            prefixFile.delete();
+        }
+    }
+
+    /**
+     * Ingesting with no -z scope should restore only the primary item,
+     * not attempt to restore or link any related items.
+     */
+    @Test
+    public void packagerImportNoScopeOnlyRestoresPrimaryItemTest() throws Exception {
+        try {
+            performExportScript(article.getHandle(), tempFile);
+            context.commit();
+            String id = getID();
+
+            context.turnOffAuthorisationSystem();
+            itemService.delete(context, itemService.find(context, article.getID()));
+            context.commit();
+            context.restoreAuthSystemState();
+
+            performImportNoScopeScript(resultFile);
+            context.commit();
+
+            Item restored = itemService.find(context, UUID.fromString(id));
+            assertNotNull("Primary item should be restored", restored);
+            assertEquals("Article",
+                    itemService.getMetadataFirstValue(restored, "dc", "title", null, Item.ANY));
+
+            List<Relationship> rels = relationshipService.findByItem(context, restored);
+            assertEquals("No relationships should be restored without -z scope", 0, rels.size());
+        } finally {
+            tempFile.delete();
+            resultFile.delete();
+        }
+    }
+
+    @Test
+    public void packagerImportWithSpecificScopeRestoresOnlyMatchingRelationshipsTest() throws Exception {
+        try {
+            performExportWithScopeScript(article.getHandle(), tempFile, "all");
+            context.commit();
+
+            // Read ID from the actual article zip that was created
+            String id = getID();
+
+            context.turnOffAuthorisationSystem();
+            itemService.delete(context, itemService.find(context, article.getID()));
+            context.commit();
+            context.restoreAuthSystemState();
+
+            performImportWithScopeScript(resultFile, "all");
+            context.commit();
+
+            Item restored = itemService.find(context, UUID.fromString(id));
+            assertNotNull("Primary item should be restored", restored);
+
+            List<RelationshipMetadataValue> meta = relationshipMetadataService
+                    .getRelationshipMetadata(restored, true);
+            boolean foundFamilyName   = meta.stream()
+                    .anyMatch(v -> v.getValue().contains("familyName"));
+            boolean foundSecondFamily = meta.stream()
+                    .anyMatch(v -> v.getValue().contains("secondFamily"));
+            assertTrue("Relationship to author should be restored",  foundFamilyName);
+            assertTrue("Relationship to author2 should be restored", foundSecondFamily);
+
+            List<Relationship> rels = relationshipService.findByItem(context, restored);
+            boolean foundArticle2Rel = rels.stream()
+                    .anyMatch(r -> r.getLeftItem().getID().equals(article2.getID())
+                            || r.getRightItem().getID().equals(article2.getID()));
+            assertFalse("Relationship to article2 should not be restored for this scope", foundArticle2Rel);
+        } finally {
+            tempFile.delete();
+            resultFile.delete();
         }
     }
 
@@ -793,12 +894,23 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private void performImportScript(File outputFile) throws Exception {
-        runDSpaceScript("packager", "-r", "-f", "-z", "*", "-u", "-e", "admin@email.com", "-t",
+        runDSpaceScript("packager", "-r", "-f", "-z", "all", "-u", "-e", "admin@email.com", "-t",
+                "AIP", outputFile.getPath());
+    }
+
+
+    private void performImportNoScopeScript(File outputFile) throws Exception {
+        runDSpaceScript("packager", "-r", "-f", "-u", "-e", "admin@email.com", "-t",
+                "AIP", outputFile.getPath());
+    }
+
+    private void performImportWithScopeScript(File outputFile, String scope) throws Exception {
+        runDSpaceScript("packager", "-r", "-f", "-z", scope, "-u", "-e", "admin@email.com", "-t",
                 "AIP", outputFile.getPath());
     }
 
     private void performReplaceScript(File outputFile) throws Exception {
-        runDSpaceScript("packager", "-r", "-f", "-u", "-e", "admin@email.com", "-t",
+        runDSpaceScript("packager", "-r", "-z", "all", "-f", "-u", "-e", "admin@email.com", "-t",
                 "AIP", outputFile.getPath());
     }
 }
