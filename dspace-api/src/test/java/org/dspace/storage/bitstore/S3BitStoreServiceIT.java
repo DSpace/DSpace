@@ -71,7 +71,9 @@ import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
  * @author Luca Giamminonni (luca.giamminonni at 4science.com)
  */
 public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
-    private static DockerImageName localstackName = DockerImageName.parse("localstack/localstack:stable");
+    // Pin to version 4.1.4 of Docker image. Newer versions (starting with 2026-03-0) require an Auth Token.
+    // See https://blog.localstack.cloud/localstack-for-aws-release-2026-03-0
+    private static DockerImageName localstackName = DockerImageName.parse("localstack/localstack:4.14.0");
 
     @SuppressWarnings("resource")
     private static LocalStackContainer localstackContainer = new LocalStackContainer(localstackName).withServices("s3");
