@@ -1767,7 +1767,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
 
-        getClient().perform(get("/api/core/collections/" + col1.getID()))
+        getClient().perform(get("/api/core/collections/" + col1.getID())
+                       .param("projection", "allLanguages"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", CollectionMatcher.matchProperties(col1.getName(),
                                                                                    col1.getID(),
@@ -1798,7 +1799,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/collections/" + col1.getID()))
+        getClient(token).perform(get("/api/core/collections/" + col1.getID())
+                            .param("projection", "allLanguages"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", CollectionMatcher.matchProperties(col1.getName(),
                                                                               col1.getID(),
@@ -1832,7 +1834,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/collections/" + col1.getID()))
+        getClient(token).perform(get("/api/core/collections/" + col1.getID())
+                            .param("projection", "allLanguages"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", CollectionMatcher.matchProperties(col1.getName(),
                                                                               col1.getID(),
@@ -1866,7 +1869,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
 
         getClient().perform(get("/api/core/collections")
-                   .param("embed", CollectionMatcher.getEmbedsParameter()))
+                       .param("embed", CollectionMatcher.getEmbedsParameter())
+                   .param("projection", "allLanguages"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -1878,7 +1882,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(jsonPath("$.metadata.['dc.description.provenance']").doesNotExist());
 
         getClient(tokenEPerson).perform(get("/api/core/collections")
-                .param("embed", CollectionMatcher.getEmbedsParameter()))
+                                   .param("embed", CollectionMatcher.getEmbedsParameter())
+                                   .param("projection", "allLanguages"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -3942,6 +3947,13 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .withName("Collection of sample items")
             .withAdminGroup(eperson)
             .build();
+        Collection col4 = CollectionBuilder.createCollection(context, child2)
+            .withName("Testing autocomplete in collection")
+            .withAdminGroup(eperson2)
+            .build();
+        Collection col5 = CollectionBuilder.createCollection(context, child2)
+            .withName("Title: subtitle (special characters)")
+            .build();
         context.restoreAuthSystemState();
 
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
@@ -3972,11 +3984,29 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         // Test eperson with no authorized collections
-        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), password);
-        getClient(tokenEPerson2).perform(get("/api/core/collections/search/" + method)
-                .param("query", "collection"))
+        getClient(tokenEPerson).perform(get("/api/core/collections/search/" + method)
+                .param("query", "auto"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), password);
+        // Test eperson2 gets only their authorized collection
+        getClient(tokenEPerson2).perform(get("/api/core/collections/search/" + method)
+                .param("query", "auto"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
+                CollectionMatcher.matchProperties(col4.getName(), col4.getID(), col4.getHandle())
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // Test query with multiple words
+        getClient(tokenEPerson2).perform(get("/api/core/collections/search/" + method)
+                .param("query", "testing auto"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(col4.getName(), col4.getID(), col4.getHandle())
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         // Test admin gets all authorized collections
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -4003,10 +4033,19 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .param("query", "test"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(col2.getName(), col2.getID(), col2.getHandle())
+                CollectionMatcher.matchProperties(col2.getName(), col2.getID(), col2.getHandle()),
+                CollectionMatcher.matchProperties(col4.getName(), col4.getID(), col4.getHandle())
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        // Test query with special characters
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/" + method)
+                .param("query", "title: subtitle (special"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
+                CollectionMatcher.matchProperties(col5.getName(), col5.getID(), col5.getHandle())
             )))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
-
     }
 
 }
