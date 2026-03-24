@@ -119,6 +119,42 @@ public class DCInputSet {
         return getField(fieldName).isPresent();
     }
 
+    /**
+     * Recursively searches for a field by its fully qualified name within this input set.
+     *
+     * <p>The search process handles several field types differently:</p>
+     *
+     * <ul>
+     *   <li><strong>qualdrop_value fields:</strong> Checks both the base field name and all possible
+     *       qualifier combinations from the dropdown pairs</li>
+     *   <li><strong>group fields:</strong> Recursively searches in child forms following the naming
+     *       convention {@code {parentFormName}-{schema}-{element}-{qualifier}}. Child forms are loaded
+     *       and searched for nested fields. This allows relation-fields with grouped metadata
+     *       (e.g., author with affiliation) to be properly resolved.</li>
+     *   <li><strong>inline-group fields:</strong> Similar to group fields, recursively searches in child
+     *       forms for nested fields within inline groups. The difference from group is that inline-group
+     *       is used for simple field grouping without relation-field associations.</li>
+     *   <li><strong>relationship fields:</strong> Matches fields using the pattern
+     *       {@code relation.{relationshipType}}</li>
+     *   <li><strong>standard fields:</strong> Direct field name matching</li>
+     * </ul>
+     *
+     * <p><strong>Behavior difference between group and inline-group:</strong></p>
+     * <ul>
+     *   <li><strong>group:</strong> Used within {@code <relation-field>} elements to define nested metadata
+     *       that should be grouped with relationship entities. For example, when creating an author relationship,
+     *       the author's affiliation can be captured as grouped metadata. The parent field stores a placeholder
+     *       value or relationship reference.</li>
+     *   <li><strong>inline-group:</strong> Used for simple grouping of related metadata fields without
+     *       relationship associations. Fields are grouped purely for UI presentation and data organization.
+     *       Both parent and child fields store actual metadata values directly on the item.</li>
+     * </ul>
+     *
+     * @param fieldName the fully qualified field name to search for, in the format
+     *                  {@code schema.element.qualifier} (e.g., "dc.contributor.author")
+     * @return an Optional containing the DCInput if found, or Optional.empty() if not found
+     *         or if an error occurs during recursive resolution
+     */
     public Optional<DCInput> getField(String fieldName) {
         for (int i = 0; i < inputs.length; i++) {
             for (int j = 0; j < inputs[i].length; j++) {
@@ -134,6 +170,8 @@ public class DCInputSet {
                         }
                     }
                 } else if (Strings.CS.equalsAny(field.getInputType(), "group", "inline-group")) {
+                    // For group and inline-group types, recursively search in child form
+                    // Child form naming convention: {parentFormName}-{schema}-{element}-{qualifier}
                     String formName = getFormName() + "-" + Utils.standardize(field.getSchema(),
                         field.getElement(), field.getQualifier(), "-");
                     try {
