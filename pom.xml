@@ -585,7 +585,7 @@
                 </property>
             </activation>
             <properties>
-                <test.argLine>-Xmx1024m -Dfile.encoding=UTF-8 -Dsolr.directoryFactory=solr.NIOFSDirectoryFactory</test.argLine>
+                <test.argLine>-Xmx1024m -Dfile.encoding=UTF-8 -Dsolr.directoryFactory=solr.NIOFSDirectoryFactory -Dlucene.cms.override_core_count=1</test.argLine>
             </properties>
         </profile>
 
