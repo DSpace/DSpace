@@ -25,11 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -4188,21 +4185,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                     .withTitle("Item with Embargo").build();
 
             // Create consistent embargo dates
-            Calendar calendar1 = Calendar.getInstance();
-            calendar1.set(Calendar.YEAR, 2019);
-            calendar1.set(Calendar.MONTH, 9);
-            calendar1.set(Calendar.DATE, 31);
-            Date embargoStartDate = calendar1.getTime();
-
-            Calendar calendar2 = Calendar.getInstance();
-            calendar2.set(Calendar.YEAR, 2200);
-            calendar2.set(Calendar.MONTH, 9);
-            calendar2.set(Calendar.DATE, 31);
-            Date embargoEndDate = calendar2.getTime();
-
-            // Convert Date objects to LocalDate for ResourcePolicyBuilder
-            LocalDate embargoStartLocalDate = embargoStartDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalDate embargoEndLocalDate = embargoEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate embargoStartLocalDate = LocalDate.of(2019, 10, 31);
+            LocalDate embargoEndLocalDate = LocalDate.of(2200, 10, 31);
 
             // Create ResourcePolicies with different date combinations
             ResourcePolicy rpWithStartDate = ResourcePolicyBuilder.createResourcePolicy(context, admin, null)
@@ -4237,6 +4221,21 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         } finally {
             context.restoreAuthSystemState();
         }
+    }
+
+    @Test
+    public void findEmbargoForbiddenForNonAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson eperson = EPersonBuilder.createEPerson(context)
+            .withEmail("nonAdmin@mail.com")
+            .withPassword(password)
+            .build();
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(get("/api/authz/resourcepolicies/search/embargo"))
+            .andExpect(status().isForbidden());
     }
 
     @Test

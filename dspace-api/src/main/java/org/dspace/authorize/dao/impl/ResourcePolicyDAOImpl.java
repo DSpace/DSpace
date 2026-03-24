@@ -421,20 +421,6 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         return singleResult(context, criteriaQuery);
     }
 
-    @Override
-    public List<ResourcePolicy> findAll(Context context, int offset, int limit) throws SQLException {
-        Query query = createQuery(context, "SELECT rp FROM ResourcePolicy rp ORDER BY rp.id");
-        query.setFirstResult(offset);
-        query.setMaxResults(limit);
-        return list(query);
-    }
-
-    @Override
-    public int countAll(Context context) throws SQLException {
-        Query query = createQuery(context, "SELECT count(rp.id) FROM ResourcePolicy rp");
-        return count(query);
-    }
-
     /**
      * Helper to build the WHERE clause for date presence queries.
      */
@@ -453,6 +439,10 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
             return " WHERE rp.startDate IS NULL AND rp.endDate IS NOT NULL";
         } else if (Boolean.FALSE.equals(hasStartDate) && Boolean.FALSE.equals(hasEndDate)) {
             return " WHERE rp.startDate IS NULL AND rp.endDate IS NULL";
+        } else if (Boolean.FALSE.equals(hasStartDate) && hasEndDate == null) {
+            return " WHERE rp.startDate IS NULL";
+        } else if (hasStartDate == null && Boolean.FALSE.equals(hasEndDate)) {
+            return " WHERE rp.endDate IS NULL";
         }
         return "";
     }
