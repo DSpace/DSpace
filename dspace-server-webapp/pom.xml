@@ -178,6 +178,11 @@
                                     <fileset dir="${project.build.directory}" includes="perf-summary.csv" />
                                 </concat>
                                 <echo message="=== END PERF-SUMMARY ===" />
+                                <echo message="=== PERF-DETAIL (method;wallMs;cpuMs;queries;entityLoads;inserts;updates;deletes;flushes;collLoads;maxQMs;maxQuery) ===" />
+                                <concat>
+                                    <fileset dir="${project.build.directory}" includes="perf-detail.csv" />
+                                </concat>
+                                <echo message="=== END PERF-DETAIL ===" />
                             </target>
                         </configuration>
                     </execution>

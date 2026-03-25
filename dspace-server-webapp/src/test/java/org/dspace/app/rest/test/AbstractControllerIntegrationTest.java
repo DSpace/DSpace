@@ -34,6 +34,7 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.security.DSpaceCsrfTokenRepository;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -94,6 +95,9 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     private static final AtomicInteger perfTestCount = new AtomicInteger();
     private static final AtomicInteger perfProcs = new AtomicInteger();
 
+    // Per-method Hibernate profiling -- only collected for the target class to keep logs small
+    private static final String PERF_DETAIL_CLASS = "LeftTiltedRelationshipRestRepositoryIT";
+
     protected static final String AUTHORIZATION_HEADER = "Authorization";
     protected static final String AUTHORIZATION_COOKIE = "Authorization-cookie";
 
@@ -135,10 +139,21 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     public void perfTimerStart() {
         perfTestStartNanos = System.nanoTime();
         perfTestStartCpuNanos = ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime();
+        if (PERF_DETAIL_CLASS.equals(getClass().getSimpleName())) {
+            try {
+                org.hibernate.SessionFactory sf = DSpaceServicesFactory.getInstance()
+                    .getServiceManager()
+                    .getServiceByName("sessionFactory", org.hibernate.SessionFactory.class);
+                sf.getStatistics().setStatisticsEnabled(true);
+                sf.getStatistics().clear();
+            } catch (Exception e) {
+                // ignore -- stats not available
+            }
+        }
     }
 
     @AfterEach
-    public void perfTimerEnd() {
+    public void perfTimerEnd(TestInfo testInfo) {
         long wallMs = (System.nanoTime() - perfTestStartNanos) / 1_000_000;
         long cpuMs = (ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime()
                       - perfTestStartCpuNanos) / 1_000_000;
@@ -146,6 +161,48 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
         perfTotalCpuMs.addAndGet(cpuMs);
         perfTestCount.incrementAndGet();
         perfProcs.set(Runtime.getRuntime().availableProcessors());
+
+        if (PERF_DETAIL_CLASS.equals(getClass().getSimpleName())) {
+            try {
+                org.hibernate.SessionFactory sf = DSpaceServicesFactory.getInstance()
+                    .getServiceManager()
+                    .getServiceByName("sessionFactory", org.hibernate.SessionFactory.class);
+                org.hibernate.stat.Statistics stats = sf.getStatistics();
+                String method = testInfo.getTestMethod()
+                    .map(m -> m.getName()).orElse("unknown");
+                String detail = method
+                    + ";" + wallMs
+                    + ";" + cpuMs
+                    + ";" + stats.getQueryExecutionCount()
+                    + ";" + stats.getEntityLoadCount()
+                    + ";" + stats.getEntityInsertCount()
+                    + ";" + stats.getEntityUpdateCount()
+                    + ";" + stats.getEntityDeleteCount()
+                    + ";" + stats.getFlushCount()
+                    + ";" + stats.getCollectionLoadCount()
+                    + ";" + stats.getQueryExecutionMaxTime()
+                    + ";" + sanitize(stats.getQueryExecutionMaxTimeQueryString());
+                try (PrintWriter pw = new PrintWriter(
+                        new FileWriter("target/perf-detail.csv", true))) {
+                    pw.println(detail);
+                }
+            } catch (Exception e) {
+                // ignore -- stats not available
+            }
+        }
+    }
+
+    /**
+     * Remove semicolons and newlines from a string to keep CSV output clean.
+     *
+     * @param s the input string (may be null)
+     * @return sanitized string safe for CSV
+     */
+    private static String sanitize(String s) {
+        if (s == null) {
+            return "";
+        }
+        return s.replace(';', ' ').replace('\n', ' ').replace('\r', ' ');
     }
 
     @org.junit.jupiter.api.AfterAll
