@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -28,7 +29,10 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.security.DSpaceCsrfTokenRepository;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.servlet.support.ErrorPageFilter;
@@ -77,6 +81,10 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
+    // Per-test performance instrumentation
+    private long perfTestStartNanos;
+    private long perfTestStartCpuNanos;
+
     protected static final String AUTHORIZATION_HEADER = "Authorization";
     protected static final String AUTHORIZATION_COOKIE = "Authorization-cookie";
 
@@ -112,6 +120,27 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
         Assertions.assertNotNull(this.jacksonHttpMessageConverter,
                              "the JSON message converter must not be null");
+    }
+
+    @BeforeEach
+    public void perfTimerStart() {
+        perfTestStartNanos = System.nanoTime();
+        perfTestStartCpuNanos = ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime();
+    }
+
+    @AfterEach
+    public void perfTimerEnd(TestInfo testInfo) {
+        long wallMs = (System.nanoTime() - perfTestStartNanos) / 1_000_000;
+        long cpuMs = (ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime()
+                      - perfTestStartCpuNanos) / 1_000_000;
+        int threads = Thread.activeCount();
+        int procs = Runtime.getRuntime().availableProcessors();
+        System.out.println("PERF-TEST: " + testInfo.getDisplayName()
+            + " wall=" + wallMs + "ms"
+            + " cpu=" + cpuMs + "ms"
+            + " cpuRatio=" + (wallMs > 0 ? String.format("%.0f%%", 100.0 * cpuMs / wallMs) : "n/a")
+            + " threads=" + threads
+            + " procs=" + procs);
     }
 
     /**
