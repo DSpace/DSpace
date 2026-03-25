@@ -156,8 +156,4 @@
     	<entry key="http://www.scholix.org" value="slx" />
     </util:map>
    
-    <bean class="java.lang.Integer" id="maxRetry">
-        <constructor-arg value="3"/>
-    </bean>
-
 </beans>

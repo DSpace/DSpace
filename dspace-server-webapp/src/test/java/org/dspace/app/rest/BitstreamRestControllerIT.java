@@ -8,7 +8,6 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
-import static jakarta.mail.internet.MimeUtility.encodeText;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
@@ -61,7 +60,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -366,7 +367,11 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         //2. A public item with a bitstream
 
         String bitstreamContent = "0123456789";
-        String bitstreamName = "ภาษาไทย";
+        String bitstreamName = "ภาษาไทย-com-acentuação.pdf";
+        String expectedAscii = "-com-acentuacao.pdf";
+        String expectedUtf8Encoded =
+        "%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2-"
+        + "com-acentua%C3%A7%C3%A3o.pdf";
 
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
 
@@ -390,7 +395,9 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
             //We expect the content disposition to have the encoded bitstream name
             .andExpect(header().string(
                 "Content-Disposition",
-                "attachment;filename=\"" + encodeText(bitstreamName) + "\""
+                String.format("attachment; filename=\"%s\"; filename*=UTF-8''%s",
+                              expectedAscii,
+                              expectedUtf8Encoded)
             ));
     }
 
@@ -983,7 +990,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
             // The citation cover page contains the item title.
             // We will now verify that the pdf text contains this title.
             String pdfText = extractPDFText(content);
-            assertTrue(StringUtils.contains(pdfText,"Public item citation cover page test 1"));
+            assertTrue(Strings.CS.contains(pdfText,"Public item citation cover page test 1"));
 
             // The dspace-api/src/test/data/dspaceFolder/assetstore/ConstitutionofIreland.pdf file contains 64 pages,
             // manually counted + 1 citation cover page
@@ -1007,7 +1014,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
         try (ByteArrayInputStream source = new ByteArrayInputStream(content);
              Writer writer = new StringWriter();
-             PDDocument pdfDoc = PDDocument.load(source)) {
+             PDDocument pdfDoc = Loader.loadPDF(new RandomAccessReadBuffer(source))) {
 
             pts.writeText(pdfDoc, writer);
             return writer.toString();
@@ -1016,7 +1023,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
     private int getNumberOfPdfPages(byte[] content) throws IOException {
         try (ByteArrayInputStream source = new ByteArrayInputStream(content);
-             PDDocument pdfDoc = PDDocument.load(source)) {
+            PDDocument pdfDoc = Loader.loadPDF(new RandomAccessReadBuffer(source))) {
             return pdfDoc.getNumberOfPages();
         }
     }
@@ -1272,12 +1279,8 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
     @Test
     public void checkContentDispositionOfFormats() throws Exception {
-        configurationService.setProperty("webui.content_disposition_format", new String[] {
-            "text/richtext",
-            "text/xml",
-            "txt"
-        });
-
+        // This test verifies that, by default, common text formats will be downloaded instead of being served inline.
+        // The next two tests will verify behavior of non-default settings of "webui.content_disposition_inline"
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, community).build();
@@ -1299,18 +1302,26 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         }
         context.restoreAuthSystemState();
 
-        // these formats are configured and files should be downloaded
+        // Based on default configuration all files should be downloaded
         verifyBitstreamDownload(rtf, "text/richtext;charset=UTF-8", true);
         verifyBitstreamDownload(xml, "text/xml;charset=UTF-8", true);
         verifyBitstreamDownload(txt, "text/plain;charset=UTF-8", true);
-        // this format is not configured and should open inline
-        verifyBitstreamDownload(csv, "text/csv;charset=UTF-8", false);
+        verifyBitstreamDownload(csv, "text/csv;charset=UTF-8", true);
     }
 
     @Test
-    public void checkHardcodedContentDispositionFormats() throws Exception {
-        // This test is similar to the above test, but it verifies that our *hardcoded settings* for
-        // webui.content_disposition_format are protecting us from loading specific formats *inline*.
+    public void checkBannedContentDispositionInlineFormats() throws Exception {
+        configurationService.setProperty("webui.content_disposition_inline", new String[] {
+            "text/html",
+            "text/javascript",
+            "rdf",
+            "text/xml",
+            "image/svg+xml"
+        });
+
+        // This test is similar to the above test, but it verifies that if a site specifies
+        // a banned format (e.g. HTML, XML, etc) in their "webui.content_disposition_inline" setting
+        // DSpace will still protect them by refusing to load the format *inline*.
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, community).build();
@@ -1340,8 +1351,9 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         }
         context.restoreAuthSystemState();
 
-        // By default, HTML, JS & XML should all download. This protects us from possible XSS attacks, as
-        // each of these formats can embed JavaScript which may execute when the file is loaded *inline*.
+        // By default, HTML, JS & XML should all download regardless of inline configuration.
+        // This protects us from possible XSS attacks, as each of these formats can embed JavaScript
+        // which may execute when the file is loaded *inline*.
         verifyBitstreamDownload(html, "text/html;charset=UTF-8", true);
         verifyBitstreamDownload(js, "text/javascript;charset=UTF-8", true);
         verifyBitstreamDownload(rdf, "application/rdf+xml;charset=UTF-8", true);
@@ -1354,22 +1366,29 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void checkWildcardContentDispositionFormats() throws Exception {
-        // Setting "*" should result in all formats being downloaded (nothing will be opened inline)
-        configurationService.setProperty("webui.content_disposition_format", "*");
-
+    public void checkContentDispositionInlineFormats() throws Exception {
+        // Set PDF and a few image formats to verify they will display inline. But leave off "text/plain"
+        configurationService.setProperty("webui.content_disposition_inline", new String[] {
+            "text/csv",
+            "application/pdf",
+            "image/jpeg",
+            "video/mpeg"
+        });
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, community).build();
         Item item = ItemBuilder.createItem(context, collection).build();
         String content = "Test Content";
         Bitstream csv;
+        Bitstream txt;
         Bitstream jpg;
         Bitstream mpg;
         Bitstream pdf;
         try (InputStream is = IOUtils.toInputStream(content, CharEncoding.UTF_8)) {
             csv = BitstreamBuilder.createBitstream(context, item, is)
                                   .withMimeType("text/csv").build();
+            txt = BitstreamBuilder.createBitstream(context, item, is)
+                                  .withMimeType("text/plain").build();
             jpg = BitstreamBuilder.createBitstream(context, item, is)
                                    .withMimeType("image/jpeg").build();
             mpg = BitstreamBuilder.createBitstream(context, item, is)
@@ -1379,11 +1398,13 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         }
         context.restoreAuthSystemState();
 
-        // All formats should be download only
-        verifyBitstreamDownload(csv, "text/csv;charset=UTF-8", true);
-        verifyBitstreamDownload(jpg, "image/jpeg;charset=UTF-8", true);
-        verifyBitstreamDownload(mpg, "video/mpeg;charset=UTF-8", true);
-        verifyBitstreamDownload(pdf, "application/pdf;charset=UTF-8", true);
+        // Only text/plain should download, while other formats should be served inline based on the configuration
+        verifyBitstreamDownload(csv, "text/csv;charset=UTF-8", false);
+        verifyBitstreamDownload(jpg, "image/jpeg;charset=UTF-8", false);
+        verifyBitstreamDownload(mpg, "video/mpeg;charset=UTF-8", false);
+        verifyBitstreamDownload(pdf, "application/pdf;charset=UTF-8", false);
+        // This is the only format not listed in the inline configuration, so it will be downloaded
+        verifyBitstreamDownload(txt, "text/plain;charset=UTF-8", true);
     }
 
 

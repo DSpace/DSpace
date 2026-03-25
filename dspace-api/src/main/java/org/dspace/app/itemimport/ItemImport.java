@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
 import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
@@ -334,33 +335,38 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     protected void readZip(Context context, ItemImportService itemImportService) throws Exception {
         Optional<InputStream> optionalFileStream = Optional.empty();
         Optional<InputStream> validationFileStream = Optional.empty();
-        if (!remoteUrl) {
-            // manage zip via upload
-            optionalFileStream = handler.getFileStream(context, zipfilename);
-            validationFileStream = handler.getFileStream(context, zipfilename);
-        } else {
-            // manage zip via remote url
-            optionalFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
-            validationFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
-        }
-
-        if (validationFileStream.isPresent()) {
-            // validate zip file
-            if (validationFileStream.isPresent()) {
-                validateZip(validationFileStream.get());
+        try {
+            if (!remoteUrl) {
+                // manage zip via upload
+                optionalFileStream = handler.getFileStream(context, zipfilename);
+                validationFileStream = handler.getFileStream(context, zipfilename);
+            } else {
+                // manage zip via remote url
+                optionalFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
+                validationFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
             }
 
-            workFile = new File(itemImportService.getTempWorkDir() + File.separator
-                    + zipfilename + "-" + context.getCurrentUser().getID());
-            FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
-        } else {
-            throw new IllegalArgumentException(
-                    "Error reading file, the file couldn't be found for filename: " + zipfilename);
-        }
+            if (validationFileStream.isPresent()) {
+                // validate zip file
+                if (validationFileStream.isPresent()) {
+                    validateZip(validationFileStream.get());
+                }
 
-        workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
-                           + File.separator + context.getCurrentUser().getID());
-        sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
+                workFile = new File(itemImportService.getTempWorkDir() + File.separator
+                        + zipfilename + "-" + context.getCurrentUser().getID());
+                FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
+            } else {
+                throw new IllegalArgumentException(
+                        "Error reading file, the file couldn't be found for filename: " + zipfilename);
+            }
+
+            workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
+                    + File.separator + context.getCurrentUser().getID());
+            sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
+        } finally {
+            optionalFileStream.ifPresent(IOUtils::closeQuietly);
+            validationFileStream.ifPresent(IOUtils::closeQuietly);
+        }
     }
 
     /**

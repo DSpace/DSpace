@@ -40,6 +40,7 @@
           This value-ref should be a bean of type VirtualMetadataConfiguration -->
     <util:map id="isAuthorOfPublicationMap">
         <entry key="dc.contributor.author" value-ref="publicationAuthor_author"/>
+        <entry key="person.identifier.orcid" value-ref="publicationAuthor_identifierOrcid"/>
     </util:map>
     <!--
          If the related item has:
@@ -60,6 +61,13 @@
         </property>
         <property name="useForPlace" value="true"/>
         <property name="populateWithNameVariant" value="true"/>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_identifierOrcid">
+        <property name="fields">
+            <util:list>
+                <value>person.identifier.orcid</value>
+            </util:list>
+        </property>
     </bean>
 
     <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field

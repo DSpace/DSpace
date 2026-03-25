@@ -41,7 +41,7 @@ import org.junit.Test;
 
 /**
  * Basic integration testing for the SAF Import feature via CLI {@link ItemImportCLI}.
- * https://wiki.lyrasis.org/display/DSDOC7x/Importing+and+Exporting+Items+via+Simple+Archive+Format
+ * https://wiki.lyrasis.org/display/DSDOC9x/Importing+and+Exporting+Items+via+Simple+Archive+Format
  *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */

@@ -31,6 +31,7 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.LicenseService;
 import org.dspace.eperson.EPerson;
@@ -259,7 +260,8 @@ public class LicenseUtilsTest extends AbstractUnitTest {
 
         StringWriter writer = new StringWriter();
         IOUtils.copy(
-            bitstreamService.retrieve(context, itemService.getBundles(item, "LICENSE").get(0).getBitstreams().get(0)),
+            bitstreamService.retrieve(context,
+                    itemService.getBundles(item, Constants.LICENSE_BUNDLE_NAME).get(0).getBitstreams().get(0)),
             writer, StandardCharsets.UTF_8);
         String license = writer.toString();
 

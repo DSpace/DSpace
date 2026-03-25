@@ -7,7 +7,11 @@
  */
 package org.dspace.browse;
 
+import static org.dspace.discovery.SearchUtils.RESOURCE_ID_FIELD;
+import static org.dspace.discovery.SearchUtils.RESOURCE_TYPE_FIELD;
+
 import java.io.Serializable;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -95,6 +99,8 @@ public class SolrBrowseDAO implements BrowseDAO {
     private String focusValue = null;
 
     private String startsWith = null;
+
+    private String dateStartsWith = null;
 
     /**
      * field to look for value in
@@ -218,9 +224,32 @@ public class SolrBrowseDAO implements BrowseDAO {
                 } else if (valuePartial) {
                     query.addFilterQueries("{!field f=" + facetField + "_partial}" + value);
                 }
+
                 if (StringUtils.isNotBlank(startsWith) && orderField != null) {
                     query.addFilterQueries(
                         "bi_" + orderField + "_sort:" + ClientUtils.escapeQueryChars(startsWith) + "*");
+                }
+                if (StringUtils.isNotBlank(dateStartsWith)) {
+                    if (!ascending) {
+                        String raw = dateStartsWith.trim();
+                        String upperBound;
+                        if (raw.length() == 4) {              // YYYY
+                            upperBound = raw + "-12-31";
+                        } else if (raw.length() == 7) {       // YYYY-MM
+                            YearMonth ym = YearMonth.parse(raw);
+                            upperBound = ym.atEndOfMonth().toString();
+                        } else {                              // YYYY-MM-DD
+                            upperBound = raw;
+                        }
+                        query.addFilterQueries("bi_" + orderField + "_sort" + ": [* TO \"" + upperBound + "\"]");
+                    } else {
+                        query.addFilterQueries("bi_" + orderField + "_sort" + ": [\"" + dateStartsWith + "\" TO *]");
+                    }
+                }
+                if (StringUtils.isNotBlank(startsWith) && StringUtils.isNotBlank(dateStartsWith)) {
+                    log.warn(String.format("dateStartsWith %s and startsWith %s both given, only one should " +
+                            "be given since different type of sort filterquery applied depending on which is not blank",
+                            dateStartsWith, startsWith));
                 }
                 // filter on item to be sure to don't include any other object
                 // indexed in the Discovery Search core
@@ -308,8 +337,10 @@ public class SolrBrowseDAO implements BrowseDAO {
     public String doMaxQuery(String column, String table, int itemID)
         throws BrowseException {
         DiscoverQuery query = new DiscoverQuery();
-        query.setQuery("search.resourceid:" + itemID
-                           + " AND search.resourcetype:" + IndexableItem.TYPE);
+        query.setQuery("*:*");
+        query.addFilterQueries(
+                RESOURCE_ID_FIELD + ":" + itemID,
+                RESOURCE_TYPE_FIELD + ":" + IndexableItem.TYPE);
         query.setMaxResults(1);
         DiscoverResult resp = null;
         try {
@@ -459,6 +490,11 @@ public class SolrBrowseDAO implements BrowseDAO {
     @Override
     public int getLimit() {
         return limit;
+    }
+
+    @Override
+    public void setDateStartsWith(String dateStartsWith) {
+        this.dateStartsWith = dateStartsWith;
     }
 
     /*

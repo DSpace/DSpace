@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -53,7 +53,7 @@ public class DSpaceObjectAdminPermissionEvaluatorPlugin extends RestObjectPermis
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
 
         if (!DSpaceRestPermission.ADMIN.equals(restPermission)
-                || !StringUtils.equalsIgnoreCase(targetType, DSPACE_OBJECT)) {
+                || !Strings.CI.equals(targetType, DSPACE_OBJECT)) {
             return false;
         }
 

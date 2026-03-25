@@ -17,7 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.core.ReloadableEntity;
 import org.hibernate.annotations.Cache;
@@ -104,7 +104,7 @@ public class EntityType implements ReloadableEntity<Integer> {
             return false;
         }
 
-        return StringUtils.equals(this.getLabel(), entityType.getLabel());
+        return Strings.CS.equals(this.getLabel(), entityType.getLabel());
     }
 
     /**

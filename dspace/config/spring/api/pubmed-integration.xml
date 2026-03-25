@@ -57,7 +57,7 @@
         <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
     </bean>
 
-    <bean id="abstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+    <bean id="abstractContrib" class="org.dspace.importer.external.pubmed.metadatamapping.contributor.PubmedAbstractMetadatumContributor">
         <property name="field" ref="dc.description.abstract"/>
         <property name="query" value="descendant::AbstractText"/>
         <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
@@ -149,10 +149,6 @@
     <util:map id="prefixToNamespaceMapping">
     </util:map>
 
-
-    <bean class="java.lang.Integer" id="maxRetry">
-        <constructor-arg value="2"/>
-    </bean>
 
     <bean class="org.dspace.importer.external.pubmed.metadatamapping.transform.GeneratePubmedQueryService" id="pubmedService">
         <description>Defines how an org.dspace.content.Item is mapped to a query in scopus. Please note that exactly one of

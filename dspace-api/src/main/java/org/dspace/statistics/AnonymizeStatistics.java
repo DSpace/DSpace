@@ -84,8 +84,22 @@ public class AnonymizeStatistics {
 
 
     public static void main(String... args) throws ParseException {
+        runAnonymizeStatistics(args);
+        // Note: Do NOT call System.exit() on success - let the JVM exit naturally.
+        // This allows launcher.xml scripts to be called via reflection in tests.
+    }
 
-        parseCommandLineOptions(createCommandLineOptions(), args);
+    /**
+     * Run the anonymize-statistics logic.
+     * This method is called by main() for CLI usage and directly by tests.
+     *
+     * @param args the command line arguments
+     * @throws ParseException if command line parsing error
+     */
+    public static void runAnonymizeStatistics(String... args) throws ParseException {
+        if (parseCommandLineOptions(createCommandLineOptions(), args)) {
+            return; // Help was printed, exit without running
+        }
         anonymizeStatistics();
     }
 
@@ -127,13 +141,20 @@ public class AnonymizeStatistics {
         return options;
     }
 
-    private static void parseCommandLineOptions(Options options, String... args) throws ParseException {
+    /**
+     * Parse the command line options.
+     * @param options the defined command-line options
+     * @param args the command line arguments
+     * @return true if help was printed (and script should exit), false to continue
+     * @throws ParseException if command line parsing error
+     */
+    private static boolean parseCommandLineOptions(Options options, String... args) throws ParseException {
 
         CommandLine commandLine = new DefaultParser().parse(options, args);
 
         if (commandLine.hasOption(HELP_OPTION)) {
             printHelp(options);
-            System.exit(-1);
+            return true;
         }
 
         if (commandLine.hasOption(SLEEP_OPTION)) {
@@ -147,6 +168,8 @@ public class AnonymizeStatistics {
         if (commandLine.hasOption(THREADS_OPTION)) {
             threads = parseInt(commandLine.getOptionValue(THREADS_OPTION));
         }
+
+        return false;
     }
 
     private static void printHelp(Options options) {
