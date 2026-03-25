@@ -12,11 +12,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.http.Cookie;
@@ -81,9 +86,13 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
-    // Per-test performance instrumentation
+    // Per-test performance instrumentation (collected per class, printed in @AfterAll)
     private long perfTestStartNanos;
     private long perfTestStartCpuNanos;
+    private static final AtomicLong perfTotalWallMs = new AtomicLong();
+    private static final AtomicLong perfTotalCpuMs = new AtomicLong();
+    private static final AtomicInteger perfTestCount = new AtomicInteger();
+    private static final AtomicInteger perfProcs = new AtomicInteger();
 
     protected static final String AUTHORIZATION_HEADER = "Authorization";
     protected static final String AUTHORIZATION_COOKIE = "Authorization-cookie";
@@ -129,18 +138,35 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     }
 
     @AfterEach
-    public void perfTimerEnd(TestInfo testInfo) {
+    public void perfTimerEnd() {
         long wallMs = (System.nanoTime() - perfTestStartNanos) / 1_000_000;
         long cpuMs = (ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime()
                       - perfTestStartCpuNanos) / 1_000_000;
-        int threads = Thread.activeCount();
-        int procs = Runtime.getRuntime().availableProcessors();
-        System.err.println("PERF-TEST: " + testInfo.getDisplayName()
-            + " wall=" + wallMs + "ms"
-            + " cpu=" + cpuMs + "ms"
-            + " cpuRatio=" + (wallMs > 0 ? String.format("%.0f%%", 100.0 * cpuMs / wallMs) : "n/a")
-            + " threads=" + threads
-            + " procs=" + procs);
+        perfTotalWallMs.addAndGet(wallMs);
+        perfTotalCpuMs.addAndGet(cpuMs);
+        perfTestCount.incrementAndGet();
+        perfProcs.set(Runtime.getRuntime().availableProcessors());
+    }
+
+    @org.junit.jupiter.api.AfterAll
+    public static void perfSummary(TestInfo testInfo) {
+        int count = perfTestCount.getAndSet(0);
+        long wallMs = perfTotalWallMs.getAndSet(0);
+        long cpuMs = perfTotalCpuMs.getAndSet(0);
+        int procs = perfProcs.get();
+        if (count > 0) {
+            String summary = testInfo.getDisplayName()
+                + ";" + count
+                + ";" + wallMs
+                + ";" + cpuMs
+                + ";" + (wallMs > 0 ? String.format("%.0f", 100.0 * cpuMs / wallMs) : "0")
+                + ";" + procs;
+            try (PrintWriter pw = new PrintWriter(new FileWriter("target/perf-summary.csv", true))) {
+                pw.println(summary);
+            } catch (IOException e) {
+                // silently ignore
+            }
+        }
     }
 
     /**
