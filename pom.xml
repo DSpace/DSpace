@@ -274,8 +274,8 @@
                         <excludes>
                             <exclude>**/Abstract*</exclude>
                         </excludes>
-                         <!-- Temporarily disabled to get PERF-TEST output in CI logs -->
-                        <redirectTestOutputToFile>false</redirectTestOutputToFile>
+                         <!-- Detailed logs in failsafe-reports/testName-output.txt instead of stdout -->
+                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <!-- Ensure full stacktrace is logged (when errors occur) -->
                         <trimStackTrace>false</trimStackTrace>
                         <!-- Whether to skip integration tests or not -->

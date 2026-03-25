@@ -135,7 +135,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
                       - perfTestStartCpuNanos) / 1_000_000;
         int threads = Thread.activeCount();
         int procs = Runtime.getRuntime().availableProcessors();
-        System.out.println("PERF-TEST: " + testInfo.getDisplayName()
+        System.err.println("PERF-TEST: " + testInfo.getDisplayName()
             + " wall=" + wallMs + "ms"
             + " cpu=" + cpuMs + "ms"
             + " cpuRatio=" + (wallMs > 0 ? String.format("%.0f%%", 100.0 * cpuMs / wallMs) : "n/a")
