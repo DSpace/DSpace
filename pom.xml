@@ -19,11 +19,11 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>21</java.version>
-        <spring.version>7.0.2</spring.version>
-        <spring-ldap.version>3.3.6</spring-ldap.version>
-        <spring-boot.version>4.0.1</spring-boot.version>
-        <spring-security.version>7.0.2</spring-security.version> <!-- sync with version used by spring-boot-->
-        <hibernate.version>7.1.13.Final</hibernate.version>
+        <spring.version>7.0.6</spring.version>
+        <spring-ldap.version>4.0.2</spring-ldap.version>
+        <spring-boot.version>4.0.4</spring-boot.version>
+        <spring-security.version>7.0.4</spring-security.version> <!-- sync with version used by spring-boot-->
+        <hibernate.version>7.2.7.Final</hibernate.version>
         <hibernate-validator.version>9.1.0.Final</hibernate-validator.version>
         <expressly.version>6.0.0</expressly.version>
         <postgresql.driver.version>42.7.10</postgresql.driver.version>
