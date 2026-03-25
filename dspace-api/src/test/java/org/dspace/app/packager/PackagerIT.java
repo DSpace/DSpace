@@ -15,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -795,7 +796,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void packagerImportAllRelationships() throws Exception {
+    public void packagerImportAllWithDeletedItemsRelationships() throws Exception {
         try {
             performExportWithScopeScript(article.getHandle(), tempFile, "all");
             context.commit();
@@ -814,26 +815,68 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
             context.commit();
             context.restoreAuthSystemState();
 
-            performImportWithScopeScript(resultFile, "all");
-            context.commit();
-
             Item restored = itemService.find(context, id);
             Item restoredAuthor = itemService.find(context, authorUUID);
             Item restoreAuthor2 = itemService.find(context, author2UUID);
             Item restoredArticle = itemService.find(context, article2UUID);
 
+            assertNull("Primary item should be gone", restored);
+            assertNull("Author should be gone", restoredAuthor);
+            assertNull("Author2 should be gone", restoreAuthor2);
+            assertNull("Article should be gone", restoredArticle);
+
+            performImportWithScopeScript(resultFile, "all");
+            context.commit();
+
+            restored = itemService.find(context, id);
+            restoredAuthor = itemService.find(context, authorUUID);
+            restoreAuthor2 = itemService.find(context, author2UUID);
+            restoredArticle = itemService.find(context, article2UUID);
+
             assertNotNull("Primary item should be restored", restored);
-            assertNotNull("Author should be restored", restoredAuthor);
-            assertNotNull("Author2 should be restored", restoreAuthor2);
-            assertNotNull("Article should be restored", restoredArticle);
+            assertNull("Author should be restored", restoredAuthor);
+            assertNull("Author2 should be restored", restoreAuthor2);
+            assertNull("Article should be restored", restoredArticle);
+        } finally {
+            tempFile.delete();
+            resultFile.delete();
+        }
+    }
+
+    @Test
+    public void packagerImportAllRelationships() throws Exception {
+        try {
+            performExportWithScopeScript(article.getHandle(), tempFile, "all");
+            context.commit();
+
+            // Read ID from the actual article zip that was created
+            UUID id = UUID.fromString(getID());
+            UUID authorUUID = UUID.fromString(author.getID().toString());
+            UUID author2UUID = UUID.fromString(author2.getID().toString());
+
+            context.turnOffAuthorisationSystem();
+            itemService.delete(context, itemService.find(context, article.getID()));
+            context.commit();
+            context.restoreAuthSystemState();
+
+            Item restored = itemService.find(context, id);
+
+            assertNull("Primary item should be gone", restored);
+
+            performImportWithScopeScript(resultFile, "all");
+            context.commit();
+
+            restored = itemService.find(context, id);
+
+            assertNotNull("Primary item should be restored", restored);
 
             List<Relationship> relationships = relationshipService.findByItem(context, restored);
 
             assertTrue(relationships.stream().anyMatch( rel ->
-                rel.getRightItem().getID().equals(authorUUID) || rel.getLeftItem().getID().equals(authorUUID)
+                    rel.getRightItem().getID().equals(authorUUID) || rel.getLeftItem().getID().equals(authorUUID)
             ));
             assertTrue(relationships.stream().anyMatch( rel ->
-                rel.getRightItem().getID().equals(author2UUID) || rel.getLeftItem().getID().equals(author2UUID)
+                    rel.getRightItem().getID().equals(author2UUID) || rel.getLeftItem().getID().equals(author2UUID)
             ));
 
             List<RelationshipMetadataValue> meta = relationshipMetadataService
@@ -844,6 +887,8 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
                     .anyMatch(v -> v.getValue().contains("secondFamily"));
             assertTrue("Relationship to author should be restored",  foundFamilyName);
             assertTrue("Relationship to author2 should be restored", foundSecondFamily);
+
+            assertEquals(2, relationships.size());
         } finally {
             tempFile.delete();
             resultFile.delete();

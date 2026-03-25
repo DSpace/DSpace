@@ -370,6 +370,27 @@ public class PackagerFileService {
             }
         }
 
+        /**
+         * Returns a flat map of { relName -> [uuid, ...] } for THIS node only.
+         * Unlike getRelMap(), this does NOT recurse into children. Intended for
+         * use during ingest/replace so that each item's relationships are wired
+         * independently from that item's own perspective, with no risk of
+         * attributing a child item's relationships to the parent item.
+         *
+         * @return Map of relationship name to list of related item UUIDs (direct children only)
+         */
+        public Map<String, List<String>> getShallowRelMap() {
+            Map<String, List<String>> relMap = new HashMap<>();
+            for (String relName : rels.keySet()) {
+                List<String> uuidList = new ArrayList<>();
+                for (FileNode child : rels.get(relName)) {
+                    uuidList.add(child.uuid);
+                }
+                relMap.put(relName, uuidList);
+            }
+            return relMap;
+        }
+
         public Map<String, Map<String,List<String>>> getPathToRelMap() {
             Map<String, Map<String,List<String>>> pathToRelMap = new HashMap<>();
             for (String relation : rels.keySet()) {

@@ -28,6 +28,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -220,6 +221,9 @@ public class Packager {
         options.addOption("h", "help", false,
                           "help (you may also specify '-h -t [type]' for additional help with a specific type of " +
                               "packager)");
+        options.addOption(Option.builder("z").longOpt("relationalScope").hasArg()
+                .optionalArg(true)
+                .desc("The scope of relations to disseminate with parent item.").build());
         options.addOption("z", "relationalScope", true,
                 "The scope of relations to disseminate with parent item.");
         options.addOption("u", "no-user-interaction", false,
@@ -325,6 +329,9 @@ public class Packager {
         }
         if (line.hasOption("relationalScope")) {
             relationalScope = line.getOptionValue("relationalScope");
+            if (relationalScope == null) {
+                relationalScope = "all";
+            }
         }
         pkgParams.setProperty("scope", relationalScope != null ? relationalScope : "");
         if (line.hasOption("dryRun")) {
@@ -664,34 +671,41 @@ public class Packager {
         }
         if (!dryRun) {
             for (String path : pathToNewUUID.keySet()) {
-                if (getDSOTypeFromUUID(context, pathToNewUUID.get(path)) == Constants.ITEM) {
-                    PackagerFileService.FileNode fileNode = packagerFileService
-                            .getFileNodeTree(context, path, scope).get(0);
-                    Map<String, Map<String, List<String>>> pathToRelMap = fileNode.getPathToRelMap();
-                    Map<String, List<String>> relToUUID = new HashMap<>();
-                    List<String> paths = new ArrayList<>();
-                    if (pathToRelMap.size() > 0) {
-                        for (String relation : pathToRelMap.get(path).keySet()) {
-                            paths = pathToRelMap.get(path).get(relation);
-                            List<String> uuids = new ArrayList<>();
-                            for (String relPath : paths) {
-                                //Check for varrying paths but file NAMES should line up
-                                if (pathToNewUUID.get(relPath) == null) {
-                                    for (String pathCheck : pathToNewUUID.keySet()) {
-                                        if (pathCheck.contains(relPath)) {
-                                            uuids.add(pathToNewUUID.get(pathCheck));
-                                            break;
-                                        }
-                                    }
-                                } else {
-                                    uuids.add(pathToNewUUID.get(relPath));
-                                }
-                            }
-                            relToUUID.put(relation, uuids);
-                            addRelationships(context, relToUUID, pathToNewUUID.get(path));
-                        }
-                    }
+                if (getDSOTypeFromUUID(context, pathToNewUUID.get(path)) != Constants.ITEM) {
+                    continue;
                 }
+
+                // -k: skip relationship wiring entirely, same behavior as skip for metadata/bitstreams
+                if (pkgParams.keepExistingModeEnabled()) {
+                    System.out.println("Skipping relationship wiring for item " + pathToNewUUID.get(path) +
+                            " due to keep-existing (-k) mode.");
+                    continue;
+                }
+
+                // Build a shallow (non-recursive) rel map for this item only.
+                // We use getFileNodeTree here to get the FileNode for this specific path,
+                // then call getShallowRelMap() so we only look at direct relationships
+                // declared in this item's own manifest -- not any children's relationships.
+                PackagerFileService.FileNode itemFileNode =
+                        packagerFileService.getFileNodeTree(context, path, scope).get(0);
+                Map<String, List<String>> shallowRelMap = itemFileNode.getShallowRelMap();
+
+                if (shallowRelMap.isEmpty()) {
+                    continue;
+                }
+
+                String itemUUID = pathToNewUUID.get(path);
+
+                // -f: delete ALL existing relationships on this item before wiring from package.
+                // We delete regardless of scope -- the package is the authoritative source of truth
+                // for this item's relationships when force-replacing.
+                if (pkgParams.replaceModeEnabled()) {
+                    deleteAllRelationships(context, itemUUID);
+                }
+
+                // Wire relationships, but only to items that already exist in the DB.
+                // Related items are never created as a side-effect of relationship wiring.
+                addRelationshipsForExistingItems(context, shallowRelMap, itemUUID);
             }
         }
     }
@@ -880,7 +894,16 @@ public class Packager {
     /**
      * Replace an one or more existing DSpace objects with the contents of
      * specified package(s) based on the options passed to the 'packager' script.
-     * This method is only called for full replaces ('-r -f' options specified)
+     * This method is only called for full replaces ('-r -f' options specified).
+     * <p>
+     * Relationship wiring rules during replace follow the same rules as ingest:
+     * <ul>
+     *   <li>Relationships are only wired for the item being replaced -- no recursion through related items.</li>
+     *   <li>If a related item does not already exist in the repository,
+     *       the relationship is skipped with a warning.</li>
+     *   <li>Since -f is always true in this path, all existing relationships on the item are deleted before
+     *       wiring from the package.</li>
+     * </ul>
      *
      * @param context      DSpace Context
      * @param sip          PackageIngester which will actually replace the object with the package
@@ -900,170 +923,229 @@ public class Packager {
             PackageException {
 
         PackagerFileService packagerFileService = new PackagerFileService(pkgParams);
+        // Track UUIDs of items that were successfully replaced so we can wire
+        // their relationships after all replacements are done.
+        Map<String, String> replacedPathToUUID = new HashMap<>();
+
         for (String sourceFileInit : sourceFiles) {
             if (dryRun) {
                 dryRunIngest(context,sourceFileInit, pkgParams.getProperty("scope"), packagerFileService);
             } else {
-                List<String> filePaths = new ArrayList<>();
-                List<PackagerFileService.FileNode> fileNodes = packagerFileService
-                        .getFileNodeTree(context, sourceFileInit, pkgParams.getProperty("scope"));
-                //List will NEVER be empty
-                fileNodes.get(0).getTreePaths(filePaths);
-                for (String sourceFile : filePaths) {
-                    //populate rels map
-                    File pkgFile = new File(sourceFile);
+                File pkgFile = new File(sourceFileInit);
 
-                    if (!pkgFile.exists()) {
-                        System.out.println("\nPackage located at " + sourceFile + " does not exist!");
-                        throw new PackagerExitException(1, "Package file does not exist: " + sourceFile);
-                    }
+                if (!pkgFile.exists()) {
+                    System.out.println("\nPackage located at " + sourceFileInit + " does not exist!");
+                    throw new PackagerExitException(1, "Package file does not exist: " + sourceFileInit);
+                }
 
-                    System.out.println("\nReplacing DSpace object(s) with package located at " + sourceFile);
-                    if (objToReplace != null) {
-                        System.out.println("Will replace existing DSpace " +
-                                Constants.typeText[objToReplace.getType()] +
-                                " [ hdl=" + objToReplace.getHandle() + " ]");
-                    }
-                    // NOTE: At this point, objToReplace may be null.  If it is null, it is up to the PackageIngester
-                    // to determine which Object needs to be replaced (based on the handle specified in the pkg, etc.)
+                System.out.println("\nReplacing DSpace object(s) with package located at " + sourceFileInit);
+                if (objToReplace != null) {
+                    System.out.println("Will replace existing DSpace " +
+                            Constants.typeText[objToReplace.getType()] +
+                            " [ hdl=" + objToReplace.getHandle() + " ]");
+                }
+                // NOTE: At this point, objToReplace may be null.  If it is null, it is up to the PackageIngester
+                // to determine which Object needs to be replaced (based on the handle specified in the pkg, etc.)
 
-                    try {
-                        //If we are doing a recursive replace, call replaceAll()
-                        if (pkgParams.recursiveModeEnabled()) {
-                            //ingest first object using package & recursively
-                            // replace anything else that package references(child objects, etc)
-                            List<String> hdlResults = sip.replaceAll(context, objToReplace, pkgFile, pkgParams);
+                try {
+                    //If we are doing a recursive replace, call replaceAll()
+                    if (pkgParams.recursiveModeEnabled()) {
+                        //ingest first object using package & recursively
+                        // replace anything else that package references(child objects, etc)
+                        List<String> hdlResults = sip.replaceAll(context, objToReplace, pkgFile, pkgParams);
 
-                            if (hdlResults != null) {
-                                //Report total objects replaced
-                                System.out.println("\nREPLACED a total of " + hdlResults.size() + " DSpace Objects.");
+                        if (hdlResults != null) {
+                            //Report total objects replaced
+                            System.out.println("\nREPLACED a total of " + hdlResults.size() + " DSpace Objects.");
 
-                                String choiceString = null;
-                                //Ask if user wants full list printed to command line, as this may be rather long.
-                                if (this.userInteractionEnabled) {
-                                    BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-                                    System.out.print("\nWould you like to view a list of all objects " +
-                                            "that were replaced? [y/n]: ");
-                                    choiceString = input.readLine();
-                                } else {
-                                    // user interaction disabled -- default answer to 'yes', as
-                                    // we want to provide user with as detailed a report as possible.
-                                    choiceString = "y";
-                                }
+                            String choiceString = null;
+                            //Ask if user wants full list printed to command line, as this may be rather long.
+                            if (this.userInteractionEnabled) {
+                                BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+                                System.out.print("\nWould you like to view a list of all objects " +
+                                        "that were replaced? [y/n]: ");
+                                choiceString = input.readLine();
+                            } else {
+                                // user interaction disabled -- default answer to 'yes', as
+                                // we want to provide user with as detailed a report as possible.
+                                choiceString = "y";
+                            }
 
-                                // Provide detailed report if user answered 'yes'
-                                if (choiceString.equalsIgnoreCase("y")) {
-                                    System.out.println("\n\n");
-                                    for (String result : hdlResults) {
-                                        DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
-                                                .resolveToObject(context, result);
+                            // Provide detailed report if user answered 'yes'
+                            if (choiceString.equalsIgnoreCase("y")) {
+                                System.out.println("\n\n");
+                                for (String result : hdlResults) {
+                                    DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
+                                            .resolveToObject(context, result);
 
-                                        if (dso != null) {
-                                            System.out.println("REPLACED DSpace " + Constants.typeText[dso.getType()] +
-                                                    " [ hdl=" + dso.getHandle() + " ] ");
+                                    if (dso != null) {
+                                        if (dso.getType() == Constants.ITEM) {
+                                            replacedPathToUUID.put(sourceFileInit, dso.getID().toString());
                                         }
+                                        System.out.println("REPLACED DSpace " + Constants.typeText[dso.getType()] +
+                                                " [ hdl=" + dso.getHandle() + " ] ");
                                     }
                                 }
-
-
                             }
-                        } else {
-                            //otherwise, just one object to replace
-                            DSpaceObject dso = sip.replace(context, objToReplace, pkgFile, pkgParams);
 
-                            if (dso != null) {
-                                System.out.println("REPLACED DSpace " + Constants.typeText[dso.getType()] +
-                                        " [ hdl=" + dso.getHandle() + " ] ");
-                            }
+
                         }
-                    } catch (WorkflowException e) {
-                        throw new PackageException(e);
+                    } else {
+                        //otherwise, just one object to replace
+                        DSpaceObject dso = sip.replace(context, objToReplace, pkgFile, pkgParams);
+
+                        if (dso != null) {
+                            if (dso.getType() == Constants.ITEM) {
+                                replacedPathToUUID.put(sourceFileInit, dso.getID().toString());
+                            }
+                            System.out.println("REPLACED DSpace " + Constants.typeText[dso.getType()] +
+                                    " [ hdl=" + dso.getHandle() + " ] ");
+                        }
                     }
+                } catch (WorkflowException e) {
+                    throw new PackageException(e);
                 }
             }
         }
         if (!dryRun) {
-            for (String sourceFile : sourceFiles) {
-                PackagerFileService.FileNode fileNode = packagerFileService
-                        .getFileNodeTree(context, sourceFile, pkgParams.getProperty("scope")).get(0);
-                Map<String, List<String>> parentRelationshipMap = new HashMap<>();
-                fileNode.getRelMap(parentRelationshipMap);
-                if (!parentRelationshipMap.isEmpty()) {
-                    addRelationships(context, parentRelationshipMap, fileNode.uuid);
+            // Wire relationships for each replaced Item.
+            // -f is always set in this path, so we delete ALL existing relationships
+            // before re-wiring from the package. Related items must already exist in
+            for (String path : replacedPathToUUID.keySet()) {
+                String itemUUID = replacedPathToUUID.get(path);
+
+                PackagerFileService.FileNode itemFileNode =
+                        packagerFileService.getFileNodeTree(context, path,
+                                pkgParams.getProperty("scope")).get(0);
+                Map<String, List<String>> shallowRelMap = itemFileNode.getShallowRelMap();
+
+                if (shallowRelMap.isEmpty()) {
+                    continue;
                 }
+
+                // -f is always active in replace() -- delete all existing relationships
+                // before re-wiring from the package manifest.
+                deleteAllRelationships(context, itemUUID);
+
+                // Wire only relationships where the related item already exists in the DB.
+                addRelationshipsForExistingItems(context, shallowRelMap, itemUUID);
             }
         }
     }
 
-    public void addRelationships(Context context, Map<String, List<String>> relsMap, String initUUID)
+    /**
+     * Deletes ALL existing relationships for the given item UUID, regardless of
+     * relationship type or scope. Used by force-replace (-f) mode to ensure the
+     * package manifest is the authoritative source of truth for the item's relationships.
+     *
+     * @param context  DSpace Context
+     * @param itemUUID UUID string of the item whose relationships should be cleared
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     */
+    protected void deleteAllRelationships(Context context, String itemUUID)
             throws SQLException, AuthorizeException {
-        //All IDs at this point should resolve as Items in the DB
-        //We're adding relations ships TO `initUUID as Item` derived FROM the relsMap
+        RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+        ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+        Item item = itemService.find(context, UUID.fromString(itemUUID));
+        if (item == null) {
+            System.out.println("deleteAllRelationships: could not find item with UUID " + itemUUID + ", skipping.");
+            return;
+        }
+        List<Relationship> existing = relationshipService.findByItem(context, item);
+        for (Relationship rel : existing) {
+            relationshipService.delete(context, rel);
+        }
+        System.out.println("Deleted " + existing.size() + " existing relationship(s) for item " + itemUUID +
+                " prior to re-wiring from package.");
+    }
+
+    /**
+     * Wires relationships for a single item from a shallow (non-recursive) rel map.
+     * <p>
+     * <ul>
+     *   <li>Does NOT prune existing relationships that are absent from the map (pruning is
+     *       handled explicitly by deleteAllRelationships() when -f is set).</li>
+     *   <li>Skips any related item that does not already exist in the DB, logging a warning.
+     *       Related items are never created as a side-effect of this method.</li>
+     *   <li>Only operates on the single item identified by initUUID -- no recursion.</li>
+     * </ul>
+     *
+     * @param context  DSpace Context
+     * @param relsMap  Map of { relationshipTypeName -> [relatedItemUUID, ...] } for this item only
+     * @param initUUID UUID string of the item to wire relationships for
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     */
+    public void addRelationshipsForExistingItems(Context context, Map<String, List<String>> relsMap, String initUUID)
+            throws SQLException, AuthorizeException {
         RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
         RelationshipTypeService relationshipTypeService = ContentServiceFactory
                 .getInstance().getRelationshipTypeService();
         ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
         Item parentItem = itemService.find(context, UUID.fromString(initUUID));
+        if (parentItem == null) {
+            System.out.println("addRelationshipsForExistingItems: could not find item with UUID "
+                    + initUUID + ", skipping.");
+            return;
+        }
         String parentEntityTypeLabel = itemService
                 .getMetadataFirstValue(parentItem, "dspace", "entity", "type", null);
 
-        // Build a flat set of all UUIDs that SHOULD be related after this operation
-        Set<String> expectedChildUUIDs = new TreeSet<>();
         for (String key : relsMap.keySet()) {
-            expectedChildUUIDs.addAll(relsMap.get(key));
-        }
-
-        // Remove any existing relationships whose child is NOT in the expected set
-        List<Relationship> existingRelationships = relationshipService.findByItem(context, parentItem);
-        for (Relationship existing : existingRelationships) {
-            Item otherItem = existing.getLeftItem().equals(parentItem) ? existing.getRightItem()
-                    : existing.getLeftItem();
-            if (!expectedChildUUIDs.contains(otherItem.getID().toString())) {
-                relationshipService.delete(context, existing);
-            }
-        }
-
-        for (String key : relsMap.keySet()) {
-            //This list will be in place order with respect to relationship side
             for (String childUUIDString : relsMap.get(key)) {
                 Item childItem = itemService.find(context, UUID.fromString(childUUIDString));
-                String childEntityTypeLabel = itemService.getMetadataFirstValue(
-                        childItem, "dspace", "entity", "type", null);
-                //Get all rel types of this label
-                List<RelationshipType> relTypes = relationshipTypeService.
-                        findByLeftwardOrRightwardTypeName(context, key);
-                //Get only possible Rel type of parent entity type, child entity type, and current label
-                RelationshipType relationshipType = matchRelationshipType(relTypes,
-                        childEntityTypeLabel, parentEntityTypeLabel, key);
-                if (relationshipType == null) {
+
+                // Rule 1: if the related item does not exist in the DB, skip with a warning.
+                // We never create related items as a side-effect of relationship wiring.
+                if (childItem == null) {
+                    System.out.println("Skipping relationship '" + key + "' for item " + initUUID +
+                            ": related item " + childUUIDString + " does not exist in the repository. " +
+                            "Restore or ingest the related item separately if this relationship is needed.");
+                    System.out.println("WARNING: Skipping relationship '" + key + "' -> " + childUUIDString +
+                            " (item does not exist in repository). Restore the related item separately.");
                     continue;
                 }
-                //Get all relationships of parent item and derived relationship type
-                List<Relationship> relationships = relationshipService
+
+                String childEntityTypeLabel = itemService.getMetadataFirstValue(
+                        childItem, "dspace", "entity", "type", null);
+
+                List<RelationshipType> relTypes = relationshipTypeService
+                        .findByLeftwardOrRightwardTypeName(context, key);
+                RelationshipType relationshipType = matchRelationshipType(relTypes,
+                        childEntityTypeLabel, parentEntityTypeLabel, key);
+
+                if (relationshipType == null) {
+                    System.out.println("addRelationshipsForExistingItems: no matching RelationshipType" +
+                            " found for key='" + key + "', parentEntity='" + parentEntityTypeLabel +
+                            "', childEntity='" + childEntityTypeLabel + "'. Skipping.");
+                    continue;
+                }
+
+                // Check if this specific relationship already exists -- don't create duplicates.
+                List<Relationship> existing = relationshipService
                         .findByItemAndRelationshipType(context, parentItem, relationshipType);
-                boolean alreadyExist = false;
-                //Determine if rel already exist
-                for (Relationship relationship : relationships) {
-                    if (relationship.getRightItem() == childItem || relationship.getLeftItem() == childItem) {
-                        alreadyExist = true;
+                boolean alreadyExists = false;
+                for (Relationship rel : existing) {
+                    if (rel.getRightItem().equals(childItem) || rel.getLeftItem().equals(childItem)) {
+                        alreadyExists = true;
                         break;
                     }
                 }
-                if (!alreadyExist) {
-                    boolean isParentLeft = false;
-                    Relationship persistedRelationship = null;
-                    //Determine left or right rel side for parent
-                    if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(parentEntityTypeLabel)) {
-                        isParentLeft = true;
-                    }
+
+                if (!alreadyExists) {
+                    boolean isParentLeft = relationshipType.getLeftType().getLabel()
+                            .equalsIgnoreCase(parentEntityTypeLabel);
+                    Relationship newRel;
                     if (isParentLeft) {
-                        persistedRelationship = relationshipService.create(context, parentItem, childItem,
+                        newRel = relationshipService.create(context, parentItem, childItem,
                                 relationshipType, -1, -1);
                     } else {
-                        persistedRelationship = relationshipService.create(context, childItem, parentItem,
+                        newRel = relationshipService.create(context, childItem, parentItem,
                                 relationshipType, -1, -1);
                     }
-                    relationshipService.update(context, persistedRelationship);
+                    relationshipService.update(context, newRel);
                 }
             }
         }
@@ -1103,7 +1185,6 @@ public class Packager {
     }
 
     public static void dirAndFilePathBuilder(List<String> sourceFileIngest, String[] sourceFiles) {
-        //ingest the object from the source file
         for (String sourceFile : sourceFiles) {
             File testFile = new File(sourceFile);
             if (testFile.exists() && testFile.isDirectory()) {
