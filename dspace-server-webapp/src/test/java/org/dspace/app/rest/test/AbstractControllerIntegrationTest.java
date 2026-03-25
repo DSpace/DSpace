@@ -12,10 +12,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +36,13 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.security.DSpaceCsrfTokenRepository;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -83,6 +95,20 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
+    // Per-test performance instrumentation (collected per class, printed in @AfterClass)
+    private long perfTestStartNanos;
+    private long perfTestStartCpuNanos;
+    private static final AtomicLong perfTotalWallMs = new AtomicLong();
+    private static final AtomicLong perfTotalCpuMs = new AtomicLong();
+    private static final AtomicInteger perfTestCount = new AtomicInteger();
+    private static final AtomicInteger perfProcs = new AtomicInteger();
+
+    // Per-method Hibernate profiling -- only collected for the target class to keep logs small
+    private static final String PERF_DETAIL_CLASS = "LeftTiltedRelationshipRestRepositoryIT";
+
+    @Rule
+    public TestName perfTestName = new TestName();
+
     protected static final String AUTHORIZATION_HEADER = "Authorization";
     protected static final String AUTHORIZATION_COOKIE = "Authorization-cookie";
 
@@ -118,6 +144,96 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
         Assert.assertNotNull("the JSON message converter must not be null",
                              this.mappingJackson2HttpMessageConverter);
+    }
+
+    @Before
+    public void perfTimerStart() {
+        perfTestStartNanos = System.nanoTime();
+        perfTestStartCpuNanos = ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime();
+        if (PERF_DETAIL_CLASS.equals(getClass().getSimpleName())) {
+            try {
+                org.hibernate.SessionFactory sf = DSpaceServicesFactory.getInstance()
+                    .getServiceManager()
+                    .getServiceByName("sessionFactory", org.hibernate.SessionFactory.class);
+                sf.getStatistics().setStatisticsEnabled(true);
+                sf.getStatistics().clear();
+            } catch (Exception e) {
+                // ignore -- stats not available
+            }
+        }
+    }
+
+    @After
+    public void perfTimerEnd() {
+        long wallMs = (System.nanoTime() - perfTestStartNanos) / 1_000_000;
+        long cpuMs = (ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime()
+                      - perfTestStartCpuNanos) / 1_000_000;
+        perfTotalWallMs.addAndGet(wallMs);
+        perfTotalCpuMs.addAndGet(cpuMs);
+        perfTestCount.incrementAndGet();
+        perfProcs.set(Runtime.getRuntime().availableProcessors());
+
+        if (PERF_DETAIL_CLASS.equals(getClass().getSimpleName())) {
+            try {
+                org.hibernate.SessionFactory sf = DSpaceServicesFactory.getInstance()
+                    .getServiceManager()
+                    .getServiceByName("sessionFactory", org.hibernate.SessionFactory.class);
+                org.hibernate.stat.Statistics stats = sf.getStatistics();
+                String method = perfTestName.getMethodName();
+                String detail = method
+                    + ";" + wallMs
+                    + ";" + cpuMs
+                    + ";" + stats.getQueryExecutionCount()
+                    + ";" + stats.getEntityLoadCount()
+                    + ";" + stats.getEntityInsertCount()
+                    + ";" + stats.getEntityUpdateCount()
+                    + ";" + stats.getEntityDeleteCount()
+                    + ";" + stats.getFlushCount()
+                    + ";" + stats.getCollectionLoadCount()
+                    + ";" + stats.getQueryExecutionMaxTime()
+                    + ";" + sanitize(stats.getQueryExecutionMaxTimeQueryString());
+                try (PrintWriter pw = new PrintWriter(
+                        new FileWriter("target/perf-detail.csv", true))) {
+                    pw.println(detail);
+                }
+            } catch (Exception e) {
+                // ignore -- stats not available
+            }
+        }
+    }
+
+    /**
+     * Remove semicolons and newlines from a string to keep CSV output clean.
+     *
+     * @param s the input string (may be null)
+     * @return sanitized string safe for CSV
+     */
+    private static String sanitize(String s) {
+        if (s == null) {
+            return "";
+        }
+        return s.replace(';', ' ').replace('\n', ' ').replace('\r', ' ');
+    }
+
+    @AfterClass
+    public static void perfSummary() {
+        int count = perfTestCount.getAndSet(0);
+        long wallMs = perfTotalWallMs.getAndSet(0);
+        long cpuMs = perfTotalCpuMs.getAndSet(0);
+        int procs = perfProcs.get();
+        if (count > 0) {
+            String summary = "unknown"
+                + ";" + count
+                + ";" + wallMs
+                + ";" + cpuMs
+                + ";" + (wallMs > 0 ? String.format("%.0f", 100.0 * cpuMs / wallMs) : "0")
+                + ";" + procs;
+            try (PrintWriter pw = new PrintWriter(new FileWriter("target/perf-summary.csv", true))) {
+                pw.println(summary);
+            } catch (IOException e) {
+                // silently ignore
+            }
+        }
     }
 
     /**

@@ -161,6 +161,33 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Print per-class and per-method performance summary after integration tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>print-perf-summary</id>
+                        <phase>post-integration-test</phase>
+                        <goals><goal>run</goal></goals>
+                        <configuration>
+                            <target>
+                                <echo message="=== PERF-SUMMARY (class;tests;wallMs;cpuMs;cpuRatio%;procs) ===" />
+                                <concat>
+                                    <fileset dir="${project.build.directory}" includes="perf-summary.csv" />
+                                </concat>
+                                <echo message="=== END PERF-SUMMARY ===" />
+                                <echo message="=== PERF-DETAIL (method;wallMs;cpuMs;queries;entityLoads;inserts;updates;deletes;flushes;collLoads;maxQMs;maxQuery) ===" />
+                                <concat>
+                                    <fileset dir="${project.build.directory}" includes="perf-detail.csv" />
+                                </concat>
+                                <echo message="=== END PERF-DETAIL ===" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
