@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -94,6 +95,11 @@ public class RequestItemServiceImpl implements RequestItemService {
     @Override
     public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException {
         return requestItemDAO.findByItem(context, item);
+    }
+
+    @Override
+    public Iterator<RequestItem> findByBitstreamId(Context context, UUID bitstreamId) throws SQLException {
+        return requestItemDAO.findByBitstreamId(context, bitstreamId);
     }
 
     @Override

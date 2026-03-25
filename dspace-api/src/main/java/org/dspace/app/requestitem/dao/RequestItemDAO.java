@@ -9,6 +9,7 @@ package org.dspace.app.requestitem.dao;
 
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.UUID;
 
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.content.Item;
@@ -26,7 +27,7 @@ import org.dspace.core.GenericDAO;
  */
 public interface RequestItemDAO extends GenericDAO<RequestItem> {
     /**
-     * Fetch a request named by its unique token (passed in emails).
+     * Fetch a request named by its unique approval token (passed in emails).
      *
      * @param context the current DSpace context.
      * @param token uniquely identifies the request.
@@ -36,4 +37,17 @@ public interface RequestItemDAO extends GenericDAO<RequestItem> {
     public RequestItem findByToken(Context context, String token) throws SQLException;
 
     public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException;
+
+    /**
+     * Retrieve all requests (as iterator) for a given bitstream UUID
+     * A UUID parameter is used here rather than Bitstream object, to make it usable
+     * in situations even when a bitstream object no longer exists, but orphaned
+     * entries need to be found by their (previous) bitstream UUID.
+     *
+     * @param context current DSpace context
+     * @param bitstreamId the bitstream UUID to search for
+     * @return the matching requests (or empty iterator)
+     */
+    public Iterator<RequestItem> findByBitstreamId(Context context, UUID bitstreamId) throws SQLException;
+
 }
