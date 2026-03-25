@@ -510,7 +510,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
                 item.setArchived(inArchive);
             }
             context.dispatchEvents();
-            indexingService.commit();
             return item;
         } catch (Exception e) {
             return handleException(e);

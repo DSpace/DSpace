@@ -287,6 +287,5 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
             getService().delete(c, dso);
         }
         c.complete();
-        indexingService.commit();
     }
 }
