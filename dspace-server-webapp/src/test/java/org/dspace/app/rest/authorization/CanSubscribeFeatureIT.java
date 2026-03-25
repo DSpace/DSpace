@@ -42,7 +42,6 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
@@ -301,7 +300,7 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
             for (ResourcePolicy resourcePolicy : resourcePolicies) {
                 ResourcePolicyBuilder.delete(resourcePolicy.getID());
             }
-        } catch (SQLException | SearchServiceException | IOException sqlException) {
+        } catch (SQLException | IOException sqlException) {
             log.error(sqlException.getMessage());
         }
     }

@@ -117,7 +117,6 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
             communityService.update(context, community);
             context.dispatchEvents();
 
-            indexingService.commit();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
