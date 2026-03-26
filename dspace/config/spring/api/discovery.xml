@@ -40,6 +40,7 @@
                 <value>person.name.translated</value>
                 <value>person.givenName</value>
                 <value>person.familyName</value>
+                <value>organization.legalName</value>
             </list>
         </property>
     </bean>
@@ -50,6 +51,7 @@
                 <value>crisrp.name</value>
                 <value>person.name.variant</value>
                 <value>person.name.translated</value>
+                <value>organization.legalName</value>
             </list>
         </property>
     </bean>
@@ -1459,7 +1461,7 @@
         </property>
     </bean>
 
-    <!-- OrgUnit → Projects (via involvedorganisation_authority) -->
+    <!-- OrgUnit → Projects (via dc.contributor.other_authority) -->
     <!-- Maps to: OrgUnit.isProjectOfOrgUnit (participated projects) -->
     <bean id="relationOrgunitProjectsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
         <property name="searchSortConfiguration">
@@ -1473,7 +1475,7 @@
         </property>
         <property name="defaultFilterQueries">
             <list>
-                <value>involvedorganisation_authority:{0}</value>
+                <value>dc.contributor.other_authority:{0}</value>
                 <value>-withdrawn:true AND -discoverable:false</value>
             </list>
         </property>
