@@ -183,6 +183,16 @@
                                     <fileset dir="${project.build.directory}" includes="perf-detail.csv" />
                                 </concat>
                                 <echo message="=== END PERF-DETAIL ===" />
+                                <echo message="=== PERF-COLLECTIONS (method;collRecreate;collRemove;collUpdate;mdRecreate;mdRemove;polRecreate;polRemove;hdlRecreate;hdlRemove) ===" />
+                                <concat>
+                                    <fileset dir="${project.build.directory}" includes="perf-collections.csv" />
+                                </concat>
+                                <echo message="=== END PERF-COLLECTIONS ===" />
+                                <echo message="=== PERF-ROLES ===" />
+                                <concat>
+                                    <fileset dir="${project.build.directory}" includes="perf-roles.csv" />
+                                </concat>
+                                <echo message="=== END PERF-ROLES ===" />
                             </target>
                         </configuration>
                     </execution>
