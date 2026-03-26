@@ -945,7 +945,7 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
      <row>
        <field>
-         <dc-schema>cris</dc-schema>
+         <dc-schema>dspace</dc-schema>
          <dc-element>policy</dc-element>
          <dc-qualifier>eperson</dc-qualifier>
          <label>Eperson Policy</label>
@@ -957,7 +957,7 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
      <row>
        <field>
-         <dc-schema>cris</dc-schema>
+         <dc-schema>dspace</dc-schema>
          <dc-element>policy</dc-element>
          <dc-qualifier>group</dc-qualifier>
          <label>Group Policy</label>
