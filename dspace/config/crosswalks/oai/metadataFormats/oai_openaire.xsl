@@ -1691,6 +1691,12 @@
             <xsl:when test="$lc_dc_type = 'research article'">
                 <xsl:text>http://purl.org/coar/resource_type/c_2df8fbb1</xsl:text>
             </xsl:when>
+            <xsl:when test="$lc_dc_type = 'conference presentation'">
+                <xsl:text>http://purl.org/coar/resource_type/R60J-J5BD</xsl:text>
+            </xsl:when>
+            <xsl:when test="$lc_dc_type = 'learning object'">
+                <xsl:text>http://purl.org/coar/resource_type/c_e059</xsl:text>
+            </xsl:when>
             <!-- other -->
             <xsl:otherwise>
                 <xsl:text>http://purl.org/coar/resource_type/c_1843</xsl:text>
