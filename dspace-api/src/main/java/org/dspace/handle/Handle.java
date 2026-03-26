@@ -41,7 +41,7 @@ public class Handle implements ReloadableEntity<Integer> {
     @Column(name = "handle", unique = true)
     private String handle;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resource_id")
     private DSpaceObject dso;
 

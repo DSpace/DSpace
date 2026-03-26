@@ -248,12 +248,16 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
             bitstreamService.update(context, bitstream);
             itemService.update(context, item);
 
+            // Dispatch events first so that event consumers (e.g. policy
+            // inheritance) finish processing before we restrict permissions.
+            // Otherwise, dispatchEvents() may re-create default policies
+            // that setOnlyReadPermission() just removed.
+            context.dispatchEvents();
+
             //Check if we need to make this bitstream private.
             if (readerGroup != null) {
                 setOnlyReadPermission(bitstream, readerGroup, null);
             }
-
-            context.dispatchEvents();
 
 
         } catch (Exception e) {
