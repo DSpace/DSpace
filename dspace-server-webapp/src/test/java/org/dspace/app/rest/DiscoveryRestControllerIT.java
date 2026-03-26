@@ -5885,9 +5885,11 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$._embedded.values[0].label", is("2017 - 2020")))
                    .andExpect(jsonPath("$._embedded.values[0].count", is(3)))
                    .andExpect(jsonPath("$._embedded.values[0]._links.search.href",
-                                       containsString(
-                                           "api/discover/search/objects?dsoType=Item&configuration=default"
-                                               + "&f.dateIssued=%5B2017%20TO%202020%5D,equals")))
+                        containsString("api/discover/search/objects?dsoType=Item" +
+                                           "&configuration=default" +
+                                           "&f.dateIssued=" +
+                                urlPathSegmentEscaper().escape("[2017 TO 2020],equals")
+                        )))
                    .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
 
     }
@@ -6820,9 +6822,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                     "api/discover/search/objects?scope=" +
                                         author.getID().toString() +
                                         "&configuration=RELATION.Person.researchoutputs" +
-                                        "&f.dateIssued=%5B2017%20TO%202020%5D,equals"
-                                )
-            ))
+                                        "&f.dateIssued=" +
+                                    urlPathSegmentEscaper().escape("[2017 TO 2020],equals")
+                                )))
             .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
 
         // finds the facets using the default configuration and
@@ -6850,9 +6852,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                 containsString(
                                     "api/discover/search/objects?configuration=default" +
                                         "&f.author=" + author.getID().toString() + ",authority" +
-                                        "&f.dateIssued=%5B2017%20TO%202020%5D,equals"
-                                )
-            ))
+                                        "&f.dateIssued=" +
+                                        urlPathSegmentEscaper().escape("[2017 TO 2020],equals")
+                                )))
             .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
 
     }
