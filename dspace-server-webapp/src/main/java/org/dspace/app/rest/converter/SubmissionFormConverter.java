@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -33,7 +32,6 @@ import org.dspace.app.util.DCInputSet;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.services.RequestService;
-import org.dspace.services.model.Request;
 import org.dspace.submit.model.LanguageFormField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -141,14 +139,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                     inputRest.setType(inputType);
                 }
 
-                Context context = null;
-                Request currentRequest = requestService.getCurrentRequest();
-                if (currentRequest != null) {
-                    HttpServletRequest request = currentRequest.getHttpServletRequest();
-                    context = ContextUtil.obtainContext(request);
-                } else {
-                    context = new Context();
-                }
+                Context context = ContextUtil.obtainCurrentRequestContext();
 
                 if (Strings.CI.equals(dcinput.getInputType(), "group") ||
                     Strings.CI.equals(dcinput.getInputType(), "inline-group")) {
