@@ -24,6 +24,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.dao.HandleDAO;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -249,7 +250,11 @@ public class HandleServiceImpl implements HandleService {
             return null;
         }
 
-        return dbhandle.getDSpaceObject();
+        // Unproxy to get the actual subclass (Item, Collection, etc.) instead
+        // of a DSpaceObject proxy. With Handle.dso mapped as FetchType.LAZY,
+        // Hibernate returns a proxy typed as DSpaceObject. Callers typically
+        // cast the result to a specific subclass, which would fail on a proxy.
+        return (DSpaceObject) Hibernate.unproxy(dbhandle.getDSpaceObject());
     }
 
     @Override
