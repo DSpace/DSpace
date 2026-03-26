@@ -14,20 +14,25 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.shell.command.CommandAlias;
 import org.springframework.shell.command.CommandCatalog;
 import org.springframework.shell.command.CommandRegistration;
-import org.springframework.shell.command.annotation.Command;
+import org.springframework.shell.standard.ShellComponent;
+import org.springframework.shell.standard.ShellMethod;
 
 /**
  * Other and default commands
  * @author paulo-graca
  *
  */
-@Command
+@ShellComponent
 public class DefaultCommands {
     /**
      * command catalog provider
      */
     private final ObjectProvider<CommandCatalog> catalogProvider;
 
+    /**
+     * constructor for dependency injection
+     * @param catalogProvider
+     */
     public DefaultCommands(ObjectProvider<CommandCatalog> catalogProvider) {
         this.catalogProvider = catalogProvider;
     }
@@ -37,9 +42,9 @@ public class DefaultCommands {
      * This method isn't required at all - we can use -h option
      * it main purpose is to use the inspector
      */
-    @Command(
-        command = "metadata",
-        description = "List all available commands and their options - for test only - you should"
+    @ShellMethod(
+        key = "metadata",
+        value = "List all available commands and their options - for test only - you should"
                       + " use -h option or the help command"
     )
     public void listCommands() {

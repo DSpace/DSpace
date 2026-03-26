@@ -7,8 +7,11 @@
  */
 package org.dspace.shell.config;
 
+import jakarta.annotation.PreDestroy;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -17,13 +20,16 @@ import org.springframework.context.annotation.Profile;
  * Starts the DSpace kernel to load all configurations and services
  */
 @Configuration
-public class DSpaceConfigLoader {
+public class DSpaceShellConfigLoader {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(DSpaceShellConfigLoader.class);
 
     /**
      * DSpace Kernel. Must be started to initialize ConfigurationService and
      * any other services.
      */
-    protected static transient DSpaceKernelImpl kernelImpl;
+    private DSpaceKernelImpl kernel;
 
     @Bean
     @Profile("!test")
@@ -32,26 +38,41 @@ public class DSpaceConfigLoader {
         // Initialize the service manager kernel
         try {
             // Get a reference to current Kernel
-            kernelImpl = DSpaceKernelInit.getKernel(null);
+            kernel = DSpaceKernelInit.getKernel(null);
+
             // If somehow the kernel is NOT initialized, initialize it.
-            // NOTE: This is likely never going to occur, as Spring Boot initializes it
-            if (!kernelImpl.isRunning()) {
-                kernelImpl.start(); // init the kernel
+            if (!kernel.isRunning()) {
+                log.debug("Starting DSpace Kernel...");
+                kernel.start();
             }
+            log.debug("DSpace Kernel started successfully.");
+
+            return kernel;
+
         } catch (Exception e) {
             // Failed to start so destroy it and log and throw an exception
-            try {
-                kernelImpl.destroy();
-            } catch (Exception e1) {
-                String message = "Failed to destroy DSpace Kernel: " + e.getMessage();
-                throw new IllegalStateException(message, e);
-            }
-            String message = "Failed to startup DSpace Kernel: " + e.getMessage();
-            System.err.println(message);
-            e.printStackTrace();
-            throw new IllegalStateException(message, e);
+            log.error("Failed to start DSpace Kernel", e);
+
+            throw new IllegalStateException(
+                    "Failed to startup DSpace Kernel", e);
         }
 
-        return kernelImpl;
+    }
+
+    /** 
+     * Shutdown and Destroy DSpace kernel
+     */
+    @PreDestroy
+    public void shutdown() {
+
+        if (kernel != null) {
+            try {
+                log.debug("Shutting down DSpace Kernel...");
+                kernel.destroy();
+            } catch (Exception e) {
+                log.error("Error shutting down DSpace Kernel", e);
+            }
+        }
+
     }
 }

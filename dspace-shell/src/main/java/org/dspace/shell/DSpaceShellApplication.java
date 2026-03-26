@@ -7,6 +7,8 @@
  */
 package org.dspace.shell;
 
+import java.io.File;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -29,7 +31,7 @@ import org.springframework.shell.command.annotation.CommandScan;
  *
  * <p><b>Usage:</b></p>
  * <pre>{@code
- * java -jar /dspace/bin/dspace.jar
+ * java -jar /dspace/bin/dspace.jar -Ddspace.dir=/dspace
  * }</pre>
  *
  * <p>The {@code @CommandScan} annotation ensures that all available Spring Shell
@@ -40,39 +42,66 @@ import org.springframework.shell.command.annotation.CommandScan;
  */
 @SuppressWarnings({ "checkstyle:hideutilityclassconstructor" })
 @SpringBootApplication(
-        scanBasePackages = {"org.dspace.shell"},
-        exclude = { DataSourceAutoConfiguration.class }
-    )
+            scanBasePackages = {
+                "org.dspace.shell"
+            },
+            exclude = { DataSourceAutoConfiguration.class }
+)
 @CommandScan
 public class DSpaceShellApplication {
 
     private static final Logger log = LoggerFactory.getLogger(DSpaceShellApplication.class);
 
     public static void main(String[] args) {
-        // Always ensure dspace.dir is set BEFORE starting Spring
-        if (System.getProperty("dspace.dir") == null) {
-            try {
-                // Locate the running JAR
-                String jarPath = new java.io.File(
-                        DSpaceShellApplication.class
-                                .getProtectionDomain()
-                                .getCodeSource()
-                                .getLocation()
-                                .toURI()
-                ).getAbsolutePath();
-
-                java.io.File jarFile = new java.io.File(jarPath);
-                java.io.File binDir = jarFile.getParentFile();   // .../dspace/bin
-                java.io.File dspaceDir = binDir.getParentFile(); // .../dspace
-
-                System.setProperty("dspace.dir", dspaceDir.getAbsolutePath());
-                log.info("Auto-detected dspace.dir={}", dspaceDir.getAbsolutePath());
-            } catch (Exception e) {
-                log.info("Failed to auto-detect dspace.dir, using current directory");
-                System.setProperty("dspace.dir", new java.io.File(".").getAbsolutePath());
-            }
-        }
+        configureDSpaceDirectory();
         // Start Spring Boot (Spring Shell) application
         SpringApplication.run(DSpaceShellApplication.class, args);
+    }
+
+    private static void configureDSpaceDirectory() {
+        if (System.getProperty("dspace.dir") != null) {
+            return;
+        }
+
+        // Check environment variable first
+        String envHome = System.getenv("DSPACE_HOME");
+
+        if (envHome != null) {
+            System.setProperty("dspace.dir", envHome);
+            log.debug("Using DSPACE_HOME as dspace.dir={}", envHome);
+            return;
+        }
+
+        // Try to detect from JAR location
+        try {
+            // Locate the running JAR
+            String jarPath = new File(
+                    DSpaceShellApplication.class
+                            .getProtectionDomain()
+                            .getCodeSource()
+                            .getLocation()
+                            .toURI()
+            ).getAbsolutePath();
+
+            File jarFile = new File(jarPath);
+            File binDir = jarFile.getParentFile();   // .../dspace/bin
+            File dspaceDir = binDir.getParentFile(); // .../dspace
+
+            if (new File(dspaceDir, "config").exists()) {
+                System.setProperty("dspace.dir", dspaceDir.getAbsolutePath());
+                log.info("Auto-detected dspace.dir={}",
+                        dspaceDir.getAbsolutePath());
+                return;
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+
+        String fallback = new File(".").getAbsolutePath();
+        System.setProperty("dspace.dir", fallback);
+
+        log.warn("Could not determine DSpace directory. Using {}", fallback);
+
     }
 }
