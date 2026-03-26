@@ -22,7 +22,7 @@
         <root.basedir>${basedir}/..</root.basedir>
         <!-- Default resource delimiter for Spring Boot, so it doesn't clash with Spring ${} placeholders-->
         <resource.delimiter>@</resource.delimiter>
-        <spring-shell.version>3.3.3</spring-shell.version>
+        <spring-shell.version>3.4.2</spring-shell.version>
     </properties>
 
 
