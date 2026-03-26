@@ -265,6 +265,29 @@
                     <!--<regex>\w+(,)+\w+</regex>-->
                 </relation-field>
             </row>
+            <!--
+                Uncomment the following definition to enable entry of
+                editors on the publication submission form
+            -->
+            <!--
+            <row>
+                <relation-field>
+                    <relationship-type>isEditorOfPublication</relationship-type>
+                    <search-configuration>person</search-configuration>
+                    <repeatable>true</repeatable>
+                    <label>Editor</label>
+                    <hint>Enter the editor's name (Family name, Given names).</hint>
+                    <linked-metadata-field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>contributor</dc-element>
+                        <dc-qualifier>editor</dc-qualifier>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                    <externalsources>orcid</externalsources>
+                    <required></required>
+                </relation-field>
+              </row>
+              -->
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
