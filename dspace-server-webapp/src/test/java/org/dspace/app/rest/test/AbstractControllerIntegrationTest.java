@@ -186,9 +186,38 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
                         new FileWriter("target/perf-detail.csv", true))) {
                     pw.println(detail);
                 }
+
+                // Collection recreation stats (bag hypothesis verification)
+                String collDetail = method
+                    + ";" + stats.getCollectionRecreateCount()
+                    + ";" + stats.getCollectionRemoveCount()
+                    + ";" + stats.getCollectionUpdateCount()
+                    + collStats(stats, "org.dspace.content.DSpaceObject.metadata")
+                    + collStats(stats, "org.dspace.content.DSpaceObject.resourcePolicies")
+                    + collStats(stats, "org.dspace.content.DSpaceObject.handles");
+                try (PrintWriter pw = new PrintWriter(
+                        new FileWriter("target/perf-collections.csv", true))) {
+                    pw.println(collDetail);
+                }
             } catch (Exception e) {
                 // ignore -- stats not available
             }
+        }
+    }
+
+    /**
+     * Get recreation and removal counts for a specific collection role.
+     *
+     * @param stats the Hibernate statistics
+     * @param role the collection role name
+     * @return CSV fragment: ;recreates;removes
+     */
+    private static String collStats(org.hibernate.stat.Statistics stats, String role) {
+        try {
+            org.hibernate.stat.CollectionStatistics cs = stats.getCollectionStatistics(role);
+            return ";" + cs.getRecreateCount() + ";" + cs.getRemoveCount();
+        } catch (Exception e) {
+            return ";-1;-1";
         }
     }
 
@@ -223,6 +252,20 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
             } catch (IOException e) {
                 // silently ignore
             }
+        }
+        // Dump all collection role names (once) so we know what Hibernate tracks
+        try {
+            org.hibernate.SessionFactory sf = DSpaceServicesFactory.getInstance()
+                .getServiceManager()
+                .getServiceByName("sessionFactory", org.hibernate.SessionFactory.class);
+            String[] roles = sf.getStatistics().getCollectionRoleNames();
+            try (PrintWriter pw = new PrintWriter(new FileWriter("target/perf-roles.csv", true))) {
+                for (String role : roles) {
+                    pw.println(role);
+                }
+            }
+        } catch (Exception e) {
+            // ignore
         }
     }
 
