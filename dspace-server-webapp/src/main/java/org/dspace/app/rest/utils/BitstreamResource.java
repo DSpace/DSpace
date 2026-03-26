@@ -45,6 +45,8 @@ public class BitstreamResource extends AbstractResource {
     protected final UUID currentUserUUID;
     protected final boolean shouldGenerateCoverPage;
     protected final Set<UUID> currentSpecialGroups;
+    protected final boolean skipAuthCheck;
+
 
     protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
@@ -55,12 +57,13 @@ public class BitstreamResource extends AbstractResource {
     protected BitstreamDocument document;
 
     public BitstreamResource(String name, UUID uuid, UUID currentUserUUID, Set<UUID> currentSpecialGroups,
-                             boolean shouldGenerateCoverPage) {
+        boolean shouldGenerateCoverPage, boolean skipAuth) {
         this.name = name;
         this.uuid = uuid;
         this.currentUserUUID = currentUserUUID;
         this.currentSpecialGroups = currentSpecialGroups;
         this.shouldGenerateCoverPage = shouldGenerateCoverPage;
+        this.skipAuthCheck = skipAuth;
     }
 
     /**
@@ -162,6 +165,9 @@ public class BitstreamResource extends AbstractResource {
         EPerson currentUser = ePersonService.find(context, currentUserUUID);
         context.setCurrentUser(currentUser);
         currentSpecialGroups.forEach(context::setSpecialGroup);
+        if (skipAuthCheck) {
+            context.turnOffAuthorisationSystem();
+        }
         return context;
     }
 

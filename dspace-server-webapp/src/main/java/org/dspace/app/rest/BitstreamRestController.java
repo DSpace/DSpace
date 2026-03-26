@@ -191,7 +191,7 @@ public class BitstreamRestController {
                 bitstreamResource =
                         new org.dspace.app.rest.utils.BitstreamResource(name, uuid,
                                 currentUser != null ? currentUser.getID() : null,
-                                context.getSpecialGroupUuids(), citationEnabledForBitstream);
+                                context.getSpecialGroupUuids(), citationEnabledForBitstream, true);
             }
 
             // We have all the data we need, close the connection to the database so that it doesn't stay open during
