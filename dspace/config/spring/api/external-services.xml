@@ -46,7 +46,7 @@
     <bean id="crossRefLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="CrossRefImportService"/>
         <property name="sourceIdentifier" value="crossref"/>
-        <property name="recordIdMetadata" value="dc.identifier.doi"/>
+        <property name="recordIdMetadata" value="dc.relation.hasversion"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>
@@ -59,7 +59,7 @@
     <bean id="dataciteLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="DataCiteImportService"/>
         <property name="sourceIdentifier" value="datacite"/>
-        <property name="recordIdMetadata" value="dc.identifier.doi"/>
+        <property name="recordIdMetadata" value="dc.relation.hasversion"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>
@@ -83,7 +83,7 @@
     <bean id="doiLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="DoiImportService"/>
         <property name="sourceIdentifier" value="doi"/>
-        <property name="recordIdMetadata" value="dc.identifier.doi"/>
+        <property name="recordIdMetadata" value="dc.relation.hasversion"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>

@@ -384,6 +384,9 @@
             <xsl:call-template name="personOrcid">
                 <xsl:with-param name="authority_value" select="$authority"/>
             </xsl:call-template>
+            <xsl:call-template name="organizationRor">
+                <xsl:with-param name="authority_value" select="$authority"/>
+            </xsl:call-template>
         </creator>
     </xsl:template>
 
@@ -435,6 +438,7 @@
         Adds contributor and contributorType information
     -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='contributor'][not(@qualifier='author')]">
+        <xsl:variable name="authority" select="@authority"/>
         <xsl:choose>
             <xsl:when test="@qualifier='editor'"> 
                 <xsl:element name="contributor">
@@ -442,6 +446,9 @@
                     <contributorName>
                         <xsl:value-of select="." />
                     </contributorName>
+                    <xsl:call-template name="organizationRor">
+                        <xsl:with-param name="authority_value" select="$authority"/>
+                    </xsl:call-template>
                 </xsl:element>
             </xsl:when>
             <xsl:when test="@qualifier='advisor'"> 
@@ -450,6 +457,9 @@
                     <contributorName>
                         <xsl:value-of select="." />
                     </contributorName>
+                    <xsl:call-template name="organizationRor">
+                        <xsl:with-param name="authority_value" select="$authority"/>
+                    </xsl:call-template>
                 </xsl:element>
             </xsl:when>
             <xsl:when test="@qualifier='illustrator'"> 
@@ -458,6 +468,9 @@
                     <contributorName>
                         <xsl:value-of select="." />
                     </contributorName>
+                    <xsl:call-template name="organizationRor">
+                        <xsl:with-param name="authority_value" select="$authority"/>
+                    </xsl:call-template>
                 </xsl:element>
             </xsl:when>
             <xsl:when test="@qualifier='other'"> 
@@ -466,6 +479,9 @@
                     <contributorName>
                         <xsl:value-of select="." />
                     </contributorName>
+                    <xsl:call-template name="organizationRor">
+                        <xsl:with-param name="authority_value" select="$authority"/>
+                    </xsl:call-template>
                 </xsl:element>
             </xsl:when>
             <xsl:when test="not(@qualifier)"> 
@@ -474,6 +490,9 @@
                     <contributorName>
                         <xsl:value-of select="." />
                     </contributorName>
+                    <xsl:call-template name="organizationRor">
+                        <xsl:with-param name="authority_value" select="$authority"/>
+                    </xsl:call-template>
                 </xsl:element>
             </xsl:when>
         </xsl:choose>
@@ -677,6 +696,17 @@
                 <xsl:attribute name="schemeURI">https://orcid.org/</xsl:attribute>
                 <xsl:attribute name="nameIdentifierScheme">ORCID</xsl:attribute>
                 <xsl:value-of select="//dspace:field[@mdschema='person' and @element='identifier' and @qualifier='orcid' and @authority=$authority_value]/text()"/>
+            </xsl:element>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="organizationRor">
+        <xsl:param name="authority_value"/>
+        <xsl:if test="starts-with($authority_value, 'virtual::') and //dspace:field[@mdschema='organization' and @element='identifier' and @qualifier='ror' and @authority=$authority_value]">
+            <xsl:element name="nameIdentifier">
+                <xsl:attribute name="schemeURI">https://ror.org/</xsl:attribute>
+                <xsl:attribute name="nameIdentifierScheme">ROR</xsl:attribute>
+                <xsl:value-of select="//dspace:field[@mdschema='organization' and @element='identifier' and @qualifier='ror' and @authority=$authority_value]/text()"/>
             </xsl:element>
         </xsl:if>
     </xsl:template>
