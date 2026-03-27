@@ -214,7 +214,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
         return ed == null || !now.isAfter(ed);
 
         // if we made it this far, start < now < end
-// date must be okay
+        // date must be okay
     }
 
     @Override
@@ -430,11 +430,5 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
             isMy = true;
         }
         return isMy || authorizeService.isAdmin(context, eperson, resourcePolicy.getdSpaceObject());
-    }
-
-    @Override
-    public List<ResourcePolicyOwnerVO> findValidPolicyOwners(Context c, List<UUID> dsoIds, int actionID)
-        throws SQLException {
-        return resourcePolicyDAO.findValidPolicyOwners(c, dsoIds, actionID);
     }
 }

@@ -515,6 +515,24 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         return new Choices(false);
     }
 
+    /**
+     * Retrieves vocabulary choices by executing an XPath query with a parameterized node ID.
+     * <p>
+     * This method evaluates an XPath template containing a {@code $nodeId} variable placeholder,
+     * substituting the provided node ID value. It then locates the matching parent node and
+     * retrieves all child nodes under {@code isComposedBy} elements, applying pagination to
+     * the results.
+     * <p>
+     *
+     * @param xpathTemplate the XPath expression template containing a {@code $nodeId} variable
+     *                      to be replaced with the actual node identifier
+     * @param nodeId        the node identifier value to substitute into the XPath template
+     * @param start         the zero-based index of the first result to return for pagination
+     * @param limit         the maximum number of choices to return
+     * @return a Choices object containing the matching child nodes with pagination metadata;
+     *         returns an error Choices object if the XPath evaluation fails or if no parent
+     *         node is found
+     */
     private Choices getChoicesByXpathWithId(String xpathTemplate, String nodeId, int start, int limit) {
         List<Choice> choices = new ArrayList<>();
         XPath xpath = XPathFactory.newInstance().newXPath();

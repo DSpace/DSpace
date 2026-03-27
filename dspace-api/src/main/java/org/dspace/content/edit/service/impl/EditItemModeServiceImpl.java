@@ -61,6 +61,7 @@ public class EditItemModeServiceImpl implements EditItemModeService {
         return findModes(context, item, true);
     }
 
+    @Override
     public List<EditItemMode> findModes(Context context, Item item, boolean checkSecurity) throws SQLException {
 
         if (context.getCurrentUser() == null) {

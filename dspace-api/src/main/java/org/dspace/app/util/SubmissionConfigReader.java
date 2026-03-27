@@ -136,15 +136,32 @@ public class SubmissionConfigReader {
                 = ContentServiceFactory.getInstance().getCollectionService();
 
     /**
-     * Load Submission Configuration from the
-     * item-submission.xml configuration file
+     * Constructs a new SubmissionConfigReader and loads the submission configuration
+     * from the item-submission.xml file located in the DSpace configuration directory.
+     * <p>
+     * This constructor parses the XML configuration file and initializes internal data structures
+     * including submission process definitions, step definitions, and collection-to-submission mappings.
+     * The configuration file must contain valid 'submission-map', 'step-definitions', and
+     * 'submission-definitions' sections.
      *
-     * @throws SubmissionConfigReaderException if servlet error
+     * @throws SubmissionConfigReaderException if the configuration file cannot be found, parsed,
+     *                                         or contains invalid structure
      */
     public SubmissionConfigReader() throws SubmissionConfigReaderException {
         buildInputs(configDir + SUBMIT_DEF_FILE_PREFIX + SUBMIT_DEF_FILE_SUFFIX);
     }
 
+    /**
+     * Reloads the submission configuration from the item-submission.xml file.
+     * <p>
+     * This method clears all cached configuration data including collection mappings,
+     * community mappings, entity type mappings, step definitions, and submission definitions,
+     * then re-parses the configuration file from disk. Use this method when the configuration
+     * file has been modified and changes need to be applied without restarting the application.
+     *
+     * @throws SubmissionConfigReaderException if the configuration file cannot be found, parsed,
+     *                                         or contains invalid structure during reload
+     */
     public void reload() throws SubmissionConfigReaderException {
         collectionToSubmissionConfig = null;
         communityToSubmissionConfig = null;
@@ -190,18 +207,31 @@ public class SubmissionConfigReader {
     }
 
     /**
-     * @return the name of the default submission configuration
+     * Returns the name of the default submission configuration process.
+     * <p>
+     * The default submission configuration is the fallback process used when no specific
+     * configuration is mapped to a collection, community, or entity type. It is defined
+     * in the 'submission-map' section of item-submission.xml with the special collection
+     * identifier 'default'.
+     *
+     * @return the name of the default submission configuration, or null if no default is defined
      */
     public String getDefaultSubmissionConfigName() {
         return collectionToSubmissionConfig.get(DEFAULT_COLLECTION);
     }
 
     /**
-     * Returns all the Item Submission process configs with pagination
+     * Returns all the Item Submission process configurations with pagination support.
+     * <p>
+     * This method retrieves all available submission configurations defined in the
+     * 'submission-definitions' section of item-submission.xml. Results can be paginated
+     * using the limit and offset parameters.
      *
-     * @param limit  max number of SubmissionConfig to return
-     * @param offset number of SubmissionConfig to skip in the return
-     * @return the list of SubmissionConfig
+     * @param limit  the maximum number of SubmissionConfig objects to return; must not be null
+     * @param offset the number of SubmissionConfig objects to skip before returning results;
+     *               if null, no offset is applied
+     * @return a list of SubmissionConfig objects representing all configured submission processes,
+     *         limited and offset according to the parameters
      */
     public List<SubmissionConfig> getAllSubmissionConfigs(Integer limit, Integer offset) {
         int idx = 0;
@@ -220,6 +250,14 @@ public class SubmissionConfigReader {
         return subConfigs;
     }
 
+    /**
+     * Returns the total count of submission configurations defined in the system.
+     * <p>
+     * This method counts all submission processes defined in the 'submission-definitions'
+     * section of item-submission.xml, including the default configuration.
+     *
+     * @return the total number of submission configurations available
+     */
     public int countSubmissionConfigs() {
         return submitDefns.size();
     }
@@ -374,10 +412,17 @@ public class SubmissionConfigReader {
     }
 
     /**
-     * Returns the Item Submission process config
+     * Returns the Item Submission process configuration for the specified submission name.
+     * <p>
+     * This method retrieves a submission configuration by its unique name as defined in the
+     * 'submission-definitions' section of item-submission.xml. The method uses a simple
+     * single-entry cache to avoid repeatedly constructing the same SubmissionConfig object
+     * for consecutive requests.
      *
-     * @param submitName submission process unique name
-     * @return the SubmissionConfig representing the item submission config
+     * @param submitName the unique name of the submission process configuration to retrieve
+     * @return the SubmissionConfig object representing the item submission configuration
+     * @throws IllegalStateException if no submission configuration with the specified name exists
+     *                               or cannot be loaded from 'item-submission.xml'
      */
     public SubmissionConfig getSubmissionConfigByName(String submitName) {
         log.debug("Loading submission process config named '" + submitName
@@ -414,14 +459,16 @@ public class SubmissionConfigReader {
     }
 
     /**
-     * Returns a particular global step definition based on its ID.
-     * <P>
+     * Returns a particular global step definition based on its unique identifier.
+     * <p>
      * Global step definitions are those defined in the {@code <step-definitions>}
-     * section of the configuration file.
+     * section of the item-submission.xml configuration file. These steps can be referenced
+     * by their ID in multiple submission processes, promoting reusability.
      *
-     * @param stepID step's identifier
-     * @return the SubmissionStepConfig representing the step
-     * @throws SubmissionConfigReaderException if no default submission process configuration defined
+     * @param stepID the unique identifier of the step definition to retrieve
+     * @return the SubmissionStepConfig representing the step configuration,
+     *         or null if no step with the specified ID exists
+     * @throws SubmissionConfigReaderException if an error occurs while retrieving the step configuration
      */
     public SubmissionStepConfig getStepConfig(String stepID)
         throws SubmissionConfigReaderException {
@@ -784,6 +831,22 @@ public class SubmissionConfigReader {
         return null;
     }
 
+    /**
+     * Returns all collections that are explicitly mapped to use a specific submission configuration.
+     * <p>
+     * This method searches the collection-to-submission mappings defined in the 'submission-map'
+     * section of item-submission.xml and returns all collections that are configured to use
+     * the specified submission process. Only collections with explicit handle-based mappings
+     * are returned; collections using the default configuration or those mapped via entity type
+     * or community inheritance are not included.
+     *
+     * @param context    the DSpace context object for database access
+     * @param submitName the unique name of the submission configuration to search for
+     * @return a list of Collection objects that are mapped to the specified submission configuration;
+     *         may be empty if no collections use this configuration
+     * @throws IllegalStateException if an error occurs while resolving collection handles
+     * @throws SQLException          if a database error occurs while resolving collection objects
+     */
     public List<Collection> getCollectionsBySubmissionConfig(Context context, String submitName)
         throws IllegalStateException, SQLException {
         List<Collection> results = new ArrayList<>();
@@ -802,6 +865,20 @@ public class SubmissionConfigReader {
         return results;
     }
 
+    /**
+     * Returns the appropriate submission configuration for an in-progress submission.
+     * <p>
+     * This method determines the submission configuration to use based on the type of
+     * in-progress submission. For EditItem submissions (item editing mode), it uses the
+     * submission definition specified by the edit mode. For all other in-progress submissions
+     * (such as WorkspaceItem or WorkflowItem), it determines the configuration based on
+     * the associated collection using the hierarchical lookup strategy.
+     *
+     * @param object  the in-progress submission object (WorkspaceItem, WorkflowItem, EditItem, etc.)
+     * @param context the DSpace context object (currently unused but may be needed in future implementations)
+     * @return the SubmissionConfig appropriate for this in-progress submission
+     * @throws IllegalStateException if no appropriate submission configuration can be found
+     */
     public SubmissionConfig getSubmissionConfigByInProgressSubmission(InProgressSubmission<?> object, Context context) {
         if (object instanceof EditItem) {
             String submissionDefinition = ((EditItem) object).getMode().getSubmissionDefinition();

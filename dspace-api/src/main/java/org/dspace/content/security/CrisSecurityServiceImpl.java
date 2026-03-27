@@ -49,6 +49,20 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
     @Autowired
     private EPersonService ePersonService;
 
+    /**
+     * Checks if the specified user has access to the given item based on the provided access mode.
+     * This method evaluates all security policies defined in the access mode and returns true if
+     * any of the security checks pass. The access mode may include multiple security levels such as
+     * ADMIN, OWNER, SUBMITTER, GROUP membership, or custom policies based on metadata fields.
+     *
+     * @param context the DSpace context
+     * @param item the item to check access for
+     * @param user the user (EPerson) requesting access, may be null for anonymous users
+     * @param accessMode the access mode containing security policies and optional filters to evaluate
+     * @return true if the user has access according to any of the security policies in the access mode,
+     *         false otherwise
+     * @throws SQLException if a database error occurs during access evaluation
+     */
     @Override
     public boolean hasAccess(Context context, Item item, EPerson user, AccessItemMode accessMode) throws SQLException {
         return accessMode.getSecurities().stream()

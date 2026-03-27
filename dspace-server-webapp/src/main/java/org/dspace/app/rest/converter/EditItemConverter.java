@@ -46,21 +46,47 @@ public class EditItemConverter
     @Autowired
     private ValidationService validationService;
 
+    /**
+     * Constructs a new EditItemConverter instance.
+     * <p>
+     * Initializes the converter by loading submission configuration settings
+     * from the parent class. This constructor is called by Spring's dependency
+     * injection framework.
+     * </p>
+     *
+     * @throws SubmissionConfigReaderException if there is an error reading the submission configuration
+     */
     public EditItemConverter() throws SubmissionConfigReaderException {
         super();
     }
 
-    /* (non-Javadoc)
-     * @see org.dspace.app.rest.converter.IndexableObjectConverter#supportsModel(org.dspace.discovery.IndexableObject)
+    /**
+     * Determines whether this converter supports the given indexable object.
+     * <p>
+     * This method checks if the indexed object contained within the provided
+     * IndexableObject is an instance of EditItem, which this converter is
+     * designed to handle.
+     * </p>
+     *
+     * @param idxo the IndexableObject to check for compatibility
+     * @return {@code true} if the indexed object is an EditItem instance, {@code false} otherwise
      */
     @Override
     public boolean supportsModel(IndexableObject idxo) {
         return idxo.getIndexedObject() instanceof EditItem;
     }
 
-    /* (non-Javadoc)
-     * @see org.dspace.app.rest.converter.DSpaceConverter#
-     * convert(java.lang.Object, org.dspace.app.rest.projection.Projection)
+    /**
+     * Converts an EditItem domain model object to its REST representation.
+     * <p>
+     * This method creates a new EditItemRest instance and populates it with data
+     * from the provided EditItem model object. The conversion respects the specified
+     * projection to control which properties are included in the REST representation.
+     * </p>
+     *
+     * @param modelObject the EditItem domain object to convert
+     * @param projection  the projection to apply, controlling which properties are included in the output
+     * @return the EditItemRest representation of the EditItem model object
      */
     @Override
     public EditItemRest convert(EditItem modelObject, Projection projection) {
@@ -140,8 +166,14 @@ public class EditItemConverter
             .forEach(error -> addError(rest.getErrors(), error));
     }
 
-    /* (non-Javadoc)
-     * @see org.dspace.app.rest.converter.DSpaceConverter#getModelClass()
+    /**
+     * Returns the domain model class that this converter handles.
+     * <p>
+     * This method provides the Class object for EditItem, which is used by the
+     * conversion framework to determine which converter to use for a given model object.
+     * </p>
+     *
+     * @return the EditItem.class object representing the domain model class
      */
     @Override
     public Class<EditItem> getModelClass() {

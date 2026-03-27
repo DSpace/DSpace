@@ -58,6 +58,8 @@ public class SharedWorkspaceSolrIndexPlugin implements SolrServiceIndexPlugin, S
     private final List<String> additionalReadMetadata;
 
     /**
+     * Constructs a new SharedWorkspaceSolrIndexPlugin with the specified metadata fields
+     * for determining additional read permissions.
      *
      * @param additionalReadMetadata metadata representing linked items for which, if present, cris.owner
      *                               must have read permissions of indexed item.
@@ -66,6 +68,18 @@ public class SharedWorkspaceSolrIndexPlugin implements SolrServiceIndexPlugin, S
         this.additionalReadMetadata = additionalReadMetadata;
     }
 
+    /**
+     * Adds additional read permissions to the Solr document for workspace items.
+     * This method customizes read permissions by adding access for:
+     * - The item submitter
+     * - Collection administrators
+     * - Collection submitters (if shared workspace is enabled)
+     * - CRIS owners of linked items defined in additionalReadMetadata
+     *
+     * @param context the DSpace context
+     * @param indexableObject the object being indexed (must be an IndexableWorkspaceItem)
+     * @param document the Solr document to which read permissions will be added
+     */
     @Override
     public void additionalIndex(Context context, IndexableObject indexableObject, SolrInputDocument document) {
 
@@ -149,6 +163,17 @@ public class SharedWorkspaceSolrIndexPlugin implements SolrServiceIndexPlugin, S
         return Optional.ofNullable(ePersonService.find(context, UUIDUtils.fromString(authority)));
     }
 
+    /**
+     * Adds additional search parameters to filter workspace items based on the current user.
+     * For "otherworkspace" discovery configuration, this method excludes workspace items
+     * submitted by the current user, allowing users to discover workspace items submitted
+     * by others in shared workspaces.
+     *
+     * @param context the DSpace context
+     * @param discoveryQuery the discovery query being executed
+     * @param solrQuery the Solr query to which additional filter parameters will be added
+     * @throws SearchServiceException if an error occurs during search parameter processing
+     */
     @Override
     public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery)
         throws SearchServiceException {
