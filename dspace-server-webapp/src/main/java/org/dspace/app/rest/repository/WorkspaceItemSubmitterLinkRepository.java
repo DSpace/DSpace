@@ -52,7 +52,7 @@ public class WorkspaceItemSubmitterLinkRepository extends AbstractDSpaceRestRepo
                 throw new ResourceNotFoundException("No such workspace item: " + id);
             }
 
-            return converter.toRest(witem.getSubmitter(), projection);
+            return witem.getSubmitter() != null ? converter.toRest(witem.getSubmitter(), projection) : null;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
