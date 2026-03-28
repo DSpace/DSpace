@@ -43,6 +43,8 @@ import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.EntityService;
@@ -162,6 +164,9 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     protected EntityService entityService = ContentServiceFactory.getInstance().getEntityService();
     protected AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance()
                                                                                    .getAuthorityValueService();
+    protected MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory
+        .getInstance()
+        .getMetadataAuthorityService();
     protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
@@ -1138,7 +1143,16 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         dcv.setElement(element);
         dcv.setQualifier(qualifier);
         dcv.setLanguage(language);
-        if (fromAuthority != null) {
+
+        final StringBuilder builder = new StringBuilder();
+        builder.append(schema).append("_").append(element);
+        if (StringUtils.isNotEmpty(qualifier)) {
+            builder.append("_").append(qualifier);
+        }
+        boolean isAuthorityControlled = metadataAuthorityService.isAuthorityAllowed(builder.toString(),
+                Constants.ITEM, null);
+
+        if (fromAuthority != null && isAuthorityControlled) {
             if (value.indexOf(':') > 0) {
                 value = value.substring(0, value.indexOf(':'));
             }
