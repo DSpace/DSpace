@@ -32,6 +32,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
@@ -271,10 +273,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                                                    dso.getID().toString() + " and type = " + getTypeText(dso));
         }
 
-        boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
+        Collection collection = getCollection(context, dso);
+        boolean authorityControlled = metadataAuthorityService.isAuthorityAllowed(
+            metadataField, dso.getType(), collection);
 
-        // Throw an error if authorities are provided for a non-authority-controlled field
-        if (!authorityControlled && authorities != null && !authorities.isEmpty() && authorities.get(0) != null) {
+        if (isNonValidAuthority(authorityControlled, authorities)) {
             throw new IllegalArgumentException("The metadata field \"" +
                     metadataField.toString()
                     + "\"" + " is not authority controlled but authorities were provided. Values:\""
@@ -876,4 +879,29 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     }
 
+    private boolean isNonValidAuthority(boolean authorityControlled, List<String> authorities) {
+        return !authorityControlled && authorities != null && authorities.size() > 0 && authorities.get(0) != null;
+    }
+
+    private Collection getCollection(Context context, T dso) throws SQLException {
+        Collection col = null;
+        switch (dso.getType()) {
+            case Constants.ITEM:
+                Item item = (Item) dso;
+                col = (Collection) item.getItemService().getParentObject(context, item);
+                break;
+            case Constants.BITSTREAM:
+                Bitstream bit = (Bitstream) dso;
+                BitstreamService bitService = ContentServiceFactory.getInstance().getBitstreamService();
+                DSpaceObject pDSO = bitService.getParentObject(context, bit);
+                if (pDSO != null && pDSO.getType() == Constants.ITEM) {
+                    Item pItem = (Item) pDSO;
+                    col = (Collection) pItem.getItemService().getParentObject(context, pItem);
+                }
+                return null;
+            default:
+                break;
+        }
+        return col;
+    }
 }

@@ -13,13 +13,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.DCInput;
+import org.dspace.app.util.DCInputSet;
+import org.dspace.app.util.DCInputsReader;
+import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.SubmissionConfig;
+import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfigReaderException;
+import org.dspace.content.Collection;
 import org.dspace.content.MetadataField;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
+import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.submit.model.UploadConfiguration;
+import org.dspace.submit.model.UploadConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -62,6 +74,17 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
     @Autowired(required = true)
     protected ConfigurationService configurationService;
 
+    @Autowired(required = true)
+    protected AuthorityServiceUtils authorityServiceUtils;
+
+    @Autowired(required = true)
+    protected UploadConfigurationService uploadConfigurationService;
+
+    @Autowired(required = true)
+    protected PluginService pluginService;
+
+    protected SubmissionConfigReader itemSubmissionConfigReader;
+
     // map of field key to authority plugin
     protected Map<String, Boolean> controlled = new HashMap<>();
 
@@ -86,6 +109,12 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
     public void init() {
 
         if (isAuthorityRequired == null) {
+            try {
+                itemSubmissionConfigReader = new SubmissionConfigReader();
+            } catch (SubmissionConfigReaderException e) {
+                throw new IllegalStateException(
+                    "Error reading the item submission configuration: " + e.getMessage(), e);
+            }
             isAuthorityRequired = new HashMap<>();
             List<String> keys = configurationService.getPropertyKeys(AUTH_PREFIX);
             Context context = new Context();
@@ -131,6 +160,7 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
                         "Authority Control: For schema=" + schema + ", elt=" + element + ", qual=" + qualifier +
                             ", controlled=" + ctl + ", required=" + req);
                 }
+                autoRegisterControlledAuthorityFromInputReader();
             } catch (SQLException e) {
                 log.error("Error reading authority config", e);
             }
@@ -221,6 +251,86 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
             copy.add(s.replaceAll("_", "."));
         }
         return copy;
+    }
+
+    @Override
+    public boolean isAuthorityAllowed(MetadataField metadataField, int dsoType, Collection collection) {
+        init();
+        return isAuthorityAllowed(makeFieldKey(metadataField), dsoType, collection);
+    }
+
+    @Override
+    public boolean isAuthorityAllowed(String fieldKey, int dsoType, Collection collection) {
+        init();
+        if (controlled.containsKey(fieldKey) && Boolean.TRUE.equals(controlled.get(fieldKey))) {
+            return true;
+        } else if (collection != null) {
+            String subName = authorityServiceUtils.getSubmissionOrFormName(
+                itemSubmissionConfigReader, dsoType, collection);
+            return controlled.containsKey(subName + "." + fieldKey)
+                && Boolean.TRUE.equals(controlled.get(subName + "." + fieldKey));
+        }
+        return false;
+    }
+
+    /**
+     * Scan all submission forms and auto-register fields that have a vocabulary
+     * or value-pairs linked to a ChoiceAuthority that stores authority in metadata.
+     */
+    private void autoRegisterControlledAuthorityFromInputReader() {
+        try {
+            List<SubmissionConfig> submissionConfigs = itemSubmissionConfigReader
+                    .getAllSubmissionConfigs(Integer.MAX_VALUE, 0);
+            DCInputsReader dcInputsReader = new DCInputsReader();
+
+            for (SubmissionConfig subCfg : submissionConfigs) {
+                String submissionName = subCfg.getSubmissionName();
+                List<DCInputSet> inputsBySubmissionName =
+                    dcInputsReader.getInputsBySubmissionName(submissionName);
+                autoRegisterControlledAuthorityFromSubmissionForms(submissionName, inputsBySubmissionName);
+            }
+            for (UploadConfiguration uploadCfg : uploadConfigurationService.getMap().values()) {
+                String formName = uploadCfg.getMetadata();
+                DCInputSet inputByFormName = dcInputsReader.getInputsByFormName(formName);
+                autoRegisterControlledAuthorityFromSubmissionForms(formName, List.of(inputByFormName));
+            }
+        } catch (DCInputsReaderException e) {
+            throw new IllegalStateException(
+                "Error reading the item submission configuration: " + e.getMessage(), e);
+        }
+    }
+
+    private void autoRegisterControlledAuthorityFromSubmissionForms(String submissionName,
+            List<DCInputSet> inputsBySubmissionName) {
+        for (DCInputSet dcinputSet : inputsBySubmissionName) {
+            DCInput[][] dcinputs = dcinputSet.getFields();
+            for (DCInput[] dcrows : dcinputs) {
+                for (DCInput dcinput : dcrows) {
+                    String authorityName = null;
+                    if (StringUtils.isNotBlank(dcinput.getPairsType())
+                            && !StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
+                        authorityName = dcinput.getPairsType();
+                    } else if (StringUtils.isNotBlank(dcinput.getVocabulary())) {
+                        authorityName = dcinput.getVocabulary();
+                    }
+
+                    if (StringUtils.isNotBlank(authorityName)) {
+                        String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
+                                dcinput.getQualifier());
+                        ChoiceAuthority ca = (ChoiceAuthority) pluginService.getNamedPlugin(
+                                ChoiceAuthority.class, authorityName);
+                        if (ca == null) {
+                            throw new IllegalStateException("Invalid configuration for " + fieldKey
+                                    + " in submission definition " + submissionName + ", form definition "
+                                    + dcinputSet.getFormName() + " no named plugin found: " + authorityName);
+                        }
+                        if (ca.storeAuthorityInMetadata()) {
+                            controlled.put(submissionName + "." + fieldKey, true);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
