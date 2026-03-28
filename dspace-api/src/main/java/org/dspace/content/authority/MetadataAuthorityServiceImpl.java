@@ -320,9 +320,10 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
                         ChoiceAuthority ca = (ChoiceAuthority) pluginService.getNamedPlugin(
                                 ChoiceAuthority.class, authorityName);
                         if (ca == null) {
-                            throw new IllegalStateException("Invalid configuration for " + fieldKey
-                                    + " in submission definition " + submissionName + ", form definition "
-                                    + dcinputSet.getFormName() + " no named plugin found: " + authorityName);
+                            log.debug("No ChoiceAuthority plugin '{}' found for field '{}'"
+                                + " in submission '{}', form '{}' -- skipping authority registration",
+                                authorityName, fieldKey, submissionName, dcinputSet.getFormName());
+                            continue;
                         }
                         if (ca.storeAuthorityInMetadata()) {
                             controlled.put(submissionName + "." + fieldKey, true);
