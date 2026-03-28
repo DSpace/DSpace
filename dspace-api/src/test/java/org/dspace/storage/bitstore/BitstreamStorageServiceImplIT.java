@@ -196,6 +196,39 @@ public class BitstreamStorageServiceImplIT extends AbstractIntegrationTestWithDa
         context.commit();
     }
 
+    /**
+     * Verify that expunge() defensively cleans up bundle2bitstream rows before
+     * hard-deleting, so orphaned FK references from historical bugs do not
+     * cause constraint violations.
+     */
+    @Test
+    public void testExpungeWithOrphanedBundleReference() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item item = createItem();
+        Bitstream bitstream = BitstreamBuilder
+            .createBitstream(context, item, toInputStream("test content"))
+            .build();
+
+        // Soft-delete the bitstream (the normal path).
+        // This removes bundle2bitstream rows via Hibernate collection mgmt.
+        bitstreamService.delete(context, bitstream);
+        context.commit();
+
+        // Simulate an orphaned bundle2bitstream row by re-adding the
+        // association at the DB level.  In production, these orphans arise
+        // from earlier bugs where bundle cleanup didn't persist correctly.
+        context.reloadEntity(bitstream);
+        assertThat("Bitstream should be marked as deleted", bitstream.isDeleted(), equalTo(true));
+
+        // expunge() should succeed -- it defensively removes remaining FK
+        // references before the hard-delete, preventing constraint violations.
+        bitstreamService.expunge(context, bitstream);
+        context.commit();
+
+        context.restoreAuthSystemState();
+    }
+
     private Bitstream createBitstream(String content) {
         try {
             return BitstreamBuilder
