@@ -376,8 +376,8 @@ public class DOIIdentifierProviderTest
         itemService.update(context, item);
         context.restoreAuthSystemState();
 
-        assertEquals("Failed to recognize DOI in item metadata.",
-                     doi, provider.getDOIOutOfObject(item));
+        assertEquals(doi, provider.getDOIOutOfObject(item),
+                     "Failed to recognize DOI in item metadata.");
     }
 
     @Test
@@ -405,8 +405,8 @@ public class DOIIdentifierProviderTest
 
         context.restoreAuthSystemState();
 
-        assertEquals("Failed to recognize DOI in item metadata.",
-            doi, provider.getDOIOutOfObject(item));
+        assertEquals(doi, provider.getDOIOutOfObject(item),
+            "Failed to recognize DOI in item metadata.");
     }
 
     @Test

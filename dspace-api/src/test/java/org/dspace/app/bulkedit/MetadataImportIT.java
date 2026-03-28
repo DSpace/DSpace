@@ -349,15 +349,15 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             ScriptLauncher.handleScript(
                 args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
 
-            assertNotNull("The handler should contain an exception",
-                testDSpaceRunnableHandler.getException());
+            assertNotNull(testDSpaceRunnableHandler.getException(),
+                "The handler should contain an exception");
 
-            assertTrue("The exception cause should be a MetadataImportException",
-                testDSpaceRunnableHandler.getException().getCause() instanceof MetadataImportException);
+            assertTrue(testDSpaceRunnableHandler.getException().getCause() instanceof MetadataImportException,
+                "The exception cause should be a MetadataImportException");
 
             String exceptionMessage = testDSpaceRunnableHandler.getException().getCause().getMessage();
-            assertTrue("The error message does not contain the expected text.",
-                    exceptionMessage.contains("exceeds the configured maximum of 1"));
+            assertTrue(exceptionMessage.contains("exceeds the configured maximum of 1"),
+                    "The error message does not contain the expected text.");
         } finally {
             csvFile.delete();
         }
@@ -372,8 +372,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         performImportScript(csv);
         Item importedItem1 = findItemByName("Title 1");
         Item importedItem2 = findItemByName("Title 2");
-        assertNotNull("Should have imported Title 1", importedItem1);
-        assertNotNull("Should have imported Title 2", importedItem2);
+        assertNotNull(importedItem1, "Should have imported Title 1");
+        assertNotNull(importedItem2, "Should have imported Title 2");
     }
 
     @Test
@@ -385,8 +385,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         performImportScript(csv);
         Item importedItem1 = findItemByName("Title 1");
         Item importedItem2 = findItemByName("Title 2");
-        assertNotNull("Should have imported Title 1 with limit disabled", importedItem1);
-        assertNotNull("Should have imported Title 2 with limit disabled", importedItem2);
+        assertNotNull(importedItem1, "Should have imported Title 1 with limit disabled");
+        assertNotNull(importedItem2, "Should have imported Title 2 with limit disabled");
     }
 
     @Test

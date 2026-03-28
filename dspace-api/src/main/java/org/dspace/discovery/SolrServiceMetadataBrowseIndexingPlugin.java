@@ -25,6 +25,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -202,7 +203,7 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                         if (!ignoreVariants) {
                                             try {
                                                 variants = choiceAuthorityService
-                                                    .getVariants(values.get(x), collection);
+                                                    .getVariants(values.get(x), Constants.ITEM, collection);
                                             } catch (Exception e) {
                                                 log.warn("Failed to get variants for "
                                                              + values.get(x).getMetadataField().toString(), e);

@@ -8,14 +8,16 @@
 package org.dspace.identifier.doi.crossref;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import jakarta.annotation.Nullable;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.identifier.doi.DOIIdentifierException;
 import org.slf4j.Logger;
@@ -47,7 +49,7 @@ class BaseHttpClient {
      * @return A {@link HttpResponse} object containing information about the registry response.
      * @throws DOIIdentifierException if an error occurs during request submission.
      */
-    HttpResponse sendHttpRequest(HttpUriRequest req,
+    HttpResponse sendHttpRequest(ClassicHttpRequest req,
                                  boolean disableRedirects,
                                  ErrorHandler handleError) throws DOIIdentifierException {
 
@@ -60,8 +62,7 @@ class BaseHttpClient {
 
         try (var client = newClient(disableRedirects)) {
             try (var response = client.execute(req)) {
-                var status = response.getStatusLine();
-                var statusCode = status.getStatusCode();
+                var statusCode = response.getCode();
                 var content = extractContent(response);
 
                 handleError.handleError(statusCode, content);
@@ -70,8 +71,8 @@ class BaseHttpClient {
 
                 return new HttpResponse(statusCode, content, url);
             }
-        } catch (IOException e) {
-            LOG.warn("Caught an IOException: ", e);
+        } catch (IOException | ParseException e) {
+            LOG.warn("Caught an exception: ", e);
             throw new RuntimeException(e);
         }
     }
@@ -85,16 +86,16 @@ class BaseHttpClient {
     }
 
     @Nullable
-    private String extractContent(CloseableHttpResponse response) throws IOException {
+    private String extractContent(CloseableHttpResponse response) throws IOException, ParseException {
         var entity = response.getEntity();
         if (entity != null) {
-            return EntityUtils.toString(entity, "UTF-8");
+            return EntityUtils.toString(entity, StandardCharsets.UTF_8);
         }
         return null;
     }
 
     @Nullable
-    private String extractRedirectUrlFromResponse(org.apache.http.HttpResponse response) {
+    private String extractRedirectUrlFromResponse(org.apache.hc.core5.http.HttpResponse response) {
         if (response.containsHeader(HttpHeaders.LOCATION)) {
             return response.getFirstHeader(HttpHeaders.LOCATION).getValue();
         }

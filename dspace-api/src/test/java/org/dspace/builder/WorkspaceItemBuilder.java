@@ -204,6 +204,18 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "date", "issued", new DCDate(issueDate).toString());
     }
 
+    public WorkspaceItemBuilder withAuthorAffilitation(final String affilation) {
+        return addMetadataValue(MetadataSchemaEnum.OAIRECERIF.getName(), "author", "affiliation", affilation);
+    }
+
+    public WorkspaceItemBuilder withProject(final String projectName) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "relation", "project", projectName);
+    }
+
+    public WorkspaceItemBuilder withEditor(final String editorName) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "editor", editorName);
+    }
+
     public WorkspaceItemBuilder withAuthor(final String authorName) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }

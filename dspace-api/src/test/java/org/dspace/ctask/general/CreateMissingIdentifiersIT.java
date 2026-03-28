@@ -117,8 +117,8 @@ public class CreateMissingIdentifiersIT
             // create item and assert it did not got any handle
             Item item = ItemBuilder.createItem(context, collection)
                     .build();
-            assertNull("Internal error in createMissingIdentifiersIT: item should not have a handle",
-                    item.getHandle());
+            assertNull(item.getHandle(),
+                    "Internal error in createMissingIdentifiersIT: item should not have a handle");
 
             // setup the curator
             Curator curator = new Curator();
@@ -136,9 +136,9 @@ public class CreateMissingIdentifiersIT
              */
             curator.curate(context, item.getID().toString());
             int status = curator.getStatus(TASK_NAME);
-            assertEquals("Curation should succeed", Curator.CURATE_SUCCESS, status);
+            assertEquals(Curator.CURATE_SUCCESS, status, "Curation should succeed");
             // assure we got a handle
-            assertNotNull("Curation task CreateMissingIdentifiers, did not assign a handle.", item.getHandle());
+            assertNotNull(item.getHandle(), "Curation task CreateMissingIdentifiers, did not assign a handle.");
         } finally {
             // restore the identifierProviders for following tests
             for (Class identifierProviderClass : identifierProviderClasses) {

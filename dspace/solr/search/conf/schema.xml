@@ -335,7 +335,7 @@
 
     <!-- Leftovers from sample schema.  Are these used? -->
     <dynamicField name="*_i"   type="int"     indexed="true" stored="true" docValues="true"/>
-    <dynamicField name="*_s"   type="string"  indexed="true" stored="true" docValues="true"/>
+    <dynamicField name="*_s"   type="string"  indexed="true" stored="true" multiValued="true" docValues="true"/>
     <dynamicField name="*_l"   type="long"    indexed="true" stored="true" docValues="true"/>
     <dynamicField name="*_t"   type="text"    indexed="true" stored="true" />
     <dynamicField name="*_b"   type="boolean" indexed="true" stored="true" />

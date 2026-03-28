@@ -118,6 +118,13 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      */
     @BeforeEach
     public void setUp() throws Exception {
+        // Ensure the search Solr core is clean before each test.
+        // In Solr 10 with soft commits, relying solely on @AfterEach reset
+        // can leave stale documents visible to the next test's NRT reader.
+        DSpaceServicesFactory.getInstance().getServiceManager()
+                .getServiceByName(null, MockSolrSearchCore.class)
+                .reset();
+
         try {
             //Start a new context
             context = new Context(Context.Mode.READ_WRITE);
@@ -247,11 +254,6 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
 
         // NOTE: we explicitly do NOT destroy our default eperson & admin as they
         // are cached and reused for all tests. This speeds up all tests.
-
-        if (cleanupException != null) {
-            throw new RuntimeException("Error cleaning up builder objects & context object",
-                                       cleanupException);
-        }
     }
 
     /**

@@ -8,11 +8,11 @@
 
 package org.dspace.storage.bitstore;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
@@ -31,7 +31,8 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class BitstreamCleanupIT extends AbstractIntegrationTestWithDatabase {
     Bitstream remaining;
@@ -43,6 +44,7 @@ public class BitstreamCleanupIT extends AbstractIntegrationTestWithDatabase {
     ConfigurationService configurationService;
     BitstreamService bitstreamService;
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -83,14 +85,14 @@ public class BitstreamCleanupIT extends AbstractIntegrationTestWithDatabase {
 
         runCleanupScript();
 
-        assertNotNull("Remaining Bitstream should remain in the database", remaining);
-        assertFalse("Remaining Bitstream should still be marked deleted=false", remaining.isDeleted());
-        assertNotNull("Deleted Bitstream should remain in the database", deleted);
-        assertTrue("Deleted Bitstream should still be marked deleted=true", deleted.isDeleted());
+        assertNotNull(remaining, "Remaining Bitstream should remain in the database");
+        assertFalse(remaining.isDeleted(), "Remaining Bitstream should still be marked deleted=false");
+        assertNotNull(deleted, "Deleted Bitstream should remain in the database");
+        assertTrue(deleted.isDeleted(), "Deleted Bitstream should still be marked deleted=true");
         assertThrows(
-            "Deleted Bitstream content should be removed from the assetstore",
             IOException.class,
-            () -> ContentServiceFactory.getInstance().getBitstreamService().retrieve(context, deleted)
+            () -> ContentServiceFactory.getInstance().getBitstreamService().retrieve(context, deleted),
+            "Deleted Bitstream content should be removed from the assetstore"
         );
     }
 
@@ -100,9 +102,9 @@ public class BitstreamCleanupIT extends AbstractIntegrationTestWithDatabase {
 
         runCleanupScript("--delete");
 
-        assertNotNull("Remaining Bitstream should remain in the database", remaining);
-        assertFalse("Remaining Bitstream should still be marked deleted=false", remaining.isDeleted());
-        assertNull("Deleted Bitstream should not remain in the database", deleted);
+        assertNotNull(remaining, "Remaining Bitstream should remain in the database");
+        assertFalse(remaining.isDeleted(), "Remaining Bitstream should still be marked deleted=false");
+        assertNull(deleted, "Deleted Bitstream should not remain in the database");
     }
 
     @Test
@@ -111,9 +113,9 @@ public class BitstreamCleanupIT extends AbstractIntegrationTestWithDatabase {
 
         runCleanupScript();
 
-        assertNotNull("Remaining Bitstream should remain in the database", remaining);
-        assertFalse("Remaining Bitstream should still be marked deleted=false", remaining.isDeleted());
-        assertNull("Deleted Bitstream should not remain in the database", deleted);
+        assertNotNull(remaining, "Remaining Bitstream should remain in the database");
+        assertFalse(remaining.isDeleted(), "Remaining Bitstream should still be marked deleted=false");
+        assertNull(deleted, "Deleted Bitstream should not remain in the database");
     }
 
     @Test
@@ -122,37 +124,37 @@ public class BitstreamCleanupIT extends AbstractIntegrationTestWithDatabase {
 
         runCleanupScript("--leave");
 
-        assertNotNull("Remaining Bitstream should remain in the database", remaining);
-        assertFalse("Remaining Bitstream should still be marked deleted=false", remaining.isDeleted());
-        assertNotNull("Deleted Bitstream should remain in the database", deleted);
-        assertTrue("Deleted Bitstream should still be marked deleted=true", deleted.isDeleted());
+        assertNotNull(remaining, "Remaining Bitstream should remain in the database");
+        assertFalse(remaining.isDeleted(), "Remaining Bitstream should still be marked deleted=false");
+        assertNotNull(deleted, "Deleted Bitstream should remain in the database");
+        assertTrue(deleted.isDeleted(), "Deleted Bitstream should still be marked deleted=true");
         assertThrows(
-            "Deleted Bitstream content should be removed from the assetstore",
             IOException.class,
-            () -> ContentServiceFactory.getInstance().getBitstreamService().retrieve(context, deleted)
+            () -> ContentServiceFactory.getInstance().getBitstreamService().retrieve(context, deleted),
+            "Deleted Bitstream content should be removed from the assetstore"
         );
     }
 
     @Test
     public void testCleanupComplainIfConfusing() throws Exception {
         assertThrows(
-            "Should throw IllegalArgumentException when both --leave and --delete are provided",
             IllegalArgumentException.class,
-            () -> runCleanupScript("--leave", "--delete")
+            () -> runCleanupScript("--leave", "--delete"),
+            "Should throw IllegalArgumentException when both --leave and --delete are provided"
         );
 
         // Confirm that it did not affect the database or assetstore
         remaining = ContentServiceFactory.getInstance().getBitstreamService().find(context, remaining.getID());
         deleted = ContentServiceFactory.getInstance().getBitstreamService().find(context, deleted.getID());
 
-        assertNotNull("Remaining Bitstream should remain in the database", remaining);
-        assertFalse("Remaining Bitstream should still be marked deleted=false", remaining.isDeleted());
-        assertNotNull("Deleted Bitstream should remain in the database", deleted);
-        assertTrue("Deleted Bitstream should still be marked deleted=true", deleted.isDeleted());
+        assertNotNull(remaining, "Remaining Bitstream should remain in the database");
+        assertFalse(remaining.isDeleted(), "Remaining Bitstream should still be marked deleted=false");
+        assertNotNull(deleted, "Deleted Bitstream should remain in the database");
+        assertTrue(deleted.isDeleted(), "Deleted Bitstream should still be marked deleted=true");
 
         assertNotNull(
-            "Deleted Bitstream content should not be removed from the assetstore",
-            ContentServiceFactory.getInstance().getBitstreamService().retrieve(context, deleted)
+            ContentServiceFactory.getInstance().getBitstreamService().retrieve(context, deleted),
+            "Deleted Bitstream content should not be removed from the assetstore"
         );
     }
 

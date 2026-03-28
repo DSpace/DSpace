@@ -17,11 +17,11 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import eu.openaire.jaxb.model.Response;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.junit.Test;
 import org.mockito.MockedStatic;
@@ -36,7 +36,7 @@ public class OpenAIRERestConnectorTest {
                MockWebServer mockServer = new MockWebServer()) {
             String projects = new String(is.readAllBytes(), StandardCharsets.UTF_8)
                     .replaceAll("( mushroom)", "( DEADBEEF)");
-            mockServer.enqueue(new MockResponse().setResponseCode(200).setBody(projects));
+            mockServer.enqueue(new MockResponse.Builder().code(200).body(projects).build());
 
             // setup mocks so we don't have to set whole DSpace kernel etc.
             // still, the idea is to test how the get method behaves

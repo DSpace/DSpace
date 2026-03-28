@@ -9,8 +9,8 @@ package org.dspace.identifier.doi.crossref;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
+import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,17 +32,17 @@ public class DOIResolverClientTest {
 
     @After
     public void tearDown() throws Exception {
-        server.shutdown();
+        server.close();
     }
 
     @Test
     public void sendDOIGetRequest_followsConfigAndReturnsRedirectInfo() throws Exception {
         // Arrange: enqueue a 302 with a Location header as dx.doi would do for a registered DOI
         var redirectUrl = "https://example.org/handle/123456789";
-        server.enqueue(new MockResponse()
-                .setResponseCode(302)
+        server.enqueue(new MockResponse.Builder()
+                .code(302)
                 .setHeader("Location", redirectUrl)
-                .setBody("Found"));
+                .body("Found").build());
 
         var doi = "doi:10.1234/abcd";
 
@@ -53,15 +53,15 @@ public class DOIResolverClientTest {
 
         var recorded = server.takeRequest();
         assertThat(recorded.getMethod()).isEqualTo("GET");
-        assertThat(recorded.getPath()).isEqualTo("/10.1234/abcd");
+        assertThat(recorded.getTarget()).isEqualTo("/10.1234/abcd");
     }
 
     @Test
     public void sendDOIGetRequest_handles404WithoutException() throws Exception {
         // Arrange: enqueue a 404 Not Found to simulate unknown DOI
-        server.enqueue(new MockResponse()
-                .setResponseCode(404)
-                .setBody("Not Found"));
+        server.enqueue(new MockResponse.Builder()
+                .code(404)
+                .body("Not Found").build());
 
         var doi = "doi:10.9999/missing";
 
@@ -72,6 +72,6 @@ public class DOIResolverClientTest {
 
         var recorded = server.takeRequest();
         assertThat(recorded.getMethod()).isEqualTo("GET");
-        assertThat(recorded.getPath()).isEqualTo("/10.9999/missing");
+        assertThat(recorded.getTarget()).isEqualTo("/10.9999/missing");
     }
 }
