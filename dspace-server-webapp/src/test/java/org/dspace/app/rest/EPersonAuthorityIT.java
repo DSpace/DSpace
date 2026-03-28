@@ -24,7 +24,9 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Integration tests for {@link EPersonAuthority}.
@@ -46,6 +48,7 @@ public class EPersonAuthorityIT extends AbstractControllerIntegrationTest {
     @Autowired
     PluginService pluginService;
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

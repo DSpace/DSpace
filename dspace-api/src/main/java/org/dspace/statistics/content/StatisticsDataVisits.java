@@ -262,6 +262,21 @@ public class StatisticsDataVisits extends StatisticsData {
                                 dataset.addValueToMatrix(j, k, objectCount.getCount());
                             }
                         }
+                        // If no facet values found (e.g. empty statistics core), fall back
+                        // to querying date facets directly to get the date range skeleton
+                        if (dataset == null && dateFacet != null) {
+                            ObjectCount[] fallbackResults = solrLoggerService
+                                .queryFacetDate(query, filterQuery, dataSetQuery.getMax(),
+                                                dateFacet.getDateType(), dateFacet.getStartDate(),
+                                                dateFacet.getEndDate(), showTotal, context, facetMinCount);
+                            dataset = new Dataset(1, fallbackResults.length);
+                            for (int j = 0; j < fallbackResults.length; j++) {
+                                dataset.setColLabel(j, fallbackResults[j].getValue());
+                                dataset.addValueToMatrix(0, j, fallbackResults[j].getCount());
+                            }
+                            dataset.setRowLabel(0, getResultName(dataSetQuery.getName(), dataSetQuery, context));
+                            dataset.setRowLabelAttr(0, getAttributes(dataSetQuery.getName(), dataSetQuery, context));
+                        }
                         if (dataset != null && !(getDatasetGenerators().get(0) instanceof DatasetTimeGenerator)) {
                             dataset.flipRowCols();
                         }

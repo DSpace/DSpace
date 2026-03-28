@@ -28,6 +28,7 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.authority.DCInputAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -55,6 +56,9 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Autowired
     private ChoiceAuthorityService cas;
+
+    @Autowired
+    private MetadataAuthorityService metadataAuthorityService;
 
     @BeforeEach
     public void setup() throws Exception {
@@ -148,6 +152,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         DCInputAuthority.reset();
         pluginService.clearNamedPluginClasses();
         cas.clearCache();
+        metadataAuthorityService.clearCache();
     }
 
     @Test

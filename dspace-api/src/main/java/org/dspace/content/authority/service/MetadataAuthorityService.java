@@ -9,6 +9,7 @@ package org.dspace.content.authority.service;
 
 import java.util.List;
 
+import org.dspace.content.Collection;
 import org.dspace.content.MetadataField;
 
 /**
@@ -40,6 +41,28 @@ import org.dspace.content.MetadataField;
  * @see org.dspace.content.authority.Choices
  */
 public interface MetadataAuthorityService {
+
+    /**
+     * Predicate - is field authority-allowed? Checks both global config and
+     * collection-specific submission form config.
+     *
+     * @param metadataField metadata field
+     * @param dsoType       the type of DSpace Object (Item, Bitstream, etc.)
+     * @param collection    the owning collection (may be null)
+     * @return true/false
+     */
+    public boolean isAuthorityAllowed(MetadataField metadataField, int dsoType, Collection collection);
+
+    /**
+     * Predicate - is field authority-allowed? Checks both global config and
+     * collection-specific submission form config.
+     *
+     * @param fieldKey      field key in the format schema_element_qualifier
+     * @param dsoType       the type of DSpace Object (Item, Bitstream, etc.)
+     * @param collection    the owning collection (may be null)
+     * @return true/false
+     */
+    public boolean isAuthorityAllowed(String fieldKey, int dsoType, Collection collection);
 
     /**
      * Predicate - is field authority-controlled?

@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,11 +56,15 @@ import org.dspace.contentreport.QueryPredicate;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.DiscoverResultItemIterator;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.discovery.indexobject.IndexableWorkflowItem;
+import org.dspace.discovery.indexobject.IndexableWorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
@@ -2012,6 +2016,72 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         return item.equals(latestVersion.getItem());
 
+    }
+
+    @Override
+    public String getEntityType(Item item) {
+        return getMetadataFirstValue(item, new MetadataFieldName("dspace.entity.type"), Item.ANY);
+    }
+
+    @Override
+    public Iterator<Item> findByLikeAuthorityValue(Context context, String likeAuthority,
+                                                   Boolean inArchive) throws SQLException {
+        return itemDAO.findByLikeAuthorityValue(context, likeAuthority, inArchive);
+    }
+
+    @Override
+    public void setEntityType(Context context, Item item, String entityType) {
+        try {
+            setMetadataSingleValue(context, item, new MetadataFieldName("dspace.entity.type"), null, entityType);
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
+
+    @Override
+    public Iterator<Item> findUnfilteredByMetadataField(Context context, String schema, String element,
+                                                        String qualifier, String value)
+        throws SQLException, AuthorizeException {
+        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        if (mds == null) {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
+        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        if (mdf == null) {
+            throw new IllegalArgumentException(
+                "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
+
+        if (Item.ANY.equals(value)) {
+            return itemDAO.findByMetadataField(context, mdf, null);
+        }
+        return itemDAO.findByMetadataField(context, mdf, value);
+    }
+
+    @Override
+    public Iterator<Item> findRelatedItemsByAuthorityControlledFields(Context c, Item item, List<String> authorities) {
+        String entityType = this.getEntityType(item);
+        String query = choiceAuthorityService.getAuthorityControlledFieldsByEntityType(entityType).stream()
+                                             .map(field -> getFieldFilter(field, authorities))
+                                             .collect(Collectors.joining(" OR "));
+
+        if (StringUtils.isEmpty(query)) {
+            return Collections.emptyIterator();
+        }
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.addDSpaceObjectFilter(IndexableItem.TYPE);
+        discoverQuery.addDSpaceObjectFilter(IndexableWorkspaceItem.TYPE);
+        discoverQuery.addDSpaceObjectFilter(IndexableWorkflowItem.TYPE);
+        discoverQuery.addFilterQueries(query);
+
+        return new DiscoverResultItemIterator(c, discoverQuery, false);
+    }
+
+    private String getFieldFilter(String field, List<String> authorities) {
+        return authorities.stream()
+                          .map(authority -> field.replaceAll("_", ".") + "_allauthority: \"" + authority + "\"")
+                          .collect(Collectors.joining(" OR "));
     }
 
 }

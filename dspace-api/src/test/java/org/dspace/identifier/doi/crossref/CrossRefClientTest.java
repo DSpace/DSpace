@@ -13,19 +13,19 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.io.IOException;
 
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
+import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
 import org.dspace.identifier.doi.DOIIdentifierException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CrossRefClientTest {
 
     private MockWebServer server;
     private CrossRefClient client;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         server = new MockWebServer();
         server.start();
@@ -42,18 +42,18 @@ public class CrossRefClientTest {
                 baseClient);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws IOException {
-        server.shutdown();
+        server.close();
     }
 
     @Test
     public void sendDepositRequest_success_returnsDoiResponseAndSendsMultipart() throws Exception {
         var metadata = "metaData";
 
-        server.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setBody("<?xml version=\"1.0\" encoding=\"UTF-8\"?><doi_batch_diagnostic />"));
+        server.enqueue(new MockResponse.Builder()
+                .code(200)
+                .body("<?xml version=\"1.0\" encoding=\"UTF-8\"?><doi_batch_diagnostic />").build());
 
         var response = client.sendDepositRequest(metadata);
 
@@ -65,21 +65,21 @@ public class CrossRefClientTest {
         // check https://www.crossref.org/documentation/register-maintain-records/direct-deposit-xml/https-post/ on details of the crossref API
 
         assertThat(recorded.getMethod()).isEqualTo("POST");
-        assertThat(recorded.getPath()).isEqualTo("/deposit");
+        assertThat(recorded.getTarget()).isEqualTo("/deposit");
 
-        var body = recorded.getBody().readUtf8();
+        var body = recorded.getBody().utf8();
         assertThat(body).contains("Content-Disposition: form-data; name=\"mdFile\"; filename=\"requestData.xml\"");
         assertThat(body).contains(metadata);
 
-        var contentType = recorded.getHeader("Content-Type");
+        var contentType = recorded.getHeaders().get("Content-Type");
         assertThat(contentType).contains("multipart/form-data");
     }
 
     @Test
     public void sendDepositRequest_unauthorized_throwsDOIIdentifierExceptionWithAuthCode() throws Exception {
-        server.enqueue(new MockResponse()
-                .setResponseCode(401)
-                .setBody("<?xml version=\"1.0\" encoding=\"UTF-8\"?><doi_batch_diagnostic />"));
+        server.enqueue(new MockResponse.Builder()
+                .code(401)
+                .body("<?xml version=\"1.0\" encoding=\"UTF-8\"?><doi_batch_diagnostic />").build());
 
         assertThatExceptionOfType(DOIIdentifierException.class)
                 .isThrownBy(() -> client.sendDepositRequest("metadata"))
@@ -95,18 +95,18 @@ public class CrossRefClientTest {
         // entity (file read / outbound request); after the fix the hardened builder refuses the DOCTYPE.
         MockWebServer sentinel = new MockWebServer();
         sentinel.start();
-        sentinel.enqueue(new MockResponse().setResponseCode(200).setBody("PWNED"));
+        sentinel.enqueue(new MockResponse.Builder().code(200).body("PWNED").build());
         String sentinelUrl = sentinel.url("/xxe-callback").toString();
 
-        server.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setBody("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        server.enqueue(new MockResponse.Builder()
+                .code(200)
+                .body("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                          + "<!DOCTYPE doi_batch_diagnostic [\n"
                          + "  <!ENTITY xxe SYSTEM \"" + sentinelUrl + "\">\n"
                          + "]>\n"
                          + "<doi_batch_diagnostic status=\"completed\">\n"
                          + "  <record_diagnostic status=\"Success\">&xxe;</record_diagnostic>\n"
-                         + "</doi_batch_diagnostic>"));
+                         + "</doi_batch_diagnostic>").build());
 
         // The DOCTYPE is refused by the hardened parser, surfacing as a BAD_ANSWER parse failure.
         assertThatExceptionOfType(DOIIdentifierException.class)
@@ -115,14 +115,14 @@ public class CrossRefClientTest {
 
         // The SYSTEM entity must not have been dereferenced.
         assertThat(sentinel.getRequestCount()).isEqualTo(0);
-        sentinel.shutdown();
+        sentinel.close();
     }
 
     @Test
     public void sendDepositRequest_200withFailureMessage_throwsDOIIdentifierExceptionWithBadRequest() throws Exception {
-        server.enqueue(new MockResponse()
-                       .setResponseCode(200)
-                       .setBody("""
+        server.enqueue(new MockResponse.Builder()
+                       .code(200)
+                       .body("""
                                 <?xml version="1.0" encoding="UTF-8"?>
                                 <doi_batch_diagnostic status="completed" sp="cskAir.local">
                                     <submission_id>1407395745</submission_id>
@@ -138,7 +138,7 @@ public class CrossRefClientTest {
                                        <failure_count>1</failure_count>
                                     </batch_data>
                                  </doi_batch_diagnostic>
-                                """));
+                                """).build());
 
         assertThatExceptionOfType(DOIIdentifierException.class)
                 .isThrownBy(() -> client.sendDepositRequest("metadata"))

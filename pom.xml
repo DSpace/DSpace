@@ -1081,6 +1081,14 @@
     -->
     <dependencyManagement>
         <dependencies>
+            <!-- Pin Thymeleaf to the version required by dspace-api (frontpage generation).
+                 Spring Boot 4's spring-boot-starter-thymeleaf pulls an older Thymeleaf (via
+                 thymeleaf-spring6), which otherwise breaks dependency convergence. -->
+            <dependency>
+                <groupId>org.thymeleaf</groupId>
+                <artifactId>thymeleaf</artifactId>
+                <version>3.1.5.RELEASE</version>
+            </dependency>
             <!-- DSpace core and endorsed Addons -->
             <dependency>
                 <groupId>org.dspace</groupId>

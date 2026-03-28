@@ -11,7 +11,7 @@ package org.dspace.app.rest;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
@@ -26,9 +26,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /*
@@ -47,7 +46,7 @@ public class MetadataAuthorityCheckIT extends AbstractControllerIntegrationTest 
 
     private Item item;
 
-    @Before
+    @BeforeEach
     public void setup() {
         context.turnOffAuthorisationSystem();
 
@@ -84,7 +83,7 @@ public class MetadataAuthorityCheckIT extends AbstractControllerIntegrationTest 
 
     @Test
     public void addNonAuthorityControlledMetadataWithAuthorities() {
-        Throwable throwable = Assert.assertThrows(IllegalArgumentException.class,
+        Throwable throwable = assertThrows(IllegalArgumentException.class,
                 () -> itemService.addMetadata(context, item, "dc", "title",null, null,
                         List.of("Public Item A"), List.of("test_authority"), null));
 
