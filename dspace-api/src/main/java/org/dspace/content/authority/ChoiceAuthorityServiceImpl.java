@@ -487,6 +487,23 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         return ma;
     }
 
+    @Override
+    public ChoiceAuthority getAuthorityByFieldKeyCollection(String fieldKey, int dsoType, Collection collection) {
+        return getAuthorityByFieldKeyCollection(fieldKey, collection);
+    }
+
+    @Override
+    public boolean isChoicesConfigured(String fieldKey, int dsoType, String formName) {
+        // Delegate to collection-based method; form-name-specific lookup not yet implemented
+        return isChoicesConfigured(fieldKey, (Collection) null);
+    }
+
+    @Override
+    public String getChoiceAuthorityName(String schema, String element, String qualifier, String formName) {
+        // Delegate to collection-based method; form-name-specific lookup not yet implemented
+        return getChoiceAuthorityName(schema, element, qualifier, (Collection) null);
+    }
+
     private ChoiceAuthority getAuthorityByFieldKeyCollection(String fieldKey, Collection collection) {
         init();
         ChoiceAuthority ma = controller.get(fieldKey);

@@ -140,6 +140,37 @@ public interface ChoiceAuthorityService {
     public boolean isChoicesConfigured(String fieldKey, Collection collection);
 
     /**
+     * Check if choices are configured for a given field key, DSO type, and form name.
+     *
+     * @param fieldKey metadata field key
+     * @param dsoType  DSpace object type (e.g. Constants.ITEM)
+     * @param formName the submission form name (may be null)
+     * @return true if choices are configured
+     */
+    public boolean isChoicesConfigured(String fieldKey, int dsoType, String formName);
+
+    /**
+     * Get the authority name for the given metadata field within a specific form.
+     *
+     * @param schema    the metadata schema
+     * @param element   the metadata element
+     * @param qualifier the metadata qualifier
+     * @param formName  the submission form name
+     * @return the authority name
+     */
+    public String getChoiceAuthorityName(String schema, String element, String qualifier, String formName);
+
+    /**
+     * Get the ChoiceAuthority for a given field key, DSO type, and collection.
+     *
+     * @param fieldKey   metadata field key
+     * @param dsoType    DSpace object type (e.g. Constants.ITEM)
+     * @param collection the collection context (may be null)
+     * @return the ChoiceAuthority, or null if none configured
+     */
+    public ChoiceAuthority getAuthorityByFieldKeyCollection(String fieldKey, int dsoType, Collection collection);
+
+    /**
      * Get the presentation keyword (should be "lookup", "select" or "suggest", but this
      * is an informal convention so it can be easily extended) for this field.
      *

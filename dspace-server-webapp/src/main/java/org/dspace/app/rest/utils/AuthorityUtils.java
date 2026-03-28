@@ -16,6 +16,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.core.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -50,8 +51,35 @@ public class AuthorityUtils {
         return cas.isChoicesConfigured(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"), null);
     }
 
+    /**
+     * Check if choices are configured for the given metadata field within a specific form.
+     *
+     * @param schema    the metadata schema
+     * @param element   the metadata element
+     * @param qualifier the metadata qualifier
+     * @param formName  the submission form name
+     * @return true if choices are configured
+     */
+    public boolean isChoice(String schema, String element, String qualifier, String formName) {
+        return cas.isChoicesConfigured(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"),
+                Constants.ITEM, formName);
+    }
+
     public String getAuthorityName(String schema, String element, String qualifier) {
-        return cas.getChoiceAuthorityName(schema, element, qualifier, null);
+        return cas.getChoiceAuthorityName(schema, element, qualifier, (String) null);
+    }
+
+    /**
+     * Get the authority name for the given metadata field within a specific form.
+     *
+     * @param schema    the metadata schema
+     * @param element   the metadata element
+     * @param qualifier the metadata qualifier
+     * @param formName  the submission form name
+     * @return the authority name
+     */
+    public String getAuthorityName(String schema, String element, String qualifier, String formName) {
+        return cas.getChoiceAuthorityName(schema, element, qualifier, formName);
     }
 
     public boolean isClosed(String schema, String element, String qualifier) {
