@@ -3188,7 +3188,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String local = sdf.format(rpDateToFormat);
         String rest = sdf.format(restDateToFormat);
-        Assert.assertEquals(local, rest);
+        assertEquals(local, rest);
     }
 
     @Test

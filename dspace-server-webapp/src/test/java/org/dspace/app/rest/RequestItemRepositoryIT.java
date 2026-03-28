@@ -656,7 +656,7 @@ public class RequestItemRepositoryIT
 
         // Verify the request item exists via findByBitstreamId before deletion
         Iterator<RequestItem> bitstreamRequests = requestItemService.findByBitstreamId(context, bitstream.getID());
-        assertTrue("Request item should exist before bitstream deletion", bitstreamRequests.hasNext());
+        assertTrue(bitstreamRequests.hasNext(), "Request item should exist before bitstream deletion");
 
         // Delete associated Bitstream
         ContentServiceFactory.getInstance().getBitstreamService().delete(context, bitstream);
@@ -667,7 +667,7 @@ public class RequestItemRepositoryIT
 
         // Also verify via findByBitstreamId
         Iterator<RequestItem> remaining = requestItemService.findByBitstreamId(context, bitstream.getID());
-        assertFalse("Request items should be removed after bitstream deletion", remaining.hasNext());
+        assertFalse(remaining.hasNext(), "Request items should be removed after bitstream deletion");
     }
 
     /**
@@ -692,18 +692,18 @@ public class RequestItemRepositoryIT
 
         // findByBitstreamId should return the request for the first bitstream
         Iterator<RequestItem> results = requestItemService.findByBitstreamId(context, bitstream.getID());
-        assertTrue("Should find request item for bitstream", results.hasNext());
+        assertTrue(results.hasNext(), "Should find request item for bitstream");
         RequestItem found = results.next();
-        assertEquals("Request item should reference correct bitstream",
-            bitstream.getID(), found.getBitstream().getID());
-        assertFalse("Should only find one request item", results.hasNext());
+        assertEquals(bitstream.getID(), found.getBitstream().getID(),
+            "Request item should reference correct bitstream");
+        assertFalse(results.hasNext(), "Should only find one request item");
 
         // findByBitstreamId should return nothing for the second bitstream
         Iterator<RequestItem> noResults = requestItemService.findByBitstreamId(context, bitstream2.getID());
-        assertFalse("Should find no request items for bitstream without requests", noResults.hasNext());
+        assertFalse(noResults.hasNext(), "Should find no request items for bitstream without requests");
 
         // findByBitstreamId should return nothing for a random UUID
         Iterator<RequestItem> randomResults = requestItemService.findByBitstreamId(context, UUID.randomUUID());
-        assertFalse("Should find no request items for nonexistent bitstream", randomResults.hasNext());
+        assertFalse(randomResults.hasNext(), "Should find no request items for nonexistent bitstream");
     }
 }

@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dspace.core.NameAwarePlugin;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Plugin interface that supplies an authority control mechanism for
@@ -158,5 +160,17 @@ public interface ChoiceAuthority extends NameAwarePlugin {
      */
     default public boolean storeAuthorityInMetadata() {
         return true;
+    }
+
+    /**
+     * Whether the authority and its choices are considered public, i.e. browsable by
+     * anonymous users. Controlled via the {@code authority.<name>.public} configuration property.
+     *
+     * @return <code>true</code> if this authority is public
+     */
+    default boolean isPublic() {
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String authorityName = getPluginInstanceName();
+        return configurationService.getBooleanProperty("authority." + authorityName + ".public");
     }
 }

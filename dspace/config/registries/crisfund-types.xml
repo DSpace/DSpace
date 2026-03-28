@@ -1,0 +1,54 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Cris Funding Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>crisfund</name>
+        <namespace>http://dspace.org/crisfund</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>crisfund</schema>
+        <element>award</element>
+        <qualifier>url</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisfund</schema>
+        <element>award</element>
+        <qualifier>uri</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisfund</schema>
+        <element>investigators</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisfund</schema>
+        <element>coinvestigators</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisfund</schema>
+        <element>leadorganizations</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisfund</schema>
+        <element>leadcoorganizations</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+</dspace-dc-types>

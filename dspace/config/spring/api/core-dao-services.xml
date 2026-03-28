@@ -75,5 +75,6 @@
     <bean class="org.dspace.app.ldn.dao.impl.LDNMessageDaoImpl"/>
     <bean class="org.dspace.app.ldn.dao.impl.NotifyPatternToTriggerDaoImpl"/>
 
+    <bean class="org.dspace.content.dao.impl.ItemForMetadataEnhancementUpdateDAOImpl"/>
 
 </beans>

@@ -7,6 +7,8 @@
  */
 package org.dspace.content;
 
+import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +16,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Supplier;
@@ -30,12 +33,15 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.utils.DSpace;
@@ -276,7 +282,17 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                                                    dso.getID().toString() + " and type = " + getTypeText(dso));
         }
 
-        boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
+        Collection collection = getCollection(context, dso);
+        boolean authorityControlled = metadataAuthorityService.isAuthorityAllowed(
+            metadataField, dso.getType(), collection);
+
+        if (isNonValidAuthority(authorityControlled, authorities)) {
+            throw new IllegalArgumentException("The metadata field \"" +
+                    metadataField.toString()
+                    + "\"" + " is not authority controlled but authorities were provided. Values:\""
+                    + authorities + "\"");
+        }
+
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
         List<MetadataValue> newMetadata = new ArrayList<>();
         // We will not verify that they are valid entries in the registry
@@ -314,8 +330,10 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     // authority sanity check: if authority is required, was it supplied?
                     // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so
                     // use a runtime exception
-                    if (authorityRequired && (metadataValue.getAuthority() == null || metadataValue.getAuthority()
-                                                                                                   .length() == 0)) {
+                    if (authorityRequired &&
+                        (metadataValue.getAuthority() == null || metadataValue.getAuthority().length() == 0) &&
+                        !PLACEHOLDER_PARENT_METADATA_VALUE.equals(values.get(i).trim())
+                    ) {
                         throw new IllegalArgumentException("The metadata field \"" + metadataField
                                 .toString() + "\" requires an authority key but none was provided. Value=\"" + values
                                 .get(i) + "\"");
@@ -437,16 +455,14 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             String fieldKey = metadataAuthorityService
                 .makeFieldKey(metadataField.getMetadataSchema().getName(), metadataField.getElement(),
                               metadataField.getQualifier());
-            if (metadataAuthorityService.isAuthorityControlled(fieldKey)) {
+            Collection collection = getCollection(context, dso);
+            if (metadataAuthorityService.isAuthorityControlled(fieldKey)
+                    && choiceAuthorityService.isChoicesConfigured(fieldKey, dso.getType(), collection)) {
                 List<String> authorities = new ArrayList<>();
                 List<Integer> confidences = new ArrayList<>();
                 for (int i = 0; i < values.size(); ++i) {
-                    if (dso instanceof Item item) {
-                        getAuthoritiesAndConfidences(fieldKey, item.getOwningCollection(), values, authorities,
-                                                     confidences, i);
-                    } else {
-                        getAuthoritiesAndConfidences(fieldKey, null, values, authorities, confidences, i);
-                    }
+                    getAuthoritiesAndConfidences(fieldKey, collection, values, authorities,
+                                                 confidences, i);
                 }
                 return addMetadata(context, dso, metadataField, language, values, authorities, confidences);
             } else {
@@ -1046,4 +1062,25 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         return matchedValues;
     }
 
+    private Collection getCollection(Context context, T dso) throws SQLException {
+        Collection col = null;
+        switch (dso.getType()) {
+            case Constants.ITEM:
+                Item item = (Item) dso;
+                col = (Collection) item.getItemService().getParentObject(context, item);
+                break;
+            case Constants.BITSTREAM:
+                Bitstream bit = (Bitstream) dso;
+                BitstreamService bitService = ContentServiceFactory.getInstance().getBitstreamService();
+                DSpaceObject pDSO = bitService.getParentObject(context, bit);
+                if (pDSO != null && pDSO.getType() == Constants.ITEM) {
+                    Item pItem = (Item) pDSO;
+                    col = (Collection) pItem.getItemService().getParentObject(context, pItem);
+                }
+                return null;
+            default:
+                break;
+        }
+        return col;
+    }
 }

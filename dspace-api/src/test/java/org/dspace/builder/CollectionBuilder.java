@@ -305,7 +305,6 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
        try (Context c = new Context()) {
             c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
-            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             collection = c.reloadEntity(collection);
             if (collection != null) {
                 deleteAdminGroup(c);
@@ -313,6 +312,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
                 deleteDefaultReadGroups(c, collection);
                 deleteWorkflowGroups(c, collection);
                 delete(c, collection);
+                c.complete();
             }
        }
     }

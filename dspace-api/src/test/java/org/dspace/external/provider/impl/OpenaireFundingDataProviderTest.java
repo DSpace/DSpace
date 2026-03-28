@@ -119,6 +119,6 @@ public class OpenaireFundingDataProviderTest extends AbstractDSpaceTest {
 
         // Should return 0 when response is null, not throw NullPointerException
         int result = provider.getNumberOfResults("test");
-        assertEquals("Should return 0 when response is null", 0, result);
+        assertEquals(0, result, "Should return 0 when response is null");
     }
 }

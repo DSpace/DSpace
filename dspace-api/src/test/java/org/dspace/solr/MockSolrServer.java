@@ -165,6 +165,7 @@ public class MockSolrServer {
 
         try {
             solrServer.deleteByQuery("*:*");
+            solrServer.commit();
         } catch (SolrServerException | IOException ex) {
             log.warn("Exception while clearing '{}' core", coreName, ex);
         }

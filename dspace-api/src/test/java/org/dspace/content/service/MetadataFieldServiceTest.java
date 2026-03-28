@@ -102,5 +102,13 @@ public class MetadataFieldServiceTest extends AbstractUnitTest {
         assertNull(
                 metadataFieldService.findByElement(context, "dc", "identifier", "issn")
         );
+
+        // Restore the metadata fields to their original 'dc' schema and commit. This test
+        // commits a schema change to the shared registry; without restoring it, later test
+        // classes in the same surefire fork would no longer find dc.subject / dc.identifier.issn.
+        MetadataSchema dcSchema = metadataSchemaService.find(context, "dc");
+        metadataFieldService.findByElement(context, "dspace", "subject", null).setMetadataSchema(dcSchema);
+        metadataFieldService.findByElement(context, "dspace", "identifier", "issn").setMetadataSchema(dcSchema);
+        context.complete();
     }
 }

@@ -8,10 +8,11 @@
 package org.dspace.identifier.doi.crossref;
 
 import java.net.URISyntaxException;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.core5.net.URIBuilder;
 import org.dspace.identifier.DOI;
 import org.dspace.identifier.doi.DOIIdentifierException;
 import org.slf4j.Logger;
@@ -85,8 +86,8 @@ public class DOIResolverClient {
             // we don't want to follow the redirect, or we don't know if just the handle
             // doesn't resolve or the DOI
             var requestConfig = RequestConfig.custom()
-                    .setSocketTimeout(TIMEOUT)
-                    .setConnectionRequestTimeout(TIMEOUT)
+                    .setResponseTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                    .setConnectionRequestTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
                     .setRedirectsEnabled(false)
                     .build();
 
