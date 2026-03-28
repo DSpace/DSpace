@@ -38,7 +38,6 @@ import java.nio.charset.Charset;
 import java.time.Period;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
@@ -89,6 +88,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import tools.jackson.databind.ObjectMapper;
 
 public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest {
     @Autowired

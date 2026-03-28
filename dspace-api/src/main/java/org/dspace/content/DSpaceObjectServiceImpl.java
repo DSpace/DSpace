@@ -7,6 +7,8 @@
  */
 package org.dspace.content;
 
+import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -270,6 +272,15 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         }
 
         boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
+
+        // Throw an error if authorities are provided for a non-authority-controlled field
+        if (!authorityControlled && authorities != null && !authorities.isEmpty() && authorities.get(0) != null) {
+            throw new IllegalArgumentException("The metadata field \"" +
+                    metadataField.toString()
+                    + "\"" + " is not authority controlled but authorities were provided. Values:\""
+                    + authorities + "\"");
+        }
+
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
         List<MetadataValue> newMetadata = new ArrayList<>();
         // We will not verify that they are valid entries in the registry
@@ -306,8 +317,10 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     // authority sanity check: if authority is required, was it supplied?
                     // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so
                     // use a runtime exception
-                    if (authorityRequired && (metadataValue.getAuthority() == null || metadataValue.getAuthority()
-                                                                                                   .length() == 0)) {
+                    if (authorityRequired &&
+                        (metadataValue.getAuthority() == null || metadataValue.getAuthority().length() == 0) &&
+                        !PLACEHOLDER_PARENT_METADATA_VALUE.equals(values.get(i).trim())
+                    ) {
                         throw new IllegalArgumentException("The metadata field \"" + metadataField
                                 .toString() + "\" requires an authority key but none was provided. Value=\"" + values
                                 .get(i) + "\"");
