@@ -36,7 +36,6 @@ import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.MultiLanguageDiscoverSearchFilterFacet;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.ConfigurationService;
-import org.dspace.web.ContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,7 +108,7 @@ public class SolrServiceValuePairsIndexPlugin implements SolrServiceIndexPlugin 
                 for (Locale locale : I18nUtil.getSupportedLocales()) {
                     String language = locale.getLanguage();
                     if (cas.isChoicesConfigured(metadata.getMetadataField().toString(), collection)) {
-                        additionalIndex(collection, item, metadata, language, document);
+                        additionalIndex(context, collection, item, metadata, language, document);
                     }
                 }
             }
@@ -122,16 +121,17 @@ public class SolrServiceValuePairsIndexPlugin implements SolrServiceIndexPlugin 
     /**
      * Adds discovery field values for a specific metadata value in a given language.
      *
+     * @param context the DSpace context
      * @param collection the parent collection used to resolve the choice authority
      * @param item the item being indexed
      * @param metadataValue the metadata value to process
      * @param language the language code for the indexed fields
      * @param document the Solr document to add fields to
      */
-    private void additionalIndex(Collection collection, Item item, MetadataValue metadataValue, String language,
-            SolrInputDocument document) {
+    private void additionalIndex(Context context, Collection collection, Item item, MetadataValue metadataValue,
+            String language, SolrInputDocument document) {
         String metadataField = metadataValue.getMetadataField().toString('.');
-        List<DiscoverySearchFilter> searchFilters = findSearchFiltersByMetadataField(item, metadataField);
+        List<DiscoverySearchFilter> searchFilters = findSearchFiltersByMetadataField(context, item, metadataField);
         String authority = metadataValue.getAuthority();
         String value = getMetadataValue(collection, metadataValue, language);
         if (StringUtils.isNotBlank(value)) {
@@ -232,12 +232,14 @@ public class SolrServiceValuePairsIndexPlugin implements SolrServiceIndexPlugin 
      * {@link MultiLanguageDiscoverSearchFilterFacet} to allow for language-based
      * searches.
      *
+     * @param context the DSpace context
      * @param item the item being indexed (used to resolve discovery configuration)
      * @param metadataField the metadata field key to search for (e.g., "dc.subject")
      * @return list of discovery search filters that include this metadata field
      */
-    private List<DiscoverySearchFilter> findSearchFiltersByMetadataField(Item item, String metadataField) {
-        return getAllDiscoveryConfiguration(item).stream()
+    private List<DiscoverySearchFilter> findSearchFiltersByMetadataField(Context context, Item item,
+            String metadataField) {
+        return getAllDiscoveryConfiguration(context, item).stream()
             .flatMap(discoveryConfiguration -> discoveryConfiguration.getSearchFilters().stream())
             .filter(searchFilter -> searchFilter.getMetadataFields().contains(metadataField))
             .distinct()
@@ -247,13 +249,14 @@ public class SolrServiceValuePairsIndexPlugin implements SolrServiceIndexPlugin 
     /**
      * Retrieves all discovery configurations associated with an item.
      *
+     * @param context the DSpace context
      * @param item the item to get configurations for
      * @return list of discovery configurations for the item's collections
      * @throws SQLRuntimeException if a database error occurs
      */
-    private List<DiscoveryConfiguration> getAllDiscoveryConfiguration(Item item) {
+    private List<DiscoveryConfiguration> getAllDiscoveryConfiguration(Context context, Item item) {
         try {
-            return SearchUtils.getAllDiscoveryConfigurations(ContextUtil.obtainCurrentRequestContext(), item);
+            return SearchUtils.getAllDiscoveryConfigurations(context, item);
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
         }

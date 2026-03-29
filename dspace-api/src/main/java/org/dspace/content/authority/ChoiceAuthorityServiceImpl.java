@@ -160,9 +160,11 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                               int start, int limit, String locale) {
         ChoiceAuthority ma = getAuthorityByFieldKeyCollection(fieldKey, collection);
         if (ma == null) {
-            throw new IllegalArgumentException(
-                "No choices plugin was configured for  field \"" + fieldKey
-                    + "\", collection=" + collection.getID().toString() + ".");
+            String errorMessage = "No choices plugin was configured for  field \"" + fieldKey + "\"";
+            if (collection != null) {
+                errorMessage = errorMessage + ", collection=" + collection.getID().toString();
+            }
+            throw new IllegalArgumentException(errorMessage);
         }
         return ma.getMatches(query, start, limit, locale);
     }
@@ -172,9 +174,11 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                                 String locale) {
         ChoiceAuthority ma = getAuthorityByFieldKeyCollection(fieldKey, collection);
         if (ma == null) {
-            throw new IllegalArgumentException(
-                "No choices plugin was configured for  field \"" + fieldKey
-                    + "\", collection=" + collection.getID().toString() + ".");
+            String errorMessage = "No choices plugin was configured for  field \"" + fieldKey + "\"";
+            if (collection != null) {
+                errorMessage = errorMessage + ", collection=" + collection.getID().toString();
+            }
+            throw new IllegalArgumentException(errorMessage);
         }
         return ma.getBestMatch(query, locale);
     }
@@ -188,9 +192,11 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     public String getLabel(String fieldKey, Collection collection, String authKey, String locale) {
         ChoiceAuthority ma = getAuthorityByFieldKeyCollection(fieldKey, collection);
         if (ma == null) {
-            throw new IllegalArgumentException(
-                "No choices plugin was configured for  field \"" + fieldKey
-                    + "\", collection=" + collection.getID().toString() + ".");
+            String errorMessage = "No choices plugin was configured for  field \"" + fieldKey + "\"";
+            if (collection != null) {
+                errorMessage = errorMessage + ", collection=" + collection.getID().toString();
+            }
+            throw new IllegalArgumentException(errorMessage);
         }
         return ma.getLabel(authKey, locale);
     }
@@ -215,9 +221,11 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         String fieldKey = metadataValue.getMetadataField().toString();
         ChoiceAuthority ma = getAuthorityByFieldKeyCollection(fieldKey, collection);
         if (ma == null) {
-            throw new IllegalArgumentException(
-                "No choices plugin was configured for  field \"" + fieldKey
-                    + "\", collection=" + collection.getID().toString() + ".");
+            String errorMessage = "No choices plugin was configured for  field \"" + fieldKey + "\"";
+            if (collection != null) {
+                errorMessage = errorMessage + ", collection=" + collection.getID().toString();
+            }
+            throw new IllegalArgumentException(errorMessage);
         }
         if (ma instanceof AuthorityVariantsSupport avs) {
             return avs.getVariants(metadataValue.getAuthority(), metadataValue.getLanguage());
@@ -513,7 +521,10 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                 configReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
                 SubmissionConfig submissionName = configReaderService
                         .getSubmissionConfigByCollection(collection);
-                ma = controllerFormDefinitions.get(fieldKey).get(submissionName.getSubmissionName());
+                Map<String, ChoiceAuthority> formDefinitions = controllerFormDefinitions.get(fieldKey);
+                if (formDefinitions != null) {
+                    ma = formDefinitions.get(submissionName.getSubmissionName());
+                }
             } catch (SubmissionConfigReaderException e) {
                 // the system is in an illegal state as the submission definition is not valid
                 throw new IllegalStateException("Error reading the item submission configuration: " + e.getMessage(),

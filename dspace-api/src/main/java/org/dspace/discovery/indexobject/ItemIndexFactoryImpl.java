@@ -45,6 +45,7 @@ import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.discovery.FullTextContentStreams;
@@ -341,7 +342,8 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                 List<String> variants = null;
                 boolean isAuthorityControlled = metadataAuthorityService
                         .isAuthorityControlled(metadataField);
-
+                boolean hasChoiceAuthority = choiceAuthorityService.isChoicesConfigured(
+                        metadataField.toString(), collection);
                 int minConfidence = isAuthorityControlled ? metadataAuthorityService
                         .getMinConfidence(metadataField) : Choices.CF_ACCEPTED;
 
@@ -375,7 +377,11 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                                                 Boolean.FALSE),
                                                 true);
 
-                        if (!ignorePrefered && !authority.startsWith(AuthorityValueService.GENERATE)) {
+                        if (
+                                !ignorePrefered &&
+                                hasChoiceAuthority &&
+                                !authority.startsWith(AuthorityValueService.GENERATE)
+                        ) {
                             try {
                                 preferedLabel = choiceAuthorityService.getLabel(meta, collection, meta.getLanguage());
                             } catch (Exception e) {
@@ -394,7 +400,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                                         .getPropertyAsType("discovery.index.authority.ignore-variants",
                                                                 Boolean.FALSE),
                                                 true);
-                        if (!ignoreVariants) {
+                        if (!ignoreVariants && hasChoiceAuthority) {
                             try {
                                 variants = choiceAuthorityService
                                     .getVariants(meta, collection);
@@ -534,6 +540,11 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                 if (authority != null) {
                     doc.addField(field + "_authority", authority);
                 }
+
+                if (meta.getAuthority() != null) {
+                    doc.addField(field + "_allauthority", meta.getAuthority());
+                }
+
                 if (toProjectionFields.contains(field) || toProjectionFields
                         .contains(unqualifiedField + "." + Item.ANY)) {
                     StringBuffer variantsToStore = new StringBuffer();
@@ -559,6 +570,12 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                     String langField = field + "." + meta.getLanguage();
                     doc.addField(langField, value);
                 }
+            }
+
+            String entityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
+            if (StringUtils.isBlank(entityType)) {
+                entityType = Constants.ENTITY_TYPE_NONE;
+                doc.addField("dspace.entity.type", entityType);
             }
 
         } catch (Exception e) {

@@ -383,16 +383,14 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             String fieldKey = metadataAuthorityService
                 .makeFieldKey(metadataField.getMetadataSchema().getName(), metadataField.getElement(),
                               metadataField.getQualifier());
-            if (metadataAuthorityService.isAuthorityControlled(fieldKey)) {
+            Collection collection = getCollection(context, dso);
+            if (metadataAuthorityService.isAuthorityControlled(fieldKey)
+                    && choiceAuthorityService.isChoicesConfigured(fieldKey, collection)) {
                 List<String> authorities = new ArrayList<>();
                 List<Integer> confidences = new ArrayList<>();
                 for (int i = 0; i < values.size(); ++i) {
-                    if (dso instanceof Item item) {
-                        getAuthoritiesAndConfidences(fieldKey, item.getOwningCollection(), values, authorities,
-                                                     confidences, i);
-                    } else {
-                        getAuthoritiesAndConfidences(fieldKey, null, values, authorities, confidences, i);
-                    }
+                    getAuthoritiesAndConfidences(fieldKey, collection, values, authorities,
+                                                 confidences, i);
                 }
                 return addMetadata(context, dso, metadataField, language, values, authorities, confidences);
             } else {

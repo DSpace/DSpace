@@ -79,6 +79,13 @@ public class HibernateDBConnection implements DBConnection<Session> {
         if (!isTransActionAlive()) {
             sessionFactory.getCurrentSession().beginTransaction();
             configureDatabaseMode();
+        } else if (getTransaction().getStatus() == TransactionStatus.MARKED_ROLLBACK) {
+            // In Hibernate 7, a MARKED_ROLLBACK transaction is considered "active" by isActive(),
+            // but the ThreadLocalSessionContext proxy rejects operations (e.g. getCriteriaBuilder).
+            // Roll back the doomed transaction and start a fresh one.
+            getTransaction().rollback();
+            sessionFactory.getCurrentSession().beginTransaction();
+            configureDatabaseMode();
         }
         // Return the current Hibernate Session object (Hibernate will create one if it doesn't yet exist)
         return sessionFactory.getCurrentSession();

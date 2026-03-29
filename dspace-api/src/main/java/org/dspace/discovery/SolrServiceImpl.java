@@ -1150,6 +1150,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             String displayedValue = transformDisplayedValue(context, facetField.getName(),
                                                                             facetValue.getName());
                             String field = transformFacetField(facetFieldConfig, facetField.getName(), true);
+                            String currentLocalePrefix = context.getCurrentLocale().getLanguage() + "_";
+                            field = StringUtils.removeStart(field, currentLocalePrefix);
+
                             String authorityValue = transformAuthorityValue(context, facetField.getName(),
                                                                             facetValue.getName());
                             String sortValue = transformSortValue(context,
