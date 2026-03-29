@@ -289,6 +289,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
                 deleteDefaultReadGroups(c, collection);
                 deleteWorkflowGroups(c, collection);
                 delete(c, collection);
+                c.complete();
             }
        }
     }
