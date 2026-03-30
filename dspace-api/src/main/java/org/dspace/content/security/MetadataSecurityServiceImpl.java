@@ -9,11 +9,14 @@ package org.dspace.content.security;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
@@ -25,6 +28,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.security.service.MetadataSecurityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataSecurityEvaluation;
 import org.dspace.core.Context;
 import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.services.ConfigurationService;
@@ -52,6 +56,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  *       {@code metadata.publicField} configuration are always visible</li>
  *   <li><strong>Permission-Based Check:</strong> Fields are visible if the user can edit
  *       the item OR if the field is not marked as hidden</li>
+ *   <li><strong>Security Level Check:</strong> Individual metadata values can have numeric
+ *       security levels (0, 1, 2) that trigger additional permission evaluations</li>
  * </ol>
  * 
  * <p><strong>Configuration-Driven Security:</strong></p>
@@ -63,6 +69,15 @@ import org.springframework.beans.factory.annotation.Autowired;
  *       are marked as hidden in the system configuration</li>
  *   <li><strong>Submission Definitions:</strong> When in submission context, uses DCInput
  *       definitions to determine field visibility</li>
+ *   <li><strong>Security Levels Map:</strong> The {@code securityLevelsMap} maps numeric security
+ *       levels to {@link MetadataSecurityEvaluation} implementations, configured in
+ *       {@code spring-dspace-security-metadata.xml}:
+ *       <ul>
+ *         <li>Level 0: Public access (everyone can view)</li>
+ *         <li>Level 1: Group-based access (only "Trusted" group members can view)</li>
+ *         <li>Level 2: Administrator and owner access (only admins and item owners can view)</li>
+ *       </ul>
+ *       This allows individual metadata values on the same item to have different visibility rules.</li>
  * </ul>
  *
  * <p><strong>Integration Points:</strong></p>
@@ -79,16 +94,22 @@ import org.springframework.beans.factory.annotation.Autowired;
  *   <li><strong>Comprehensive Coverage:</strong> All metadata access goes through security checks</li>
  *   <li><strong>Admin Override:</strong> Administrators can always access withdrawn item metadata</li>
  *   <li><strong>Context Awareness:</strong> Different rules for submission vs. public access</li>
+ *   <li><strong>Value-Level Granularity:</strong> Different values for the same field can have
+ *       different visibility based on their security level</li>
  * </ul>
  * 
  * @see MetadataSecurityService
  * @see MetadataExposureService
  * @see AuthorizeService
  * @see DCInputsReader
+ * @see MetadataSecurityEvaluation
  * @author Mykhaylo Boychuk (4science.it)
  * @author Luca Giamminonni (4science.it)
  */
 public class MetadataSecurityServiceImpl implements MetadataSecurityService {
+
+    @Resource(name = "securityLevelsMap")
+    private final Map<String, MetadataSecurityEvaluation> securityLevelsMap = new HashMap<>();
 
     @Autowired
     private ItemService itemService;
@@ -163,8 +184,9 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
         }
 
         return metadataValues.stream()
-                             .filter(value -> isMetadataValueVisible(context, item, value))
-                             .collect(Collectors.toList());
+                                .filter(value -> isMetadataValueVisible(context, item, value))
+                                .filter(value -> isMetadataValueReturnAllowed(context, item, value))
+                                .collect(Collectors.toList());
 
     }
 
@@ -239,6 +261,20 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
      */
     private boolean isMetadataFieldVisibleFor(Context context, Item item, MetadataField metadataField) {
         return isNotHidden(context, metadataField) || canEditItem(context, item);
+    }
+
+    private boolean isMetadataValueReturnAllowed(Context context, Item item, MetadataValue metadataValue) {
+        Integer securityLevel = metadataValue.getSecurityLevel();
+        if (securityLevel == null) {
+            return true;
+        }
+
+        MetadataSecurityEvaluation metadataSecurityEvaluation = getMetadataSecurityEvaluator(securityLevel);
+        try {
+            return metadataSecurityEvaluation.allowMetadataFieldReturn(context, item, metadataValue.getMetadataField());
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
     }
 
     private boolean isPublicMetadataField(MetadataField metadataField) {
@@ -370,5 +406,9 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
         }
+    }
+
+    public MetadataSecurityEvaluation getMetadataSecurityEvaluator(int securityValue) {
+        return securityLevelsMap.get(securityValue + "");
     }
 }

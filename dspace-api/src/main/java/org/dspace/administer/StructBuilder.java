@@ -16,7 +16,6 @@ import static org.dspace.content.service.DSpaceObjectService.MD_SHORT_DESCRIPTIO
 import static org.dspace.content.service.DSpaceObjectService.MD_SIDEBAR_TEXT;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

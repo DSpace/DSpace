@@ -7,10 +7,7 @@
  */
 package org.dspace.authorize.dao.impl;
 
-import static java.util.Collections.emptyList;
-
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
