@@ -21,7 +21,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.exception.ExtractMetadataStepException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ErrorRest;
@@ -212,11 +211,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             String[] path = op.getPath().substring(1).split("/", 3);
             if (OPERATION_PATH_SECTIONS.equals(path[0])) {
                 String section = path[1];
-                try {
-                    submissionService.evaluatePatchToInprogressSubmission(context, request, source, wsi, section, op);
-                } catch (ExtractMetadataStepException e) {
-                    log.warn(e.getMessage(), e);
-                }
+                submissionService.evaluatePatchToInprogressSubmission(context, request, source, wsi, section, op);
             } else {
                 throw new DSpaceBadRequestException(
                     "Patch path operation need to starts with '" + OPERATION_PATH_SECTIONS + "'");
