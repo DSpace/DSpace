@@ -54,6 +54,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.HtmlUtils;
+
 /**
  * Component to expose item requests and handle operations like create (request), put (grant/deny), and
  * email sending. Support for requested item access by a secure token / link is supported as well as the legacy
@@ -207,12 +208,13 @@ public class RequestItemRepository
         if (null != user) { // Prefer authenticated user's name.
             username = user.getFullName();
         } else { // An anonymous session may provide a name.
-            // Escape username to evade nasty XSS attempts
-            username = HtmlUtils.htmlEscape(rir.getRequestName(),"UTF-8");
+            username = rir.getRequestName();
         }
+        // Escape username to evade nasty XSS attempts in HTML templates.
+        username = escapeForEmailTemplate(username);
 
-        // Requester's message text, escaped to evade nasty XSS attempts
-        String message = HtmlUtils.htmlEscape(rir.getRequestMessage(),"UTF-8");
+        // Escape request message to evade nasty XSS attempts in HTML templates.
+        String message = escapeForEmailTemplate(rir.getRequestMessage());
 
         // Create the request.
         String token;
@@ -242,6 +244,20 @@ public class RequestItemRepository
         }
         // #8636 - Security issue: Should not return RequestItemRest to avoid token exposure
         return null;
+    }
+
+    /**
+     * Escape user-supplied content before it is persisted and later rendered in e-mail templates.
+     *
+     * @param value incoming potentially unsafe value.
+     * @return escaped value safe for inclusion in HTML templates.
+     */
+    private String escapeForEmailTemplate(String value) {
+        if (value == null) {
+            return "";
+        }
+        String emailCharset = configurationService.getProperty("mail.charset", "UTF-8");
+        return HtmlUtils.htmlEscape(value, emailCharset);
     }
 
     // NOTICE:  there is no service method for this -- requests are never deleted?
