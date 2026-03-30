@@ -5,16 +5,14 @@
 ## {2}  submitter's name
 ## {3}  Description of task
 ## {4}  link to 'my DSpace' page
-## {5}  UM Task information
 ##
-#set($subject = "${config.get('dspace.shortname')}: [ " + ${params[5]} + " ] - You have a new task")
+#set($subject = "${config.get('dspace.name')}: You have a new task")
 
 A new item has been submitted:
 
 Title:        ${params[0]}
 Collection:   ${params[1]}
 Submitted by: ${params[2]}
-Task subject: ${params[5]}
 
 ${params[3]}
 
