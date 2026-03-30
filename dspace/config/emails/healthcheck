@@ -7,24 +7,10 @@
 #set($subject = "${config.get('dspace.name')}: Repository healthcheck")
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Healthcheck Completed</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+        #parse("_email_common_styles")
         .output {
             background-color: #f9f9f9;
             padding: 20px;
@@ -34,19 +20,13 @@
             font-family: monospace;
             white-space: pre-wrap;
         }
-        .info {
-            background-color: #e3f2fd;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>System Healthcheck Completed</h2>
 
-        <div class="info">
+        <div class="info-box">
             <p>The healthcheck finished with the following output:</p>
         </div>
 

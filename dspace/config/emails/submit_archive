@@ -8,38 +8,10 @@
 #set($subject = "${config.get('dspace.name')}: Submission Approved and Archived")
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Submission Has Been Accepted</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .success-notification {
-            color: #2e7d32;
-            background-color: #e8f5e9;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 20px 0;
-            border-left: 4px solid #4caf50;
-        }
-        .submission-details {
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
+        #parse("_email_common_styles")
         .identifier {
             background-color: #e3f2fd;
             padding: 20px;
@@ -57,20 +29,17 @@
             margin: 20px 0;
             border-left: 4px solid #ff9800;
         }
-        .signature {
-            margin-top: 30px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Submission Accepted</h2>
 
-        <div class="success-notification">
+        <div class="success-box">
             Your submission has been accepted and archived in ${config.get('dspace.name')}!
         </div>
 
-        <div class="submission-details">
+        <div class="detail-box">
             <p><strong>You submitted:</strong> ${params[0]}</p>
             <p><strong>To collection:</strong> ${params[1]}</p>
         </div>
@@ -78,7 +47,7 @@
         <p>Your submission has been assigned the following identifier:</p>
 
         <div class="identifier">
-            ${params[2]}
+            <a href="${params[2]}">${params[2]}</a>
         </div>
 
         <div class="citation-note">

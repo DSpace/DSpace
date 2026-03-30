@@ -15,39 +15,12 @@
 #set($subject = "${config.get('dspace.name')}: Request copy of document")
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Request a Copy - Author</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+        #parse("_email_common_styles")
         .greeting {
             margin-bottom: 20px;
-        }
-        .request-info {
-            background-color: #e3f2fd;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 20px 0;
-            border-left: 4px solid #2196f3;
-        }
-        .document-info {
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 4px;
-            margin: 20px 0;
         }
         .message {
             background-color: #f0f7ff;
@@ -57,15 +30,6 @@
             border-left: 4px solid #007cba;
             font-style: italic;
         }
-        .action-button {
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: #007cba;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
         .important {
             background-color: #fff3e0;
             padding: 15px;
@@ -73,26 +37,19 @@
             margin: 20px 0;
             border-left: 4px solid #ff9800;
         }
-        .signature {
-            margin-top: 30px;
-        }
-        .contact {
-            color: #666;
-            font-style: italic;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <p class="greeting">Dear ${params[7]},</p>
 
-        <div class="request-info">
+        <div class="info-box">
             A user of ${params[9]}, named ${params[0]} and using the email ${params[1]}, requested a copy of the file(s) associated with a document submitted by you:
         </div>
 
-        <div class="document-info">
+        <div class="detail-box">
             <strong>"${params[4]}"</strong><br>
-            (${params[3]})
+            (<a href="${params[3]}">${params[3]}</a>)
         </div>
 
         <p>This request came along with the following message:</p>
@@ -101,7 +58,7 @@
             "${params[5]}"
         </div>
 
-        <p>To answer, click <a href="${params[6]}" class="action-button">here</a>. Whether you choose to grant or deny the request, we think that it's in your best interest to respond.</p>
+        <p>To answer, click <a href="${params[6]}" class="button">here</a>. Whether you choose to grant or deny the request, we think that it's in your best interest to respond.</p>
 
         <div class="important">
             <p><strong>IMPORTANT NOTICES:</strong></p>

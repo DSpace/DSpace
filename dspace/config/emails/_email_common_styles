@@ -1,0 +1,63 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+.container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.button {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #007cba;
+    color: white !important;
+    text-decoration: none;
+    border-radius: 4px;
+    margin: 20px 0;
+    font-weight: bold;
+}
+.signature {
+    margin-top: 30px;
+}
+.contact {
+    color: #666;
+    font-style: italic;
+}
+.detail-item {
+    margin: 10px 0;
+}
+.error-box {
+    color: #d32f2f;
+    background-color: #ffebee;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 20px 0;
+    border-left: 4px solid #d32f2f;
+}
+.success-box {
+    color: #2e7d32;
+    background-color: #e8f5e9;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 20px 0;
+    border-left: 4px solid #4caf50;
+}
+.info-box {
+    background-color: #e3f2fd;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 20px 0;
+    border-left: 4px solid #2196f3;
+}
+.detail-box {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 4px;
+    margin: 20px 0;
+}
