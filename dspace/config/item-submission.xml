@@ -399,6 +399,7 @@
         </submission-process>
 
         <submission-process name="person-edit">
+            <step id="collection"/>
             <step id="personStep"/>
             <!-- The custom-url step can be uncommented to allow the Person's custom URL (when enabled) to be
                  customized during submission.-->
@@ -407,6 +408,7 @@
         </submission-process>
 
         <submission-process name="admin-person-edit">
+            <step id="collection"/>
             <step id="personStep"/>
             <!-- The custom-url step can be uncommented to allow the Person's custom URL (when enabled) to be
                  customized during submission.-->
@@ -428,6 +430,7 @@
         </submission-process>
 
         <submission-process name="project-edit">
+            <step id="collection"/>
             <step id="projectStep"/>
             <step id="upload"/>
         </submission-process>
@@ -444,6 +447,7 @@
         </submission-process>
 
         <submission-process name="orgunit-edit">
+            <step id="collection"/>
             <step id="orgUnitStep"/>
             <step id="upload"/>
         </submission-process>
@@ -460,6 +464,7 @@
         </submission-process>
 
         <submission-process name="journal-edit">
+            <step id="collection"/>
             <step id="journalStep"/>
             <step id="upload"/>
         </submission-process>
@@ -476,6 +481,7 @@
         </submission-process>
 
         <submission-process name="journalvolume-edit">
+            <step id="collection"/>
             <step id="journalVolumeStep"/>
             <step id="upload"/>
         </submission-process>
@@ -492,6 +498,7 @@
         </submission-process>
 
         <submission-process name="journalissue-edit">
+            <step id="collection"/>
             <step id="journalIssueStep"/>
             <step id="upload"/>
         </submission-process>
@@ -510,6 +517,7 @@
         </submission-process>
 
         <submission-process name="dataset-edit">
+            <step id="collection"/>
             <!-- Datasets use a custom first step, but share page 2 with "traditional" Item form -->
             <step id="datasetStep"/>
             <step id="traditionalpagetwo"/>
