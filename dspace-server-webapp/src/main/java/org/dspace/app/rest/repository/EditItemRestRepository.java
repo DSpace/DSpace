@@ -113,7 +113,8 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, S
      * @param data the composite identifier in format "UUID:MODE" (e.g., "123e4567-e89b-12d3-a456-426614174000:FULL")
      * @return the EditItemRest representation of the edit item, or null if not found
      * @throws DSpaceBadRequestException if the data parameter is not in the expected format
-     * @throws ResourceNotFoundException if the item with the specified UUID does not exist or the mode configuration is not found
+     * @throws ResourceNotFoundException if the item with the specified UUID does not exist or the mode configuration
+ *                                       is not found
      * @throws AccessDeniedException if the current user does not have rights to edit in the specified mode
      * @throws RuntimeException if a database error occurs
      */

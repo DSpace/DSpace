@@ -24,6 +24,7 @@ import org.dspace.content.edit.service.EditItemModeService;
 import org.dspace.content.edit.service.EditItemModeValidator;
 import org.dspace.content.security.service.CrisSecurityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.exception.SQLRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,7 +124,7 @@ public class EditItemModeServiceImpl implements EditItemModeService {
 
         String entityType = itemService.getEntityTypeLabel(item);
         if (isBlank(entityType)) {
-            return defaultModes;
+            entityType = Constants.ENTITY_TYPE_NONE;
         }
 
         String entityTypeLowerCase = entityType.toLowerCase();

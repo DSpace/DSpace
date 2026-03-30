@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.edit.EditItemMode;
 import org.dspace.core.Context;

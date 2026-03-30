@@ -220,6 +220,19 @@
 <!--                        </bean>-->
 <!--                    </list>-->
 <!--                </entry>-->
+                <entry key="none">
+                    <list>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="FULL" />
+                            <property name="security">
+                                <value type="org.dspace.content.security.CrisSecurity">
+                                    ITEM_ADMIN
+                                </value>
+                            </property>
+                            <property name="submissionDefinition" value="traditional-edit" />
+                        </bean>
+                    </list>
+                </entry>
             </map>
         </property>
     </bean>
