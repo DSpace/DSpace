@@ -687,7 +687,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
                                          new String[] {
                                              "org.dspace.content.authority.EPersonAuthority = EPersonAuthority",
-                                             "org.dspace.content.authority.OrcidAuthority = AuthorAuthority"
+                                             "org.dspace.content.authority.SampleAuthority = AuthorAuthority"
                                          });
         configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
         configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
@@ -803,7 +803,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         choiceAuthorityService.getChoiceAuthoritiesNames();
         configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
                                          new String[] {
-                                             "org.dspace.content.authority.OrcidAuthority = EditorAuthority"
+                                             "org.dspace.content.authority.SampleAuthority = EditorAuthority"
                                          });
         configurationService.setProperty("choices.plugin.dc.contributor.editor", "EditorAuthority");
         configurationService.setProperty("choices.presentation.dc.contributor.editor", "suggest");

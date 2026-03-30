@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
@@ -280,47 +278,19 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     @Override
     public void cleanup() throws Exception {
-        // Collect workflow group UUIDs before deleting the collection, since the
-        // collection entity will be gone after delete().
-        List<UUID> workflowGroupIds = new ArrayList<>();
-        try (Context c = new Context()) {
+       try (Context c = new Context()) {
             c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
             collection = c.reloadEntity(collection);
             if (collection != null) {
-                // Save workflow group IDs by name convention before deleting
-                for (int i = 1; i <= 3; i++) {
-                    String groupName = "COLLECTION_" + collection.getID() + "_WORKFLOW_STEP_" + i;
-                    Group wfGroup = groupService.findByName(c, groupName);
-                    if (wfGroup != null) {
-                        workflowGroupIds.add(wfGroup.getID());
-                    }
-                }
                 deleteAdminGroup(c);
                 deleteItemTemplate(c);
                 deleteDefaultReadGroups(c, collection);
-                // Delete the collection (cleans up pool tasks, claimed tasks, workflow
-                // items via collectionService.delete()). Workflow groups must be deleted
-                // AFTER because in Hibernate 7, pool tasks hold FK references to both
-                // the group and the EPerson.
+                deleteWorkflowGroups(c, collection);
                 delete(c, collection);
+                c.complete();
             }
-        }
-        // delete() called c.complete(). Now delete orphaned workflow groups in a
-        // new context (pool tasks are gone, so group delete will succeed).
-        if (!workflowGroupIds.isEmpty()) {
-            try (Context c2 = new Context()) {
-                c2.setDispatcher("noindex");
-                c2.turnOffAuthorisationSystem();
-                for (UUID groupId : workflowGroupIds) {
-                    Group group = groupService.find(c2, groupId);
-                    if (group != null) {
-                        groupService.delete(c2, group);
-                    }
-                }
-                c2.complete();
-            }
-        }
+       }
     }
 
     private void deleteAdminGroup(Context c) throws SQLException, AuthorizeException, IOException {
