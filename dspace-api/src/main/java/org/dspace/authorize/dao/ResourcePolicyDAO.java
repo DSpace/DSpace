@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.authorize.ResourcePolicyOwnerVO;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
@@ -43,6 +42,23 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
     public void deleteByDsoAndTypeAndAction(Context context, DSpaceObject dSpaceObject, String type, int action)
         throws SQLException;
 
+    /**
+     * Retrieves all resource policies for a specific DSpace object filtered by action and policy type.
+     * <p>
+     * This method returns policies that match all three criteria: the DSpace object, the action ID,
+     * and the resource policy type. All conditions must be satisfied for a policy to be included
+     * in the results.
+     *
+     * @param c        the DSpace context object for database access
+     * @param o        the DSpace object whose policies to retrieve
+     * @param actionId the action identifier to filter by (as defined in {@link org.dspace.core.Constants})
+     * @param type     the resource policy type to filter by (e.g., {@link ResourcePolicy#TYPE_SUBMISSION},
+     *                 {@link ResourcePolicy#TYPE_WORKFLOW}, {@link ResourcePolicy#TYPE_CUSTOM},
+     *                 {@link ResourcePolicy#TYPE_INHERITED})
+     * @return a list of ResourcePolicy objects matching all specified criteria; returns an empty list
+     *         if no matching policies are found
+     * @throws SQLException if a database error occurs during the query
+     */
     public List<ResourcePolicy> findByDSoAndActionAndType(Context c, DSpaceObject o, int actionId, String type)
         throws SQLException;
 
@@ -246,16 +262,5 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
 
     public ResourcePolicy findOneById(Context context, Integer id) throws SQLException;
 
-    /**
-     * Return a list of date valid policy owners for a list of object that match the
-     * action.
-     *
-     * @param  c            context
-     * @param  dsoIds       DSpaceObject ids policies relate to
-     * @param  actionID     action (defined in class Constants)
-     * @return              list of resource policies
-     * @throws SQLException if there's a database problem
-     */
-    List<ResourcePolicyOwnerVO> findValidPolicyOwners(Context c, List<UUID> dsoIds, int actionID) throws SQLException;
 
 }

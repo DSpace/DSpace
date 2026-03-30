@@ -194,8 +194,8 @@
         <step-definition id="owner" mandatory="true">
             <heading>submit.progressbar.describe.owner</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
-        <type>submission-form</type>
-
+            <type>submission-form</type>
+        </step-definition>
         <!-- This optional step may enrich the current submission using information extracted
              from uploaded files or metadata.  -->
         <!-- Please note that this step will be triggered only when a request is performed,
