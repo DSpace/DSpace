@@ -83,6 +83,7 @@ import org.dspace.supervision.SupervisionOrder;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -119,12 +120,16 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
     }
 
+    @AfterEach
     @Override
     public void destroy() throws Exception {
-        context.turnOffAuthorisationSystem();
-        configurationService.setProperty("discovery.highlights.escape-html", escapeHTML);
-        context.restoreAuthSystemState();
-        super.destroy();
+        try {
+            context.turnOffAuthorisationSystem();
+            configurationService.setProperty("discovery.highlights.escape-html", escapeHTML);
+            context.restoreAuthSystemState();
+        } finally {
+            super.destroy();
+        }
     }
 
     @Test

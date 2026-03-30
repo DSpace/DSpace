@@ -8,7 +8,7 @@
 
 package org.dspace.content;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -32,16 +32,16 @@ import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.services.ConfigurationService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DuplicateDetectionServiceImplTest {
 
     @Mock
@@ -63,7 +63,7 @@ public class DuplicateDetectionServiceImplTest {
     @InjectMocks
     DuplicateDetectionServiceImpl duplicateDetectionService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(context.getCurrentLocale()).thenReturn(Locale.GERMAN);
     }
@@ -179,15 +179,15 @@ public class DuplicateDetectionServiceImplTest {
             List<List<DuplicateComparison>> duplicateComparisons =
                 duplicateDetectionService.buildComparisonValueGroups(context, item);
 
-            assertEquals("Two groups were created", 2, duplicateComparisons.size());
-            assertEquals("Group 1 has 2 members", 2, duplicateComparisons.get(0).size());
-            assertEquals("Title value in group 1 is as expected", "thisisawonderfultitle",
-                duplicateComparisons.get(0).get(0).value());
-            assertEquals("Author value in group 1 is as expected", "johndoe",
-                duplicateComparisons.get(0).get(1).value());
-            assertEquals("Group 2 has 1 member", 1, duplicateComparisons.get(1).size());
-            assertEquals("Custom value in group 2 is as expected", "isvariantformofxxxxxx/13",
-                duplicateComparisons.get(1).get(0).value());
+            assertEquals(2, duplicateComparisons.size(), "Two groups were created");
+            assertEquals(2, duplicateComparisons.get(0).size(), "Group 1 has 2 members");
+            assertEquals("thisisawonderfultitle",
+                duplicateComparisons.get(0).get(0).value(), "Title value in group 1 is as expected");
+            assertEquals("johndoe",
+                duplicateComparisons.get(0).get(1).value(), "Author value in group 1 is as expected");
+            assertEquals(1, duplicateComparisons.get(1).size(), "Group 2 has 1 member");
+            assertEquals("isvariantformofxxxxxx/13",
+                duplicateComparisons.get(1).get(0).value(), "Custom value in group 2 is as expected");
         }
     }
 }

@@ -7,9 +7,10 @@
  */
 package org.dspace.app.customurl.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -26,8 +27,8 @@ import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.utils.DSpace;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Comprehensive unit tests for {@link CustomUrlServiceImpl}.
@@ -41,7 +42,8 @@ public class CustomUrlServiceImplIT extends AbstractIntegrationTestWithDatabase 
     private final IndexingService indexingService = new DSpace().getSingletonService(IndexingService.class);
     private Collection collection;
 
-    @Before
+    @BeforeEach
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();
@@ -71,7 +73,7 @@ public class CustomUrlServiceImplIT extends AbstractIntegrationTestWithDatabase 
         assertFalse(customUrlService.findItemByCustomUrl(context, null).isPresent());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testFindItemByCustomUrl_ThrowsExceptionOnDuplicates() throws Exception {
         context.turnOffAuthorisationSystem();
         Item item1 = ItemBuilder.createItem(context, collection).build();
@@ -82,7 +84,8 @@ public class CustomUrlServiceImplIT extends AbstractIntegrationTestWithDatabase 
         reindexItem(item1);
         reindexItem(item2);
 
-        customUrlService.findItemByCustomUrl(context, "duplicate");
+        assertThrows(IllegalStateException.class, () ->
+            customUrlService.findItemByCustomUrl(context, "duplicate"));
     }
 
     @Test
@@ -107,35 +110,40 @@ public class CustomUrlServiceImplIT extends AbstractIntegrationTestWithDatabase 
         assertEquals("resume-with-accents", customUrlService.generateUniqueCustomUrl(context, "Résumé with Accénts"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGenerateUniqueCustomUrl_ThrowsExceptionOnNull() {
-        customUrlService.generateUniqueCustomUrl(context, null);
+        assertThrows(IllegalArgumentException.class, () ->
+            customUrlService.generateUniqueCustomUrl(context, null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGenerateUniqueCustomUrl_ThrowsExceptionOnBlank() {
-        customUrlService.generateUniqueCustomUrl(context, "   ");
+        assertThrows(IllegalArgumentException.class, () ->
+            customUrlService.generateUniqueCustomUrl(context, "   "));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGenerateUniqueCustomUrl_ThrowsExceptionOnPureNonLatin() {
         // This string contains ONLY characters that are stripped by [^a-z0-9]
         // Resulting slug is empty -> Should throw exception
-        customUrlService.generateUniqueCustomUrl(context, "测试文章标题");
+        assertThrows(IllegalArgumentException.class, () ->
+            customUrlService.generateUniqueCustomUrl(context, "测试文章标题"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGenerateUniqueCustomUrl_ThrowsExceptionOnPureSymbols() {
         // Resulting slug is empty -> Should throw exception
-        customUrlService.generateUniqueCustomUrl(context, "∑∫∞±≤≥");
+        assertThrows(IllegalArgumentException.class, () ->
+            customUrlService.generateUniqueCustomUrl(context, "∑∫∞±≤≥"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGenerateUniqueCustomUrl_ThrowsExceptionOnPureEmoji() {
-        customUrlService.generateUniqueCustomUrl(context, "🌍🌡️📊");
+        assertThrows(IllegalArgumentException.class, () ->
+            customUrlService.generateUniqueCustomUrl(context, "🌍🌡️📊"));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testGenerateUniqueCustomUrl_ThrowsExceptionOnOverflow() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -160,7 +168,8 @@ public class CustomUrlServiceImplIT extends AbstractIntegrationTestWithDatabase 
 
         // 4. Attempt generation
         // This calls findLatest -> gets MAX_VALUE -> tries to add +1 -> Throws Exception
-        customUrlService.generateUniqueCustomUrl(context, baseUrl);
+        assertThrows(IllegalStateException.class, () ->
+            customUrlService.generateUniqueCustomUrl(context, baseUrl));
     }
 
     @Test
@@ -214,14 +223,15 @@ public class CustomUrlServiceImplIT extends AbstractIntegrationTestWithDatabase 
         assertEquals("different", remaining.get(0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testDeleteOldCustomUrlByIndex_OutOfBounds() {
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection).build();
         customUrlService.addOldCustomUrl(context, item, "old-1");
         context.restoreAuthSystemState();
 
-        customUrlService.deleteOldCustomUrlByIndex(context, item, 5);
+        assertThrows(IllegalArgumentException.class, () ->
+            customUrlService.deleteOldCustomUrlByIndex(context, item, 5));
     }
 
     @Test
