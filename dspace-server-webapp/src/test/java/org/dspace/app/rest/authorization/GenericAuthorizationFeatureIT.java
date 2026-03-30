@@ -205,26 +205,6 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
                 .withName("item1AdminGroup")
                 .addMember(item1Admin)
                 .build();
-            ResourcePolicyBuilder.createResourcePolicy(
-                    context, null, item1AdminGroup)
-                .withDspaceObject(item1)
-                .withAction(Constants.ADMIN)
-                .build();
-            ResourcePolicyBuilder.createResourcePolicy(
-                    context, communityAWriter, null)
-                .withDspaceObject(communityA)
-                .withAction(Constants.WRITE)
-                .build();
-            ResourcePolicyBuilder.createResourcePolicy(
-                    context, collectionXWriter, null)
-                .withDspaceObject(collectionX)
-                .withAction(Constants.WRITE)
-                .build();
-            ResourcePolicyBuilder.createResourcePolicy(
-                    context, item1Writer, null)
-                .withDspaceObject(item1)
-                .withAction(Constants.WRITE)
-                .build();
 
             communityB = CommunityBuilder.createCommunity(context)
                 .withName("communityB")
@@ -310,7 +290,11 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         }
 
         // Create bundles and bitstreams per test (cleaned up by
-        // AbstractBuilder after each test)
+        // AbstractBuilder after each test). Bundles must be created
+        // BEFORE the WRITE/ADMIN ResourcePolicies below, because
+        // addBundle() inherits the item's current policies. Creating
+        // policies first would cause bundles to inherit WRITE
+        // permissions that the tests expect NOT to be present.
         context.turnOffAuthorisationSystem();
         bundle1 = BundleBuilder.createBundle(context, item1)
             .withName("bundle1")
@@ -334,6 +318,31 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
                 .withMimeType("text/plain")
                 .build();
         }
+
+        // Add per-test ResourcePolicies for ADMIN and WRITE. These
+        // are recreated each test (and cleaned up by builders) to
+        // match the original test setup order where bundles were
+        // created before these policies existed.
+        ResourcePolicyBuilder.createResourcePolicy(
+                context, null, item1AdminGroup)
+            .withDspaceObject(item1)
+            .withAction(Constants.ADMIN)
+            .build();
+        ResourcePolicyBuilder.createResourcePolicy(
+                context, communityAWriter, null)
+            .withDspaceObject(communityA)
+            .withAction(Constants.WRITE)
+            .build();
+        ResourcePolicyBuilder.createResourcePolicy(
+                context, collectionXWriter, null)
+            .withDspaceObject(collectionX)
+            .withAction(Constants.WRITE)
+            .build();
+        ResourcePolicyBuilder.createResourcePolicy(
+                context, item1Writer, null)
+            .withDspaceObject(item1)
+            .withAction(Constants.WRITE)
+            .build();
         context.restoreAuthSystemState();
 
         // Reload eperson into current session to avoid stale proxy

@@ -143,6 +143,13 @@ public class CanSeeVersionsFeatureIT extends AbstractControllerIntegrationTest {
         // Create bundle and bitstream per test (cleaned up by
         // AbstractBuilder after each test)
         context.turnOffAuthorisationSystem();
+
+        // Restore default policies on the shared item. Tests that
+        // call removeAllPolicies() strip policies that subsequent
+        // tests depend on.
+        authorizeService.removeAllPolicies(context, itemA);
+        itemService.inheritCollectionDefaultPolicies(
+            context, itemA, collectionA);
         bundleA = BundleBuilder.createBundle(context, itemA)
             .withName("ORIGINAL")
             .build();

@@ -172,6 +172,10 @@ public class ViewWorkflowStatisticsFeatureIT extends AbstractControllerIntegrati
         }
         context.restoreAuthSystemState();
 
+        // Reload site into current session (may be detached after
+        // context.commit() in the first-test branch)
+        site = siteService.findSite(context);
+
         siteRest = siteConverter.convert(site, Projection.DEFAULT);
         communityARest = communityConverter.convert(
             communityA, Projection.DEFAULT);

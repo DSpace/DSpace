@@ -52,6 +52,10 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexingService;
+import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.discovery.indexobject.IndexableCommunity;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
@@ -99,6 +103,9 @@ public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTes
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private IndexingService indexingService;
 
     private EPerson userA;
     private Community communityA;
@@ -176,6 +183,21 @@ public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTes
             collectionB = collectionService.find(context,
                 collectionBId);
             itemA = itemService.find(context, itemAId);
+
+            // Re-index shared fixtures in Solr (cleared by
+            // @AfterEach destroy())
+            indexingService.indexContent(context,
+                new IndexableCommunity(communityA),
+                true, false);
+            indexingService.indexContent(context,
+                new IndexableCollection(collectionA),
+                true, false);
+            indexingService.indexContent(context,
+                new IndexableCollection(collectionB),
+                true, false);
+            indexingService.indexContent(context,
+                new IndexableItem(itemA),
+                true, true);
         }
 
         // Reload eperson into current session
@@ -341,8 +363,12 @@ public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTes
     @SuppressWarnings("unchecked")
     public void canManageMappingsWithUserThatCanManageTwoCollectionsTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        authorizeService.addPolicy(context, collectionA, Constants.ADD, userA);
-        authorizeService.addPolicy(context, collectionB, Constants.ADD, userA);
+        ResourcePolicyBuilder.createResourcePolicy(context, userA, null)
+                             .withDspaceObject(collectionA)
+                             .withAction(Constants.ADD).build();
+        ResourcePolicyBuilder.createResourcePolicy(context, userA, null)
+                             .withDspaceObject(collectionB)
+                             .withAction(Constants.ADD).build();
         context.restoreAuthSystemState();
 
         ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);

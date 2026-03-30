@@ -277,12 +277,22 @@ public class CanManageBitstreamBundlesFeatureIT extends AbstractControllerIntegr
     public void checkCanCreateVersionsFeatureTest() throws Exception {
         context.turnOffAuthorisationSystem();
         //permissions for userA
-        authorizeService.addPolicy(context, itemA, Constants.ADD, userA);
-        authorizeService.addPolicy(context, itemA, Constants.REMOVE, userA);
+        ResourcePolicyBuilder.createResourcePolicy(context, userA, null)
+                             .withDspaceObject(itemA)
+                             .withAction(Constants.ADD).build();
+        ResourcePolicyBuilder.createResourcePolicy(context, userA, null)
+                             .withDspaceObject(itemA)
+                             .withAction(Constants.REMOVE).build();
         // permissions for userB
-        authorizeService.addPolicy(context, itemA, Constants.REMOVE, userB);
-        authorizeService.addPolicy(context, itemB, Constants.REMOVE, userB);
-        authorizeService.addPolicy(context, itemB, Constants.ADD, userB);
+        ResourcePolicyBuilder.createResourcePolicy(context, userB, null)
+                             .withDspaceObject(itemA)
+                             .withAction(Constants.REMOVE).build();
+        ResourcePolicyBuilder.createResourcePolicy(context, userB, null)
+                             .withDspaceObject(itemB)
+                             .withAction(Constants.REMOVE).build();
+        ResourcePolicyBuilder.createResourcePolicy(context, userB, null)
+                             .withDspaceObject(itemB)
+                             .withAction(Constants.ADD).build();
 
         context.restoreAuthSystemState();
 
