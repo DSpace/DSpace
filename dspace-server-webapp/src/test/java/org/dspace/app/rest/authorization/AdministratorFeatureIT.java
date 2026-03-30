@@ -11,7 +11,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import org.dspace.app.rest.authorization.impl.AdministratorOfFeature;
 import org.dspace.app.rest.converter.CollectionConverter;
@@ -25,8 +27,7 @@ import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
@@ -36,18 +37,28 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.SiteService;
+import org.dspace.core.Context;
+import org.dspace.discovery.IndexingService;
+import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.discovery.indexobject.IndexableCommunity;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Test suite for the administrator feature
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  *
  */
@@ -58,9 +69,15 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
     @Autowired
     GroupService groupService;
     @Autowired
-    AuthorizeService authService;
+    private EPersonService ePersonService;
     @Autowired
-    CommunityService communityService;
+    private CommunityService communityService;
+    @Autowired
+    private CollectionService collectionService;
+    @Autowired
+    private ItemService itemService;
+    @Autowired
+    private IndexingService indexingService;
     @Autowired
     private ItemConverter itemConverter;
     @Autowired
@@ -87,8 +104,26 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
     private Item itemInCollectionA;
     private Item itemInCollectionB;
 
+    // Static UUIDs for reloading shared fixtures across test instances
+    private static UUID adminComAId;
+    private static UUID adminComBId;
+    private static UUID adminColAId;
+    private static UUID adminColBId;
+    private static UUID adminItemAId;
+    private static UUID adminItemBId;
+    private static UUID communityAId;
+    private static UUID subCommunityOfAId;
+    private static UUID communityBId;
+    private static UUID collectionAId;
+    private static UUID collectionBId;
+    private static UUID itemInCollectionAId;
+    private static UUID itemInCollectionBId;
+    private static boolean sharedFixturesCreated = false;
 
-    /** 
+    // Auth token cache: shared fixtures persist across tests so JWT tokens remain valid
+    private static final Map<String, String> authTokenCache = new HashMap<>();
+
+    /**
      * this hold a reference to the test feature {@link AdministratorOfFeature}
      */
     private AuthorizationFeature administratorFeature;
@@ -99,78 +134,197 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
         super.setUp();
         siteService = ContentServiceFactory.getInstance().getSiteService();
         administratorFeature = authorizationFeatureService.find(AdministratorOfFeature.NAME);
-        initAdminsAndObjects();
+
+        if (!sharedFixturesCreated) {
+            // Create shared fixtures once on the first test
+            context.turnOffAuthorisationSystem();
+
+            adminComA = EPersonBuilder.createEPerson(context)
+                                      .withEmail("adminComA@example.com")
+                                      .withPassword(password)
+                                      .build();
+
+            adminComB = EPersonBuilder.createEPerson(context)
+                                      .withEmail("adminComB@example.com")
+                                      .withPassword(password)
+                                      .build();
+
+            adminColA = EPersonBuilder.createEPerson(context)
+                                      .withEmail("adminColA@example.com")
+                                      .withPassword(password)
+                                      .build();
+
+            adminColB = EPersonBuilder.createEPerson(context)
+                                      .withEmail("adminColB@example.com")
+                                      .withPassword(password)
+                                      .build();
+
+            adminItemA = EPersonBuilder.createEPerson(context)
+                                       .withEmail("adminItemA@example.com")
+                                       .withPassword(password)
+                                       .build();
+
+            adminItemB = EPersonBuilder.createEPerson(context)
+                                       .withEmail("adminItemB@example.com")
+                                       .withPassword(password)
+                                       .build();
+
+            communityA = CommunityBuilder.createCommunity(context)
+                                         .withName("Community A")
+                                         .withAdminGroup(adminComA)
+                                         .build();
+
+            subCommunityOfA = CommunityBuilder.createSubCommunity(context, communityA)
+                                              .withName("Sub Community of CommunityA")
+                                              .build();
+
+            communityB = CommunityBuilder.createCommunity(context)
+                                         .withName("Community B")
+                                         .withAdminGroup(adminComB)
+                                         .build();
+
+            collectionA = CollectionBuilder.createCollection(context, subCommunityOfA)
+                                           .withName("Collection A")
+                                           .withAdminGroup(adminColA)
+                                           .build();
+
+            collectionB = CollectionBuilder.createCollection(context, communityB)
+                                           .withName("Collection B")
+                                           .withAdminGroup(adminColB)
+                                           .build();
+
+            itemInCollectionA = ItemBuilder.createItem(context, collectionA)
+                                           .withTitle("Item in Collection A")
+                                           .withAdminUser(adminItemA)
+                                           .build();
+
+            itemInCollectionB = ItemBuilder.createItem(context, collectionB)
+                                           .withTitle("Item in Collection B")
+                                           .withAdminUser(adminItemB)
+                                           .build();
+
+            context.restoreAuthSystemState();
+
+            // Store UUIDs for reloading into subsequent test contexts
+            adminComAId = adminComA.getID();
+            adminComBId = adminComB.getID();
+            adminColAId = adminColA.getID();
+            adminColBId = adminColB.getID();
+            adminItemAId = adminItemA.getID();
+            adminItemBId = adminItemB.getID();
+            communityAId = communityA.getID();
+            subCommunityOfAId = subCommunityOfA.getID();
+            communityBId = communityB.getID();
+            collectionAId = collectionA.getID();
+            collectionBId = collectionB.getID();
+            itemInCollectionAId = itemInCollectionA.getID();
+            itemInCollectionBId = itemInCollectionB.getID();
+
+            // Commit shared fixtures to the database
+            context.commit();
+
+            // Deregister shared fixtures from builder auto-cleanup so that
+            // @AfterEach destroy() does not delete them after this test
+            AbstractBuilder.cleanupBuilderCache();
+            sharedFixturesCreated = true;
+        } else {
+            // Reload shared fixtures from UUIDs into the current test's Context
+            adminComA = ePersonService.find(context, adminComAId);
+            adminComB = ePersonService.find(context, adminComBId);
+            adminColA = ePersonService.find(context, adminColAId);
+            adminColB = ePersonService.find(context, adminColBId);
+            adminItemA = ePersonService.find(context, adminItemAId);
+            adminItemB = ePersonService.find(context, adminItemBId);
+            communityA = communityService.find(context, communityAId);
+            subCommunityOfA = communityService.find(context, subCommunityOfAId);
+            communityB = communityService.find(context, communityBId);
+            collectionA = collectionService.find(context, collectionAId);
+            collectionB = collectionService.find(context, collectionBId);
+            itemInCollectionA = itemService.find(context, itemInCollectionAId);
+            itemInCollectionB = itemService.find(context, itemInCollectionBId);
+
+            // Re-index shared fixtures in Solr (the mock Solr index is
+            // cleared by @AfterEach destroy()). This is necessary because
+            // authorization checks may query Solr.
+            indexingService.indexContent(
+                context, new IndexableCommunity(communityA),
+                true, false);
+            indexingService.indexContent(
+                context, new IndexableCommunity(subCommunityOfA),
+                true, false);
+            indexingService.indexContent(
+                context, new IndexableCommunity(communityB),
+                true, false);
+            indexingService.indexContent(
+                context, new IndexableCollection(collectionA),
+                true, false);
+            indexingService.indexContent(
+                context, new IndexableCollection(collectionB),
+                true, false);
+            indexingService.indexContent(
+                context, new IndexableItem(itemInCollectionA),
+                true, false);
+            indexingService.indexContent(
+                context, new IndexableItem(itemInCollectionB),
+                true, true);
+        }
+
+        // Reload eperson into current session to avoid stale proxy
+        // issues when prior test classes leave detached state
+        eperson = context.reloadEntity(eperson);
     }
 
-    private void initAdminsAndObjects() throws SQLException, AuthorizeException {
-        context.turnOffAuthorisationSystem();
+    /**
+     * Clean up shared fixtures after all tests have completed.
+     * Deletes communities (cascades to collections/items), then EPersons.
+     */
+    @AfterAll
+    public static void tearDownSharedFixtures() throws Exception {
+        if (!sharedFixturesCreated) {
+            return;
+        }
+        Context ctx = new Context(Context.Mode.READ_WRITE);
+        ctx.turnOffAuthorisationSystem();
 
+        CommunityService comService =
+            ContentServiceFactory.getInstance().getCommunityService();
+        EPersonService epService =
+            EPersonServiceFactory.getInstance().getEPersonService();
 
-        adminComA = EPersonBuilder.createEPerson(context)
-                                  .withEmail("adminComA@example.com")
-                                  .withPassword(password)
-                                  .build();
+        // Delete communities (cascades to sub-communities, collections, items)
+        Community comA = comService.find(ctx, communityAId);
+        if (comA != null) {
+            comService.delete(ctx, comA);
+        }
+        Community comB = comService.find(ctx, communityBId);
+        if (comB != null) {
+            comService.delete(ctx, comB);
+        }
 
-        adminComB = EPersonBuilder.createEPerson(context)
-                                  .withEmail("adminComB@example.com")
-                                  .withPassword(password)
-                                  .build();
+        for (UUID id : new UUID[]{adminComAId, adminComBId, adminColAId,
+            adminColBId, adminItemAId, adminItemBId}) {
+            EPerson ep = epService.find(ctx, id);
+            if (ep != null) {
+                epService.delete(ctx, ep);
+            }
+        }
 
-        adminColA = EPersonBuilder.createEPerson(context)
-                                  .withEmail("adminColA@example.com")
-                                  .withPassword(password)
-                                  .build();
+        ctx.complete();
+        sharedFixturesCreated = false;
+        authTokenCache.clear();
+    }
 
-        adminColB = EPersonBuilder.createEPerson(context)
-                                  .withEmail("adminColB@example.com")
-                                  .withPassword(password)
-                                  .build();
+    // -------------------------------------------------------------------------
+    // Helper methods
+    // -------------------------------------------------------------------------
 
-        adminItemA = EPersonBuilder.createEPerson(context)
-                                   .withEmail("adminItemA@example.com")
-                                   .withPassword(password)
-                                   .build();
-
-        adminItemB = EPersonBuilder.createEPerson(context)
-                                   .withEmail("adminItemB@example.com")
-                                   .withPassword(password)
-                                   .build();
-
-        communityA = CommunityBuilder.createCommunity(context)
-                                     .withName("Community A")
-                                     .withAdminGroup(adminComA)
-                                     .build();
-
-        subCommunityOfA = CommunityBuilder.createSubCommunity(context, communityA)
-                                          .withName("Sub Community of CommunityA")
-                                          .build();
-
-        communityB = CommunityBuilder.createCommunity(context)
-                                     .withName("Community B")
-                                     .withAdminGroup(adminComB)
-                                     .build();
-
-        collectionA = CollectionBuilder.createCollection(context, subCommunityOfA)
-                                       .withName("Collection A")
-                                       .withAdminGroup(adminColA)
-                                       .build();
-
-        collectionB = CollectionBuilder.createCollection(context, communityB)
-                                       .withName("Collection B")
-                                       .withAdminGroup(adminColB)
-                                       .build();
-
-        itemInCollectionA = ItemBuilder.createItem(context, collectionA)
-                                       .withTitle("Item in Collection A")
-                                       .withAdminUser(adminItemA)
-                                       .build();
-
-        itemInCollectionB = ItemBuilder.createItem(context, collectionB)
-                                       .withTitle("Item in Collection B")
-                                       .withAdminUser(adminItemB)
-                                       .build();
-
-        context.restoreAuthSystemState();
+    private String getCachedAuthToken(String email) throws Exception {
+        String token = authTokenCache.get(email);
+        if (token == null) {
+            token = getAuthToken(email, password);
+            authTokenCache.put(email, token);
+        }
+        return token;
     }
 
     @Test
@@ -180,9 +334,9 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
         CommunityRest SubCommunityOfARest = communityConverter.convert(subCommunityOfA, DefaultProjection.DEFAULT);
 
         // tokens
-        String tokenAdminComA = getAuthToken(adminComA.getEmail(), password);
-        String tokenAdminComB = getAuthToken(adminComB.getEmail(), password);
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenAdminComA = getCachedAuthToken(adminComA.getEmail());
+        String tokenAdminComB = getCachedAuthToken(adminComB.getEmail());
+        String tokenAdmin = getCachedAuthToken(admin.getEmail());
 
         // define authorizations that we know must exists
         Authorization authAdminSiteComA = new Authorization(admin, administratorFeature, communityRestA);
@@ -240,11 +394,11 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
         CollectionRest collectionRestA = collectionConverter.convert(collectionA, DefaultProjection.DEFAULT);
         CollectionRest collectionRestB = collectionConverter.convert(collectionB, DefaultProjection.DEFAULT);
 
-        String tokenAdminColA = getAuthToken(adminColA.getEmail(), password);
-        String tokenAdminColB = getAuthToken(adminColB.getEmail(), password);
-        String tokenAdminComA = getAuthToken(adminComA.getEmail(), password);
-        String tokenAdminComB = getAuthToken(adminComB.getEmail(), password);
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenAdminColA = getCachedAuthToken(adminColA.getEmail());
+        String tokenAdminColB = getCachedAuthToken(adminColB.getEmail());
+        String tokenAdminComA = getCachedAuthToken(adminComA.getEmail());
+        String tokenAdminComB = getCachedAuthToken(adminComB.getEmail());
+        String tokenAdmin = getCachedAuthToken(admin.getEmail());
 
         // define authorizations that we know must exists
 
@@ -316,7 +470,7 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
 
         // tokens
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenAdmin = getCachedAuthToken(admin.getEmail());
 
         // define authorizations of Admin that we know must exists
         Authorization authAdminSite = new Authorization(admin, administratorFeature, siteRest);
@@ -357,13 +511,13 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
         ItemRest itemRestA = itemConverter.convert(itemInCollectionA, DefaultProjection.DEFAULT);
         ItemRest itemRestB = itemConverter.convert(itemInCollectionB, DefaultProjection.DEFAULT);
 
-        String tokenAdminItemA = getAuthToken(adminItemA.getEmail(), password);
-        String tokenAdminItemB = getAuthToken(adminItemB.getEmail(), password);
-        String tokenAdminColA = getAuthToken(adminColA.getEmail(), password);
-        String tokenAdminColB = getAuthToken(adminColB.getEmail(), password);
-        String tokenAdminComA = getAuthToken(adminComA.getEmail(), password);
-        String tokenAdminComB = getAuthToken(adminComB.getEmail(), password);
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenAdminItemA = getCachedAuthToken(adminItemA.getEmail());
+        String tokenAdminItemB = getCachedAuthToken(adminItemB.getEmail());
+        String tokenAdminColA = getCachedAuthToken(adminColA.getEmail());
+        String tokenAdminColB = getCachedAuthToken(adminColB.getEmail());
+        String tokenAdminComA = getCachedAuthToken(adminComA.getEmail());
+        String tokenAdminComB = getCachedAuthToken(adminComB.getEmail());
+        String tokenAdmin = getCachedAuthToken(admin.getEmail());
 
         // define authorizations that we know must exists
 

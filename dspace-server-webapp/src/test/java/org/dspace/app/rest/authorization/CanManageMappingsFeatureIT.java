@@ -14,6 +14,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
@@ -30,6 +33,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
@@ -42,15 +46,27 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Test for the canManageMappings authorization feature.
+ * <p>
+ * Shared test fixtures are created once on the first test's
+ * {@code @BeforeEach} and reused across all tests via static UUID fields.
+ * </p>
  */
 public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTest {
 
@@ -72,6 +88,18 @@ public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTes
     @Autowired
     private AuthorizationFeatureService authorizationFeatureService;
 
+    @Autowired
+    private EPersonService ePersonService;
+
+    @Autowired
+    private CommunityService communityService;
+
+    @Autowired
+    private CollectionService collectionService;
+
+    @Autowired
+    private ItemService itemService;
+
     private EPerson userA;
     private Community communityA;
     private Collection collectionA;
@@ -85,47 +113,142 @@ public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTes
 
     final String feature = "canManageMappings";
 
+    // Static UUIDs for reloading shared fixtures
+    private static UUID userAId;
+    private static UUID communityAId;
+    private static UUID collectionAId;
+    private static UUID collectionBId;
+    private static UUID itemAId;
+    private static boolean sharedFixturesCreated = false;
+
+    private static final Map<String, String> authTokenCache =
+        new HashMap<>();
+
     @Override
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        context.turnOffAuthorisationSystem();
 
-        userA = EPersonBuilder.createEPerson(context)
+        canManageMappingsFeature = authorizationFeatureService
+            .find(CanManageMappingsFeature.NAME);
+
+        if (!sharedFixturesCreated) {
+            context.turnOffAuthorisationSystem();
+
+            userA = EPersonBuilder.createEPerson(context)
                 .withEmail("userEmail@test.com")
                 .withPassword(password).build();
 
-        communityA = CommunityBuilder.createCommunity(context)
-            .withName("communityA")
-            .build();
-        collectionA = CollectionBuilder.createCollection(context, communityA)
-            .withName("collectionA")
-            .build();
-        collectionB = CollectionBuilder.createCollection(context, communityA)
+            communityA = CommunityBuilder.createCommunity(context)
+                .withName("communityA")
+                .build();
+            collectionA = CollectionBuilder
+                .createCollection(context, communityA)
+                .withName("collectionA")
+                .build();
+            collectionB = CollectionBuilder
+                .createCollection(context, communityA)
                 .withName("collectionB")
                 .build();
-        itemA = ItemBuilder.createItem(context, collectionA)
-            .withTitle("itemA")
-            .build();
+            itemA = ItemBuilder.createItem(context, collectionA)
+                .withTitle("itemA")
+                .build();
+
+            context.restoreAuthSystemState();
+
+            // Store UUIDs for reloading
+            userAId = userA.getID();
+            communityAId = communityA.getID();
+            collectionAId = collectionA.getID();
+            collectionBId = collectionB.getID();
+            itemAId = itemA.getID();
+
+            context.commit();
+            AbstractBuilder.cleanupBuilderCache();
+            sharedFixturesCreated = true;
+        } else {
+            // Reload shared fixtures from UUIDs
+            userA = ePersonService.find(context, userAId);
+            communityA = communityService.find(context,
+                communityAId);
+            collectionA = collectionService.find(context,
+                collectionAId);
+            collectionB = collectionService.find(context,
+                collectionBId);
+            itemA = itemService.find(context, itemAId);
+        }
+
+        // Reload eperson into current session
+        eperson = context.reloadEntity(eperson);
+
+        // Create bundle and bitstream per test (cleaned up by
+        // AbstractBuilder after each test)
+        context.turnOffAuthorisationSystem();
         bundleA = BundleBuilder.createBundle(context, itemA)
             .withName("ORIGINAL")
             .build();
         String bitstreamContent = "Dummy content";
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstreamA = BitstreamBuilder.createBitstream(context, bundleA, is)
+        try (InputStream is = IOUtils.toInputStream(
+                bitstreamContent, CharEncoding.UTF_8)) {
+            bitstreamA = BitstreamBuilder
+                .createBitstream(context, bundleA, is)
                 .withName("bistreamA")
                 .build();
         }
-        canManageMappingsFeature = authorizationFeatureService.find(CanManageMappingsFeature.NAME);
         context.restoreAuthSystemState();
 
-        collectionARest = collectionConverter.convert(collectionA, Projection.DEFAULT);
-        bitstreamARest = bitstreamConverter.convert(bitstreamA, Projection.DEFAULT);
+        // Convert to REST representations (needs session-attached
+        // entities)
+        collectionARest = collectionConverter.convert(
+            collectionA, Projection.DEFAULT);
+        bitstreamARest = bitstreamConverter.convert(
+            bitstreamA, Projection.DEFAULT);
+    }
+
+    /**
+     * Clean up shared fixtures after all tests have completed.
+     */
+    @AfterAll
+    public static void tearDownSharedFixtures() throws Exception {
+        if (!sharedFixturesCreated) {
+            return;
+        }
+        Context ctx = new Context(Context.Mode.READ_WRITE);
+        ctx.turnOffAuthorisationSystem();
+
+        org.dspace.content.service.CommunityService comService =
+            ContentServiceFactory.getInstance()
+                .getCommunityService();
+        EPersonService epService =
+            EPersonServiceFactory.getInstance().getEPersonService();
+
+        Community com = comService.find(ctx, communityAId);
+        if (com != null) {
+            comService.delete(ctx, com);
+        }
+        EPerson ep = epService.find(ctx, userAId);
+        if (ep != null) {
+            epService.delete(ctx, ep);
+        }
+
+        ctx.complete();
+        sharedFixturesCreated = false;
+        authTokenCache.clear();
+    }
+
+    private String getCachedAuthToken(String email)
+        throws Exception {
+        String token = authTokenCache.get(email);
+        if (token == null) {
+            token = getAuthToken(email, password);
+            authTokenCache.put(email, token);
+        }
+        return token;
     }
 
     @Test
     public void adminCollectionAdminSuccess() throws Exception {
-        String adminToken = getAuthToken(admin.getEmail(), password);
+        String adminToken = getCachedAuthToken(admin.getEmail());
         getClient(adminToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -138,7 +261,7 @@ public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTes
 
     @Test
     public void epersonCollectionNotFound() throws Exception {
-        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        String epersonToken = getCachedAuthToken(eperson.getEmail());
         getClient(epersonToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -160,7 +283,7 @@ public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTes
             .withAction(Constants.WRITE)
             .build();
 
-        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        String epersonToken = getCachedAuthToken(eperson.getEmail());
         getClient(epersonToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -178,7 +301,7 @@ public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTes
             .withAction(Constants.ADMIN)
             .build();
 
-        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        String epersonToken = getCachedAuthToken(eperson.getEmail());
         getClient(epersonToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -203,7 +326,7 @@ public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTes
 
     @Test
     public void adminBitstreamNotFound() throws Exception {
-        String adminToken = getAuthToken(admin.getEmail(), password);
+        String adminToken = getCachedAuthToken(admin.getEmail());
         getClient(adminToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -224,9 +347,9 @@ public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTes
 
         ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
 
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        String tokenAUser = getAuthToken(userA.getEmail(), password);
-        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        String tokenAdmin = getCachedAuthToken(admin.getEmail());
+        String tokenAUser = getCachedAuthToken(userA.getEmail());
+        String tokenEPerson = getCachedAuthToken(eperson.getEmail());
 
         // define authorizations that we know must exists
         Authorization admin2ItemA = new Authorization(admin, canManageMappingsFeature, itemRestA);
@@ -256,8 +379,8 @@ public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTes
     public void canManageMappingsOnlyAdminHasAccessTest() throws Exception {
         ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
 
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        String tokenAUser = getAuthToken(userA.getEmail(), password);
+        String tokenAdmin = getCachedAuthToken(admin.getEmail());
+        String tokenAUser = getCachedAuthToken(userA.getEmail());
 
         // define authorizations that we know must exists
         Authorization admin2ItemA = new Authorization(admin, canManageMappingsFeature, itemRestA);

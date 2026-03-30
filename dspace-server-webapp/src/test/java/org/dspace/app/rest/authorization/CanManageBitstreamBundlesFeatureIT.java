@@ -10,6 +10,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import org.dspace.app.rest.authorization.impl.CanManageBitstreamBundlesFeature;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
@@ -17,6 +21,7 @@ import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
@@ -25,17 +30,29 @@ import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.discovery.IndexingService;
+import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.discovery.indexobject.IndexableCommunity;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Test for the canManageBitstreamBundles authorization feature.
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 public class CanManageBitstreamBundlesFeatureIT extends AbstractControllerIntegrationTest {
@@ -52,6 +69,21 @@ public class CanManageBitstreamBundlesFeatureIT extends AbstractControllerIntegr
     @Autowired
     private AuthorizationFeatureService authorizationFeatureService;
 
+    @Autowired
+    private EPersonService ePersonService;
+
+    @Autowired
+    private CommunityService communityService;
+
+    @Autowired
+    private CollectionService collectionService;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private IndexingService indexingService;
+
     private Item itemA;
     private Item itemB;
     private EPerson userA;
@@ -66,53 +98,178 @@ public class CanManageBitstreamBundlesFeatureIT extends AbstractControllerIntegr
 
     final String feature = "canManageBitstreamBundles";
 
+    // Static UUIDs for reloading shared fixtures across test instances
+    private static UUID userAId;
+    private static UUID userBId;
+    private static UUID userColAadminId;
+    private static UUID userColBadminId;
+    private static UUID userComAdminId;
+    private static UUID communityAId;
+    private static UUID collectionAId;
+    private static UUID collectionBId;
+    private static UUID itemAId;
+    private static UUID itemBId;
+    private static boolean sharedFixturesCreated = false;
+
+    // Auth token cache: shared fixtures persist across tests so JWT tokens remain valid
+    private static final Map<String, String> authTokenCache = new HashMap<>();
+
     @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        context.turnOffAuthorisationSystem();
 
-        canManageBitstreamBundlesFeature = authorizationFeatureService.find(CanManageBitstreamBundlesFeature.NAME);
+        canManageBitstreamBundlesFeature = authorizationFeatureService
+            .find(CanManageBitstreamBundlesFeature.NAME);
 
-        userA = EPersonBuilder.createEPerson(context)
-                             .withEmail("userEmail@test.com")
-                             .withPassword(password).build();
+        if (!sharedFixturesCreated) {
+            // Create shared fixtures once on the first test
+            context.turnOffAuthorisationSystem();
 
-        userB = EPersonBuilder.createEPerson(context)
-                              .withEmail("userB.email@test.com")
-                              .withPassword(password).build();
+            userA = EPersonBuilder.createEPerson(context)
+                                 .withEmail("userEmail@test.com")
+                                 .withPassword(password).build();
 
-        userColAadmin = EPersonBuilder.createEPerson(context)
-                                     .withEmail("userColAadmin@test.com")
-                                     .withPassword(password).build();
+            userB = EPersonBuilder.createEPerson(context)
+                                  .withEmail("userB.email@test.com")
+                                  .withPassword(password).build();
 
-        userColBadmin = EPersonBuilder.createEPerson(context)
-                                      .withEmail("userColBadmin@test.com")
-                                      .withPassword(password).build();
+            userColAadmin = EPersonBuilder.createEPerson(context)
+                                         .withEmail("userColAadmin@test.com")
+                                         .withPassword(password).build();
 
-        userComAdmin = EPersonBuilder.createEPerson(context)
-                                     .withEmail("userComAdmin@test.com")
-                                     .withPassword(password).build();
+            userColBadmin = EPersonBuilder.createEPerson(context)
+                                          .withEmail("userColBadmin@test.com")
+                                          .withPassword(password).build();
 
-        communityA = CommunityBuilder.createCommunity(context)
-                                     .withName("communityA")
-                                     .withAdminGroup(userComAdmin).build();
+            userComAdmin = EPersonBuilder.createEPerson(context)
+                                         .withEmail("userComAdmin@test.com")
+                                         .withPassword(password).build();
 
-        collectionA = CollectionBuilder.createCollection(context, communityA)
-                                       .withName("Collection A")
-                                       .withAdminGroup(userColAadmin).build();
+            communityA = CommunityBuilder.createCommunity(context)
+                                         .withName("communityA")
+                                         .withAdminGroup(userComAdmin).build();
 
-        collectionB = CollectionBuilder.createCollection(context, communityA)
-                                       .withName("Collection B")
-                                       .withAdminGroup(userColBadmin).build();
+            collectionA = CollectionBuilder
+                .createCollection(context, communityA)
+                .withName("Collection A")
+                .withAdminGroup(userColAadmin).build();
 
-        itemA = ItemBuilder.createItem(context, collectionA)
-                           .withTitle("Item A").build();
+            collectionB = CollectionBuilder
+                .createCollection(context, communityA)
+                .withName("Collection B")
+                .withAdminGroup(userColBadmin).build();
 
-        itemB = ItemBuilder.createItem(context, collectionB)
-                           .withTitle("Item B").build();
-        context.restoreAuthSystemState();
+            itemA = ItemBuilder.createItem(context, collectionA)
+                               .withTitle("Item A").build();
 
+            itemB = ItemBuilder.createItem(context, collectionB)
+                               .withTitle("Item B").build();
+
+            context.restoreAuthSystemState();
+
+            // Store UUIDs for reloading into subsequent test contexts
+            userAId = userA.getID();
+            userBId = userB.getID();
+            userColAadminId = userColAadmin.getID();
+            userColBadminId = userColBadmin.getID();
+            userComAdminId = userComAdmin.getID();
+            communityAId = communityA.getID();
+            collectionAId = collectionA.getID();
+            collectionBId = collectionB.getID();
+            itemAId = itemA.getID();
+            itemBId = itemB.getID();
+
+            // Commit shared fixtures to the database
+            context.commit();
+
+            // Deregister shared fixtures from builder auto-cleanup so that
+            // @AfterEach destroy() does not delete them after this test
+            AbstractBuilder.cleanupBuilderCache();
+            sharedFixturesCreated = true;
+        } else {
+            // Reload shared fixtures from UUIDs into the current test's Context
+            userA = ePersonService.find(context, userAId);
+            userB = ePersonService.find(context, userBId);
+            userColAadmin = ePersonService.find(context, userColAadminId);
+            userColBadmin = ePersonService.find(context, userColBadminId);
+            userComAdmin = ePersonService.find(context, userComAdminId);
+            communityA = communityService.find(context, communityAId);
+            collectionA = collectionService.find(context, collectionAId);
+            collectionB = collectionService.find(context, collectionBId);
+            itemA = itemService.find(context, itemAId);
+            itemB = itemService.find(context, itemBId);
+
+            // Re-index shared fixtures in Solr (the mock Solr index is
+            // cleared by @AfterEach destroy())
+            indexingService.indexContent(
+                context, new IndexableCommunity(communityA),
+                true, false);
+            indexingService.indexContent(
+                context, new IndexableCollection(collectionA),
+                true, false);
+            indexingService.indexContent(
+                context, new IndexableCollection(collectionB),
+                true, false);
+            indexingService.indexContent(
+                context, new IndexableItem(itemA),
+                true, false);
+            indexingService.indexContent(
+                context, new IndexableItem(itemB),
+                true, true);
+        }
+
+        // Reload eperson into current session to avoid stale proxy
+        // issues when prior test classes leave detached state
+        eperson = context.reloadEntity(eperson);
+    }
+
+    /**
+     * Clean up shared fixtures after all tests have completed.
+     * Deletes communities (cascades to collections and items),
+     * then epersons.
+     */
+    @AfterAll
+    public static void tearDownSharedFixtures() throws Exception {
+        if (!sharedFixturesCreated) {
+            return;
+        }
+        Context ctx = new Context(Context.Mode.READ_WRITE);
+        ctx.turnOffAuthorisationSystem();
+
+        CommunityService comService =
+            ContentServiceFactory.getInstance().getCommunityService();
+        EPersonService epService =
+            EPersonServiceFactory.getInstance().getEPersonService();
+
+        Community com = comService.find(ctx, communityAId);
+        if (com != null) {
+            comService.delete(ctx, com);
+        }
+        for (UUID id : new UUID[]{userAId, userBId, userColAadminId,
+            userColBadminId, userComAdminId}) {
+            EPerson ep = epService.find(ctx, id);
+            if (ep != null) {
+                epService.delete(ctx, ep);
+            }
+        }
+
+        ctx.complete();
+        sharedFixturesCreated = false;
+        authTokenCache.clear();
+    }
+
+    // -------------------------------------------------------------------------
+    // Helper methods
+    // -------------------------------------------------------------------------
+
+    private String getCachedAuthToken(String email) throws Exception {
+        String token = authTokenCache.get(email);
+        if (token == null) {
+            token = getAuthToken(email, password);
+            authTokenCache.put(email, token);
+        }
+        return token;
     }
 
     @Test
@@ -132,13 +289,13 @@ public class CanManageBitstreamBundlesFeatureIT extends AbstractControllerIntegr
         ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
         ItemRest itemRestB = itemConverter.convert(itemB, DefaultProjection.DEFAULT);
 
-        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        String tokenAUser = getAuthToken(userA.getEmail(), password);
-        String tokenBUser = getAuthToken(userB.getEmail(), password);
-        String tokenComAdmin = getAuthToken(userComAdmin.getEmail(), password);
-        String tokenColAadmin = getAuthToken(userColAadmin.getEmail(), password);
-        String tokenColBadmin = getAuthToken(userColBadmin.getEmail(), password);
+        String tokenEPerson = getCachedAuthToken(eperson.getEmail());
+        String tokenAdmin = getCachedAuthToken(admin.getEmail());
+        String tokenAUser = getCachedAuthToken(userA.getEmail());
+        String tokenBUser = getCachedAuthToken(userB.getEmail());
+        String tokenComAdmin = getCachedAuthToken(userComAdmin.getEmail());
+        String tokenColAadmin = getCachedAuthToken(userColAadmin.getEmail());
+        String tokenColBadmin = getCachedAuthToken(userColBadmin.getEmail());
 
         // define authorizations that we know must exists
         Authorization admin2ItemA = new Authorization(admin, canManageBitstreamBundlesFeature, itemRestA);
@@ -225,10 +382,10 @@ public class CanManageBitstreamBundlesFeatureIT extends AbstractControllerIntegr
 
         ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
 
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        String tokenAUser = getAuthToken(userA.getEmail(), password);
-        String tokenComAdmin = getAuthToken(userComAdmin.getEmail(), password);
-        String tokenColAadmin = getAuthToken(userColAadmin.getEmail(), password);
+        String tokenAdmin = getCachedAuthToken(admin.getEmail());
+        String tokenAUser = getCachedAuthToken(userA.getEmail());
+        String tokenComAdmin = getCachedAuthToken(userComAdmin.getEmail());
+        String tokenColAadmin = getCachedAuthToken(userColAadmin.getEmail());
 
         // define authorizations that we know must exists
         Authorization admin2ItemA = new Authorization(admin, canManageBitstreamBundlesFeature, itemRestA);
@@ -268,10 +425,10 @@ public class CanManageBitstreamBundlesFeatureIT extends AbstractControllerIntegr
 
         ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
 
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        String tokenAUser = getAuthToken(userA.getEmail(), password);
-        String tokenComAdmin = getAuthToken(userComAdmin.getEmail(), password);
-        String tokenColAadmin = getAuthToken(userColAadmin.getEmail(), password);
+        String tokenAdmin = getCachedAuthToken(admin.getEmail());
+        String tokenAUser = getCachedAuthToken(userA.getEmail());
+        String tokenComAdmin = getCachedAuthToken(userComAdmin.getEmail());
+        String tokenColAadmin = getCachedAuthToken(userColAadmin.getEmail());
 
         // define authorizations that we know must exists
         Authorization admin2ItemA = new Authorization(admin, canManageBitstreamBundlesFeature, itemRestA);
@@ -314,11 +471,11 @@ public class CanManageBitstreamBundlesFeatureIT extends AbstractControllerIntegr
         ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
         ItemRest itemRestB = itemConverter.convert(itemB, DefaultProjection.DEFAULT);
 
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        String tokenAUser = getAuthToken(userA.getEmail(), password);
-        String tokenComAdmin = getAuthToken(userComAdmin.getEmail(), password);
-        String tokenColAadmin = getAuthToken(userColAadmin.getEmail(), password);
-        String tokenColBadmin = getAuthToken(userColBadmin.getEmail(), password);
+        String tokenAdmin = getCachedAuthToken(admin.getEmail());
+        String tokenAUser = getCachedAuthToken(userA.getEmail());
+        String tokenComAdmin = getCachedAuthToken(userComAdmin.getEmail());
+        String tokenColAadmin = getCachedAuthToken(userColAadmin.getEmail());
+        String tokenColBadmin = getCachedAuthToken(userColBadmin.getEmail());
 
         // define authorizations that we know must exists
         Authorization admin2ItemA = new Authorization(admin, canManageBitstreamBundlesFeature, itemRestA);
@@ -374,11 +531,11 @@ public class CanManageBitstreamBundlesFeatureIT extends AbstractControllerIntegr
         ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
         ItemRest itemRestB = itemConverter.convert(itemB, DefaultProjection.DEFAULT);
 
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        String tokenAUser = getAuthToken(userA.getEmail(), password);
-        String tokenComAdmin = getAuthToken(userComAdmin.getEmail(), password);
-        String tokenColAadmin = getAuthToken(userColAadmin.getEmail(), password);
-        String tokenColBadmin = getAuthToken(userColBadmin.getEmail(), password);
+        String tokenAdmin = getCachedAuthToken(admin.getEmail());
+        String tokenAUser = getCachedAuthToken(userA.getEmail());
+        String tokenComAdmin = getCachedAuthToken(userComAdmin.getEmail());
+        String tokenColAadmin = getCachedAuthToken(userColAadmin.getEmail());
+        String tokenColBadmin = getCachedAuthToken(userColBadmin.getEmail());
 
         // define authorizations that we know must exists
         Authorization admin2ItemA = new Authorization(admin, canManageBitstreamBundlesFeature, itemRestA);
@@ -436,11 +593,11 @@ public class CanManageBitstreamBundlesFeatureIT extends AbstractControllerIntegr
         ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
         ItemRest itemRestB = itemConverter.convert(itemB, DefaultProjection.DEFAULT);
 
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        String tokenAUser = getAuthToken(userA.getEmail(), password);
-        String tokenComAdmin = getAuthToken(userComAdmin.getEmail(), password);
-        String tokenColAadmin = getAuthToken(userColAadmin.getEmail(), password);
-        String tokenColBadmin = getAuthToken(userColBadmin.getEmail(), password);
+        String tokenAdmin = getCachedAuthToken(admin.getEmail());
+        String tokenAUser = getCachedAuthToken(userA.getEmail());
+        String tokenComAdmin = getCachedAuthToken(userComAdmin.getEmail());
+        String tokenColAadmin = getCachedAuthToken(userColAadmin.getEmail());
+        String tokenColBadmin = getCachedAuthToken(userColBadmin.getEmail());
 
         // define authorizations that we know must exists
         Authorization admin2ItemA = new Authorization(admin, canManageBitstreamBundlesFeature, itemRestA);
@@ -496,11 +653,11 @@ public class CanManageBitstreamBundlesFeatureIT extends AbstractControllerIntegr
         ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
         ItemRest itemRestB = itemConverter.convert(itemB, DefaultProjection.DEFAULT);
 
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        String tokenAUser = getAuthToken(userA.getEmail(), password);
-        String tokenComAdmin = getAuthToken(userComAdmin.getEmail(), password);
-        String tokenColAadmin = getAuthToken(userColAadmin.getEmail(), password);
-        String tokenColBadmin = getAuthToken(userColBadmin.getEmail(), password);
+        String tokenAdmin = getCachedAuthToken(admin.getEmail());
+        String tokenAUser = getCachedAuthToken(userA.getEmail());
+        String tokenComAdmin = getCachedAuthToken(userComAdmin.getEmail());
+        String tokenColAadmin = getCachedAuthToken(userColAadmin.getEmail());
+        String tokenColBadmin = getCachedAuthToken(userColBadmin.getEmail());
 
         // define authorizations that we know must exists
         Authorization admin2ItemA = new Authorization(admin, canManageBitstreamBundlesFeature, itemRestA);

@@ -12,11 +12,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
@@ -31,10 +35,22 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.discovery.IndexingService;
+import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.discovery.indexobject.IndexableCommunity;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +67,13 @@ import org.springframework.test.web.servlet.ResultActions;
  *     canReorderBitstreams
  *     canCreateBitstream
  *     canCreateBundle
+ *
+ * <p>
+ * Shared test fixtures are created once on the first test's
+ * {@code @BeforeEach} and reused across all tests via static UUID fields.
+ * Per-test state (temporary EPersons, ResourcePolicies) is created and
+ * cleaned up normally per test.
+ * </p>
  */
 public class GenericAuthorizationFeatureIT extends AbstractControllerIntegrationTest {
 
@@ -58,6 +81,24 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
 
     @Autowired
     ConfigurationService configurationService;
+
+    @Autowired
+    private EPersonService ePersonService;
+
+    @Autowired
+    private CommunityService communityService;
+
+    @Autowired
+    private CollectionService collectionService;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private GroupService groupService;
+
+    @Autowired
+    private IndexingService indexingService;
 
     private Community communityA;
     private Community communityAA;
@@ -81,130 +122,290 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
     private EPerson collectionXWriter;
     private EPerson item1Writer;
 
+    // Static UUIDs for reloading shared fixtures across test instances
+    private static UUID communityAId;
+    private static UUID communityAAId;
+    private static UUID communityBId;
+    private static UUID communityBBId;
+    private static UUID collectionXId;
+    private static UUID collectionYId;
+    private static UUID item1Id;
+    private static UUID item2Id;
+    private static UUID item1AdminGroupId;
+    private static UUID communityAAdminId;
+    private static UUID collectionXAdminId;
+    private static UUID item1AdminId;
+    private static UUID communityAWriterId;
+    private static UUID collectionXWriterId;
+    private static UUID item1WriterId;
+    private static boolean sharedFixturesCreated = false;
+
+    // Auth token cache: shared fixtures persist across tests so JWT tokens remain valid
+    private static final Map<String, String> authTokenCache = new HashMap<>();
+
     @Override
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
 
+        if (!sharedFixturesCreated) {
+            context.turnOffAuthorisationSystem();
+
+            communityAAdmin = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Jhon", "Brown")
+                .withEmail("communityAAdmin@my.edu")
+                .withPassword(password)
+                .build();
+            collectionXAdmin = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Jhon", "Brown")
+                .withEmail("collectionXAdmin@my.edu")
+                .withPassword(password)
+                .build();
+            item1Admin = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Jhon", "Brown")
+                .withEmail("item1Admin@my.edu")
+                .withPassword(password)
+                .build();
+            communityAWriter = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Jhon", "Brown")
+                .withEmail("communityAWriter@my.edu")
+                .withPassword(password)
+                .build();
+            collectionXWriter = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Jhon", "Brown")
+                .withEmail("collectionXWriter@my.edu")
+                .withPassword(password)
+                .build();
+            item1Writer = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Jhon", "Brown")
+                .withEmail("item1Writer@my.edu")
+                .withPassword(password)
+                .build();
+
+            communityA = CommunityBuilder.createCommunity(context)
+                .withName("communityA")
+                .withAdminGroup(communityAAdmin)
+                .build();
+            communityAA = CommunityBuilder.createCommunity(context)
+                .withName("communityAA")
+                .addParentCommunity(context, communityA)
+                .build();
+            collectionX = CollectionBuilder.createCollection(context, communityAA)
+                .withName("collectionX")
+                .withAdminGroup(collectionXAdmin)
+                .build();
+            item1 = ItemBuilder.createItem(context, collectionX)
+                .withTitle("item1")
+                .withIssueDate("2020-07-08")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("item1Entry")
+                .build();
+
+            item1AdminGroup = GroupBuilder.createGroup(context)
+                .withName("item1AdminGroup")
+                .addMember(item1Admin)
+                .build();
+            ResourcePolicyBuilder.createResourcePolicy(
+                    context, null, item1AdminGroup)
+                .withDspaceObject(item1)
+                .withAction(Constants.ADMIN)
+                .build();
+            ResourcePolicyBuilder.createResourcePolicy(
+                    context, communityAWriter, null)
+                .withDspaceObject(communityA)
+                .withAction(Constants.WRITE)
+                .build();
+            ResourcePolicyBuilder.createResourcePolicy(
+                    context, collectionXWriter, null)
+                .withDspaceObject(collectionX)
+                .withAction(Constants.WRITE)
+                .build();
+            ResourcePolicyBuilder.createResourcePolicy(
+                    context, item1Writer, null)
+                .withDspaceObject(item1)
+                .withAction(Constants.WRITE)
+                .build();
+
+            communityB = CommunityBuilder.createCommunity(context)
+                .withName("communityB")
+                .build();
+            communityBB = CommunityBuilder.createCommunity(context)
+                .withName("communityBB")
+                .addParentCommunity(context, communityB)
+                .build();
+            collectionY = CollectionBuilder
+                .createCollection(context, communityBB)
+                .withName("collectionY")
+                .build();
+            item2 = ItemBuilder.createItem(context, collectionY)
+                .withTitle("item2")
+                .withIssueDate("2020-07-08")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("item2Entry")
+                .build();
+
+            context.restoreAuthSystemState();
+
+            // Store UUIDs for reloading into subsequent test contexts
+            communityAAdminId = communityAAdmin.getID();
+            collectionXAdminId = collectionXAdmin.getID();
+            item1AdminId = item1Admin.getID();
+            communityAWriterId = communityAWriter.getID();
+            collectionXWriterId = collectionXWriter.getID();
+            item1WriterId = item1Writer.getID();
+            communityAId = communityA.getID();
+            communityAAId = communityAA.getID();
+            communityBId = communityB.getID();
+            communityBBId = communityBB.getID();
+            collectionXId = collectionX.getID();
+            collectionYId = collectionY.getID();
+            item1Id = item1.getID();
+            item2Id = item2.getID();
+            item1AdminGroupId = item1AdminGroup.getID();
+
+            context.commit();
+            AbstractBuilder.cleanupBuilderCache();
+            sharedFixturesCreated = true;
+        } else {
+            // Reload shared fixtures from UUIDs into the current
+            // test's Context
+            communityAAdmin = ePersonService.find(context,
+                communityAAdminId);
+            collectionXAdmin = ePersonService.find(context,
+                collectionXAdminId);
+            item1Admin = ePersonService.find(context, item1AdminId);
+            communityAWriter = ePersonService.find(context,
+                communityAWriterId);
+            collectionXWriter = ePersonService.find(context,
+                collectionXWriterId);
+            item1Writer = ePersonService.find(context, item1WriterId);
+            communityA = communityService.find(context, communityAId);
+            communityAA = communityService.find(context, communityAAId);
+            communityB = communityService.find(context, communityBId);
+            communityBB = communityService.find(context, communityBBId);
+            collectionX = collectionService.find(context, collectionXId);
+            collectionY = collectionService.find(context, collectionYId);
+            item1 = itemService.find(context, item1Id);
+            item2 = itemService.find(context, item2Id);
+            item1AdminGroup = groupService.find(context,
+                item1AdminGroupId);
+
+            // Re-index shared fixtures in Solr (cleared by @AfterEach)
+            indexingService.indexContent(context,
+                new IndexableCommunity(communityA), true, false);
+            indexingService.indexContent(context,
+                new IndexableCommunity(communityAA), true, false);
+            indexingService.indexContent(context,
+                new IndexableCommunity(communityB), true, false);
+            indexingService.indexContent(context,
+                new IndexableCommunity(communityBB), true, false);
+            indexingService.indexContent(context,
+                new IndexableCollection(collectionX), true, false);
+            indexingService.indexContent(context,
+                new IndexableCollection(collectionY), true, false);
+            indexingService.indexContent(context,
+                new IndexableItem(item1), true, false);
+            indexingService.indexContent(context,
+                new IndexableItem(item2), true, true);
+        }
+
+        // Create bundles and bitstreams per test (cleaned up by
+        // AbstractBuilder after each test)
         context.turnOffAuthorisationSystem();
-
-        communityAAdmin = EPersonBuilder.createEPerson(context)
-            .withNameInMetadata("Jhon", "Brown")
-            .withEmail("communityAAdmin@my.edu")
-            .withPassword(password)
-            .build();
-        collectionXAdmin = EPersonBuilder.createEPerson(context)
-            .withNameInMetadata("Jhon", "Brown")
-            .withEmail("collectionXAdmin@my.edu")
-            .withPassword(password)
-            .build();
-        item1Admin = EPersonBuilder.createEPerson(context)
-            .withNameInMetadata("Jhon", "Brown")
-            .withEmail("item1Admin@my.edu")
-            .withPassword(password)
-            .build();
-        communityAWriter = EPersonBuilder.createEPerson(context)
-            .withNameInMetadata("Jhon", "Brown")
-            .withEmail("communityAWriter@my.edu")
-            .withPassword(password)
-            .build();
-        collectionXWriter = EPersonBuilder.createEPerson(context)
-            .withNameInMetadata("Jhon", "Brown")
-            .withEmail("collectionXWriter@my.edu")
-            .withPassword(password)
-            .build();
-        item1Writer = EPersonBuilder.createEPerson(context)
-            .withNameInMetadata("Jhon", "Brown")
-            .withEmail("item1Writer@my.edu")
-            .withPassword(password)
-            .build();
-
-        communityA = CommunityBuilder.createCommunity(context)
-            .withName("communityA")
-            .withAdminGroup(communityAAdmin)
-            .build();
-        communityAA = CommunityBuilder.createCommunity(context)
-            .withName("communityAA")
-            .addParentCommunity(context, communityA)
-            .build();
-        collectionX = CollectionBuilder.createCollection(context, communityAA)
-            .withName("collectionX")
-            .withAdminGroup(collectionXAdmin)
-            .build();
-        item1 = ItemBuilder.createItem(context, collectionX)
-            .withTitle("item1")
-            .withIssueDate("2020-07-08")
-            .withAuthor("Smith, Donald").withAuthor("Doe, John")
-            .withSubject("item1Entry")
-            .build();
         bundle1 = BundleBuilder.createBundle(context, item1)
             .withName("bundle1")
             .build();
-        try (InputStream is = IOUtils.toInputStream("randomContent", CharEncoding.UTF_8)) {
-            bitstream1 = BitstreamBuilder.createBitstream(context, bundle1, is)
+        try (InputStream is = IOUtils.toInputStream(
+                "randomContent", CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder
+                .createBitstream(context, bundle1, is)
                 .withName("bitstream1")
                 .withMimeType("text/plain")
                 .build();
         }
-
-        item1AdminGroup = GroupBuilder.createGroup(context)
-            .withName("item1AdminGroup")
-            .addMember(item1Admin)
-            .build();
-        ResourcePolicyBuilder.createResourcePolicy(context, null, item1AdminGroup)
-            .withDspaceObject(item1)
-            .withAction(Constants.ADMIN)
-            .build();
-        ResourcePolicyBuilder.createResourcePolicy(context, communityAWriter, null)
-            .withDspaceObject(communityA)
-            .withAction(Constants.WRITE)
-            .build();
-        ResourcePolicyBuilder.createResourcePolicy(context, collectionXWriter, null)
-            .withDspaceObject(collectionX)
-            .withAction(Constants.WRITE)
-            .build();
-        ResourcePolicyBuilder.createResourcePolicy(context, item1Writer, null)
-            .withDspaceObject(item1)
-            .withAction(Constants.WRITE)
-            .build();
-
-        communityB = CommunityBuilder.createCommunity(context)
-            .withName("communityB")
-            .build();
-        communityBB = CommunityBuilder.createCommunity(context)
-            .withName("communityBB")
-            .addParentCommunity(context, communityB)
-            .build();
-        collectionY = CollectionBuilder.createCollection(context, communityBB)
-            .withName("collectionY")
-            .build();
-        item2 = ItemBuilder.createItem(context, collectionY)
-            .withTitle("item2")
-            .withIssueDate("2020-07-08")
-            .withAuthor("Smith, Donald").withAuthor("Doe, John")
-            .withSubject("item2Entry")
-            .build();
         bundle2 = BundleBuilder.createBundle(context, item2)
             .withName("bundle2")
             .build();
-        try (InputStream is = IOUtils.toInputStream("randomContent", CharEncoding.UTF_8)) {
-            bitstream2 = BitstreamBuilder.createBitstream(context, bundle2, is)
+        try (InputStream is = IOUtils.toInputStream(
+                "randomContent", CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder
+                .createBitstream(context, bundle2, is)
                 .withName("bitstream2")
                 .withMimeType("text/plain")
                 .build();
         }
-
         context.restoreAuthSystemState();
 
+        // Reload eperson into current session to avoid stale proxy
+        eperson = context.reloadEntity(eperson);
+
         configurationService.setProperty(
-            "org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", "true");
+            "org.dspace.app.rest.authorization"
+                + ".AlwaysThrowExceptionFeature.turnoff",
+            "true");
+    }
+
+    /**
+     * Clean up shared fixtures after all tests have completed.
+     */
+    @AfterAll
+    public static void tearDownSharedFixtures() throws Exception {
+        if (!sharedFixturesCreated) {
+            return;
+        }
+        Context ctx = new Context(Context.Mode.READ_WRITE);
+        ctx.turnOffAuthorisationSystem();
+
+        org.dspace.content.service.CommunityService comService =
+            ContentServiceFactory.getInstance().getCommunityService();
+        EPersonService epService =
+            EPersonServiceFactory.getInstance().getEPersonService();
+        GroupService grpService =
+            EPersonServiceFactory.getInstance().getGroupService();
+
+        // Delete communities (cascades items, collections, etc.)
+        Community comA = comService.find(ctx, communityAId);
+        if (comA != null) {
+            comService.delete(ctx, comA);
+        }
+        Community comB = comService.find(ctx, communityBId);
+        if (comB != null) {
+            comService.delete(ctx, comB);
+        }
+        // Delete the standalone group
+        Group grp = grpService.find(ctx, item1AdminGroupId);
+        if (grp != null) {
+            grpService.delete(ctx, grp);
+        }
+        // Delete EPersons
+        for (UUID id : new UUID[]{communityAAdminId,
+            collectionXAdminId, item1AdminId, communityAWriterId,
+            collectionXWriterId, item1WriterId}) {
+            EPerson ep = epService.find(ctx, id);
+            if (ep != null) {
+                epService.delete(ctx, ep);
+            }
+        }
+
+        ctx.complete();
+        sharedFixturesCreated = false;
+        authTokenCache.clear();
+    }
+
+    private String getCachedAuthToken(String email) throws Exception {
+        String token = authTokenCache.get(email);
+        if (token == null) {
+            token = getAuthToken(email, password);
+            authTokenCache.put(email, token);
+        }
+        return token;
     }
 
     private void testAdminsHavePermissionsAllDso(String feature) throws Exception {
-        String adminToken = getAuthToken(admin.getEmail(), password);
-        String communityAAdminToken = getAuthToken(communityAAdmin.getEmail(), password);
-        String collectionXAdminToken = getAuthToken(collectionXAdmin.getEmail(), password);
-        String item1AdminToken = getAuthToken(item1Admin.getEmail(), password);
+        String adminToken = getCachedAuthToken(admin.getEmail());
+        String communityAAdminToken = getCachedAuthToken(communityAAdmin.getEmail());
+        String collectionXAdminToken = getCachedAuthToken(collectionXAdmin.getEmail());
+        String item1AdminToken = getCachedAuthToken(item1Admin.getEmail());
         String siteId = ContentServiceFactory.getInstance().getSiteService().findSite(context).getID().toString();
 
         // Verify the general admin has this feature on the site
@@ -371,10 +572,10 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
     }
 
     private void testAdminsHavePermissionsItem(String feature) throws Exception {
-        String adminToken = getAuthToken(admin.getEmail(), password);
-        String communityAAdminToken = getAuthToken(communityAAdmin.getEmail(), password);
-        String collectionXAdminToken = getAuthToken(collectionXAdmin.getEmail(), password);
-        String item1AdminToken = getAuthToken(item1Admin.getEmail(), password);
+        String adminToken = getCachedAuthToken(admin.getEmail());
+        String communityAAdminToken = getCachedAuthToken(communityAAdmin.getEmail());
+        String collectionXAdminToken = getCachedAuthToken(collectionXAdmin.getEmail());
+        String item1AdminToken = getCachedAuthToken(item1Admin.getEmail());
 
         // Verify the general admin has this feature on item 1
         getAuthorizationFeatures(adminToken, "http://localhost/api/core/items/" + item1.getID())
@@ -409,9 +610,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
     }
 
     private void testWriteUsersHavePermissionsAllDso(String feature, boolean hasDSOAccess) throws Exception {
-        String communityAWriterToken = getAuthToken(communityAWriter.getEmail(), password);
-        String collectionXWriterToken = getAuthToken(collectionXWriter.getEmail(), password);
-        String item1WriterToken = getAuthToken(item1Writer.getEmail(), password);
+        String communityAWriterToken = getCachedAuthToken(communityAWriter.getEmail());
+        String collectionXWriterToken = getCachedAuthToken(collectionXWriter.getEmail());
+        String item1WriterToken = getCachedAuthToken(item1Writer.getEmail());
 
         // Verify community A write has this feature on community A if the boolean parameter is true
         // (or doesn’t have access otherwise)
@@ -565,9 +766,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
     }
 
     private void testWriteUsersHavePermissionsItem(String feature, boolean hasDSOAccess) throws Exception {
-        String communityAWriterToken = getAuthToken(communityAWriter.getEmail(), password);
-        String collectionXWriterToken = getAuthToken(collectionXWriter.getEmail(), password);
-        String item1WriterToken = getAuthToken(item1Writer.getEmail(), password);
+        String communityAWriterToken = getCachedAuthToken(communityAWriter.getEmail());
+        String collectionXWriterToken = getCachedAuthToken(collectionXWriter.getEmail());
+        String item1WriterToken = getCachedAuthToken(item1Writer.getEmail());
 
         // Verify community A write doesn’t have this feature on item 1
         getAuthorizationFeatures(communityAWriterToken, "http://localhost/api/core/items/" + item1.getID())
@@ -626,11 +827,11 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
 
     @Test
     public void testCanMoveAdmin() throws Exception {
-        String item1WriterToken = getAuthToken(item1Writer.getEmail(), password);
-        String adminToken = getAuthToken(admin.getEmail(), password);
-        String communityAAdminToken = getAuthToken(communityAAdmin.getEmail(), password);
-        String collectionXAdminToken = getAuthToken(collectionXAdmin.getEmail(), password);
-        String item1AdminToken = getAuthToken(item1Admin.getEmail(), password);
+        String item1WriterToken = getCachedAuthToken(item1Writer.getEmail());
+        String adminToken = getCachedAuthToken(admin.getEmail());
+        String communityAAdminToken = getCachedAuthToken(communityAAdmin.getEmail());
+        String collectionXAdminToken = getCachedAuthToken(collectionXAdmin.getEmail());
+        String item1AdminToken = getCachedAuthToken(item1Admin.getEmail());
         final String feature = "canMove";
 
         // Verify the general admin has this feature on item 1
@@ -692,7 +893,7 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .build();
         context.restoreAuthSystemState();
 
-        String item1WriterToken = getAuthToken(item1Writer.getEmail(), password);
+        String item1WriterToken = getCachedAuthToken(item1Writer.getEmail());
         // verify item 1 write has this feature on item 1
         getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
@@ -722,10 +923,10 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
 
     @Test
     public void testCanDeleteAdmin() throws Exception {
-        String adminToken = getAuthToken(admin.getEmail(), password);
-        String communityAAdminToken = getAuthToken(communityAAdmin.getEmail(), password);
-        String collectionXAdminToken = getAuthToken(collectionXAdmin.getEmail(), password);
-        String item1AdminToken = getAuthToken(item1Admin.getEmail(), password);
+        String adminToken = getCachedAuthToken(admin.getEmail());
+        String communityAAdminToken = getCachedAuthToken(communityAAdmin.getEmail());
+        String collectionXAdminToken = getCachedAuthToken(collectionXAdmin.getEmail());
+        String item1AdminToken = getCachedAuthToken(item1Admin.getEmail());
         String siteId = ContentServiceFactory.getInstance().getSiteService().findSite(context).getID().toString();
         final String feature = "canDelete";
 
@@ -906,8 +1107,8 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
 
     @Test
     public void testCanDeleteAdminParent() throws Exception {
-        String collectionXAdminToken = getAuthToken(collectionXAdmin.getEmail(), password);
-        String item1AdminToken = getAuthToken(item1Admin.getEmail(), password);
+        String collectionXAdminToken = getCachedAuthToken(collectionXAdmin.getEmail());
+        String item1AdminToken = getCachedAuthToken(item1Admin.getEmail());
         final String feature = "canDelete";
 
         // Create a community AA admin, grant REMOVE permissions on community A to this user
@@ -1194,10 +1395,10 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
 
     @Test
     public void testCanReorderBitstreamsAdmin() throws Exception {
-        String adminToken = getAuthToken(admin.getEmail(), password);
-        String communityAAdminToken = getAuthToken(communityAAdmin.getEmail(), password);
-        String collectionXAdminToken = getAuthToken(collectionXAdmin.getEmail(), password);
-        String item1AdminToken = getAuthToken(item1Admin.getEmail(), password);
+        String adminToken = getCachedAuthToken(admin.getEmail());
+        String communityAAdminToken = getCachedAuthToken(communityAAdmin.getEmail());
+        String collectionXAdminToken = getCachedAuthToken(collectionXAdmin.getEmail());
+        String item1AdminToken = getCachedAuthToken(item1Admin.getEmail());
         final String feature = "canReorderBitstreams";
 
         // Verify the general admin has this feature on the bundle in item 1
@@ -1233,9 +1434,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
 
     @Test
     public void testCanReorderBitstreamsWriter() throws Exception {
-        String communityAWriterToken = getAuthToken(communityAWriter.getEmail(), password);
-        String collectionXWriterToken = getAuthToken(collectionXWriter.getEmail(), password);
-        String item1WriterToken = getAuthToken(item1Writer.getEmail(), password);
+        String communityAWriterToken = getCachedAuthToken(communityAWriter.getEmail());
+        String collectionXWriterToken = getCachedAuthToken(collectionXWriter.getEmail());
+        String item1WriterToken = getCachedAuthToken(item1Writer.getEmail());
         final String feature = "canReorderBitstreams";
 
         // Verify community A write doesn’t have this feature on the bundle in item 1
@@ -1264,10 +1465,10 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
 
     @Test
     public void testCanCreateBitstreamAdmin() throws Exception {
-        String adminToken = getAuthToken(admin.getEmail(), password);
-        String communityAAdminToken = getAuthToken(communityAAdmin.getEmail(), password);
-        String collectionXAdminToken = getAuthToken(collectionXAdmin.getEmail(), password);
-        String item1AdminToken = getAuthToken(item1Admin.getEmail(), password);
+        String adminToken = getCachedAuthToken(admin.getEmail());
+        String communityAAdminToken = getCachedAuthToken(communityAAdmin.getEmail());
+        String collectionXAdminToken = getCachedAuthToken(collectionXAdmin.getEmail());
+        String item1AdminToken = getCachedAuthToken(item1Admin.getEmail());
         final String feature = "canCreateBitstream";
 
         // Verify the general admin has this feature on the bundle in item 1
@@ -1303,9 +1504,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
 
     @Test
     public void testCanCreateBitstreamWriter() throws Exception {
-        String communityAWriterToken = getAuthToken(communityAWriter.getEmail(), password);
-        String collectionXWriterToken = getAuthToken(collectionXWriter.getEmail(), password);
-        String item1WriterToken = getAuthToken(item1Writer.getEmail(), password);
+        String communityAWriterToken = getCachedAuthToken(communityAWriter.getEmail());
+        String collectionXWriterToken = getCachedAuthToken(collectionXWriter.getEmail());
+        String item1WriterToken = getCachedAuthToken(item1Writer.getEmail());
         final String feature = "canCreateBitstream";
 
         // Verify community A write doesn’t have this feature on the bundle in item 1
@@ -1404,9 +1605,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
 
     @Test
     public void testCanCreateBundleWriter() throws Exception {
-        String communityAWriterToken = getAuthToken(communityAWriter.getEmail(), password);
-        String collectionXWriterToken = getAuthToken(collectionXWriter.getEmail(), password);
-        String item1WriterToken = getAuthToken(item1Writer.getEmail(), password);
+        String communityAWriterToken = getCachedAuthToken(communityAWriter.getEmail());
+        String collectionXWriterToken = getCachedAuthToken(collectionXWriter.getEmail());
+        String item1WriterToken = getCachedAuthToken(item1Writer.getEmail());
         final String feature = "canCreateBundle";
 
         // Verify community A write doesn’t have this feature on item 1
