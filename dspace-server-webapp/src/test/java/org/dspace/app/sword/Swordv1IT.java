@@ -111,6 +111,8 @@ public class Swordv1IT extends AbstractWebClientIntegrationTest {
     @Test
     public void depositTest() throws Exception {
         context.turnOffAuthorisationSystem();
+        // Reload eperson to ensure it is attached to the current Hibernate session
+        eperson = context.reloadEntity(eperson);
         // Create a top level community and one Collection
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
