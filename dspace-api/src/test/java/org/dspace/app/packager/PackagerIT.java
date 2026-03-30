@@ -253,13 +253,13 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
         itemService.delete(context, itemService.find(context, id));
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col1, id).build();
-        installItemService.installItem(context, workspaceItem, "123456789/1000");
+        installItemService.installItem(context, workspaceItem, "123456789/1000000");
         performImportNoForceScript(resultFile);
         Iterator<Item> items = itemService.findByCollection(context, col1);
         // Find the specific item by UUID
         Item testItem = itemService.find(context, id);
         assertNotNull("Item with original UUID should exist", testItem);
-        assertNotEquals("123456789/1000", handle); // item should not have been overwritten
+        assertNotEquals("123456789/1000000", handle); // item should not have been overwritten
         assertEquals(id, testItem.getID());
         itemService.delete(context, testItem);
         context.restoreAuthSystemState();
