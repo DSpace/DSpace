@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
@@ -40,8 +41,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +100,8 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.supervision.SupervisionOrder;
+import org.dspace.validation.CclicenseValidator;
+import org.dspace.validation.LicenseValidator;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -113,6 +116,10 @@ import org.springframework.test.web.servlet.MvcResult;
  */
 public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    public static final String LICENSE_ERROR_MESSAGE_PATH =
+        "$.errors[?(@.message=='" + LicenseValidator.ERROR_VALIDATION_LICENSEREQUIRED + "')]";
+    public static final String CCLICENSE_ERROR_MESSAGE_PATH =
+        "$.errors[?(@.message=='" + CclicenseValidator.ERROR_VALIDATION_CCLICENSEREQUIRED + "')]";
     @Autowired
     private CollectionService cs;
     @Autowired
@@ -2274,6 +2281,78 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void patchUpdateNestedMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        eperson = context.reloadEntity(eperson);
+
+        //** GIVEN **
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection nestedMetadataCollection =
+            CollectionBuilder.createCollection(context, parentCommunity, "123456789/nested-metadata-test")
+                             .withName("Nested Metadata Test Collection")
+                             .build();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        context.commit();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, nestedMetadataCollection)
+                                                  .withTitle("Workspace Item 1")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        // ** WHEN **
+        // Consolidate all operations into a single list for one PATCH call
+        List<Operation> patchOperations = new ArrayList<>();
+
+        // 1. Add Author
+        Map<String, String> authorValue = new HashMap<>();
+        authorValue.put("value", "Smith, John");
+        patchOperations.add(
+            new AddOperation("/sections/publicationStepGroup/dc.contributor.author", Arrays.asList(authorValue)));
+
+        // 2. Add Editor (required for validation)
+        Map<String, String> editorValue = new HashMap<>();
+        editorValue.put("value", "Doe, Jane");
+        patchOperations.add(
+            new AddOperation("/sections/publicationStepGroup/dc.contributor.editor", Arrays.asList(editorValue)));
+
+        // 3. Add Nested Affiliation (tests recursive resolution)
+        Map<String, String> affiliationValue = new HashMap<>();
+        affiliationValue.put("value", "University of Example");
+        patchOperations.add(new AddOperation("/sections/publicationStepGroup/oairecerif.author.affiliation",
+                                             Arrays.asList(affiliationValue)));
+
+        String patchBody = getPatchContent(patchOperations);
+
+        // Perform a single PATCH call
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                         .content(patchBody)
+                                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.errors").doesNotExist());
+
+        // ** THEN **
+        // Verify that all changes have been persisted correctly
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(
+                                jsonPath("$.sections.publicationStepGroup['dc.contributor.author'][0].value").value(
+                                    "Smith, John"))
+                            .andExpect(
+                                jsonPath("$.sections.publicationStepGroup['dc.contributor.editor'][0].value").value(
+                                    "Doe, Jane"))
+                            .andExpect(jsonPath(
+                                "$.sections.publicationStepGroup['oairecerif.author.affiliation'][0].value").value(
+                                "University of Example"));
+    }
+
+    @Test
     /**
      * Test the update of metadata for fields configured with type-bind
      *
@@ -3800,9 +3879,18 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                                contains( hasJsonPath("$.paths",
-                                    contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(
+                                jsonPath(
+
+                                    LICENSE_ERROR_MESSAGE_PATH,
+                                    contains(
+                                        hasJsonPath(
+                                            "$.paths",
+                                            contains(hasJsonPath("$", is("/sections/license")))
+                                        )
+                                    )
+                                )
+                            )
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3812,9 +3900,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                    contains( hasJsonPath("$.paths",
-                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(hasJsonPath("$.paths", contains(
+                                                    hasJsonPath("$", is("/sections/license")))))))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3830,9 +3918,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                                    contains( hasJsonPath("$.paths",
-                                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(
+                                                    hasJsonPath("$.paths",
+                                                                contains(hasJsonPath("$", is("/sections/license"))))
+                                                )
+                            ))
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3842,9 +3933,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem2.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                    contains( hasJsonPath("$.paths",
-                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(hasJsonPath("$.paths", contains(
+                                                    hasJsonPath("$", is("/sections/license")))))))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3860,9 +3951,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                                contains( hasJsonPath("$.paths",
-                                    contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(
+                                                    hasJsonPath("$.paths",
+                                                                contains(hasJsonPath("$", is("/sections/license")))
+                                                    )
+                                                )
+                            ))
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3872,9 +3967,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem3.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                    contains( hasJsonPath("$.paths",
-                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(
+                                                    hasJsonPath("$.paths",
+                                                                contains(hasJsonPath("$", is("/sections/license")))
+                                                    )
+                                                )
+                            ))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3890,10 +3989,14 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(
-                                jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                                    contains( hasJsonPath("$.paths",
-                                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(
+                                                    hasJsonPath(
+                                                        "$.paths",
+                                                        contains(hasJsonPath("$", is("/sections/license")))
+                                                    )
+                                                )
+                            ))
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3903,9 +4006,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem4.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                contains( hasJsonPath("$.paths",
-                    contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(hasJsonPath("$.paths", contains(
+                                                    hasJsonPath("$", is("/sections/license")))))))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -5728,7 +5831,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // date in YYYY-MM-DD format
         DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
         // lease ends 1 day too late
-        LocalDate endDate = LocalDate.now().plus(6, ChronoUnit.MONTHS).plus(1, ChronoUnit.DAYS);
+        LocalDate endDate = LocalDate.now().plusMonths(6).plusDays(1);
         String endDateStr = dateFmt.format(endDate);
 
         // prepare patch body
@@ -5819,7 +5922,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // date in YYYY-MM-DD format
         DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
         // embargo ends 1 day too late
-        LocalDate startDate = LocalDate.now().plus(36, ChronoUnit.MONTHS).plus(1, ChronoUnit.DAYS);
+        LocalDate startDate = LocalDate.now().plusMonths(36).plusDays(1);
         String startDateStr = dateFmt.format(startDate);
 
         // prepare patch body
@@ -8170,7 +8273,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
 
         Instant date2 = Instant.parse(retrievalTime2.get());
 
-        assertTrue(date.equals(date2));
+        assertEquals(date, date2);
 
         // create a list of values to use in add operation
         List<Operation> operations = new ArrayList<>();
@@ -8212,7 +8315,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
         date2 = Instant.parse(retrievalTime2.get());
-        assertTrue(date.equals(date2));
+        assertEquals(date, date2);
     }
 
     @Test
@@ -8266,7 +8369,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
 
         Instant date2 = Instant.parse(retrievalTime2.get());
 
-        assertTrue(date.equals(date2));
+        assertEquals(date, date2);
 
         // create a list of values to use in add operation
         List<Operation> operations = new ArrayList<>();
@@ -8304,7 +8407,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
         date2 = Instant.parse(retrievalTime2.get());
-        assertTrue(date.equals(date2));
+        assertEquals(date, date2);
     }
 
     @Test
@@ -9800,6 +9903,9 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                     .andExpect(status().isCreated())
                     // cclicense is required
+                                .andExpect(jsonPath(CCLICENSE_ERROR_MESSAGE_PATH,
+                                                    contains(hasJsonPath("$.paths", contains(
+                                                        hasJsonPath("$", is("/sections/cclicense")))))))
                     .andExpect(jsonPath("$.errors[?(@.message=='error.validation.cclicense.required')]",
                             contains(
                                     hasJsonPath("$.paths", contains(

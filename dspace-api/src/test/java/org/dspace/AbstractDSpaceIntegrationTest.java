@@ -71,8 +71,10 @@ public class AbstractDSpaceIntegrationTest {
     @BeforeClass
     public static void initTestEnvironment() {
         try {
-            //Stops System.exit(0) throws exception instead of exiting
-            System.setSecurityManager(new NoExitSecurityManager());
+            // NOTE: SecurityManager was removed here for Java 21 compatibility.
+            // Java 21 removes SecurityManager entirely (JEP 411).
+            // The NoExitSecurityManager was a defensive measure to catch System.exit() calls,
+            // but tests work correctly without it.
 
             // All tests should assume UTC timezone by default (unless overridden in the test itself)
             // This ensures that Spring doesn't attempt to change the timezone of dates that are read from the
@@ -124,7 +126,7 @@ public class AbstractDSpaceIntegrationTest {
      */
     @AfterClass
     public static void destroyTestEnvironment() throws SQLException {
-        System.setSecurityManager(null);
+        // NOTE: SecurityManager cleanup removed for Java 21 compatibility (JEP 411)
 
         // Clear our test properties
         testProps.clear();

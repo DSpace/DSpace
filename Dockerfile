@@ -3,9 +3,9 @@
 #
 # - note: default tag for branch: dspace/dspace: dspace/dspace:latest
 
-# This Dockerfile uses JDK17 by default.
+# This Dockerfile uses JDK21 by default.
 # To build with other versions, use "--build-arg JDK_VERSION=[value]"
-ARG JDK_VERSION=17
+ARG JDK_VERSION=21
 # The Docker version tag to build from
 ARG DSPACE_VERSION=latest
 # The Docker registry to use for DSpace images. Defaults to "docker.io"
@@ -17,12 +17,13 @@ FROM ${DOCKER_REGISTRY}/dspace/dspace-dependencies:${DSPACE_VERSION} AS build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
+USER root
 RUN mkdir /install \
     && chown -Rv dspace: /install \
     && chown -Rv dspace: /app
 USER dspace
 # Copy the DSpace source code (from local machine) into the workdir (excluding .dockerignore contents)
-ADD --chown=dspace . /app/
+COPY --chown=dspace . /app/
 # Build DSpace
 # Copy the dspace-installer directory to /install.  Clean up the build to keep the docker image small
 # Maven flags here ensure that we skip building test environment and skip all code verification checks.
@@ -40,16 +41,11 @@ ARG TARGET_DIR=dspace-installer
 # COPY the /install directory from 'build' container to /dspace-src in this container
 COPY --from=build /install /dspace-src
 WORKDIR /dspace-src
-# Create the initial install deployment using ANT
-ENV ANT_VERSION=1.10.13
-ENV ANT_HOME=/tmp/ant-$ANT_VERSION
-ENV PATH=$ANT_HOME/bin:$PATH
-# Download and install 'ant'
-RUN mkdir $ANT_HOME && \
-    curl --silent --show-error --location --fail --retry 5 --output /tmp/apache-ant.tar.gz \
-      https://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz && \
-    tar -zx --strip-components=1 -f /tmp/apache-ant.tar.gz -C $ANT_HOME && \
-    rm /tmp/apache-ant.tar.gz
+# Install Apache Ant
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ant \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
 # Run necessary 'ant' deploy scripts
 RUN ant init_installation update_configs update_code update_webapps
 

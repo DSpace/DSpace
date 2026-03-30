@@ -30,7 +30,6 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Spring Security configuration for DSpace Server Webapp
@@ -104,7 +103,7 @@ public class WebSecurityConfiguration {
         http.securityMatcher("/api/**", "/iiif/**", actuatorBasePath + "/**", "/signposting/**")
             .authorizeHttpRequests((requests) -> requests
                 // Ensure /actuator/info endpoint is restricted to admins
-                .requestMatchers(new AntPathRequestMatcher(actuatorBasePath + "/info", HttpMethod.GET.name()))
+                .requestMatchers(HttpMethod.GET, actuatorBasePath + "/info")
                     .hasAnyAuthority(ADMIN_GRANT)
                 // All other requests should be permitted at this layer because we check permissions on each method
                 // via @PreAuthorize annotations. As this code runs first, we must permitAll() here in order to pass
@@ -141,7 +140,8 @@ public class WebSecurityConfiguration {
                 // On logout, clear the "session" salt
                 .addLogoutHandler(customLogoutHandler)
                 // Configure the logout entry point & require POST
-                .logoutRequestMatcher(new AntPathRequestMatcher("/api/authn/logout", HttpMethod.POST.name()))
+                // If CSRF protection is enabled (default in DSpace REST), a POST request is needed to trigger logout
+                .logoutUrl("/api/authn/logout")
                 // When logout is successful, return OK (204) status
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
             )

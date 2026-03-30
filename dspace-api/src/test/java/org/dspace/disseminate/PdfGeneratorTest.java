@@ -7,39 +7,89 @@
  */
 package org.dspace.disseminate;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Tests for {@link PdfGenerator}.
+ */
 public class PdfGeneratorTest {
 
-    @Test
-    public void canRenderPdf() throws Exception {
+    private PdfGenerator pdfGenerator;
+    private Map<String, String> variables;
+    private File testOutputFile;
 
-        var pdf = new PdfGenerator();
+    @Before
+    public void setUp() {
+        pdfGenerator = new PdfGenerator();
+        variables = new HashMap<>();
+        variables.put("metadata_title", "Test Title");
+        variables.put("metadata_author", "Test Author");
+        variables.put("metadata_editor", "Test Editor");
+        testOutputFile = new File("target/testCoverpage.pdf");
+    }
 
-        Map<String, String> variables = new HashMap<>();
-
-        variables.put("metadata_title", "This is my test title");
-        variables.put("metadata_author", "Author a; Author b; Author c; etc.");
-        variables.put("metadata_editor", "Editor 1; Editor 2; Editor 3; etc.");
-
-        var html = pdf.parseTemplate("dspace_coverpage", variables);
-
-        try (var page = pdf.generate(html)) {
-            assertThat(page.getNumberOfPages(), equalTo(1));
+    @After
+    public void tearDown() {
+        if (testOutputFile.exists()) {
+            testOutputFile.delete();
         }
+    }
 
-        // PDF is written to the filesystem so you can view it.
+    @Test
+    public void testParseTemplate() {
+        String html = pdfGenerator.parseTemplate("dspace_coverpage", variables);
+        assertNotNull("HTML output should not be null", html);
+        assertTrue("HTML should contain title", html.contains("Test Title"));
+        assertTrue("HTML should contain author", html.contains("Test Author"));
+        assertTrue("HTML should contain standard tags", html.contains("<html") || html.contains("<!DOCTYPE html>"));
+    }
 
-        // use e.g. entr view the PDF and restart the viewer when there are changes (https://eradman.com/entrproject/)
-        // ls testCoverpage.pdf | entr -r open testCoverpage.pdf (replace open with your pdf viewer)
+    @Test
+    public void testGeneratePDDocument() throws IOException {
+        String html = pdfGenerator.parseTemplate("dspace_coverpage", variables);
+        try (PDDocument document = pdfGenerator.generate(html)) {
+            assertNotNull("Generated PDDocument should not be null", document);
+            assertEquals("Generated PDF should have 1 page", 1, document.getNumberOfPages());
+        }
+    }
 
-        pdf.generateToFile(html, new File("target/testCoverpage.pdf"));
+    @Test
+    public void testGenerateToFile() {
+        String html = pdfGenerator.parseTemplate("dspace_coverpage", variables);
+        pdfGenerator.generateToFile(html, testOutputFile);
+
+        assertTrue("Output file should exist", testOutputFile.exists());
+        assertTrue("Output file should not be empty", testOutputFile.length() > 0);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testGenerateWithInvalidHtml() {
+        pdfGenerator.generate("<unclosed>tag");
+    }
+
+    @Test
+    public void testBlockXXE() {
+        String xxePayload = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<!DOCTYPE foo [ <!ENTITY xxe SYSTEM \"file:///etc/passwd\"> ]>" +
+                "<html><body>&xxe;</body></html>";
+
+        try {
+            pdfGenerator.generate(xxePayload);
+            throw new AssertionError("Should have blocked XXE/DOCTYPE");
+        } catch (RuntimeException e) {
+            // Expected
+        }
     }
 }

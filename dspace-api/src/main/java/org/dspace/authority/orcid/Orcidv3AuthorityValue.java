@@ -8,15 +8,13 @@
 package org.dspace.authority.orcid;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.solr.common.SolrDocument;
@@ -43,12 +41,6 @@ public class Orcidv3AuthorityValue extends PersonAuthorityValue {
      * The ORCID identifier
      */
     private String orcid_id;
-
-    /*
-     * Map containing key-value pairs filled in by "setValues(Person person)".
-     * This represents all dynamic information of the object.
-     */
-    private Map<String, List<String>> otherMetadata = new HashMap<String, List<String>>();
 
     /**
      * The syntax that the ORCID id needs to conform to
@@ -199,22 +191,6 @@ public class Orcidv3AuthorityValue extends PersonAuthorityValue {
         }
         return update;
     }
-
-    /**
-     * Add additional metadata to the otherMetadata map*/
-    public void addOtherMetadata(String label, String data) {
-        List<String> strings = otherMetadata.get(label);
-        if (strings == null) {
-            strings = new ArrayList<>();
-        }
-        strings.add(data);
-        otherMetadata.put(label, strings);
-    }
-
-    public Map<String, List<String>> getOtherMetadata() {
-        return otherMetadata;
-    }
-
 
     /**
      * Generate a solr record from this instance

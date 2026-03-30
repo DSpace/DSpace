@@ -7,11 +7,13 @@
  */
 package org.dspace.discovery;
 
+import java.util.List;
+
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.tika.utils.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.duplicatedetection.DuplicateComparison;
 import org.dspace.content.service.DuplicateDetectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -42,8 +44,8 @@ public class SolrServiceIndexComparisonPlugin implements SolrServiceIndexPlugin 
     /**
      * Index the normalised name of the item to a solr field
      *
-     * @param context DSpace context
-     * @param idxObj the indexable item
+     * @param context  DSpace context
+     * @param idxObj   the indexable item
      * @param document the Solr document
      */
     @Override
@@ -77,18 +79,18 @@ public class SolrServiceIndexComparisonPlugin implements SolrServiceIndexPlugin 
     /**
      * Add the actual comparison value field to the given solr doc
      *
-     * @param context DSpace context
-     * @param item DSpace item
+     * @param context  DSpace context
+     * @param item     DSpace item
      * @param document Solr document
      */
     private void indexItemComparisonValue(Context context, Item item, SolrInputDocument document) {
         if (item != null) {
-            // Build normalised comparison value and add to the document
-            String comparisonValue = duplicateDetectionService.buildComparisonValue(context, item);
-            if (!StringUtils.isBlank(comparisonValue)) {
-                // Add the field to the document
-                document.addField(configurationService.getProperty("duplicate.comparison.solr.field",
-                        "deduplication_keyword"), comparisonValue);
+            // Build normalised comparison values and add them to the document
+            // Group is not relevant for indexing, so the list can be flattened
+            for (DuplicateComparison comparison : duplicateDetectionService.buildComparisonValueGroups(context, item)
+                .stream().flatMap(List::stream).toList()) {
+                document.addField(DuplicateComparison.getSolrFieldPrefix(configurationService, comparison),
+                    comparison.value());
             }
         }
     }

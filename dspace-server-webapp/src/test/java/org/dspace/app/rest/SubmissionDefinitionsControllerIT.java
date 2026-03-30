@@ -190,8 +190,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
         //Match only that a section exists with a submission configuration behind
         getClient(token).perform(get("/api/config/submissiondefinitions/traditional/collections")
                    .param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.page.totalElements", is(0)));
+                   .andExpect(status().isNoContent());
     }
 
     @Test

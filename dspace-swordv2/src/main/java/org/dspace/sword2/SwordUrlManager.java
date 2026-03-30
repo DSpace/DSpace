@@ -7,6 +7,8 @@
  */
 package org.dspace.sword2;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -386,10 +388,10 @@ public class SwordUrlManager {
 
             if (handle != null && !"".equals(handle)) {
                 bsLink = bsLink + "/bitstream/" + handle + "/" +
-                    bitstream.getSequenceID() + "/" + bitstream.getName();
+                    bitstream.getSequenceID() + "/" + URLEncoder.encode(bitstream.getName(), StandardCharsets.UTF_8);
             } else {
                 bsLink = bsLink + "/retrieve/" + bitstream.getID() + "/" +
-                    bitstream.getName();
+                    URLEncoder.encode(bitstream.getName(), StandardCharsets.UTF_8);
             }
 
             return bsLink;
@@ -401,7 +403,7 @@ public class SwordUrlManager {
     public String getActionableBitstreamUrl(Bitstream bitstream)
         throws DSpaceSwordException {
         return this.getSwordBaseUrl() + "/edit-media/bitstream/" +
-            bitstream.getID() + "/" + bitstream.getName();
+            bitstream.getID() + "/" + URLEncoder.encode(bitstream.getName(), StandardCharsets.UTF_8);
     }
 
     public boolean isActionableBitstreamUrl(Context context, String url) {
