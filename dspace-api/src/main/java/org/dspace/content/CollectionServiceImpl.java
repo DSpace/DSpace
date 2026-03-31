@@ -792,7 +792,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Remove any workflow roles
         collectionRoleService.deleteByCollection(context, collection);
 
-        collection.getResourcePolicies().clear();
+        collection.clearResourcePolicies();
 
         // Remove default administrators group
         Group g = collection.getAdministrators();

@@ -67,7 +67,7 @@ public class BitstreamResourcePolicyRemovePatchOperation
                         for (ResourcePolicy policy : policies) {
                             int toDelete = Integer.parseInt(rpIdx);
                             if (index == toDelete) {
-                                b.getResourcePolicies().remove(policy);
+                                b.removeResourcePolicy(policy);
                                 bitstream = b;
                                 break;
                             }

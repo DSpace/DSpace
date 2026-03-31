@@ -266,13 +266,13 @@ public class HibernateDBConnection implements DBConnection<Session> {
                 // The metadatavalue relation has CascadeType.ALL, so they are evicted automatically
                 // and we don' need to uncache the values explicitly.
 
-                if (Hibernate.isInitialized(dso.getHandles())) {
+                if (Hibernate.isInitialized(dso.getHandlesInternal())) {
                     for (Handle handle : Utils.emptyIfNull(dso.getHandles())) {
                         uncacheEntity(handle);
                     }
                 }
 
-                if (Hibernate.isInitialized(dso.getResourcePolicies())) {
+                if (Hibernate.isInitialized(dso.getResourcePoliciesInternal())) {
                     for (ResourcePolicy policy : Utils.emptyIfNull(dso.getResourcePolicies())) {
                         uncacheEntity(policy);
                     }
