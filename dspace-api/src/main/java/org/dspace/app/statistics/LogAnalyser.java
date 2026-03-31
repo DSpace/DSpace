@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -1089,8 +1090,12 @@ public class LogAnalyser {
      * @param date the date to be converted
      * @return An Instant datetime object of the form YYYY-MM-DDTHH:MM:SSZ
      */
-    public static Instant convertDate(LocalDate date) {
-        return date.atStartOfDay(ZoneId.systemDefault()).toInstant();
+    public static Instant convertDate(LocalDate date, boolean startOfDay) {
+        if (startOfDay) {
+            return date.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        } else {
+            return date.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant();
+        }
     }
 
 
@@ -1220,13 +1225,13 @@ public class LogAnalyser {
         StringBuilder accessionedQuery = new StringBuilder();
         accessionedQuery.append("dc.date.accessioned_dt:[");
         if (startDate != null) {
-            accessionedQuery.append(convertDate(startDate));
+            accessionedQuery.append(convertDate(startDate, true));
         } else {
             accessionedQuery.append("*");
         }
         accessionedQuery.append(" TO ");
         if (endDate != null) {
-            accessionedQuery.append(convertDate(endDate));
+            accessionedQuery.append(convertDate(endDate, false));
         } else {
             accessionedQuery.append("*");
         }
