@@ -324,7 +324,6 @@ public class XSLTIngestionCrosswalk
             }
         }
 
-
         // Sanity-check the generated DIM, make sure it would load.
         Context context = new Context();
         Iterator di = dimList.iterator();
