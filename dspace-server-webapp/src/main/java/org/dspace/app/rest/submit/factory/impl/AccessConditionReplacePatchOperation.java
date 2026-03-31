@@ -77,7 +77,7 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
             // to replace an access condition with a new one
             AccessConditionDTO accessConditionDTO = evaluateSingleObject((LateObjectEvaluator) value);
             if (Objects.nonNull(accessConditionDTO) && Objects.nonNull(getOption(configuration, accessConditionDTO))) {
-                item.getResourcePolicies().remove(policies.get(idxToReplace));
+                item.removeResourcePolicy(policies.get(idxToReplace));
                 resourcePolicyService.delete(context, policies.get(idxToReplace));
                 AccessConditionOption option = getOption(configuration, accessConditionDTO);
                 option.createResourcePolicy(context, item, accessConditionDTO.getName(), null,
