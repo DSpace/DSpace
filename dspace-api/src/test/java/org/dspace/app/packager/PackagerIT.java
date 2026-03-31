@@ -24,8 +24,10 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -291,17 +293,33 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         try {
             performExportScript(article.getHandle(), tempFile);
             context.commit();
+            Item articleBefore = itemService.find(context, article.getID());
+            assertEquals(2, relationshipService.findByItem(context, articleBefore).size());
+
             List<RelationshipMetadataValue> leftList = relationshipMetadataService
-                    .getRelationshipMetadata(itemService.find(context, article.getID()), true);
-            assertThat(leftList.size(), equalTo(6));
+                    .getRelationshipMetadata(articleBefore, true);
             assertThat(leftList, hasItem(hasProperty("value", equalTo("familyName, firstName"))));
+            assertThat(leftList, hasItem(hasProperty("value", equalTo("secondFamily, secondFirst"))));
+
             String id = getID();
             performImportScript(resultFile);
-            //get the new item create by the import
             Item item2 = itemService.findByIdOrLegacyId(context, id);
+            assertNotNull(item2);
+
+            List<Relationship> relationshipsAfter = relationshipService.findByItem(context, item2);
+            assertEquals(2, relationshipsAfter.size());
+            Set<UUID> relatedPeerIds = new HashSet<>();
+            for (Relationship r : relationshipsAfter) {
+                Item left = r.getLeftItem();
+                Item right = r.getRightItem();
+                relatedPeerIds.add(item2.getID().equals(left.getID()) ? right.getID() : left.getID());
+            }
+            assertTrue(relatedPeerIds.contains(author.getID()));
+            assertTrue(relatedPeerIds.contains(author2.getID()));
+
             leftList = relationshipMetadataService.getRelationshipMetadata(item2, true);
-            assertThat(leftList.size(), equalTo(6));
             assertThat(leftList, hasItem(hasProperty("value", equalTo("familyName, firstName"))));
+            assertThat(leftList, hasItem(hasProperty("value", equalTo("secondFamily, secondFirst"))));
         } finally {
             tempFile.delete();
             resultFile.delete();
