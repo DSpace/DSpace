@@ -35,8 +35,65 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * This is the repository that is responsible to manage
- * EntityMetadataSecurityConfiguration Rest objects.
+ * REST repository for retrieving entity-specific metadata security configurations.
+ * <p>
+ * This repository exposes metadata security settings that control which users can view specific
+ * metadata fields on items of different entity types. The configuration supports both entity-wide
+ * defaults and field-specific overrides.
+ * <p>
+ * <strong>REST Endpoint:</strong>
+ * <pre>
+ * GET /api/core/securitysettings/{entityType}
+ * </pre>
+ * <p>
+ * <strong>Example Request:</strong>
+ * <pre>
+ *
+ * // Get security configuration for Person entity
+ * GET /api/core/securitysettings/person
+ * Response:
+ * {
+ *   "entityType": "person",
+ *   "metadataSecurityDefault": [0, 1, 2],
+ *   "metadataCustomSecurity": {
+ *     "person.email": [2]
+ *   }
+ * }
+ * </pre>
+ * <p>
+ * <strong>Response Structure:</strong>
+ * <ul>
+ *   <li><strong>entityType</strong> - The entity type this configuration applies to</li>
+ *   <li><strong>metadataSecurityDefault</strong> - Default security levels for all metadata fields
+ *       (array of integers: 0=public, 1=group, 2=admin/owner)</li>
+ *   <li><strong>metadataCustomSecurity</strong> - Map of metadata field → security levels for
+ *       field-specific overrides</li>
+ * </ul>
+ *
+ * <strong>Configuration Properties:</strong>
+ * <pre>
+ * # Default security levels for all entity types (fallback)
+ * metadatavalue.visibility.settings = [0 1 2]
+ *
+ * # Entity-specific default (overrides fallback)
+ * metadatavalue.visibility.publication.settings = [0 1 2]
+ *
+ * # Field-specific override (most specific)
+ * metadatavalue.visibility.publication.dc.contributor.author.settings = [2]
+ * </pre>
+ *
+ * <strong>Use Cases:</strong>
+ * <ul>
+ *   <li>REST clients querying what security levels apply to entity metadata</li>
+ *   <li>Frontend forms determining which metadata fields have restricted visibility</li>
+ *   <li>Administrative tools displaying metadata security configurations per entity</li>
+ *   <li>Validation of metadata security settings before saving</li>
+ * </ul>
+ * <p>
+ *
+ * @see EntityMetadataSecurityConfiguration
+ * @see org.dspace.content.service.MetadataSecurityEvaluation
+ * @see org.dspace.content.service.DSpaceObjectService
  */
 @Component(EntityMetadataSecurityConfigurationRest.CATEGORY + "."
         + EntityMetadataSecurityConfigurationRest.NAME_PLURAL)
@@ -71,6 +128,38 @@ public class EnitityMetadataSecurityConfigurationRestRepository extends
     @Autowired
     private ConverterService converter;
 
+    /**
+     * Retrieves the metadata security configuration for a specific entity type.
+     * <p>
+     * This method reads configuration properties to determine:
+     * <ul>
+     *   <li>Default security levels for all metadata fields of this entity type</li>
+     *   <li>Field-specific security level overrides</li>
+     * </ul>
+     * <p>
+     * <strong>Configuration Lookup Process:</strong>
+     * <ol>
+     *   <li>Check {@code metadatavalue.visibility.{entityType}.settings} for entity-specific defaults</li>
+     *   <li>If not found, check {@code metadatavalue.visibility.settings} for global defaults</li>
+     *   <li>Scan all properties matching {@code metadatavalue.visibility.{entityType}.*} for field overrides</li>
+     *   <li>Parse security level arrays from format {@code "[0 1 2]"} to integer lists</li>
+     * </ol>
+     *
+     * <p>
+     * <strong>Field-Specific Overrides:</strong>
+     * The {@code metadataCustomSecurity} map only includes fields with custom settings that differ
+     * from the entity default. Fields using the default security levels are not included in the map.
+     * <p>
+     * <strong>Missing Configuration:</strong>
+     * If no configuration exists for the entity type or globally, the method returns a configuration
+     * object with empty/null security levels. This indicates that metadata security is not enforced
+     * for the entity type.
+     *
+     * @param context the DSpace context for database access (unused in this implementation)
+     * @param entityType the entity type identifier (e.g., "publication", "person", "project")
+     * @return the {@link EntityMetadataSecurityConfigurationRest} containing default and field-specific
+     *         security level configurations for the entity type
+     */
     @Override
     @PreAuthorize("isAuthenticated()")
     public EntityMetadataSecurityConfigurationRest findOne(final Context context, final String entityType) {
@@ -142,11 +231,33 @@ public class EnitityMetadataSecurityConfigurationRestRepository extends
         return converter.toRest(entityMetadataSecurityConfiguration, utils.obtainProjection());
     }
 
+    /**
+     * Not implemented - security configurations are always queried by specific entity type.
+     * <p>
+     * Metadata security configurations are entity-specific and defined in DSpace configuration
+     * properties. There is no meaningful way to list "all security configurations" as they depend
+     * on runtime configuration and available entity types.
+     * <p>
+     * Use {@link #findOne(Context, String)} with a specific entity type to retrieve the configuration.
+     *
+     * @param context the DSpace context (unused)
+     * @param pageable pagination parameters (unused)
+     * @return never returns normally
+     * @throws ResourceNotFoundException always thrown with message "No configurations found"
+     */
     @Override
     public Page<EntityMetadataSecurityConfigurationRest> findAll(Context context, Pageable pageable) {
         throw new ResourceNotFoundException("No configurations found");
     }
 
+    /**
+     * Returns the domain class managed by this repository.
+     * <p>
+     * This method is required by the DSpaceRestRepository interface to identify the REST resource
+     * type handled by this repository.
+     *
+     * @return {@link EntityMetadataSecurityConfigurationRest}.class
+     */
     @Override
     public Class<EntityMetadataSecurityConfigurationRest> getDomainClass() {
         return EntityMetadataSecurityConfigurationRest.class;

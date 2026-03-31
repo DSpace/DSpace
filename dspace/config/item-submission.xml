@@ -327,6 +327,9 @@
             <step id="license"/>
         </submission-process>
 
+        <!-- Submission form used during item editing for traditional items (post-publication via EditItem system).
+             Used by FULL mode for items without an entity type. Differs from "traditional" by excluding
+             collection and license steps. -->
         <submission-process name="traditional-edit">
             <!--Uncommment to display the SAMPLE step as your first step -->
             <!--<step id="sample"/> -->
@@ -376,8 +379,9 @@
             <step id="license"/>
         </submission-process>
 
+        <!-- Submission form used during Publication editing (post-publication via EditItem system).
+             Differs from "Publication" by excluding collection and license steps. -->
         <submission-process name="publication-edit">
-            <step id="collection"/>
             <!-- Publications use a custom first step, but share page 2 with "traditional" Item form -->
             <step id="publicationStep"/>
             <step id="traditionalpagetwo"/>
@@ -398,8 +402,10 @@
             <step id="license"/>
         </submission-process>
 
+        <!-- Submission form used during Person editing (post-publication via EditItem system).
+             Used by OWNER mode in edititem-service.xml. Differs from "Person" by excluding
+             collection and license steps. -->
         <submission-process name="person-edit">
-            <step id="collection"/>
             <step id="personStep"/>
             <!-- The custom-url step can be uncommented to allow the Person's custom URL (when enabled) to be
                  customized during submission.-->
@@ -407,13 +413,14 @@
             <step id="upload"/>
         </submission-process>
 
+        <!-- Submission form used during Person editing by administrators (post-publication via EditItem system).
+             Used by FULL mode in edititem-service.xml. Includes owner step for managing dspace.object.owner
+             metadata. Differs from "Person" by excluding collection and license steps. -->
         <submission-process name="admin-person-edit">
-            <step id="collection"/>
             <step id="personStep"/>
             <!-- The custom-url step can be uncommented to allow the Person's custom URL (when enabled) to be
                  customized during submission.-->
             <!-- <step id="custom-url"/> -->
-            <step id="upload"/>
             <step id="owner" />
             <step id="upload" />
         </submission-process>
@@ -429,8 +436,9 @@
             <step id="license"/>
         </submission-process>
 
+        <!-- Submission form used during Project editing (post-publication via EditItem system).
+             Differs from "Project" by excluding collection and license steps. -->
         <submission-process name="project-edit">
-            <step id="collection"/>
             <step id="projectStep"/>
             <step id="upload"/>
         </submission-process>
@@ -446,8 +454,9 @@
             <step id="license"/>
         </submission-process>
 
+        <!-- Submission form used during OrgUnit editing (post-publication via EditItem system).
+             Differs from "OrgUnit" by excluding collection and license steps. -->
         <submission-process name="orgunit-edit">
-            <step id="collection"/>
             <step id="orgUnitStep"/>
             <step id="upload"/>
         </submission-process>
@@ -463,8 +472,9 @@
             <step id="license"/>
         </submission-process>
 
+        <!-- Submission form used during Journal editing (post-publication via EditItem system).
+             Differs from "Journal" by excluding collection and license steps. -->
         <submission-process name="journal-edit">
-            <step id="collection"/>
             <step id="journalStep"/>
             <step id="upload"/>
         </submission-process>
@@ -480,8 +490,9 @@
             <step id="license"/>
         </submission-process>
 
+        <!-- Submission form used during JournalVolume editing (post-publication via EditItem system).
+             Differs from "JournalVolume" by excluding collection and license steps. -->
         <submission-process name="journalvolume-edit">
-            <step id="collection"/>
             <step id="journalVolumeStep"/>
             <step id="upload"/>
         </submission-process>
@@ -497,8 +508,9 @@
             <step id="license"/>
         </submission-process>
 
+        <!-- Submission form used during JournalIssue editing (post-publication via EditItem system).
+             Differs from "JournalIssue" by excluding collection and license steps. -->
         <submission-process name="journalissue-edit">
-            <step id="collection"/>
             <step id="journalIssueStep"/>
             <step id="upload"/>
         </submission-process>
@@ -516,8 +528,9 @@
             <step id="license"/>
         </submission-process>
 
+        <!-- Submission form used during Dataset editing (post-publication via EditItem system).
+             Differs from "Dataset" by excluding collection and license steps. -->
         <submission-process name="dataset-edit">
-            <step id="collection"/>
             <!-- Datasets use a custom first step, but share page 2 with "traditional" Item form -->
             <step id="datasetStep"/>
             <step id="traditionalpagetwo"/>

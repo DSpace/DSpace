@@ -68,8 +68,8 @@ public class DownloadFeature implements AuthorizationFeature {
             }
         } catch (Exception e) {
             log.warn(
-                    "We got an exception during the cris security evaluation, safe fallback " +
-                    "ignoring extra grant given by cris",
+                    "We got an exception during the security evaluation, safe fallback " +
+                    "ignoring extra grant.",
                     e);
         }
         return false;

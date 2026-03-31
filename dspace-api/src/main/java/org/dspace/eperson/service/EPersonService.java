@@ -348,11 +348,35 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
     EPerson findByProfileItem(Context context, Item profile) throws SQLException;
 
     /**
-     * Check if the given user is the owner of the given item.
+     * Check if the given user is the owner of the given item. An EPerson is considered the "owner" of an item if
+     * their UUID appears in the authority field of the item's {@code dspace.object.owner} metadata.
      *
-     * @param  user the user
-     * @param  item the item to check
-     * @return      true if the given user is the owner of the item, false otherwise
+     * <p><strong>How Ownership Is Determined:</strong></p>
+     * <ol>
+     *   <li>Retrieves all {@code dspace.object.owner} metadata values from the item</li>
+     *   <li>Extracts the authority field from each metadata value</li>
+     *   <li>Compares the authority UUID to the user's EPerson UUID</li>
+     *   <li>Returns {@code true} if ANY {@code dspace.object.owner} authority matches the user's UUID</li>
+     * </ol>
+     *
+     * <p><strong>Multiple Owners:</strong></p>
+     * <p>An item can have multiple {@code dspace.object.owner} metadata values, allowing for
+     * shared ownership. If the user matches ANY of the owner authority values, they are considered
+     * an owner.</p>
+     *
+     * <p><strong>Important Notes:</strong></p>
+     * <ul>
+     *   <li>This method does NOT check if the user is the item's submitter (use
+     *       {@code item.getSubmitter()} for that)</li>
+     *   <li>If the user parameter is {@code null}, this method returns {@code false}</li>
+     * </ul>
+     *
+     * @param user the EPerson to check for ownership
+     * @param item the item to check ownership of
+     * @return {@code true} if the user's UUID matches any {@code dspace.object.owner} authority;
+     *         {@code false} otherwise (including when user is {@code null})
+     * @see org.dspace.content.MetadataAdministratorAndOwnerAccess
+     * @see org.dspace.discovery.SharedWorkspaceSolrIndexPlugin
      */
     boolean isOwnerOfItem(EPerson user, Item item);
 }

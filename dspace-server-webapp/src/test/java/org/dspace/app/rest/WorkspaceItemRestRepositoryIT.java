@@ -6197,7 +6197,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             String tokenSubmitter2 = getAuthToken(submitter2.getEmail(), password);
             getClient(tokenSubmitter2)
                 .perform(get("/api/discover/search/objects")
-                             .param("configuration", "otherworkspace")
+                             .param("configuration", "otherWorkspace")
                              .param("projection", "preventMetadataSecurity")
                              .param("embed", "metrics"))
                 .andExpect(status().isOk())
@@ -6254,7 +6254,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             String tokenSubmitter2 = getAuthToken(submitter2.getEmail(), password);
             getClient(tokenSubmitter2)
                 .perform(get("/api/discover/search/objects")
-                             .param("configuration", "otherworkspace")
+                             .param("configuration", "otherWorkspace")
                              .param("query", workspaceItem.getID().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(0)));

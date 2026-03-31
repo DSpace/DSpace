@@ -44,7 +44,7 @@ public class BitstreamResourceAccessByToken extends BitstreamResource {
 
     public BitstreamResourceAccessByToken(String name, UUID uuid, UUID currentUserUUID, Set<UUID> currentSpecialGroups,
                                           boolean shouldGenerateCoverPage, String accessToken) {
-        super(name, uuid, currentUserUUID, currentSpecialGroups, shouldGenerateCoverPage, false);
+        super(name, uuid, currentUserUUID, currentSpecialGroups, shouldGenerateCoverPage);
         this.accessToken = accessToken;
     }
 

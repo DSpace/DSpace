@@ -98,7 +98,7 @@
                 <!-- "workspace" is a special entry to search for your own workspace items -->
                 <entry key="workspace" value-ref="workspaceConfiguration" />
                 <entry key="supervisedWorkspace" value-ref="supervisedWorkspaceConfiguration" />
-                <entry key="otherworkspace" value-ref="otherWorkspaceConfiguration" />
+                <entry key="otherWorkspace" value-ref="otherWorkspaceConfiguration" />
                 <!-- "workflow" is a special entry to search for your own workflow tasks -->
                 <entry key="workflow" value-ref="workflowConfiguration" />
                 <!-- "workflowAdmin" is a special entry to search for all workflow items if you are an administrator -->
@@ -1012,15 +1012,17 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
-    <!--The other workspace configuration settings for discovery -->
+    <!--The other workspace configuration settings for discovery.
+        "Other workspace" shows workspace items that the current user can view and potentially edit
+        because they are linked as authors or owners via dspace.object.owner metadata authority.
+        This enables collaborative editing where co-authors can see each other's in-progress work. -->
     <bean id="otherWorkspaceConfiguration"
           class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype">
-        <property name="id" value="otherworkspace" />
+        <property name="id" value="otherWorkspace" />
         <!--Which sidebar facets are to be displayed -->
         <property name="sidebarFacets">
             <list>
-                <ref bean="searchFilterObjectNamedType" />
                 <ref bean="searchFilterType" />
                 <ref bean="searchFilterIssued" />
             </list>
@@ -1028,7 +1030,6 @@
         <!--The search filters which can be used on the discovery search page -->
         <property name="searchFilters">
             <list>
-                <ref bean="searchFilterObjectNamedType" />
                 <ref bean="searchFilterType" />
                 <ref bean="searchFilterIssued" />
                 <ref bean="searchFilterEntityType" />

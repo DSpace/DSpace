@@ -188,6 +188,8 @@ public class BitstreamRestController {
                                 context.getSpecialGroupUuids(), citationEnabledForBitstream, accessToken);
             } else {
                 // Get input stream using default user/group authorization
+                // skipAuth=true because @PreAuthorize already performed authorization security checks (allowing
+                // submitters and authors/owners to access embargoed bitstreams).
                 bitstreamResource =
                         new org.dspace.app.rest.utils.BitstreamResource(name, uuid,
                                 currentUser != null ? currentUser.getID() : null,

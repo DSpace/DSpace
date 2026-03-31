@@ -68,7 +68,7 @@
                 <!-- "workspace" is a special entry to search for your own workspace items -->
                 <entry key="workspace" value-ref="workspaceConfiguration" />
                 <entry key="supervisedWorkspace" value-ref="supervisedWorkspaceConfiguration" />
-                <entry key="otherworkspace" value-ref="otherWorkspaceConfiguration" />
+                <entry key="otherWorkspace" value-ref="otherWorkspaceConfiguration" />
                 <!-- "workflow" is a special entry to search for your own workflow tasks -->
                 <entry key="workflow" value-ref="workflowConfiguration" />
                 <!-- "workflowAdmin" is a special entry to search for all workflow items if you are an administrator -->

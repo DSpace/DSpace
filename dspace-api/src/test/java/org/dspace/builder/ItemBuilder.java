@@ -209,11 +209,11 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, schema, element, qualifier, language, value, authority, confidence);
     }
 
-    public ItemBuilder withCrisPolicyEPerson(String value, String authority) {
+    public ItemBuilder withPolicyEPerson(String value, String authority) {
         return addMetadataValue(item, DSPACE.getName(), "policy", "eperson", null, value, authority, CF_ACCEPTED);
     }
 
-    public ItemBuilder withCrisPolicyGroup(String value, String authority) {
+    public ItemBuilder withPolicyGroup(String value, String authority) {
         return addMetadataValue(item, DSPACE.getName(), "policy", "group", null, value, authority, CF_ACCEPTED);
     }
 

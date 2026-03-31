@@ -14,6 +14,7 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.content.security.service.MetadataSecurityService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
@@ -147,6 +148,42 @@ public interface Projection {
     PageRequest getPagingOptions(String rel, HALResource<? extends RestAddressableModel> resource,
                                  Link... oldLinks);
 
+    /**
+     * Determines whether metadata security evaluation should be bypassed when this projection is applied.
+     * <p>
+     * <strong>Default Behavior:</strong> Returns {@code false}, meaning normal metadata security checks
+     * are performed. Most projections do not need to alter security behavior, so they inherit this default.
+     * <p>
+     * <strong>When {@code false} (default):</strong>
+     * <ul>
+     *   <li>Metadata security service performs full evaluation of each metadata value</li>
+     *   <li>Security levels (0, 1, 2) assigned to metadata values are respected</li>
+     *   <li>Permission checks determine which metadata fields are visible to the current user</li>
+     *   <li>Group-based access and owner-based access rules are enforced</li>
+     * </ul>
+     * <p>
+     * <strong>When {@code true} (override required):</strong>
+     * <ul>
+     *   <li>Metadata security evaluation is completely bypassed</li>
+     *   <li>Only fields configured as public via {@code metadata.publicField} property are returned</li>
+     *   <li>All security levels and permission checks are ignored</li>
+     * </ul>
+     * <p>
+     * <strong>Override This Method When:</strong>
+     * <ul>
+     *   <li>Building a projection that should expose only minimal public metadata (e.g., for discovery
+     *       scenarios where users view items they don't own)</li>
+     *   <li>Performance optimization is needed to avoid expensive security checks for publicly
+     *       accessible data</li>
+     * </ul>
+     * <p>
+     *
+     * @return {@code false} by default (perform normal security checks); override to return {@code true}
+     *         to bypass metadata security evaluation entirely
+     * @see PreventMetadataSecurityProjection
+     * @see CompositeProjection#preventMetadataLevelSecurity()
+     * @see MetadataSecurityService
+     */
     default boolean preventMetadataLevelSecurity() {
         return false;
     }

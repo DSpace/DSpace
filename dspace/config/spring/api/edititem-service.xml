@@ -4,9 +4,64 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
+    <!--
+        EditItemServiceImpl
+
+        Core service for managing EditItem lifecycle operations including creation, deletion,
+        and metadata updates for archived items undergoing post-publication editing.
+        Implements org.dspace.content.edit.service.EditItemService.
+    -->
     <bean class="org.dspace.content.edit.service.impl.EditItemServiceImpl"/>
+
+    <!--
+        EditItemModeValidatorImpl
+
+        Validates EditItem operations against the constraints defined by the active EditItemMode.
+        Ensures that modifications comply with the mode's submission definition and security policies.
+        Implements org.dspace.content.edit.service.EditItemModeValidator.
+    -->
     <bean class="org.dspace.content.edit.service.impl.EditItemModeValidatorImpl"/>
 
+    <!--
+        EditItemModeServiceImpl Configuration
+
+        This bean configures role-based editing modes for archived items (post-publication editing).
+        Each entity type can have multiple modes with different security constraints and submission definitions.
+
+        STRUCTURE:
+        - editModesMap: Maps entity type (String) → List of EditItemMode beans
+        - Each EditItemMode defines:
+            * name: Mode identifier (e.g., "FULL", "OWNER", "INVESTIGATOR")
+            * security: Access control level (CrisSecurity enum: ITEM_ADMIN, OWNER, CUSTOM, SUBMITTER)
+            * submissionDefinition: References a submission-forms.xml definition for field layout
+            * items (optional): For CUSTOM security, list of metadata fields used for authorization
+
+        SECURITY LEVELS (org.dspace.content.security.CrisSecurity):
+        - ITEM_ADMIN: Only administrators can access this mode
+        - OWNER: Item owner (dspace.object.owner authority) or administrator
+        - SUBMITTER: Item submitter or administrator
+        - CUSTOM: Custom authorization based on metadata fields in 'items' property
+                  (e.g., users listed in crisfund.investigators field)
+
+        DEFAULT ENABLED ENTITY TYPES:
+        - publication: FULL mode (admin-only, uses "publication-edit" definition)
+        - person: FULL mode (admin-only) + OWNER mode (profile owner can edit using "person-edit" definition)
+        - orgunit: FULL mode (admin-only, uses "orgunit-edit" definition)
+        - project: FULL mode (admin-only, uses "project-edit" definition)
+        - journal, journalvolume, journalissue: FULL mode (admin-only)
+        - dataset: FULL mode (admin-only, uses "dataset-edit" definition)
+        - none: FULL mode for items without entity type (uses "traditional-edit" definition)
+
+        ADDING NEW ENTITY TYPES:
+        1. Add <entry key="your-entity-type"> to editModesMap
+        2. Define one or more EditItemMode beans with appropriate security levels
+        3. Create corresponding submission definition in submission-forms.xml
+
+        EXAMPLE - Person Entity with Two Modes:
+        - FULL mode: Administrators can edit all fields using "admin-person-edit" definition
+        - OWNER mode: Profile owner can edit their own profile using "person-edit" definition
+                      (more restricted field set than admin mode)
+    -->
     <bean class="org.dspace.content.edit.service.impl.EditItemModeServiceImpl">
         <property name="editModesMap">
             <map>

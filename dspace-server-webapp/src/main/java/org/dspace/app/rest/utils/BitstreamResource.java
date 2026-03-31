@@ -57,6 +57,16 @@ public class BitstreamResource extends AbstractResource {
     protected BitstreamDocument document;
 
     public BitstreamResource(String name, UUID uuid, UUID currentUserUUID, Set<UUID> currentSpecialGroups,
+                             boolean shouldGenerateCoverPage) {
+        this.name = name;
+        this.uuid = uuid;
+        this.currentUserUUID = currentUserUUID;
+        this.currentSpecialGroups = currentSpecialGroups;
+        this.shouldGenerateCoverPage = shouldGenerateCoverPage;
+        this.skipAuthCheck = false;
+    }
+
+    public BitstreamResource(String name, UUID uuid, UUID currentUserUUID, Set<UUID> currentSpecialGroups,
         boolean shouldGenerateCoverPage, boolean skipAuth) {
         this.name = name;
         this.uuid = uuid;
@@ -160,6 +170,25 @@ public class BitstreamResource extends AbstractResource {
         return builder.toString();
     }
 
+    /**
+     * Initializes a DSpace context for bitstream retrieval.
+     * <p>
+     * This method creates a new context, sets the current user and special groups, and optionally
+     * turns off authorization checks if {@link #skipAuthCheck} is {@code true}.
+     * <p>
+     * <strong>Authorization Handling:</strong>
+     * <ul>
+     *   <li>If {@code skipAuthCheck = false}: Standard authorization checks apply during
+     *       {@link BitstreamService#retrieve}</li>
+     *   <li>If {@code skipAuthCheck = true}: Authorization system is disabled via
+     *       {@link Context#turnOffAuthorisationSystem()}, allowing bitstream retrieval without
+     *       permission checks (used when authorization was already verified at controller level)</li>
+     * </ul>
+     *
+     * @return a newly initialized DSpace context with user, groups, and authorization state configured
+     * @throws SQLException if database operations fail during context initialization or user lookup
+     * @see #skipAuthCheck
+     */
     Context initializeContext() throws SQLException {
         Context context = new Context();
         EPerson currentUser = ePersonService.find(context, currentUserUUID);

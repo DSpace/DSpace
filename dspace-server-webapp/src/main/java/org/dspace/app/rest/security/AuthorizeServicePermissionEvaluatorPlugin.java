@@ -109,8 +109,8 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
                             }
                         } catch (Exception e) {
                             log.warn(
-                                    "We got an exception during the cris security evaluation, safe fallback " +
-                                    "ignoring extra grant given by cris",
+                                    "We got an exception during the security evaluation, safe fallback " +
+                                    "ignoring extra grant.",
                                     e);
                         }
                     }

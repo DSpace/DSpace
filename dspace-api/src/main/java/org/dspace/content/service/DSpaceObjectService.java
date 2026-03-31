@@ -390,6 +390,47 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
     public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
                            String lang, String value, String authority, int confidence, int place) throws SQLException;
 
+    /**
+     * Add a single metadata value at a specific position with security level control.
+     * 
+     * <p><strong>Purpose:</strong></p>
+     * <p>This method extends the standard {@link #addMetadata} functionality by adding
+     * value-level security control through the {@code securityValue} parameter. This enables
+     * fine-grained access control where different metadata values for the same field can have
+     * different visibility rules.</p>
+     * 
+     * <p><strong>Security Level Behavior:</strong></p>
+     * <p>The {@code securityValue} parameter maps to security evaluators configured in
+     * {@code spring-dspace-security-metadata.xml}:</p>
+     * <ul>
+     *   <li><strong>null</strong> (default) - No security restriction; metadata is visible
+     *       according to standard field-level visibility rules. This is the most common case
+     *       for regular metadata that should follow normal DSpace permissions.</li>
+     *   <li><strong>0</strong> - Public access; everyone can view this specific value</li>
+     *   <li><strong>1</strong> - Group-based access; only "Trusted" group members can view</li>
+     *   <li><strong>2</strong> - Admin/Owner access; only administrators and item owners can view</li>
+     * </ul>
+     * 
+     * <p><strong>Why Default is Null:</strong></p>
+     * <p>The default null value is intentional and represents "no additional security beyond
+     * standard DSpace permissions". Most metadata values do not require special security restrictions.</p>
+     * 
+     * @param context       the DSpace context
+     * @param dso           the DSpaceObject to add metadata to
+     * @param schema        the schema name (e.g., "dc")
+     * @param element       the element name (e.g., "contributor")
+     * @param qualifier     the qualifier name, or null for unqualified
+     * @param lang          the language code, or null for no language
+     * @param value         the metadata value to add
+     * @param authority     the authority control key, or null
+     * @param confidence    the authority confidence level
+     * @param place         the position to insert at (0-based)
+     * @param securityValue the security level (null for no restriction, 0/1/2 for specific levels)
+     * @return the created MetadataValue, or null for default implementation
+     * @throws SQLException if database error occurs
+     * @see org.dspace.content.security.MetadataSecurityServiceImpl
+     * @see org.dspace.content.service.MetadataSecurityEvaluation
+     */
     default MetadataValue addMetadataInPlaceSecured(Context context, T dso, String schema, String element,
                                                     String qualifier, String lang, String value, String authority,
                                                     int confidence, int place, Integer securityValue)
@@ -537,9 +578,46 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
     void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
                                   String value, String authority, int confidence, int index) throws SQLException;
 
+    /**
+     * Replace a metadata value at a specific index position.
+     *
+     * <p>This method removes the existing metadata value at the specified index and inserts
+     * a new value at the same position, maintaining the relative ordering of other values.</p>
+     *
+     * @param context   the DSpace context
+     * @param dso       the DSpaceObject to modify
+     * @param schema    the schema name
+     * @param element   the element name
+     * @param qualifier the qualifier name, or null
+     * @param lang      the language code, or null
+     * @param value     the new metadata value
+     * @param authority the authority control key, or null
+     * @param confidence the authority confidence level
+     * @param index     the zero-based position of the value to replace
+     * @throws SQLException if database error occurs or index is out of bounds
+     */
     void replaceMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
                          String value, String authority, int confidence, int index) throws SQLException;
 
+    /**
+     * Replace a metadata value at a specific index with security level control.
+     * 
+     * <p>Combines the behavior of {@link #replaceMetadata} with value-level security.
+     * The existing value at the index is removed and replaced with a new secured value.</p>
+     *
+     * @param context       the DSpace context
+     * @param dso           the DSpaceObject to modify
+     * @param schema        the schema name
+     * @param element       the element name
+     * @param qualifier     the qualifier name, or null
+     * @param lang          the language code, or null
+     * @param value         the new metadata value
+     * @param authority     the authority control key, or null
+     * @param confidence    the authority confidence level
+     * @param index         the zero-based position of the value to replace
+     * @param securityLevel the security level (null for no restriction, 0/1/2 for specific levels)
+     * @throws SQLException if database error occurs or index is out of bounds
+     */
     void replaceSecuredMetadata(Context context, T dso, String schema,
                                 String element, String qualifier, String lang,
                                 String value, String authority,
@@ -561,14 +639,86 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      */
     public void setMetadataModified(T dso);
 
+    /**
+     * Add a single metadata value with security level control.
+     * 
+     * <p>This method appends a metadata value to the end of existing values for the field,
+     * with additional security level control for fine-grained access restrictions.</p>
+     *
+     * 
+     * @param context       the DSpace context
+     * @param dso           the DSpaceObject to add metadata to
+     * @param schema        the schema name
+     * @param element       the element name
+     * @param qualifier     the qualifier name, or null
+     * @param lang          the language code, or null
+     * @param value         the metadata value to add
+     * @param authority     the authority control key, or null
+     * @param confidence    the authority confidence level
+     * @param securityLevel the security level (null for no restriction, 0/1/2 for specific levels)
+     * @return the created MetadataValue
+     * @throws SQLException if database error occurs
+     */
     MetadataValue addSecuredMetadata(Context context, T dso, String schema, String element, String qualifier,
                                      String lang, String value, String authority, int confidence, Integer securityLevel)
         throws SQLException;
 
+    /**
+     * Add a single metadata value with security level control using a MetadataField object.
+     * 
+     * <p>Variant of {@link #addSecuredMetadata(Context, DSpaceObject, String, String, String, String, String, String, int, Integer)}
+     * that accepts a pre-resolved {@link MetadataField} object instead of schema/element/qualifier.</p>
+     * 
+     * @param context       the DSpace context
+     * @param dso           the DSpaceObject to add metadata to
+     * @param metadataField the metadata field to add a value to
+     * @param lang          the language code, or null
+     * @param value         the metadata value to add
+     * @param authority     the authority control key, or null
+     * @param confidence    the authority confidence level
+     * @param securityLevel the security level (null for no restriction, 0/1/2 for specific levels)
+     * @return the created MetadataValue
+     * @throws SQLException if database error occurs
+     */
     MetadataValue addSecuredMetadata(Context context, T dso, MetadataField metadataField, String lang,
                                      String value, String authority, int confidence, Integer securityLevel)
         throws SQLException;
 
+    /**
+     * Insert a metadata value at a specific position with security level, shifting existing values to the right.
+     * 
+     * <p><strong>Behavior:</strong></p>
+     * <ul>
+     *   <li>Inserts the new value at the specified index position</li>
+     *   <li>Existing values at that position and beyond are shifted right (index + 1)</li>
+     *   <li>The new value gets the specified security level</li>
+     * </ul>
+     * 
+     * <p><strong>Example:</strong></p>
+     * <pre>
+     * Existing values: ["value1", "value2", "value3"] at indices [0, 1, 2]
+     * Call: addAndShiftRightSecuredMetadata(..., index=1, value="newValue", securityLevel=1)
+     * Result: ["value1", "newValue", "value2", "value3"] at indices [0, 1, 2, 3]
+     *         where "newValue" has security level 1
+     * </pre>
+     * 
+     * <p><strong>Default Implementation:</strong></p>
+     * <p>This is a default interface method with no-op implementation. Only {@link ItemService}
+     * provides full functionality. For other DSpaceObject types, this method does nothing.</p>
+     * 
+     * @param context       the DSpace context
+     * @param dso           the DSpaceObject to modify
+     * @param schema        the schema name
+     * @param element       the element name
+     * @param qualifier     the qualifier name, or null
+     * @param lang          the language code, or null
+     * @param value         the metadata value to insert
+     * @param authority     the authority control key, or null
+     * @param confidence    the authority confidence level
+     * @param index         the zero-based position to insert at
+     * @param securitylevel the security level (null for no restriction, 0/1/2 for specific levels)
+     * @throws SQLException if database error occurs
+     */
     default void addAndShiftRightSecuredMetadata(Context context, T dso, String schema, String element,
                                                  String qualifier, String lang, String value,
                                                  String authority, int confidence, int index, Integer securitylevel)

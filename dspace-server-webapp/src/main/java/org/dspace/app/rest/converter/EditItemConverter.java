@@ -27,8 +27,20 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
- * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
+ * Converter that transforms {@link EditItem} domain objects into {@link EditItemRest} REST representations.
  *
+ * <p><strong>Purpose:</strong></p>
+ * <p>This converter is responsible for transforming EditItem objects (which represent post-publication
+ * item editing sessions) into their REST API representations. It extends
+ * {@link AInprogressItemConverter} to reuse the submission infrastructure for editing already-published
+ * items, providing a consistent editing experience whether creating new items or modifying existing ones.</p>
+ *
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
+ * @see EditItem
+ * @see EditItemRest
+ * @see EditItemMode
+ * @see AInprogressItemConverter
+ * @see org.dspace.app.rest.repository.EditItemRestRepository
  */
 @Component
 public class EditItemConverter
@@ -96,6 +108,38 @@ public class EditItemConverter
         return rest;
     }
 
+    /**
+     * Populates the REST representation with data from the EditItem domain model.
+     *
+     * <p><strong>Population Process:</strong></p>
+     * <ol>
+     *   <li><strong>Extract Mode:</strong> Retrieves the {@link EditItemMode} which controls the editing behavior</li>
+     *   <li><strong>Set Initial ID:</strong> Sets REST ID to "{itemUUID}:none" as a temporary placeholder</li>
+     *   <li><strong>Process Mode (if present):</strong>
+     *       <ul>
+     *           <li>Adds validation errors to the REST object</li>
+     *           <li>Updates REST ID to "{itemUUID}:{modeName}"</li>
+     *           <li>Converts the mode's submission definition to REST format</li>
+     *           <li>Stores the submission definition name for section processing</li>
+     *           <li>Iterates through all submission sections</li>
+     *       </ul>
+     *   </li>
+     *   <li><strong>Section Processing:</strong> For each submission section:
+     *       <ul>
+     *           <li>Converts the section from REST to model representation</li>
+     *           <li>Checks if the section should be hidden for in-progress submissions</li>
+     *           <li>Loads the section's processing class dynamically</li>
+     *           <li>Invokes the {@link DataProcessingStep} to populate section-specific data</li>
+     *           <li>Adds the populated section data to the REST object</li>
+     *       </ul>
+     *   </li>
+     * </ol>
+     *
+     *
+     * @param obj        the EditItem domain object to convert from
+     * @param rest       the EditItemRest object to populate
+     * @param projection the projection controlling which properties to include
+     */
     protected void fillFromModel(EditItem obj, EditItemRest rest, Projection projection) {
         EditItemMode mode = obj.getMode();
 

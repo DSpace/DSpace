@@ -114,12 +114,12 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, S
      * @return the EditItemRest representation of the edit item, or null if not found
      * @throws DSpaceBadRequestException if the data parameter is not in the expected format
      * @throws ResourceNotFoundException if the item with the specified UUID does not exist or the mode configuration
- *                                       is not found
+     *                                   is not found
      * @throws AccessDeniedException if the current user does not have rights to edit in the specified mode
      * @throws RuntimeException if a database error occurs
      */
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("isAuthenticated()")
     // Security is checked internally in EditItemModeServiceImpl.hasAccess
     public EditItemRest findOne(Context context, String data) {
         EditItem editItem = null;
@@ -162,6 +162,7 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, S
      * @return a paginated list of EditItemRest objects
      * @throws RuntimeException if a database error occurs while retrieving edit items
      */
+    @PreAuthorize("isAuthenticated()")
     @Override
     public Page<EditItemRest> findAll(Context context, Pageable pageable) {
         Iterator<EditItem> it = null;
@@ -442,7 +443,7 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, S
         }
     }
 
-    @PreAuthorize("permitAll")
+    @PreAuthorize("isAuthenticated()")
     @SearchRestMethod(name = "findModesById")
     public Page<EditItemModeRest> findModesById(@Parameter(value = "uuid", required = true) UUID id,
                                                 Pageable pageable) {

@@ -262,8 +262,8 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
             .withAuthor("Author", author.getID().toString())
             .withEditor("Editor", editor.getID().toString())
             .withEditor("Another editor", "5260f7f1-f583-4a7a-86e5-25db93a29240")
-            .withCrisPolicyEPerson("First User", firstUser.getID().toString())
-            .withCrisPolicyGroup("Second User", group.getID().toString())
+            .withPolicyEPerson("First User", firstUser.getID().toString())
+            .withPolicyGroup("Second User", group.getID().toString())
             .build();
 
         context.restoreAuthSystemState();

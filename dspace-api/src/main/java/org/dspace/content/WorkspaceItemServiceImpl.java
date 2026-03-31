@@ -325,6 +325,29 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
     }
 
+    /**
+     * Determines if the current user is NOT authorized to delete a workspace item.
+     *
+     * <p><strong>Authorization Policy:</strong></p>
+     * <p>A user is <strong>authorized</strong> to delete a workspace item if <strong>ANY</strong>
+     * of the following conditions are met:</p>
+     * <ol>
+     *   <li><strong>Administrator:</strong> The current user is a DSpace administrator</li>
+     *   <li><strong>Original Submitter:</strong> The current user is the original submitter of the item
+     *       (matches {@code item.getSubmitter()})</li>
+     *   <li><strong>Explicit DELETE Permission:</strong> The current user has a DELETE permission
+     *       policy on the item (via {@link ResourcePolicy})</li>
+     * </ol>
+     *
+     * @param context DSpace context containing the current user
+     * @param item    the Item contained in the WorkspaceItem being evaluated for deletion
+     * @return {@code true} if the current user is NOT authorized to delete (deletion should be blocked);
+     *         {@code false} if the user IS authorized (deletion should proceed)
+     * @throws SQLException if database operations fail during authorization checks
+     * @see #deleteAll(Context, WorkspaceItem)
+     * @see AuthorizeService#isAdmin(Context)
+     * @see AuthorizeService#authorizeActionBoolean(org.dspace.core.Context, org.dspace.content.DSpaceObject, int)
+     */
     private boolean isNotAuthorizedToDelete(Context context, Item item) throws SQLException {
         EPerson submitter = item.getSubmitter();
         EPerson currentUser = context.getCurrentUser();
