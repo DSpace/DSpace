@@ -9,6 +9,7 @@ package org.dspace.app.rest.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
@@ -87,19 +88,35 @@ public class BitstreamResourceAccessByToken extends BitstreamResource {
             if (shouldGenerateCoverPage) {
                 var coverPage = getCoverpageByteArray(fileRetrievalContext, bitstream);
 
-                this.document = new BitstreamDocument(etag(bitstream),
+                this.document = new BitstreamDocumentCoverPage(etag(bitstream),
                         coverPage.length,
                         new ByteArrayInputStream(coverPage));
             } else {
-                this.document = new BitstreamDocument(bitstream.getChecksum(),
+                this.document = new BitstreamDocumentAuthorizedAccess(bitstream.getChecksum(),
                         bitstream.getSizeBytes(),
-                        bitstreamService.retrieve(fileRetrievalContext, bitstream));
+                        bitstream.getID());
             }
         } catch (SQLException | AuthorizeException | IOException e) {
             throw new RuntimeException(e);
         }
 
         LOG.debug("fetched document {} {}", shouldGenerateCoverPage, document);
+    }
+
+    private class BitstreamDocumentAuthorizedAccess extends BitstreamDocumentInputstream {
+        public BitstreamDocumentAuthorizedAccess(String etag, long length, UUID bitstreamUUID) {
+            super(etag, length, bitstreamUUID);
+        }
+
+        @Override
+        public InputStream getInputstream() {
+            try (Context context = initializeContext()) {
+                context.turnOffAuthorisationSystem();
+                return bitstreamService.retrieve(context, bitstreamService.find(context, bitstreamUUID));
+            } catch (SQLException | IOException | AuthorizeException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

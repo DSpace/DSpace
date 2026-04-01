@@ -8,6 +8,7 @@
 package org.dspace.content.crosswalk;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
 
@@ -56,7 +57,9 @@ public class LicenseStreamDisseminationCrosswalk
             Bitstream licenseBs = PackageUtils.findDepositLicense(context, (Item) dso);
 
             if (licenseBs != null) {
-                Utils.copy(bitstreamService.retrieve(context, licenseBs), out);
+                try (InputStream bitstreamInputStream = bitstreamService.retrieve(context, licenseBs)) {
+                    Utils.copy(bitstreamInputStream, out);
+                }
             }
         }
     }
