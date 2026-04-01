@@ -269,6 +269,14 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
             List<String> values, List<String> authorities, List<Integer> confidences, Supplier<Integer> placeSupplier)
                     throws SQLException {
+
+        return addMetadata(context, dso, metadataField, lang, values, authorities, confidences, placeSupplier, null);
+    }
+
+    public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
+        List<String> values, List<String> authorities, List<Integer> confidences, Supplier<Integer> placeSupplier,
+        Integer securityLevel) throws SQLException {
+
         // Throw an error if we are attempting to add empty values
         if (values == null || values.isEmpty()) {
             throw new IllegalArgumentException("Cannot add empty values to a new metadata field " +
@@ -310,6 +318,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 newMetadata.add(metadataValue);
 
                 metadataValue.setPlace(placeSupplier.get());
+                metadataValue.setSecurityLevel(securityLevel);
 
                 metadataValue.setLanguage(lang == null ? null : lang.trim());
 
@@ -385,6 +394,68 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     private boolean isNotPlaceholderMetadataValue(String metadataValue) {
         return !Strings.CS.equals(metadataValue, PLACEHOLDER_PARENT_METADATA_VALUE);
+    }
+
+    @Override
+    public MetadataValue addSecuredMetadata(Context context, T dso, String schema, String element,
+        String qualifier, String lang, String value, String authority, int confidence, Integer securityLevel)
+        throws SQLException {
+
+        MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
+        if (metadataField == null) {
+            throw new SQLException(
+                "bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not " +
+                    "exist!");
+        }
+
+        return addSecuredMetadata(context, dso, metadataField, lang, value, authority, confidence, securityLevel);
+
+    }
+
+    @Override
+    public MetadataValue addSecuredMetadata(Context context, T dso, MetadataField metadataField, String lang,
+        String value, String authority, int confidence, Integer securityLevel) throws SQLException {
+
+        // Set place to list length of all metadatavalues for the given
+        // schema.element.qualifier combination.
+        // Subtract one to adhere to the 0 as first element rule
+        final Supplier<Integer> placeSupplier = () -> this
+            .getMetadata(dso, metadataField.getMetadataSchema().getName(), metadataField.getElement(),
+                metadataField.getQualifier(), Item.ANY)
+            .size() - 1;
+
+        return addMetadata(context, dso, metadataField, lang, Arrays.asList(value), Arrays.asList(authority),
+            Arrays.asList(confidence), placeSupplier, securityLevel).stream().findFirst().orElse(null);
+
+    }
+
+    @Override
+    public void addAndShiftRightSecuredMetadata(Context context, T dso, String schema, String element, String qualifier,
+        String lang, String value, String authority, int confidence, int index, Integer securitylevel)
+        throws SQLException {
+        List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
+
+        int idx = 0;
+        int place = 0;
+        boolean last = true;
+        for (MetadataValue rr : list) {
+            if (idx == index) {
+                MetadataValue newMetadata = addMetadata(context, dso, schema, element, qualifier,
+                        lang, value, authority, confidence);
+
+                moveSingleMetadataValue(context, dso, place, newMetadata);
+                place++;
+                last = false;
+            }
+            moveSingleMetadataValue(context, dso, place, rr);
+            place++;
+            idx++;
+        }
+        if (last) {
+            addSecuredMetadata(context, dso, schema, element, qualifier,
+                    lang, value, authority, confidence, securitylevel);
+
+        }
     }
 
     @Override
@@ -967,6 +1038,16 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
         removeMetadataValues(context, dso, Arrays.asList(list.get(index)));
         addAndShiftRightMetadata(context, dso, schema, element, qualifier, lang, value, authority, confidence, index);
+    }
+
+    @Override
+    public void replaceSecuredMetadata(Context context, T dso, String schema, String element, String qualifier,
+        String lang, String value, String authority, int confidence, int index, Integer securityLevel)
+        throws SQLException {
+        List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
+        removeMetadataValues(context, dso, Arrays.asList(list.get(index)));
+        addAndShiftRightSecuredMetadata(context, dso, schema, element, qualifier, lang, value, authority, confidence,
+            index, securityLevel);
     }
 
     @Override

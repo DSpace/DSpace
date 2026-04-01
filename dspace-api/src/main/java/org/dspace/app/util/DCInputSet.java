@@ -37,12 +37,18 @@ public class DCInputSet {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DCInputSet.class);
 
     /**
-     * constructor
+     * Constructs a new DCInputSet instance by parsing and organizing input fields into a two-dimensional array.
      *
-     * @param formName       form name
-     * @param rows           the rows
-     * @param listMap        map
-     * @throws DCInputsReaderException
+     * <p>This constructor processes the provided rows of field definitions and creates DCInput objects
+     * for each field. The resulting structure organizes fields by row position, allowing for multi-column
+     * layouts in submission forms.</p>
+     *
+     * @param inputReader the DCInputsReader instance used to resolve child forms for group and inline-group fields
+     * @param formName the name of the form that defines this input set
+     * @param rows a list of rows, where each row contains a list of field definitions represented as maps
+     *             of string key-value pairs
+     * @param listMap a map containing value-pairs for dropdown lists, keyed by list name
+     * @throws DCInputsReaderException if there is an error parsing the field definitions or creating DCInput objects
      */
     public DCInputSet(DCInputsReader inputReader, String formName, List<List<Map<String, String>>> rows,
         Map<String, List<String>> listMap)
@@ -61,46 +67,61 @@ public class DCInputSet {
     }
 
     /**
-     * Return the name of the form that defines this input set
+     * Returns the name of the form that defines this input set.
      *
-     * @return formName     the name of the form
+     * <p>The form name is used to identify this particular input configuration and is specified
+     * in the input-forms.xml configuration file.</p>
+     *
+     * @return the name of the form
      */
     public String getFormName() {
         return formName;
     }
 
     /**
-     * Return the number of fields in this  input set
+     * Returns the number of field rows in this input set.
      *
-     * @return number of pages
+     * <p>Note: This returns the number of rows (pages), not the total number of individual fields.
+     * Each row may contain multiple fields arranged horizontally.</p>
+     *
+     * @return the number of field rows in this input set
      */
     public int getNumberFields() {
         return inputs.length;
     }
 
     /**
-     * Get all the fields
+     * Returns all the fields in this input set organized in a two-dimensional array.
      *
-     * @return an array containing the fields
+     * <p>The outer array represents rows (pages) and the inner arrays represent fields within each row.
+     * This structure allows for multi-column layouts in submission forms.</p>
+     *
+     * @return a two-dimensional array containing all DCInput fields organized by row and column position
      */
-
     public DCInput[][] getFields() {
         return inputs;
     }
 
     /**
-     * Does this set of inputs include an alternate title field?
+     * Checks whether this input set includes an alternate title field.
      *
-     * @return true if the current set has an alternate title field
+     * <p>This is a convenience method that checks for the presence of the "dc.title.alternative" field,
+     * which is commonly used to capture alternative titles for items.</p>
+     *
+     * @return true if the current set has a "dc.title.alternative" field, false otherwise
      */
     public boolean isDefinedMultTitles() {
         return isFieldPresent("dc.title.alternative");
     }
 
     /**
-     * Does this set of inputs include the previously published fields?
+     * Checks whether this input set includes all fields required for previously published items.
      *
-     * @return true if the current set has all the prev. published fields
+     * <p>This method verifies the presence of three fields commonly used to capture information
+     * about previously published works: "dc.date.issued", "dc.identifier.citation", and "dc.publisher".</p>
+     *
+     * @return true if the current set has all three previously published fields (date issued, citation, and publisher),
+     *         false otherwise
      */
     public boolean isDefinedPubBefore() {
         return isFieldPresent("dc.date.issued") &&
@@ -109,11 +130,15 @@ public class DCInputSet {
     }
 
     /**
-     * Does the current input set define the named field?
-     * Scan through every field in every page of the input set
+     * Checks whether the current input set defines the named field.
      *
-     * @param fieldName selects the field.
-     * @return true if the current set has the named field
+     * <p>This method scans through every field in every row of the input set to determine if
+     * the specified field exists. It delegates to the {@link #getField(String)} method for
+     * the actual search logic.</p>
+     *
+     * @param fieldName the fully qualified field name to search for, in the format
+     *                  {@code schema.element.qualifier} (e.g., "dc.contributor.author")
+     * @return true if the current set contains the named field, false otherwise
      */
     public boolean isFieldPresent(String fieldName) {
         return getField(fieldName).isPresent();
@@ -188,7 +213,7 @@ public class DCInputSet {
                     return Optional.of(field);
                 } else {
                     String fullName = field.getFieldName();
-                    if (fullName.equals(fieldName)) {
+                    if (fullName != null && fullName.equals(fieldName)) {
                         return Optional.of(field);
                     }
                 }
@@ -244,15 +269,21 @@ public class DCInputSet {
     }
 
     /**
-     * Iterate DC input rows and populate a list of all allowed field names in this submission configuration.
-     * This is important because an input can be configured repeatedly in a form (for example it could be required
-     * for type Book, and allowed but not required for type Article).
-     * If the field is allowed for this document type it'll never be stripped from metadata on validation.
+     * Iterates through all DC input rows and populates a list of all allowed field names for a specific document type.
      *
-     * This can be more efficient than isFieldPresent to avoid looping the input set with each check.
+     * <p>This method is important because an input can be configured repeatedly in a form with different
+     * requirements for different document types. For example, a field could be required for type "Book"
+     * but optional for type "Article". If a field is allowed for the specified document type, it will
+     * never be stripped from metadata during validation.</p>
      *
-     * @param documentTypeValue     Document type eg. Article, Book
-     * @return                      ArrayList of field names to use in validation
+     * <p>This method is more efficient than repeatedly calling {@link #isFieldPresent(String, String)}
+     * because it builds a complete list in a single pass through the input set.</p>
+     *
+     * <p>Special handling for qualdrop_value fields: Both the base field name and all qualified variations
+     * (field name + qualifier) are added to the list to ensure proper validation.</p>
+     *
+     * @param documentTypeValue the document type to check against, for example "Article" or "Book"
+     * @return a list of field names that are allowed for the specified document type
      */
     public List<String> populateAllowedFieldNames(String documentTypeValue) {
         List<String> allowedFieldNames = new ArrayList<>();
