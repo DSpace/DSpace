@@ -68,12 +68,12 @@ public class SubscribeMatcher extends BaseMatcher<Subscription> {
 
     @Override
     public void describeTo(Description description) {
-        String subscription = String.format("Type: %s, eperson: %s, dso: %s, params: %s",
-                                      type, eperson.getID(), dso.getID(), parameters.stream()
-                                                                                    .map(p -> "{ name: " + p.getName() +
-                                                                                        ", value: " + p.getValue() +
-                                                                                        "}")
-                                                                                    .collect(Collectors.joining(", ")));
+        String subscription = "Type: %s, eperson: %s, dso: %s, params: %s".formatted(
+            type, eperson.getID(), dso.getID(), parameters.stream()
+                .map(p -> "{ name: " + p.getName() +
+                    ", value: " + p.getValue() +
+                    "}")
+                .collect(Collectors.joining(", ")));
         description.appendText("Subscription matching: " + subscription);
     }
 }

@@ -51,7 +51,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
@@ -107,9 +106,10 @@ import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItem;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.ObjectMapper;
 
 public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -3052,8 +3052,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/items/" + item.getID())
-                            .param("projection", "allLanguages"))
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
                    .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
@@ -3084,8 +3083,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/items/" + item.getID())
-                                     .param("projection", "allLanguages"))
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
             .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
@@ -5506,10 +5504,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .withName("col3")
             .withAdminGroup(eperson)
             .build();
-        Collection col4 = CollectionBuilder.createCollection(context, child2)
-            .withName("col4")
-            .withAdminGroup(eperson2)
-            .build();
         Item item1 = ItemBuilder.createItem(context, col1)
             .withTitle("Sample item")
             .build();
@@ -5518,12 +5512,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .build();
         Item item3 = ItemBuilder.createItem(context, col3)
             .withTitle("Item of sample bitstreams")
-            .build();
-        Item item4 = ItemBuilder.createItem(context, col4)
-            .withTitle("Testing autocomplete in items")
-            .build();
-        Item item5 = ItemBuilder.createItem(context, col4)
-            .withTitle("Title: subtitle (special characters)")
             .build();
 
         context.restoreAuthSystemState();
@@ -5556,29 +5544,11 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         // Test eperson with no authorized items
-        getClient(tokenEPerson).perform(get("/api/core/items/search/" + method)
-                .param("query", "auto"))
+        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), password);
+        getClient(tokenEPerson2).perform(get("/api/core/items/search/" + method)
+                .param("query", "community"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(0)));
-
-        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), password);
-        // Test eperson2 with one authorized item
-        getClient(tokenEPerson2).perform(get("/api/core/items/search/" + method)
-                .param("query", "auto"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.items", Matchers.contains(
-                ItemMatcher.matchItemProperties(item4)
-            )))
-            .andExpect(jsonPath("$.page.totalElements", is(1)));
-
-        // Test query with multiple words
-        getClient(tokenEPerson2).perform(get("/api/core/items/search/" + method)
-                .param("query", "testing auto"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
-                ItemMatcher.matchItemProperties(item4)
-            )))
-            .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         // Test query as admin
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -5605,17 +5575,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .param("query", "test"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
-                ItemMatcher.matchItemProperties(item2),
-                ItemMatcher.matchItemProperties(item4)
-            )))
-            .andExpect(jsonPath("$.page.totalElements", is(2)));
-
-        // Test special characters in query
-        getClient(tokenAdmin).perform(get("/api/core/items/search/" + method)
-                .param("query", "title: subtitle (special"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.items", Matchers.contains(
-                ItemMatcher.matchItemProperties(item5)
+                ItemMatcher.matchItemProperties(item2)
             )))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
 

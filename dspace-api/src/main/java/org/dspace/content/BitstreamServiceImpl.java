@@ -261,7 +261,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         super.update(context, bitstream);
         if (bitstream.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, bitstream.getID(), null,
-                                       getIdentifiers(context, bitstream)));
+                                       DetailType.INFO, getIdentifiers(context, bitstream)));
             bitstream.setModified();
         }
         if (bitstream.isMetadataModified()) {
@@ -281,6 +281,12 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public void delete(Context context, Bitstream bitstream) throws SQLException, AuthorizeException {
+        // Reload bitstream to ensure it's attached to the current session
+        // (Required for Hibernate 7 which may have detached entities during cascading deletes)
+        bitstream = context.reloadEntity(bitstream);
+        if (bitstream == null) {
+            return;
+        }
 
         // changed to a check on delete
         // Check authorisation
@@ -370,7 +376,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     public void updateLastModified(Context context, Bitstream bitstream) {
         //Also fire a modified event since the bitstream HAS been modified
         context.addEvent(
-            new Event(Event.MODIFY, Constants.BITSTREAM, bitstream.getID(), null, getIdentifiers(context, bitstream)));
+            new Event(Event.MODIFY, Constants.BITSTREAM, bitstream.getID(), null,
+                      DetailType.INFO, getIdentifiers(context, bitstream)));
     }
 
     @Override

@@ -7,17 +7,17 @@
  */
 package org.dspace.statistics.util;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mwood
@@ -32,7 +32,7 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
 
     private SpiderDetectorService spiderDetectorService;
 
-    @Before
+    @BeforeEach
     public void init() {
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         clientInfoService = CoreServiceFactory.getInstance().getClientInfoService();
@@ -68,27 +68,27 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
 
         // Test agent patterns
         req.setAgent("msnboT Is WaTching you");
-        assertTrue("'msnbot' didn't match pattern", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), "'msnbot' didn't match pattern");
 
         req.setAgent("mozilla/5.0 (x11; linux x86_64; rv:91.0) gecko/20100101 firefox/91.0");
-        assertFalse("'Firefox' matched a pattern", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), "'Firefox' matched a pattern");
 
         // Test IP patterns
         candidate = "192.168.2.1";
         req.setAddress(candidate);
-        assertTrue(candidate + " did not match IP patterns", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), candidate + " did not match IP patterns");
 
         req.setAddress(NOT_A_BOT_ADDRESS);
-        assertFalse(NOT_A_BOT_ADDRESS + " matched IP patterns", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), NOT_A_BOT_ADDRESS + " matched IP patterns");
 
         // Test DNS patterns
         candidate = "baiduspiDer-dSPace-test.crawl.baIDu.com";
         req.setRemoteHost(candidate);
-        assertTrue(candidate + " did match DNS patterns", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), candidate + " did match DNS patterns");
 
         candidate = "wIki.dsPace.oRg";
         req.setRemoteHost(candidate);
-        assertFalse(candidate + " matched DNS patterns", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), candidate + " matched DNS patterns");
 
     }
 
@@ -107,27 +107,27 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
 
         // Test agent patterns
         req.setAgent("msnbot is watching you");
-        assertTrue("'msnbot' did not match any pattern", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), "'msnbot' did not match any pattern");
 
         req.setAgent("Firefox");
-        assertFalse("'Firefox' matched a pattern", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), "'Firefox' matched a pattern");
 
         // Test IP patterns
         candidate = "192.168.2.1";
         req.setAddress(candidate);
-        assertTrue(candidate + " did not match IP patterns", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), candidate + " did not match IP patterns");
 
         req.setAddress(NOT_A_BOT_ADDRESS);
-        assertFalse(NOT_A_BOT_ADDRESS + " matched IP patterns", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), NOT_A_BOT_ADDRESS + " matched IP patterns");
 
         // Test DNS patterns
         candidate = "baiduspider-dspace-test.crawl.baidu.com";
         req.setRemoteHost(candidate);
-        assertTrue(candidate + " did not match DNS patterns", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), candidate + " did not match DNS patterns");
 
         candidate = "wiki.dspace.org";
         req.setRemoteHost(candidate);
-        assertFalse(candidate + " matched DNS patterns", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), candidate + " matched DNS patterns");
     }
 
     /**
@@ -140,30 +140,30 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
 
         // Test IP patterns
         candidate = "192.168.2.1";
-        assertTrue(candidate + " did not match IP patterns",
-                   spiderDetectorService.isSpider(candidate, null, null, null));
+        assertTrue(spiderDetectorService.isSpider(candidate, null, null, null),
+                   candidate + " did not match IP patterns");
 
         candidate = NOT_A_BOT_ADDRESS;
-        assertFalse(candidate + " matched IP patterns",
-                    spiderDetectorService.isSpider(candidate, null, null, null));
+        assertFalse(spiderDetectorService.isSpider(candidate, null, null, null),
+                    candidate + " matched IP patterns");
 
         // Test DNS patterns
         candidate = "baiduspider-dspace-test.crawl.baidu.com";
-        assertTrue(candidate + " did not match DNS patterns",
-                   spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, candidate, null));
+        assertTrue(spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, candidate, null),
+                   candidate + " did not match DNS patterns");
 
         candidate = "wiki.dspace.org";
-        assertFalse(candidate + " matched DNS patterns",
-                    spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, candidate, null));
+        assertFalse(spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, candidate, null),
+                    candidate + " matched DNS patterns");
 
         // Test agent patterns
         candidate = "msnbot is watching you";
-        assertTrue("'" + candidate + "' did not match agent patterns",
-                   spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, null, candidate));
+        assertTrue(spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, null, candidate),
+                   "'" + candidate + "' did not match agent patterns");
 
         candidate = "Firefox";
-        assertFalse("'" + candidate + "' matched agent patterns",
-                    spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, null, candidate));
+        assertFalse(spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, null, candidate),
+                    "'" + candidate + "' matched agent patterns");
     }
 
     /**
@@ -174,12 +174,12 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
         String candidate;
 
         candidate = "192.168.2.1";
-        assertTrue(candidate + " did not match IP patterns",
-                   spiderDetectorService.isSpider(candidate, null, null, null));
+        assertTrue(spiderDetectorService.isSpider(candidate, null, null, null),
+                   candidate + " did not match IP patterns");
 
         candidate = NOT_A_BOT_ADDRESS;
-        assertFalse(candidate + " matched IP patterns",
-                    spiderDetectorService.isSpider(candidate, null, null, null));
+        assertFalse(spiderDetectorService.isSpider(candidate, null, null, null),
+                    candidate + " matched IP patterns");
 
     }
 
@@ -201,27 +201,27 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
 
         // Test agent patterns
         req.setAgent("msnboT Is WaTching you");
-        assertFalse("'msnbot' matched pattern", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), "'msnbot' matched pattern");
 
         req.setAgent("FirefOx");
-        assertFalse("'Firefox' matched a pattern", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), "'Firefox' matched a pattern");
 
         // Test IP patterns
         candidate = "192.168.2.1";
         req.setAddress(candidate);
-        assertTrue(candidate + " did not match IP patterns", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), candidate + " did not match IP patterns");
 
         req.setAddress(NOT_A_BOT_ADDRESS);
-        assertFalse(NOT_A_BOT_ADDRESS + " matched IP patterns", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), NOT_A_BOT_ADDRESS + " matched IP patterns");
 
         // Test DNS patterns
         candidate = "baiduspiDer-dSPace-test.crawl.baIDu.com";
         req.setRemoteHost(candidate);
-        assertFalse(candidate + " did match DNS patterns", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), candidate + " did match DNS patterns");
 
         candidate = "wIki.dsPace.oRg";
         req.setRemoteHost(candidate);
-        assertFalse(candidate + " matched DNS patterns", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), candidate + " matched DNS patterns");
 
     }
 
@@ -240,19 +240,19 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
 
         // Test agent patterns
         req.setAgent("msnbot is WaTching you");
-        assertTrue("'msnbot' didn't match pattern", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), "'msnbot' didn't match pattern");
 
         req.setAgent("MSNBOT Is WaTching you");
-        assertFalse("'msnbot' matched pattern", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), "'msnbot' matched pattern");
 
         // Test DNS patterns
         candidate = "baiduspider-dspace-test.crawl.baidu.com";
         req.setRemoteHost(candidate);
-        assertTrue(candidate + " did not match DNS patterns", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), candidate + " did not match DNS patterns");
 
         candidate = "baiduspiDer-dSPace-test.crawl.baIDu.com";
         req.setRemoteHost(candidate);
-        assertFalse(candidate + " matched DNS patterns", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), candidate + " matched DNS patterns");
     }
 
     /**
@@ -273,19 +273,19 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
 
         // Test agent patterns
         req.setAgent("msnbot is WaTching you");
-        assertTrue("'msnbot' didn't match pattern", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), "'msnbot' didn't match pattern");
 
         req.setAgent("MSNBOT Is WaTching you");
-        assertTrue("'msnbot' didn't match pattern", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), "'msnbot' didn't match pattern");
 
         // Test DNS patterns
         candidate = "baiduspider-dspace-test.crawl.baidu.com";
         req.setRemoteHost(candidate);
-        assertTrue(candidate + " did not match DNS patterns", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), candidate + " did not match DNS patterns");
 
         candidate = "baiduspiDer-dSPace-test.crawl.baIDu.com";
         req.setRemoteHost(candidate);
-        assertTrue(candidate + " didn't match DNS patterns", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), candidate + " didn't match DNS patterns");
     }
 
     /**
@@ -305,19 +305,19 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
 
         // Test agent patterns
         req.setAgent("msnbot is WaTching you");
-        assertTrue("'msnbot' didn't match pattern", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), "'msnbot' didn't match pattern");
 
         req.setAgent("MSNBOT Is WaTching you");
-        assertFalse("'msnbot' matched pattern", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), "'msnbot' matched pattern");
 
         // Test DNS patterns
         candidate = "baiduspider-dspace-test.crawl.baidu.com";
         req.setRemoteHost(candidate);
-        assertTrue(candidate + " did not match DNS patterns", spiderDetectorService.isSpider(req));
+        assertTrue(spiderDetectorService.isSpider(req), candidate + " did not match DNS patterns");
 
         candidate = "baiduspiDer-dSPace-test.crawl.baIDu.com";
         req.setRemoteHost(candidate);
-        assertFalse(candidate + " matched DNS patterns", spiderDetectorService.isSpider(req));
+        assertFalse(spiderDetectorService.isSpider(req), candidate + " matched DNS patterns");
 
 
     }
@@ -328,7 +328,7 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
      *
      * @throws Exception
      */
-    @After
+    @AfterEach
     public void cleanup() throws Exception {
         spiderDetectorService = null;
         configurationService.setProperty("usage-statistics.bots.case-insensitive", false);

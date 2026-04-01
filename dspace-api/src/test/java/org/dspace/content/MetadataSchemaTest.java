@@ -12,12 +12,11 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -28,9 +27,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataSchemaService;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.test.util.AopTestUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -60,24 +58,30 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     private AuthorizeService authorizeServiceSpy;
 
     /**
+     * Original AuthorizeService (saved before spying for restoration in @After)
+     */
+    private AuthorizeService originalAuthorizeService;
+
+    /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
      *
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
         try {
             this.ms = metadataSchemaService.find(context, MetadataSchemaEnum.DC.getName());
 
+            // Save the original authorizeService before spying (for restoration in @After)
+            originalAuthorizeService = authorizeService;
+
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
-            Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
-            authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
-                withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
+            authorizeServiceSpy = spy(originalAuthorizeService);
             // "Wire" our spy to be used by the current loaded object services
             // (To ensure these services use the spy instead of the real service)
             ReflectionTestUtils.setField(metadataSchemaService, "authorizeService", authorizeServiceSpy);
@@ -85,6 +89,24 @@ public class MetadataSchemaTest extends AbstractUnitTest {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
         }
+    }
+
+    /**
+     * This method will be run after every test as per @After. It will
+     * clean resources initialized by the @Before methods.
+     *
+     * Other methods can be annotated with @After here or in subclasses
+     * but no execution order is guaranteed
+     */
+    @org.junit.jupiter.api.AfterEach
+    @Override
+    public void destroy() {
+        // Restore the original authorizeService to prevent test pollution
+        if (originalAuthorizeService != null) {
+            ReflectionTestUtils.setField(metadataSchemaService, "authorizeService", originalAuthorizeService);
+        }
+
+        super.destroy();
     }
 
     /**
@@ -165,26 +187,30 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     /**
      * Test of create method, of class MetadataSchema.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testCreateNoAuth() throws Exception {
-        String namespace = "namespace";
-        String name = "name";
-        metadataSchemaService.create(context, name, namespace);
-        fail("Exception expected");
+        assertThrows(AuthorizeException.class, () -> {
+            String namespace = "namespace";
+            String name = "name";
+            metadataSchemaService.create(context, name, namespace);
+            fail("Exception expected");
+        });
     }
 
     /**
      * Test of create method, of class MetadataSchema.
      */
-    @Test(expected = NonUniqueMetadataException.class)
+    @Test
     public void testCreateRepeated() throws Exception {
-        // Allow full Admin perms
-        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
+        assertThrows(NonUniqueMetadataException.class, () -> {
+            // Allow full Admin perms
+            when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
-        String namespace = ms.getNamespace();
-        String name = ms.getName();
-        metadataSchemaService.create(context, name, namespace);
-        fail("Exception expected");
+            String namespace = ms.getNamespace();
+            String name = ms.getName();
+            metadataSchemaService.create(context, name, namespace);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -219,28 +245,32 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     /**
      * Test of update method, of class MetadataSchema.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testUpdateNoAuth() throws Exception {
-        metadataSchemaService.update(context, ms);
-        fail("Exception expected");
+        assertThrows(AuthorizeException.class, () -> {
+            metadataSchemaService.update(context, ms);
+            fail("Exception expected");
+        });
     }
 
     /**
      * Test of update method, of class MetadataSchema.
      */
-    @Test(expected = NonUniqueMetadataException.class)
+    @Test
     public void testUpdateRepeated() throws Exception {
-        // Allow full Admin perms
-        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
+        assertThrows(NonUniqueMetadataException.class, () -> {
+            // Allow full Admin perms
+            when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
-        String namespace = ms.getNamespace();
-        String name = ms.getName();
-        MetadataSchema m = metadataSchemaService.create(context, name, namespace);
+            String namespace = ms.getNamespace();
+            String name = ms.getName();
+            MetadataSchema m = metadataSchemaService.create(context, name, namespace);
 
-        m.setName(name);
-        m.setNamespace(namespace);
-        metadataSchemaService.update(context, m);
-        fail("Exception expected");
+            m.setName(name);
+            m.setNamespace(namespace);
+            metadataSchemaService.update(context, m);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -264,14 +294,16 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     /**
      * Test of delete method, of class MetadataSchema.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test
     public void testDeleteNoAuth() throws Exception {
-        String namespace = "namespace3";
-        String name = "name3";
-        MetadataSchema m = metadataSchemaService.create(context, name, namespace);
+        assertThrows(AuthorizeException.class, () -> {
+            String namespace = "namespace3";
+            String name = "name3";
+            MetadataSchema m = metadataSchemaService.create(context, name, namespace);
 
-        metadataSchemaService.delete(context, m);
-        fail("Exception expected");
+            metadataSchemaService.delete(context, m);
+            fail("Exception expected");
+        });
     }
 
     /**
@@ -281,7 +313,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     public void testFindAll() throws Exception {
         List<MetadataSchema> found = metadataSchemaService.findAll(context);
         assertThat("testFindAll 0", found, notNullValue());
-        assertTrue("testFindAll 1", found.size() >= 1);
+        assertTrue(found.size() >= 1, "testFindAll 1");
 
         boolean added = false;
         for (MetadataSchema msc : found) {
@@ -289,7 +321,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
                 added = true;
             }
         }
-        assertTrue("testFindAll 2", added);
+        assertTrue(added, "testFindAll 2");
     }
 
     /**

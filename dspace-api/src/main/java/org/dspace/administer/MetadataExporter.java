@@ -335,9 +335,11 @@ public class MetadataExporter {
      * Print the usage message to standard output
      */
     public static void usage() {
-        String usage = "Use this class with the following options:\n" +
-            " -f <xml output file> : specify the output file for the schemas\n" +
-            " -s <schema> : name of the schema to export\n";
+        String usage = """
+            Use this class with the following options:
+             -f <xml output file> : specify the output file for the schemas
+             -s <schema> : name of the schema to export
+            """;
         System.out.println(usage);
     }
 }

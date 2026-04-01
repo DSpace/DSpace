@@ -7,11 +7,10 @@
  */
 package org.dspace.builder;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Objects;
+import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.ldn.NotifyPatternToTrigger;
@@ -83,7 +82,6 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     public WorkspaceItem build() {
         try {
             context.dispatchEvents();
-            indexingService.commit();
             return workspaceItem;
         } catch (Exception e) {
             return handleException(e);
@@ -111,9 +109,6 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
      * @throws IOException
      */
     public static void deleteWorkspaceItem(Integer id) throws SQLException, IOException {
-        if (Objects.isNull(id)) {
-            return;
-        }
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             WorkspaceItem workspaceItem = workspaceItemService.find(c, id);
@@ -149,10 +144,23 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
             }
             item = c.reloadEntity(item);
             if (item != null) {
+                // Delete any NotifyPatternToTrigger entries that reference this item before deleting the item.
+                // Required for Hibernate 7 compatibility - must delete referencing entities before the Item.
+                deleteNotifyPatternsForItem(c, item);
                 deleteItem(c, item);
             }
             c.complete();
-            indexingService.commit();
+        }
+    }
+
+    /**
+     * Delete all NotifyPatternToTrigger entries that reference the given Item.
+     * This must be done before deleting the Item to avoid TransientPropertyValueException in Hibernate 7.
+     */
+    private void deleteNotifyPatternsForItem(Context c, Item itemToClean) throws SQLException {
+        List<NotifyPatternToTrigger> patterns = notifyPatternToTriggerService.findByItem(c, itemToClean);
+        for (NotifyPatternToTrigger pattern : patterns) {
+            notifyPatternToTriggerService.delete(c, pattern);
         }
     }
 
@@ -161,25 +169,13 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return workspaceItemService;
     }
 
-    protected WorkspaceItemBuilder addMetadataValue(String schema, String element, String qualifier, String value) {
-        return addMetadataValue(schema, element, qualifier, null, value, null, -1);
-    }
-
-    protected WorkspaceItemBuilder addMetadataValue(String schema, String element, String qualifier, String language,
-                                                    String value) {
-        return addMetadataValue(schema, element, qualifier, language, value, null, -1);
-    }
-
-    protected WorkspaceItemBuilder addMetadataValue(String schema, String element, String qualifier, String language,
-                                                    String value, String authority, int confidence) {
-
+    protected WorkspaceItemBuilder addMetadataValue(final String schema,
+            final String element, final String qualifier, final String value) {
         try {
-            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, language,
-                                    value, authority, confidence);
+            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY, value);
         } catch (Exception e) {
             return handleException(e);
         }
-
         return this;
     }
 
@@ -191,7 +187,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     protected WorkspaceItemBuilder setMetadataSingleValue(final String schema,
             final String element, final String qualifier, final String value) {
         try {
-            itemService.setMetadataSingleValue(context, workspaceItem.getItem(), schema, element, qualifier, null,
+            itemService.setMetadataSingleValue(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY,
                     value);
         } catch (Exception e) {
             return handleException(e);
@@ -204,38 +200,12 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return setMetadataSingleValue(MetadataSchemaEnum.DC.getName(), "title", null, title);
     }
 
-    public WorkspaceItemBuilder withTitleForLanguage(final String title, final String language) {
-        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "title", null, language, title);
-    }
-
     public WorkspaceItemBuilder withIssueDate(final String issueDate) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "date", "issued", new DCDate(issueDate).toString());
     }
 
     public WorkspaceItemBuilder withAuthor(final String authorName) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
-    }
-
-    public WorkspaceItemBuilder withAuthor(String authorName, String authority) {
-        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", null, authorName, authority,
-                                600);
-    }
-
-    public WorkspaceItemBuilder withAuthorAffilitation(final String affilation) {
-        return addMetadataValue(MetadataSchemaEnum.OAIRECERIF.getName(), "author", "affiliation", affilation);
-    }
-
-    public WorkspaceItemBuilder withEditor(final String editorName) {
-        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "editor", editorName);
-    }
-
-    public WorkspaceItemBuilder withEditor(String editorName, String authority) {
-        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "editor", null, editorName, authority,
-                                600);
-    }
-
-    public WorkspaceItemBuilder withProject(final String projectName) {
-        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "relation", "project", projectName);
     }
 
     public WorkspaceItemBuilder withSubject(final String subject) {
@@ -246,30 +216,10 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "identifier", "issn", issn);
     }
 
-    public WorkspaceItemBuilder withSubjectForLanguage(final String subject, final String language) {
-        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, language, subject);
-    }
-
     public WorkspaceItemBuilder withEntityType(final String entityType) {
-        return setMetadataSingleValue("dspace", "entity", "type", entityType);
+        return addMetadataValue("dspace", "entity", "type", entityType);
     }
 
-    public WorkspaceItemBuilder withOrcidIdentifier(String orcid) {
-        return addMetadataValue("person", "identifier", "orcid", orcid);
-    }
-
-    public WorkspaceItemBuilder withCustomUrl(String url) {
-        return setMetadataSingleValue("dspace", "customurl", null, url);
-    }
-
-    public WorkspaceItemBuilder withCustomIdentifierUrl(String url, String authority) {
-        return addMetadataValue("oairecerif", "identifier", "url", Item.ANY, url, authority, 600);
-    }
-
-    public WorkspaceItemBuilder withOldCustomUrl(String url) {
-        return addMetadataValue("dspace", "customurl", "old", url);
-
-    }
     public WorkspaceItemBuilder withAbstract(final String subject) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(),"description", "abstract", subject);
     }
@@ -291,10 +241,6 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
             handleException(e);
         }
         return this;
-    }
-
-    public WorkspaceItemBuilder withFulltext(String name, String source, byte[] content) {
-        return withFulltext(name, source, new ByteArrayInputStream(content));
     }
 
     public WorkspaceItemBuilder withFulltext(String name, String source, InputStream is) {
@@ -322,6 +268,14 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
             handleException(e);
         }
         return this;
+    }
+
+    public WorkspaceItemBuilder withCustomUrl(String url) {
+        return setMetadataSingleValue("dspace", "customurl", null, url);
+    }
+
+    public WorkspaceItemBuilder withOldCustomUrl(String url) {
+        return addMetadataValue("dspace", "customurl", "old", url);
     }
 
 }

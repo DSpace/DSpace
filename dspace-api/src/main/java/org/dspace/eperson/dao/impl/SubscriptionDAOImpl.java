@@ -55,6 +55,28 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
         return list(context, criteriaQuery, false, Subscription.class, limit, offset);
     }
 
+    /**
+     * Find subscriptions by DSpaceObject.
+     * Used for Hibernate 7 compatible entity-based deletion.
+     *
+     * @param context the DSpace context
+     * @param dSpaceObject the DSpaceObject
+     * @param limit limit for results (-1 for unlimited)
+     * @param offset offset for results (-1 for none)
+     * @return list of subscriptions for the DSpaceObject
+     * @throws SQLException if database error occurs
+     */
+    public List<Subscription> findByDSpaceObject(Context context, DSpaceObject dSpaceObject,
+                                                  Integer limit, Integer offset) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        jakarta.persistence.criteria.CriteriaQuery criteriaQuery =
+            getCriteriaQuery(criteriaBuilder, Subscription.class);
+        Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
+        criteriaQuery.select(subscriptionRoot);
+        criteriaQuery.where(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.dSpaceObject), dSpaceObject));
+        return list(context, criteriaQuery, false, Subscription.class, limit, offset);
+    }
+
     @Override
     public List<Subscription> findByEPersonAndDso(Context context, EPerson eperson,
                                                   DSpaceObject dSpaceObject,
@@ -77,28 +99,31 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
 
     @Override
     public void deleteByDspaceObject(Context context, DSpaceObject dSpaceObject) throws SQLException {
-        String hqlQuery = "delete from Subscription where dSpaceObject=:dSpaceObject";
-        Query query = createQuery(context, hqlQuery);
-        query.setParameter("dSpaceObject", dSpaceObject);
-        query.executeUpdate();
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        // Bulk HQL deletes don't update the persistence context, causing TransientPropertyValueException.
+        List<Subscription> subscriptions = findByDSpaceObject(context, dSpaceObject, -1, -1);
+        for (Subscription subscription : subscriptions) {
+            delete(context, subscription);
+        }
     }
 
     @Override
     public void deleteByEPerson(Context context, EPerson eperson) throws SQLException {
-        String hqlQuery = "delete from Subscription where ePerson=:ePerson";
-        Query query = createQuery(context, hqlQuery);
-        query.setParameter("ePerson", eperson);
-        query.executeUpdate();
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        List<Subscription> subscriptions = findByEPerson(context, eperson, -1, -1);
+        for (Subscription subscription : subscriptions) {
+            delete(context, subscription);
+        }
     }
 
     @Override
     public void deleteByDSOAndEPerson(Context context, DSpaceObject dSpaceObject, EPerson eperson)
             throws SQLException {
-        String hqlQuery = "delete from Subscription where dSpaceObject=:dSpaceObject AND ePerson=:ePerson";
-        Query query = createQuery(context, hqlQuery);
-        query.setParameter("dSpaceObject", dSpaceObject);
-        query.setParameter("ePerson", eperson);
-        query.executeUpdate();
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        List<Subscription> subscriptions = findByEPersonAndDso(context, eperson, dSpaceObject, -1, -1);
+        for (Subscription subscription : subscriptions) {
+            delete(context, subscription);
+        }
     }
 
     @Override
@@ -107,7 +132,7 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
         String hqlQuery = "select s from Subscription s join %s dso " +
                 "ON dso = s.dSpaceObject ORDER BY s.id";
         if (resourceType != null) {
-            hqlQuery = String.format(hqlQuery, resourceType);
+            hqlQuery = hqlQuery.formatted(resourceType);
         }
         Query query = createQuery(context, hqlQuery);
         if (limit != -1) {

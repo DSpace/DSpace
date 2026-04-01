@@ -7,9 +7,9 @@
  */
 package org.dspace.process;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -26,7 +26,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class will aim to test Process related use cases

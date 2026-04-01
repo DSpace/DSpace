@@ -23,7 +23,7 @@
     this file, see http://wiki.apache.org/solr/SolrConfigXml.
 -->
 <config>
-    <luceneMatchVersion>8.8.1</luceneMatchVersion>
+    <luceneMatchVersion>10.0.0</luceneMatchVersion>
     
     <!-- Include contributed libraries that we use in DSpace. -->
     <!-- NOTE: When using Solr >=9.8, you MUST start Solr with `-Dsolr.config.lib.enabled=true` for this to work -->

@@ -16,6 +16,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.sql.SQLException;
 import java.text.ParsePosition;
@@ -26,9 +27,9 @@ import java.util.regex.Pattern;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.statistics.LogAnalyser;
 import org.dspace.app.statistics.LogLine;
@@ -278,8 +279,12 @@ public class ClassicDSpaceLogConverter {
      */
     private static void printHelp(Options options, int exitCode) {
         // print the help message
-        HelpFormatter myhelp = new HelpFormatter();
-        myhelp.printHelp("ClassicDSpaceLogConverter\n", options);
+        HelpFormatter myhelp = HelpFormatter.builder().get();
+        try {
+            myhelp.printHelp("ClassicDSpaceLogConverter", null, options, null, false);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         System.err.println("\n\tClassicDSpaceLogConverter -i infilename -o outfilename -v (for verbose output)");
         System.exit(exitCode);
     }

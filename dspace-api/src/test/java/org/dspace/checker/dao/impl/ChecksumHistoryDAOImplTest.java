@@ -7,7 +7,7 @@
  */
 package org.dspace.checker.dao.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import jakarta.persistence.Query;
 import org.dspace.AbstractUnitTest;
 import org.dspace.checker.ChecksumResultCode;
 import org.dspace.content.Bitstream;
@@ -23,11 +22,11 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.CoreHelpers;
 import org.dspace.core.HibernateDBConnection;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author mwood
@@ -37,20 +36,20 @@ public class ChecksumHistoryDAOImplTest
     public ChecksumHistoryDAOImplTest() {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass()
         throws SQLException, ClassNotFoundException {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown()
         throws SQLException {
     }
@@ -66,7 +65,7 @@ public class ChecksumHistoryDAOImplTest
 
         // Create two older rows
         HibernateDBConnection dbc = (HibernateDBConnection) CoreHelpers.getDBConnection(context);
-        Query qry = dbc.getSession().createNativeQuery(
+        var insertQry = dbc.getSession().createNativeMutationQuery(
             "INSERT INTO checksum_history"
                 + "(check_id, process_end_date, result, bitstream_id)"
                 + " VALUES (:id, :date, :result, :bitstream)");
@@ -81,29 +80,29 @@ public class ChecksumHistoryDAOImplTest
         // Add a past date row with matching result code
         Instant matchDate = retentionDate.minus(1, ChronoUnit.DAYS);
         int matchId = 0;
-        qry.setParameter("id", matchId);
-        qry.setParameter("date", matchDate);
-        qry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
-        qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
-        qry.executeUpdate();
+        insertQry.setParameter("id", matchId);
+        insertQry.setParameter("date", matchDate);
+        insertQry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
+        insertQry.setParameter("bitstream", bs.getID());
+        insertQry.executeUpdate();
 
         // Add a past date row with a nonmatching result code
         Instant noMatchDate = retentionDate.minus(2, ChronoUnit.DAYS);
         int noMatchId = 1;
-        qry.setParameter("id", noMatchId);
-        qry.setParameter("date", noMatchDate);
-        qry.setParameter("result", ChecksumResultCode.CHECKSUM_NO_MATCH.name());
-        qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
-        qry.executeUpdate();
+        insertQry.setParameter("id", noMatchId);
+        insertQry.setParameter("date", noMatchDate);
+        insertQry.setParameter("result", ChecksumResultCode.CHECKSUM_NO_MATCH.name());
+        insertQry.setParameter("bitstream", bs.getID());
+        insertQry.executeUpdate();
 
         // Add a future date row with a matching result code
         Instant futureDate = retentionDate.plus(3, ChronoUnit.DAYS);
         int futureMatchId = 2;
-        qry.setParameter("id", futureMatchId);
-        qry.setParameter("date", futureDate);
-        qry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
-        qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
-        qry.executeUpdate();
+        insertQry.setParameter("id", futureMatchId);
+        insertQry.setParameter("date", futureDate);
+        insertQry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
+        insertQry.setParameter("bitstream", bs.getID());
+        insertQry.executeUpdate();
 
         // Test!
         ChecksumHistoryDAOImpl instance = new ChecksumHistoryDAOImpl();
@@ -113,23 +112,23 @@ public class ChecksumHistoryDAOImplTest
         assertEquals(expResult, result);
 
         // See if matching old row is gone.
-        qry = dbc.getSession().createQuery(
-            "SELECT COUNT(*) FROM ChecksumHistory WHERE id = :id");
+        var selectQry = dbc.getSession().createQuery(
+            "SELECT COUNT(*) FROM ChecksumHistory WHERE id = :id", Long.class);
         long count;
 
-        qry.setParameter("id", matchId);
-        count = (Long) qry.getSingleResult();
-        assertEquals("Should find no row at matchDate", 0, count);
+        selectQry.setParameter("id", matchId);
+        count = (Long) selectQry.getSingleResult();
+        assertEquals(0, count, "Should find no row at matchDate");
 
         // See if nonmatching old row is still present.
-        qry.setParameter("id", noMatchId);
-        count = (Long) qry.getSingleResult();
-        assertEquals("Should find one row at noMatchDate", 1, count);
+        selectQry.setParameter("id", noMatchId);
+        count = (Long) selectQry.getSingleResult();
+        assertEquals(1, count, "Should find one row at noMatchDate");
 
         // See if future date row is still present.
-        qry.setParameter("id", futureMatchId);
-        count = (Long) qry.getSingleResult();
-        assertEquals("Should find one row at futureDate", 1, count);
+        selectQry.setParameter("id", futureMatchId);
+        count = (Long) selectQry.getSingleResult();
+        assertEquals(1, count, "Should find one row at futureDate");
     }
 
     /**

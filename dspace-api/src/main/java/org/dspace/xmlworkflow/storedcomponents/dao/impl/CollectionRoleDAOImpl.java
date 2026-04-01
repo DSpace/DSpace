@@ -10,7 +10,6 @@ package org.dspace.xmlworkflow.storedcomponents.dao.impl;
 import java.sql.SQLException;
 import java.util.List;
 
-import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
@@ -72,9 +71,11 @@ public class CollectionRoleDAOImpl extends AbstractHibernateDAO<CollectionRole> 
 
     @Override
     public void deleteByCollection(Context context, Collection collection) throws SQLException {
-        String hql = "delete from CollectionRole WHERE collection=:collection";
-        Query query = createQuery(context, hql);
-        query.setParameter("collection", collection);
-        query.executeUpdate();
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        // Bulk HQL deletes don't update the persistence context, causing TransientPropertyValueException.
+        List<CollectionRole> roles = findByCollection(context, collection);
+        for (CollectionRole role : roles) {
+            delete(context, role);
+        }
     }
 }

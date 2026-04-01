@@ -9,15 +9,19 @@ package org.dspace.content;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.AbstractUnitTest;
+import org.dspace.app.audit.MetadataEvent;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -35,8 +39,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -75,7 +79,7 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         dspaceObject = null;
@@ -83,49 +87,88 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
     }
 
     /**
-     * Test of clearDetails method, of class DSpaceObject.
+     * Test of clearMetadataEventDetails method, of class DSpaceObject.
      */
     @Test
-    public void testClearDetails() {
-        String[] testData = new String[] {"details 1", "details 2", "details 3"};
-        for (String s : testData) {
-            dspaceObject.addDetails(s);
-        }
+    public void testClearMetadataEventDetails() {
+        // Clear any events accumulated during test object creation
+        dspaceObject.clearMetadataEventDetails();
 
-        String details = dspaceObject.getDetails();
-        dspaceObject.clearDetails();
+        MetadataEvent event1 = new MetadataEvent();
+        event1.setMetadataField("dc_title");
+        event1.setValue("Test Title");
+        event1.setAction(MetadataEvent.ADD);
 
-        assertThat("testClearDetails 0", dspaceObject.getDetails(), nullValue());
-        assertThat("testClearDetails 1", dspaceObject.getDetails(), not(equalTo(details)));
+        MetadataEvent event2 = new MetadataEvent();
+        event2.setMetadataField("dc_description");
+        event2.setValue("Test Description");
+        event2.setAction(MetadataEvent.MODIFY);
+
+        dspaceObject.addMetadataEventDetails(event1);
+        dspaceObject.addMetadataEventDetails(event2);
+
+        List<MetadataEvent> details = dspaceObject.getMetadataEventDetails();
+        assertThat("testClearMetadataEventDetails 0", details, hasSize(2));
+
+        dspaceObject.clearMetadataEventDetails();
+        assertThat("testClearMetadataEventDetails 1",
+            dspaceObject.getMetadataEventDetails(), is(empty()));
     }
 
     /**
-     * Test of addDetails method, of class DSpaceObject.
+     * Test of addMetadataEventDetails method, of class DSpaceObject.
      */
     @Test
-    public void testAddDetails() {
-        dspaceObject.clearDetails();
-        String[] testData = new String[] {"details 1", "details 2", "details 3"};
-        for (String s : testData) {
-            dspaceObject.addDetails(s);
-        }
-        assertThat("testAddDetails 0", dspaceObject.getDetails(), is(equalTo("details 1, details 2, details 3")));
-        assertThat("testAddDetails 1", dspaceObject.getDetails(), is(not(equalTo(null))));
+    public void testAddMetadataEventDetails() {
+        dspaceObject.clearMetadataEventDetails();
+
+        MetadataEvent event1 = new MetadataEvent();
+        event1.setMetadataField("dc_title");
+        event1.setValue("Test Title");
+        event1.setAction(MetadataEvent.ADD);
+
+        MetadataEvent event2 = new MetadataEvent();
+        event2.setMetadataField("dc_description");
+        event2.setValue("Test Description");
+        event2.setAction(MetadataEvent.MODIFY);
+
+        MetadataEvent event3 = new MetadataEvent();
+        event3.setMetadataField("dc_subject");
+        event3.setValue("Test Subject");
+        event3.setAction(MetadataEvent.REMOVE);
+
+        dspaceObject.addMetadataEventDetails(event1);
+        dspaceObject.addMetadataEventDetails(event2);
+        dspaceObject.addMetadataEventDetails(event3);
+
+        List<MetadataEvent> details = dspaceObject.getMetadataEventDetails();
+        assertThat("testAddMetadataEventDetails 0", details, hasSize(3));
     }
 
     /**
-     * Test of getDetails method, of class DSpaceObject.
+     * Test of getMetadataEventDetails method, of class DSpaceObject.
      */
     @Test
-    public void testGetDetails() {
-        dspaceObject.clearDetails();
-        assertThat("testGetDetails 0", dspaceObject.getDetails(), nullValue());
+    public void testGetMetadataEventDetails() {
+        dspaceObject.clearMetadataEventDetails();
+        assertThat("testGetMetadataEventDetails 0",
+            dspaceObject.getMetadataEventDetails(), is(empty()));
 
-        String[] testData = new String[] {"details 1", "details 2", "details 3"};
-        for (String s : testData) {
-            dspaceObject.addDetails(s);
-        }
-        assertThat("testGetDetails 1", dspaceObject.getDetails(), is(equalTo("details 1, details 2, details 3")));
+        MetadataEvent event1 = new MetadataEvent();
+        event1.setMetadataField("dc_title");
+        event1.setValue("Test Title");
+        event1.setAction(MetadataEvent.ADD);
+
+        MetadataEvent event2 = new MetadataEvent();
+        event2.setMetadataField("dc_description");
+        event2.setValue("Test Description");
+        event2.setAction(MetadataEvent.MODIFY);
+
+        dspaceObject.addMetadataEventDetails(event1);
+        dspaceObject.addMetadataEventDetails(event2);
+
+        List<MetadataEvent> details = dspaceObject.getMetadataEventDetails();
+        assertThat("testGetMetadataEventDetails 1", details, hasSize(2));
     }
 
     /**
@@ -215,22 +258,24 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
     /**
      * Test of getAdminObject method, of class DSpaceObject.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGetAdminObjectwithException() throws SQLException {
+        assertThrows(IllegalArgumentException.class, () -> {
 
-        if (this.dspaceObject instanceof Bundle
-            || this.dspaceObject instanceof Community
-            || this.dspaceObject instanceof Collection
-            || this.dspaceObject instanceof Item) {
-            //the previous classes overwrite the method, we add this to pass
-            //this test
-            throw new IllegalArgumentException();
-        } else {
-            DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(
-                dspaceObject.getType());
-            dSpaceObjectService.getAdminObject(context, dspaceObject, Constants.ADMIN);
-            fail("Exception should have been thrown");
-        }
+            if (this.dspaceObject instanceof Bundle
+                || this.dspaceObject instanceof Community
+                || this.dspaceObject instanceof Collection
+                || this.dspaceObject instanceof Item) {
+                //the previous classes overwrite the method, we add this to pass
+                //this test
+                throw new IllegalArgumentException();
+            } else {
+                DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(
+                    dspaceObject.getType());
+                dSpaceObjectService.getAdminObject(context, dspaceObject, Constants.ADMIN);
+                fail("Exception should have been thrown");
+            }
+        });
     }
 
     /**

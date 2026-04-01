@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,9 +34,9 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * This is an integration test to ensure collections and communities interact properly.
@@ -64,7 +64,7 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -77,7 +77,7 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         super.destroy();
@@ -224,8 +224,8 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
 
         // Test deletion of single Bitstream as a Community Admin (delete just flags as deleted)
         bitstreamService.delete(context, bitstream);
-        assertTrue("Community Admin unable to flag Bitstream as deleted",
-                   bitstream.isDeleted());
+        assertTrue(bitstream.isDeleted(),
+                   "Community Admin unable to flag Bitstream as deleted");
         // NOTE: A Community Admin CANNOT "expunge" a Bitstream, as delete() removes all their permissions
 
         // Test deletion of single Item as a Community Admin
@@ -306,8 +306,8 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
 
         // Test deletion of single Bitstream as a Collection Admin (delete just flags as deleted)
         bitstreamService.delete(context, bitstream2);
-        assertTrue("Collection Admin unable to flag Bitstream as deleted",
-                   bitstream2.isDeleted());
+        assertTrue(bitstream2.isDeleted(),
+                   "Collection Admin unable to flag Bitstream as deleted");
         // NOTE: A Collection Admin CANNOT "expunge" a Bitstream, as delete() removes all their permissions
 
         // Test deletion of single Bundle as a Collection Admin
@@ -324,7 +324,7 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
                    itemService.find(context, itemId), nullValue());
         assertThat("Collection Admin unable to delete sub-Bundle",
                    bundleService.find(context, bundleId), nullValue());
-        assertTrue("Collection Admin unable to flag sub-Bitstream as deleted",
-                   bitstream.isDeleted());
+        assertTrue(bitstream.isDeleted(),
+                   "Collection Admin unable to flag sub-Bitstream as deleted");
     }
 }

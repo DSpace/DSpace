@@ -37,8 +37,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.orcid.factory.OrcidServiceFactory;
 import org.dspace.orcid.model.OrcidProfileSectionType;
 import org.dspace.orcid.model.factory.OrcidProfileSectionFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.orcid.jaxb.model.common.Iso3166Country;
 import org.orcid.jaxb.model.common.Relationship;
 import org.orcid.jaxb.model.v3.release.record.Address;
@@ -61,7 +61,7 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
 
     private Collection collection;
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         profileSectionFactoryService = OrcidServiceFactory.getInstance().getOrcidProfileSectionFactoryService();

@@ -262,6 +262,21 @@ public class StatisticsDataVisits extends StatisticsData {
                                 dataset.addValueToMatrix(j, k, objectCount.getCount());
                             }
                         }
+                        // If no facet values found (e.g. empty statistics core), fall back
+                        // to querying date facets directly to get the date range skeleton
+                        if (dataset == null && dateFacet != null) {
+                            ObjectCount[] fallbackResults = solrLoggerService
+                                .queryFacetDate(query, filterQuery, dataSetQuery.getMax(),
+                                                dateFacet.getDateType(), dateFacet.getStartDate(),
+                                                dateFacet.getEndDate(), showTotal, context, facetMinCount);
+                            dataset = new Dataset(1, fallbackResults.length);
+                            for (int j = 0; j < fallbackResults.length; j++) {
+                                dataset.setColLabel(j, fallbackResults[j].getValue());
+                                dataset.addValueToMatrix(0, j, fallbackResults[j].getCount());
+                            }
+                            dataset.setRowLabel(0, getResultName(dataSetQuery.getName(), dataSetQuery, context));
+                            dataset.setRowLabelAttr(0, getAttributes(dataSetQuery.getName(), dataSetQuery, context));
+                        }
                         if (dataset != null && !(getDatasetGenerators().get(0) instanceof DatasetTimeGenerator)) {
                             dataset.flipRowCols();
                         }
@@ -406,8 +421,7 @@ public class StatisticsDataVisits extends StatisticsData {
 
     protected void processAxis(Context context, DatasetGenerator datasetGenerator, List<DatasetQuery> queries)
         throws SQLException {
-        if (datasetGenerator instanceof DatasetDSpaceObjectGenerator) {
-            DatasetDSpaceObjectGenerator dspaceObjAxis = (DatasetDSpaceObjectGenerator) datasetGenerator;
+        if (datasetGenerator instanceof DatasetDSpaceObjectGenerator dspaceObjAxis) {
             // Get the types involved
             List<DSORepresentation> dsoRepresentations = dspaceObjAxis.getDsoRepresentations();
             for (int i = 0; i < dsoRepresentations.size(); i++) {
@@ -471,8 +485,7 @@ public class StatisticsDataVisits extends StatisticsData {
 
                 queries.add(datasetQuery);
             }
-        } else if (datasetGenerator instanceof DatasetTypeGenerator) {
-            DatasetTypeGenerator typeAxis = (DatasetTypeGenerator) datasetGenerator;
+        } else if (datasetGenerator instanceof DatasetTypeGenerator typeAxis) {
             DatasetQuery datasetQuery = new DatasetQuery();
 
             // First make sure our query is in order
@@ -822,8 +835,8 @@ public class StatisticsDataVisits extends StatisticsData {
 
                 //DS-3602: For clarity, adding "id:" to the right hand side of the search
                 //In the solr schema, "id" has been declared as the defaultSearchField so the field name is optional
-                if (dso instanceof DSpaceObjectLegacySupport) {
-                    query += " (id:" + dso.getID() + " OR id:" + ((DSpaceObjectLegacySupport) dso).getLegacyId() + ")";
+                if (dso instanceof DSpaceObjectLegacySupport support) {
+                    query += " (id:" + dso.getID() + " OR id:" + support.getLegacyId() + ")";
                 } else {
                     query += "id:" + dso.getID();
                 }
@@ -847,9 +860,9 @@ public class StatisticsDataVisits extends StatisticsData {
                     default:
                         break;
                 }
-                if (currentDso instanceof DSpaceObjectLegacySupport) {
+                if (currentDso instanceof DSpaceObjectLegacySupport support) {
                     owningStr = "(" + owningStr + ":" + currentDso.getID() + " OR "
-                        + owningStr + ":" + ((DSpaceObjectLegacySupport) currentDso).getLegacyId() + ")";
+                        + owningStr + ":" + support.getLegacyId() + ")";
                 } else {
                     owningStr += ":" + currentDso.getID();
                 }

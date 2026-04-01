@@ -506,10 +506,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         try {
             installItemService.installItem(context, workspaceItem, this.handle);
             itemService.update(context, item);
-            //Check if we need to make this item private. This has to be done after item install.
-            if (readerGroup != null) {
-                setOnlyReadPermission(workspaceItem.getItem(), readerGroup, null);
-            }
 
             if (withdrawn) {
                 itemService.withdraw(context, item);
@@ -517,8 +513,18 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             if (inArchive) {
                 item.setArchived(inArchive);
             }
+
+            // Dispatch events first so that event consumers (e.g. policy
+            // inheritance) finish processing before we restrict permissions.
+            // Otherwise, dispatchEvents() may re-create default policies
+            // that setOnlyReadPermission() just removed.
             context.dispatchEvents();
             indexingService.commit();
+
+            //Check if we need to make this item private. This has to be done after item install.
+            if (readerGroup != null) {
+                setOnlyReadPermission(workspaceItem.getItem(), readerGroup, null);
+            }
             return item;
         } catch (Exception e) {
             return handleException(e);

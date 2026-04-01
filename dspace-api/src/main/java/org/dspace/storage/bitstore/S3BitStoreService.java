@@ -11,6 +11,7 @@ import static java.lang.String.valueOf;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -25,10 +26,10 @@ import java.util.function.Supplier;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -567,13 +568,13 @@ public class S3BitStoreService extends BaseBitStoreService {
         Options options = new Options();
         Option option;
 
-        option = Option.builder("a").desc("access key").hasArg().required().build();
+        option = Option.builder("a").desc("access key").hasArg().required().get();
         options.addOption(option);
 
-        option = Option.builder("s").desc("secret key").hasArg().required().build();
+        option = Option.builder("s").desc("secret key").hasArg().required().get();
         options.addOption(option);
 
-        option = Option.builder("f").desc("asset file name").hasArg().required().build();
+        option = Option.builder("f").desc("asset file name").hasArg().required().get();
         options.addOption(option);
 
         DefaultParser parser = new DefaultParser();
@@ -583,8 +584,13 @@ public class S3BitStoreService extends BaseBitStoreService {
             command = parser.parse(options, args);
         } catch (ParseException e) {
             System.err.println(e.getMessage());
-            new HelpFormatter().printHelp(
-                    S3BitStoreService.class.getSimpleName() + "options", options);
+            try {
+                HelpFormatter.builder().get().printHelp(
+                    S3BitStoreService.class.getSimpleName() + "options",
+                    null, options, null, false);
+            } catch (IOException ioe) {
+                throw new UncheckedIOException(ioe);
+            }
             return;
         }
 

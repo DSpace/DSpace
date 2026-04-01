@@ -12,6 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BitstreamFormatBuilder;
@@ -35,6 +37,7 @@ import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.RequestItemBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.builder.SiteBuilder;
+import org.dspace.builder.SupervisionOrderBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 
@@ -44,6 +47,8 @@ import org.dspace.builder.WorkspaceItemBuilder;
  * builders.
  */
 public class AbstractBuilderCleanupUtil {
+
+    private static final Logger log = LogManager.getLogger();
 
     private final LinkedHashMap<String, List<AbstractBuilder>> map
             = new LinkedHashMap<>();
@@ -65,6 +70,7 @@ public class AbstractBuilderCleanupUtil {
         map.put(ResourcePolicyBuilder.class.getName(), new ArrayList<>());
         map.put(RelationshipBuilder.class.getName(), new ArrayList<>());
         map.put(RequestItemBuilder.class.getName(), new ArrayList<>());
+        map.put(SupervisionOrderBuilder.class.getName(), new ArrayList<>());
         map.put(PoolTaskBuilder.class.getName(), new ArrayList<>());
         map.put(WorkflowItemBuilder.class.getName(), new ArrayList<>());
         map.put(WorkspaceItemBuilder.class.getName(), new ArrayList<>());
@@ -101,11 +107,25 @@ public class AbstractBuilderCleanupUtil {
      * @throws Exception    If something goes wrong
      */
     public void cleanupBuilders() throws Exception {
+        Exception firstException = null;
         for (Map.Entry<String, List<AbstractBuilder>> entry : map.entrySet()) {
             List<AbstractBuilder> list = entry.getValue();
             for (AbstractBuilder abstractBuilder : list) {
-                abstractBuilder.cleanup();
+                try {
+                    abstractBuilder.cleanup();
+                } catch (Exception e) {
+                    log.error("Failed to cleanup builder {}: {}",
+                              abstractBuilder.getClass().getSimpleName(), e.getMessage(), e);
+                    if (firstException == null) {
+                        firstException = e;
+                    } else {
+                        firstException.addSuppressed(e);
+                    }
+                }
             }
+        }
+        if (firstException != null) {
+            throw firstException;
         }
     }
 

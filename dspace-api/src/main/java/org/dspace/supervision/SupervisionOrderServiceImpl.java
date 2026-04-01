@@ -19,6 +19,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.dspace.supervision.dao.SupervisionOrderDao;
 import org.dspace.supervision.service.SupervisionOrderService;
@@ -82,7 +83,7 @@ public class SupervisionOrderServiceImpl implements SupervisionOrderService {
         supervisionOrder.setGroup(group);
         SupervisionOrder supOrder = supervisionDao.create(context, supervisionOrder);
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(), null,
-            itemService.getIdentifiers(context, item)));
+            DetailType.INFO, itemService.getIdentifiers(context, item)));
         return supOrder;
     }
 

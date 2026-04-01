@@ -9,7 +9,6 @@ package org.dspace.app.rest;
 
 import static org.dspace.app.rest.configuration.ActuatorConfiguration.UP_WITH_ISSUES_STATUS;
 import static org.dspace.app.rest.link.search.HealthIndicatorMatcher.match;
-import static org.dspace.app.rest.link.search.HealthIndicatorMatcher.matchDatabase;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -19,8 +18,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Map;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.junit.Test;
-import org.springframework.boot.actuate.health.Status;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.health.contributor.Status;
 
 /**
  * Integration tests to verify the health indicators configuration.
@@ -59,11 +58,12 @@ public class HealthIndicatorsIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
+        // In Spring Boot 4, the composite "db" health indicator is no longer
+        // auto-configured. The database health check is not available by default.
         getClient(token).perform(get(HEALTH_PATH))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.status", is(UP_WITH_ISSUES_STATUS.getCode())))
             .andExpect(jsonPath("$.components", allOf(
-                matchDatabase(Status.UP),
                 match("solrSearchCore", Status.UP, Map.of("status", 0, "detectedPathType", "root")),
                 match("solrStatisticsCore", Status.UP, Map.of("status", 0, "detectedPathType", "root")),
                 match("geoIp", UP_WITH_ISSUES_STATUS,

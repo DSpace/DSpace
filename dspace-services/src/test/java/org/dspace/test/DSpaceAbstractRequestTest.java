@@ -7,10 +7,10 @@
  */
 package org.dspace.test;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
 
 /**
@@ -30,22 +30,22 @@ public abstract class DSpaceAbstractRequestTest extends DSpaceAbstractKernelTest
         return requestId;
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void initRequestService() {
         _initializeRequestService();
     }
 
-    @Before
+    @BeforeEach
     public void startRequest() {
         _startRequest();
     }
 
-    @After
+    @AfterEach
     public void endRequest() {
         _endRequest();
     }
 
-    @AfterClass
+    @AfterAll
     public static void cleanupRequestService() {
         _destroyRequestService();
     }

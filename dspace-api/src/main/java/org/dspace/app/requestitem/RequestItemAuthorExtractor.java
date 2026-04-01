@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Interface to abstract the strategy for selecting the author to contact for

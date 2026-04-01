@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -27,6 +28,7 @@ import org.dspace.eperson.EPerson;
 @Table(name = "qaevent_processed")
 public class QAEventProcessed implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 3427340199132007814L;
 
     @Id

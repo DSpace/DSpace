@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -342,8 +342,8 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                 validationFileStream = handler.getFileStream(context, zipfilename);
             } else {
                 // manage zip via remote url
-                optionalFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
-                validationFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
+                optionalFileStream = Optional.ofNullable(URI.create(zipfilename).toURL().openStream());
+                validationFileStream = Optional.ofNullable(URI.create(zipfilename).toURL().openStream());
             }
 
             if (validationFileStream.isPresent()) {

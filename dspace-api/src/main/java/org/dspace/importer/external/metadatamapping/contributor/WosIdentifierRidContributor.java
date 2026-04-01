@@ -44,8 +44,8 @@ public class WosIdentifierRidContributor extends SimpleXpathMetadatumContributor
                 namespaces);
         List<Object> nodes = xpath.evaluate(t);
         for (Object el : nodes) {
-            if (el instanceof Element) {
-                Element element = ((Element) el).getChild("name");
+            if (el instanceof Element element1) {
+                Element element = element1.getChild("name");
                 if (Objects.nonNull(element)) {
                     String type = element.getAttributeValue("role");
                     setIdentyfier(type, element, values);

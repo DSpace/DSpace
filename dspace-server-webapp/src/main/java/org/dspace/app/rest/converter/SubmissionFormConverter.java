@@ -31,7 +31,6 @@ import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
-import org.dspace.services.RequestService;
 import org.dspace.submit.model.LanguageFormField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,13 +48,9 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     private static final String INPUT_TYPE_NAME = "name";
     private static final String INPUT_TYPE_LOOKUP = "lookup";
     private static final String INPUT_TYPE_LOOKUP_NAME = "lookup-name";
-    private static final String INPUT_TYPE_DROPDOWN = "dropdown";
 
     @Autowired
     private AuthorityUtils authorityUtils;
-
-    @Autowired
-    private RequestService requestService;
 
     @Autowired
     private SubmissionFormRestRepository submissionFormRestRepository;
@@ -126,12 +121,12 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
 
                 SelectableMetadata selMd = new SelectableMetadata();
                 if (isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
-                             dcinput.getPairsType(), dcinput.getVocabulary(), formName)) {
+                        dcinput.getPairsType(), dcinput.getVocabulary())) {
                     inputRest.setType(getPresentation(dcinput.getSchema(), dcinput.getElement(),
                                                       dcinput.getQualifier(), inputType));
                     selMd.setControlledVocabulary(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
                                                         dcinput.getQualifier(), dcinput.getPairsType(),
-                                                                   dcinput.getVocabulary(), formName));
+                                                        dcinput.getVocabulary(), null));
                     selMd.setClosed(
                             isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
                                     dcinput.getPairsType(), dcinput.getVocabulary(), dcinput.isClosedVocabulary()));
@@ -167,11 +162,9 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                     selMd.setLabel((String) pairs.get(idx));
                     selMd.setMetadata(org.dspace.core.Utils
                             .standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
-                    if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
-                                                formName)) {
+                    if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
                         selMd.setControlledVocabulary(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
-                                                                       pairs.get(idx + 1), dcinput.getPairsType(),
-                                                                       dcinput.getVocabulary(), formName));
+                                pairs.get(idx + 1), dcinput.getPairsType(), dcinput.getVocabulary(), null));
                         selMd.setClosed(isClosed(dcinput.getSchema(), dcinput.getElement(),
                                 dcinput.getQualifier(), null, dcinput.getVocabulary(), dcinput.isClosedVocabulary()));
                     }
@@ -218,8 +211,6 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                     return INPUT_TYPE_ONEBOX;
                 } else if (AuthorityUtils.PRESENTATION_TYPE_LOOKUP.equals(presentation)) {
                     return INPUT_TYPE_LOOKUP;
-                } else if (AuthorityUtils.PRESENTATION_TYPE_SELECT.equals(presentation)) {
-                    return INPUT_TYPE_DROPDOWN;
                 }
             } else if (INPUT_TYPE_NAME.equals(inputType)) {
                 if (AuthorityUtils.PRESENTATION_TYPE_LOOKUP.equals(presentation) ||
@@ -252,11 +243,11 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     }
 
     private boolean isChoice(String schema, String element, String qualifier, String valuePairsName,
-                             String vocabularyName, String formname) {
+            String vocabularyName) {
         if (StringUtils.isNotBlank(valuePairsName) || StringUtils.isNotBlank(vocabularyName)) {
             return true;
         }
-        return authorityUtils.isChoice(schema, element, qualifier, formname);
+        return authorityUtils.isChoice(schema, element, qualifier);
     }
 
     @Override

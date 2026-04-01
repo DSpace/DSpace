@@ -18,10 +18,8 @@ import java.sql.SQLException;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.EPersonBuilder;
-import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link EPersonAuthority}.
@@ -31,8 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class EPersonAuthorityIT extends AbstractControllerIntegrationTest {
 
-    @Autowired
-    private ConfigurationService configurationService;
 
     @Test
     public void testEPersonAuthorityWithFirstName() throws Exception {
@@ -115,8 +111,6 @@ public class EPersonAuthorityIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void testEPersonAuthorityWithAnonymousUser() throws Exception {
-
-        configurationService.setProperty("authority.EPersonAuthority.public", true);
 
         context.turnOffAuthorisationSystem();
         createEPerson("Luca", "Giamminonni");

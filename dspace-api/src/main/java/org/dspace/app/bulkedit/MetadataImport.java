@@ -164,11 +164,11 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     protected EntityService entityService = ContentServiceFactory.getInstance().getEntityService();
     protected AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance()
                                                                                    .getAuthorityValueService();
-    protected ConfigurationService configurationService
-            = DSpaceServicesFactory.getInstance().getConfigurationService();
     protected MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory
         .getInstance()
         .getMetadataAuthorityService();
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -989,7 +989,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 // Look for it in the actual list of Collections
                 boolean found = false;
                 for (Collection collection : actualCollections) {
-                    if (collection.getID() != item.getOwningCollection().getID()) {
+                    if (!collection.getID().equals(item.getOwningCollection().getID())) {
                         // Is it there?
                         if (csvcollection.equals(collection.getHandle())) {
                             found = true;
@@ -1146,11 +1146,9 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
         final StringBuilder builder = new StringBuilder();
         builder.append(schema).append("_").append(element);
-
         if (StringUtils.isNotEmpty(qualifier)) {
             builder.append("_").append(qualifier);
         }
-
         boolean isAuthorityControlled = metadataAuthorityService.isAuthorityAllowed(builder.toString(),
                 Constants.ITEM, null);
 

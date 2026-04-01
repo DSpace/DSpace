@@ -8,6 +8,7 @@
 package org.dspace.app.util;
 
 import java.beans.Introspector;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.Driver;
@@ -38,7 +39,7 @@ public class DSpaceContextListener implements ServletContextListener {
             String osName = System.getProperty("os.name");
 
             if (osName != null && osName.toLowerCase().contains("windows")) {
-                URL url = new URL("http://localhost/");
+                URL url = URI.create("http://localhost/").toURL();
                 URLConnection urlConn = url.openConnection();
                 urlConn.setDefaultUseCaches(false);
             }

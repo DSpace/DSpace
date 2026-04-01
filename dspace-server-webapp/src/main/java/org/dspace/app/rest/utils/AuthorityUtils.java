@@ -35,8 +35,6 @@ public class AuthorityUtils {
 
     public static final String PRESENTATION_TYPE_SUGGEST = "suggest";
 
-    public static final String PRESENTATION_TYPE_SELECT = "select";
-
     public static final String RESERVED_KEYMAP_PARENT = "parent";
 
     @Autowired
@@ -48,18 +46,38 @@ public class AuthorityUtils {
     @Autowired
     private ConverterService converter;
 
-    /**
-     *
-     * @param schema
-     * @param element
-     * @param qualifier
-     * @return
-     */
-    public boolean isChoice(String schema, String element, String qualifier, String formname) {
-        return cas.isChoicesConfigured(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"),
-                Constants.ITEM, formname);
+
+    public boolean isChoice(String schema, String element, String qualifier) {
+        return cas.isChoicesConfigured(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"), null);
     }
 
+    /**
+     * Check if choices are configured for the given metadata field within a specific form.
+     *
+     * @param schema    the metadata schema
+     * @param element   the metadata element
+     * @param qualifier the metadata qualifier
+     * @param formName  the submission form name
+     * @return true if choices are configured
+     */
+    public boolean isChoice(String schema, String element, String qualifier, String formName) {
+        return cas.isChoicesConfigured(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"),
+                Constants.ITEM, formName);
+    }
+
+    public String getAuthorityName(String schema, String element, String qualifier) {
+        return cas.getChoiceAuthorityName(schema, element, qualifier, (String) null);
+    }
+
+    /**
+     * Get the authority name for the given metadata field within a specific form.
+     *
+     * @param schema    the metadata schema
+     * @param element   the metadata element
+     * @param qualifier the metadata qualifier
+     * @param formName  the submission form name
+     * @return the authority name
+     */
     public String getAuthorityName(String schema, String element, String qualifier, String formName) {
         return cas.getChoiceAuthorityName(schema, element, qualifier, formName);
     }
@@ -75,37 +93,19 @@ public class AuthorityUtils {
     /**
      * TODO the authorityName MUST be a part of Choice model
      *
-     * @param fix            if true mean that we need to deal with a
-     *                       DSpaceControlledVocabulary that requires to have the
-     *                       vocabulary name in both the authority than in the entry
-     *                       id. An entry id with a double vocabulary name would
-     *                       cause issue to angular if the vocabulary entry was
-     *                       requested using just one occurrence of the name FIXME
-     *                       hack to deal with an improper use on the angular side
-     *                       of the node id (otherinformation.id) to build a
-     *                       vocabulary entry details ID
-     * @param choice         the choice to convert
-     * @param authorityName  the name of the authority to which the choice belongs
-     * @param isHierarchical <code>true</code> if it is an hierarchical vocabulary
-     * @param storeAuthority <code>true</code> if the authority is configured to store the
-     *                       authority in the metadata
-     *                       {@link ChoiceAuthority#storeAuthorityInMetadata()}
-     * @param projection     the name of the projection to use, or {@code null}.
+     * @param choice
+     * @param authorityName
+     * @param projection the name of the projection to use, or {@code null}.
      * @return
      */
-    public VocabularyEntryDetailsRest convertEntryDetails(boolean fix, Choice choice, String authorityName,
-            boolean isHierarchical, boolean storeAuthority, Projection projection) {
+    public VocabularyEntryDetailsRest convertEntryDetails(Choice choice, String authorityName,
+           boolean isHierarchical, Projection projection) {
         if (choice == null) {
             return null;
         }
         VocabularyEntryDetailsRest entry = converter.toRest(choice, projection);
         entry.setVocabularyName(authorityName);
-        if (!fix) {
-            entry.setId(authorityName + ":" + entry.getId());
-        }
-        if (storeAuthority) {
-            entry.setAuthority(choice.authority);
-        }
+        entry.setId(authorityName + ":" + entry.getId());
         entry.setInHierarchicalVocabulary(isHierarchical);
         return entry;
     }
@@ -137,7 +137,6 @@ public class AuthorityUtils {
         if (StringUtils.isNotBlank(choice.authority)) {
             entry.setVocabularyEntryDetailsRest(converter.toRest(choice, projection));
         }
-        entry.setSource(choice.source);
         return entry;
     }
 
@@ -153,15 +152,5 @@ public class AuthorityUtils {
         VocabularyRest result = converter.toRest(source, projection);
         result.setName(authorityName);
         return result;
-    }
-
-    /**
-     * Get the configured "isHierarchical" value for this authority.
-     *
-     * @param authorityName single string identifying authority name
-     * @return true if authority is Hierarchical.
-     */
-    public boolean isHierarchical(String authorityName) {
-        return cas.getChoiceAuthorityByAuthorityName(authorityName).isHierarchical();
     }
 }

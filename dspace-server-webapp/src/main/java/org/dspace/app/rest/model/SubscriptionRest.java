@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class SubscriptionRest extends BaseObjectRest<Integer> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public static final String NAME = "subscription";

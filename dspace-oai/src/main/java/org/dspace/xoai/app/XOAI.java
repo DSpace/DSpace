@@ -41,9 +41,9 @@ import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -172,7 +172,7 @@ public class XOAI {
                 }
 
             }
-            solrServerResolver.getServer().commit();
+            solrServerResolver.getServer().commit(true, true, true);
 
             // Set last compilation date
             xoaiLastCompilationCacheService.put(Instant.now());
@@ -336,7 +336,7 @@ public class XOAI {
                 if (i % batchSize == 0) {
                     System.out.println(i + " items imported so far...");
                     server.add(list);
-                    server.commit();
+                    server.commit(true, true, true);
                     list.clear();
                     try {
                         context.uncacheEntities();
@@ -489,7 +489,7 @@ public class XOAI {
 
         // Message output before processing - for debugging purposes
         if (verbose) {
-            println(String.format("Item %s with handle %s is about to be indexed", item.getID().toString(), handle));
+            println("Item %s with handle %s is about to be indexed".formatted(item.getID().toString(), handle));
         }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -507,7 +507,7 @@ public class XOAI {
         doc.addField("item.compile", out.toString());
 
         if (verbose) {
-            println(String.format("Item %s with handle %s indexed", item.getID().toString(), handle));
+            println("Item %s with handle %s indexed".formatted(item.getID().toString(), handle));
         }
 
         return doc;
@@ -564,7 +564,7 @@ public class XOAI {
         try {
             System.out.println("Clearing index");
             solrServerResolver.getServer().deleteByQuery("*:*");
-            solrServerResolver.getServer().commit();
+            solrServerResolver.getServer().commit(true, true, true);
             System.out.println("Index cleared");
         } catch (SolrServerException | IOException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);

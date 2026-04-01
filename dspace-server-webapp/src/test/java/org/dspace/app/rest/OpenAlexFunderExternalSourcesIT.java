@@ -29,8 +29,8 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -50,7 +50,7 @@ public class OpenAlexFunderExternalSourcesIT extends AbstractControllerIntegrati
     private OpenAlexImportMetadataSourceServiceImpl openAlexImportMetadataSourceService;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ReflectionTestUtils.setField(openAlexImportMetadataSourceService, "liveImportClient", liveImportClient);
     }

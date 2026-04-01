@@ -76,10 +76,6 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
         return setMetadataSingleValue(community, MetadataSchemaEnum.DC.getName(), "title", null, communityName);
     }
 
-    public CommunityBuilder withNameForLanguage(final String communityName, String language) {
-        return addMetadataValue(community, MetadataSchemaEnum.DC.getName(), "title", null, language, communityName);
-    }
-
     public CommunityBuilder withTitle(final String communityTitle) {
         return addMetadataValue(community, MetadataSchemaEnum.DC.getName(), "title", null, communityTitle);
     }
@@ -121,7 +117,6 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
             communityService.update(context, community);
             context.dispatchEvents();
 
-            indexingService.commit();
         } catch (Exception e) {
             e.printStackTrace();
             return null;

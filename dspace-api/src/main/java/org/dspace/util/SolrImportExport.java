@@ -10,6 +10,8 @@ package org.dspace.util;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
 import java.time.YearMonth;
@@ -23,20 +25,20 @@ import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.request.LukeRequest;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.client.solrj.response.FieldStatsInfo;
 import org.apache.solr.client.solrj.response.LukeResponse;
@@ -250,12 +252,14 @@ public class SolrImportExport {
         }
 
         try {
-            HttpSolrClient adminSolr = new HttpSolrClient.Builder(baseSolrUrl).build();
+            HttpJettySolrClient adminSolr = new HttpJettySolrClient.Builder(baseSolrUrl).build();
 
             // try to find out size of core and compare with free space in export directory
             CoreAdminResponse status = CoreAdminRequest.getStatus(indexName, adminSolr);
-            Object coreSizeObj = status.getCoreStatus(indexName).get("sizeInBytes");
-            long coreSize = coreSizeObj != null ? Long.valueOf(coreSizeObj.toString()) : -1;
+            // Solr 10 uses typed response objects with public fields instead of generic Maps
+            var coreData = status.getCoreStatus(indexName);
+            long coreSize = (coreData != null && coreData.index != null && coreData.index.sizeInBytes != null)
+                ? coreData.index.sizeInBytes : -1;
             long usableExportSpace = exportDir.getUsableSpace();
             if (coreSize >= 0 && usableExportSpace < coreSize) {
                 System.err.println("Not enough space in export directory " + exportDirName
@@ -317,8 +321,8 @@ public class SolrImportExport {
             }
 
             // commit changes
-            HttpSolrClient origSolr = new HttpSolrClient.Builder(origSolrUrl).build();
-            origSolr.commit();
+            HttpJettySolrClient origSolr = new HttpJettySolrClient.Builder(origSolrUrl).build();
+            origSolr.commit(true, true, true);
 
             // swap back (statistics now going to actual core name in actual data dir)
             swapRequest = new CoreAdminRequest();
@@ -335,7 +339,7 @@ public class SolrImportExport {
             importIndex(tempIndexName, exportDir, origSolrUrl, false);
 
             // commit changes
-            origSolr.commit();
+            origSolr.commit(true, true, true);
 
             // unload now-temp core (temp core name)
             CoreAdminRequest.unloadCore(tempIndexName, false, false, adminSolr);
@@ -398,7 +402,7 @@ public class SolrImportExport {
                                                     + indexName);
         }
 
-        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
+        HttpJettySolrClient solr = new HttpJettySolrClient.Builder(solrUrl).build();
 
         // must get multivalue fields before clearing
         List<String> multivaluedFields = getMultiValuedFields(solr);
@@ -431,12 +435,13 @@ public class SolrImportExport {
             }
             contentStreamUpdateRequest.setParam("stream.contentType", "text/csv;charset=utf-8");
             contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
-            contentStreamUpdateRequest.addFile(file, "text/csv;charset=utf-8");
+            // Solr 10 uses Path instead of File
+            contentStreamUpdateRequest.addFile(file.toPath(), "text/csv;charset=utf-8");
 
             solr.request(contentStreamUpdateRequest);
         }
 
-        solr.commit(true, true);
+        solr.commit(true, true, true);
     }
 
     /**
@@ -445,7 +450,7 @@ public class SolrImportExport {
      * @param solr the solr server to query.
      * @return A list containing all multi-valued fields, or an empty list if none are found / there aren't any.
      */
-    private static List<String> getMultiValuedFields(HttpSolrClient solr) {
+    private static List<String> getMultiValuedFields(HttpJettySolrClient solr) {
         List<String> result = new ArrayList<>();
         try {
             LukeRequest request = new LukeRequest();
@@ -471,9 +476,9 @@ public class SolrImportExport {
      * @throws SolrServerException if there is a problem in communicating with Solr.
      */
     public static void clearIndex(String solrUrl) throws IOException, SolrServerException {
-        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
+        HttpJettySolrClient solr = new HttpJettySolrClient.Builder(solrUrl).build();
         solr.deleteByQuery("*:*");
-        solr.commit();
+        solr.commit(true, true, true);
         solr.optimize();
     }
 
@@ -497,8 +502,8 @@ public class SolrImportExport {
     public static void exportIndex(String indexName, File toDir, String solrUrl, String timeField, String fromWhen,
                                    boolean overwrite)
         throws SolrServerException, IOException, SolrImportExportException {
-        log.info(String.format("Export Index [%s] to [%s] using [%s] Time Field[%s] FromWhen[%s]", indexName, toDir,
-                               solrUrl, timeField, fromWhen));
+        log.info("Export Index [%s] to [%s] using [%s] Time Field[%s] FromWhen[%s]".formatted(indexName, toDir,
+            solrUrl, timeField, fromWhen));
         if (StringUtils.isBlank(solrUrl)) {
             throw new SolrImportExportException(
                 "Could not construct solr URL for index" + indexName + ", aborting export.");
@@ -510,7 +515,7 @@ public class SolrImportExport {
                                                     + indexName);
         }
 
-        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
+        HttpJettySolrClient solr = new HttpJettySolrClient.Builder(solrUrl).build();
 
         SolrQuery query = new SolrQuery("*:*");
         if (StringUtils.isNotBlank(fromWhen)) {
@@ -572,15 +577,18 @@ public class SolrImportExport {
 
             for (int i = 0; i < docsThisMonth; i += ROWS_PER_FILE) {
                 monthQuery.setStart(i);
-                URL url = new URL(solrUrl + "/select?" + monthQuery.toString());
+                URL url = URI.create(solrUrl + "/select?" + monthQuery.toString()).toURL();
 
                 File file = new File(toDir.getCanonicalPath(),
                                      makeExportFilename(indexName, monthStartDate, docsThisMonth, i));
                 if (file.createNewFile() || overwrite) {
                     FileUtils.copyURLToFile(url, file);
-                    String message = String.format(
-                        "Solr export to file [%s] complete.  Export for Index [%s] Month [%s] Batch [%d] Num Docs [%d]",
-                        file.getCanonicalPath(), indexName, monthStart, i, docsThisMonth);
+                    String message =
+                        ("Solr export to file [%s] complete.  Export for"
+                            + " Index [%s] Month [%s] Batch [%d]"
+                            + " Num Docs [%d]").formatted(
+                            file.getCanonicalPath(), indexName,
+                            monthStart, i, docsThisMonth);
                     log.info(message);
                 } else if (file.exists()) {
                     String message = String.format(
@@ -700,8 +708,12 @@ public class SolrImportExport {
      * @param exitCode the exit code to use. The method will call System#exit(int) with the given code.
      */
     private static void printHelpAndExit(Options options, int exitCode) {
-        HelpFormatter myhelp = new HelpFormatter();
-        myhelp.printHelp(SolrImportExport.class.getSimpleName() + "\n", options);
+        HelpFormatter myhelp = HelpFormatter.builder().get();
+        try {
+            myhelp.printHelp(SolrImportExport.class.getSimpleName(), null, options, null, false);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         System.out.println("\n\nCommand Defaults");
         System.out.println("\tsolr-export-statistics  [-a export]  [-i statistics]");
         System.out.println("\tsolr-import-statistics  [-a import]  [-i statistics]");

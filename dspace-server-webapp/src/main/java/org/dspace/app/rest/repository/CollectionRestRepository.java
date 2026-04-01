@@ -15,8 +15,6 @@ import java.util.Objects;
 import java.util.SortedMap;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -74,6 +72,9 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This is the repository responsible to manage Item Rest object
@@ -345,7 +346,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         try {
             ServletInputStream input = req.getInputStream();
             collectionRest = mapper.readValue(input, CollectionRest.class);
-        } catch (IOException e1) {
+        } catch (IOException | JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
 
@@ -374,7 +375,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         CollectionRest collectionRest;
         try {
             collectionRest = mapper.readValue(jsonNode.toString(), CollectionRest.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new UnprocessableEntityException("Error parsing collection json: " + e.getMessage());
         }
         Collection collection = cs.find(context, id);
@@ -404,7 +405,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             cs.delete(context, collection);
         } catch (SQLException e) {
             throw new RuntimeException("Unable to delete Collection with id = " + id, e);
-        } catch (IOException e) {
+        } catch (IOException | JacksonException e) {
             throw new RuntimeException("Unable to delete collection because the logo couldn't be deleted", e);
         }
     }
@@ -643,7 +644,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                 }
             }
             metadataConverter.setMetadata(context, group, metadata);
-        } catch (IOException e1) {
+        } catch (IOException | JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
         return converter.toRest(group, utils.obtainProjection());

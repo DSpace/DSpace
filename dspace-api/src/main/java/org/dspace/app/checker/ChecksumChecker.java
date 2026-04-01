@@ -8,6 +8,8 @@
 package org.dspace.app.checker;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -17,10 +19,10 @@ import java.util.UUID;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.checker.BitstreamDispatcher;
@@ -106,14 +108,14 @@ public final class ChecksumChecker {
                 .longOpt("bitstream-ids")
                 .hasArgs()
                 .desc("Space separated list of bitstream UUIDs")
-                .build();
+                .get();
         options.addOption(option);
 
         option = Option.builder("p")
                 .longOpt("prune")
                 .optionalArg(true)
                 .desc("Prune old results (optionally using specified properties file for configuration)")
-                .build();
+                .get();
         options.addOption(option);
 
         try {
@@ -236,9 +238,12 @@ public final class ChecksumChecker {
      * @param options that are available for the user
      */
     private static void printHelp(Options options) {
-        HelpFormatter myhelp = new HelpFormatter();
-
-        myhelp.printHelp("checker\n", options);
+        HelpFormatter myhelp = HelpFormatter.builder().get();
+        try {
+            myhelp.printHelp("checker", null, options, null, false);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         System.out.println("\nChecksum Checker usage examples:");
         System.out.println("\nThe following options are mutually exclusive:");
         System.out.println(" - Specify a duration for checker process, using s(seconds),"

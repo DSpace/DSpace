@@ -7,8 +7,6 @@
  */
 package org.dspace.app.ldn.action;
 
-import static java.lang.String.format;
-
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -145,7 +143,7 @@ public class LDNEmailAction implements LDNAction {
 
         } else if (actionSendFilter.startsWith("GROUP:")) {
             String groupName = actionSendFilter.replace("GROUP:", "");
-            String property = format("email.%s.list", groupName);
+            String property = "email.%s.list".formatted(groupName);
             String[] groupEmails = configurationService.getArrayProperty(property);
             recipients = Arrays.asList(groupEmails);
         } else {

@@ -12,13 +12,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.Filter;
 import jakarta.servlet.http.Cookie;
 import org.apache.commons.lang3.ArrayUtils;
@@ -30,20 +34,22 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.security.DSpaceCsrfTokenRepository;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
-import org.junit.Assert;
-import org.junit.runner.RunWith;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.servlet.support.ErrorPageFilter;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.AbstractJacksonHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -52,6 +58,8 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.web.context.WebApplicationContext;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Abstract integration test class that will take care of setting up the Spring Boot environment to run
@@ -68,10 +76,6 @@ import org.springframework.web.context.WebApplicationContext;
  * @see org.dspace.app.rest.test.AbstractWebClientIntegrationTest
  */
 // Run tests with JUnit and Spring TestContext Framework
-@RunWith(SpringRunner.class)
-// Specify main class to use to load Spring ApplicationContext
-// NOTE: By default, Spring caches and reuses ApplicationContext for each integration test (to speed up tests)
-// See: https://docs.spring.io/spring/docs/current/spring-framework-reference/testing.html#integration-testing
 @SpringBootTest(classes = TestApplication.class)
 // Load DSpace initializers in Spring ApplicationContext (to initialize DSpace Kernel & Configuration)
 @ContextConfiguration(initializers = { DSpaceKernelInitializer.class, DSpaceConfigurationInitializer.class })
@@ -83,6 +87,17 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
+    // Per-test performance instrumentation (collected per class, printed in @AfterAll)
+    private long perfTestStartNanos;
+    private long perfTestStartCpuNanos;
+    private static final AtomicLong perfTotalWallMs = new AtomicLong();
+    private static final AtomicLong perfTotalCpuMs = new AtomicLong();
+    private static final AtomicInteger perfTestCount = new AtomicInteger();
+    private static final AtomicInteger perfProcs = new AtomicInteger();
+
+    // Per-method Hibernate profiling -- only collected for the target class to keep logs small
+    private static final String PERF_DETAIL_CLASS = "LeftTiltedRelationshipRestRepositoryIT";
+
     protected static final String AUTHORIZATION_HEADER = "Authorization";
     protected static final String AUTHORIZATION_COOKIE = "Authorization-cookie";
 
@@ -93,13 +108,22 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     public static final String REST_SERVER_URL = "http://localhost/api/";
     public static final String BASE_REST_SERVER_URL = "http://localhost";
 
-    // Our standard/expected content type
-    protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
-                                                    MediaTypes.HAL_JSON.getSubtype(), StandardCharsets.UTF_8);
+    // Our standard/expected content type (Spring HATEOAS 3.x / Spring Boot 4 uses VND_HAL_JSON)
+    protected MediaType contentType = new MediaType(MediaTypes.VND_HAL_JSON.getType(),
+                                                    MediaTypes.VND_HAL_JSON.getSubtype(), StandardCharsets.UTF_8);
 
     protected MediaType textUriContentType = RestMediaTypes.TEXT_URI_LIST;
 
-    protected HttpMessageConverter mappingJackson2HttpMessageConverter;
+    protected HttpMessageConverter jacksonHttpMessageConverter;
+
+    /**
+     * Cached CSRF token cookie, to avoid fetching a new one for every MockMvc request.
+     * The CSRF token is a random UUID validated by stateless string comparison (cookie value == header value),
+     * so the same token can safely be reused across requests within a test instance.
+     * With the default PER_METHOD lifecycle, this cache auto-resets per test.
+     * With PER_CLASS lifecycle, the same token remains valid across all tests in the class.
+     */
+    private Cookie cachedCsrfTokenCookie;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -113,11 +137,145 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     @Autowired
     void setConverters(HttpMessageConverter<?>[] converters) {
 
-        this.mappingJackson2HttpMessageConverter = Arrays.asList(converters).stream().filter(
-            hmc -> hmc instanceof MappingJackson2HttpMessageConverter).findAny().get();
+        this.jacksonHttpMessageConverter = Arrays.asList(converters).stream().filter(
+            hmc -> hmc instanceof AbstractJacksonHttpMessageConverter).findAny().get();
 
-        Assert.assertNotNull("the JSON message converter must not be null",
-                             this.mappingJackson2HttpMessageConverter);
+        Assertions.assertNotNull(this.jacksonHttpMessageConverter,
+                             "the JSON message converter must not be null");
+    }
+
+    @BeforeEach
+    public void perfTimerStart() {
+        perfTestStartNanos = System.nanoTime();
+        perfTestStartCpuNanos = ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime();
+        if (PERF_DETAIL_CLASS.equals(getClass().getSimpleName())) {
+            try {
+                org.hibernate.SessionFactory sf = DSpaceServicesFactory.getInstance()
+                    .getServiceManager()
+                    .getServiceByName("sessionFactory", org.hibernate.SessionFactory.class);
+                sf.getStatistics().setStatisticsEnabled(true);
+                sf.getStatistics().clear();
+            } catch (Exception e) {
+                // ignore -- stats not available
+            }
+        }
+    }
+
+    @AfterEach
+    public void perfTimerEnd(TestInfo testInfo) {
+        long wallMs = (System.nanoTime() - perfTestStartNanos) / 1_000_000;
+        long cpuMs = (ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime()
+                      - perfTestStartCpuNanos) / 1_000_000;
+        perfTotalWallMs.addAndGet(wallMs);
+        perfTotalCpuMs.addAndGet(cpuMs);
+        perfTestCount.incrementAndGet();
+        perfProcs.set(Runtime.getRuntime().availableProcessors());
+
+        if (PERF_DETAIL_CLASS.equals(getClass().getSimpleName())) {
+            try {
+                org.hibernate.SessionFactory sf = DSpaceServicesFactory.getInstance()
+                    .getServiceManager()
+                    .getServiceByName("sessionFactory", org.hibernate.SessionFactory.class);
+                org.hibernate.stat.Statistics stats = sf.getStatistics();
+                String method = testInfo.getTestMethod()
+                    .map(m -> m.getName()).orElse("unknown");
+                String detail = method
+                    + ";" + wallMs
+                    + ";" + cpuMs
+                    + ";" + stats.getQueryExecutionCount()
+                    + ";" + stats.getEntityLoadCount()
+                    + ";" + stats.getEntityInsertCount()
+                    + ";" + stats.getEntityUpdateCount()
+                    + ";" + stats.getEntityDeleteCount()
+                    + ";" + stats.getFlushCount()
+                    + ";" + stats.getCollectionLoadCount()
+                    + ";" + stats.getQueryExecutionMaxTime()
+                    + ";" + sanitize(stats.getQueryExecutionMaxTimeQueryString());
+                try (PrintWriter pw = new PrintWriter(
+                        new FileWriter("target/perf-detail.csv", true))) {
+                    pw.println(detail);
+                }
+
+                // Collection recreation stats (bag hypothesis verification)
+                String collDetail = method
+                    + ";" + stats.getCollectionRecreateCount()
+                    + ";" + stats.getCollectionRemoveCount()
+                    + ";" + stats.getCollectionUpdateCount()
+                    + collStats(stats, "org.dspace.content.DSpaceObject.metadata")
+                    + collStats(stats, "org.dspace.content.DSpaceObject.resourcePolicies")
+                    + collStats(stats, "org.dspace.content.DSpaceObject.handles");
+                try (PrintWriter pw = new PrintWriter(
+                        new FileWriter("target/perf-collections.csv", true))) {
+                    pw.println(collDetail);
+                }
+            } catch (Exception e) {
+                // ignore -- stats not available
+            }
+        }
+    }
+
+    /**
+     * Get recreation and removal counts for a specific collection role.
+     *
+     * @param stats the Hibernate statistics
+     * @param role the collection role name
+     * @return CSV fragment: ;recreates;removes
+     */
+    private static String collStats(org.hibernate.stat.Statistics stats, String role) {
+        try {
+            org.hibernate.stat.CollectionStatistics cs = stats.getCollectionStatistics(role);
+            return ";" + cs.getRecreateCount() + ";" + cs.getRemoveCount();
+        } catch (Exception e) {
+            return ";-1;-1";
+        }
+    }
+
+    /**
+     * Remove semicolons and newlines from a string to keep CSV output clean.
+     *
+     * @param s the input string (may be null)
+     * @return sanitized string safe for CSV
+     */
+    private static String sanitize(String s) {
+        if (s == null) {
+            return "";
+        }
+        return s.replace(';', ' ').replace('\n', ' ').replace('\r', ' ');
+    }
+
+    @org.junit.jupiter.api.AfterAll
+    public static void perfSummary(TestInfo testInfo) {
+        int count = perfTestCount.getAndSet(0);
+        long wallMs = perfTotalWallMs.getAndSet(0);
+        long cpuMs = perfTotalCpuMs.getAndSet(0);
+        int procs = perfProcs.get();
+        if (count > 0) {
+            String summary = testInfo.getDisplayName()
+                + ";" + count
+                + ";" + wallMs
+                + ";" + cpuMs
+                + ";" + (wallMs > 0 ? String.format("%.0f", 100.0 * cpuMs / wallMs) : "0")
+                + ";" + procs;
+            try (PrintWriter pw = new PrintWriter(new FileWriter("target/perf-summary.csv", true))) {
+                pw.println(summary);
+            } catch (IOException e) {
+                // silently ignore
+            }
+        }
+        // Dump all collection role names (once) so we know what Hibernate tracks
+        try {
+            org.hibernate.SessionFactory sf = DSpaceServicesFactory.getInstance()
+                .getServiceManager()
+                .getServiceByName("sessionFactory", org.hibernate.SessionFactory.class);
+            String[] roles = sf.getStatistics().getCollectionRoleNames();
+            try (PrintWriter pw = new PrintWriter(new FileWriter("target/perf-roles.csv", true))) {
+                for (String role : roles) {
+                    pw.println(role);
+                }
+            }
+        } catch (Exception e) {
+            // ignore
+        }
     }
 
     /**
@@ -192,7 +350,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     public String getPatchContent(List<Operation> ops) {
         try {
             return mapper.writeValueAsString(ops);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             e.printStackTrace();
         }
         return null;
@@ -217,9 +375,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
      */
     public RequestPostProcessor validCsrfToken() {
         return request -> {
-            // Obtain the current CSRF token cookie from the (mock) backend via GET request
-            // TODO: This method may be expensive for ITs as it GETs a new token for every request. We may want to
-            // investigate if caching the CSRF token would work without causing random test failures.
+            // Obtain the current CSRF token cookie from the (mock) backend via GET request (cached per test instance)
             Cookie csrfCookie = getCsrfTokenCookie();
 
             if (csrfCookie != null) {
@@ -252,9 +408,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
      */
     public RequestPostProcessor validCsrfTokenViaParam() {
         return request -> {
-            // Obtain the current CSRF token cookie from the (mock) backend via GET request
-            // TODO: This method may be expensive for ITs as it GETs a new token for every request. We may want to
-            // investigate if caching the CSRF token would work without causing random test failures.
+            // Obtain the current CSRF token cookie from the (mock) backend via GET request (cached per test instance)
             Cookie csrfCookie = getCsrfTokenCookie();
 
             if (csrfCookie != null) {
@@ -346,6 +500,11 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
      * @throws Exception
      */
     public Cookie getCsrfTokenCookie() {
+        // Return cached token if available. The CSRF token is a random UUID validated by stateless
+        // string comparison, so the same token can safely be reused across requests.
+        if (cachedCsrfTokenCookie != null) {
+            return cachedCsrfTokenCookie;
+        }
         try {
             // Set up a non-logging MockMvc builder to obtain the CSRF cookie
             // This call is not logged by default to avoid cluttering logs of ITs, but you can switch this to "true"
@@ -355,8 +514,10 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
             // Perform a GET request to our CSRF endpoint to obtain the current CSRF token
             MvcResult mvcResult = mockMvc.perform(get("/api/security/csrf")).andReturn();
 
-            // Read and return the Cookie which contains the CSRF token for DSpace
-            return mvcResult.getResponse().getCookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            // Read, cache, and return the Cookie which contains the CSRF token for DSpace
+            cachedCsrfTokenCookie = mvcResult.getResponse()
+                .getCookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            return cachedCsrfTokenCookie;
         } catch (Exception e) {
             log.error("Could not obtain the CSRF token cookie for Integration Tests", e);
         }

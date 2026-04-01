@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.output.NullOutputStream;
 import org.dspace.app.util.DSpaceObjectUtilsImpl;
 import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -191,7 +190,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         Curator curator = new Curator(handler);
         OutputStream reporterStream;
         if (null == this.reporter) {
-            reporterStream = NullOutputStream.NULL_OUTPUT_STREAM;
+            reporterStream = OutputStream.nullOutputStream();
         } else if ("-".equals(this.reporter)) {
             reporterStream = System.out;
         } else {

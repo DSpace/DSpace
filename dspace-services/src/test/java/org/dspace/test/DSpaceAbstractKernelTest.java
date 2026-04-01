@@ -7,15 +7,15 @@
  */
 package org.dspace.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -27,7 +27,7 @@ import org.junit.Test;
  */
 public abstract class DSpaceAbstractKernelTest extends DSpaceAbstractTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void initKernel() {
         _initializeKernel();
         assertNotNull(kernelImpl);
@@ -35,7 +35,7 @@ public abstract class DSpaceAbstractKernelTest extends DSpaceAbstractTest {
         assertNotNull(kernel);
     }
 
-    @AfterClass
+    @AfterAll
     public static void destroyKernel() {
         _destroyKernel();
     }

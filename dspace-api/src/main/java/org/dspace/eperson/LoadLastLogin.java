@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -31,9 +32,9 @@ import jdbm.helper.Tuple;
 import jdbm.helper.TupleBrowser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -55,8 +56,10 @@ public class LoadLastLogin {
 
     public static void main(String[] argv)
         throws IOException, SQLException, AuthorizeException {
-        final String USAGE = "LoadLastLogin [options] path...path\n\n"
-            + "'path's are paths to DSpace log files";
+        final String USAGE = """
+            LoadLastLogin [options] path...path
+
+            'path's are paths to DSpace log files""";
 
         final String loginRE =
             "([0-9-]+) ([0-9:]+)[^@]+@ " // Date(1), time(2), goop
@@ -78,7 +81,12 @@ public class LoadLastLogin {
         } catch (org.apache.commons.cli.ParseException ex) {
             System.err.println(ex.getMessage());
             if (!(ex instanceof MissingOptionException)) {
-                new HelpFormatter().printHelp(USAGE, options);
+                try {
+                    HelpFormatter.builder().get().printHelp(
+                        USAGE, null, options, null, false);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
             }
             System.exit(1);
         }
@@ -86,7 +94,12 @@ public class LoadLastLogin {
         if (command.hasOption('h')) {
             System.out.println("Load users' last_active dates into the database from DSpace logs.");
             System.out.println();
-            new HelpFormatter().printHelp(USAGE, options);
+            try {
+                HelpFormatter.builder().get().printHelp(
+                    USAGE, null, options, null, false);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
             System.exit(0);
         }
 
