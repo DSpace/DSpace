@@ -20,11 +20,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import jakarta.annotation.PostConstruct;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
@@ -90,6 +92,7 @@ public class EZIDIdentifierProvider
     static final String CFG_USER = "identifier.doi.ezid.user";
     static final String CFG_PASSWORD = "identifier.doi.ezid.password";
     static final String CFG_PUBLISHER = "identifier.doi.ezid.publisher";
+    public static final String CFG_DOI_METADATA = "identifier.doi.metadata";
 
     // DataCite metadata field names
     static final String DATACITE_PUBLISHER = "datacite.publisher";
@@ -97,9 +100,7 @@ public class EZIDIdentifierProvider
 
     // DSpace metadata field name elements
     // XXX move these to MetadataSchema or some such
-    public static final String MD_SCHEMA = "dc";
-    public static final String DOI_ELEMENT = "identifier";
-    public static final String DOI_QUALIFIER = null;
+    public MetadataFieldName doiMetadataFieldName;
 
     private static final String DOI_SCHEME = "doi:";
 
@@ -128,6 +129,13 @@ public class EZIDIdentifierProvider
     @Autowired(required = true)
     protected ItemService itemService;
 
+    @PostConstruct
+    protected void setDOIMetadata() {
+        this.doiMetadataFieldName =
+            new MetadataFieldName(this.configurationService.getProperty(CFG_DOI_METADATA,
+                                                                        "dc.identifier.doi"));
+    }
+
     @Override
     public boolean supports(Class<? extends Identifier> identifier) {
         return DOI.class.isAssignableFrom(identifier);
@@ -152,7 +160,11 @@ public class EZIDIdentifierProvider
             return null;
         }
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
-        List<MetadataValue> identifiers = dsoService.getMetadata(dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<MetadataValue> identifiers = dsoService.getMetadata(dso,
+                                                                 doiMetadataFieldName.schema,
+                                                                 doiMetadataFieldName.element,
+                                                                 doiMetadataFieldName.qualifier,
+                                                                 null);
         for (MetadataValue identifier : identifiers) {
             if ((null != identifier.getValue()) && (identifier.getValue().startsWith(DOI_SCHEME))) {
                 return identifier.getValue();
@@ -161,7 +173,12 @@ public class EZIDIdentifierProvider
 
         String id = mint(context, dso);
         try {
-            dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, id);
+            dsoService.addMetadata(context, dso,
+                                   doiMetadataFieldName.schema,
+                                   doiMetadataFieldName.element,
+                                   doiMetadataFieldName.qualifier,
+                                   null,
+                                   id);
             dsoService.update(context, dso);
         } catch (SQLException | AuthorizeException ex) {
             throw new IdentifierException("New identifier not stored", ex);
@@ -192,7 +209,11 @@ public class EZIDIdentifierProvider
         if (response.isSuccess()) {
             try {
                 DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(object);
-                dsoService.addMetadata(context, object, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+                dsoService.addMetadata(context, object,
+                                       doiMetadataFieldName.schema,
+                                       doiMetadataFieldName.element,
+                                       doiMetadataFieldName.qualifier,
+                                       null,
                                        idToDOI(identifier));
                 dsoService.update(context, object);
                 log.info("registered {}", identifier);
@@ -227,7 +248,11 @@ public class EZIDIdentifierProvider
         if (response.isSuccess()) {
             DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
             try {
-                dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, idToDOI(identifier));
+                dsoService.addMetadata(context, dso,
+                                       doiMetadataFieldName.schema,
+                                       doiMetadataFieldName.element,
+                                       doiMetadataFieldName.qualifier,
+                                       null, idToDOI(identifier));
                 dsoService.update(context, dso);
                 log.info("reserved {}", identifier);
             } catch (SQLException | AuthorizeException ex) {
@@ -299,7 +324,9 @@ public class EZIDIdentifierProvider
         Iterator<Item> found;
         try {
             found = itemService.findByMetadataField(context,
-                                                    MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER,
+                                                    doiMetadataFieldName.schema,
+                                                    doiMetadataFieldName.element,
+                                                    doiMetadataFieldName.qualifier,
                                                     idToDOI(identifier));
         } catch (IdentifierException | SQLException | AuthorizeException | IOException ex) {
             log.error(ex::getMessage);
@@ -323,7 +350,11 @@ public class EZIDIdentifierProvider
 
         MetadataValue found = null;
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(object);
-        for (MetadataValue candidate : dsoService.getMetadata(object, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null)) {
+        for (MetadataValue candidate : dsoService.getMetadata(object,
+                                                              doiMetadataFieldName.schema,
+                                                              doiMetadataFieldName.element,
+                                                              doiMetadataFieldName.qualifier,
+                                                              null)) {
             if (candidate.getValue().startsWith(DOI_SCHEME)) {
                 found = candidate;
                 break;
@@ -345,7 +376,11 @@ public class EZIDIdentifierProvider
 
         // delete from EZID
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
-        List<MetadataValue> metadata = dsoService.getMetadata(dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<MetadataValue> metadata = dsoService.getMetadata(dso,
+                                                              doiMetadataFieldName.schema,
+                                                              doiMetadataFieldName.element,
+                                                              doiMetadataFieldName.qualifier,
+                                                              null);
         List<String> remainder = new ArrayList<>();
         int skipped = 0;
         for (MetadataValue id : metadata) {
@@ -382,8 +417,17 @@ public class EZIDIdentifierProvider
 
         // delete from item
         try {
-            dsoService.clearMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-            dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, remainder);
+            dsoService.clearMetadata(context, dso,
+                                     doiMetadataFieldName.schema,
+                                     doiMetadataFieldName.element,
+                                     doiMetadataFieldName.qualifier,
+                                     null);
+            dsoService.addMetadata(context, dso,
+                                   doiMetadataFieldName.schema,
+                                   doiMetadataFieldName.element,
+                                   doiMetadataFieldName.qualifier,
+                                   null,
+                                   remainder);
             dsoService.update(context, dso);
         } catch (SQLException | AuthorizeException e) {
             log.error("Failed to re-add identifiers:  {}", e::getMessage);
@@ -400,7 +444,11 @@ public class EZIDIdentifierProvider
         log.debug("delete {} from {}", identifier, dso);
 
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
-        List<MetadataValue> metadata = dsoService.getMetadata(dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<MetadataValue> metadata = dsoService.getMetadata(dso,
+                                                              doiMetadataFieldName.schema,
+                                                              doiMetadataFieldName.element,
+                                                              doiMetadataFieldName.qualifier,
+                                                              null);
         List<String> remainder = new ArrayList<>();
         int skipped = 0;
         for (MetadataValue id : metadata) {
@@ -438,8 +486,17 @@ public class EZIDIdentifierProvider
 
         // delete from item
         try {
-            dsoService.clearMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-            dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, remainder);
+            dsoService.clearMetadata(context, dso,
+                                     doiMetadataFieldName.schema,
+                                     doiMetadataFieldName.element,
+                                     doiMetadataFieldName.qualifier,
+                                     null);
+            dsoService.addMetadata(context, dso,
+                                   doiMetadataFieldName.schema,
+                                   doiMetadataFieldName.element,
+                                   doiMetadataFieldName.qualifier,
+                                   null,
+                                   remainder);
             dsoService.update(context, dso);
         } catch (SQLException | AuthorizeException e) {
             log.error("Failed to re-add identifiers:  {}", e::getMessage);

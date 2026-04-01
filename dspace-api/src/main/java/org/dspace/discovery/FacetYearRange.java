@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
@@ -104,7 +105,15 @@ public class FacetYearRange {
         yearRangeQuery.setSortField(dateFacet + "_sort", DiscoverQuery.SORT_ORDER.asc);
         yearRangeQuery.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
         yearRangeQuery.addSearchField(dateFacet);
-        DiscoverResult lastYearResult = searchService.search(context, scope, yearRangeQuery);
+        boolean isRelatedEntity =
+            StringUtils.isNotBlank(parentQuery.getDiscoveryConfigurationName()) &&
+            parentQuery.getDiscoveryConfigurationName().toUpperCase().startsWith("RELATION");
+        DiscoverResult lastYearResult;
+        if (isRelatedEntity) {
+            lastYearResult = searchService.search(context, yearRangeQuery);
+        } else {
+            lastYearResult = searchService.search(context, scope, yearRangeQuery);
+        }
 
         if (0 < lastYearResult.getIndexableObjects().size()) {
             List<DiscoverResult.SearchDocument> searchDocuments = lastYearResult
@@ -115,7 +124,12 @@ public class FacetYearRange {
         }
         //Now get the first year
         yearRangeQuery.setSortField(dateFacet + "_sort", DiscoverQuery.SORT_ORDER.desc);
-        DiscoverResult firstYearResult = searchService.search(context, scope, yearRangeQuery);
+        DiscoverResult firstYearResult;
+        if (isRelatedEntity) {
+            firstYearResult = searchService.search(context, yearRangeQuery);
+        } else {
+            firstYearResult = searchService.search(context, scope, yearRangeQuery);
+        }
         if (0 < firstYearResult.getIndexableObjects().size()) {
             List<DiscoverResult.SearchDocument> searchDocuments = firstYearResult
                 .getSearchDocument(firstYearResult.getIndexableObjects().get(0));
