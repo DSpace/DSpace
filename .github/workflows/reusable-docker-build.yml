@@ -129,7 +129,7 @@ jobs:
       # Extract metadata used for Docker images in all build steps below
       - name: Extract metadata (tags, labels) from GitHub for Docker image
         id: meta_build
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.DOCKER_BUILD_REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAGS }}
@@ -264,7 +264,7 @@ jobs:
 
       - name: Add Docker metadata for image
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.DOCKER_BUILD_REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAGS }}
@@ -308,7 +308,7 @@ jobs:
       # This recreates Docker tags for DockerHub
       - name: Add Docker metadata for image
         id: meta_dockerhub
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAGS }}
