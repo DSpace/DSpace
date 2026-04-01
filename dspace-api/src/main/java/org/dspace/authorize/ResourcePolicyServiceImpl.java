@@ -28,6 +28,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -156,8 +157,9 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
         context.turnOffAuthorisationSystem();
         if (resourcePolicy.getdSpaceObject() != null) {
             //A policy for a DSpace Object has been modified, fire a modify event on the DSpace object
-            contentServiceFactory.getDSpaceObjectService(resourcePolicy.getdSpaceObject())
-                                 .updateLastModified(context, resourcePolicy.getdSpaceObject());
+            DSpaceObject dso = (DSpaceObject) Hibernate.unproxy(resourcePolicy.getdSpaceObject());
+            contentServiceFactory.getDSpaceObjectService(dso)
+                                 .updateLastModified(context, dso);
         }
         context.restoreAuthSystemState();
     }
@@ -336,7 +338,8 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
             context.turnOffAuthorisationSystem();
             for (DSpaceObject dSpaceObject : relatedDSpaceObjects) {
                 //A policy for a DSpace Object has been modified, fire a modify event on the DSpace object
-                contentServiceFactory.getDSpaceObjectService(dSpaceObject).updateLastModified(context, dSpaceObject);
+                DSpaceObject dso = (DSpaceObject) Hibernate.unproxy(dSpaceObject);
+                contentServiceFactory.getDSpaceObjectService(dso).updateLastModified(context, dso);
             }
             context.restoreAuthSystemState();
         }

@@ -18,8 +18,8 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class for {@link CommunityCollectionLinkRepository}
@@ -31,7 +31,7 @@ public class CommunityCollectionLinkRepositoryIT extends AbstractControllerInteg
     Collection collection2;
     Collection collection3;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

@@ -940,10 +940,10 @@ public class SwordAuthenticator {
      */
     public boolean canSubmitTo(SwordContext context, DSpaceObject dso)
         throws DSpaceSwordException {
-        if (dso instanceof Collection) {
-            return this.canSubmitTo(context, (Collection) dso);
+        if (dso instanceof Collection collection) {
+            return this.canSubmitTo(context, collection);
         } else {
-            return dso instanceof Item && this.canSubmitTo(context, (Item) dso);
+            return dso instanceof Item i && this.canSubmitTo(context, i);
         }
     }
 }

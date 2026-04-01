@@ -66,7 +66,6 @@ public class QAEventBuilder extends AbstractBuilder<QAEvent, QAEventService> {
             item = itemBuilder.build();
             this.title = name;
             context.dispatchEvents();
-            indexingService.commit();
         } catch (Exception e) {
             return handleException(e);
         }

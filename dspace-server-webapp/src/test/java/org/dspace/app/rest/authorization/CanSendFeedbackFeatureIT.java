@@ -20,8 +20,8 @@ import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -45,7 +45,7 @@ public class CanSendFeedbackFeatureIT extends AbstractControllerIntegrationTest 
     private AuthorizationFeature canSendFeedbackFeature;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         canSendFeedbackFeature = authorizationFeatureService.find(CanSendFeedbackFeature.NAME);

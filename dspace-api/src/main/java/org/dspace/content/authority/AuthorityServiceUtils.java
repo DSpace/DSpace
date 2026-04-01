@@ -18,7 +18,7 @@ import org.dspace.submit.service.SubmissionConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Collection of utility methods used by the *AuthorityServiceImpl
+ * Collection of utility methods used by the *AuthorityServiceImpl.
  *
  * @author Andrea Bollini
  */
@@ -34,11 +34,11 @@ public final class AuthorityServiceUtils {
      *
      * @param configReader the Submission Config Reader to query for configurations
      * @param dsoType      the type of DSpace Object (ITEM or BITSTREAM). Other types
-     * return null.
+     *                     return null.
      * @param collection   the collection context used to determine the assigned
-     * submission process
+     *                     submission process
      * @return the name of the submission process or metadata form, or null if no
-     * mapping is found or the type is unsupported
+     *         mapping is found or the type is unsupported
      */
     public String getSubmissionOrFormName(SubmissionConfigReader configReader, int dsoType,
             Collection collection) {
@@ -61,20 +61,13 @@ public final class AuthorityServiceUtils {
 
     /**
      * Resolves the configuration name used as a key for authority lookups using
-     * the SubmissionConfigService.
-     * <p>
-     * This method performs the same logic as
-     * {@link #getSubmissionOrFormName(SubmissionConfigReader, int, Collection)}
-     * but utilizes the service layer instead of the reader. It identifies the
-     * context required to find field-specific authority settings in
-     * {@code ChoiceAuthorityServiceImpl}.
-     * </p>
+     * the service layer instead of the reader.
      *
      * @param submissionConfigService the service used to access submission configurations
      * @param dsoType                 the type of DSpace Object (ITEM or BITSTREAM)
      * @param collection              the collection context
      * @return the name of the submission process or metadata form, or null if no
-     * mapping is found
+     *         mapping is found
      */
     public String getSubmissionOrFormName(SubmissionConfigService submissionConfigService, int dsoType,
                                           Collection collection) {

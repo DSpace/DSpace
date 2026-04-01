@@ -11,9 +11,9 @@ import static org.dspace.app.rest.configuration.ActuatorConfiguration.UP_WITH_IS
 
 import org.dspace.statistics.GeoIpService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.health.AbstractHealthIndicator;
-import org.springframework.boot.actuate.health.Health.Builder;
-import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.health.contributor.AbstractHealthIndicator;
+import org.springframework.boot.health.contributor.Health.Builder;
+import org.springframework.boot.health.contributor.HealthIndicator;
 
 /**
  * Implementation of {@link HealthIndicator} that verifies if the GeoIP database

@@ -8,6 +8,7 @@
 package org.dspace.embargo;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.sql.SQLException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -16,9 +17,9 @@ import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
@@ -105,12 +106,22 @@ public class EmbargoCLITool {
             line = new DefaultParser().parse(options, argv);
         } catch (ParseException e) {
             System.err.println("Command error: " + e.getMessage());
-            new HelpFormatter().printHelp(EmbargoServiceImpl.class.getName(), options);
+            try {
+                HelpFormatter.builder().get().printHelp(
+                    EmbargoServiceImpl.class.getName(), null, options, null, false);
+            } catch (IOException ioe) {
+                throw new UncheckedIOException(ioe);
+            }
             System.exit(1);
         }
 
         if (line.hasOption('h')) {
-            new HelpFormatter().printHelp(EmbargoServiceImpl.class.getName(), options);
+            try {
+                HelpFormatter.builder().get().printHelp(
+                    EmbargoServiceImpl.class.getName(), null, options, null, false);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
             System.exit(0);
         }
 

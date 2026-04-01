@@ -23,8 +23,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class for the ItemEventProcessor
@@ -37,7 +37,7 @@ public class ItemEventProcessorIT extends AbstractIntegrationTestWithDatabase {
 
     private String encodedUrl;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

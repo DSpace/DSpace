@@ -30,7 +30,6 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.orm.hibernate5.SessionFactoryUtils;
 
 /**
  * Hibernate implementation of the DBConnection.
@@ -60,6 +59,9 @@ public class HibernateDBConnection implements DBConnection<Session> {
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
 
+    @Autowired
+    private DataSource dataSource;
+
     private boolean batchModeEnabled = false;
     private boolean readOnlyEnabled = false;
 
@@ -75,6 +77,13 @@ public class HibernateDBConnection implements DBConnection<Session> {
         // If we don't yet have a live transaction, start a new one
         // NOTE: a Session cannot be used until a Transaction is started.
         if (!isTransActionAlive()) {
+            sessionFactory.getCurrentSession().beginTransaction();
+            configureDatabaseMode();
+        } else if (getTransaction().getStatus() == TransactionStatus.MARKED_ROLLBACK) {
+            // In Hibernate 7, a MARKED_ROLLBACK transaction is considered "active" by isActive(),
+            // but the ThreadLocalSessionContext proxy rejects operations (e.g. getCriteriaBuilder).
+            // Roll back the doomed transaction and start a fresh one.
+            getTransaction().rollback();
             sessionFactory.getCurrentSession().beginTransaction();
             configureDatabaseMode();
         }
@@ -174,7 +183,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
 
     @Override
     public DataSource getDataSource() {
-        return SessionFactoryUtils.getDataSource(sessionFactory);
+        return dataSource;
     }
 
     @Override
@@ -213,10 +222,22 @@ public class HibernateDBConnection implements DBConnection<Session> {
     public <E extends ReloadableEntity> E reloadEntity(final E entity) throws SQLException {
         if (entity == null) {
             return null;
-        } else if (getSession().contains(entity)) {
+        }
+        // In Hibernate 7, calling session.contains() when the transaction is in MARKED_ROLLBACK
+        // state throws an exception. Check the transaction status first.
+        Session session = getSession();
+        Transaction tx = session.getTransaction();
+        TransactionStatus status = tx != null ? tx.getStatus() : null;
+        // Skip reload if there's no transaction or it's not in ACTIVE state
+        // (MARKED_ROLLBACK is technically "active" per isActive() but won't allow operations)
+        if (status == null || status != TransactionStatus.ACTIVE) {
+            // Can't safely use session operations - return entity as-is
+            return entity;
+        }
+        if (session.contains(entity)) {
             return entity;
         } else {
-            return (E) getSession().get(HibernateProxyHelper.getClassWithoutInitializingProxy(entity), entity.getID());
+            return (E) session.find(HibernateProxyHelper.getClassWithoutInitializingProxy(entity), entity.getID());
         }
     }
 
@@ -260,8 +281,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
     @Override
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException {
         if (entity != null) {
-            if (entity instanceof DSpaceObject) {
-                DSpaceObject dso = (DSpaceObject) entity;
+            if (entity instanceof DSpaceObject dso) {
 
                 // The metadatavalue relation has CascadeType.ALL, so they are evicted automatically
                 // and we don' need to uncache the values explicitly.
@@ -280,8 +300,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
             }
 
             // ITEM
-            if (entity instanceof Item) {
-                Item item = (Item) entity;
+            if (entity instanceof Item item) {
 
                 //DO NOT uncache the submitter. This could be the current eperson. Uncaching could lead to
                 //LazyInitializationExceptions (see DS-3648)
@@ -292,8 +311,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
                     }
                 }
                 // BUNDLE
-            } else if (entity instanceof Bundle) {
-                Bundle bundle = (Bundle) entity;
+            } else if (entity instanceof Bundle bundle) {
 
                 if (Hibernate.isInitialized(bundle.getBitstreams())) {
                     for (Bitstream bitstream : Utils.emptyIfNull(bundle.getBitstreams())) {
@@ -304,8 +322,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
                 // No specific child entities to decache
 
                 // COMMUNITY
-            } else if (entity instanceof Community) {
-                Community community = (Community) entity;
+            } else if (entity instanceof Community community) {
 
                 // We don't uncache groups as they might still be referenced from the Context object
 
@@ -314,8 +331,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
                 }
 
                 // COLLECTION
-            } else if (entity instanceof Collection) {
-                Collection collection = (Collection) entity;
+            } else if (entity instanceof Collection collection) {
 
                 //We don't uncache groups as they might still be referenced from the Context object
 
@@ -325,6 +341,15 @@ public class HibernateDBConnection implements DBConnection<Session> {
                 if (Hibernate.isInitialized(collection.getTemplateItem())) {
                     uncacheEntity(collection.getTemplateItem());
                 }
+            }
+
+            // Skip uncaching if the transaction is not active or is marked for rollback.
+            // In Hibernate 7, session operations like contains() throw when
+            // the transaction is in MARKED_ROLLBACK state. Note: isTransActionAlive()
+            // returns true for MARKED_ROLLBACK, so we must check status explicitly.
+            if (!isTransActionAlive() || getTransaction().getStatus().isOneOf(
+                    TransactionStatus.MARKED_ROLLBACK, TransactionStatus.ROLLING_BACK)) {
+                return;
             }
 
             // Unless this object exists in the session, we won't do anything
@@ -350,7 +375,10 @@ public class HibernateDBConnection implements DBConnection<Session> {
      */
     @Override
     public void flushSession() throws SQLException {
-        if (getSession().isDirty()) {
+        // Skip flush if the transaction is not active (e.g. MARKED_ROLLBACK).
+        // In Hibernate 7, session.isDirty() throws when the transaction is
+        // in MARKED_ROLLBACK state.
+        if (isTransActionAlive() && getSession().isDirty()) {
             getSession().flush();
         }
     }

@@ -38,52 +38,52 @@ public class ItemImportScriptConfiguration<T extends ItemImport> extends ScriptC
 
         options.addOption(Option.builder("a").longOpt("add")
                 .desc("add items to DSpace")
-                .hasArg(false).required(false).build());
+                .hasArg(false).required(false).get());
         options.addOption(Option.builder("r").longOpt("replace")
                 .desc("replace items in mapfile")
-                .hasArg(false).required(false).build());
+                .hasArg(false).required(false).get());
         options.addOption(Option.builder("d").longOpt("delete")
                 .desc("delete items listed in mapfile")
-                .hasArg(false).required(false).build());
+                .hasArg(false).required(false).get());
         options.addOption(Option.builder("z").longOpt("zip")
                 .desc("name of zip file")
                 .type(InputStream.class)
-                .hasArg().build());
+                .hasArg().get());
         options.addOption(Option.builder("u").longOpt("url")
                 .desc("url of zip file")
-                .hasArg().build());
+                .hasArg().get());
         options.addOption(Option.builder("c").longOpt("collection")
                 .desc("destination collection(s) Handle or database ID")
-                .hasArg().required(false).build());
+                .hasArg().required(false).get());
         options.addOption(Option.builder("m").longOpt("mapfile")
                 .desc("mapfile items in mapfile")
                 .type(InputStream.class)
-                .hasArg().required(false).build());
+                .hasArg().required(false).get());
         options.addOption(Option.builder("w").longOpt("workflow")
                 .desc("send submission through collection's workflow")
-                .hasArg(false).required(false).build());
+                .hasArg(false).required(false).get());
         options.addOption(Option.builder("n").longOpt("notify")
                 .desc("if sending submissions through the workflow, send notification emails")
-                .hasArg(false).required(false).build());
+                .hasArg(false).required(false).get());
         options.addOption(Option.builder("v").longOpt("validate")
                 .desc("test run - do not actually import items")
-                .hasArg(false).required(false).build());
+                .hasArg(false).required(false).get());
         options.addOption(Option.builder("x").longOpt("exclude-bitstreams")
                 .desc("do not load or expect content bitstreams")
-                .hasArg(false).required(false).build());
+                .hasArg(false).required(false).get());
         options.addOption(Option.builder("p").longOpt("template")
                 .desc("apply template")
-                .hasArg(false).required(false).build());
+                .hasArg(false).required(false).get());
         options.addOption(Option.builder("R").longOpt("resume")
                 .desc("resume a failed import (add only)")
-                .hasArg(false).required(false).build());
+                .hasArg(false).required(false).get());
         options.addOption(Option.builder("q").longOpt("quiet")
                 .desc("don't display metadata")
-                .hasArg(false).required(false).build());
+                .hasArg(false).required(false).get());
 
         options.addOption(Option.builder("h").longOpt("help")
                 .desc("help")
-                .hasArg(false).required(false).build());
+                .hasArg(false).required(false).get());
 
         return options;
     }

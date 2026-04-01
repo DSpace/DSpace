@@ -10,9 +10,9 @@ package org.dspace.importer.external.metadatamapping.contributor;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tools.jackson.databind.JsonNode;
 
 
 /**
@@ -66,7 +66,7 @@ public class InvertedIndexProcessor extends AbstractJsonPathMetadataProcessor {
         }
 
         SortedMap<Integer, String> positionMap = new TreeMap<>();
-        targetNode.fields().forEachRemaining(entry -> entry.getValue()
+        targetNode.properties().iterator().forEachRemaining(entry -> entry.getValue()
                                                               .forEach(position ->
                                                                            positionMap
                                                                                .put(position.asInt(), entry.getKey())));

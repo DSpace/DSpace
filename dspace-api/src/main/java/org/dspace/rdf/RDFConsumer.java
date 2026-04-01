@@ -234,9 +234,9 @@ public class RDFConsumer implements Consumer {
             // ignore unfinished submissions here. Every unfinished submission
             // has an workspace item. The item flag "in_archive" doesn't help us
             // here as this is also set to false if a newer version was submitted.
-            if (dso instanceof Item) {
-                if (workspaceItemService.findByItem(ctx, (Item) dso) != null
-                    || workflowItemService.findByItem(ctx, (Item) dso) != null) {
+            if (dso instanceof Item item) {
+                if (workspaceItemService.findByItem(ctx, item) != null
+                    || workflowItemService.findByItem(ctx, item) != null) {
                     log.debug(
                         "Ignoring Item " + dso.getID() + " as a corresponding workspace or workflow item exists.");
                     return;

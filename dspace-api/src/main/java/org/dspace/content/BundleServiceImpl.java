@@ -567,6 +567,12 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             item.removeBundle(bundle);
         }
 
+        // Remove all resource policies right before removing the bundle entity.
+        // Must happen after all authorization checks but before bundleDAO.delete() to prevent
+        // Hibernate 7 TransientPropertyValueException when managed ResourcePolicies reference
+        // a removed Bundle entity during auto-flush.
+        authorizeService.removeAllPolicies(context, bundle);
+
         // Remove ourself
         bundleDAO.delete(context, bundle);
     }

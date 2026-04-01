@@ -12,8 +12,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.SQLException;
 import java.util.Optional;
@@ -38,8 +38,8 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link CustomUrlConsumer}.
@@ -68,7 +68,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
     private Collection collection;
 
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
 
         configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Person");
@@ -618,9 +618,9 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         // Verify we can find the item by custom URL before versioning
         Optional<Item> foundBeforeVersioning = customUrlService.findItemByCustomUrl(context, customUrl);
-        assertTrue("Should find item by custom URL before versioning", foundBeforeVersioning.isPresent());
-        assertEquals("Found item should be the original item", originalItem.getID(),
-                     foundBeforeVersioning.get().getID());
+        assertTrue(foundBeforeVersioning.isPresent(), "Should find item by custom URL before versioning");
+        assertEquals(originalItem.getID(), foundBeforeVersioning.get().getID(),
+                     "Found item should be the original item");
 
         // Now create a new version
         Version newVersion = VersionBuilder.createVersion(context, originalItem, "Second version").build();

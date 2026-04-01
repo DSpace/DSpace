@@ -81,10 +81,4 @@ public class CompositeProjection extends AbstractProjection {
         }
         return true;
     }
-
-    @Override
-    public boolean isAllLanguages() {
-        return projections.stream()
-                          .anyMatch(Projection::isAllLanguages);
-    }
 }

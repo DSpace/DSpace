@@ -7,8 +7,8 @@
  */
 package org.dspace.app.itemimport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -35,9 +35,9 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.flywaydb.core.internal.util.ExceptionUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Basic integration testing for the SAF Import feature via CLI {@link ItemImportCLI}.
@@ -60,7 +60,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     private Path workDir;
     private static final String TEMP_DIR = ItemImport.TEMP_DIR;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -89,7 +89,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
         workDir = Path.of(file.getAbsolutePath());
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         PathUtils.deleteOnExit(tempDir);
@@ -549,6 +549,57 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     private void checkMetadata() throws Exception {
+        // Debug: check context state
+        System.out.println("DEBUG: Context valid: " + context.isValid());
+        System.out.println("DEBUG: Collection object: " + collection);
+        System.out.println("DEBUG: Collection ID: " + (collection != null ? collection.getID() : "null"));
+
+        // Try to reload the collection in the new context
+        System.out.println("DEBUG: Attempting to reload collection by ID...");
+        if (collection != null) {
+            Collection reloadedCollection = ContentServiceFactory.getInstance()
+                .getCollectionService().find(context, collection.getID());
+            System.out.println("DEBUG: Reloaded collection: " + reloadedCollection);
+            if (reloadedCollection != null) {
+                System.out.println("DEBUG: Reloaded collection name: " + reloadedCollection.getName());
+            }
+        }
+
+        // Debug: check all regular items (including non-archived)
+        System.out.println("DEBUG: Checking regular items via itemService.findAllRegularItems()...");
+        Iterator<Item> regularItems = itemService.findAllRegularItems(context);
+        int regularCount = 0;
+        while (regularItems.hasNext()) {
+            Item i = regularItems.next();
+            System.out.println("DEBUG: Regular item: " + i.getID() + " - title: " + i.getName() +
+                               " - inArchive: " + i.isArchived() + " - withdrawn: " + i.isWithdrawn());
+            regularCount++;
+        }
+        System.out.println("DEBUG: Total regular items found: " + regularCount);
+
+        // Debug: check all items in collection
+        System.out.println("DEBUG: Checking items in collection...");
+        Iterator<Item> collectionItems = itemService.findAllByCollection(context, collection);
+        int collCount = 0;
+        while (collectionItems.hasNext()) {
+            Item i = collectionItems.next();
+            System.out.println("DEBUG: Collection item: " + i.getID() + " - title: " + i.getName() +
+                               " - inArchive: " + i.isArchived());
+            collCount++;
+        }
+        System.out.println("DEBUG: Total items in collection: " + collCount);
+
+        // Debug: check all items via service (archived only)
+        System.out.println("DEBUG: Checking all items via itemService.findAll()...");
+        Iterator<Item> allItems = itemService.findAll(context);
+        int count = 0;
+        while (allItems.hasNext()) {
+            Item i = allItems.next();
+            System.out.println("DEBUG: Archived item: " + i.getID() + " - title: " + i.getName());
+            count++;
+        }
+        System.out.println("DEBUG: Total archived items found: " + count);
+
         Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
         assertEquals(item.getName(), publicationTitle);
         assertEquals(itemService.getMetadata(item, "dc.date.issued"), "1990");
@@ -600,5 +651,26 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     private void perfomImportScript(String[] args)
             throws Exception {
         runDSpaceScript(args);
+
+        // Debug: Check database directly via JDBC
+        System.out.println("DEBUG: Checking database via JDBC after script...");
+        javax.sql.DataSource ds = DSpaceServicesFactory.getInstance()
+            .getServiceManager()
+            .getServiceByName("dataSource", javax.sql.DataSource.class);
+        try (java.sql.Connection conn = ds.getConnection()) {
+            System.out.println("DEBUG JDBC: Connection URL: " + conn.getMetaData().getURL());
+            System.out.println("DEBUG JDBC: autocommit: " + conn.getAutoCommit());
+            try (java.sql.Statement stmt = conn.createStatement();
+                 java.sql.ResultSet rs = stmt.executeQuery("SELECT uuid, in_archive, withdrawn FROM item")) {
+                int count = 0;
+                while (rs.next()) {
+                    System.out.println("DEBUG JDBC: Item UUID=" + rs.getString("uuid") +
+                        ", in_archive=" + rs.getBoolean("in_archive") +
+                        ", withdrawn=" + rs.getBoolean("withdrawn"));
+                    count++;
+                }
+                System.out.println("DEBUG JDBC: Total items in database: " + count);
+            }
+        }
     }
 }

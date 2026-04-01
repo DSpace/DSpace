@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
+import java.net.URI;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.NumberFormat;
@@ -174,7 +175,7 @@ public class OREIngestionCrosswalk
                     // Make sure the url string escapes all the oddball characters
                     String processedURL = encodeForURL(href);
                     // Generate a request for the aggregated resource
-                    ARurl = new URL(processedURL);
+                    ARurl = URI.create(processedURL).toURL();
                     in = ARurl.openStream();
                 } catch (FileNotFoundException fe) {
                     log.error("The provided URI failed to return a resource: " + href);

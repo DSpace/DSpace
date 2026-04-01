@@ -7,7 +7,7 @@
  */
 package org.dspace.orcid.client;
 
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 
 /**
  * Model a successfully response incoming from ORCID using {@link OrcidClient}.

@@ -7,8 +7,8 @@
  */
 package org.dspace.app.sherpa.submit;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.SQLException;
 
@@ -31,11 +31,11 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * SHERPASubmitServiceTest creates a dummy item with an ISSN in its metadata, and makes sure
@@ -57,16 +57,16 @@ public class SHERPASubmitServiceTest extends AbstractUnitTest {
     Community testCommunity = null;
 
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
 
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         // Create primary Test community
@@ -83,7 +83,7 @@ public class SHERPASubmitServiceTest extends AbstractUnitTest {
         collectionService.update(context, testCollection);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         context.restoreAuthSystemState();
         testCommunity = null;
@@ -111,13 +111,13 @@ public class SHERPASubmitServiceTest extends AbstractUnitTest {
         SHERPAResponse response = sherpaSubmitService.searchRelatedJournals(context, testItem);
 
         // Make sure response is not null or empty
-        assertTrue("Response should not be null", response != null);
+        assertTrue(response != null, "Response should not be null");
 
         // For each response (there should be only one based on test data) perform the standard set
         // of thorough parsing tests
 
         // Assert response is not error, or fail with message
-        assertFalse("Response was flagged as 'isError'", response.isError());
+        assertFalse(response.isError(), "Response was flagged as 'isError'");
 
         // Skip remainder of parsing tests - these are already done in SHERPAServiceTEst
     }

@@ -18,9 +18,9 @@ import org.dspace.content.MetadataField;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.RegistrationDataMetadataService;
 import org.dspace.eperson.service.RegistrationDataService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
@@ -37,7 +37,7 @@ public class RegistrationDataMetadataServiceImplIT extends AbstractIntegrationTe
     RegistrationData registrationData;
     RegistrationDataMetadata metadata;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -53,7 +53,7 @@ public class RegistrationDataMetadataServiceImplIT extends AbstractIntegrationTe
         context.restoreAuthSystemState();
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         this.registrationDataService.delete(context, registrationData);

@@ -157,10 +157,6 @@
                 <stored-value>tr</stored-value>
             </pair>
             <pair>
-                <displayed-value>Український</displayed-value>
-                <stored-value>uk</stored-value>
-            </pair>
-            <pair>
                 <displayed-value>(Iнша)</displayed-value>
                 <stored-value>other</stored-value>
             </pair>

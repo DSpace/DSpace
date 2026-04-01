@@ -190,10 +190,13 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 // increment processed count
                 ++processed;
             }
+            // commit after each item to release DB resources
+            // NOTE: In Hibernate 7, we must commit BEFORE uncaching entities to avoid
+            // "Detached entity passed to persist" errors. The flush during commit
+            // must complete while all entities are still attached to the session.
+            c.commit();
             // clear item objects from context cache and internal cache
             c.uncacheEntity(currentItem);
-            // commit after each item to release DB resources
-            c.commit();
             currentItem = null;
         }
     }
@@ -254,10 +257,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                     logError(formatBitstreamDetails(myItem.getHandle(), myBitstream));
                     logError(ThrowableUtils.formatCauseChain(e));
                 }
-            } else if (filterClass instanceof SelfRegisterInputFormats) {
-                // Filter implements self registration, so check to see if it should be applied
-                // given the formats it claims to support
-                SelfRegisterInputFormats srif = (SelfRegisterInputFormats) filterClass;
+            } else if (filterClass instanceof SelfRegisterInputFormats srif) {
                 boolean applyFilter = false;
 
                 // Check MIME type

@@ -60,12 +60,12 @@ public class OrcidValidatorImpl implements OrcidValidator {
     @Override
     public List<OrcidValidationError> validate(Object object) {
 
-        if (object instanceof Work && isWorkValidationEnabled()) {
-            return validateWork((Work) object);
+        if (object instanceof Work work && isWorkValidationEnabled()) {
+            return validateWork(work);
         }
 
-        if (object instanceof Funding && isFundingValidationEnabled()) {
-            return validateFunding((Funding) object);
+        if (object instanceof Funding funding && isFundingValidationEnabled()) {
+            return validateFunding(funding);
         }
 
         return Collections.emptyList();

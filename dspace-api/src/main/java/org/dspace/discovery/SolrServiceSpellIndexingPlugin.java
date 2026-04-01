@@ -31,8 +31,8 @@ public class SolrServiceSpellIndexingPlugin implements SolrServiceIndexPlugin {
 
     @Override
     public void additionalIndex(Context context, IndexableObject indexableObject, SolrInputDocument document) {
-        if (indexableObject instanceof IndexableItem) {
-            Item item = ((IndexableItem) indexableObject).getIndexedObject();
+        if (indexableObject instanceof IndexableItem indexableItem) {
+            Item item = indexableItem.getIndexedObject();
             List<MetadataValue> dcValues = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(item.getType());
             for (MetadataValue dcValue : dcValues) {

@@ -62,9 +62,9 @@ import org.dspace.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.orcid.jaxb.model.v3.release.record.Email;
 import org.orcid.jaxb.model.v3.release.record.Emails;
 import org.orcid.jaxb.model.v3.release.record.FamilyName;
@@ -115,7 +115,7 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
     @Autowired
     private RegistrationDataService registrationDataService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         originalOrcidClient = orcidAuthentication.getOrcidClient();
         orcidAuthentication.setOrcidClient(orcidClientMock);
@@ -125,7 +125,7 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
                 "org.dspace.authenticate.PasswordAuthentication"));
     }
 
-    @After
+    @AfterEach
     public void after() throws Exception {
         orcidAuthentication.setOrcidClient(originalOrcidClient);
         if (createdEperson != null) {
