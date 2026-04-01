@@ -51,10 +51,10 @@ public class MetadataValueServiceImpl implements MetadataValueService {
         MetadataValue metadataValue = new MetadataValue();
         metadataValue.setMetadataField(metadataField);
         metadataValue.setDSpaceObject(dso);
-        dso.addMetadata(metadataValue);
-//An update here isn't needed, this is persisted upon the merge of the owning object
-//        metadataValueDAO.save(context, metadataValue);
+        // Persist first so that the PK is assigned before adding to the entity's Set.
+        // Adding with id=0 and then mutating the id corrupts the HashSet bucket placement.
         metadataValue = metadataValueDAO.create(context, metadataValue);
+        dso.addMetadata(metadataValue);
         log.info(LogHelper.getHeader(context, "add_metadatavalue",
                                      "metadata_value_id=" + metadataValue.getID()));
 

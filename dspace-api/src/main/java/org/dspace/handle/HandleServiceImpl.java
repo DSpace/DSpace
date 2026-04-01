@@ -142,8 +142,9 @@ public class HandleServiceImpl implements HandleService {
 
         handle.setHandle(handleId);
         handle.setDSpaceObject(dso);
-        dso.addHandle(handle);
+        // Set all hashCode-relevant fields before adding to the entity's Set
         handle.setResourceTypeId(dso.getType());
+        dso.addHandle(handle);
         handleDAO.save(context, handle);
 
         log.debug("Created new handle for {} (ID={}) {}",
