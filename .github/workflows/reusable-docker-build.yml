@@ -147,7 +147,7 @@ jobs:
       - name: Build and push image to ${{ env.DOCKER_BUILD_REGISTRY }}
         if: ${{ ! matrix.isPr }}
         id: docker_build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           build-contexts: |
             ${{ inputs.dockerfile_additional_contexts }}
@@ -201,7 +201,7 @@ jobs:
       # NOTE: This step cannot be combined with the build above as it's a different type of output.
       - name: Build and push image to local TAR file
         if: ${{ matrix.arch == 'linux/amd64'}}
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           build-contexts: |
             ${{ inputs.dockerfile_additional_contexts }}
