@@ -26,6 +26,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import org.dspace.app.audit.MetadataEvent;
@@ -80,8 +81,10 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
 
     /**
      * Using a Set avoids Hibernate bag recreation on every change.
+     * Ordered by id so that REST responses return access conditions in creation order.
      */
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject", cascade = CascadeType.ALL)
+    @OrderBy("id")
     private final Set<ResourcePolicy> resourcePolicies = new LinkedHashSet<>();
 
     /**
