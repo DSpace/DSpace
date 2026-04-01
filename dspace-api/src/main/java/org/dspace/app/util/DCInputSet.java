@@ -10,10 +10,12 @@ package org.dspace.app.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Utils;
+
 /**
  * Class representing all DC inputs required for a submission, organized into pages
  *
@@ -30,14 +32,22 @@ public class DCInputSet {
      */
     private DCInput[][] inputs = null;
 
+    private DCInputsReader inputReader;
+
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DCInputSet.class);
+
     /**
      * constructor
      *
      * @param formName       form name
      * @param rows           the rows
      * @param listMap        map
+     * @throws DCInputsReaderException
      */
-    public DCInputSet(String formName, List<List<Map<String, String>>> rows, Map<String, List<String>> listMap) {
+    public DCInputSet(DCInputsReader inputReader, String formName, List<List<Map<String, String>>> rows,
+        Map<String, List<String>> listMap)
+        throws DCInputsReaderException {
+        this.inputReader = inputReader;
         this.formName = formName;
         this.inputs = new DCInput[rows.size()][];
         for (int i = 0; i < inputs.length; i++) {
@@ -93,9 +103,9 @@ public class DCInputSet {
      * @return true if the current set has all the prev. published fields
      */
     public boolean isDefinedPubBefore() {
-        return (isFieldPresent("dc.date.issued") &&
+        return isFieldPresent("dc.date.issued") &&
             isFieldPresent("dc.identifier.citation") &&
-            isFieldPresent("dc.publisher"));
+            isFieldPresent("dc.publisher");
     }
 
     /**
@@ -106,31 +116,85 @@ public class DCInputSet {
      * @return true if the current set has the named field
      */
     public boolean isFieldPresent(String fieldName) {
+        return getField(fieldName).isPresent();
+    }
+
+    /**
+     * Recursively searches for a field by its fully qualified name within this input set.
+     *
+     * <p>The search process handles several field types differently:</p>
+     *
+     * <ul>
+     *   <li><strong>qualdrop_value fields:</strong> Checks both the base field name and all possible
+     *       qualifier combinations from the dropdown pairs</li>
+     *   <li><strong>group fields:</strong> Recursively searches in child forms following the naming
+     *       convention {@code {parentFormName}-{schema}-{element}-{qualifier}}. Child forms are loaded
+     *       and searched for nested fields. This allows relation-fields with grouped metadata
+     *       (e.g., author with affiliation) to be properly resolved.</li>
+     *   <li><strong>inline-group fields:</strong> Similar to group fields, recursively searches in child
+     *       forms for nested fields within inline groups. The difference from group is that inline-group
+     *       is used for simple field grouping without relation-field associations.</li>
+     *   <li><strong>relationship fields:</strong> Matches fields using the pattern
+     *       {@code relation.{relationshipType}}</li>
+     *   <li><strong>standard fields:</strong> Direct field name matching</li>
+     * </ul>
+     *
+     * <p><strong>Behavior difference between group and inline-group:</strong></p>
+     * <ul>
+     *   <li><strong>group:</strong> Used within {@code <relation-field>} elements to define nested metadata
+     *       that should be grouped with relationship entities. For example, when creating an author relationship,
+     *       the author's affiliation can be captured as grouped metadata. The parent field stores a placeholder
+     *       value or relationship reference.</li>
+     *   <li><strong>inline-group:</strong> Used for simple grouping of related metadata fields without
+     *       relationship associations. Fields are grouped purely for UI presentation and data organization.
+     *       Both parent and child fields store actual metadata values directly on the item.</li>
+     * </ul>
+     *
+     * @param fieldName the fully qualified field name to search for, in the format
+     *                  {@code schema.element.qualifier} (e.g., "dc.contributor.author")
+     * @return an Optional containing the DCInput if found, or Optional.empty() if not found
+     *         or if an error occurs during recursive resolution
+     */
+    public Optional<DCInput> getField(String fieldName) {
         for (int i = 0; i < inputs.length; i++) {
             for (int j = 0; j < inputs[i].length; j++) {
                 DCInput field = inputs[i][j];
                 // If this is a "qualdrop_value" field, then the full field name is the field + dropdown qualifier
-                if (StringUtils.equals(field.getInputType(), "qualdrop_value")) {
+                if (Strings.CS.equals(field.getInputType(), "qualdrop_value")) {
                     List<String> pairs = field.getPairs();
                     for (int k = 0; k < pairs.size(); k += 2) {
                         String qualifier = pairs.get(k + 1);
                         String fullName = Utils.standardize(field.getSchema(), field.getElement(), qualifier, ".");
                         if (fullName.equals(fieldName)) {
-                            return true;
+                            return Optional.of(field);
                         }
+                    }
+                } else if (Strings.CS.equalsAny(field.getInputType(), "group", "inline-group")) {
+                    // For group and inline-group types, recursively search in child form
+                    // Child form naming convention: {parentFormName}-{schema}-{element}-{qualifier}
+                    String formName = getFormName() + "-" + Utils.standardize(field.getSchema(),
+                        field.getElement(), field.getQualifier(), "-");
+                    try {
+                        DCInputSet inputConfig = inputReader.getInputsByFormName(formName);
+                        Optional<DCInput> f = inputConfig.getField(fieldName);
+                        if (f.isPresent()) {
+                            return f;
+                        }
+                    } catch (DCInputsReaderException e) {
+                        log.error(e.getMessage(), e);
                     }
                 } else if (field.isRelationshipField() &&
                     ("relation." + field.getRelationshipType()).equals(fieldName)) {
-                    return true;
+                    return Optional.of(field);
                 } else {
                     String fullName = field.getFieldName();
-                    if (Objects.equals(fullName, fieldName)) {
-                        return true;
+                    if (fullName.equals(fieldName)) {
+                        return Optional.of(field);
                     }
                 }
             }
         }
-        return false;
+        return Optional.empty();
     }
 
     /**

@@ -256,11 +256,11 @@ public class DSBitStoreService extends BaseBitStoreService {
         Path normalizedPath = bitstreamFile.toPath().normalize();
         String[] allowedAssetstoreRoots = DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getArrayProperty("assetstore.allowed.roots", new String[]{});
-        if (!normalizedPath.startsWith(baseDir.getAbsolutePath())
+        if (!normalizedPath.startsWith(baseDir.getCanonicalPath())
             && !StringUtils.startsWithAny(normalizedPath.toString(), allowedAssetstoreRoots)) {
             log.error("Bitstream path outside of assetstore root requested:" +
                     "bitstream={}, path={}, assetstore={}",
-                    bitstream.getID(), normalizedPath, baseDir.getAbsolutePath());
+                    bitstream.getID(), normalizedPath, baseDir.getCanonicalPath());
             throw new IOException("Illegal bitstream path constructed");
         }
         return bitstreamFile;

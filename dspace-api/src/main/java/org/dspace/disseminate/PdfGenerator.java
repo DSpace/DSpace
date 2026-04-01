@@ -7,21 +7,28 @@
  */
 package org.dspace.disseminate;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.dspace.app.util.XMLUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import org.w3c.dom.Document;
 import org.xhtmlrenderer.pdf.ITextRenderer;
+import org.xml.sax.SAXException;
 
 /**
  * Generates a PDF coverpage.
@@ -36,7 +43,7 @@ public class PdfGenerator {
      * Render a HTML coverpage.
      *
      * @param templateName the name of the thymeleaf template
-     * @param variables dynamic content for the template
+     * @param variables    dynamic content for the template
      * @return a rendered HTML coverpage
      */
     public String parseTemplate(String templateName, Map<String, String> variables) {
@@ -65,7 +72,7 @@ public class PdfGenerator {
     /**
      * render a HTML coverpage to a file
      *
-     * @param html the coverpage HTML
+     * @param html   the coverpage HTML
      * @param toFile file to write to
      */
     public void generateToFile(String html, File toFile) {
@@ -81,6 +88,9 @@ public class PdfGenerator {
      *
      * @param html the coverpage HTML
      * @return resulting pdfbox PDDocument
+     * @throws IOException                  if IO error
+     * @throws ParserConfigurationException if config error
+     * @throws SAXException                 if XML error
      */
     public PDDocument generate(String html) {
         try (var out = new ByteArrayOutputStream()) {
@@ -92,10 +102,15 @@ public class PdfGenerator {
     }
 
     private void generate(String html, OutputStream out) {
-        var renderer = new ITextRenderer();
-
-        renderer.setDocumentFromString(html);
-        renderer.layout();
-        renderer.createPDF(out);
+        try {
+            var renderer = new ITextRenderer();
+            DocumentBuilder builder = XMLUtils.getDocumentBuilder();
+            Document doc = builder.parse(new ByteArrayInputStream(html.getBytes(StandardCharsets.UTF_8)));
+            renderer.setDocument(doc, null);
+            renderer.layout();
+            renderer.createPDF(out);
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

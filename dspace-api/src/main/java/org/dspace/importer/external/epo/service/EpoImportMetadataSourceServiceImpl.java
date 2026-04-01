@@ -14,6 +14,7 @@ import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -27,9 +28,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.HttpException;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.jena.ext.xerces.impl.dv.util.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
@@ -163,7 +164,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     private Map<String, String> getLoginHeaderParams() {
         Map<String, String> params = new HashMap<String, String>();
         String authString = consumerKey + ":" + consumerSecret;
-        params.put("Authorization", "Basic " + Base64.encode(authString.getBytes()));
+        params.put("Authorization", "Basic " + Base64.getEncoder().encodeToString(authString.getBytes()));
         params.put("Content-type", "application/x-www-form-urlencoded");
         return params;
     }
@@ -317,7 +318,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                         .filter(r -> r.getValue(dateFiled.getSchema(), dateFiled.getElement(),
                                     dateFiled.getQualifier())
                                 .stream()
-                                .anyMatch(m -> StringUtils.equals(m.getValue(),
+                                .anyMatch(m -> Strings.CS.equals(m.getValue(),
                                         id.split(APP_NO_DATE_SEPARATOR_REGEX)[1])
                         ))
                         .limit(1).collect(Collectors.toList());

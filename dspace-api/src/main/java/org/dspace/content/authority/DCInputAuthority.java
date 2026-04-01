@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
@@ -48,6 +49,8 @@ import org.dspace.core.SelfNamedPlugin;
  * fields.
  */
 public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority {
+    public static final String UNKNOWN_KEY = "UNKNOWN KEY ";
+
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DCInputAuthority.class);
 
     /**
@@ -157,7 +160,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         List<Choice> v = new ArrayList<Choice>();
         for (int i = 0; i < valuesLocale.length; ++i) {
             // In a DCInputAuthority context, a user will want to query the labels, not the values
-            if (query == null || StringUtils.containsIgnoreCase(labelsLocale[i], query)) {
+            if (query == null || Strings.CI.contains(labelsLocale[i], query)) {
                 if (found >= start && v.size() < limit) {
                     v.add(new Choice(null, valuesLocale[i], labelsLocale[i]));
                     if (valuesLocale[i].equalsIgnoreCase(query)) {
@@ -196,18 +199,21 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
             locale = I18nUtil.getDefaultLocale().getLanguage();
         }
 
+        String[] valuesLocale = values.get(locale);
         String[] labelsLocale = labels.get(locale);
         int pos = -1;
-        for (int i = 0; i < labelsLocale.length; i++) {
-            if (labelsLocale[i].equals(key)) {
+        // search in the values to return the label
+        for (int i = 0; valuesLocale != null && i < valuesLocale.length; i++) {
+            if (valuesLocale[i].equals(key)) {
                 pos = i;
                 break;
             }
         }
-        if (pos != -1) {
+        if (pos != -1 && labelsLocale != null) {
+            // return the label in the same position where we found the value
             return labelsLocale[pos];
         } else {
-            return "UNKNOWN KEY " + key;
+            return UNKNOWN_KEY + key;
         }
     }
 

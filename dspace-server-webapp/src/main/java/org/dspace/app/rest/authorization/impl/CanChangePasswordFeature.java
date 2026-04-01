@@ -9,7 +9,7 @@ package org.dspace.app.rest.authorization.impl;
 
 import java.sql.SQLException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -30,7 +30,7 @@ public class CanChangePasswordFeature implements AuthorizationFeature {
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         if (context.getCurrentUser() != null && !context.isContextUserSwitched()
-            && StringUtils.equals(context.getAuthenticationMethod(), "password")) {
+            && Strings.CS.equals(context.getAuthenticationMethod(), "password")) {
             return true;
         }
         return false;

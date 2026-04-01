@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.mediafilter.service.MediaFilterService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -460,7 +460,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                       .flatMap(bundle ->
                           bundle.getBitstreams().stream())
                       .filter(bitstream ->
-                          StringUtils.equals(bitstream.getName().trim(), bitstreamName.trim()))
+                          Strings.CS.equals(bitstream.getName().trim(), bitstreamName.trim()))
                       .collect(Collectors.toList());
     }
 

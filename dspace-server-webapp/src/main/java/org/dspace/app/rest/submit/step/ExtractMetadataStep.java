@@ -20,6 +20,7 @@ import java.util.StringJoiner;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Equator;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.submit.ListenerProcessingStep;
@@ -132,8 +133,8 @@ public class ExtractMetadataStep implements ListenerProcessingStep, UploadableSt
                     if (!CollectionUtils.isEqualCollection(prevMetadata, currMetadata, new Equator<MetadataValue>() {
                         @Override
                         public boolean equate(MetadataValue o1, MetadataValue o2) {
-                            return StringUtils.equals(o1.getValue(), o2.getValue())
-                                    && StringUtils.equals(o1.getAuthority(), o2.getAuthority());
+                            return Strings.CS.equals(o1.getValue(), o2.getValue())
+                                    && Strings.CS.equals(o1.getAuthority(), o2.getAuthority());
                         }
                         @Override
                         public int hash(MetadataValue o) {
