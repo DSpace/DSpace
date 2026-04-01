@@ -72,7 +72,7 @@ public class BitstreamResourcePolicyReplacePatchOperation extends ReplacePatchOp
                     for (ResourcePolicy policy : policies) {
                         int toReplace = Integer.parseInt(rpIdx);
                         if (index == toReplace) {
-                            b.getResourcePolicies().remove(policy);
+                            b.removeResourcePolicy(policy);
                             break;
                         }
                         index++;

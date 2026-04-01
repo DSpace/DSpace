@@ -447,31 +447,32 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public void clearMetadata(Context context, T dso, String schema, String element, String qualifier, String lang)
         throws SQLException {
-        Iterator<MetadataValue> metadata = dso.getMetadata().iterator();
-        while (metadata.hasNext()) {
-            MetadataValue metadataValue = metadata.next();
-            // If this value matches, delete it
+        List<MetadataValue> toRemove = new ArrayList<>();
+        for (MetadataValue metadataValue : dso.getMetadata()) {
             if (match(schema, element, qualifier, lang, metadataValue)) {
                 dso.addMetadataEventDetails(new MetadataEvent(metadataValue, MetadataEvent.REMOVE));
-                metadata.remove();
-                metadataValueService.delete(context, metadataValue);
+                toRemove.add(metadataValue);
             }
         }
-        dso.setMetadataModified();
+        dso.removeMetadata(toRemove);
+        for (MetadataValue metadataValue : toRemove) {
+            metadataValueService.delete(context, metadataValue);
+        }
     }
 
     @Override
     public void removeMetadataValues(Context context, T dso, List<MetadataValue> values) throws SQLException {
-        Iterator<MetadataValue> metadata = dso.getMetadata().iterator();
-        while (metadata.hasNext()) {
-            MetadataValue metadataValue = metadata.next();
+        List<MetadataValue> toRemove = new ArrayList<>();
+        for (MetadataValue metadataValue : dso.getMetadata()) {
             if (values.contains(metadataValue)) {
                 dso.addMetadataEventDetails(new MetadataEvent(metadataValue, MetadataEvent.REMOVE));
-                metadata.remove();
-                metadataValueService.delete(context, metadataValue);
+                toRemove.add(metadataValue);
             }
         }
-        dso.setMetadataModified();
+        dso.removeMetadata(toRemove);
+        for (MetadataValue metadataValue : toRemove) {
+            metadataValueService.delete(context, metadataValue);
+        }
     }
 
     /**

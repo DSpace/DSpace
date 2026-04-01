@@ -9,7 +9,6 @@ package org.dspace.handle;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -143,8 +142,9 @@ public class HandleServiceImpl implements HandleService {
 
         handle.setHandle(handleId);
         handle.setDSpaceObject(dso);
-        dso.addHandle(handle);
+        // Set all hashCode-relevant fields before adding to the entity's Set
         handle.setResourceTypeId(dso.getType());
+        dso.addHandle(handle);
         handleDAO.save(context, handle);
 
         log.debug("Created new handle for {} (ID={}) {}",
@@ -212,17 +212,15 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public void unbindHandle(Context context, DSpaceObject dso)
         throws SQLException {
-        Iterator<Handle> handles = dso.getHandles().iterator();
-        if (handles.hasNext()) {
-            while (handles.hasNext()) {
-                final Handle handle = handles.next();
-                handles.remove();
-                //Only set the "resouce_id" column to null when unbinding a handle.
+        List<Handle> handlesToUnbind = new ArrayList<>(dso.getHandles());
+        if (!handlesToUnbind.isEmpty()) {
+            for (Handle handle : handlesToUnbind) {
+                dso.removeHandle(handle);
+                //Only set the "resource_id" column to null when unbinding a handle.
                 // We want to keep around the "resource_type_id" value, so that we
                 // can verify during a restore whether the same *type* of resource
                 // is reusing this handle!
                 handle.setDSpaceObject(null);
-
 
                 handleDAO.save(context, handle);
 
@@ -315,15 +313,14 @@ public class HandleServiceImpl implements HandleService {
             // or if object is already deleted.
             if (dbHandle.getDSpaceObject() != null) {
                 // Remove the old handle from the current handle list
-                dbHandle.getDSpaceObject().getHandles().remove(dbHandle);
+                dbHandle.getDSpaceObject().removeHandle(dbHandle);
             }
             // Transfer the current handle to the new object
             dbHandle.setDSpaceObject(newOwner);
             dbHandle.setResourceTypeId(newOwner.getType());
-            newOwner.getHandles().add(0, dbHandle);
+            newOwner.addHandle(dbHandle);
             handleDAO.save(context, dbHandle);
         }
-
     }
 
     ////////////////////////////////////////
