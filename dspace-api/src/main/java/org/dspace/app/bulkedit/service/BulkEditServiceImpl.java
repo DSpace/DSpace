@@ -103,6 +103,9 @@ public class BulkEditServiceImpl implements BulkEditService {
         int commitCount = 0;
         int iAtLastCommit = 0;
         for (BulkEditChange bechange : bulkEditChanges) {
+            if (bechange.getItem() != null) {
+                bechange.setItem(c.reloadEntity(bechange.getItem()));
+            }
             applyBulkEditChange(c, bechange);
 
             if (bechange.getItem() != null) {
