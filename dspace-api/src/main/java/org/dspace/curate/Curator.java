@@ -148,14 +148,15 @@ public class Curator {
      * Add a task to the set to be performed. Caller should make no assumptions
      * on execution ordering.
      *
+     * @param ctx DSpace context object
      * @param taskName - logical name of task
      * @return this curator - to support concatenating invocation style
      */
-    public Curator addTask(String taskName) {
+    public Curator addTask(Context ctx, String taskName) {
         ResolvedTask task = resolver.resolveTask(taskName);
         if (task != null) {
             try {
-                task.init(this);
+                task.init(ctx, this);
                 trMap.put(taskName, new TaskRunner(task));
                 // performance order currently FIFO - to be revisited
                 perfList.add(taskName);

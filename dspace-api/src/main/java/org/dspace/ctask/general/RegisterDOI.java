@@ -49,8 +49,8 @@ public class RegisterDOI extends AbstractCurationTask {
      * Initialise the curation task and read configuration, instantiate the DOI provider
      */
     @Override
-    public void init(Curator curator, String taskId) throws IOException {
-        super.init(curator, taskId);
+    public void init(Context ctx, Curator curator, String taskId) throws IOException {
+        super.init(ctx, curator, taskId);
         // Get distribution behaviour from configuration, with a default value of 'false'
         distributed = configurationService.getBooleanProperty(PLUGIN_PREFIX + ".distributed", false);
         log.debug("PLUGIN_PREFIX = " + PLUGIN_PREFIX + ", skipFilter = " + skipFilter +

@@ -35,9 +35,9 @@ public class PropertyParameterTestingTask
     private static final Logger LOG = LogManager.getLogger();
 
     @Override
-    public void init(Curator curator, String taskId)
+    public void init(Context ctx, Curator curator, String taskId)
             throws IOException {
-        super.init(curator, taskId);
+        super.init(ctx, curator, taskId);
         LOG.info("Received 'init' on task {}", taskId);
         // Display some properties.
         LOG.info("taskProperty = '{}'; runParameter = '{}'",

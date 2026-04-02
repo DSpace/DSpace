@@ -73,8 +73,8 @@ public class ClamScan extends AbstractCurationTask {
     protected BitstreamService bitstreamService;
 
     @Override
-    public void init(Curator curator, String taskId) throws IOException {
-        super.init(curator, taskId);
+    public void init(Context ctx, Curator curator, String taskId) throws IOException {
+        super.init(ctx, curator, taskId);
         host = configurationService.getProperty(PLUGIN_PREFIX + ".service.host");
         port = configurationService.getIntProperty(PLUGIN_PREFIX + ".service.port");
         timeout = configurationService.getIntProperty(PLUGIN_PREFIX + ".socket.timeout");

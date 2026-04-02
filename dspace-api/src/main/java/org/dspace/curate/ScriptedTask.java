@@ -27,15 +27,17 @@ public interface ScriptedTask {
      * Since the curator can provide services to the task, this represents
      * curation DI.
      *
+     * @param ctx DSpace context object
      * @param curator the Curator controlling this task
      * @param taskId  identifier task should use in invoking services
      * @throws IOException if IO error
      */
-    public void init(Curator curator, String taskId) throws IOException;
+    public void init(Context ctx, Curator curator, String taskId) throws IOException;
 
     /**
      * Perform the curation task upon passed DSO
      *
+     * @param ctx DSpace context object
      * @param dso the DSpace object
      * @return status code
      * @throws IOException if IO error

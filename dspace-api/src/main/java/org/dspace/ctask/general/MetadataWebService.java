@@ -171,8 +171,8 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
      * @throws IOException if the parser could not be configured, or passed through.
      */
     @Override
-    public void init(Curator curator, String taskId) throws IOException {
-        super.init(curator, taskId);
+    public void init(Context ctx, Curator curator, String taskId) throws IOException {
+        super.init(ctx, curator, taskId);
         lang = configurationService.getProperty("default.language");
         String fldSep = taskProperty("separator");
         fieldSeparator = (fldSep != null) ? fldSep : " ";

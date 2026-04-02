@@ -55,7 +55,7 @@ public class CreateMissingIdentifiersIT
                 CreateMissingIdentifiers.class.getCanonicalName() + " = " + TASK_NAME);
 
         Curator curator = new Curator();
-        curator.addTask(TASK_NAME);
+        curator.addTask(context, TASK_NAME);
 
         context.setCurrentUser(admin);
         parentCommunity = CommunityBuilder.createCommunity(context)

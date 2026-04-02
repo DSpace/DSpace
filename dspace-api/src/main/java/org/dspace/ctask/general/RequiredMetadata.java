@@ -43,8 +43,8 @@ public class RequiredMetadata extends AbstractCurationTask {
     protected Map<String, List<String>> reqMap = new HashMap<String, List<String>>();
 
     @Override
-    public void init(Curator curator, String taskId) throws IOException {
-        super.init(curator, taskId);
+    public void init(Context ctx, Curator curator, String taskId) throws IOException {
+        super.init(ctx, curator, taskId);
         try {
             reader = new DCInputsReader();
         } catch (DCInputsReaderException dcrE) {

@@ -50,8 +50,8 @@ public abstract class AbstractTranslator extends AbstractCurationTask {
 
 
     @Override
-    public void init(Curator curator, String taskId) throws IOException {
-        super.init(curator, taskId);
+    public void init(Context ctx, Curator curator, String taskId) throws IOException {
+        super.init(ctx, curator, taskId);
 
         // Load configuration
         authLang = configurationService.getProperty("default.locale");

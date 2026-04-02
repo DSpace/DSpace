@@ -89,8 +89,8 @@ public class CuratorReportTest
         ListReporter reporter = new ListReporter();
         Curator curator = new Curator();
         curator.setReporter(reporter);
-        curator.addTask("task1");
-        curator.addTask("task2");
+        curator.addTask(context, "task1");
+        curator.addTask(context, "task2");
         curator.curate(context, site);
 
         // Validate the results.

@@ -54,7 +54,7 @@ public abstract class AbstractCurationTask implements CurationTask {
     protected EPersonService ePersonService;
 
     @Override
-    public void init(Curator curator, String taskId) throws IOException {
+    public void init(Context ctx, Curator curator, String taskId) throws IOException {
         this.curator = curator;
         this.taskId = taskId;
         communityService = ContentServiceFactory.getInstance().getCommunityService();
