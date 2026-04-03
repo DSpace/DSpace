@@ -1138,7 +1138,7 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api-lang</artifactId>
-                <version>[9.0.0,10.0.0)</version>
+                <version>[10.0.0,11.0.0)</version>
             </dependency>
 
             <!-- DSpace third Party Dependencies -->
