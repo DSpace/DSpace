@@ -179,7 +179,7 @@ public class MetadataValidator implements SubmissionStepValidator {
      * @param input   input field
      * @param errors  List holding all errors
      * @param config  submission step config
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     private void relationshipRequiredFieldCheck(Context context, Item item, DCInput input, List<ValidationError> errors,
                                                 SubmissionStepConfig config) {

@@ -67,7 +67,7 @@ public class RegisterDOI extends AbstractCurationTask {
      * and the original purpose of this task is to essentially implement a "Register DOI" button on the Edit Item page.
      * @param dso DSpaceObject for which to register a DOI (must be item)
      * @return status indicator
-     * @throws IOException
+     * @throws IOException if IO error
      */
     @Override
     public int perform(DSpaceObject dso) throws IOException {
