@@ -32,7 +32,7 @@
         <solr.client.version>8.11.4</solr.client.version>
 
         <ehcache.version>3.11.1</ehcache.version>
-        <errorprone.version>2.47.0</errorprone.version>
+        <errorprone.version>2.48.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-annotations.version below -->
         <jackson.version>2.21.1</jackson.version>
         <jackson-annotations.version>2.21</jackson-annotations.version>
@@ -374,7 +374,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <!-- Used to validate License Headers (see build process) -->
                 <plugin>
