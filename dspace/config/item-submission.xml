@@ -397,7 +397,7 @@
             <step id="personStep"/>
             <!-- The custom-url step can be uncommented to allow the Person's custom URL (when enabled) to be
                  customized during submission.-->
-            <!-- <step id="custom-url"/> -->
+            <step id="custom-url"/>
             <step id="upload"/>
             <step id="license"/>
         </submission-process>
@@ -409,7 +409,7 @@
             <step id="personStep"/>
             <!-- The custom-url step can be uncommented to allow the Person's custom URL (when enabled) to be
                  customized during submission.-->
-            <!-- <step id="custom-url"/> -->
+            <step id="custom-url"/>
             <step id="upload"/>
         </submission-process>
 
@@ -420,7 +420,7 @@
             <step id="personStep"/>
             <!-- The custom-url step can be uncommented to allow the Person's custom URL (when enabled) to be
                  customized during submission.-->
-            <!-- <step id="custom-url"/> -->
+            <step id="custom-url"/>
             <step id="owner" />
             <step id="upload" />
         </submission-process>
