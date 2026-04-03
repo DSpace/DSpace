@@ -18,32 +18,22 @@ import java.util.UUID;
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public final class BitstreamInputstreamOpenInfo {
+public final class BitstreamInputStreamOpenInfo {
 
     private static final int STACK_TRACE_LINES = 30;
 
     private final UUID id;
     private final String kind;
     private final Instant openedAt;
-    private final String threadName;
     private final Throwable openedAtThrowable;
 
-    public BitstreamInputstreamOpenInfo(UUID id,
+    public BitstreamInputStreamOpenInfo(UUID id,
                                         String kind,
                                         Instant openedAt,
-                                        Throwable openedAtThrowable) {
-        this(id, kind, openedAt, Thread.currentThread().getName(), openedAtThrowable);
-    }
-
-    public BitstreamInputstreamOpenInfo(UUID id,
-                                        String kind,
-                                        Instant openedAt,
-                                        String threadName,
                                         Throwable openedAtThrowable) {
         this.id = id;
         this.kind = kind;
         this.openedAt = openedAt;
-        this.threadName = threadName;
         this.openedAtThrowable = openedAtThrowable;
     }
 
@@ -75,15 +65,6 @@ public final class BitstreamInputstreamOpenInfo {
     }
 
     /**
-     * Get the name of the thread were the InputStream was opened
-     *
-     * @return the name of the thread were the InputStream was opened
-     */
-    public String threadName() {
-        return threadName;
-    }
-
-    /**
      * Get the throwable of were the InputStream was opened
      *
      * @return the throwable of were the InputStream was opened
@@ -112,11 +93,10 @@ public final class BitstreamInputstreamOpenInfo {
 
     @Override
     public String toString() {
-        return "OpenInfo{" +
+        return "BitstreamInputStreamOpenInfo{" +
                 "id=" + id +
                 ", kind='" + kind + '\'' +
                 ", openedAt=" + openedAt +
-                ", threadName='" + threadName + '\'' +
                 ", openedAtThrowable=\n" + openedAtStackTrace() +
                 '}';
     }

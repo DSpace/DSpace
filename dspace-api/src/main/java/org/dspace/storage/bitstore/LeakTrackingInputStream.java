@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 public final class LeakTrackingInputStream extends FilterInputStream {
 
     private static final Cleaner CLEANER = Cleaner.create();
-    private static final ConcurrentMap<UUID, BitstreamInputstreamOpenInfo> OPEN = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<UUID, BitstreamInputStreamOpenInfo> OPEN = new ConcurrentHashMap<>();
 
     private final UUID id = UUID.randomUUID();
     private final Cleaner.Cleanable cleanable;
@@ -45,11 +45,11 @@ public final class LeakTrackingInputStream extends FilterInputStream {
      */
     public LeakTrackingInputStream(InputStream in, String kind) {
         super(in);
-        BitstreamInputstreamOpenInfo info =
-                new BitstreamInputstreamOpenInfo(id, kind, Instant.now(), new Exception("Opened here"));
+        BitstreamInputStreamOpenInfo info =
+                new BitstreamInputStreamOpenInfo(id, kind, Instant.now(), new Exception("Opened here"));
         OPEN.put(id, info);
         this.cleanable = CLEANER.register(this, () -> {
-            BitstreamInputstreamOpenInfo leaked = OPEN.remove(id);
+            BitstreamInputStreamOpenInfo leaked = OPEN.remove(id);
             if (leaked != null) {
                 log.error("LEAKED {} stream {}", leaked.kind(), leaked.id(), leaked.openedAtThrowable());
             }
@@ -66,7 +66,7 @@ public final class LeakTrackingInputStream extends FilterInputStream {
         super.close();
     }
 
-    public static Map<UUID, BitstreamInputstreamOpenInfo> snapshotOpenStreams() {
+    public static Map<UUID, BitstreamInputStreamOpenInfo> snapshotOpenStreams() {
         return Map.copyOf(OPEN);
     }
 }
