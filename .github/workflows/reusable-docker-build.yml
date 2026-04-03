@@ -178,7 +178,7 @@ jobs:
       # (The purpose of the combined manifest is to list both amd64 and arm64 builds under same tag)
       - name: Upload Docker build digest to artifact
         if: ${{ ! matrix.isPr }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: digests-${{ inputs.build_id }}-${{ env.ARCH_NAME }}
           path: /tmp/digests/*
@@ -224,7 +224,7 @@ jobs:
       # This step is only done for AMD64, as that's the only image we use in our automated testing (at this time).
       - name: Upload local image TAR to artifact
         if: ${{ matrix.arch == 'linux/amd64'}}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: docker-image-${{ inputs.build_id }}-${{ env.ARCH_NAME }}
           path: /tmp/${{ inputs.build_id }}.tar
