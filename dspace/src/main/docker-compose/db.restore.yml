@@ -15,7 +15,7 @@ services:
     image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-postgres-loadsql:${DSPACE_VER:-dspace-9_x}"
     environment:
       # Location where the dump SQL file will be available on the running container
-      - LOCALSQL=/tmp/pgdump.sql
+      - LOCALSQL=${LOCALSQL:-/tmp/pgdump.sql}
     volumes:
       # Volume which shares a local SQL file at "./pgdump.sql" to the running container
       # IF YOUR LOCAL FILE HAS A DIFFERENT NAME (or is in a different location), then change the "./pgdump.sql"
