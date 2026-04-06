@@ -310,7 +310,7 @@
             <!-- To include the 'Duplicate Detection' step, uncomment the line below. Make sure
                  that duplicate-detection.cfg is properly configured and items have been reindexed since
                  enabling the feature -->
-            <!-- <step id="duplicates"/> -->
+            <step id="duplicates"/>
 
             <!--Step will be COAR Notify services to the item -->
             <!-- <step id="coarnotify"/> -->
@@ -375,6 +375,7 @@
             <!-- Publications use a custom first step, but share page 2 with "traditional" Item form -->
             <step id="publicationStep"/>
             <step id="traditionalpagetwo"/>
+            <step id="duplicates"/>
             <step id="upload"/>
             <step id="license"/>
         </submission-process>
