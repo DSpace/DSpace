@@ -13,6 +13,9 @@ import org.dspace.content.Bundle;
 import org.dspace.content.dao.BundleDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Context;
+import org.hibernate.LockMode;
+import org.hibernate.LockOptions;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Bundle object.
@@ -30,5 +33,15 @@ public class BundleDAOImpl extends AbstractHibernateDSODAO<Bundle> implements Bu
     @Override
     public int countRows(Context context) throws SQLException {
         return count(createQuery(context, "SELECT count(*) from Bundle"));
+    }
+
+    @Override
+    public void lockForWrite(Context context, Bundle bundle) throws SQLException {
+        Session session = getHibernateSession(context);
+        // Flush pending changes first so they are visible in the refresh query.
+        // Without this, any in-memory associations (e.g. item2bundle) that have not yet been
+        // flushed would be absent from the reloaded entity state.
+        session.flush();
+        session.refresh(bundle, new LockOptions(LockMode.PESSIMISTIC_WRITE));
     }
 }
