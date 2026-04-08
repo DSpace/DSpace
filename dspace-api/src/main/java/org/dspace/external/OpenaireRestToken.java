@@ -31,8 +31,8 @@ public class OpenaireRestToken {
     /**
      * Stores the grabbed token
      * 
-     * @param accessToken
-     * @param expiresIn
+     * @param accessToken the access token string
+     * @param expiresIn   the token expiration period in seconds
      */
     public OpenaireRestToken(String accessToken, Long expiresIn) {
         this.accessToken = accessToken;
@@ -51,8 +51,8 @@ public class OpenaireRestToken {
     /**
      * If the existing token has an expiration date and if it is at a minute of
      * expiring
-     * 
-     * @return
+     *
+     * @return true if the token is valid and not near expiration, false otherwise
      */
     public boolean isValidToken() {
         if (this.accessToken == null) {
