@@ -21,7 +21,7 @@
         <java.version>17</java.version>
         <spring.version>6.2.17</spring.version>
         <spring-ldap.version>3.3.6</spring-ldap.version>
-        <spring-boot.version>3.5.12</spring-boot.version>
+        <spring-boot.version>3.5.13</spring-boot.version>
         <spring-security.version>6.5.9</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>6.4.10.Final</hibernate.version>
         <hibernate-validator.version>8.0.3.Final</hibernate-validator.version>
