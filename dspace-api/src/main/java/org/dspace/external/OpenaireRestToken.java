@@ -52,7 +52,7 @@ public class OpenaireRestToken {
      * If the existing token has an expiration date and if it is at a minute of
      * expiring
      *
-     * @return true if the token is valid and not near expiration, false otherwise
+     * @return true if the token is present and not near expiration, false otherwise
      */
     public boolean isValidToken() {
         if (this.accessToken == null) {
