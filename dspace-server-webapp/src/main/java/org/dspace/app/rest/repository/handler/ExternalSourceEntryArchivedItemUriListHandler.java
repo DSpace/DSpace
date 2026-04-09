@@ -22,7 +22,9 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,6 +42,9 @@ public class ExternalSourceEntryArchivedItemUriListHandler extends ExternalSourc
 
     @Autowired
     private InstallItemService installItemService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     private static final Logger log = org.apache.logging.log4j.LogManager
         .getLogger(ExternalSourceEntryItemUriListHandler.class);
@@ -62,13 +67,20 @@ public class ExternalSourceEntryArchivedItemUriListHandler extends ExternalSourc
             return false;
         }
         try {
-            String owningCollectionUuid = request.getParameter("owningCollection");
-            Collection collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
-            if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                    Constants.ADD)) {
-                throw new AuthorizeException("Only admins/submitters are allowed to create items using external data");
-            }
+            if (this.configurationService.getBooleanProperty("submitter.allow.external.entities", false)) {
+                String owningCollectionUuid = request.getParameter("owningCollection");
+                Collection collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
+                if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
+                        Constants.ADD)) {
+                    throw new AuthorizeException("Only admins or submitters with at least one collection they have " +
+                            "submitter privileges to, are allowed to create items using external data");
+                }
+            } else {
+                if (!authorizeService.isAdmin(context)) {
+                    throw new AuthorizeException("Only admins are allowed to create items using external data");
 
+                }
+            }
         } catch (SQLException e) {
             log.error("context isAdmin check resulted in an error", e);
             return false;
