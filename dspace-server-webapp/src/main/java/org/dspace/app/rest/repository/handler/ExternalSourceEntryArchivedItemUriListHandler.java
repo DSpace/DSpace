@@ -9,14 +9,18 @@ package org.dspace.app.rest.repository.handler;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,6 +34,9 @@ public class ExternalSourceEntryArchivedItemUriListHandler extends ExternalSourc
 
     @Autowired
     private AuthorizeService authorizeService;
+
+    @Autowired
+    private CollectionService collectionService;
 
     @Autowired
     private InstallItemService installItemService;
@@ -55,9 +62,13 @@ public class ExternalSourceEntryArchivedItemUriListHandler extends ExternalSourc
             return false;
         }
         try {
-            if (!authorizeService.isAdmin(context)) {
-                throw new AuthorizeException("Only admins are allowed to create items using external data");
+            String owningCollectionUuid = request.getParameter("owningCollection");
+            Collection collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
+            if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
+                    Constants.ADD)) {
+                throw new AuthorizeException("Only admins/submitters are allowed to create items using external data");
             }
+
         } catch (SQLException e) {
             log.error("context isAdmin check resulted in an error", e);
             return false;
