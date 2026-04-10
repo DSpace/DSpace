@@ -80,6 +80,16 @@ public class CustomUrlValidator implements SubmissionStepValidator {
         return List.of();
     }
 
+    /**
+     * Checks if the custom URL contains invalid characters.
+     * The URL must contain only Latin letters (a-z, A-Z), digits (0-9), hyphens (-),
+     * underscores (_), and dots (.).
+     * This prevents URLs with Cyrillic, Arabic, Chinese, or other non-Latin scripts
+     * from being accepted, as they cause UI rendering issues.
+     *
+     * @param customUrl the custom URL to check
+     * @return true if the URL contains invalid characters, false otherwise
+     */
     private boolean hasInvalidCharacters(String customUrl) {
         return !URL_PATH_PATTERN.matcher(customUrl).matches();
     }
