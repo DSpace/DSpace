@@ -52,7 +52,13 @@ public class MediaFilterScriptConfiguration<T extends MediaFilterScript> extends
                                     .build();
         options.addOption(pluginOption);
 
-        options.addOption("d", "fromdate", true, "Process only item from specified last modified date");
+        options.addOption("d", "fromdate", true, "Process only items modified after specified date (YYYY-MM-DD)\n" +
+                                                    "Can be combined with -i to restrict run a community/collection.");
+
+        options.addOption("a", "autodate", false, "Process items updated after the last --autodate -based site-wide " +
+                                                    "run (stores the time at the start of the run regardless of the " +
+                                                    "filters used)\n Can be combined with -d to set a custom date " +
+                                                    "for processing or with -f to store the date after full run.");
 
         Option skipOption = Option.builder("s")
                                   .longOpt("skip")

@@ -99,6 +99,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     protected boolean isQuiet = false;
     protected boolean isForce = false; // default to not forced
     protected Date fromDate = null;
+    protected boolean useAutoDate = false;
 
     protected MediaFilterServiceImpl() {
 
@@ -120,28 +121,31 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     public void applyFiltersAllItems(Context context) throws Exception {
         boolean storeLastDate = false;
         String timeToStore = null;
-        if (fromDate == null) {
+        if (useAutoDate) {
             storeLastDate = true;
             // dspace.filtermedia.lastdate is saved as datetime. If new items are added while running
             // the script, storing time at the start of script to ensure that these items are processed
             // in the next run.
             timeToStore = DCDate.getCurrent().toString();
+        }
+        if (fromDate == null && useAutoDate) {
             String lastDate = siteService.getMetadata(siteService.findSite(context), "dspace.filtermedia.lastdate");
-            logInfo("Last date retrieved from db for media filter processing: " + lastDate);
             if ((lastDate != null) && (!isForce)) {
+                logInfo("Using fromdate " + lastDate + " retrieved from db");
                 fromDate = new DCDate(lastDate).toDate();
             }
         }
         if (skipList != null) {
             //if a skip-list exists, we need to filter community-by-community
             //so we can respect what is in the skip-list
+            //(handles also fromDate filtering if the option is present)
             List<Community> topLevelCommunities = communityService.findAllTop(context);
 
             for (Community topLevelCommunity : topLevelCommunities) {
                 applyFiltersCommunity(context, topLevelCommunity);
             }
         } else if (fromDate != null) {
-            logInfo("Using fromDate " + fromDate);
+            //no skip-list, search all items based on last modified date
             Iterator<Item> itemIterator =
                     itemService.findByLastModifiedSince(
                             context,
@@ -638,4 +642,10 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     public void setFromDate(Date fromDate) {
         this.fromDate = fromDate;
     }
+
+    @Override
+    public void setUseAutoDate(boolean useAutoDate) {
+        this.useAutoDate = useAutoDate;
+    }
+
 }

@@ -44,9 +44,10 @@ import org.dspace.utils.DSpace;
  * MFM: -v verbose outputs all extracted text to STDOUT; -f force forces all
  * bitstreams to be processed, even if they have been before; -n noindex does not
  * recreate index after processing bitstreams; -i [identifier] limits processing
- * scope to a community, collection or item; -m [max] limits processing to a
+ * scope to a community, collection or item; -m [maximum] limits processing to a
  * maximum number of items; -d [fromdate] takes only items starting from this date,
- * filtering by last_modified in the item table.
+ * filtering by last_modified in the item table; -a [autodate] will store the start
+ * time of the run and use that as fromdate for the next run.
  */
 public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfiguration> {
 
@@ -69,6 +70,7 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
     private String[] skipIds = null;
     private Map<String, List<String>> filterFormats = new HashMap<>();
     private LocalDate fromDate = null;
+    private boolean useAutoDate = false;
 
     private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
 
@@ -128,12 +130,24 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
             fromDate = LocalDate.parse(commandLine.getOptionValue('d'));
         }
 
-
+        if (commandLine.hasOption('a')) {
+            useAutoDate = true;
+        }
     }
 
     public void internalRun() throws Exception {
         if (help) {
             printHelp();
+            return;
+        }
+
+        if (useAutoDate && max2Process != Integer.MAX_VALUE) {
+            handler.logWarning("WARNING: using --maximum option with --autodate may result to saved date even though " +
+                                "not all items have been processed. Continuing anyway.");
+        }
+
+        if (useAutoDate && identifier != null) {
+            handler.logError("--identifier option cannot be used with --autodate");
             return;
         }
 
@@ -143,6 +157,7 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
         mediaFilterService.setQuiet(isQuiet);
         mediaFilterService.setVerbose(isVerbose);
         mediaFilterService.setMax2Process(max2Process);
+        mediaFilterService.setUseAutoDate(useAutoDate);
 
         //initialize an array of our enabled filters
         List<FormatFilter> filterList = new ArrayList<>();
@@ -233,6 +248,7 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
 
         if (fromDate != null) {
             mediaFilterService.setFromDate(Date.from(fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            handler.logInfo("Using manually supplied fromdate " + fromDate);
         }
 
         Context c = null;
@@ -240,12 +256,14 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
         try {
             c = new Context();
 
-            MetadataField field = metadataFieldService.findByElement(c, "dspace", "filtermedia", "lastdate");
-            if (field == null) {
-                throw new SQLException("Cannot find field dspace.filtermedia.lastdate from the Metadata "
-                                          + "Registry. Please update the registry by running\n"
-                                          + "./dspace registry-loader -metadata ../config/registries/dspace-types.xml\n"
-                                          + "in the [dspace]/bin/ directory.");
+            if (useAutoDate) {
+                MetadataField field = metadataFieldService.findByElement(c, "dspace", "filtermedia", "lastdate");
+                if (field == null) {
+                    throw new SQLException("Cannot find field dspace.filtermedia.lastdate from the Metadata "
+                                        + "Registry. Please update the registry by running\n"
+                                        + "./dspace registry-loader -metadata ../config/registries/dspace-types.xml\n"
+                                        + "in the [dspace]/bin/ directory.");
+                }
             }
 
             // have to be super-user to do the filtering
