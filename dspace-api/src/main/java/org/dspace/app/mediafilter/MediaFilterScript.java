@@ -39,15 +39,15 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
 /**
- * MediaFilterManager is the class that invokes the media/format filters over the
+ * MediaFilterScript is the class that invokes the media/format filters over the
  * repository's content. A few command line flags affect the operation of the
- * MFM: -v verbose outputs all extracted text to STDOUT; -f force forces all
- * bitstreams to be processed, even if they have been before; -n noindex does not
- * recreate index after processing bitstreams; -i [identifier] limits processing
- * scope to a community, collection or item; -m [maximum] limits processing to a
- * maximum number of items; -d [fromdate] takes only items starting from this date,
- * filtering by last_modified in the item table; -a [autodate] will store the start
- * time of the run and use that as fromdate for the next run.
+ * script: -v verbose outputs all extracted text to STDOUT; -f force forces all
+ * bitstreams (accounting for date limit) to be processed, even if they have
+ * been before; -i [identifier] limits processing scope to a community,
+ * collection or item; -m [maximum] limits processing to a maximum number of items;
+ * -d [fromdate] takes only items starting from this date, filtering by last_modified
+ * in the item table; -a [autodate] will store the start time of the run and use
+ * that as fromdate for the next run.
  */
 public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfiguration> {
 
@@ -125,8 +125,7 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
             skipIds = commandLine.getOptionValues('s');
         }
 
-        // isForce overrides fromDate
-        if (!isForce && commandLine.hasOption('d')) {
+        if (commandLine.hasOption('d')) {
             fromDate = LocalDate.parse(commandLine.getOptionValue('d'));
         }
 

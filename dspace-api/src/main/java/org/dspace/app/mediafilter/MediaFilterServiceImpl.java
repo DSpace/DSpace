@@ -130,7 +130,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         }
         if (fromDate == null && useAutoDate) {
             String lastDate = siteService.getMetadata(siteService.findSite(context), "dspace.filtermedia.lastdate");
-            if ((lastDate != null) && (!isForce)) {
+            if (lastDate != null) {
                 logInfo("Using fromdate " + lastDate + " retrieved from db");
                 fromDate = new DCDate(lastDate).toDate();
             }

@@ -30,13 +30,14 @@ public class MediaFilterScriptConfiguration<T extends MediaFilterScript> extends
     @Override
     public Options getOptions() {
         Options options = new Options();
-        options.addOption("v", "verbose", false, "print all extracted text and other details to STDOUT");
-        options.addOption("q", "quiet", false, "do not print anything except in the event of errors.");
-        options.addOption("f", "force", false, "force all bitstreams to be processed (overrides fromdate)");
+        options.addOption("v", "verbose", false, "Print all extracted text and other details to STDOUT");
+        options.addOption("q", "quiet", false, "Do not print anything except in the event of errors");
+        options.addOption("f", "force", false, "Force all bitstreams (can be restricted with -d or -i) " +
+                                                                    "to be processed");
         options.addOption("i", "identifier", true,
             "ONLY process bitstreams belonging to the provided handle identifier");
-        options.addOption("m", "maximum", true, "process no more than maximum items");
-        options.addOption("h", "help", false, "help");
+        options.addOption("m", "maximum", true, "Process no more than maximum items");
+        options.addOption("h", "help", false, "Help");
 
         Option pluginOption = Option.builder("p")
                                     .longOpt("plugins")
@@ -47,18 +48,16 @@ public class MediaFilterScriptConfiguration<T extends MediaFilterScript> extends
                                             "ONLY run the specified Media Filter plugin(s)\n" +
                                                     "listed from '" + MEDIA_FILTER_PLUGINS_KEY + "' in dspace.cfg.\n" +
                                                     "Separate multiple with a comma (,)\n" +
-                                                    "(e.g. MediaFilterManager -p \n\"Word Text Extractor\",\"PDF Text" +
+                                                    "(e.g. filter-media -p \n\"Word Text Extractor\",\"PDF Text" +
                                                     " Extractor\")")
                                     .build();
         options.addOption(pluginOption);
 
-        options.addOption("d", "fromdate", true, "Process only items modified after specified date (YYYY-MM-DD)\n" +
-                                                    "Can be combined with -i to restrict run a community/collection.");
+        options.addOption("d", "fromdate", true, "Process only items modified after specified date (YYYY-MM-DD)");
 
         options.addOption("a", "autodate", false, "Process items updated after the last --autodate -based site-wide " +
-                                                    "run (stores the time at the start of the run regardless of the " +
-                                                    "filters used)\n Can be combined with -d to set a custom date " +
-                                                    "for processing or with -f to store the date after full run.");
+                                    "run (stores the time at the start of the run regardless of the filters used),\n" +
+                                    "can be combined with -d to set a custom date");
 
         Option skipOption = Option.builder("s")
                                   .longOpt("skip")
@@ -68,7 +67,7 @@ public class MediaFilterScriptConfiguration<T extends MediaFilterScript> extends
                                   .desc(
                                           "SKIP the bitstreams belonging to identifier\n" +
                                                   "Separate multiple identifiers with a comma (,)\n" +
-                                                  "(e.g. MediaFilterManager -s \n 123456789/34,123456789/323)")
+                                                  "(e.g. filter-media -s \n 123456789/34,123456789/323)")
                                   .build();
         options.addOption(skipOption);
 
