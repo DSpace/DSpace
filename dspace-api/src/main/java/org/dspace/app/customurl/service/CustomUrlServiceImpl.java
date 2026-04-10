@@ -32,6 +32,7 @@ import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.validation.util.CustomUrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,7 +188,13 @@ public class CustomUrlServiceImpl implements CustomUrlService {
         String cleanBase = normalizeUrl(rawInput);
         if (StringUtils.isBlank(cleanBase)) {
             throw new IllegalArgumentException("Input '" + rawInput + "' does not contain any valid " +
-                                                   "alphanumeric characters to generate a URL");
+                                                   "Latin characters to generate a URL");
+        }
+
+        // Verify the normalized result is a valid custom URL (should only contain Latin chars, digits, hyphens)
+        if (CustomUrlUtils.hasInvalidCharacters(cleanBase)) {
+            throw new IllegalArgumentException("Normalized URL '" + cleanBase + "' from input '" + rawInput +
+                                                   "' contains invalid characters");
         }
 
         if (!customUrlExists(context, cleanBase)) {
