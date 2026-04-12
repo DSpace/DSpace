@@ -288,6 +288,8 @@
                 </relation-field>
               </row>
               -->
+            <!-- Uncomment this block to enable the Advisor field on your submission form.
+                 This adds a relationship lookup for advisor entities linked to publications.
             <row>
                 <relation-field>
                     <relationship-type>isAdvisorOfPublication</relationship-type>
@@ -304,6 +306,7 @@
                     <required></required>
                 </relation-field>
             </row>
+            -->
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
