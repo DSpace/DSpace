@@ -22,6 +22,10 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * <h2>
+ *     WARNING: Use the utility wrapper: {@link org.dspace.content.security.service.MetadataSecurityService}.
+ * </h2>
+ *
  * Static utility class to manage configuration for exposure (hiding) of
  * certain Item metadata fields.
  *
@@ -57,6 +61,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Larry Stone
  * @version $Revision: 3734 $
  */
+@Deprecated
 public class MetadataExposureServiceImpl implements MetadataExposureService {
     protected Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataExposureServiceImpl.class);
 
