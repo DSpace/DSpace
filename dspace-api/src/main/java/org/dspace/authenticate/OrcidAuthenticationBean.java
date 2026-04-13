@@ -120,7 +120,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
     @Override
     public boolean isUsed(Context context, HttpServletRequest request) {
-        return request.getAttribute(ORCID_AUTH_ATTRIBUTE) != null;
+        return request != null && request.getAttribute(ORCID_AUTH_ATTRIBUTE) != null;
     }
 
     @Override
