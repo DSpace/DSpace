@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -94,6 +96,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class CrisSecurityServiceImpl implements CrisSecurityService {
+
+    private static final Logger log = LogManager.getLogger(CrisSecurityServiceImpl.class);
 
     @Autowired
     private ItemService itemService;
@@ -188,27 +192,48 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
      */
     private boolean checkSecurity(Context context, Item item, EPerson user, AccessItemMode accessMode,
                               CrisSecurity crisSecurity) throws SQLException {
+        String userEmail = user != null ? user.getEmail() : "anonymous";
+        UUID itemId = item.getID();
+
+        log.debug("[CRIS-SECURITY] Evaluating security={} for user={}, item={}",
+                  crisSecurity, userEmail, itemId);
+
+        boolean granted;
+
         switch (crisSecurity) {
             case ADMIN:
-                return authorizeService.isAdmin(context, user);
+                granted = authorizeService.isAdmin(context, user);
+                break;
             case CUSTOM:
-                return hasAccessByCustomPolicy(context, item, user, accessMode);
+                granted = hasAccessByCustomPolicy(context, item, user, accessMode);
+                break;
             case GROUP:
-                return hasAccessByGroup(context, user, accessMode.getGroups());
+                granted = hasAccessByGroup(context, user, accessMode.getGroups());
+                break;
             case ITEM_ADMIN:
-                return authorizeService.isAdmin(context, user, item);
+                granted = authorizeService.isAdmin(context, user, item);
+                break;
             case OWNER:
-                return isOwner(user, item);
+                granted = isOwner(user, item);
+                break;
             case SUBMITTER:
-                return user != null && user.equals(item.getSubmitter());
+                granted = user != null && user.equals(item.getSubmitter());
+                break;
             case SUBMITTER_GROUP:
-                return isUserInSubmitterGroup(context, item, user);
+                granted = isUserInSubmitterGroup(context, item, user);
+                break;
             case ALL:
-                return true;
+                granted = true;
+                break;
             case NONE:
             default:
-                return false;
+                granted = false;
         }
+
+        log.debug("[CRIS-SECURITY] {} security={}, user={}, item={}",
+                  granted ? "GRANTED" : "DENIED", crisSecurity, userEmail, itemId);
+
+        return granted;
     }
 
     /**
@@ -249,9 +274,33 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
      */
     private boolean hasAccessByCustomPolicy(Context context, Item item, EPerson user, AccessItemMode accessMode)
         throws SQLException {
-        return hasAccessByGroupMetadataFields(context, item, user, accessMode.getGroupMetadataFields())
-            || hasAccessByUserMetadataFields(context, item, user, accessMode.getUserMetadataFields())
-            || hasAccessByItemMetadataFields(context, item, user, accessMode.getItemMetadataFields());
+
+        String userEmail = user != null ? user.getEmail() : "anonymous";
+        UUID itemId = item.getID();
+
+        log.debug("[CRIS-SECURITY] Evaluating CUSTOM sub-policies for user={}, item={}",
+                  userEmail, itemId);
+
+        if (hasAccessByGroupMetadataFields(context, item, user, accessMode.getGroupMetadataFields())) {
+            log.debug("[CRIS-SECURITY] CUSTOM matched via group metadata for user={}, item={}",
+                      userEmail, itemId);
+            return true;
+        }
+
+        if (hasAccessByUserMetadataFields(context, item, user, accessMode.getUserMetadataFields())) {
+            log.debug("[CRIS-SECURITY] CUSTOM matched via user metadata for user={}, item={}",
+                      userEmail, itemId);
+            return true;
+        }
+
+        if (hasAccessByItemMetadataFields(context, item, user, accessMode.getItemMetadataFields())) {
+            log.debug("[CRIS-SECURITY] CUSTOM matched via item metadata (transitive ownership)"
+                      + " for user={}, item={}", userEmail, itemId);
+            return true;
+        }
+
+        log.debug("[CRIS-SECURITY] CUSTOM no match for user={}, item={}", userEmail, itemId);
+        return false;
     }
 
     /**
@@ -286,6 +335,10 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
         for (Group group : userGroups) {
             for (String groupMetadataField : groupMetadataFields) {
                 if (anyMetadataHasAuthorityEqualsTo(item, groupMetadataField, group.getID())) {
+                    log.debug("[CRIS-SECURITY] Group metadata match: user={}, item={},"
+                              + " field={}, group={} ({})",
+                              user.getEmail(), item.getID(), groupMetadataField,
+                              group.getName(), group.getID());
                     return true;
                 }
             }
@@ -323,6 +376,8 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
 
         for (String userMetadataField : userMetadataFields) {
             if (anyMetadataHasAuthorityEqualsTo(item, userMetadataField, user.getID())) {
+                log.debug("[CRIS-SECURITY] User metadata match: user={} ({}), item={}, field={}",
+                          user.getEmail(), user.getID(), item.getID(), userMetadataField);
                 return true;
             }
         }
@@ -355,8 +410,18 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
             return false;
         }
 
-        return findRelatedItems(context, item, itemMetadataFields).stream()
-            .anyMatch(relatedItem -> isOwner(user, relatedItem));
+        List<Item> relatedItems = findRelatedItems(context, item, itemMetadataFields);
+
+        for (Item relatedItem : relatedItems) {
+            if (isOwner(user, relatedItem)) {
+                log.debug("[CRIS-SECURITY] Item metadata match (transitive ownership):"
+                          + " user={} ({}), item={}, relatedItem={}",
+                          user.getEmail(), user.getID(), item.getID(), relatedItem.getID());
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -382,10 +447,17 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
 
         for (String itemMetadataField : itemMetadataFields) {
             List<MetadataValue> metadataValues = itemService.getMetadataByMetadataString(item, itemMetadataField);
+
+            log.debug("[CRIS-SECURITY] Resolving related items: field={}, item={}, candidates={}",
+                      itemMetadataField, item.getID(), metadataValues.size());
+
             for (MetadataValue metadataValue : metadataValues) {
                 UUID relatedItemId = UUIDUtils.fromString(metadataValue.getAuthority());
                 Item relatedItem = itemService.find(context, relatedItemId);
                 if (relatedItem != null) {
+                    log.debug("[CRIS-SECURITY] Resolved related item: field={}, authority={},"
+                              + " relatedItem={}",
+                              itemMetadataField, metadataValue.getAuthority(), relatedItemId);
                     relatedItems.add(relatedItem);
                 }
             }
@@ -414,19 +486,39 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
      */
     private boolean hasAccessByGroup(Context context, EPerson user, List<String> groups) {
         if (CollectionUtils.isEmpty(groups)) {
+            log.debug("[CRIS-SECURITY] Group check skipped: no groups configured");
             return false;
         }
 
-        return groups.stream()
-                .map(group -> findGroupByNameOrUUID(context, group))
-                .filter(group -> group != null)
-                .anyMatch(group -> {
-                    try {
-                        return groupService.isMember(context, user, group);
-                    } catch (SQLException e) {
-                        return false;
-                    }
-                });
+        if (user == null) {
+            log.debug("[CRIS-SECURITY] Group check skipped: anonymous user");
+            return false;
+        }
+
+        log.debug("[CRIS-SECURITY] Checking group membership: user={} ({}), groupCount={}",
+                  user.getEmail(), user.getID(), groups.size());
+
+        for (String groupIdentifier : groups) {
+            Group group = findGroupByNameOrUUID(context, groupIdentifier);
+            if (group == null) {
+                log.debug("[CRIS-SECURITY] Group not found: identifier={}", groupIdentifier);
+                continue;
+            }
+
+            try {
+                boolean isMember = groupService.isMember(context, user, group);
+                log.debug("[CRIS-SECURITY] Group membership: user={}, group={} ({}), member={}",
+                          user.getEmail(), group.getName(), group.getID(), isMember);
+                if (isMember) {
+                    return true;
+                }
+            } catch (SQLException e) {
+                log.debug("[CRIS-SECURITY] Group membership check failed: user={}, group={},"
+                          + " error={}", user.getEmail(), group.getName(), e.getMessage());
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -483,8 +575,21 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
      * @return true if any metadata value's authority equals the UUID
      */
     private boolean anyMetadataHasAuthorityEqualsTo(Item item, String metadata, UUID uuid) {
-        return itemService.getMetadataByMetadataString(item, metadata).stream()
-            .anyMatch(value -> uuid.toString().equals(value.getAuthority()));
+        List<MetadataValue> metadataValues = itemService.getMetadataByMetadataString(item, metadata);
+
+        log.debug("[CRIS-SECURITY] Checking authorities: field={}, item={}, values={}, targetUUID={}",
+                  metadata, item.getID(), metadataValues.size(), uuid);
+
+        for (MetadataValue value : metadataValues) {
+            String authority = value.getAuthority();
+            if (uuid.toString().equals(authority)) {
+                log.debug("[CRIS-SECURITY] Authority match: field={}, value='{}', authority={}",
+                          metadata, value.getValue(), authority);
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
