@@ -127,6 +127,8 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
 
         if (commandLine.hasOption('d')) {
             fromDate = LocalDate.parse(commandLine.getOptionValue('d'));
+        } else {
+            fromDate = null;
         }
 
         if (commandLine.hasOption('a')) {
@@ -156,11 +158,15 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
         mediaFilterService.setQuiet(isQuiet);
         mediaFilterService.setVerbose(isVerbose);
         mediaFilterService.setMax2Process(max2Process);
+        if (fromDate != null) {
+            mediaFilterService.setFromDate(Date.from(fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        } else {
+            mediaFilterService.setFromDate(null);
+        }
         mediaFilterService.setUseAutoDate(useAutoDate);
 
         //initialize an array of our enabled filters
         List<FormatFilter> filterList = new ArrayList<>();
-
 
         //set up each filter
         for (int i = 0; i < filterNames.length; i++) {
@@ -243,11 +249,6 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
         if (skipIds != null && skipIds.length > 0) {
             //save to a global skip list
             mediaFilterService.setSkipList(Arrays.asList(skipIds));
-        }
-
-        if (fromDate != null) {
-            mediaFilterService.setFromDate(Date.from(fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
-            handler.logInfo("Using manually supplied fromdate " + fromDate);
         }
 
         Context c = null;

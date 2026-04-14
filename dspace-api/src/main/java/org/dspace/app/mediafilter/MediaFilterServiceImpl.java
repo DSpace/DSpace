@@ -641,11 +641,18 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     @Override
     public void setFromDate(Date fromDate) {
         this.fromDate = fromDate;
+        if (fromDate != null) {
+            logInfo("Using manually supplied fromdate " + fromDate);
+        }
     }
+
 
     @Override
     public void setUseAutoDate(boolean useAutoDate) {
         this.useAutoDate = useAutoDate;
+        if (useAutoDate) {
+            logInfo("Stored lastdate functionality activated.");
+        }
     }
 
 }
