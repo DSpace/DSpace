@@ -164,6 +164,7 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
                 existingMdv.setValue(metadataValue.getValue());
                 dso.addMetadataEventDetails(new MetadataEvent(existingMdv, MetadataEvent.MODIFY));
                 dsoService.setMetadataModified(dso);
+                existingMdv.setSecurityLevel(metadataValue.getSecurityLevel());
             } else {
                 throw new UnprocessableEntityException("There is no metadata of this type at that index");
             }

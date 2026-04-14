@@ -461,6 +461,11 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
+
+        Email emailSpy = Mockito.spy(Email.class);
+        doNothing().when(emailSpy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(emailSpy);
+
         try {
             // will throw InvalidReCaptchaException because 'x-captcha-payload' not equal captchaToken
             getClient().perform(post("/api/eperson/registrations")

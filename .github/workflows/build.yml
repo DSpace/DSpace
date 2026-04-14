@@ -25,7 +25,7 @@ jobs:
           #  - surefire.rerunFailingTestsCount => try again for flakey tests, and keep track of/report on number of retries
           - type: "Unit Tests"
             java: 21
-            mvnflags: "-Dtest.argLine=-Xmx2048m -DskipUnitTests=false -Dsurefire.rerunFailingTestsCount=2"
+            mvnflags: "-DskipUnitTests=false -Dsurefire.rerunFailingTestsCount=2"
             resultsdir: "**/target/surefire-reports/**"
           # NOTE: ITs skip all code validation checks, as they are already done by Unit Test job.
           #  - enforcer.skip     => Skip maven-enforcer-plugin rules
@@ -65,14 +65,14 @@ jobs:
       # (This artifact is downloadable at the bottom of any job's summary page)
       - name: Upload Results of ${{ matrix.type }} to Artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.type }} results
           path: ${{ matrix.resultsdir }}
 
       # Upload code coverage report to artifact, so that it can be shared with the 'codecov' job (see below)
       - name: Upload code coverage report to Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.type }} coverage report
           path: 'dspace/target/site/jacoco-aggregate/jacoco.xml'

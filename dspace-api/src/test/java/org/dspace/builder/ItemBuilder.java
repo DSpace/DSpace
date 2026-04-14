@@ -9,6 +9,7 @@ package org.dspace.builder;
 
 import static org.dspace.content.LicenseUtils.getLicenseText;
 import static org.dspace.content.MetadataSchemaEnum.DC;
+import static org.dspace.content.MetadataSchemaEnum.DSPACE;
 import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 
 import java.io.IOException;
@@ -208,6 +209,14 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, schema, element, qualifier, language, value, authority, confidence);
     }
 
+    public ItemBuilder withPolicyEPerson(String value, String authority) {
+        return addMetadataValue(item, DSPACE.getName(), "policy", "eperson", null, value, authority, CF_ACCEPTED);
+    }
+
+    public ItemBuilder withPolicyGroup(String value, String authority) {
+        return addMetadataValue(item, DSPACE.getName(), "policy", "group", null, value, authority, CF_ACCEPTED);
+    }
+
     public ItemBuilder withDoiIdentifier(String doi) {
         return addMetadataValue(item, "dc", "identifier", "doi", doi);
     }
@@ -248,8 +257,16 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", "abstract", description);
     }
 
+    public ItemBuilder withRelationProject(String project, String authority) {
+        return addMetadataValue(item, DC.getName(), "relation", "project", null, project, authority, 600);
+    }
+
     public ItemBuilder withRelationJournal(String journal, String authority) {
         return addMetadataValue(item, DC.getName(), "relation", "journal", null, journal, authority, 600);
+    }
+
+    public ItemBuilder withProjectInvestigator(String investigator, String authority) {
+        return addMetadataValue(item, "crispj", "investigator", null, null, investigator, authority, 600);
     }
 
     public ItemBuilder withType(String type) {

@@ -74,6 +74,14 @@ public abstract class AbstractBulkEditParsingService<T, R> implements BulkEditPa
 
             rowTotal = records.size();
 
+            int maxItems = configurationService.getIntProperty("bulkedit.import.max.items", 1000);
+            if (rowTotal > maxItems && maxItems > 0) {
+                throw new MetadataImportException(
+                    "Import contains " + rowTotal + " items, which exceeds the configured "
+                        + "maximum of " + maxItems + ". You can change this limit by setting "
+                        + "'bulkedit.import.max.items' in your local configuration.");
+            }
+
             for (R record : records) {
                 record = preprocessRecord(c, record);
                 BulkEditChange change = initChange(c, record);
