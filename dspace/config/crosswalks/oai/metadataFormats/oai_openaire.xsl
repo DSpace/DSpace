@@ -369,7 +369,7 @@
     <!-- This template creates the sub-element <datacite:nameIdentifier> of type Researcher ID from a Person built entity -->
     <xsl:template match="doc:field[starts-with(@name,'person.identifier.rid')]" mode="entity_author">
         <datacite:nameIdentifier nameIdentifierScheme="Researcher ID"
-            schemeURI="https://www.researcherid.com">
+            schemeURI="https://www.webofscience.com">
             <xsl:value-of select="./text()"/>
         </datacite:nameIdentifier>
     </xsl:template>
@@ -803,7 +803,7 @@
 
     <!-- oaire:resourceType -->
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_publicationtype.html -->
-    <xsl:template match="doc:element[@name='dc']/doc:element[@name='type']/doc:element" mode="oaire">
+    <xsl:template match="doc:element[@name='dc']/doc:element[@name='type']/doc:element[doc:field[@name='value']]" mode="oaire">
         <xsl:variable name="resourceTypeGeneral">
             <xsl:call-template name="resolveResourceTypeGeneral">
                 <xsl:with-param name="field" select="./doc:field[@name='value']/text()"/>
@@ -858,13 +858,13 @@
     <!-- datacite:sizes -->
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_size.html -->
     <xsl:template match="doc:element[@name='bundles']/doc:element[@name='bundle']" mode="datacite">
-        <datacite:sizes>
-            <xsl:if test="doc:field[@name='name' and text()='ORIGINAL']">
+        <xsl:if test="doc:field[@name='name' and text()='ORIGINAL']">
+            <datacite:sizes>
                 <xsl:for-each select="doc:element[@name='bitstreams']/doc:element[@name='bitstream']">
                     <xsl:apply-templates select="." mode="datacite"/>
                 </xsl:for-each>
-            </xsl:if>
-        </datacite:sizes>
+            </datacite:sizes>
+        </xsl:if>
     </xsl:template>
     
      <!-- datacite:size -->
@@ -1490,7 +1490,7 @@
             </xsl:when>
             <xsl:when test="$lc_dc_type = 'thesis'">
                 <xsl:text>literature</xsl:text>
-            </xsl:when>		
+            </xsl:when>
             <xsl:when test="$lc_dc_type = 'dataset'">
                 <xsl:text>dataset</xsl:text>
             </xsl:when>
@@ -1690,6 +1690,12 @@
             </xsl:when>
             <xsl:when test="$lc_dc_type = 'research article'">
                 <xsl:text>http://purl.org/coar/resource_type/c_2df8fbb1</xsl:text>
+            </xsl:when>
+            <xsl:when test="$lc_dc_type = 'conference presentation'">
+                <xsl:text>http://purl.org/coar/resource_type/R60J-J5BD</xsl:text>
+            </xsl:when>
+            <xsl:when test="$lc_dc_type = 'learning object'">
+                <xsl:text>http://purl.org/coar/resource_type/c_e059</xsl:text>
             </xsl:when>
             <!-- other -->
             <xsl:otherwise>

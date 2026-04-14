@@ -73,7 +73,7 @@ env:
   REDEPLOY_DEMO_URL: ${{ secrets.REDEPLOY_DEMO_URL }}
   # Current DSpace branches (and architecture) which are deployed to demo.dspace.org & sandbox.dspace.org respectively
   DEPLOY_DEMO_BRANCH: 'dspace-9_x'
-  DEPLOY_SANDBOX_BRANCH: 'main'
+  DEPLOY_SANDBOX_BRANCH: 'dspace-10.0-testathon'
   DEPLOY_ARCH: 'linux/amd64'
   # Registry used during building of Docker images. (All images are later copied to docker.io registry)
   # We use GitHub's Container Registry to avoid aggressive rate limits at DockerHub.
@@ -109,13 +109,13 @@ jobs:
 
       # https://github.com/actions/checkout
       - name: Checkout codebase
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # https://github.com/docker/login-action
       # NOTE: This login occurs for BOTH non-PRs or PRs. PRs *must* also login to access private images from GHCR
       # during the build process
       - name: Login to ${{ env.DOCKER_BUILD_REGISTRY }}
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_BUILD_REGISTRY }}
           username: ${{ github.repository_owner }}
@@ -126,7 +126,7 @@ jobs:
       # use the 'docker' driver so buildx can access images loaded into the local Docker daemon.
       # For all other builds, use the default 'docker-container' driver.
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
         with:
           driver: ${{ (matrix.isPr && (inputs.build_id == 'dspace-prod' || inputs.build_id == 'dspace-test' || inputs.build_id == 'dspace-cli')) && 'docker' || 'docker-container' }}
 
@@ -134,7 +134,7 @@ jobs:
       # Extract metadata used for Docker images in all build steps below
       - name: Extract metadata (tags, labels) from GitHub for Docker image
         id: meta_build
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.DOCKER_BUILD_REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAGS }}
@@ -152,7 +152,7 @@ jobs:
       # https://github.com/actions/download-artifact
       - name: Download dspace-dependencies image artifact
         if: ${{ matrix.isPr && (inputs.build_id == 'dspace-prod' || inputs.build_id == 'dspace-test' || inputs.build_id == 'dspace-cli') && matrix.arch == 'linux/amd64' }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: docker-image-dspace-dependencies-linux-amd64
           path: /tmp/docker
@@ -175,7 +175,7 @@ jobs:
       - name: Build and push image to ${{ env.DOCKER_BUILD_REGISTRY }}
         if: ${{ ! matrix.isPr }}
         id: docker_build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           build-contexts: |
             ${{ inputs.dockerfile_additional_contexts }}
@@ -206,7 +206,7 @@ jobs:
       # (The purpose of the combined manifest is to list both amd64 and arm64 builds under same tag)
       - name: Upload Docker build digest to artifact
         if: ${{ ! matrix.isPr }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: digests-${{ inputs.build_id }}-${{ env.ARCH_NAME }}
           path: /tmp/digests/*
@@ -231,7 +231,7 @@ jobs:
       # with direct tarball export. This includes: dspace-dependencies, dspace-solr, dspace-postgres-loadsql
       - name: Build and push image to local TAR file (docker-container driver)
         if: ${{ matrix.arch == 'linux/amd64' && (!matrix.isPr || (inputs.build_id != 'dspace-prod' && inputs.build_id != 'dspace-test' && inputs.build_id != 'dspace-cli')) }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           build-contexts: |
             ${{ inputs.dockerfile_additional_contexts }}
@@ -255,7 +255,7 @@ jobs:
       # The docker driver doesn't support tarball export, so we use 'load: true' and then 'docker save'.
       - name: Build image (docker driver for local dependencies access)
         if: ${{ matrix.arch == 'linux/amd64' && matrix.isPr && (inputs.build_id == 'dspace-prod' || inputs.build_id == 'dspace-test' || inputs.build_id == 'dspace-cli') }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           build-contexts: |
             ${{ inputs.dockerfile_additional_contexts }}
@@ -278,7 +278,7 @@ jobs:
       # This step is only done for AMD64, as that's the only image we use in our automated testing (at this time).
       - name: Upload local image TAR to artifact
         if: ${{ matrix.arch == 'linux/amd64'}}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: docker-image-${{ inputs.build_id }}-${{ env.ARCH_NAME }}
           path: /tmp/${{ inputs.build_id }}.tar
@@ -299,7 +299,7 @@ jobs:
       - docker-build
     steps:
       - name: Download Docker build digests
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: /tmp/digests
           # Download digests for both AMD64 and ARM64 into same directory
@@ -307,18 +307,18 @@ jobs:
           merge-multiple: true
 
       - name: Login to ${{ env.DOCKER_BUILD_REGISTRY }}
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_BUILD_REGISTRY }}
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Add Docker metadata for image
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.DOCKER_BUILD_REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAGS }}
@@ -362,7 +362,7 @@ jobs:
       # This recreates Docker tags for DockerHub
       - name: Add Docker metadata for image
         id: meta_dockerhub
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAGS }}
@@ -370,7 +370,7 @@ jobs:
 
       # Login to source registry first, as this is where we are copying *from*
       - name: Login to ${{ env.DOCKER_BUILD_REGISTRY }}
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_BUILD_REGISTRY }}
           username: ${{ github.repository_owner }}
@@ -378,7 +378,7 @@ jobs:
 
       # Login to DockerHub, since this is where we are copying *to*
       - name: Login to DockerHub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}

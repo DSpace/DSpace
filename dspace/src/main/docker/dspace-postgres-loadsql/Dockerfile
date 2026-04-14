@@ -21,9 +21,9 @@ ENV POSTGRES_DB=${POSTGRES_DB}
 ENV POSTGRES_USER=${POSTGRES_USER}
 ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
-# Install curl which is necessary to load SQL file
+# Install curl and ca-certificates which are necessary to load SQL file
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
+    && apt-get install -y --no-install-recommends curl ca-certificates \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/*
 

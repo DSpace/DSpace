@@ -596,6 +596,58 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return reindexItem || !inIndex;
     }
 
+    /**
+     * Retrieves from Solr the list of administrable communities and collections for the
+     * current user based on a clause containing the e-person and group IDs.
+     * Builds and returns the "location" query part for these DSO's.
+     *
+     * @param epersonAndGroupClause A Solr filter clause containing one or more IDs combined with OR,
+     *                 e.g. {@code "eUUIDe1 OR gUUIDg2 OR gUUIDg3 OR ..."}.
+     *
+     * @return An empty string if no administrable DSO exists, or a string in the form
+     *         {@code "location:(mUUID1 OR lUUID2 ... )"} when there are administrable DSO's.
+     */
+    @Override
+    public String createLocationQueryForAdministrableDSOs(String epersonAndGroupClause) {
+        StringBuilder locationQuery = new StringBuilder();
+        try {
+
+            SolrQuery solrQuery = new SolrQuery();
+
+            String query = "*:*";
+            solrQuery.setQuery(query);
+            solrQuery.addField(SearchUtils.RESOURCE_ID_FIELD);
+            solrQuery.addField(SearchUtils.RESOURCE_TYPE_FIELD);
+            solrQuery.addFilterQuery("(" + SearchUtils.RESOURCE_TYPE_FIELD + ":" + IndexableCommunity.TYPE + " OR "
+                + SearchUtils.RESOURCE_TYPE_FIELD + ":" + IndexableCollection.TYPE + ")");
+            solrQuery.addFilterQuery("admin:(" + epersonAndGroupClause + ")");
+            solrQuery.setRows(Integer.MAX_VALUE);
+
+            QueryResponse solrQueryResponse = solrSearchCore.getSolr().query(solrQuery,
+                solrSearchCore.REQUEST_METHOD);
+            if (solrQueryResponse != null) {
+                List<String> containerUUIDs = new ArrayList<>();
+                for (SolrDocument doc : solrQueryResponse.getResults()) {
+                    String type = (String) doc.getFieldValue(SearchUtils.RESOURCE_TYPE_FIELD);
+                    String uniqueID = (String) doc.getFieldValue(SearchUtils.RESOURCE_ID_FIELD);
+                    if (IndexableCommunity.TYPE.equals(type)) {
+                        containerUUIDs.add("m" + uniqueID);
+                    } else if (IndexableCollection.TYPE.equals(type)) {
+                        containerUUIDs.add("l" + uniqueID);
+                    }
+                }
+                if (!containerUUIDs.isEmpty()) {
+                    locationQuery.append("location:(");
+                    locationQuery.append(String.join(" OR ", containerUUIDs));
+                    return locationQuery.append(")").toString();
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to retrieve administrable communities and collections from Solr:", e);
+        }
+        return "";
+    }
+
     @Override
     public String createLocationQueryForAdministrableItems(Context context)
         throws SQLException {
@@ -1098,7 +1150,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         for (FacetField.Count facetValue : facetValues) {
                             String displayedValue = transformDisplayedValue(context, facetField.getName(),
                                                                             facetValue.getName());
+
                             String field = transformFacetField(facetFieldConfig, facetField.getName(), true);
+                            String currentLocalePrefix = context.getCurrentLocale().getLanguage() + "_";
+                            field = StringUtils.removeStart(field, currentLocalePrefix);
+
                             String authorityValue = transformAuthorityValue(context, facetField.getName(),
                                                                             facetValue.getName());
                             String sortValue = transformSortValue(context,
@@ -1556,6 +1612,27 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return ClientUtils.escapeQueryChars(query);
     }
 
+    /**
+     * Utility method to format an autocomplete query over a specific field. Combines the escaped query with a
+     * wildcard search over the specified {@code autocompleteField}. This field is typically non-tokenized and
+     * allows recovering searches containing spaces as a single value.
+     *
+     * @param query the user input to search for
+     * @param autocompleteField non-tokenized field used for wildcard autocomplete
+     * @return the constructed Solr query, or the original query if blank
+     */
+    @Override
+    public String formatAutoCompleteQuery(String query, String autocompleteField) {
+        if (StringUtils.isNotBlank(query)) {
+            StringBuilder buildQuery = new StringBuilder();
+            String escapedQuery = escapeQueryChars(query);
+            buildQuery.append("(").append(escapedQuery).append(" OR ").append(autocompleteField).append(":*")
+                .append(escapedQuery).append("*").append(")");
+            return buildQuery.toString();
+        }
+        return query;
+    }
+
     @Override
     public FacetYearRange getFacetYearRange(Context context, IndexableObject scope,
                                             DiscoverySearchFilterFacet facet, List<String> filterQueries,
@@ -1588,6 +1665,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             }
         }
         return null;
+    }
+
+    @Override
+    public SolrSearchCore getSolrSearchCore() {
+        return solrSearchCore;
     }
 
 }

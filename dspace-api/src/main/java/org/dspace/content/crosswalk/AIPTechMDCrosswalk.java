@@ -288,7 +288,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
             dc.add(makeDC("identifier", "uri", site.getURL()));
         }
 
-        return XSLTDisseminationCrosswalk.createDIM(dso, dc);
+        return XSLTDisseminationCrosswalk.createDIM(context, dso, dc);
     }
 
     private static MetadataValueDTO makeDC(String element, String qualifier, String value) {

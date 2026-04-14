@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -84,6 +85,13 @@ public class MetadataValue implements ReloadableEntity<Integer> {
      */
     @Column(name = "confidence")
     private int confidence = -1;
+
+    /**
+     * Security level value
+     */
+    @Nullable
+    @Column(name = "security_level")
+    private Integer securityLevel;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "dspace_object_id")
@@ -271,5 +279,30 @@ public class MetadataValue implements ReloadableEntity<Integer> {
         return hash;
     }
 
+    @Override
+    public String toString() {
+        return "MetadataValue [id=" + id + ", metadataField=" + metadataField + ", value=" + value + ", language="
+            + language + ", place=" + place + ", authority=" + authority + ", confidence=" + confidence
+            + ", securityLevel=" + securityLevel + "]";
+    }
 
+    public String getSchema() {
+        return getMetadataField().getMetadataSchema().getName();
+    }
+
+    public String getElement() {
+        return getMetadataField().getElement();
+    }
+
+    public String getQualifier() {
+        return getMetadataField().getQualifier();
+    }
+
+    public Integer getSecurityLevel() {
+        return securityLevel;
+    }
+
+    public void setSecurityLevel(Integer securityLevel) {
+        this.securityLevel = securityLevel;
+    }
 }

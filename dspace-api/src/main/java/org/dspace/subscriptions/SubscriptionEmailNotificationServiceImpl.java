@@ -154,7 +154,7 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
      * @param context            DSpace context
      * @param subscriptionType   Could be "content" or "statistics". NOTE: in DSpace we have only "content"
      * @param frequency          Could be "D" stand for Day, "W" stand for Week, and "M" stand for Month
-     * @return
+     * @return list of subscriptions matching the given type and frequency
      */
     private List<Subscription> findAllSubscriptionsBySubscriptionTypeAndFrequency(Context context,
              String subscriptionType, String frequency) {

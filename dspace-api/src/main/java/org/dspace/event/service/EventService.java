@@ -20,7 +20,7 @@ public interface EventService {
 
     // The name of the default dispatcher assigned to every new context unless
     // overridden
-    public static final String DEFAULT_DISPATCHER = "default";
+    String DEFAULT_DISPATCHER = "default";
 
     /**
      * Get dispatcher for configuration named by "name". Returns cached instance
@@ -29,9 +29,37 @@ public interface EventService {
      * @param name dispatcher name
      * @return cached instance of dispatcher
      */
-    public Dispatcher getDispatcher(String name);
+    Dispatcher getDispatcher(String name);
 
-    public void returnDispatcher(String key, Dispatcher disp);
+    /**
+     * Returns a Dispatcher instance to the service once it is no longer required.
+     * <p>
+     * This method releases the resources associated with the dispatcher,
+     * allowing the service to reclaim or recycle the instance for future
+     * event processing tasks.
+     * </p>
+     *
+     * @param key  the identifier of the dispatcher to be returned.
+     * @param disp the Dispatcher instance to return.
+     * @throws IllegalStateException if the dispatcher cannot be processed by the service.
+     */
+    void returnDispatcher(String key, Dispatcher disp);
 
-    public int getConsumerIndex(String consumerClass);
+    /**
+     * Retrieves the unique numerical index associated with a specific consumer.
+     * <p>
+     * This index is typically used by the event system to track the
+     * state of event processing across different consumers using bitsets.
+     * </p>
+     *
+     * @param consumerClass the configured name of the consumer.
+     * @return the unique index of the consumer, or -1 if the consumer
+     * is not recognized.
+     */
+    int getConsumerIndex(String consumerClass);
+
+    /**
+     * Reload the dispatcher configuration.
+     */
+    void reloadConfiguration();
 }

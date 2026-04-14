@@ -21,12 +21,13 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.exception.ResourceAlreadyExistsException;
@@ -56,6 +57,7 @@ import org.dspace.profile.service.ResearcherProfileService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.Assert;
 
 /**
@@ -97,6 +99,10 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
     @Autowired(required = false)
     private List<AfterResearcherProfileCreationAction> afterCreationActions;
+
+    @Autowired(required = false)
+    @Qualifier("sharedWorkspaceAuthorMetadataFields")
+    private List<String> sharedWorkspaceAuthorMetadataFields;
 
     @PostConstruct
     public void postConstruct() {
@@ -233,6 +239,33 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
     @Override
     public String getProfileType() {
         return configurationService.getProperty("researcher-profile.entity-type", "Person");
+    }
+
+    @Override
+    public boolean isAuthorOf(Context context, EPerson ePerson, Item item) {
+
+        try {
+
+            if (CollectionUtils.isEmpty(sharedWorkspaceAuthorMetadataFields) || Objects.isNull(ePerson)) {
+                return false;
+            }
+
+            ResearcherProfile researcherProfile = findById(context, ePerson.getID());
+
+            if (researcherProfile == null) {
+                return false;
+            }
+
+            String profileItemId = researcherProfile.getItem().getID().toString();
+
+            return sharedWorkspaceAuthorMetadataFields.stream()
+                .flatMap(field -> itemService.getMetadataByMetadataString(item, field).stream())
+                .anyMatch(metadataValue -> profileItemId.equals(metadataValue.getAuthority()));
+
+        } catch (SQLException | AuthorizeException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private Optional<Item> findItemByURI(final Context context, final URI uri) throws SQLException {

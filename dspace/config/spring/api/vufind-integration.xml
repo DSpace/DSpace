@@ -112,10 +112,16 @@
 
     <bean id="vufindIdentifierDoi" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="vufind.dc.identifier.doi"/>
-        <property name="query" value="/dcIdentifierDoi"/>
+        <property name="metadataProcessor" ref="vufindIdentifierDoiMetadataProcessor"/>
+    </bean>
+    <bean name="vufindIdentifierDoiMetadataProcessor"
+	  class="org.dspace.importer.external.metadatamapping.contributor.RegexReplacingJsonPathMetadataProcessor">
+      <property name="path" value="/dcIdentifierDoi"/>
+      <property name="regexPattern" value="^"/>
+      <property name="replacement" value="https://doi.org/"/>
     </bean>
     <bean id="vufind.dc.identifier.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.doi"/>
+        <constructor-arg value="dc.relation.hasversion"/>
     </bean>
 
     <bean id="vufindDateIssued" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
