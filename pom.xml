@@ -21,7 +21,7 @@
         <java.version>21</java.version>
         <spring.version>6.2.17</spring.version>
         <spring-ldap.version>3.3.6</spring-ldap.version>
-        <spring-boot.version>3.5.12</spring-boot.version>
+        <spring-boot.version>3.5.13</spring-boot.version>
         <spring-security.version>6.5.9</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>6.4.10.Final</hibernate.version>
         <hibernate-validator.version>8.0.3.Final</hibernate-validator.version>
@@ -42,7 +42,7 @@
         <jcache-version>1.1.1</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
         <jetty.version>9.4.58.v20250814</jetty.version>
-        <log4j.version>2.25.3</log4j.version>
+        <log4j.version>2.25.4</log4j.version>
         <pdfbox-version>3.0.6</pdfbox-version>
         <rome.version>1.19.0</rome.version>
         <!-- SLF4J is not used, but specified for dependency convergence issues between many dependencies -->
@@ -324,7 +324,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.8.2</version>
+                    <version>4.9.8.3</version>
                     <configuration>
                         <effort>Max</effort>
                         <threshold>Low</threshold>
@@ -1138,7 +1138,7 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api-lang</artifactId>
-                <version>[9.0.0,10.0.0)</version>
+                <version>[10.0.0,11.0.0)</version>
             </dependency>
 
             <!-- DSpace third Party Dependencies -->
@@ -1453,7 +1453,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.53.1</version>
+                <version>3.54.0</version>
             </dependency>
 
             <!-- Several dependencies disagree on version of GSON including Jena, Google-OAuth-Client
@@ -1489,7 +1489,7 @@
             <dependency>
                 <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
-                <version>1.10.15</version>
+                <version>1.10.16</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.jena</groupId>
