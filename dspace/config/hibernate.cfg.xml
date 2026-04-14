@@ -39,8 +39,6 @@
         <property name="jakarta.persistence.sharedCache.mode">ENABLE_SELECTIVE</property>
 
         <!-- Entities to be loaded by hibernate -->
-        <mapping class="org.dspace.app.util.WebApp"/>
-
         <mapping class="org.dspace.authorize.ResourcePolicy"/>
 
         <mapping class="org.dspace.checker.ChecksumHistory"/>
