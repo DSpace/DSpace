@@ -17,6 +17,7 @@ import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -504,7 +505,7 @@ public class XOAI {
         metadata.write(xmlContext);
         xmlContext.getWriter().flush();
         xmlContext.getWriter().close();
-        doc.addField("item.compile", out.toString());
+        doc.addField("item.compile", out.toString(StandardCharsets.UTF_8));
 
         if (verbose) {
             println(String.format("Item %s with handle %s indexed", item.getID().toString(), handle));
