@@ -29,6 +29,7 @@ import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
@@ -42,7 +43,9 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.I18nUtil;
 import org.dspace.deletion.process.DSpaceObjectDeletionProcess;
+import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +67,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     private Bitstream bitstream5;
     private Bitstream bitstream6;
     private Collection collection;
+    private EPerson communityAdmin;
 
     @Autowired
     private ItemService itemService;
@@ -72,8 +76,17 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     public void setUp() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();
+
+        communityAdmin = EPersonBuilder.createEPerson(context)
+                              .withNameInMetadata("first (admin)", "last (admin)")
+                              .withEmail("admin@email.com")
+                              .withCanLogin(true)
+                              .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                              .withPassword(password)
+                              .build();
         community = CommunityBuilder.createCommunity(context)
                                     .withName("My community")
+                                    .withAdminGroup(communityAdmin)
                                     .build();
         collection = CollectionBuilder.createCollection(context, community)
                                       .withName("Publication collection")
@@ -136,6 +149,22 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         }
 
         context.restoreAuthSystemState();
+    }
+
+    /**
+     * A user with delete permission (e.g. admin) on a parent object, but not the
+     * object itself, should be allowed to run the script to delete by inheriteance
+     */
+    @Test
+    public void testScriptConfigurationAuthorizeAllowsParentAdmin() throws Exception {
+        String tokenCommunityAdmin = getAuthToken(communityAdmin.getEmail(), password);
+        String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", collection.getID().toString() };
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
+        deletionProcess.initialize(args, handler, admin);
+        deletionProcess.run();
+        getClient(tokenCommunityAdmin).perform(get("/api/core/collections/" + collection.getID()))
+                             .andExpect(status().isNotFound());
     }
 
     @Test
