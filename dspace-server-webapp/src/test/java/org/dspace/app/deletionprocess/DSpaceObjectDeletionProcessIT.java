@@ -139,7 +139,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void asyncDetetionOfItemTest() throws Exception {
+    public void asyncDeletionOfItemTest() throws Exception {
         // verify that item with bitstreams exist
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
@@ -207,7 +207,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void asyncDetetionOfCollectionTest() throws Exception {
+    public void asyncDeletionOfCollectionTest() throws Exception {
 
         // verify that collection with items/bitstreams exists
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -299,7 +299,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void asyncDetetionOfCommunityTest() throws Exception {
+    public void asyncDeletionOfCommunityTest() throws Exception {
 
         // verify that community with collections/items/bitstreams exists
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -399,7 +399,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void asyncDetetionOfUnsupportedObjectTest() throws Exception {
+    public void asyncDeletionOfUnsupportedObjectTest() throws Exception {
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
@@ -423,7 +423,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void asyncDetetionOfItemByHandleTest() throws Exception {
+    public void asyncDeletionOfItemByHandleTest() throws Exception {
         // verify that item with bitstreams exist
         AtomicReference<String> idRef = new AtomicReference<>();
 
