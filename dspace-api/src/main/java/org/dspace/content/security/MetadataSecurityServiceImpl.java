@@ -155,10 +155,13 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
     public <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadataValues(Context context, T dso,
                                                                                             String schema,
                                                                    String element, String qualifier, String language) {
+        if (withdrawnFullyBlacked(context, dso)) {
+            return List.of();
+        }
         DSpaceObjectService<T> dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
         List<MetadataValue> values =
             dSpaceObjectService.getMetadata(dso, schema, element, qualifier, language);
-        return getPermissionFilteredMetadata(context, dso, values);
+        return filter(context, dso, values);
     }
 
     @Override
@@ -169,10 +172,24 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
     @Override
     public <T extends DSpaceObject> List<MetadataValue> getPermissionAndLangFilteredMetadataFields(Context context,
                                                                                                    T dso) {
+        if (withdrawnFullyBlacked(context, dso)) {
+            return List.of();
+        }
         String language = context != null ? context.getCurrentLocale().getLanguage() : Item.ANY;
         DSpaceObjectService<T> dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
         List<MetadataValue> values = dSpaceObjectService.getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, language);
-        return getPermissionFilteredMetadata(context, dso, values);
+        return filter(context, dso, values);
+    }
+
+    /**
+     * Withdrawn items must not disseminate any metadata to non-admins when
+     * rendered externally (REST API, OAI, RDF, CSV export, etc). This is a
+     * dissemination-level concern and intentionally NOT enforced by
+     * {@link #filter}: internal service calls such as {@code item.getName()}
+     * still need to resolve a title on withdrawn items.
+     */
+    private <T extends DSpaceObject> boolean withdrawnFullyBlacked(Context context, T dso) {
+        return (dso instanceof Item item) && item.isWithdrawn() && isNotAdmin(context, dso);
     }
 
     /**
@@ -199,12 +216,9 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
      * @param metadataValues the complete list of metadata values to filter
      * @return filtered list containing only metadata values the user can access
      */
-    private <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadata(Context context, T dso,
-                                                              List<MetadataValue> metadataValues) {
-
-        if ((dso instanceof Item item) && item.isWithdrawn() && isNotAdmin(context, dso)) {
-            return List.of();
-        }
+    @Override
+    public <T extends DSpaceObject> List<MetadataValue> filter(Context context, T dso,
+                                                               List<MetadataValue> metadataValues) {
 
         Optional<List<DCInputSet>> inputs = submissionDefinitionInputs();
         if (inputs.isPresent()) {

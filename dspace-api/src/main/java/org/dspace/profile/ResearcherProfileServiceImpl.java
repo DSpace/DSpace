@@ -208,7 +208,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
             throw new IllegalArgumentException("The provided item has not a profile type. Item ID: " + item.getID());
         }
 
-        if (haveDifferentEmail(item, ePerson)) {
+        if (haveDifferentEmail(context, item, ePerson)) {
             throw new IllegalArgumentException("The provided item is not claimable because it has a different email "
                 + "than the given user's email. Item ID: " + item.getID());
         }
@@ -384,11 +384,18 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         return entityType == null || !entityType.equals(getProfileType());
     }
 
-    private boolean haveDifferentEmail(Item item, EPerson currentUser) {
-        return itemService.getMetadataByMetadataString(item, "person.email").stream()
-            .map(MetadataValue::getValue)
-            .filter(StringUtils::isNotBlank)
-            .noneMatch(email -> email.equalsIgnoreCase(currentUser.getEmail()));
+    private boolean haveDifferentEmail(Context context, Item item, EPerson currentUser) {
+        // person.email is an admin-only field (metadata.hide.person.email = true)
+        // but the claim check must be able to read it to match against the authenticated user.
+        context.turnOffAuthorisationSystem();
+        try {
+            return itemService.getMetadataByMetadataString(item, "person.email").stream()
+                .map(MetadataValue::getValue)
+                .filter(StringUtils::isNotBlank)
+                .noneMatch(email -> email.equalsIgnoreCase(currentUser.getEmail()));
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 
     private void removeOwnerMetadata(Context context, Item profileItem) throws SQLException {

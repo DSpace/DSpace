@@ -90,4 +90,23 @@ public interface MetadataSecurityService {
      * @return                         the metadata values filtered by both permissions and language
      */
     <T extends DSpaceObject> List<MetadataValue> getPermissionAndLangFilteredMetadataFields(Context context, T dso);
+
+    /**
+     * Apply the same permission and security-level filters used by
+     * {@link #getPermissionFilteredMetadataValues} to an already-fetched list
+     * of metadata values. Pure: takes values in, returns the allowed subset
+     * without talking to the database. Idempotent.
+     *
+     * <p>This is the hook used by
+     * {@link org.dspace.content.service.DSpaceObjectService#getMetadata
+     * DSpaceObjectService.getMetadata} to filter in-place, and by callers that
+     * already have a list of raw metadata values and want to apply the same
+     * rules without re-fetching.</p>
+     *
+     * @param context the DSpace context (may be {@code null}; no admin override then)
+     * @param dso     the owning DSpace object
+     * @param values  the already-fetched metadata values
+     * @return the subset of values the current user is allowed to see
+     */
+    <T extends DSpaceObject> List<MetadataValue> filter(Context context, T dso, List<MetadataValue> values);
 }
