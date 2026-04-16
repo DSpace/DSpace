@@ -22,7 +22,6 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.factory.UtilServiceFactory;
-import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -36,7 +35,6 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
@@ -51,14 +49,8 @@ import org.dspace.xoai.data.DSpaceItem;
 public class ItemUtils {
     private static final Logger log = LogManager.getLogger(ItemUtils.class);
 
-    private static final MetadataExposureService metadataExposureService
-            = UtilServiceFactory.getInstance().getMetadataExposureService();
-
     private static final ItemService itemService
             = ContentServiceFactory.getInstance().getItemService();
-
-    private static final RelationshipService relationshipService
-            = ContentServiceFactory.getInstance().getRelationshipService();
 
     private static final BitstreamService bitstreamService
             = ContentServiceFactory.getInstance().getBitstreamService();
@@ -316,15 +308,12 @@ public class ItemUtils {
         // read all metadata into Metadata Object
         metadata = new Metadata();
 
-        List<MetadataValue> vals = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+
+        List<MetadataValue> vals = UtilServiceFactory.getInstance().getMetadataSecurityService()
+                                                     .getPermissionFilteredMetadataValues(context, item);
         for (MetadataValue val : vals) {
             MetadataField field = val.getMetadataField();
             try {
-                // Don't expose fields that are hidden by configuration
-                if (metadataExposureService.isHidden(context, field.getMetadataSchema().getName(), field.getElement(),
-                        field.getQualifier())) {
-                    continue;
-                }
 
                 Element schema = getElement(metadata.getElement(), field.getMetadataSchema().getName());
                 if (schema == null) {
