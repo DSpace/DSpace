@@ -472,7 +472,10 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
 
     /**
      * Loads the legacy {@code metadata.hide.*} configuration into the
-     * lookup maps on first use.
+     * lookup maps on first use. Emits a one-time deprecation warning when
+     * any legacy keys are present so installs migrate to the equivalent
+     * {@code metadatavalue.visibility.*.settings = [2]} expression in
+     * {@code metadata-security.cfg}.
      */
     private synchronized void initHiddenFieldMaps() {
         if (hiddenElementSets != null) {
@@ -480,6 +483,7 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
         }
         Map<String, Set<String>> sets = new HashMap<>();
         Map<String, Map<String, Set<String>>> maps = new HashMap<>();
+        boolean legacyKeysFound = false;
         for (String key : configurationService.getPropertyKeys()) {
             if (!key.startsWith(LEGACY_HIDE_PREFIX)) {
                 continue;
@@ -487,6 +491,7 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
             if (!configurationService.getBooleanProperty(key, true)) {
                 continue;
             }
+            legacyKeysFound = true;
             String mdField = key.substring(LEGACY_HIDE_PREFIX.length());
             String[] segment = mdField.split("\\.", 3);
             if (segment.length == 3) {
@@ -499,6 +504,11 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
                 log.warn("Bad format in hidden metadata directive, field=\"{}\", config property={}",
                          mdField, key);
             }
+        }
+        if (legacyKeysFound) {
+            log.warn("`{}*` configuration is deprecated; migrate these entries to "
+                     + "`metadatavalue.visibility.*.settings = [2]` in `metadata-security.cfg`.",
+                     LEGACY_HIDE_PREFIX);
         }
         this.hiddenElementSets = sets;
         this.hiddenElementMaps = maps;
