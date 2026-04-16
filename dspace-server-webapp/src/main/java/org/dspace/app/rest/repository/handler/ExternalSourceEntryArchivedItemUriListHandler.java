@@ -67,6 +67,7 @@ public class ExternalSourceEntryArchivedItemUriListHandler extends ExternalSourc
             return false;
         }
         try {
+            // TODO: This should be replaced by a solution, which doesn't bypass the submission workflow of the owning collection. See: https://github.com/DSpace/DSpace/issues/9114
             if (this.configurationService.getBooleanProperty("submitter.allow.external.entities", false)) {
                 String owningCollectionUuid = request.getParameter("owningCollection");
                 Collection collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
