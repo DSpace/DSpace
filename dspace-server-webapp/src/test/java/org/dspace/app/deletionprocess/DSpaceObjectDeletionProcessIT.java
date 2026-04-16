@@ -68,6 +68,8 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     private Bitstream bitstream6;
     private Collection collection;
     private EPerson communityAdmin;
+    private Community adminCommunity;
+    private Collection collInAdminCommunity;
 
     @Autowired
     private ItemService itemService;
@@ -77,16 +79,8 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         super.setUp();
         context.turnOffAuthorisationSystem();
 
-        communityAdmin = EPersonBuilder.createEPerson(context)
-                              .withNameInMetadata("first (admin)", "last (admin)")
-                              .withEmail("admin@email.com")
-                              .withCanLogin(true)
-                              .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
-                              .withPassword(password)
-                              .build();
         community = CommunityBuilder.createCommunity(context)
                                     .withName("My community")
-                                    .withAdminGroup(communityAdmin)
                                     .build();
         collection = CollectionBuilder.createCollection(context, community)
                                       .withName("Publication collection")
@@ -157,13 +151,32 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
      */
     @Test
     public void testScriptConfigurationAuthorizeAllowsParentAdmin() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        communityAdmin = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("first (community admin)", "last (community admin)")
+                .withEmail("communityadmin@email.com")
+                .withCanLogin(true)
+                .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                .withPassword(password)
+                .build();
+
+        adminCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Community with an administrator")
+                .withAdminGroup(communityAdmin).build();
+
+        collInAdminCommunity = CollectionBuilder.createCollection(context, adminCommunity)
+                .withName("Collection beneath community with an administrator")
+                .build();
+        context.restoreAuthSystemState();
+
         String tokenCommunityAdmin = getAuthToken(communityAdmin.getEmail(), password);
-        String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", collection.getID().toString() };
+        String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", collInAdminCommunity.getID().toString() };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
         deletionProcess.initialize(args, handler, admin);
         deletionProcess.run();
-        getClient(tokenCommunityAdmin).perform(get("/api/core/collections/" + collection.getID()))
+        getClient(tokenCommunityAdmin).perform(get("/api/core/collections/" + collInAdminCommunity.getID()))
                              .andExpect(status().isNotFound());
     }
 
