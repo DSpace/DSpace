@@ -27,8 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * This class will handle ExternalSourceEntryUriList and it'll create Item objects based on them.
- * This will create Archived items and thus only Admin users can use it
+ * This class will handle ExternalSourceEntryUriList, and it'll create Item objects based on them.
+ * This will create Archived items and thus only Admin users can use it, unless the "submitter.allow.external.entities"
+ * is set to true, allowing submitters with submit permission to the given owning collection to import external items.
  */
 @Component
 public class ExternalSourceEntryArchivedItemUriListHandler extends ExternalSourceEntryItemUriListHandler<Item> {
@@ -71,8 +72,8 @@ public class ExternalSourceEntryArchivedItemUriListHandler extends ExternalSourc
                 Collection collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
                 if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
                         Constants.ADD)) {
-                    throw new AuthorizeException("Only admins or submitters with at least one collection they have " +
-                            "submitter privileges to, are allowed to create items using external data");
+                    throw new AuthorizeException("Only admins or submitters with submit permission to the given " +
+                            "owning collection parameter, are allowed to create items using external data");
                 }
             } else {
                 if (!authorizeService.isAdmin(context)) {
