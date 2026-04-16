@@ -85,26 +85,28 @@ public class DSpaceObjectDeletionProcessScriptConfiguration<T extends DSpaceObje
      * and REST usage: hasPermission('DELETE') for the DSO, with inherit = true
      * @param context DSpace context of the current user
      * @param commandLineParameters command line parameters, required to parse and resolve the DSO identifier
-     * @return result of authorize delete check, default false
+     * @return result of authorize delete check, default is to call super method
      * @throws IllegalArgumentException if the identifier cannot be resolved
      * @throws SQLException if the DAO operation for the authZ check fails
      */
     @Override
     public boolean isAllowedToExecute(Context context, List<DSpaceCommandLineParameter> commandLineParameters) {
-        try {
-            for (DSpaceCommandLineParameter parameter : commandLineParameters) {
-                if ("-i".equals(parameter.getName())) {
-                    DSpaceObject dso = resolveDSpaceObject(context, parameter.getValue())
-                        .orElseThrow(() -> new IllegalArgumentException("Could not resolve %s to DSpace Object"
-                                    .formatted(parameter.getValue())));
-                    return authorizeService.authorizeActionBoolean(context, dso, Constants.DELETE, true);
+        if (null != commandLineParameters) {
+            try {
+                for (DSpaceCommandLineParameter parameter : commandLineParameters) {
+                    if ("-i".equals(parameter.getName())) {
+                        DSpaceObject dso = resolveDSpaceObject(context, parameter.getValue())
+                                .orElseThrow(() -> new IllegalArgumentException("Could not resolve %s to DSpace Object"
+                                        .formatted(parameter.getValue())));
+                        return authorizeService.authorizeActionBoolean(context, dso, Constants.DELETE, true);
+                    }
                 }
+            } catch (IllegalArgumentException | SQLException e) {
+                log.error(e.getMessage());
             }
-        } catch (IllegalArgumentException | SQLException e) {
-            log.error(e.getMessage());
         }
-        return false;
 
+        return super.isAllowedToExecute(context, commandLineParameters);
     }
 
     @Override
