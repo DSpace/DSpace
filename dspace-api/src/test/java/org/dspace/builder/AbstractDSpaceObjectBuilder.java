@@ -7,6 +7,8 @@
  */
 package org.dspace.builder;
 
+import static org.dspace.content.authority.Choices.CF_UNSET;
+
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Period;
@@ -62,6 +64,13 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         return addMetadataValue(dso, schema, element, qualifier, null, value, null, Choices.CF_UNSET);
     }
 
+    protected <B extends AbstractDSpaceObjectBuilder<T>> B addSecuredMetadataValue(final T dso, final String schema,
+                                                                                   final String element,
+                                                                                   final String qualifier,
+                                                                                   final String value,
+                                                                                   final Integer securityLevel) {
+        return addSecuredMetadataValue(dso, schema, element, qualifier, null, value, null, CF_UNSET, securityLevel);
+    }
 
     protected <B extends AbstractDSpaceObjectBuilder<T>> B addMetadataValue(final T dso, final String schema,
                                                                             final String element,
@@ -86,6 +95,22 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         return (B) this;
     }
 
+    protected <B extends AbstractDSpaceObjectBuilder<T>> B addSecuredMetadataValue(final T dso, final String schema,
+                                                                                   final String element,
+                                                                                   final String qualifier,
+                                                                                   final String language,
+                                                                                   final String value,
+                                                                                   final String authority,
+                                                                                   final int confidence,
+                                                                                   final Integer securityLevel) {
+        try {
+            getService().addSecuredMetadata(context, dso, schema, element, qualifier, language, value, authority,
+                confidence, securityLevel);
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return (B) this;
+    }
 
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setMetadataSingleValue(final T dso, final String schema,
                                                                                   final String element,
@@ -206,8 +231,8 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         try {
 
             ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,
-                                                                      eperson, startDate, Constants.REMOVE,
-                                                                      "Integration Test", dso);
+                eperson, startDate, Constants.REMOVE,
+                "Integration Test", dso);
             if (rp != null) {
                 log.info("Updating resource policy with REMOVE for eperson: " + eperson.getEmail());
                 resourcePolicyService.update(context, rp);
@@ -236,8 +261,8 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         try {
 
             ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,
-                                                                      eperson, startDate, Constants.ADD,
-                                                                      "Integration Test", dso);
+                eperson, startDate, Constants.ADD,
+                "Integration Test", dso);
             if (rp != null) {
                 log.info("Updating resource policy with ADD for eperson: " + eperson.getEmail());
                 resourcePolicyService.update(context, rp);
@@ -266,8 +291,8 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         try {
 
             ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,
-                                                                      eperson, startDate, Constants.WRITE,
-                                                                      "Integration Test", dso);
+                eperson, startDate, Constants.WRITE,
+                "Integration Test", dso);
             if (rp != null) {
                 log.info("Updating resource policy with WRITE for eperson: " + eperson.getEmail());
                 resourcePolicyService.update(context, rp);

@@ -51,13 +51,26 @@ public abstract class MetadataValueAddPatchOperation<DSO extends DSpaceObject>
         throws SQLException {
         String[] metadata = Utils.tokenize(target);
         if (index == -1) {
-            getDSpaceObjectService().addMetadata(context, source, metadata[0], metadata[1], metadata[2],
-                                                 object.getLanguage(), object.getValue(), object.getAuthority(),
-                                                 object.getConfidence());
+            if (object.getSecurityLevel() != null) {
+                getDSpaceObjectService().addSecuredMetadata(context, source, metadata[0], metadata[1], metadata[2],
+                        object.getLanguage(), object.getValue(), object.getAuthority(),
+                        object.getConfidence(), object.getSecurityLevel());
+            } else {
+                getDSpaceObjectService().addMetadata(context, source, metadata[0], metadata[1], metadata[2],
+                        object.getLanguage(), object.getValue(), object.getAuthority(),
+                        object.getConfidence());
+            }
+
         } else {
-            getDSpaceObjectService().addAndShiftRightMetadata(context, source, metadata[0], metadata[1], metadata[2],
-                                                              object.getLanguage(), object.getValue(),
-                                                              object.getAuthority(), object.getConfidence(), index);
+            if (object.getSecurityLevel() != null) {
+                getDSpaceObjectService().addAndShiftRightSecuredMetadata(context, source, metadata[0], metadata[1],
+                    metadata[2], object.getLanguage(), object.getValue(),
+                        object.getAuthority(), object.getConfidence(), index, object.getSecurityLevel());
+            } else {
+                getDSpaceObjectService().addAndShiftRightMetadata(context, source, metadata[0], metadata[1],
+                    metadata[2], object.getLanguage(), object.getValue(),
+                        object.getAuthority(), object.getConfidence(), index);
+            }
         }
     }
 
