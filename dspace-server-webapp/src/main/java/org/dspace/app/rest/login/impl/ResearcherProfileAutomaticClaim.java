@@ -11,7 +11,6 @@ import static org.apache.commons.collections4.IteratorUtils.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
@@ -86,14 +85,13 @@ public class ResearcherProfileAutomaticClaim implements PostLoggedInAction {
 
         try {
             claimProfile(context, currentUser);
-        } catch (SQLException | AuthorizeException | IOException e) {
+        } catch (SQLException | AuthorizeException e) {
             LOGGER.error("An error occurs during the profile claim by email", e);
         }
 
     }
 
-    private void claimProfile(Context context, EPerson currentUser)
-            throws SQLException, AuthorizeException, IOException {
+    private void claimProfile(Context context, EPerson currentUser) throws SQLException, AuthorizeException {
 
         UUID id = currentUser.getID();
         String fullName = currentUser.getFullName();
@@ -114,8 +112,7 @@ public class ResearcherProfileAutomaticClaim implements PostLoggedInAction {
         return researcherProfileService.findById(context, context.getCurrentUser().getID()) != null;
     }
 
-    private Item findClaimableProfile(Context context, EPerson currentUser)
-            throws SQLException, AuthorizeException, IOException {
+    private Item findClaimableProfile(Context context, EPerson currentUser) throws SQLException, AuthorizeException {
 
         String value = getValueToSearchFor(context, currentUser);
         if (StringUtils.isEmpty(value)) {
