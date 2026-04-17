@@ -328,7 +328,7 @@ public class EZIDIdentifierProvider
                                                     doiMetadataFieldName.element,
                                                     doiMetadataFieldName.qualifier,
                                                     idToDOI(identifier));
-        } catch (IdentifierException | SQLException | AuthorizeException | IOException ex) {
+        } catch (IdentifierException | SQLException | AuthorizeException ex) {
             log.error(ex::getMessage);
             throw new IdentifierNotResolvableException(ex);
         }
