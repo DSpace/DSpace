@@ -185,8 +185,11 @@ jobs:
           sleep 10
           docker container ls
       # Create a test admin account. Load test data from a simple set of AIPs as defined in cli.ingest.yml
+      # NOTE: Before creating test data, we wait for the backend to become responsive by requesting it every 10 sec.
+      # Timeout after 5 minutes. This is done to ensure the backend is fully initialized before we create test data.
       - name: Load test data into Backend
         run: |
+          timeout 5m wget --retry-connrefused -t 0 --waitretry=10 http://127.0.0.1:8080/server/api
           docker compose -f docker-compose-cli.yml run --rm dspace-cli create-administrator -e test@test.edu -f admin -l user -p admin -c en
           docker compose -f docker-compose-cli.yml -f dspace/src/main/docker-compose/cli.ingest.yml run --rm dspace-cli
       # Verify backend started successfully.
