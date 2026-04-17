@@ -242,7 +242,7 @@ public class EmbargoServiceImpl implements EmbargoService {
 
     @Override
     public Iterator<Item> findItemsByLiftMetadata(Context context)
-        throws SQLException, IOException, AuthorizeException {
+        throws SQLException, AuthorizeException {
         return itemService.findArchivedByMetadataField(context, lift_schema, lift_element, lift_qualifier, Item.ANY);
     }
 }

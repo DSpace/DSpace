@@ -84,10 +84,13 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
+import org.dspace.core.service.PluginService;
 import org.dspace.disseminate.CitationDocumentServiceImpl;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -138,6 +141,15 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
     @Autowired
     private RequestItemService requestItemService;
+
+    @Autowired
+    private PluginService pluginService;
+
+    @Autowired
+    private ChoiceAuthorityService choiceAuthorityService;
+
+    @Autowired
+    private MetadataAuthorityService metadataAuthorityService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -1637,5 +1649,105 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
         // Cleanup created request
         RequestItemBuilder.deleteRequestItem(foundRequest.getToken());
+    }
+
+    @Test
+    public void testEmbargoedBitstreamWithCrisSecurity() throws Exception {
+        choiceAuthorityService.getChoiceAuthoritiesNames();
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] {
+                                             "org.dspace.content.authority.ItemAuthority = AuthorAuthority"
+                                         });
+        configurationService.setProperty("cris.ItemAuthority.AuthorAuthority.entityType", "Person");
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community and one collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        // this should be a publication collection but right now no control are enforced
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+        // this should be a person collection
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Person").build();
+
+        //2. A public item with an embargoed bitstream
+        String bitstreamContent = "Embargoed!";
+        EPerson authorEp = EPersonBuilder.createEPerson(context)
+                                         .withEmail("author@example.com")
+                                         .withPassword(password)
+                                         .build();
+        Item profile = ItemBuilder.createItem(context, col2)
+                                  .withTitle("Author")
+                                  .withDspaceObjectOwner(authorEp)
+                                  .build();
+        // set our submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password)
+                                          .build();
+        context.setCurrentUser(submitter);
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            // we need a publication to check our cris enhanced security
+            Item publicItem1 =
+                ItemBuilder.createItem(context, col1)
+                           .withEntityType("Publication")
+                           .withTitle("Public item 1")
+                           .withIssueDate("2017-10-17")
+                           .withAuthor("Just an author without profile")
+                           .withAuthor("A profile not longer in the system",
+                                       UUID.randomUUID().toString())
+                           .withAuthor("An author with invalid authority",
+                                       "this is not an uuid")
+                           .withAuthor("Author",
+                                       profile.getID().toString())
+                           .build();
+
+            bitstream = BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Test Embargoed Bitstream")
+                .withDescription("This bitstream is embargoed")
+                .withMimeType("text/plain")
+                .withEmbargoPeriod(Period.ofMonths(6))
+                .build();
+        }
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //anonymous try to download the bitstream
+        getClient()
+            .perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+            // ** THEN **
+            .andExpect(status().isUnauthorized());
+
+        // another unrelated eperson should get forbidden
+        getClient(getAuthToken(eperson.getEmail(), password))
+            .perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+            // ** THEN **
+            .andExpect(status().isForbidden());
+
+        // the submitter should be able to download according to our custom cris policy
+        getClient(getAuthToken(submitter.getEmail(), password))
+            .perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+            // ** THEN **
+            .andExpect(status().isOk());
+
+        // the author should be able to download according to our custom cris policy
+        getClient(getAuthToken(authorEp.getEmail(), password))
+            .perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+            // ** THEN **
+            .andExpect(status().isOk());
+
+        // unauthorized request should not log statistics so we have only 2 successful visits
+        checkNumberOfStatsRecords(bitstream, 2);
     }
 }

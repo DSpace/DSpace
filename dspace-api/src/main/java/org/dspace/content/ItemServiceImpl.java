@@ -1430,7 +1430,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             if (!isInProgressSubmission(context, item)) {
                 return true;
             }
-            return false;
+            return researcherProfileService.isAuthorOf(context, context.getCurrentUser(), item);
         }
 
         return collectionService.canEditBoolean(context, item.getOwningCollection(), false);
@@ -1499,7 +1499,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public Iterator<Item> findArchivedByMetadataField(Context context, String metadataField, String value)
-            throws SQLException, AuthorizeException, IOException {
+            throws SQLException, AuthorizeException {
         String[] mdValueByField = getMDValueByField(metadataField);
         return findArchivedByMetadataField(context, mdValueByField[0], mdValueByField[1], mdValueByField[2], value);
     }
@@ -1566,7 +1566,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public Iterator<Item> findArchivedByMetadataField(Context context,
                                                       String schema, String element, String qualifier, String value)
-        throws SQLException, AuthorizeException, IOException {
+        throws SQLException, AuthorizeException {
         MetadataField mdf = metadataFieldService.findByElement(context, schema, element, qualifier);
         if (mdf == null) {
             throw new IllegalArgumentException(
@@ -1957,8 +1957,78 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         final Supplier<Integer> placeSupplier = () -> place;
 
-        return addMetadata(context, dso, metadataField, lang, Arrays.asList(value),
-                Arrays.asList(authority), Arrays.asList(confidence), placeSupplier)
+        return addMetadata(context, dso, metadataField, lang, Collections.singletonList(value),
+                           Collections.singletonList(authority), List.of(confidence), placeSupplier)
+                .stream().findFirst().orElse(null);
+    }
+
+    /**
+     * Adds a metadata value to an Item at a specific position with a security level.
+     *
+     * <p><strong>Implementation Override:</strong></p>
+     * <p>This is the concrete implementation of the default empty method defined in
+     * {@link org.dspace.content.service.DSpaceObjectService#addMetadataInPlaceSecured}.</p>
+     *
+     * <p><strong>What This Method Does:</strong></p>
+     * <ol>
+     *   <li><strong>Validates Metadata Field:</strong> Ensures the metadata field exists in the
+     *       metadata registry. Throws an exception if the field is not registered.</li>
+     *   <li><strong>Inserts at Specified Position:</strong> Places the metadata value at the
+     *       exact position specified by the {@code place} parameter rather than appending to the end.</li>
+     *   <li><strong>Applies Security Level:</strong> Sets the {@code security_level} to control who can
+     *   view this metadata value based on the three-tier security system.</li>
+     *   <li><strong>Delegates to Core Add Method:</strong> Uses the internal
+     *       {@code addMetadata(context, dso, metadataField, lang, values, authorities, confidences,
+     *       placeSupplier, securityValue)} method which handles database persistence, place calculations,
+     *       and metadata event tracking.</li>
+     * </ol>
+     *
+     * <p><strong>Security Level System:</strong></p>
+     * <ul>
+     *   <li><strong>{@code null}</strong> - No additional security restriction; follows standard field-level
+     *       visibility rules (most common, default behavior)</li>
+     *   <li><strong>0</strong> - Public access (everyone can view, evaluated by {@code MetadataPublicAccess})</li>
+     *   <li><strong>1</strong> - Group-based access (only "Trusted" group members, evaluated by
+     *       {@code MetadataGroupBasedAccess})</li>
+     *   <li><strong>2</strong> - Administrator and owner access only (evaluated by
+     *       {@code MetadataAdministratorAndOwnerAccess})</li>
+     * </ul>
+     *
+     * @param context       DSpace context for database operations and authorization
+     * @param dso           the Item to add metadata to
+     * @param schema        metadata field schema (e.g., "dc", "dcterms")
+     * @param element       metadata field element (e.g., "title", "contributor")
+     * @param qualifier     metadata field qualifier (e.g., "author", "alternative"), or {@code null} for unqualified
+     * @param lang          ISO639 language code (e.g., "en", "en_US"), or {@code null} for no language
+     * @param value         the metadata value to add
+     * @param authority     external authority key for this value (e.g., ORCID, UUID), or {@code null}
+     * @param confidence    authority confidence level (use {@link org.dspace.content.authority.Choices} constants)
+     * @param place         the exact position where this value should be inserted (0-based index)
+     * @param securityValue the security level: {@code null} (default), {@code 0} (public), {@code 1} (group),
+     *                      or {@code 2} (admin/owner)
+     * @return the newly created MetadataValue object, or {@code null} if creation failed
+     * @throws SQLException if the metadata field does not exist in the registry or database operations fail
+     * @see #addMetadata(Context, Item, MetadataField, String, List, List, List, Supplier, Integer)
+     * @see org.dspace.content.security.MetadataSecurityServiceImpl
+     * @see org.dspace.content.service.MetadataSecurityEvaluation
+     */
+    @Override
+    public MetadataValue addMetadataInPlaceSecured(Context context, Item dso, String schema, String element,
+                                                   String qualifier, String lang, String value,
+                                                   String authority, int confidence, int place,
+                                                   Integer securityValue)
+        throws SQLException {
+
+        // We will not verify that they are valid entries in the registry
+        // until update() is called.
+        MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
+        if (metadataField == null) {
+            throw new SQLException("bad_dublin_core schema=" + schema + "." + element + "." + qualifier +
+                    ". Metadata field does not exist!");
+        }
+        final Supplier<Integer> placeSupplier = () -> place;
+        return addMetadata(context, dso, metadataField, lang, Collections.singletonList(value),
+                           Collections.singletonList(authority), List.of(confidence), placeSupplier, securityValue)
                 .stream().findFirst().orElse(null);
     }
 

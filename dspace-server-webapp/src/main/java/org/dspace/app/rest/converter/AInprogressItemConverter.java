@@ -9,7 +9,6 @@ package org.dspace.app.rest.converter;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.AInprogressSubmissionRest;
@@ -27,7 +26,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.submit.factory.SubmissionServiceFactory;
@@ -71,16 +69,29 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
     @Autowired
     private ValidationService validationService;
 
-
+    /**
+     * Default constructor for AInprogressItemConverter.
+     * Initializes the submission configuration service from the SubmissionServiceFactory.
+     *
+     * @throws SubmissionConfigReaderException if there is an error reading the submission configuration
+     */
     public AInprogressItemConverter() throws SubmissionConfigReaderException {
         submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
     }
 
+    /**
+     * Fills the REST representation object with data from the DSpace model object.
+     * This method populates the REST representation with submission sections, validation errors,
+     * and submission definition information based on the collection's configuration.
+     * It dynamically loads and executes data processing steps for each submission section.
+     *
+     * @param obj        the DSpace API in-progress submission object to convert from
+     * @param witem      the DSpace REST in-progress submission representation to populate
+     * @param projection the projection object defining which fields to include in the representation
+     */
     protected void fillFromModel(T obj, R witem, Projection projection) {
         Collection collection = obj.getCollection();
         Item item = obj.getItem();
-        EPerson submitter = null;
-        submitter = obj.getSubmitter();
 
         witem.setId(obj.getID());
 
@@ -94,6 +105,7 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
             SubmissionDefinitionRest def = converter.toRest(
                     submissionConfigService.getSubmissionConfigByCollection(collection), projection);
             witem.setSubmissionDefinition(def);
+            storeSubmissionName(def.getName());
             for (SubmissionSectionRest sections : def.getPanels()) {
                 SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);
 
@@ -133,16 +145,43 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         }
     }
 
+    /**
+     * Validates the in-progress submission and adds any validation errors to the REST representation.
+     * This method retrieves the current context, runs validation on the submission object,
+     * and converts validation errors to REST error objects which are then added to the item.
+     *
+     * @param obj   the DSpace API in-progress submission object to validate
+     * @param witem the DSpace REST in-progress submission representation to add errors to
+     */
     @SuppressWarnings("unchecked")
     private void addValidationErrorsToItem(T obj, R witem) {
         Request currentRequest = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext((HttpServletRequest) currentRequest.getServletRequest());
+        Context context = ContextUtil.obtainContext(currentRequest.getHttpServletRequest());
 
         validationService.validate(context, obj).stream()
                          .map(ErrorRest::fromValidationError)
                          .forEach(error -> addError(witem.getErrors(), error));
     }
 
+    /**
+     * Stores the submission definition name in the current request attributes.
+     * This allows the submission name to be accessed later in the request processing lifecycle.
+     *
+     * @param name the name of the submission definition to store
+     */
+    void storeSubmissionName(final String name) {
+        requestService.getCurrentRequest().setAttribute("submission-name", name);
+    }
+
+    /**
+     * Adds an error to the list of errors, merging errors with the same i18n message key.
+     * If an error with the same message already exists in the list, the paths from the new error
+     * are added to the existing error. Otherwise, the new error is added to the list.
+     * This prevents duplicate error messages while preserving all affected paths.
+     *
+     * @param errors the list of existing errors to add to
+     * @param toAdd  the new error to add or merge with an existing error
+     */
     protected void addError(List<ErrorRest> errors, ErrorRest toAdd) {
 
         boolean found = false;

@@ -722,10 +722,9 @@ public interface ItemService
      * @return an iterator over the items matching that authority value
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
-     * @throws IOException        if IO error
      */
     Iterator<Item> findArchivedByMetadataField(Context context, String metadataField, String value)
-            throws SQLException, AuthorizeException, IOException;
+            throws SQLException, AuthorizeException;
 
     /**
      * Find items based on a specific metadata field and value, bypassing standard
@@ -781,11 +780,10 @@ public interface ItemService
      * @return an iterator over the items matching that authority value
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
-     * @throws IOException        if IO error
      */
     Iterator<Item> findArchivedByMetadataField(Context context,
                                                String schema, String element, String qualifier, String value)
-        throws SQLException, AuthorizeException, IOException;
+        throws SQLException, AuthorizeException;
 
     /**
      * Returns a list of items that match the given predicates, within the
