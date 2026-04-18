@@ -44,7 +44,7 @@
         <pdfbox-version>3.0.6</pdfbox-version>
         <rome.version>1.19.0</rome.version>
         <slf4j.version>2.0.17</slf4j.version>
-        <tika.version>3.2.3</tika.version>
+        <tika.version>3.3.0</tika.version>
         <!-- Sync BouncyCastle & ASM with whatever version Tika uses -->
         <!-- WARNING: BouncyCastle is also required by the maven-gpg-plugin to sign code during release. Do not update
              unless the new BouncyCastle version is compatible both with tika-parsers and maven-gpg-plugin. -->
