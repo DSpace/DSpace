@@ -8,8 +8,6 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
@@ -36,13 +34,13 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.Period;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
@@ -668,8 +666,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // Replace anon read policy on bundle of bitstream with ePerson READ policy
         resourcePolicyService.removePolicies(context, bitstream.getBundles().get(0), Constants.READ);
         ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
-            .withAction(Constants.READ)
-            .withDspaceObject(bitstream.getBundles().get(0)).build();
+                             .withAction(Constants.READ)
+                             .withDspaceObject(bitstream.getBundles().get(0)).build();
 
         context.restoreAuthSystemState();
 
@@ -856,8 +854,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // Replace anon read policy on item of bitstream with ePerson READ policy
         resourcePolicyService.removePolicies(context, publicItem1, Constants.READ);
         ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
-            .withAction(Constants.READ)
-            .withDspaceObject(publicItem1).build();
+                             .withAction(Constants.READ)
+                             .withDspaceObject(publicItem1).build();
 
         context.restoreAuthSystemState();
 
@@ -1266,7 +1264,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String token = getAuthToken(asUser.getEmail(), password);
 
         new MetadataPatchSuite(mapper).runWith(getClient(token), "/api/core/bitstreams/"
-            + parentCommunity.getLogo().getID(), expectedStatus);
+                + parentCommunity.getLogo().getID(), expectedStatus);
     }
 
     @Test
@@ -1329,7 +1327,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String requestBody = getPatchContent(ops);
         getClient(token)
             .perform(patch("/api/core/bitstreams/" + bitstream.getID())
-                .content(requestBody)
+            .content(requestBody)
             .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(
@@ -1504,9 +1502,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         }
 
         ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
-            .withAction(WRITE)
-            .withDspaceObject(col1)
-            .build();
+                             .withAction(WRITE)
+                             .withDspaceObject(col1)
+                             .build();
 
         context.restoreAuthSystemState();
 
@@ -1964,11 +1962,11 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         Item embargoItem1 = ItemBuilder.createItem(context, col1)
-            .withTitle("Test")
-            .withIssueDate("2010-10-17")
-            .withAuthor("Smith, Donald")
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
                                       .withEmbargoPeriod(Period.ofMonths(6))
-            .build();
+                                      .build();
 
         String bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream1 = null;
@@ -2180,7 +2178,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .build();
 
         Bundle license = BundleBuilder.createBundle(context, publicItem1)
-                                      .withName(Constants.LICENSE_BUNDLE_NAME)
+            .withName(Constants.LICENSE_BUNDLE_NAME)
             .build();
 
         String bitstreamContent = "This is an archived bitstream";
@@ -2234,7 +2232,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .build();
 
         Bundle license = BundleBuilder.createBundle(context, publicItem1)
-                                      .withName(Constants.LICENSE_BUNDLE_NAME)
+            .withName(Constants.LICENSE_BUNDLE_NAME)
             .build();
 
         String bitstreamContent = "This is an archived bitstream";
@@ -2280,7 +2278,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .build();
 
         Bundle license = BundleBuilder.createBundle(context, publicItem1)
-                                      .withName(Constants.LICENSE_BUNDLE_NAME)
+            .withName(Constants.LICENSE_BUNDLE_NAME)
             .build();
 
         String bitstreamContent = "This is an archived bitstream";
@@ -2345,7 +2343,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .build();
 
         Bundle license = BundleBuilder.createBundle(context, publicItem1)
-                                      .withName(Constants.LICENSE_BUNDLE_NAME)
+            .withName(Constants.LICENSE_BUNDLE_NAME)
             .build();
 
         String bitstreamContent = "This is an archived bitstream";
@@ -2385,7 +2383,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .build();
 
         Bundle license = BundleBuilder.createBundle(context, publicItem1)
-                                      .withName(Constants.LICENSE_BUNDLE_NAME)
+            .withName(Constants.LICENSE_BUNDLE_NAME)
             .build();
 
         String bitstreamContent = "This is an archived bitstream";
@@ -2785,9 +2783,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .withPassword(password)
             .build();
         EPerson col2Admin = EPersonBuilder.createEPerson(context)
-            .withEmail("col2admin@test.com")
-            .withPassword(password)
-            .build();
+                                          .withEmail("col2admin@test.com")
+                                          .withPassword(password)
+                                          .build();
         Group col1_AdminGroup = GroupBuilder.createCollectionAdminGroup(context, col1)
                 .addMember(col1Admin)
                 .build();
@@ -2891,9 +2889,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .withName("Collection 2")
             .build();
         EPerson parentCommunityAdmin = EPersonBuilder.createEPerson(context)
-            .withEmail("parentComAdmin@test.com")
-            .withPassword(password)
-            .build();
+                                          .withEmail("parentComAdmin@test.com")
+                                          .withPassword(password)
+                                          .build();
         Group parentComAdminGroup = GroupBuilder.createCommunityAdminGroup(context, parentCommunity)
                 .addMember(parentCommunityAdmin)
                 .build();
@@ -3070,14 +3068,15 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .withName("Bitstream2")
                 .withDescription("description2")
                 .withMimeType("text/plain")
-                .withEmbargoPeriod("2 week")
+                .withEmbargoPeriod(Period.ofWeeks(2))
                 .build();
         }
 
         List<ResourcePolicy> bitstream2ResourcePolicys = resourcePolicyService.find(context, bitstream2);
         ResourcePolicy bitstream2RP = bitstream2ResourcePolicys.get(0);
         bitstream2RP.setRpName("embargo");
-        bitstream2RP.setStartDate(new DCDate(bitstream2RP.getStartDate()).toDate());
+        bitstream2RP.setStartDate(new DCDate(bitstream2RP.getStartDate().atStartOfDay(ZoneOffset.UTC)).toDate()
+                .toLocalDate());
         resourcePolicyService.update(context, bitstream2RP);
 
         // Add another bitstream to an item
@@ -3158,7 +3157,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         //  rpDateToFormat is the startdate from our local bitstream RP
         //  restDateToFormat is the startdate we're getting returned in our rest body
         Date rpDateToFormat = Date.from(new DCDate(bitstream2RP
-                .getStartDate()).toDate().toInstant());
+                .getStartDate().atStartOfDay(ZoneOffset.UTC)).toDate().toInstant());
         Date restDateToFormat = Date.from(new DCDate(dateRef.get()).toDate().toInstant());
 
         // Format the dates to compare them accordingly
