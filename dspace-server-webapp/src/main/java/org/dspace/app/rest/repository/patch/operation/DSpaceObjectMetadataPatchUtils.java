@@ -77,6 +77,7 @@ public final class DSpaceObjectMetadataPatchUtils {
                             metadataValue = new MetadataValueRest();
                             metadataValue.setValue(valueString);
                         }
+                        metadataValues.add(metadataValue);
                     }
                 }
             }
