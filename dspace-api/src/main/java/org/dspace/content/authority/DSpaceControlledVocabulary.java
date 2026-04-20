@@ -87,6 +87,19 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         super();
     }
 
+    /**
+     * Controlled vocabulary XML files are always considered public.
+     * They contain static, non-sensitive classification data (e.g., subject
+     * taxonomies like SRSC or NSI) that must be browsable by anonymous users
+     * in submission vocabulary lookups.
+     *
+     * @return always {@code true}
+     */
+    @Override
+    public boolean isPublic() {
+        return true;
+    }
+
     @Override
     public boolean storeAuthorityInMetadata() {
         init(null);
